@@ -1,0 +1,50 @@
+{
+    "private": true,
+    "scripts": {
+        "dev": "npm run development",
+        "development": "mix",
+        "watch": "mix watch",
+        "watch-poll": "mix watch -- --watch-options-poll=1000",
+        "hot": "mix watch --hot",
+        "prod": "npm run production",
+        "production": "mix --production"
+    },
+    "devDependencies": {
+        "axios": "^0.25.0",
+        "browser-sync": "^2.27.9",
+        "browser-sync-webpack-plugin": "^2.3.0",
+        "laravel-mix": "^6.0.49",
+        "lodash": "^4.17.19",
+        "postcss": "^8.1.14",
+        "resolve-url-loader": "^5.0.0",
+        "sass": "^1.51.0",
+        "sass-loader": "^12.6.0",
+        "style-loader": "^3.3.1"
+    },
+    "dependencies": {
+        "@fortawesome/fontawesome-free": "^6.1.1",
+        "compressorjs": "^1.1.1",
+        "fs": "^0.0.1-security",
+        "imagemin-mozjpeg": "^10.0.0",
+        "imagemin-webpack-plugin": "^2.4.2",
+        "jquery": "^3.6.0",
+        "js-datepicker": "^5.18.0",
+        "locutus": "^2.0.16",
+        "path": "^0.12.7",
+        "style-module": "^1.0.0",
+        "tapjs": "^1.0.9"
+    },
+    "browserslist": {
+        "production": [
+            ">0.2%",
+            "not dead",
+            "not op_mini all"
+        ],
+        "development": [
+            "last 1 chrome version",
+            "last 1 firefox version",
+            "last 1 safari version",
+            "last 1 ie version"
+        ]
+    }
+}

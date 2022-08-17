@@ -1,0 +1,112 @@
+// функции
+// #{inspect($font-family-sans-serif)  inspect - чтобы сохранять ковычки в строке
+
+
+
+$body-bg: #fff;
+$body-color: #0000;
+$minContentWidth: 320px;
+
+$font-size-root: 10px; // размер шрифта для REM
+$fa-font-path: "../fonts/fontawesome";
+$font-size-base: 16px; // размер шрифта базовый
+//$font-weight-base: normal;
+
+$enable-smooth-scroll: true; // мягкий скролл
+
+
+// Переменные брейкпоинтов
+$grid-breakpoints: (
+	xs: 0,
+	sm: 576px,
+	md: 768px,
+	lg: 992px,
+	xl: 1400px,
+	xxl: 1600px
+);
+
+$container-max-widths: (
+	sm: 540px,
+	md: 720px,
+	lg: 960px,
+	xl: 1340px,
+	xxl: 1520px
+);
+
+
+
+
+$grid-columns:			12; // количество столбцев
+$grid-row-columns:		30; // можно задавать не просто класс .row а .row-cols-5 - что будет означать на одном ряду 5 одинаковых колонок (но можно сделать разную ширину, задав для определенного блока конкретную ширину)
+$grid-gutter-width:		1rem; // расстояние между колонками по-умолчанию
+
+
+
+
+//------------------------------------------------------------------------------------------------------------
+
+
+
+
+// Скролл
+$sbBg: #c9d0d7; // фон полосы прокрутки
+$sbSliderBg: #6c7e91; // слайдер полосы прокрутки
+$sbWidth: 10px; // ширина полосы прокрутки
+$sbBorderRadius: 0px; // округление полосы прокрутки
+$sbSliderBorderRadius: 4px; // округление слайдера полосы прокрутки
+
+
+
+
+
+// Цвета
+$colorDarkViolett: #1e1528;
+$colorLightViolett: #56545c;
+$colorBlue: #54e9ff;
+$colorBlack: #454545;
+$colorMain: #454545;
+
+
+
+
+$headerHeight: (
+	xs: 50px,
+	sm: 50px,
+	md: 60px,
+	lg: 60px,
+	xl: 70px,
+	xxl: 70px
+);
+
+
+
+
+$footerHeight: (
+	xs: 50px,
+	sm: 50px,
+	md: 60px,
+	lg: 60px,
+	xl: 70px,
+	xxl: 70px
+);
+
+
+
+
+
+
+
+
+
+//---------------------------------------------------
+
+
+// переменные.  использовать: var(--#{$variable-prefix}название переменной)
+$rootVars: (
+	bgColor: rgb(247, 184, 148),
+	fontColor: $body-color,
+	notifyXOffset: 30px,
+	notifyYOffset: 80px,
+	sbWidth: $sbWidth
+	//название: значение
+);

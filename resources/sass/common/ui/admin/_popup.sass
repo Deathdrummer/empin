@@ -1,0 +1,171 @@
+@import "@sass/common/vars"
+
+
+
+@keyframes ddrPopUpIn
+	from
+		background-color: transparent
+		backdrop-filter: blur(0px)
+	
+	to
+		background-color: #10303075
+		backdrop-filter: blur(3px)
+		
+
+@keyframes ddrPopUpOut
+	from
+		background-color: #10303075
+		backdrop-filter: blur(3px)
+	
+	to
+		background-color: transparent
+		backdrop-filter: blur(0px)
+
+	
+@keyframes ddrPopUpDialogIn
+	from
+		opacity: 0
+		pointer-events: none
+		
+	to
+		opacity: 1
+		pointer-events: auto
+
+	
+
+
+
+
+
+
+
+
+.ddrpopup
+	+scrollbar($sbBg, $sbSliderBg, $sbWidth, $sbBorderRadius, $sbSliderBorderRadius)
+
+	&__container
+		padding-top: 15px
+		padding-bottom: 15px
+
+	&__win
+		background-color: #fdfdfd
+		border-radius: 3px
+		min-height: 150px
+		transform: scale(0.9)
+		
+		&_opening
+			transform: scale(1)
+		
+		&_closing
+			transform: scale(1.4) 
+	
+	
+	&__close
+		top: 0px
+		right: 0px
+		height: 40px
+		width: 40px
+		display: flex
+		align-items: center
+		justify-content: center
+		+fontAwesome('\f00d')
+		font-size: 28px
+		color: #93bbcb
+		transition: color 0.16s
+		
+		&:hover
+			color: #5ba2bf
+		
+		&:active
+			color: #4b8197
+		
+		
+	&__wait
+		background-color: #fdfdfdf5
+		backdrop-filter: blur(2px)
+	
+		.ddrpopupwait
+			&__icon
+				width: 50px 
+				filter: hue-rotate(152deg) 
+				margin-bottom: 6px 
+			
+			&__label
+				font-size: 14px 
+		
+		
+	&__dialog
+		background-color: #0073741a
+		backdrop-filter: blur(2px)
+		
+		
+		.popupdialog
+			padding: 15px
+			background-color: #fff 
+			box-shadow: 0px 11px 8px -10px #375a5a26 
+			border: 1px solid #eee 
+			border-radius: 3px 
+		
+		&__message
+			
+		&__buttons
+			margin-top: 15px 
+		
+	
+	
+	
+	&__header
+		padding-left: 40px 
+		padding-right: 40px 
+		height: 40px
+	
+	&__title
+		text-align: center 
+		
+		&_overflow
+		
+		&_h1
+			font-size: 18px
+			color: #487c91
+			
+		&_h2
+			font-size: 20px
+			
+		&_h3
+			font-size: 20px
+			
+		&_h4
+			font-size: 20px
+			
+		&_h5
+			font-size: 20px
+	
+	
+	&__data
+		padding: 15px
+			
+	
+	&__footer
+		padding: 15px
+		padding-top: 0
+		
+	
+	&__buttons
+
+
+
+
+
+
+	// классы для окна
+	&_dialog
+		+fontWeight(600)
+	
+	
+	
+	&_white
+		background-color: #fff !important
+		
+	
+		
+

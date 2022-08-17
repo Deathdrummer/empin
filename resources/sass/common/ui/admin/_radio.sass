@@ -1,0 +1,367 @@
+
+.auth
+	
+	
+	
+
+	
+.large
+	&-radio
+		position: relative
+		display: inline-flex
+		align-items: center
+		
+		
+		input[type="radio"]
+			display: none
+			
+			+ label
+				flex: 0 0 auto
+				border: 2px solid #a4a4c1
+				border-radius: 50%
+				display: flex
+				align-items: center
+				justify-content: center
+				width: 20px
+				height: 20px
+				cursor: pointer
+				z-index: 10
+				
+				~ label
+					+resp(font-size, $inputFontSize, (line-height: 0))
+					cursor: pointer
+					padding-left: 5px
+				
+				
+					
+		
+		&_changed
+			input[type="radio"] + label
+				
+		
+		&_checked
+			input[type="radio"] + label
+				background-color: #a4a4c1
+				
+				&:after
+					content: ""
+					position: absolute
+					border-radius: 50%
+					width: 8px
+					height: 8px
+					display: block
+					background-color: #fff
+		
+		
+		&_disabled
+			pointer-events: none
+			
+			input[type="checkbox"]
+				+ label
+					border-color: #d5d5d5
+				
+				&:checked
+					+ label
+						background-color: #d5d5d5
+								
+				+ label ~ label
+					color: #cdcdcd
+		
+		
+		
+		
+		&_error
+			&.large-radio_checked
+				label
+					&:first-of-type
+						border-color: #ff1818 !important
+						background-color: #ff9494 !important
+					
+			&:not(.large-radio_checked)
+				label
+					&:first-of-type
+						border-color: #ff1818 !important
+			
+			label		
+				&:last-of-type
+					color: #ff1818 !important
+		
+			
+		&__errorlabel
+			position: absolute
+			left: 0
+			bottom: 0
+			height: 0
+			width: 100%
+			z-index: 10
+			
+			&:empty
+				display: none
+			
+			
+			> div
+				position: absolute
+				top: 0
+				left: 0
+				width: 100%
+				height: 100%
+				font-size: 12px
+				line-height: 12px
+				color: #f00
+				transform: translateY($errorLabelShift)
+				
+				strong
+					font-weight: 400
+	
+	
+	
+
+
+
+.normal
+	&-radio
+		position: relative
+		display: inline-flex
+		align-items: center
+		
+		
+		input[type="radio"]
+			display: none
+			
+			+ label
+				flex: 0 0 auto
+				border: 2px solid #a4a4c1
+				border-radius: 50%
+				display: flex
+				align-items: center
+				justify-content: center
+				width: 16px
+				height: 16px
+				cursor: pointer
+				z-index: 10
+				
+				~ label
+					+addict(font-size, $inputFontSize, '/ 1.2')
+					cursor: pointer
+					padding-left: 4px
+				
+				
+					
+		
+		&_changed
+			input[type="radio"] + label
+				
+		
+		&_checked
+			input[type="radio"] + label
+				background-color: #a4a4c1
+				
+				&:after
+					content: ""
+					position: absolute
+					border-radius: 50%
+					width: 6px
+					height: 6px
+					display: block
+					background-color: #fff
+		
+		
+		&_disabled
+			pointer-events: none
+			
+			input[type="checkbox"]
+				+ label
+					border-color: #d5d5d5
+				
+				&:checked
+					+ label
+						background-color: #d5d5d5
+								
+				+ label ~ label
+					color: #cdcdcd
+		
+		
+		&_error
+			&.normal-radio_checked
+				label
+					&:first-of-type
+						border-color: #ff1818 !important
+						background-color: #ff9494 !important
+					
+			&:not(.normal-radio_checked)
+				label
+					&:first-of-type
+						border-color: #ff1818 !important
+			
+			label		
+				&:last-of-type
+					color: #ff1818 !important
+		
+			
+		&__errorlabel
+			position: absolute
+			left: 0
+			bottom: 0
+			height: 0
+			width: 100%
+			z-index: 10
+			
+			&:empty
+				display: none
+			
+			
+			> div
+				position: absolute
+				top: 0
+				left: 0
+				width: 100%
+				height: 100%
+				font-size: 11px
+				line-height: 11px
+				color: #f00
+				transform: translateY($errorLabelShift)
+				
+				strong
+					font-weight: 400
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+.small
+	&-radio
+		position: relative
+		display: inline-flex
+		align-items: center
+		
+		
+		input[type="radio"]
+			display: none
+			
+			+ label
+				flex: 0 0 auto
+				border: 2px solid #a4a4c1
+				border-radius: 50%
+				display: flex
+				align-items: center
+				justify-content: center
+				width: 14px
+				height: 14px
+				cursor: pointer
+				z-index: 10
+				
+				~ label
+					+addict(font-size, $inputFontSize, '/ 1.4')
+					cursor: pointer
+					padding-left: 3px
+				
+				
+					
+		
+		&_changed
+			input[type="radio"] + label
+				
+		
+		&_checked
+			input[type="radio"] + label
+				background-color: #a4a4c1
+				
+				&:after
+					content: ""
+					position: absolute
+					border-radius: 50%
+					width: 4px
+					height: 4px
+					display: block
+					background-color: #fff
+		
+		
+		&_disabled
+			pointer-events: none
+			
+			input[type="checkbox"]
+				+ label
+					border-color: #d5d5d5
+				
+				&:checked
+					+ label
+						background-color: #d5d5d5
+								
+				+ label ~ label
+					color: #cdcdcd
+		
+		
+		&_error
+			&.small-radio_checked
+				label
+					&:first-of-type
+						border-color: #ff1818 !important
+						background-color: #ff9494 !important
+					
+			&:not(.small-radio_checked)
+				label
+					&:first-of-type
+						border-color: #ff1818 !important
+			
+			label		
+				&:last-of-type
+					color: #ff1818 !important
+		
+			
+		&__errorlabel
+			position: absolute
+			left: 0
+			bottom: 0
+			height: 0
+			width: 100%
+			z-index: 10
+			
+			&:empty
+				display: none
+			
+			
+			> div
+				position: absolute
+				top: 0
+				left: 0
+				width: 100%
+				height: 100%
+				font-size: 10px
+				line-height: 10px
+				color: #f00
+				transform: translateY($errorLabelShift)
+				
+				strong
+					font-weight: 400
+	
+	
+	
+	
+
+
+
+.radio-empty
+	border: 2px solid
+	display: inline-block
+	border-radius: 50%
+	
+	&-large
+		width: 20px
+		height: 20px
+		
+	&-normal
+		width: 16px
+		height: 16px
+	
+	&-small
+		width: 14px
+		height: 14px

@@ -1,0 +1,678 @@
+@import "@sass/common/mixins/common"
+@import "@sass/common/mixins/scrollAdapt"
+@import "@sass/common/mixins/scrollbar"
+@import "@sass/common/mixins/placeholder"
+@import "@sass/common/mixins/resp"
+@import "@sass/common/mixins/addict"
+@import "@sass/common/mixins/font"
+@import "@sass/common/mixins/hr"
+@import "@sass/common/vars"
+@import "@sass/common/ui/admin"
+//@import url('https://fonts.googleapis.com/css2?family=Fira+Sans:wght@100;200;300;400;500;600;700;800;900&display=swap')
+//@import url('https://fonts.googleapis.com/css2?family=Raleway:wght@100;200;300;400;500;600;700;800;900&display=swap')
+@import url('https://fonts.googleapis.com/css2?family=Mulish:wght@200;300;400;500;600;700;800;900&display=swap')
+
+body
+	+scrollbar($sbBg, $sbSliderBg, $sbWidth, $sbBorderRadius, $sbSliderBorderRadius)
+	background-color: #ecf0f4
+
+
+*
+	+font('Mulish')
+	
+
+
+
+.notifyjs-corner
+	right: calc(-100vw + 100% + var(--ddr-notifyXOffset)) !important
+	top: var(--ddr-notifyYOffset) !important
+	text-shadow: none !important
+	
+	[data-notify-text]
+		+fontWeight(400)
+		text-shadow: none !important
+	
+
+
+.ddrpopup
+	+scrollbar($sbBg, $sbSliderBg, $sbWidth, $sbBorderRadius, $sbSliderBorderRadius)
+
+
+input, textarea, [contenteditable]
+	+placeholder(#ccc)
+
+
+.app
+	min-height: 100%
+	display: flex
+	flex-direction: column
+	width: 100vw
+	position: relative
+	margin-left: calc(-100vw + 100%)
+	right: calc(-100vw + 100% + $sbWidth)
+	padding-left: $sbWidth
+
+
+
+
+
+.header
+	flex: 0 1 auto
+	background-color: #fff
+	position: fixed
+	top: 0
+	left: 0
+	width: 100vw
+	box-shadow: 18px 1px 20px rgb(0 0 0 / 10%)
+	z-index: 11
+	
+	&__container
+		display: flex
+	
+	
+	&__left
+		background-color: #181824
+		flex: 0 0 250px
+		padding-left: 1rem
+		padding-right: 1rem
+	
+	&__logo
+		display: flex
+		align-items: center
+		
+		
+		> div
+			padding-right: 10px
+			
+		> p
+			font-size: 16px
+			line-height: 18px
+			+fontWeight(400)
+			color: #e6e6ed
+			word-break: break-word
+	
+	
+	
+	&__right
+		flex: 0 1 100%
+		padding-left: 1rem
+		padding-right: 25px
+	
+	&__block
+		+resp(height, $headerHeight)
+		display: flex
+		align-items: center
+	
+		&_center
+			justify-content: center
+		
+	
+	&__pagetitle
+		font-size: 18px
+		+fontWeight(300)
+		color: #181824
+		opacity: 0
+		pointer-events: none
+		transition: opacity 0.16s
+		
+		&_visible
+			opacity: 1
+			pointer-events: auto
+			transition: opacity 0.3s
+	
+	
+	
+	
+	&__logout
+		display: flex
+		align-items: center
+		background-color: #fff
+		border: 1px solid transparent
+		border-radius: $borderRadius
+		cursor: pointer
+		+resp(height, $inputHeight)
+		+resp(padding-left, $inputPaddingX, (padding-right: 0))
+		transition: background-color 0.16s, border-color 0.16s, box-shadow 0.16s
+		
+		span
+			+fontWeight(400)
+			font-size: 14px
+			line-height: 14px
+			//margin-top: 2px
+			color: $colorBlack
+		
+		i
+			margin-right: 5px
+			font-size: 16px
+			color: #9f9fa9
+		
+		
+		&:hover
+			border-color: #d6eeef
+			
+			i
+				color: #181824
+		
+		&:active
+			box-shadow: 0 0 0 0.2rem rgb(28 192 197 / 50%)
+			//background-color: #16afb2
+			border-color: #93e3e5
+		
+		
+	
+	
+	
+	
+
+.content
+	flex: 1 1 100%
+	min-height: 500px
+	+resp(padding-top, $headerHeight)
+	display: grid
+	grid-template-columns: 250px calc(100% - 250px) 
+	grid-template-rows: 1fr
+	gap: 0px
+	grid-auto-flow: row
+	grid-template-areas: ". ."
+	grid-area: content
+
+
+
+
+
+.aside
+	background-color: #181824
+	height: 100%
+	//position: relative
+	
+	
+	&__nav
+		margin-top: 1rem
+		position: sticky
+		z-index: 1
+		padding-bottom: 20px
+		
+		ul
+			li
+			
+				&:not(.opened)
+					.aside__navitem
+						.navitemhandler
+							&:hover
+								background-color: #51516a
+				
+				span
+					word-break: break-word
+				
+				&.opened
+					background-color: #2f2f44
+					
+					.aside__navitem
+						.navitemhandler
+							cursor: default
+							
+							&:hover, &:active
+								background-color: none!important
+							
+							i
+								transform: rotate(-90deg)
+								color: #d8d8e5
+								//&::after
+									//content: '\f107' !important
+					
+					ul
+						display: block !important
+						
+						
+				&.opened:not(.active)
+					.aside__navitem
+						&:hover
+							background-color: #3a3a4e !important
+					
+				&:not(.active)
+					cursor: pointer
+				
+				+ li
+					border-top: 1px solid #2f2f44
+					
+					
+				
+				&.active
+					> .aside__navitem	
+						border-right-color: #ff6969
+						background-color: #404058
+						
+						span
+							color: #fff
+				
+				
+				> ul
+					padding-left: 14px
+					display: none
+					//margin-bottom: 15px
+					
+					> li
+						border-left: 1px solid #4d4d64
+						
+						.aside__navitem
+							min-height: 40px
+							padding-top: 4px
+							padding-bottom: 4px
+							padding-right: 4px
+						
+						&:hover
+							.aside__navitem
+								background-color: #3a3a4e !important
+								
+						&.active
+							.aside__navitem
+								background-color: #404058 !important
+							
+						
+						> .aside__navitem
+							span
+								font-size: 0.8em
+	
+	
+	
+	&__navitem
+		display: flex
+		align-items: center
+		justify-content: space-between
+		min-height: 50px
+		border-right: 3px solid transparent
+		padding-left: 1rem
+		padding-right: 5px
+		padding-top: 4px
+		padding-bottom: 4px
+		transition: background-color 0.16s
+		
+		&:hover
+			background-color: #2f2f44
+		
+		&:active
+			background-color: #3e3e56
+			transition: background-color 0s
+	
+		span
+			color: #bebec7
+		
+		.navitemhandler
+			flex: 0 0 auto
+			cursor: pointer
+			display: flex
+			align-items: center
+			justify-content: center
+			width: 36px
+			height: 42px
+			border-radius: 5px
+			background-color: #7e7e9d26
+			transition: background-color 0.16s
+			
+			i
+				display: inline-block
+				+fontAwesome()
+				font-style: normal
+				color: #9999ad
+				//margin-right: 15px
+				transition: transform 0.16s
+				
+				&::after
+					content: '\f104'	
+			
+			&:active
+				background-color: #7e7e9d66 !important
+	
+	
+	
+	
+	
+	
+	
+	
+.main
+	display: flex
+	flex-direction: column
+	
+	&__content
+		flex: 1 1 100%
+		padding: 1rem
+		
+		> *
+			pointer-events: none
+			opacity: 0
+			transition: opacity 0.3s
+		
+		&_visible
+			> *
+				pointer-events: auto
+				opacity: 1
+
+
+
+
+section
+	height: 100%
+	
+.section
+	&_center
+		display: flex
+		align-items: center
+		justify-content: center
+		text-align: center
+	
+	
+	&_error
+		h1
+			color: #d8dee3
+			font-size: 56px
+			+fontWeight(300)
+		
+		span
+			display: inline-block
+			margin-top: 20px
+			color: #b9bfc5
+			font-size: 20px
+			+fontWeight(300)
+		
+
+
+
+
+
+.footer
+	flex: 0 1 auto
+	//grid-area: footer
+	background-color: #e9ecef
+	padding-left: 1rem
+	padding-right: 25px
+	
+	&__block
+		+resp(height, $footerHeight)
+		display: flex
+		align-items: center
+	
+
+
+
+
+	
+
+.auth
+	height: 100%
+	display: flex
+	align-items: center
+	justify-content: center
+	background-color: #ecf0f4
+	+scrollAdapt()
+	
+	
+	&__form
+		padding: 30px
+		background-color: #fff
+		border-radius: 4px
+		
+		&_auth
+			width: 500px
+			
+			
+		&_reg
+			width: 500px
+		
+	
+	&__row
+	
+	&__logo
+		display: flex
+		align-items: center
+		
+		> div
+			padding-right: 10px
+			
+		> p
+			font-size: 26px
+			+fontWeight(400)
+			
+				
+	&__greetengs
+		font-size: 20px
+	
+	&__subgreetengs
+		font-size: 16px
+	
+	
+	&__formblock
+	
+	
+	&__field
+		margin-bottom: 30px
+		width: 100%
+	
+	&__greetengs
+		margin-bottom: 5px
+	
+	&__subgreetengs
+	
+	
+	&__textlink
+		cursor: pointer
+		display: inline-block
+		border-bottom: 1px solid transparent
+		+fontWeight(400)
+		
+		
+	&__forgot
+		color: #343a40
+		
+		&:hover
+			color: #343a40
+			border-color: #343a40
+		
+		
+	&__reg
+		color: #27bbbf
+		
+		&:hover
+			color: #008f93
+			border-color: #008f93
+	
+	
+	&__agreement
+		color: #27bbbf
+		
+		&:hover
+			color: #008f93
+			border-color: #008f93
+	
+
+
+
+
+
+
+
+
+
+.form
+	&__item
+		padding-bottom: 2rem
+		
+	&__label
+		display: block
+		margin-bottom: 2px
+		font-size: 13px
+	
+	&__line
+		+hr(10%, 90%, #d4dbe0)
+		
+
+
+
+
+
+
+
+
+
+
+
+.card
+	position: relative
+	background-color: #fff
+	padding: 15px
+	border-radius: 4px
+	//opacity: 0
+	//pointer-events: none
+	//transition: opacity 0.16s
+	
+	//&_visible
+	//	opacity: 1
+	//	pointer-events: auto
+	
+	
+	&__wait
+		position: absolute
+		top: 0
+		left: 0,
+		display: flex
+		align-items: center
+		justify-content: center
+		width: 100%
+		height: 100%
+		background-color: #fffffff2
+		border-radius: inherit
+		z-index: 10
+		
+		&_closing
+			opacity: 0
+			transition: opacity 0.3s ease 0.2s
+	
+	
+	.cardwait
+		text-align: center
+		
+		&__icon
+			filter: hue-rotate(170deg)
+			width: 50px
+			height: 50px
+		
+		&__text
+			margin-top: 5px
+			color: #a6a6b3
+			font-size: 14px
+	
+	
+	&__header
+		display: flex
+		justify-content: space-between
+		align-items: flex-start
+		margin-bottom: 2rem
+		
+	
+	&__title
+		font-size: 16px
+		
+	&__desc
+		font-size: 12px
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.ddrtabs
+	width: 100%
+	display: flex
+	
+	&__nav
+		flex: 1 0 250px
+		
+		&-auto
+			flex-basis: auto
+		
+		li
+			
+			word-break: break-word
+	
+	&__content
+		flex: 0 1 100%
+
+
+
+.ddrtabsnav
+	height: 100%
+	position: relative
+	overflow-y: hidden
+	
+	&::after
+		content: ''
+		position: absolute
+		right: 0
+		//top: 0
+		background-color: #d4dedf
+		width: 1px
+		height: 100%
+	
+	
+	&__item
+		min-height: 40px
+		padding: 5px	
+		display: flex
+		align-items: center
+		border: 1px solid transparent
+		border-right: none
+		position: relative
+		+fontWeight(300)
+		transition: color 0.16s
+		
+		
+		
+		&:not(.ddrtabsnav__item_active)
+			cursor: pointer
+			border-right: 1px solid #d4dedf
+			color: #afbdc3
+			
+			&:hover
+				color: #486264
+			
+
+		&_active
+			//box-shadow: 2px 0 0 -1px #fff
+			border-color: #d4dedf
+			border-radius: 5px 0 0 5px
+			color: #486264
+			
+			
+			
+		
+
+
+.ddrtabscontent
+	padding-left: 2rem
+	
+	&__item
+		display: none
+		
+		&_visible
+			display: block
+	
+	
+
+
+
+

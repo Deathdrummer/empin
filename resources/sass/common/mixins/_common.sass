@@ -1,0 +1,8 @@
+@function _is($type, $var)
+	@return type-of($var) == $type
+
+@function isList($data)
+	@return type-of($data) == 'list'
+
+@function isMap($data)
+	@return type-of($data) == 'map'

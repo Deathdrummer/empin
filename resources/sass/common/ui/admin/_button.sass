@@ -1,0 +1,465 @@
+
+
+.auth
+	&-buttons-group
+		display: inline-flex
+		align-items: center
+		
+		> * + *
+			margin-left: 10px
+	
+	
+	&-button
+		display: inline-block
+		width: 100%
+		
+		button
+			width: 100%
+			background-color: #1bdbe0
+			border: 1px solid #1bdbe0
+			border-radius: $borderRadius
+			+resp(height, $inputHeight)
+			+resp(line-height, $inputHeight)
+			+resp(padding-left, $inputPaddingX, (padding-right: 0))
+			text-transform: uppercase
+			+fontWeight($buttonFontWeight)
+			color: #fff
+			+resp(font-size, $inputFontSize)
+			
+			cursor: pointer
+			box-shadow: none
+			transition: background-color 0.16s, border-color 0.16s, box-shadow 0.16s
+		
+		&:not(:disabled):not(.disabled):hover
+			button
+				background-color: #17babe
+				border-color: #16afb2
+			
+		
+		button:not(:disabled):not(.disabled):active
+			box-shadow: 0 0 0 0.2rem rgb(28 192 197 / 50%)
+			background-color: #16afb2
+			border-color: #14a3a7
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+.large
+	&-buttons-group
+		display: inline-flex
+		align-items: center
+		
+	
+	
+	
+	&-button
+		display: inline-flex
+		align-items: center
+		
+		button
+			width: 100%
+			border: 1px solid
+			border-radius: $borderRadius
+			+resp(height, $inputHeight)
+			+addict(line-height, $inputHeight, '/ 1.1')
+			+resp(padding-left, $inputPaddingX, (padding-right: 0))
+			+resp(font-size, $inputFontSize)
+			
+			+fontWeight($buttonFontWeight)
+			cursor: pointer
+			box-shadow: none
+			transition: background-color 0.16s, border-color 0.16s, box-shadow 0.16s
+		
+	
+		&_rounded
+			button
+				+resp(border-radius, $inputHeight)
+	
+	
+	
+	
+	
+	
+	
+
+
+
+.normal
+	&-buttons-group
+		display: inline-flex
+		align-items: center
+		
+	
+	
+	&-button
+		display: inline-flex
+		
+		button
+			width: 100%
+			border: 1px solid
+			border-radius: $borderRadius
+			+addict(height, $inputHeight, '/ 1.4')
+			+addict(line-height, $inputHeight, '/ 1.5')
+			+addict(padding-left, $inputPaddingX, '/ 1.4')
+			+addict(padding-right, $inputPaddingX, '/ 1.4')
+			+addict(font-size, $inputFontSize, '/ 1.2')
+			+fontWeight($buttonFontWeight)
+			
+			cursor: pointer
+			box-shadow: none
+			transition: background-color 0.16s, border-color 0.16s, box-shadow 0.16s
+	
+	
+	
+		&_rounded
+			button
+				+addict(border-radius, $inputHeight, '/ 1.4')
+	
+	
+	
+	
+	
+	
+.small
+	&-buttons-group
+		display: inline-flex
+		align-items: center
+		
+		
+	&-button
+		display: inline-flex
+		
+		button
+			width: 100%
+			border: 1px solid
+			border-radius: $borderRadius
+			+addict(height, $inputHeight, '/ 1.7')
+			+addict(line-height, $inputHeight, '/ 1.8')
+			+addict(padding-left, $inputPaddingX, '/ 1.7')
+			+addict(padding-right, $inputPaddingX, '/ 1.7')
+			+addict(font-size, $inputFontSize, '/ 1.33')
+			
+			+fontWeight($buttonFontWeight)
+			cursor: pointer
+			box-shadow: none
+			transition: background-color 0.16s, border-color 0.16s, box-shadow 0.16s
+	
+	
+		&_rounded
+			button
+				+addict(border-radius, $inputHeight, '/ 1.7')
+
+
+
+
+
+
+
+
+.verysmall
+	&-buttons-group
+		display: inline-flex
+		align-items: center
+	
+		
+	&-button
+		display: inline-flex
+		
+		button
+			width: 100%
+			border: 1px solid
+			border-radius: $borderRadius
+			+addict(height, $inputHeight, '/ 2')
+			+addict(line-height, $inputHeight, '/ 2.1')
+			+addict(padding-left, $inputPaddingX, '/ 2')
+			+addict(padding-right, $inputPaddingX, '/ 2')
+			+addict(font-size, $inputFontSize, '/ 1.5')
+			
+			+fontWeight($buttonFontWeight)
+			cursor: pointer
+			box-shadow: none
+			transition: background-color 0.16s, border-color 0.16s, box-shadow 0.16s
+	
+
+
+		&_rounded
+			button
+				+addict(border-radius, $inputHeight, '/ 2')
+
+
+
+
+
+
+
+//-------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+.button
+	&-blue	
+		button
+			background-color: #1bdbe0
+			border: 1px solid #1bdbe0
+			color: #fff
+			box-shadow: none
+			transition: background-color 0.16s, border-color 0.16s, box-shadow 0.16s
+			
+			i
+				color: #fff
+		
+		&:not(:disabled):not(.disabled):hover
+			button
+				background-color: #17babe
+				border-color: #17babe
+		
+		&:not(:disabled):not(.disabled).active, &:not(:disabled):not(.disabled):active
+			button
+				box-shadow: 0 0 0 0.2rem rgb(28 192 197 / 50%)
+				background-color: #16afb2
+				border-color: #14a3a7
+
+
+
+	&-gray	
+		button
+			background-color: #d8d8d8
+			border: 1px solid #d8d8d8
+			color: #fff
+			box-shadow: none
+			transition: background-color 0.16s, border-color 0.16s, box-shadow 0.16s
+			
+			i
+				color: #fff
+		
+		&:not(:disabled):not(.disabled):hover
+			button
+				background-color: #c5c5c5
+				border-color: #bfbfbf
+		
+		&:not(:disabled):not(.disabled).active, &:not(:disabled):not(.disabled):active
+			button
+				box-shadow: 0 0 0 0.2rem rgb(189 189 190 / 50%)
+				background-color: #bfbfbf
+				border-color: #b8b8b8
+	
+	
+	
+	
+	
+	&-neutral	
+		button
+			background-color: #9ea8bf
+			border: 1px solid #97a1b9
+			color: #fff
+			box-shadow: none
+			transition: background-color 0.16s, border-color 0.16s, box-shadow 0.16s
+			
+			i
+				color: #fff
+		
+		&:not(:disabled):not(.disabled):hover
+			button
+				background-color: #959fb7
+				border-color: #919cb5
+		
+		&:not(:disabled):not(.disabled).active, &:not(:disabled):not(.disabled):active
+			button
+				box-shadow: 0 0 0 0.2rem rgb(125 136 167 / 50%)
+				background-color: #828faf
+				border-color: #808eaf
+
+
+
+				
+
+
+	&-green	
+		button
+			background-color: #38ce3c
+			border: 1px solid #38ce3c
+			color: #fff
+			box-shadow: none
+			transition: background-color 0.16s, border-color 0.16s, box-shadow 0.16s
+			
+			i
+				color: #fff
+		
+		&:not(:disabled):not(.disabled):hover
+			button
+				background-color: #2cb430
+				border-color: #2aa92d
+		
+		&:not(:disabled):not(.disabled).active, &:not(:disabled):not(.disabled):active
+			button
+				box-shadow: 0 0 0 0.2rem rgb(86 213 89 / 50%)
+				background-color: #2aa92d
+				border-color: #279f2a
+
+				
+	&-red	
+		button
+			background-color: #ff7a90
+			border: 1px solid #ff7a90
+			color: #fff
+			box-shadow: none
+			transition: background-color 0.16s, border-color 0.16s, box-shadow 0.16s
+			
+			i
+				color: #fff
+		
+		&:not(:disabled):not(.disabled):hover
+			button
+				background-color: #f37186
+				border-color: #f37186
+		
+		&:not(:disabled):not(.disabled).active, &:not(:disabled):not(.disabled):active
+			button
+				box-shadow: 0 0 0 0.2rem rgb(255 104 129 / 50%)
+				background-color: #ff1a41
+				border-color: #ff0d36
+	
+	
+	
+	&-yellow	
+		button
+			background-color: #ffde73
+			border: 1px solid #ffde73
+			color: #ad8400
+			box-shadow: none
+			transition: background-color 0.16s, border-color 0.16s, box-shadow 0.16s
+			
+			i
+				color: #ad8400
+		
+		&:not(:disabled):not(.disabled):hover
+			button
+				color: #ad8400
+				background-color: #ffd54d
+				border-color: #ffd240
+		
+		&:not(:disabled):not(.disabled).active, &:not(:disabled):not(.disabled):active
+			button
+				box-shadow: 0 0 0 0.2rem rgb(222 194 104 / 50%)
+				color: #ad8400
+				background-color: #ffd240
+				border-color: #ffcf33
+		
+		
+		
+	&-purple	
+		button
+			background-color: #b08ad7
+			border: 1px solid #aa84d1
+			color: #fff
+			box-shadow: none
+			transition: background-color 0.16s, border-color 0.16s, box-shadow 0.16s
+			
+			i
+				color: #fff
+		
+		&:not(:disabled):not(.disabled):hover
+			button
+				color: #fff
+				background-color: #a07bc5
+				border-color: #9b77bf
+		
+		&:not(:disabled):not(.disabled).active, &:not(:disabled):not(.disabled):active
+			button
+				box-shadow: 0 0 0 0.2rem rgb(128 88 169 / 50%)
+				color: #fff
+				background-color: #8d67b3
+				border-color: #8b65b1
+		
+	
+	
+	
+	&-light	
+		button
+			background-color: #f8fafb
+			border: 1px solid #e9eef3
+			color: #8f9ba7
+			box-shadow: none
+			transition: background-color 0.16s, border-color 0.16s, box-shadow 0.16s
+			
+			i
+				color: #8f9ba7
+		
+		&:not(:disabled):not(.disabled):hover
+			button
+				color: #7d8a97
+				background-color: #f3f6f7
+				border-color: #e9edf1
+		
+		&:not(:disabled):not(.disabled).active, &:not(:disabled):not(.disabled):active
+			button
+				box-shadow: 0 0 0 0.2rem rgb(239 244 245 / 50%)
+				color: #626c76
+				background-color: #e9eeef
+				border-color: #dde3e7
+	
+	
+	
+	&-dark	
+		button
+			background-color: #3e4b5b
+			border: 1px solid #3e4b5b
+			color: #fff
+			box-shadow: none
+			transition: background-color 0.16s, border-color 0.16s, box-shadow 0.16s
+			
+			i
+				color: #fff
+		
+		&:not(:disabled):not(.disabled):hover
+			button
+				color: #fff
+				background-color: #2f3844
+				border-color: #29323d
+		
+		&:not(:disabled):not(.disabled).active, &:not(:disabled):not(.disabled):active
+			button
+				box-shadow: 0 0 0 0.2rem rgb(91 102 116 / 50%)
+				color: #fff
+				background-color: #29323d
+				border-color: #242c35
+		
+	
+		
+		
+	
+	
+	
+	
+
+
+
+
+
+.button	
+	button:disabled, button.disabled
+		background-color: #f1f1f1 !important
+		border: 1px solid #f1f1f1 !important
+		color: #d1d1d1 !important
+		box-shadow: none !important
+		cursor: default !important
+		
+		i
+			color: #d1d1d1
+		

@@ -1,0 +1,33 @@
+.container,
+.container-fluid {
+	@include make-container();
+}
+
+
+@each $breakpoint, $container-max-width in $container-max-widths {
+	.container-#{$breakpoint} {
+		@extend .container-fluid;
+	}
+
+	@include media-breakpoint-up($breakpoint, $grid-breakpoints) {
+		%responsive-container-#{$breakpoint} {
+			max-width: $container-max-width;
+		}
+	}
+
+	// Extend each breakpoint which is smaller or equal to the current breakpoint
+	$extend-breakpoint: true;
+
+	@each $name, $width in $grid-breakpoints {
+		@if ($extend-breakpoint) {
+			.container#{breakpoint-infix($name, $grid-breakpoints)} {
+				@extend %responsive-container-#{$breakpoint};
+			}
+
+			// Once the current breakpoint is reached, stop extending
+			@if ($breakpoint == $name) {
+				$extend-breakpoint: false;
+			}
+		}
+	}
+}

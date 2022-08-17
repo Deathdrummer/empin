@@ -1,0 +1,401 @@
+
+.select
+	&__label
+		position: absolute
+		background-color: #fff
+		display: block
+		z-index: 1
+
+
+.auth
+	
+	
+
+	
+	
+	
+	
+	
+	
+.large
+	&-select
+		position: relative
+		display: inline-block
+		
+		> select
+			width: 100%
+			+resp(height, $inputHeight)
+			+resp(font-size, $inputFontSize)
+			border: 1px solid #e4e8ed
+			border-radius: $borderRadius
+			transform: border-color 0.16s
+			+resp(padding-left, $inputPaddingX, (padding-right: 15))
+			background: #fff !important
+			color: #c3c3c3
+			+placeholder((color: $hpColor, focusColor: $hpColorFocus, disabledColor: $hpColorDisable, durationHover: $phDurationHover, durationLeave: $phDurationLeave))
+			appearance: none
+			
+			option:not([disabled])
+				color: $inputColor !important
+			
+			option[disabled]
+				color: #c3c3c3 !important
+			
+		&::after
+			content: '▼'
+			position: absolute
+			display: block
+			height: 14px
+			width: 14px
+			right: 6px
+			top: calc(50% - 7px)
+			font-size: 14px
+			line-height: 14px
+			color: #aabccd
+			pointer-events: none
+			
+		
+		&__label
+			top: -6px
+			left: 6px
+			padding-left: 6px
+			padding-right: 6px
+			font-size: 12px
+			line-height: 12px
+						
+			
+		&_noempty
+			> select
+				border-color: #cadbf1
+				color: $inputColor
+			
+			&::after
+				color: #cadbf1
+			
+		&_focused
+			> select
+				border-color: #b3becb
+			
+			&::after
+				color: #a3a3b3
+			
+		
+		&_changed:not(.large-select_disabled)
+			> select
+				border-color: #b1d0ef
+				box-shadow: 0 0 0px 1px #82f185
+			
+			&::after
+				color: #b1d0ef
+		
+		&_disabled
+			> select
+				background-color: #fefefe
+				pointer-events: none
+				border-color: #f1f1f1 !important
+				color: #dfdfdf !important
+			
+			&::after
+				color: #efefef
+			
+			.select__label
+				color: #cdcdcd
+				
+		
+		&_error
+			> select
+				border-color: #ffa3a3 !important
+				color: #ff1818 !important
+				box-shadow: none !important
+			
+			&::after
+				color: #ff1818
+		
+			
+		&__errorlabel
+			position: absolute
+			left: 0
+			bottom: 0
+			height: 0
+			width: 100%
+			z-index: 10
+			
+			&:empty
+				display: none
+			
+			
+			> div
+				position: absolute
+				top: 0
+				left: 0
+				width: 100%
+				height: 100%
+				font-size: 12px
+				line-height: 12px
+				color: #f00
+				transform: translateY($errorLabelShift)
+				
+				strong
+					font-weight: 400
+	
+	
+	
+	
+
+
+
+.normal
+	&-select
+		position: relative
+		display: inline-block
+		
+		> select
+			width: 100%
+			+addict(font-size, $inputFontSize, '/ 1.2')
+			+addict(height, $inputHeight, '/ 1.4')
+			border: 1px solid #e4e8ed
+			border-radius: $borderRadius
+			transform: border-color 0.16s
+			+resp(padding-left, $inputPaddingX, (padding-right: 13))
+			background: #fff !important
+			color: #c3c3c3
+			+placeholder((color: $hpColor, focusColor: $hpColorFocus, disabledColor: $hpColorDisable, durationHover: $phDurationHover, durationLeave: $phDurationLeave))
+			appearance: none
+			
+			option:not(:disabled)
+				color: $inputColor !important
+			
+			option:disabled
+				color: #c3c3c3 !important
+			
+			
+		&::after
+			content: '▼'
+			position: absolute
+			display: block
+			height: 12px
+			width: 12px
+			right: 5px
+			top: calc(50% - 6px)
+			font-size: 12px
+			line-height: 12px
+			color: #aabccd
+			pointer-events: none
+			
+		
+		&__label
+			top: -6px
+			left: 6px
+			padding-left: 5px
+			padding-right: 5px
+			font-size: 11px
+			line-height: 11px
+						
+			
+		&_noempty
+			> select
+				border-color: #cadbf1
+				color: $inputColor
+			
+			&::after
+				color: #cadbf1
+			
+		&_focused
+			> select
+				border-color: #b3becb
+			
+			&::after
+				color: #a3a3b3
+			
+		
+		&_changed:not(.normal-select_disabled)
+			> select
+				border-color: #b1d0ef
+				box-shadow: 0 0 0px 1px #82f185
+			
+			&::after
+				color: #b1d0ef
+		
+		&_disabled
+			> select
+				background-color: #fefefe
+				pointer-events: none
+				border-color: #f1f1f1 !important
+				color: #dfdfdf !important
+			
+			&::after
+				color: #efefef
+			
+			.select__label
+				color: #cdcdcd
+		
+		&_error
+			> select
+				border-color: #ffa3a3 !important
+				color: #ff1818 !important
+				box-shadow: none !important
+			
+			&::after
+				color: #ff1818
+		
+			
+		&__errorlabel
+			position: absolute
+			left: 0
+			bottom: 0
+			height: 0
+			width: 100%
+			z-index: 10
+			
+			&:empty
+				display: none
+			
+			
+			> div
+				position: absolute
+				top: 0
+				left: 0
+				width: 100%
+				height: 100%
+				font-size: 11px
+				line-height: 11px
+				color: #f00
+				transform: translateY($errorLabelShift)
+				
+				strong
+					font-weight: 400
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+.small
+	&-select
+		position: relative
+		display: inline-block
+		
+		> select
+			width: 100%
+			+addict(font-size, $inputFontSize, '/ 1.3')
+			+addict(height, $inputHeight, '/ 1.6')
+			border: 1px solid #e4e8ed
+			border-radius: $borderRadius
+			transform: border-color 0.16s
+			+resp(padding-left, $inputPaddingX, (padding-right: 12))
+			background: #fff !important
+			color: #c3c3c3
+			+placeholder((color: $hpColor, focusColor: $hpColorFocus, disabledColor: $hpColorDisable, durationHover: $phDurationHover, durationLeave: $phDurationLeave))
+			appearance: none
+			
+			option:not(:disabled)
+				color: $inputColor !important
+			
+			option:disabled
+				color: #c3c3c3 !important
+			
+		&::after
+			content: '▼'
+			position: absolute
+			display: block
+			height: 11px
+			width: 11px
+			right: 5px
+			top: calc(50% - 5.5px)
+			font-size: 11px
+			line-height: 11px
+			color: #aabccd
+			pointer-events: none
+			
+		
+		&__label
+			top: -5px
+			left: 6px
+			padding-left: 5px
+			padding-right: 5px
+			font-size: 10px
+			line-height: 10px
+						
+			
+		&_noempty
+			> select
+				border-color: #cadbf1
+				color: $inputColor
+			
+			&::after
+				color: #cadbf1
+			
+		&_focused
+			> select
+				border-color: #b3becb
+			
+			&::after
+				color: #a3a3b3
+			
+		
+		&_changed:not(.small-select_disabled)
+			> select
+				border-color: #b1d0ef
+				box-shadow: 0 0 0px 1px #82f185
+			
+			&::after
+				color: #b1d0ef
+		
+		&_disabled
+			> select
+				background-color: #fefefe
+				pointer-events: none
+				border-color: #f1f1f1 !important
+				color: #dfdfdf !important
+			
+			&::after
+				color: #efefef
+			
+			.select__label
+				color: #cdcdcd
+		
+		&_error
+			> select
+				border-color: #ffa3a3 !important
+				color: #ff1818 !important
+				box-shadow: none !important
+			
+			&::after
+				color: #ff1818
+		
+			
+		&__errorlabel
+			position: absolute
+			left: 0
+			bottom: 0
+			height: 0
+			width: 100%
+			z-index: 10
+			
+			&:empty
+				display: none
+			
+			
+			> div
+				position: absolute
+				top: 0
+				left: 0
+				width: 100%
+				height: 100%
+				font-size: 10px
+				line-height: 10px
+				color: #f00
+				transform: translateY($errorLabelShift)
+				
+				strong
+					font-weight: 400
+	
+	
+	
+	
+	
+

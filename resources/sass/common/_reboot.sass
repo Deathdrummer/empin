@@ -1,0 +1,304 @@
+@import "./bootstrap/functions"
+@import "./bootstrap/variables"
+@import "./vars"
+
+*
+	box-sizing: border-box
+	outline: none !important
+	margin: 0
+	padding: 0
+
+
+*,
+*::before,
+*::after
+	box-sizing: border-box
+
+
+
+html
+	height: 100%
+	margin-right: calc(100% - 100vw)
+	font-size: $font-size-root
+	line-height: 1.1
+	-webkit-text-size-adjust: 100%
+	-ms-text-size-adjust: 100%
+	-ms-overflow-style: scrollbar
+	-webkit-tap-highlight-color: rgba(0,0,0,0)
+	
+html, body
+	height: 100%
+	width: 100%
+
+body
+	margin: 0
+	font-size: $font-size-base
+	color: $body-color
+	text-align: left
+	background-color: $body-bg
+	min-width: $minContentWidth
+	-webkit-text-size-adjust: 100%
+	-webkit-tap-highlight-color: rgba($body-color, 0)
+	-webkit-font-smoothing: antialiased
+	-moz-osx-font-smoothing: grayscale
+	
+	
+	
+	
+
+
+@at-root
+	@-ms-viewport
+		width: device-width
+	
+article, aside, dialog, figcaption, figure, footer, header, hgroup, main, nav, section
+	display: block
+
+[tabindex="-1"]:focus
+	outline: none !important
+
+
+
+
+h1,h2,h3,h4,h5,h6,p,b,strong,span,a,li,small,em,label,sup,sub,i,u,input,select,textarea,button,fieldset,article,table,time,address,blockquote,figure,figcaption
+	margin-bottom: 0
+	-webkit-font-smoothing: antialiased !important
+	color: $colorMain
+
+ul
+	padding: 0
+	margin: 0
+	
+	li
+		list-style: none
+
+
+
+sub,
+sup
+	position: relative
+	font-size: 75%
+	line-height: 0
+	vertical-align: baseline
+
+sub
+	bottom: -.25em
+sup
+	top: -.5em
+
+
+a
+	color: #00abff
+	text-decoration: none
+	background-color: transparent
+	-webkit-text-decoration-skip: objects
+	
+	&[disabled]
+		background-color: #ccc !important
+		cursor: default !important
+		pointer-events: none
+
+
+	&:not([href]):not([tabindex])
+		color: inherit
+		text-decoration: none
+
+		&:focus
+			outline: 0
+		
+	
+
+pre,
+code,
+kbd,
+samp
+	font-family: monospace, monospace
+	font-size: 1em
+
+pre
+	margin-top: 0
+	margin-bottom: 1rem
+	overflow: auto
+	-ms-overflow-style: scrollbar
+
+figure
+	margin: 0 0 1rem
+
+img
+	vertical-align: middle
+	border-style: none
+
+
+a,
+area,
+button,
+[role="button"],
+input:not([type="range"]),
+label,
+select,
+summary,
+textarea
+	touch-action: manipulation
+
+
+table
+	border-collapse: collapse
+
+
+caption
+	padding-top: 0
+	padding-bottom: 0
+	text-align: left
+	caption-side: bottom
+
+th
+	text-align: inherit
+
+button:focus 
+	outline: 5px auto -webkit-focus-ring-color
+
+input,
+button,
+select,
+optgroup,
+textarea
+	margin: 0
+	font-family: inherit
+	font-size: inherit
+	line-height: inherit
+
+button,
+input
+	overflow: visible
+
+button,
+select
+	text-transform: none
+
+button,
+[type="button"],
+[type="reset"],
+[type="submit"]
+	-webkit-appearance: button
+
+
+button::-moz-focus-inner,
+[type="button"]::-moz-focus-inner,
+[type="reset"]::-moz-focus-inner,
+[type="submit"]::-moz-focus-inner 
+	padding: 0
+	border-style: none
+
+input[type="radio"],
+input[type="checkbox"] 
+	box-sizing: border-box
+	padding: 0
+
+
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"],
+input[type="month"]
+	-webkit-appearance: listbox
+
+
+input::-ms-reveal,
+input::-ms-clear
+	display: none
+
+
+
+fieldset
+	min-width: 0
+	padding: 0
+	margin: 0
+	border: 0
+
+legend
+	display: block
+	width: 100%
+	max-width: 100%
+	padding: 0
+	margin-bottom: .5rem
+	font-size: 1.5rem
+	line-height: inherit
+	color: inherit
+	white-space: normal
+
+progress
+	vertical-align: baseline
+
+[type="number"]::-webkit-inner-spin-button,
+[type="number"]::-webkit-outer-spin-button
+	height: auto
+
+[type="search"]
+	outline-offset: -2px
+	-webkit-appearance: none
+
+[type="search"]::-webkit-search-cancel-button,
+[type="search"]::-webkit-search-decoration 
+	-webkit-appearance: none
+
+
+
+::-moz-focus-inner
+	padding: 0
+	border-style: none
+
+
+
+::-webkit-inner-spin-button
+	height: auto
+
+
+
+[type="search"]
+	outline-offset: -2px
+	-webkit-appearance: textfield
+
+
+::-webkit-search-decoration
+	-webkit-appearance: none
+
+
+::-webkit-color-swatch-wrapper
+	padding: 0
+
+
+
+::file-selector-button
+	font: inherit
+
+
+::-webkit-file-upload-button
+	font: inherit
+	-webkit-appearance: button
+
+
+
+output
+	display: inline-block
+
+
+
+iframe
+	border: 0
+
+
+summary
+	display: list-item
+	cursor: pointer
+
+
+progress
+	vertical-align: baseline
+
+
+
+[hidden]
+	display: none !important
+
+
+template
+	display: none

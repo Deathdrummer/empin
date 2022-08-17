@@ -1,0 +1,46 @@
+=placeholder($args)
+	@if _is('map', $args)
+		$color: map-get($args, 'color')
+		$focusColor: map-get($args, 'focusColor')
+		$disabledColor: map-get($args, 'disabledColor')
+		$durationHover: map-get($args, 'durationHover')
+		$durationLeave: map-get($args, 'durationLeave')
+
+		&::-webkit-input-placeholder
+			color: $color
+			transition: color $durationLeave
+		&:-moz-placeholder
+			color: $color
+			transition: color $durationLeave
+		&::-moz-placeholder
+			color: $color
+			transition: color $durationLeave
+		&:-ms-input-placeholder
+			color: $color
+			transition: color $durationLeave
+		
+		&[disabled]::-webkit-input-placeholder
+			transition: color 0s
+			color: $disabledColor
+		&[disabled]:-moz-placeholder
+			color: $disabledColor
+			transition: color 0s
+		&[disabled]::-moz-placeholder
+			color: $disabledColor
+			transition: color 0s
+		&[disabled]:-ms-input-placeholder
+			color: $disabledColor
+			transition: color 0s
+			
+		&:focus::-webkit-input-placeholder
+			color: $focusColor
+			transition: color $durationHover
+		&:focus:-moz-placeholder
+			color: $focusColor
+			transition: color $durationHover
+		&:focus::-moz-placeholder
+			color: $focusColor
+			transition: color $durationHover
+		&:focus:-ms-input-placeholder
+			color: $focusColor
+			transition: color $durationHover

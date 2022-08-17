@@ -1,0 +1,744 @@
+@import "@sass/common/mixins/inputBg"
+@import "@sass/common/mixins/placeholder"
+
+
+
+
+.input
+	&_focused
+		&.normal-input-datepicker
+			.icon
+				i
+					color: #5a8395
+	
+	&__label
+		position: absolute
+		background-color: #fff
+		display: block
+		z-index: 1
+		
+	.postfix_icon
+		position: absolute
+		right: 1px
+		top: 1px
+		display: flex
+		align-items: center
+		justify-content: center
+		height: calc(100% - 2px) 
+		background-color: #fff5b8
+		
+		i
+			color: #5a511a
+			
+
+
+
+
+
+
+
+.auth
+	&-input
+		position: relative
+		display: inline-block
+		
+		> input
+			width: 100%
+			+resp(height, $inputHeight)
+			border: 1px solid #e4e8ed
+			border-radius: $borderRadius
+			+resp(font-size, $inputFontSize)
+			transform: border-color 0.16s
+			
+			
+		&:not(.auth-input-color)
+			> input
+				background: #fff !important
+				color: $inputColor
+				+inputBg(#fdfdfd)
+				+placeholder((color: $hpColor, focusColor: $hpColorFocus, disabledColor: $hpColorDisable, durationHover: $phDurationHover, durationLeave: $phDurationLeave))
+		
+		
+		&:not(.auth-input-color):not(.normal-input-auth)
+			> input
+				+resp(padding-left, $inputPaddingX, (padding-right: 0))
+		
+		&-number
+			> input
+				+resp(padding-left, $inputPaddingX)
+				padding-right: 3px
+		
+		
+		&-datepicker
+			.icon
+				position: absolute
+				top: 0
+				display: flex
+				align-items: center
+				+addict(right, $inputPaddingX, '/ 1.2')
+				+addict(height, $inputHeight, '/ 1.4')
+				pointer-events: none
+				z-index: 10
+				
+				i
+					font-size: 18px
+					color: #a6b9c1
+		
+		.postfix_icon
+			+resp(min-width, $inputHeight)
+			+addict(font-size, $inputFontSize, '/ 1.2')
+			border-radius: 0 #{$borderRadius} #{$borderRadius} 0
+					
+		
+		
+		
+		&__label
+			top: -6px
+			left: 6px
+			padding-left: 6px
+			padding-right: 6px
+			font-size: 12px
+			line-height: 12px
+		
+		
+			
+		&_noempty
+			> input
+				border-color: #cadbf1
+			
+		&_focused
+			> input
+				border-color: #b3becb
+			
+		
+		&_changed
+			> input
+				border-color: #73e376
+				box-shadow: 0 0 0px 1px #82f185
+		
+		&_disabled
+			> input
+				color: #d5d3d3
+				background-color: #fefefe !important
+				border-color: #f1f1f1 !important
+			
+			.input__label
+				color: #cdcdcd
+		
+		&_iconed
+			+resp(padding-right, $inputHeight)
+		
+		&_error
+			> input
+				border-color: #ffa3a3 !important
+				box-shadow: none !important
+			
+		&__errorlabel
+			position: absolute
+			left: 0
+			bottom: 0
+			height: 0
+			width: 100%
+			z-index: 10
+			
+			&:empty
+				display: none
+			
+			
+			> div
+				position: absolute
+				top: 0
+				left: 0
+				width: 100%
+				height: 100%
+				font-size: 12px
+				line-height: 12px
+				color: #f00
+				transform: translateY($errorLabelShift)
+				
+				strong
+					font-weight: 400
+		
+		&-color
+			> input
+				+resp(min-width, $inputHeight)
+				cursor: pointer
+	
+	
+	
+	
+	
+	
+	
+	
+	&-showpassword
+		width: 20px
+		height: 100%
+		display: flex
+		align-items: center
+		justify-content: center
+		position: absolute
+		+resp(right, $inputPaddingX)
+		top: 0
+		
+		> *
+			cursor: pointer
+			color: #a5b6b7
+			
+			&:hover
+				color: #659fa3
+
+
+
+
+
+
+
+.large
+	&-input
+		position: relative
+		display: inline-block
+		
+		> input
+			width: 100%
+			+resp(height, $inputHeight)
+			+resp(font-size, $inputFontSize)
+			border: 1px solid #e4e8ed
+			border-radius: $borderRadius
+			transform: border-color 0.16s
+			
+			
+		&:not(.large-input-color)
+			> input
+				background: #fff
+				color: $inputColor
+				+inputBg(#fdfdfd)
+				+placeholder((color: $hpColor, focusColor: $hpColorFocus, disabledColor: $hpColorDisable, durationHover: $phDurationHover, durationLeave: $phDurationLeave))
+		
+		
+		&:not(.large-input-color):not(.large-input-number)
+			> input
+				+resp(padding-left, $inputPaddingX, (padding-right: 0))
+		
+		&:not(.large-input-color):not(.large-input_iconed):not(.large-input-number)
+			> input
+				+resp(padding-left, $inputPaddingX)
+		
+		&:not(.large-input_iconed)
+			> input
+				+resp(padding-right, $inputPaddingX)
+		
+		&.large-input_iconed
+			> input
+				+resp(padding-right, $inputHeight)
+		
+		
+		
+		&-number
+			> input
+				+resp(padding-left, $inputPaddingX)
+				padding-right: 3px
+		
+		
+		&-datepicker
+			.icon
+				position: absolute
+				top: 0
+				display: flex
+				align-items: center
+				+resp(right, $inputPaddingX)
+				+resp(height, $inputHeight)
+				pointer-events: none
+				z-index: 10
+				
+				i
+					font-size: 18px
+					color: #a6b9c1
+		
+		.postfix_icon
+			+resp(min-width, $inputHeight)
+			+resp(font-size, $inputFontSize)
+			border-radius: 0 #{$borderRadius} #{$borderRadius} 0
+		
+		
+		
+		&__label
+			top: -6px
+			left: 6px
+			padding-left: 6px
+			padding-right: 6px
+			font-size: 12px
+			line-height: 12px
+						
+			
+		&_noempty
+			> input
+				border-color: #cadbf1
+			
+		&_focused
+			> input
+				border-color: #b3becb
+			
+		
+		&_changed
+			> input
+				border-color: #73e376
+				box-shadow: 0 0 0px 1px #82f185
+				
+		
+		&_disabled
+			> input
+				background-color: #fefefe !important
+				border-color: #f1f1f1 !important
+				color: #dfdfdf !important
+			
+			.input__label
+				color: #cdcdcd
+		
+		&_error
+			> input
+				border-color: #ffa3a3 !important
+				color: #ff1818 !important
+				box-shadow: none !important
+			
+		&__errorlabel
+			position: absolute
+			left: 0
+			bottom: 0
+			height: 0
+			width: 100%
+			z-index: 10
+			
+			&:empty
+				display: none
+			
+			
+			> div
+				position: absolute
+				top: 0
+				left: 0
+				width: 100%
+				height: 100%
+				font-size: 12px
+				line-height: 12px
+				color: #f00
+				transform: translateY($errorLabelShift)
+				
+				strong
+					font-weight: 400
+		
+		&-color
+			> input
+				+resp(min-width, $inputHeight)
+				cursor: pointer
+		
+		
+		
+		
+		
+		
+	&-showpassword
+		width: 20px
+		height: 100%
+		display: flex
+		align-items: center
+		justify-content: center
+		position: absolute
+		+resp(right, $inputPaddingX)
+		top: 0
+		
+		> *
+			cursor: pointer
+			color: #a5b6b7
+			
+			&:hover
+				color: #659fa3
+	
+	
+
+
+
+	
+	
+	
+	
+	
+	
+	
+	
+
+	
+	
+	
+	
+
+
+
+.normal
+	&-input
+		position: relative
+		display: inline-block
+		
+		> input
+			width: 100%
+			+addict(font-size, $inputFontSize, '/ 1.2')
+			+addict(height, $inputHeight, '/ 1.4')
+			border: 1px solid #e4e8ed
+			border-radius: $borderRadius
+			transform: border-color 0.16s
+			
+			
+		&:not(.normal-input-color)
+			> input
+				background: #fff !important
+				color: $inputColor
+				+inputBg(#fdfdfd)
+				+placeholder((color: $hpColor, focusColor: $hpColorFocus, disabledColor: $hpColorDisable, durationHover: $phDurationHover, durationLeave: $phDurationLeave))
+		
+		&:not(.normal-input-color):not(.normal-input-number)
+			> input
+				+addict(padding-left, $inputPaddingX, '/ 1.2')
+		
+		&:not(.normal-input-color):not(.normal-input_iconed):not(.normal-input-number)
+			> input
+				+addict(padding-right, $inputPaddingX, '/ 1.2')
+		
+		&.normal-input_iconed
+			> input
+				+addict(padding-right, $inputHeight, '/ 1.4')
+		
+		&-number
+			> input
+				+addict(padding-left, $inputPaddingX, '/ 1.2')
+				padding-right: 3px
+		
+		&-datepicker
+			.icon
+				position: absolute
+				top: 0
+				display: flex
+				align-items: center
+				+addict(right, $inputPaddingX, '/ 1.2')
+				+addict(height, $inputHeight, '/ 1.4')
+				pointer-events: none
+				z-index: 10
+				
+				i
+					font-size: 16px
+					color: #a6b9c1
+		
+					
+		.postfix_icon
+			+addict(min-width, $inputHeight, '/ 1.4')
+			+addict(font-size, $inputFontSize, '/ 1.2')
+			border-radius: 0 #{$borderRadius} #{$borderRadius} 0
+				
+		
+		
+		
+		&__label
+			top: -6px
+			left: 6px
+			padding-left: 6px
+			padding-right: 6px
+			font-size: 11px
+			line-height: 11px
+						
+			
+		&_noempty
+			> input
+				border-color: #cadbf1
+			
+		&_focused
+			> input
+				//border-color: #f00
+			
+		
+		&_changed
+			> input
+				border-color: #73e376
+				box-shadow: 0 0 0px 1px #82f185
+		
+		&_disabled
+			> input
+				background-color: #fefefe !important
+				border-color: #f1f1f1 !important
+				color: #dfdfdf !important
+			
+			.input__label
+				color: #cdcdcd
+		
+		
+		&_error
+			> input
+				border-color: #ffa3a3 !important
+				color: #ff1818 !important
+				box-shadow: none !important
+			
+		&__errorlabel
+			position: absolute
+			left: 0
+			bottom: 0
+			height: 0
+			width: 100%
+			z-index: 10
+			
+			&:empty
+				display: none
+			
+			
+			> div
+				position: absolute
+				top: 0
+				left: 0
+				width: 100%
+				height: 100%
+				font-size: 11px
+				line-height: 11px
+				color: #f00
+				transform: translateY($errorLabelShift)
+				
+				strong
+					font-weight: 400
+		
+		&-color
+			> input
+				+resp(min-width, $inputHeight)
+				cursor: pointer
+		
+		
+		
+		
+		
+		
+		
+	&-showpassword
+		width: 20px
+		height: 100%
+		display: flex
+		align-items: center
+		justify-content: center
+		position: absolute
+		+resp(right, $inputPaddingX)
+		top: 0
+		
+		> *
+			cursor: pointer
+			color: #a5b6b7
+			
+			&:hover
+				color: #659fa3
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+.small
+	&-input
+		position: relative
+		display: inline-block
+		
+		> input
+			width: 100%
+			+addict(font-size, $inputFontSize, '/ 1.3')
+			+addict(height, $inputHeight, '/ 1.6')
+			border: 1px solid #e4e8ed
+			border-radius: $borderRadius
+			transform: border-color 0.16s
+			
+			
+		&:not(.small-input-color)
+			> input
+				background: #fff !important
+				color: $inputColor
+				+inputBg(#fdfdfd)
+				+placeholder((color: $hpColor, focusColor: $hpColorFocus, disabledColor: $hpColorDisable, durationHover: $phDurationHover, durationLeave: $phDurationLeave))
+		
+		
+		&:not(.small-input-color):not(.small-input-number)
+			> input
+				+addict(padding-left, $inputPaddingX, '/ 1.6')
+		
+		&:not(.small-input-color):not(.small-input_iconed):not(.small-input-number)
+			> input
+				+addict(padding-right, $inputPaddingX, '/ 1.6')
+		
+		&.small-input_iconed
+			> input
+				+addict(padding-right, $inputHeight, '/ 1.6')
+		
+		
+		&-number
+			> input
+				+addict(padding-left, $inputPaddingX, '/ 1.6')
+				padding-right: 3px
+		
+		
+		&-datepicker
+			.icon
+				position: absolute
+				top: 0
+				display: flex
+				align-items: center
+				+addict(right, $inputPaddingX, '/ 1.6')
+				+addict(height, $inputHeight, '/ 1.6')
+				pointer-events: none
+				z-index: 10
+				
+				i
+					font-size: 14px
+					color: #a6b9c1
+					
+					
+		.postfix_icon
+			+addict(min-width, $inputHeight, '/ 1.6')	
+			+addict(font-size, $inputFontSize, '/ 1.3')
+			border-radius: 0 #{$borderRadius} #{$borderRadius} 0
+		
+		
+		&__label
+			top: -6px
+			left: 5px
+			padding-left: 5px
+			padding-right: 5px
+			font-size: 10px
+			line-height: 12px
+						
+			
+		&_noempty
+			> input
+				border-color: #cadbf1
+			
+		&_focused
+			> input
+				border-color: #b3becb
+			
+		
+		&_changed
+			> input
+				border-color: #73e376
+				box-shadow: 0 0 0px 1px #82f185
+		
+		&_disabled
+			> input
+				background-color: #fefefe !important
+				border-color: #f1f1f1 !important
+				color: #dfdfdf !important
+			
+			.input__label
+				color: #cdcdcd
+		
+		&_error
+			> input
+				border-color: #ffa3a3 !important
+				color: #ff1818 !important
+				box-shadow: none !important
+			
+		&__errorlabel
+			position: absolute
+			left: 0
+			bottom: 0
+			height: 0
+			width: 100%
+			z-index: 10
+			
+			&:empty
+				display: none
+			
+			
+			> div
+				position: absolute
+				top: 0
+				left: 0
+				width: 100%
+				height: 100%
+				font-size: 10px
+				line-height: 10px
+				color: #f00
+				transform: translateY($errorLabelShift)
+				
+				strong
+					font-weight: 400
+		
+		&-color
+			> input
+				+resp(min-width, $inputHeight)
+				cursor: pointer
+		
+		
+		
+		
+		
+		
+			
+	&-showpassword
+		width: 20px
+		height: 100%
+		display: flex
+		align-items: center
+		justify-content: center
+		position: absolute
+		+resp(right, $inputPaddingX)
+		top: 0
+		
+		> *
+			cursor: pointer
+			color: #a5b6b7
+			
+			&:hover
+				color: #659fa3
+	
+	
+
+
+
+
+
+
+
+
+
+
+
+//----------------------------------------------------------------------------------
+
+
+.white
+	&-input
+		&:not([class^=input-color])
+			> input
+				background: #fff
+
+		&__label
+			background-color: #fff
+
+
+
+
+.gray
+	&-input
+		&:not([class^=input-color])
+			> input
+				background: #fdfdfd
+
+		&__label
+			background-color: #fdfdfd
+

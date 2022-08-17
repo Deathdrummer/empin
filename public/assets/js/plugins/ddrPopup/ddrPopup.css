@@ -1,0 +1,322 @@
+@keyframes ddrPopUpIn {
+	from {
+		background-color: transparent;
+		backdrop-filter: blur(0px);
+	}
+	to {
+		background-color: #003c3c75;
+		backdrop-filter: blur(3px);
+	}
+}
+	
+
+@keyframes ddrPopUpOut {
+	from {
+		background-color: #003c3c75;
+		backdrop-filter: blur(3px);
+	}
+	to {
+		background-color: transparent;
+		backdrop-filter: blur(0px);
+	}
+}
+
+	
+@keyframes ddrPopUpDialogIn {
+	from {
+		opacity: 0;
+		pointer-events: none;
+	}
+		
+	to {
+		opacity: 1;
+		pointer-events: auto;
+	}
+}
+	
+
+
+
+.ddrpopup {
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	min-height: 100vh;
+	overflow-x: hidden;
+	overflow-y: auto;
+	z-index: 1000;
+}
+	
+	
+	.ddrpopup_opening {
+		animation: ddrPopUpIn 0.2s;
+		animation-fill-mode: forwards;
+	}
+		
+	
+	.ddrpopup_closing {
+		animation: ddrPopUpOut 0.2s;
+		animation-fill-mode: forwards;
+	}
+		
+	
+	.ddrpopup__wrap {
+		position: relative;
+		top: 0;
+		width: 100vw;
+		min-height: 100vh;
+		height: auto;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		overflow: hidden;
+	}
+		
+	
+	.ddrpopup__container {
+		margin-right: calc(-100vw + 100%);
+		padding-top: 15px;
+		padding-bottom: 15px;
+	}
+		
+	
+	.ddrpopup__win {
+		position: relative;
+		display: grid;
+		min-width: 280px;
+		max-width: calc(100vw - 30px);
+		width: var(--popup-width);
+		min-height: 250px;
+		opacity: 0;
+		transform: scale(0.8);
+		background-color: #fff;
+	}
+		
+		
+		.ddrpopup__win_opening {
+			opacity: 1;
+			transform: scale(1);
+			transition: transform 0.2s ease-out, opacity 0.2s ease-out, width 0.1s ease-out;
+		}
+			
+		
+		.ddrpopup__win_closing {
+			opacity: 0;
+			transform: scale(1.8);
+			transition: transform 0.2s ease-out, opacity 0.2s ease-out, width 0.1s ease-out;
+		}
+			
+		
+		.ddrpopup__win_animated {
+			transition: width 0.2s;
+		}
+	
+	
+	
+	.ddrpopup__content {
+		display: flex;
+		flex-flow: column nowrap;
+		align-items: stretch;
+		justify-content: space-between;
+		align-content: space-between;
+		width: 100%;
+		height: 100%;
+	}
+		
+	
+	
+	.ddrpopup__close {
+		position: absolute;
+		top: 5px;
+		right: 5px;
+		width: 26px;
+		height: 26px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		cursor: pointer;
+		z-index: 1000;
+	}
+		
+		.ddrpopup__close:hover::before, .ddrpopup__close:hover::after {
+			/*background-color: darken(#a9a2b3, 20%);*/
+		}
+		
+		
+		.ddrpopup__close::before, .ddrpopup__close::after {
+			content: '';
+			position: absolute;
+			display: block;
+			width: 100%;
+			height: 3px;
+			border-radius: 2px;
+			transition: background-color 0.16s;
+		}
+			
+		
+		.ddrpopup__close::before {
+			top: calc(50% - 1.5px);
+			transform: rotate(45deg);
+		}
+			
+		.ddrpopup__close::after {
+			top: calc(50% - 1.5px);
+			transform: rotate(-45deg);
+		}
+			
+			
+	.ddrpopup__wait {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		opacity: 0;
+		background-color: #fffffff5;
+		backdrop-filter: blur(2px);
+		pointer-events: none;
+		transition: opacity 0.05s;
+		z-index: 1002;
+	}
+		
+		
+		.ddrpopup__wait_visible {
+			opacity: 1;
+			pointer-events: auto;
+			transition: opacity 0.16s;
+		}
+			
+		
+		.ddrpopupwait {
+			position: relative;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+		}
+			
+		
+			.ddrpopupwait__icon {
+				width: 50px;
+				filter: hue-rotate(134deg);
+				margin-bottom: 6px;
+			}
+				
+			
+			.ddrpopupwait__label {
+				font-size: 14px;
+			}
+	
+	
+	.ddrpopup__dialog {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		display: flex;
+		align-items: flex-start;
+		justify-content: center;
+		background-color: #0073741a;
+		backdrop-filter: blur(2px);
+		opacity: 0;
+		z-index: 1001;
+	}
+	
+		.ddrpopup__dialog_visible {
+			animation: ddrPopUpDialogIn 0.2s;
+			animation-fill-mode: forwards;
+		}
+			
+		.popupdialog {
+			align-items: center;
+			position: relative;
+			padding: 15px;
+			text-align: center;
+			background-color: #fff;
+			box-shadow: 0px 11px 8px -10px #375a5a26;
+			border:  1px solid #eee;
+			border-radius: 3px;
+		}
+			.popupdialog_centred {
+				align-items: center;
+			}
+			
+			.popupdialog__message {
+				
+			}
+				
+			.popupdialog__buttons {
+				margin-top: 15px;
+			}
+				
+				.popupdialog__buttons button {
+					margin-left: 5px;
+					margin-right: 5px;
+				}
+					
+				
+			
+	
+	.ddrpopup__header {
+		flex: 0 1 auto;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding-left: 40px;
+		padding-right: 40px;
+	}
+		
+	
+	.ddrpopup__title {
+		text-align: center;
+	}
+		
+		.ddrpopup__title_overflow {
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+			vertical-align: middle;
+		}
+			
+		
+		.ddrpopup__title_1 {}
+		.ddrpopup__title_2 {}
+		.ddrpopup__title_3 {}
+		.ddrpopup__title_4 {}
+		.ddrpopup__title_5 {}
+			
+		
+	.ddrpopup__data {
+		flex: 1 1 100%;
+	}
+		
+		
+	.ddrpopup__footer {
+		flex: 0 1 auto;
+	}
+		.ddrpopup__footer:empty {
+			padding: 0;
+		}
+	
+		
+	
+	.ddrpopup__buttons {
+		display: flex;
+		justify-content: flex-end;
+		z-index: 1000;
+		position: relative;
+	}
+		
+		
+		.ddrpopup__buttons button  {
+			margin-left: 10px;
+		}
+		
+		.ddrpopup__buttons_close {
+			/*background-color: #f00;*/
+		}

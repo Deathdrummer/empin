@@ -1,0 +1,23 @@
+[ddrhscroll] {
+	position: relative;
+	visibility: hidden;
+	height: 100% !important;
+}
+[ddrhscroll].visible {
+	visibility: visible;
+}
+	[ddrhscroll].enabled > div {
+		position: sticky;
+		top: 0px;
+		overflow: hidden;
+		white-space: nowrap;
+		max-width: 100%;
+	}
+	[ddrhscroll].enabled > div > [ddrhscrolltrack] {
+		/*width: max-content;*/
+		font-size: 0;
+	}
+		[ddrhscroll].enabled > div > [ddrhscrolltrack] > * {
+			font-size: initial;
+			white-space: initial;
+		}

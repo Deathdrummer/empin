@@ -1,0 +1,9 @@
+=inputBg($color: #fff, $importaint: false)
+	&:-webkit-autofill
+		@if $importaint
+			-webkit-box-shadow: 0 0 0px 1000px #{$color} inset #{"!importaint"}
+			background-color: #{$color} #{"!importaint"}
+		
+		@else
+			-webkit-box-shadow: 0 0 0px 1000px #{$color} inset
+			background-color: #{$color}

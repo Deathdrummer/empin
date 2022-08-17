@@ -1,0 +1,139 @@
+@import "@sass/common/bootstrap/functions"
+@import "@sass/common/bootstrap/variables"
+
+$sm: map-get($grid-breakpoints, sm)
+$md: map-get($grid-breakpoints, md)
+$lg: map-get($grid-breakpoints, lg)
+$xl: map-get($grid-breakpoints, xl)
+$xxl: map-get($grid-breakpoints, xxl)
+
+//- css параметр
+//- массив, брейкпоинт: css значение
+//- массив сопутствующих параметров css параметр: разность от основного css значения
+=resp($param, $map, $dopParamMap: '')
+	@each $b, $val in $map
+		@if $b == m
+			#{$param}: $val
+			@if $dopParamMap != ''
+				@each $dpParam, $dpDiff in $dopParamMap
+					#{$dpParam}: $val + $dpDiff
+					
+		@else if $b == xs
+			#{$param}: $val
+			@if $dopParamMap != ''
+				@each $dpParam, $dpDiff in $dopParamMap
+					#{$dpParam}: $val + $dpDiff
+					
+		@else if $b == sm
+			@media screen and (min-width: $sm)
+				#{$param}: $val
+				@if $dopParamMap != ''
+					@each $dpParam, $dpDiff in $dopParamMap
+						#{$dpParam}: $val + $dpDiff
+						
+		@else if $b == md
+			@media screen and (min-width: $md)
+				#{$param}: $val
+				@if $dopParamMap != ''
+					@each $dpParam, $dpDiff in $dopParamMap
+						#{$dpParam}: $val + $dpDiff
+						
+		@else if $b == lg
+			@media screen and (min-width: $lg)
+				#{$param}: $val
+				@if $dopParamMap != ''
+					@each $dpParam, $dpDiff in $dopParamMap
+						#{$dpParam}: $val + $dpDiff
+						
+		@else if $b == xl
+			@media screen and (min-width: $xl)
+				#{$param}: $val	
+				@if $dopParamMap != ''
+					@each $dpParam, $dpDiff in $dopParamMap
+						#{$dpParam}: $val + $dpDiff
+		
+		@else if $b == xxl
+			@media screen and (min-width: $xxl)
+				#{$param}: $val	
+				@if $dopParamMap != ''
+					@each $dpParam, $dpDiff in $dopParamMap
+						#{$dpParam}: $val + $dpDiff
+						
+						
+		@else if $b == xs-down
+			@media screen and (max-width: $sm - 1px)
+				#{$param}: $val
+				@if $dopParamMap != ''
+					@each $dpParam, $dpDiff in $dopParamMap
+						#{$dpParam}: $val + $dpDiff
+						
+		@else if $b == sm-down
+			@media screen and (max-width: $md - 1px)
+				#{$param}: $val
+				@if $dopParamMap != ''
+					@each $dpParam, $dpDiff in $dopParamMap
+						#{$dpParam}: $val + $dpDiff
+						
+		@else if $b == md-down
+			@media screen and (max-width: $lg - 1px)
+				#{$param}: $val
+				@if $dopParamMap != ''
+					@each $dpParam, $dpDiff in $dopParamMap
+						#{$dpParam}: $val + $dpDiff
+						
+		@else if $b == lg-down
+			@media screen and (max-width: $xl - 1px)
+				#{$param}: $val
+				@if $dopParamMap != ''
+					@each $dpParam, $dpDiff in $dopParamMap
+						#{$dpParam}: $val + $dpDiff
+		
+		@else if $b == xl-down
+			@media screen and (max-width: $xxl - 1px)
+				#{$param}: $val
+				@if $dopParamMap != ''
+					@each $dpParam, $dpDiff in $dopParamMap
+						#{$dpParam}: $val + $dpDiff
+		
+		@else if $b == xs-only
+			@media screen and (max-width: $sm - 1px)
+				#{$param}: $val
+				@if $dopParamMap != ''
+					@each $dpParam, $dpDiff in $dopParamMap
+						#{$dpParam}: $val + $dpDiff
+						
+		@else if $b == sm-only
+			@media screen and (min-width: $sm) and (max-width: $md - 1px)
+				#{$param}: $val
+				@if $dopParamMap != ''
+					@each $dpParam, $dpDiff in $dopParamMap
+						#{$dpParam}: $val + $dpDiff
+						
+		@else if $b == md-only
+			@media screen and (min-width: $md) and (max-width: $lg - 1px)
+				#{$param}: $val
+				@if $dopParamMap != ''
+					@each $dpParam, $dpDiff in $dopParamMap
+						#{$dpParam}: $val + $dpDiff
+						
+		@else if $b == lg-only
+			@media screen and (min-width: $lg) and (max-width: $xl - 1px)
+				#{$param}: $val
+				@if $dopParamMap != ''
+					@each $dpParam, $dpDiff in $dopParamMap
+						#{$dpParam}: $val + $dpDiff
+		
+		@else if $b == xl-only
+			@media screen and (min-width: $xl) and (max-width: $xxl - 1px)
+				#{$param}: $val
+				@if $dopParamMap != ''
+					@each $dpParam, $dpDiff in $dopParamMap
+						#{$dpParam}: $val + $dpDiff			
+		
+		@else
+			@media screen and (min-width: $b)
+				#{$param}: $val
+				@if $dopParamMap != ''
+					@each $dpParam, $dpDiff in $dopParamMap
+						#{$dpParam}: $val + $dpDiff
+

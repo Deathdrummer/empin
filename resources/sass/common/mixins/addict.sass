@@ -1,0 +1,152 @@
+@import "@sass/common/bootstrap/functions"
+@import "@sass/common/bootstrap/variables"
+
+$sm: map-get($grid-breakpoints, sm)
+$md: map-get($grid-breakpoints, md)
+$lg: map-get($grid-breakpoints, lg)
+$xl: map-get($grid-breakpoints, xl)
+$xxl: map-get($grid-breakpoints, xxl)
+
+// Дополнение к resp
+// зависимое свойство, которое меняется от заданного коэффициента. 
+// Пример: (height, (xs: 20px, sm: 40px, ...), '+ 30px') - будет прибавляться + 30 пикселей 
+// еще пример: +addict('right', $ddrselectHeight, '/ 2', '-')
+=addict($param, $map, $coeff, $sign: '')
+	@each $b, $val in $map
+		@if $b == m or $b == xs
+			@if _is('number', $coeff)
+				+_initSign($param, $val, $coeff, $sign)
+			@else if _is('string', $coeff)
+				#{$param}: calc(#{$val+' '+$sign+' '+$coeff})
+				
+		@else if $b == sm
+			@media screen and (min-width: $sm)
+				@if _is('number', $coeff)
+					+_initSign($param, $val, $coeff, $sign)
+				@else if _is('string', $coeff)
+					#{$param}: calc(#{$val+' '+$sign+' '+$coeff})
+						
+		@else if $b == md
+			@media screen and (min-width: $md)
+				@if _is('number', $coeff)
+					+_initSign($param, $val, $coeff, $sign)
+				@else if _is('string', $coeff)
+					#{$param}: calc(#{$val+' '+$sign+' '+$coeff})
+						
+		@else if $b == lg
+			@media screen and (min-width: $lg)
+				@if _is('number', $coeff)
+					+_initSign($param, $val, $coeff, $sign)
+				@else if _is('string', $coeff)
+					#{$param}: calc(#{$val+' '+$sign+' '+$coeff})
+						
+		@else if $b == xl
+			@media screen and (min-width: $xl)
+				@if _is('number', $coeff)
+					+_initSign($param, $val, $coeff, $sign)
+				@else if _is('string', $coeff)
+					#{$param}: calc(#{$sign}#{$val+' '+$coeff})
+		
+		@else if $b == xxl
+			@media screen and (min-width: $xxl)
+				@if _is('number', $coeff)
+					+_initSign($param, $val, $coeff, $sign)
+				@else if _is('string', $coeff)
+					#{$param}: calc(#{$sign}#{$val+' '+$coeff})
+						
+						
+		@else if $b == xs-down
+			@media screen and (max-width: $sm - 1px)
+				@if _is('number', $coeff)
+					+_initSign($param, $val, $coeff, $sign)
+				@else if _is('string', $coeff)
+					#{$param}: calc(#{$sign}#{$val+' '+$coeff})
+						
+		@else if $b == sm-down
+			@media screen and (max-width: $md - 1px)
+				@if _is('number', $coeff)
+					+_initSign($param, $val, $coeff, $sign)
+				@else if _is('string', $coeff)
+					#{$param}: calc(#{$sign}#{$val+' '+$coeff})
+						
+		@else if $b == md-down
+			@media screen and (max-width: $lg - 1px)
+				@if _is('number', $coeff)
+					+_initSign($param, $val, $coeff, $sign)
+				@else if _is('string', $coeff)
+					#{$param}: calc(#{$sign}#{$val+' '+$coeff})
+						
+		@else if $b == lg-down
+			@media screen and (max-width: $xl - 1px)
+				@if _is('number', $coeff,)
+					+_initSign($param, $val, $coeff, $sign)
+				@else if _is('string', $coeff)
+					#{$param}: calc(#{$sign}#{$val+' '+$coeff})
+		
+		@else if $b == xl-down
+			@media screen and (max-width: $xxl - 1px)
+				@if _is('number', $coeff,)
+					+_initSign($param, $val, $coeff, $sign)
+				@else if _is('string', $coeff)
+					#{$param}: calc(#{$sign}#{$val+' '+$coeff})
+		
+		@else if $b == xs-only
+			@media screen and (max-width: $sm - 1px)
+				@if _is('number', $coeff)
+					+_initSign($param, $val, $coeff, $sign)
+				@else if _is('string', $coeff)
+					#{$param}: calc(#{$sign}#{$val+' '+$coeff})
+						
+		@else if $b == sm-only
+			@media screen and (min-width: $sm) and (max-width: $md - 1px)
+				@if _is('number', $coeff)
+					+_initSign($param, $val, $coeff, $sign)
+				@else if _is('string', $coeff)
+					#{$param}: calc(#{$sign}#{$val+' '+$coeff})
+						
+		@else if $b == md-only
+			@media screen and (min-width: $md) and (max-width: $lg - 1px)
+				@if _is('number', $coeff)
+					+_initSign($param, $val, $coeff, $sign)
+				@else if _is('string', $coeff)
+					#{$param}: calc(#{$sign}#{$val+' '+$coeff})
+						
+		@else if $b == lg-only
+			@media screen and (min-width: $lg) and (max-width: $xl - 1px)
+				@if _is('number', $coeff)
+					+_initSign($param, $val, $coeff, $sign)
+				@else if _is('string', $coeff)
+					#{$param}: calc(#{$sign}#{$val+' '+$coeff})
+		
+		@else if $b == xl-only
+			@media screen and (min-width: $xl) and (max-width: $xxl - 1px)
+				@if _is('number', $coeff)
+					+_initSign($param, $val, $coeff, $sign)
+				@else if _is('string', $coeff)
+					#{$param}: calc(#{$sign}#{$val+' '+$coeff})
+		
+		@else
+			@media screen and (min-width: $b)
+				@if _is('number', $coeff)
+					+_initSign($param, $val, $coeff, $sign)
+				@else if _is('string', $coeff)
+					#{$param}: calc(#{$sign}#{$val+' '+$coeff})
+
+
+
+
+
+
+
+// Вспомогательный миксин для addict
+=_initSign($param, $val1, $val2, $sign)
+	@if $sign == '/'
+		#{$param}: $val1/$val2
+	@else if $sign == '*'
+		#{$param}: $val1*$val2
+	@else if $sign == '+'
+		#{$param}: $val1+$val2
+	@else if $sign == '-'
+		#{$param}: $val1-$val2
+	@else if $sign == '%'
+		#{$param}: $val1%$val2

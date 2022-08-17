@@ -1,0 +1,611 @@
+@import "@sass/common/mixins/common"
+@import "@sass/common/mixins/scrollAdapt"
+@import "@sass/common/mixins/scrollbar"
+@import "@sass/common/mixins/placeholder"
+@import "@sass/common/mixins/resp"
+@import "@sass/common/mixins/addict"
+@import "@sass/common/mixins/font"
+@import "@sass/common/mixins/hr"
+@import "@sass/common/mixins/button"
+@import "@sass/common/vars"
+@import "@sass/common/ui/admin"
+//@import url('https://fonts.googleapis.com/css2?family=Fira+Sans:wght@100;200;300;400;500;600;700;800;900&display=swap')
+//@import url('https://fonts.googleapis.com/css2?family=Raleway:wght@100;200;300;400;500;600;700;800;900&display=swap')
+@import url('https://fonts.googleapis.com/css2?family=Mulish:wght@200;300;400;500;600;700;800;900&display=swap')
+
+body
+	+scrollbar($sbBg, $sbSliderBg, $sbWidth, $sbBorderRadius, $sbSliderBorderRadius)
+	background-color: #ecf0f4
+
+
+*
+	+font('Mulish')
+	
+
+
+
+.notifyjs-corner
+	right: calc(-100vw + 100% + var(--ddr-notifyXOffset)) !important
+	top: var(--ddr-notifyYOffset) !important
+	text-shadow: none !important
+	
+	[data-notify-text]
+		+fontWeight(400)
+		text-shadow: none !important
+	
+
+
+.ddrpopup
+	+scrollbar($sbBg, $sbSliderBg, $sbWidth, $sbBorderRadius, $sbSliderBorderRadius)
+
+
+input, textarea, [contenteditable]
+	+placeholder(#ccc)
+
+
+.app
+	min-height: 100%
+	display: flex
+	flex-direction: column
+	width: 100vw
+	position: relative
+	margin-left: calc(-100vw + 100%)
+	right: calc(-100vw + 100% + $sbWidth)
+	padding-left: $sbWidth
+
+
+
+
+
+.header
+	background-color: #fff
+	position: fixed
+	top: 0
+	left: 0
+	width: 100vw
+	box-shadow: 18px 1px 20px rgb(0 0 0 / 10%)
+	z-index: 11
+	
+	&__container
+		padding-right: 25px
+		padding-left: 25px
+	
+	&__block
+		+resp(height, $headerHeight)
+		display: flex
+		align-items: center
+	
+	
+	&__line
+		position: relative
+		width: 1px
+		height: calc(100% - 16px)
+		top: 8px
+		background-color: #e2e8ed
+	
+	
+	&__logo
+		display: flex
+		align-items: center
+		margin-right: 30px
+		
+		> div
+			padding-right: 10px
+			
+			img
+				width: 60px
+		> p
+			font-size: 16px
+			line-height: 18px
+			+fontWeight(400)
+			color: #181824
+	
+	
+	
+	//---------------------------------------------------------------- Меню
+	&__nav
+		margin-right: 20px
+			
+		.headernav
+			display: flex
+			opacity: 0
+			pointer-events: none
+			position: absolute
+			background-color: #181824
+			box-shadow: 0 11px 15px -7px rgb(30 36 41 / 34%)
+			+resp(top, $headerHeight)
+			z-index: 200
+			border-radius: 5px
+			transition: opacity 0.16s
+			
+			
+			&__handler
+				display: flex
+				align-items: center
+				cursor: pointer
+				
+				i
+					font-size: 28px
+					color: #767689
+					transition: color 0.16s
+					
+				
+				p
+					font-size: 20px
+					text-transform: uppercase
+					margin-left: 5px
+					transition: color 0.16s
+					
+				&:hover
+					i, p
+						color: #658cad
+			
+			&__item
+				width: 240px
+				padding: 15px
+				
+				p
+					font-size: 14px
+					margin-bottom: 10px
+					color: #394e5f
+			
+			
+				ul
+					width: 100%
+					margin-bottom: 0
+					//margin: $grid-gutter-width / 2
+					
+					li
+						display: flex
+						align-items: center
+						cursor: pointer
+						padding: 2px 4px 0px
+						height: 42px
+						font-size: 14px
+						line-height: 16px
+						list-style: none
+						color: #d8d8e5
+						border: 1px solid transparent
+						border-top: 1px solid #2f2f44
+						// background-color: lighten(#c7ccd0, 2%)
+						transition: background-color 0.16s
+						
+						span
+							color: #d8d8e5
+						
+						&:last-of-type
+							border-bottom: 1px solid #2f2f44
+							
+							
+						&:hover
+							background-color: #2f2f44
+							color: #d8d8e5
+						
+						&:active
+							background-color: #51516a
+							color: #d8d8e5
+							transition: background-color 0s
+							
+						&.active
+							background-color: #51516a
+							color: #d8d8e5
+							cursor: default
+		
+		
+		&_opened
+			.headernav
+				opacity: 1
+				pointer-events: auto
+			
+			.headernav__handler
+				i, p
+					color: #2badf9 !important
+		
+		
+
+	
+	&__pagetitle
+		font-size: 18px
+		+fontWeight(300)
+		color: #181824
+		opacity: 0
+		pointer-events: none
+		transition: opacity 0.16s
+		
+		&_visible
+			opacity: 1
+			pointer-events: auto
+			transition: opacity 0.3s
+	
+	
+	
+	
+	&__logout
+		display: flex
+		align-items: center
+		background-color: #fff
+		border: 1px solid transparent
+		border-radius: $borderRadius
+		cursor: pointer
+		+resp(height, $inputHeight)
+		+resp(padding-left, $inputPaddingX, (padding-right: 0))
+		transition: background-color 0.16s, border-color 0.16s, box-shadow 0.16s
+		
+		span
+			+fontWeight(400)
+			font-size: 14px
+			line-height: 14px
+			//margin-top: 2px
+			color: $colorBlack
+		
+		i
+			margin-right: 5px
+			font-size: 16px
+			color: #9f9fa9
+		
+		
+		&:hover
+			border-color: #d6eeef
+			
+			i
+				color: #181824
+		
+		&:active
+			box-shadow: 0 0 0 0.2rem rgb(28 192 197 / 50%)
+			//background-color: #16afb2
+			border-color: #93e3e5
+		
+		
+	
+	
+	
+	
+
+.content
+	flex: 1 1 100%
+	min-height: 500px
+	+resp(padding-top, $headerHeight)
+	display: grid
+	grid-template-columns: 100%
+	grid-template-rows: 1fr
+	gap: 0px
+	grid-auto-flow: row
+	grid-template-areas: ". ."
+	grid-area: content
+
+
+	
+.main
+	display: flex
+	flex-direction: column
+	
+	&__content
+		flex: 1 1 100%
+		padding: 1rem
+		
+		> *
+			pointer-events: none
+			opacity: 0
+			transition: opacity 0.3s
+		
+		&_visible
+			> *
+				pointer-events: auto
+				opacity: 1
+
+
+
+
+section
+	height: 100%
+	
+.section
+	&_center
+		display: flex
+		align-items: center
+		justify-content: center
+		text-align: center
+	
+	
+	&_error
+		h1
+			color: #d8dee3
+			font-size: 56px
+			+fontWeight(300)
+		
+		span
+			display: inline-block
+			margin-top: 20px
+			color: #b9bfc5
+			font-size: 20px
+			+fontWeight(300)
+		
+
+
+
+
+
+.footer
+	flex: 0 1 auto
+	//grid-area: footer
+	background-color: #e9ecef
+	padding-left: 1rem
+	padding-right: 25px
+	
+	&__block
+		+resp(height, $footerHeight)
+		display: flex
+		align-items: center
+	
+
+
+
+
+	
+
+.auth
+	height: 100%
+	display: flex
+	align-items: center
+	justify-content: center
+	background-color: #ecf0f4
+	+scrollAdapt()
+	
+	
+	&__form
+		padding: 30px
+		background-color: #fff
+		border-radius: 4px
+		
+		&_auth
+			width: 500px
+			
+			
+		&_reg
+			width: 500px
+		
+	
+	&__row
+	
+	&__logo
+		display: flex
+		align-items: center
+		
+		> div
+			padding-right: 10px
+			
+			img
+				width: 100px
+		> p
+			font-size: 26px
+			+fontWeight(400)
+			
+				
+	&__greetengs
+		font-size: 20px
+	
+	&__subgreetengs
+		font-size: 16px
+	
+	
+	&__formblock
+	
+	
+	&__field
+		margin-bottom: 30px
+		width: 100%
+	
+	&__greetengs
+		margin-bottom: 5px
+	
+	&__subgreetengs
+	
+	
+	&__textlink
+		cursor: pointer
+		display: inline-block
+		border-bottom: 1px solid transparent
+		+fontWeight(400)
+		
+		
+	&__forgot
+		color: #343a40
+		
+		&:hover
+			color: #343a40
+			border-color: #343a40
+		
+		
+	&__reg
+		color: #27bbbf
+		
+		&:hover
+			color: #008f93
+			border-color: #008f93
+	
+	
+	&__agreement
+		color: #27bbbf
+		
+		&:hover
+			color: #008f93
+			border-color: #008f93
+	
+
+
+
+
+
+
+
+
+
+.card
+	position: relative
+	background-color: #fff
+	padding: 15px
+	border-radius: 4px
+	//opacity: 0
+	//pointer-events: none
+	//transition: opacity 0.16s
+	
+	//&_visible
+	//	opacity: 1
+	//	pointer-events: auto
+	
+	
+	&__wait
+		position: absolute
+		top: 0
+		left: 0,
+		display: flex
+		align-items: center
+		justify-content: center
+		width: 100%
+		height: 100%
+		background-color: #fffffff2
+		border-radius: inherit
+		z-index: 10
+		
+		&_closing
+			opacity: 0
+			transition: opacity 0.3s ease 0.2s
+	
+	
+	.cardwait
+		text-align: center
+		
+		&__icon
+			filter: hue-rotate(170deg)
+			width: 50px
+			height: 50px
+		
+		&__text
+			margin-top: 5px
+			color: #a6a6b3
+			font-size: 14px
+	
+	
+	&__header
+		display: flex
+		justify-content: space-between
+		align-items: flex-start
+		margin-bottom: 2rem
+		
+	
+	&__title
+		font-size: 16px
+		
+	&__desc
+		font-size: 12px
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.ddrtabs
+	width: 100%
+	display: flex
+	
+	&__nav
+		flex: 1 0 250px
+		
+		li
+			word-break: break-all
+	
+	&__content
+		flex: 0 1 100%
+
+
+
+.ddrtabsnav
+	
+	&__item
+		min-height: 40px
+		padding: 5px	
+		display: flex
+		align-items: center
+		border: 1px solid transparent
+		border-right: none
+		position: relative
+		+fontWeight(300)
+		transition: color 0.16s
+		
+		
+		
+		&:not(.ddrtabsnav__item_active)
+			cursor: pointer
+			border-right: 1px solid #d4dedf
+			color: #afbdc3
+			
+			&:hover
+				color: #486264
+			
+
+		&_active
+			//box-shadow: 2px 0 0 -1px #fff
+			border-color: #d4dedf
+			border-radius: 5px 0 0 5px
+			color: #486264
+			
+			
+			
+		
+
+
+.ddrtabscontent
+	padding-left: 2rem
+	
+	&__item
+		display: none
+		
+		&_visible
+			display: block
+	
+	
+
+
+
+
+
+
+
+
+.form
+	&__item
+		padding-bottom: 2rem
+		
+	&__label
+		display: block
+		margin-bottom: 2px
+		font-size: 13px
+	
+	&__line
+		+hr(10%, 90%, #d4dbe0)
+
+
+
+
+
+
+
+.hovered
+	border: 1px solid
+	+ddrBtn((normal: (bg: #fff, border: #eaecf1, color: #647f8b, animate: 0.3s), hover: (bg: #f2f6f9, border: #ecf0f3, color: #2d5364, animate: 0.16s), active: (bg: #e9eff3, border: #d9e4eb, color: #005a83)))
+	display: flex

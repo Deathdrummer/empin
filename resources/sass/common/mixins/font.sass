@@ -1,0 +1,29 @@
+=font($family, $weight: false, $style: false)
+	@if $family
+		font-family: #{$family}, sans-serif
+	
+	@if $weight
+		font-weight: #{$weight}
+		
+	
+	@if $style
+		font-style: #{$style}
+
+
+
+=fontAwesome($icon: false, $cls: false)
+	font-family: 'Font Awesome 6 Free'
+	font-weight: 900
+	
+	@if $icon
+		&::after
+			content: $icon
+			@if $cls
+				@each $param, $value in $cls
+					#{$param}: $value
+
+
+
+=fontWeight($weight: false)
+	@if $weight
+		font-weight: #{$weight}

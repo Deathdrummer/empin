@@ -1,0 +1,819 @@
+=input()
+	display: inline-block
+	position: relative
+	vertical-align: top
+	border: 1px solid #d0d6da
+	width: 100%
+	//overflow: hidden
+	border-radius: 3px
+	transition: border-color 0.16s, box-shadow 0.16s
+	
+	
+	input
+		background: none
+		background-color: #fefefe
+		border: none
+		width: 100%
+		font-size: 14px
+		height: 34px
+		padding: 0 4px
+		
+		&[type="color"]
+			cursor: pointer
+
+
+
+
+
+
+
+
+
+
+
+=date()
+	position: relative
+	display: inline-block
+	
+	
+	&::after
+		content: "\f073"
+		font: normal normal normal 14px/1 FontAwesome
+		position: absolute
+		right: 6px
+		top: calc(50% - 7px)
+		color: #c4c8cc
+		pointer-events: none
+		transition: color 0.16s
+			
+		
+	input
+		background: none
+		background-color: #fefefe
+		border: none
+		font-size: 14px
+		appearance: none
+		border-radius: 2px
+		height: 34px
+		padding-right: 25px
+		padding-left: 4px
+		transition: border-color 0.16s
+		color: #666
+		width: 100%
+		cursor: pointer
+		
+	
+	&.focused
+		border-color: darken(#d0d6da, 8%)
+		box-shadow: 0 4px 10px -1px rgba(68, 86, 101, 0.4)
+		
+		label
+			background-color: darken(#82909e, 8%)
+		
+		&::after
+			color: darken(#c4c8cc, 30%) !important
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+=textarea()
+	position: relative
+	display: inline-block
+	vertical-align: top
+	border: 1px solid #d0d6da
+	width: 100%
+	//overflow: hidden
+	border-radius: 3px
+	transition: border-color 0.16s, box-shadow 0.16s
+	
+	&.focused
+		border-color: darken(#d0d6da, 8%)
+		box-shadow: 0 4px 10px -1px rgba(68, 86, 101, 0.4)
+		
+		label
+			background-color: darken(#82909e, 8%)
+	
+	
+	label
+		display: block
+		margin: 0
+		padding: 6px 4px
+		font-size: 0
+		background-color: #82909e
+		transition: background-color 0.16s
+		
+		span
+			display: inline-block
+			font-size: 13px
+			line-height: 13px
+			color: #fff
+	
+	&.error
+		border-color: #ff1e1e
+		background-color: #fff0f0
+		
+		span.error:not(:empty)
+			opacity: 1
+			z-index: 1210
+			
+	span.error
+		position: absolute
+		top: 100%
+		left: 0
+		font-size: 12px
+		line-height: 12px
+		+font('roboto', medium)
+		opacity: 0
+		background-color: #f88
+		box-shadow: 0 1px 0 0 #ff1e1e, 1px 0 0 0 #ff1e1e, -1px 0 0 0 #ff1e1e
+		padding: 2px 4px
+		width: 100%
+		color: #fff
+		pointer-events: none
+		transition: opacity 0.16s
+		
+		
+	textarea
+		background: none
+		background-color: #fefefe
+		border: none
+		margin-bottom: 0
+		display: block
+		width: 100%
+		min-height: 132px
+		max-height: 100vh
+		font-size: 14px
+		padding: 0 4px
+		
+		&[resizey]
+			resize: vertical
+		
+		&[resizex]
+			resize: horizontal
+		
+		&[noresize]
+			resize: none
+
+
+
+
+
+
+
+=file()
+	display: inline-block
+	vertical-align: top
+	border: 1px solid #d0d6da
+	width: auto
+	overflow: hidden
+	border-radius: 3px
+	
+	input
+		display: none
+	
+	> label
+		display: block
+		margin: 0
+		padding: 6px 4px
+		font-size: 0
+		background-color: #82909e
+		
+		span
+			display: inline-block
+			font-size: 13px
+			line-height: 13px
+			color: #fff
+	
+	
+	
+	> div
+		display: flex
+		background-color: #fff
+		padding: 10px
+		background-color: #f4f6f7
+		transition: background-color 0.16s
+		position: relative
+		@extend .noselect
+		
+		&:hover
+			background-color: darken(#f4f6f7, 1%)
+		
+		label
+			margin-bottom: 0
+			
+			.image
+				padding: 14px
+				width: 170px
+				height: 170px
+				display: flex
+				align-items: center
+				justify-content: center
+				
+				img
+					max-width: 100%
+					height: auto
+					
+		
+		div
+			display: flex
+			flex-direction: column
+			justify-content: space-between
+			cursor: pointer
+			
+		
+			span
+				display: block
+				font-size: 13px
+				line-height: 13px
+				background-color: #84add4
+				color: #fff
+				padding: 2px 4px
+				border-radius: 2px
+				position: absolute
+				left: 10px
+				max-width: 160px
+				pointer-events: none
+				word-break: break-word
+				
+			
+			button
+				border: none
+				color: #fff
+				width: 40px
+				height: calc(50% - 5px)
+				border-radius: 3px
+				cursor: pointer
+				transition: background-color 0.16s
+				
+				i
+					font-size: 24px
+					line-height: 45px
+				
+				&.add
+					background-color: #4296bb
+					
+					&:hover
+						background-color: darken(#4296bb, 6%)
+				
+				&.remove
+					background-color: #c54747
+					
+					&:hover
+						background-color: darken(#c54747, 6%)
+
+
+
+
+
+
+
+=radio()
+	display: inline-block
+	vertical-align: top
+	overflow: hidden
+	border-radius: 3px
+	
+	> label
+		display: inline-block
+		margin: 0
+		font-size: 0
+		padding: 6px 4px
+		border: 1px solid #d0d6da
+		border-radius: 3px
+		background-color: #82909e
+		
+		span
+			display: inline-block
+			font-size: 13px
+			line-height: 13px
+			color: #fff
+		
+		+ .radio_items
+			margin-top: 10px
+		
+	
+	&_items
+		display: block
+		width: 100%
+		word-spacing: 6px
+		
+		
+		&_item
+			display: inline-block
+			word-spacing: normal
+			
+			label
+				margin-bottom: 0
+				cursor: pointer
+												
+				input
+					display: none
+					
+					&:checked ~ span
+						color: #fff
+						background-color: #7793ab
+						border-color: #7793ab
+						box-shadow: none
+				span
+					font-size: 14px
+					background-color: #e0e0e0
+					border-radius: 3px
+					padding: 5px 10px
+					display: block
+					color: #afafaf
+					transition: background-color 0.16s
+					box-shadow: 0 0 0 1px #bdc4ca inset
+					
+					&:hover
+						background-color: darken(#e0e0e0, 3%)
+
+
+
+
+
+=checkbox()
+	display: inline-block
+	vertical-align: top
+	overflow: hidden
+	border-radius: 3px
+	
+	> label
+		display: inline-block
+		margin: 0
+		font-size: 0
+		padding: 6px 4px
+		border: 1px solid #d0d6da
+		border-radius: 3px
+		background-color: #82909e
+		
+		span
+			display: inline-block
+			font-size: 13px
+			line-height: 13px
+			color: #fff
+			
+	&_items
+		display: block
+		width: 100%
+		word-spacing: 6px
+		margin-top: 10px
+		
+		&_item
+			display: block
+			word-spacing: normal
+			
+			&_block
+				display: flex
+				
+				label
+					margin-bottom: 0
+					
+					&:first-of-type
+						span
+							border-radius: 3px 0 0 3px
+					
+					&:last-of-type
+						span
+							border-radius: 0 3px 3px 0
+					
+					input
+						display: none
+						
+						&:checked ~ span
+							background-color: #7793ab
+							color: #fff
+						
+					span
+						cursor: pointer
+						display: block
+						width: 40px
+						height: 40px
+						background-color: #e0e0e0
+						transition: background-color 0.16s
+						display: flex
+						align-items: center
+						justify-content: center
+						color: #b1b1b1
+						
+						&:hover
+							background-color: lighten(#cacfd4, 3%)
+
+
+
+
+
+=select()
+	position: relative
+	display: inline-block
+	border: 1px solid #d0d6da
+	transition: border-color 0.16s, box-shadow 0.16s
+	
+	&.focused
+		border-color: darken(#d0d6da, 8%)
+		box-shadow: 0 4px 10px -1px rgba(68, 86, 101, 0.4)
+	
+	&.small
+		select
+			height: 26px
+	
+	&__caret
+		position: absolute
+		//display: block
+		height: 14px
+		width: 14px
+		right: 6px
+		top: calc(50% - 7px)
+		font-size: 14px
+		color: #c4c8cc
+		pointer-events: none
+		
+		&::after
+			position: absolute
+			top: 0
+			content: "▼"
+			display: inline-block
+			line-height: 100%
+			height: 100%
+			transition: color 0.16s
+	
+	
+	&.error
+		border-color: #ff1e1e
+		background-color: #fff0f0
+		
+		span.error:not(:empty)
+			opacity: 1
+			z-index: 1210
+	
+	&:not(.nowidth)
+		width: 100%
+		
+	&.nowidth
+		width: auto
+			
+	span.error
+		position: absolute
+		top: 100%
+		left: 0
+		font-size: 12px
+		line-height: 12px
+		+font('roboto', medium)
+		opacity: 0
+		background-color: #f88
+		box-shadow: 0 1px 0 0 #ff1e1e, 1px 0 0 0 #ff1e1e, -1px 0 0 0 #ff1e1e
+		padding: 2px 4px
+		width: 100%
+		color: #fff
+		pointer-events: none
+		transition: opacity 0.16s
+			
+		
+	select
+		appearance: none
+		border-radius: 2px
+		border: none
+		background: #fff
+		height: 34px
+		padding-right: 25px
+		padding-left: 4px
+		transition: border-color 0.16s
+		color: #666
+		width: 100%
+		cursor: pointer
+		
+		&.error
+			~ .select__caret::after
+				color: #f55
+		
+		
+		&:focus
+			border-color: darken(#a7acaf, 30%)
+			
+			~ .select__caret::after
+				color: darken(#c4c8cc, 30%)
+	
+		option
+			background-color: #fff
+			
+			&[disabled]
+				background: #ccc
+			
+
+
+
+
+
+
+
+
+=checkblock($offset: 0)
+	display: inline-block
+
+	label
+		position: relative
+		margin-bottom: 0
+		
+		&:hover ~ label::after
+			color: #10262d
+	
+	input[type="checkbox"], input[type="radio"]
+		display: none
+		
+		~ label::after
+			content: "\f096"
+			position: relative
+			top: 0
+			font: normal normal normal 14px/1 FontAwesome
+			font-size: 24px
+			display: block
+			width: 22px
+			cursor: pointer
+			z-index: 999
+		
+			
+		&:checked ~ label::after
+			content: "\f046"
+			color: #3a6577
+			@if $offset
+				left: #{$offset}
+			
+		&:disabled:not(:checked) ~ label::after
+			content: "\f096"
+			color: #aaa
+			cursor: default
+		
+		&:disabled:checked ~ label::after
+			content: "\f046"
+			color: #9a9d9e
+			cursor: default
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+=btn($styles: (), $classes: ())
+	display: inline-flex
+	align-items: center
+	vertical-align: top
+	font-size: 14px
+	word-spacing: normal
+	background-color: #4296bb
+	border: none
+	cursor: pointer
+	color: #fff
+	height: 34px
+	padding-left: 15px
+	padding-right: 15px
+	border-radius: 3px
+	text-transform: uppercase
+	transition: background-color 0.16s
+	
+	@if $styles
+		@each $param, $val in $styles
+			#{$param}: $val
+		
+	@if $classes
+		@each $cls in $classes
+			@extend #{'.'+$cls}
+	
+	> *
+		margin: auto
+		
+	&:hover
+		background-color: darken(#4296bb, 7%)
+	
+	&:active
+		background-color: darken(#4296bb, 20%)
+		transition: background-color 0s
+	
+	&.large
+		font-size: 16px
+		height: 40px
+		padding-left: 30px
+		padding-right: 30px
+	
+	&.small
+		font-size: 12px
+		height: 26px
+		padding-left: 15px
+		padding-right: 15px
+	
+	&.custom
+		font-size: initial
+		height: initial
+		padding-left: initial
+		padding-right: initial
+	
+	&.fieldheight
+		height: 60px
+		min-width: 60px
+		
+		i
+			font-size: 24px
+	
+	&.remove:not(:disabled)
+		background-color: #c54747!important	
+		
+		&:hover
+			background-color: darken(#c54747, 7%)!important	
+	
+		&:active
+			background-color: darken(#c54747, 20%)!important	
+			transition: none!important	
+	
+	&:disabled, &.disabled
+		background-color: #bbbbbb!important	
+		cursor: default!important
+		transition: background-color 0s!important	
+	
+		
+	@keyframes shake
+		from, to
+			transform: translate3d(0, 0, 0)
+			background-color: #c54747
+		
+
+		10%, 30%, 50%, 70%, 90%
+			transform: translate3d(-3px, 0, 0)
+		
+
+		20%, 40%, 60%, 80%
+			transform: translate3d(3px, 0, 0)
+	
+	@keyframes shakedis
+		from, to
+			transform: translate3d(0, 0, 0)
+			background-color: #bbbbbb
+		
+
+		10%, 30%, 50%, 70%, 90%
+			transform: translate3d(-3px, 0, 0)
+		
+
+		20%, 40%, 60%, 80%
+			transform: translate3d(3px, 0, 0)
+	
+	&.error
+		animation: shake 0.8s
+		background-color: #c54747
+		
+		&:disabled.error
+			animation: shakedis 0.8s
+		
+		&:hover
+			background-color: darken(#c54747, 7%)
+		
+		&:active
+			background-color: darken(#c54747, 20%)
+			transition: background-color 0s
+	
+	&.alt
+		background-color: #466580
+		
+		&:hover
+			background-color: darken(#466580, 7%)
+		
+		&:active
+			background-color: darken(#466580, 20%)
+			transition: background-color 0s
+	
+	&.alt2
+		background-color: #63717d
+		
+		&:hover
+			background-color: darken(#63717d, 7%)
+		
+		&:active
+			background-color: darken(#63717d, 20%)
+			transition: background-color 0s
+	
+	&.pay
+		background-color: #65a25b
+		
+		&:hover
+			background-color: darken(#65a25b, 7%)
+		
+		&:active
+			background-color: darken(#65a25b, 20%)
+			transition: background-color 0s
+	
+	
+	
+	&.done
+		position: relative
+		
+		&:disabled::before
+			box-shadow: 0 0 0 3px #bbbbbb
+		
+		&:disabled::after
+			color: #bbbbbb
+		
+		&::before
+			content: ''
+			position: absolute
+			top: -10px
+			right: -6px
+			width: 26px
+			height: 26px
+			background-color: #fff
+			border-radius: 50%
+			box-shadow: 0 0 0 3px #4296bb
+		
+		&::after
+			content: '\f00c'
+			position: absolute
+			top: -8px
+			right: -4px
+			font: normal normal normal 14px/1 FontAwesome
+			font-size: 22px
+			color: #00a900
+		
+		&:not(.fieldheight)::before
+			top: -8px
+			right: -4px
+			width: 16px
+			height: 16px
+			
+		&:not(.fieldheight)::after
+			top: -7px
+			right: -3px
+			font-size: 14px
+		
+		&.small
+			&::before
+				top: -8px
+				right: -4px
+				width: 13px
+				height: 13px
+				
+			&::after
+				top: -7px
+				right: -4px
+				font-size: 12px
+		
+			
+	
+	
+	&.fail
+		position: relative
+		
+		&:disabled::before
+			box-shadow: 0 0 0 3px #bbbbbb
+		
+		&:disabled::after
+			color: #bbbbbb
+		
+		&::before
+			content: ''
+			position: absolute
+			top: -10px
+			right: -6px
+			width: 26px
+			height: 26px
+			background-color: #fff
+			border-radius: 50%
+			box-shadow: 0 0 0 3px #c54747
+		
+		&::after
+			content: '\f00d'
+			position: absolute
+			top: -9px
+			right: -1.5px
+			font: normal normal normal 14px/1 FontAwesome
+			font-size: 22px
+			color: #a90000
+		
+		&:not(.fieldheight)::before
+			top: -8px
+			right: -4px
+			width: 16px
+			height: 16px
+			
+		&:not(.fieldheight)::after
+			top: -7px
+			right: -1px
+			font-size: 14px
+		
+		
+
+

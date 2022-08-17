@@ -1,0 +1,393 @@
+@import "@sass/common/mixins/inputBg"
+@import "@sass/common/mixins/placeholder"
+
+
+.textarea
+	&_noresize
+		resize: none
+
+	&__label
+		position: absolute
+		background-color: #fff
+		display: block
+		z-index: 1
+
+
+
+.auth
+	&-textarea
+		position: relative
+		display: inline-block
+		
+		textarea
+			width: 100%
+			resize: vertical
+			+resp(min-height, $inputHeight)
+			+resp(padding, $inputPaddingX)
+			border: 1px solid #e4e8ed
+			border-radius: $borderRadius
+			background: #fff !important
+			color: $inputColor
+			transform: border-color 0.16s
+			+inputBg(#fdfdfd)
+			+placeholder((color: $hpColor, focusColor: $hpColorFocus, disabledColor: $hpColorDisable, durationHover: $phDurationHover, durationLeave: $phDurationLeave))
+			+scrollbar(#eee, #aaa, 4px, 1px, 1px)
+			
+			
+			
+		&_noempty
+			> textarea
+				border-color: #cadbf1
+				background-color: #f99
+			
+		&_focused
+			> textarea
+				border-color: #b3becb
+				background-color: #777
+			
+		
+		&_changed
+			> textarea
+				border-color: #b1d0ef
+				box-shadow: 0 0 0px 1px #82f185
+			
+		&_disabled
+			> textarea
+				background-color: #fefefe
+				border-color: #f1f1f1 !important
+				color: #dfdfdf !important
+			
+			.textarea__label
+				color: #cdcdcd
+		
+		
+		&_error
+			> textarea
+				border-color: #ffa3a3 !important
+				box-shadow: none !important
+			
+		&__errorlabel
+			position: absolute
+			left: 0
+			bottom: 0
+			height: 0
+			width: 100%
+			z-index: 10
+			
+			&:empty
+				display: none
+			
+			
+			> div
+				position: absolute
+				top: 0
+				left: 0
+				width: 100%
+				height: 100%
+				font-size: 12px
+				line-height: 12px
+				color: #f00
+				transform: translateY($errorLabelShift)
+				
+				strong
+					font-weight: 400
+	
+	
+	
+	
+	
+	
+	
+	
+	
+.large
+	&-textarea
+		position: relative
+		display: inline-block
+		
+		textarea
+			width: 100%
+			resize: vertical
+			+resp(min-height, $inputHeight)
+			+resp(padding, $inputPaddingX)
+			+resp(font-size, $inputFontSize)
+			border: 1px solid #e4e8ed
+			border-radius: $borderRadius
+			background: #fff !important
+			color: $inputColor
+			transform: border-color 0.16s
+			+inputBg(#fdfdfd)
+			+placeholder((color: $hpColor, focusColor: $hpColorFocus, disabledColor: $hpColorDisable, durationHover: $phDurationHover, durationLeave: $phDurationLeave))
+			+scrollbar(#eee, #aaa, 4px, 1px, 1px)
+		
+		
+		&__label
+			top: -6px
+			left: 6px
+			padding-left: 6px
+			padding-right: 6px
+			font-size: 12px
+			line-height: 12px
+			
+			
+			
+		&_noempty
+			> textarea
+				border-color: #cadbf1
+				background-color: #f99
+			
+		&_focused
+			> textarea
+				border-color: #b3becb
+				background-color: #777
+			
+		
+		&_changed
+			> textarea
+				border-color: #b1d0ef
+				box-shadow: 0 0 0px 1px #82f185
+		
+		&_disabled
+			> textarea
+				background-color: #fefefe
+				border-color: #f1f1f1 !important
+				color: #dfdfdf !important
+			
+			.textarea__label
+				color: #cdcdcd
+		
+		
+		&_error
+			> textarea
+				border-color: #ffa3a3 !important
+				color: #ff1818 !important
+				box-shadow: none !important
+				
+			
+		&__errorlabel
+			position: absolute
+			left: 0
+			bottom: 0
+			height: 0
+			width: 100%
+			z-index: 10
+			
+			&:empty
+				display: none
+			
+			
+			> div
+				position: absolute
+				top: 0
+				left: 0
+				width: 100%
+				height: 100%
+				font-size: 12px
+				line-height: 12px
+				color: #f00
+				transform: translateY($errorLabelShift)
+				
+				strong
+					font-weight: 400
+	
+	
+	
+
+
+
+.normal
+	&-textarea
+		position: relative
+		display: inline-block
+		
+		textarea
+			width: 100%
+			resize: vertical
+			+addict(min-height, $inputHeight, '/ 1.4')
+			+addict(padding-left, $inputPaddingX, '/ 1.2')
+			+addict(padding-right, $inputPaddingX, '/ 1.2')
+			+addict(padding-top, $inputPaddingX, '/ 1.4')
+			+addict(padding-bottom, $inputPaddingX, '/ 1.4')
+			+addict(font-size, $inputFontSize, '/ 1.2')
+			border: 1px solid #e4e8ed
+			border-radius: $borderRadius
+			background: #fff !important
+			color: $inputColor
+			transform: border-color 0.16s
+			+inputBg(#fdfdfd)
+			+placeholder((color: $hpColor, focusColor: $hpColorFocus, disabledColor: $hpColorDisable, durationHover: $phDurationHover, durationLeave: $phDurationLeave))
+			+scrollbar(#eee, #aaa, 4px, 1px, 1px)
+		
+		
+		&__label
+			top: -6px
+			left: 5px
+			padding-left: 5px
+			padding-right: 5px
+			font-size: 11px
+			line-height: 11px
+			
+			
+			
+		&_noempty
+			> textarea
+				border-color: #cadbf1
+				background-color: #f99
+			
+		&_focused
+			> textarea
+				border-color: #b3becb
+				background-color: #777
+			
+		
+		&_changed
+			> textarea
+				border-color: #b1d0ef
+				box-shadow: 0 0 0px 1px #82f185
+		
+		&_disabled
+			> textarea
+				background-color: #fefefe
+				border-color: #f1f1f1 !important
+				color: #dfdfdf !important
+			
+			.textarea__label
+				color: #cdcdcd
+		
+		&_error
+			> textarea
+				border-color: #ffa3a3 !important
+				color: #ff1818 !important
+				box-shadow: none !important
+				
+			
+		&__errorlabel
+			position: absolute
+			left: 0
+			bottom: 0
+			height: 0
+			width: 100%
+			z-index: 10
+			
+			&:empty
+				display: none
+			
+			
+			> div
+				position: absolute
+				top: 0
+				left: 0
+				width: 100%
+				height: 100%
+				font-size: 11px
+				line-height: 11px
+				color: #f00
+				transform: translateY($errorLabelShift)
+				
+				strong
+					font-weight: 400
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+.small
+	&-textarea
+		position: relative
+		display: inline-block
+		
+		textarea
+			width: 100%
+			resize: vertical
+			+addict(min-height, $inputHeight, '/ 1.4')
+			+addict(padding, $inputPaddingX, '/ 1.4')
+			+addict(font-size, $inputFontSize, '/ 1.4')
+			border: 1px solid #e4e8ed
+			border-radius: $borderRadius
+			background: #fff !important
+			color: $inputColor
+			transform: border-color 0.16s
+			+inputBg(#fdfdfd)
+			+placeholder((color: $hpColor, focusColor: $hpColorFocus, disabledColor: $hpColorDisable, durationHover: $phDurationHover, durationLeave: $phDurationLeave))
+			+scrollbar(#eee, #aaa, 4px, 1px, 1px)
+		
+		
+		&__label
+			top: -5px
+			left: 5px
+			padding-left: 5px
+			padding-right: 5px
+			font-size: 10px
+			line-height: 10px
+			
+			
+			
+		&_noempty
+			> textarea
+				border-color: #cadbf1
+				background-color: #f99
+			
+		&_focused
+			> textarea
+				border-color: #b3becb
+				background-color: #777
+			
+		
+		&_changed
+			> textarea
+				border-color: #b1d0ef
+				box-shadow: 0 0 0px 1px #82f185
+		
+		&_disabled
+			> textarea
+				background-color: #fefefe
+				border-color: #f1f1f1 !important
+				color: #dfdfdf !important
+			
+			.textarea__label
+				color: #cdcdcd
+		
+		&_error
+			> textarea
+				border-color: #ffa3a3 !important
+				color: #ff1818 !important
+				box-shadow: none !important
+				
+			
+		&__errorlabel
+			position: absolute
+			left: 0
+			bottom: 0
+			height: 0
+			width: 100%
+			z-index: 10
+			
+			&:empty
+				display: none
+			
+			
+			> div
+				position: absolute
+				top: 0
+				left: 0
+				width: 100%
+				height: 100%
+				font-size: 11px
+				line-height: 11px
+				color: #f00
+				transform: translateY($errorLabelShift)
+				
+				strong
+					font-weight: 400
+	
+	
+	
+	
