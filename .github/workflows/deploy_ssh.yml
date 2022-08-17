@@ -1,0 +1,43 @@
+on: push
+name: Публикация на empin.shopdevelop.ru
+jobs:
+  FTP-Deploy-Action:
+    name: SSH-Deploy
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2.1.0
+      with:
+        fetch-depth: 2
+    
+    - name: Deploy to Server
+      uses: easingthemes/ssh-deploy@main
+      env:
+          SSH_PRIVATE_KEY: ${{ secrets.key }}
+          ARGS: "-rc --delete"
+          SOURCE: "/"
+          REMOTE_HOST: vh05.hostline.ru
+          REMOTE_USER: vh112866
+          TARGET: /var/www/vh112866/data/www/empin.shopdevelop.ru/
+          EXCLUDE: "/node_modules/, /vendor/" # через запятую
+    
+    
+    # если деплоить config.php и modifications.json иначе добавить вручную
+    #- name: Deploy config to Server
+    #  uses: easingthemes/ssh-deploy@main
+    #  env:
+    #      SSH_PRIVATE_KEY: ${{ secrets.key }}
+    #      ARGS: "--ignore-existing"
+    #      SOURCE: "/production/app/config/config.php"
+    #      REMOTE_HOST: vh05.hostline.ru
+    #      REMOTE_USER: vh112866
+    #      TARGET: /var/www/vh112866/data/www/advokat.shopdevelop.ru/app/config/
+    #
+    #- name: Deploy modifications to Server
+    #  uses: easingthemes/ssh-deploy@main
+    #  env:
+    #      SSH_PRIVATE_KEY: ${{ secrets.key }}
+    #      ARGS: "--ignore-existing"
+    #      SOURCE: "/production/modifications.json"
+    #      REMOTE_HOST: vh05.hostline.ru
+    #      REMOTE_USER: vh112866
+    #      TARGET: /var/www/vh112866/data/www/advokat.shopdevelop.ru/
