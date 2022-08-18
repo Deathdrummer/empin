@@ -29,6 +29,7 @@ return new class extends Migration {
 			
 			$table->integer('from_id')->nullable()->comment('Кто внес данные. Польжительное значение - сотрудник, отрицательное - админ');
 			
+			
 			$table->timestamps();
         });
     }
