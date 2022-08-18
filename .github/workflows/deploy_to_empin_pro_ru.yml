@@ -1,0 +1,21 @@
+on: push
+name: Публикация на empin-pro.ru
+jobs:
+  FTP-Deploy-Action:
+    name: SSH-Deploy
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2.1.0
+      with:
+        fetch-depth: 2
+    
+    - name: Deploy to Server
+      uses: easingthemes/ssh-deploy@main
+      env:
+          SSH_PRIVATE_KEY: ${{ secrets.key }} # key - по-моему, так доолжен называться ключ в панели хостинга, где он добавляется
+          ARGS: "-rc --delete"
+          SOURCE: "/"
+          REMOTE_HOST: 185.4.75.200
+          REMOTE_USER: vh355994
+          TARGET: /var/www/empin_pro_usr/data/www/empin-pro.ru
+          EXCLUDE: "/node_modules/, /vendor/" # через запятую
