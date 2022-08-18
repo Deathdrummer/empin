@@ -26,7 +26,7 @@ class VerifyEmail extends NotificationsVerifyEmail {
 		
 		return URL::temporarySignedRoute(
             $this->guard.'verification.verify',
-            Carbon::now()->addMinutes(Config::get('auth.verification.expire', 60)),
+            Carbon::now()->addMinutes(Config::get('auth.verification.expire', 500)),
             [
                 'id' => sha1($notifiable->getKey()),
                 'hash' => sha1($notifiable->getEmailForVerification())

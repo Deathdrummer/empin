@@ -93,13 +93,13 @@ return [
         'users' => [
             'provider' => 'users',
             'table' => 'password_resets',
-            'expire' => 300,
+            'expire' => 60,
             'throttle' => 60,
         ],
 		'admin_users' => [
             'provider' => 'admin_users',
             'table' => 'admin_password_resets',
-            'expire' => 300,
+            'expire' => 60,
             'throttle' => 60,
         ],
     ],
