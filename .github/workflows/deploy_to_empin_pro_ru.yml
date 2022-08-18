@@ -18,4 +18,4 @@ jobs:
           REMOTE_HOST: 185.4.75.200
           REMOTE_USER: empin_pro_usr
           TARGET: /var/www/empin_pro_usr/data/www/empin-pro.ru
-          EXCLUDE: "/node_modules/, /vendor/" # через запятую
+          EXCLUDE: "/node_modules/, /vendor/, /.env" # через запятую
