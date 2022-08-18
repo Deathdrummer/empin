@@ -63,7 +63,7 @@ class AdminController extends Controller {
 		$settingsService = App::make(Settings::class);
 		$settings = $settingsService->getMany('company_name');
 		
-		return view('admin.auth.reg', compact('locale', 'data'), $settings->all());
+		return view('admin.auth.reg', compact('locale'), $settings->all());
 	}
 	
 	

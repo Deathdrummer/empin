@@ -9,7 +9,7 @@ use App\View\Components\inputs\Datepicker;
 use App\View\Components\Inputs\File;
 use App\View\Components\Inputs\Input;
 use App\View\Components\Inputs\InputGroup;
-use App\View\Components\inputs\Localebar;
+use App\View\Components\Inputs\Localebar;
 use App\View\Components\Inputs\Textarea;
 use App\View\Components\Inputs\Radio;
 use App\View\Components\Inputs\Select;

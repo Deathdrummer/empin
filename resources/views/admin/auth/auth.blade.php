@@ -3,7 +3,6 @@
 	{{-- <p>{{$company_name ?? 'no'}}</p> --}}
 </div>
 
-
 <div class="row mb24px">
 	<div class="col">
 		<p class="auth__greetengs">{{__('auth.greetengs')}}</p>
