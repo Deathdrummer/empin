@@ -3,7 +3,6 @@
 use Carbon\Carbon;
 use Illuminate\Auth\Notifications\VerifyEmail as NotificationsVerifyEmail;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\URL;
 
 class VerifyEmail extends NotificationsVerifyEmail {
