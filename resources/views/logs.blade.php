@@ -6,6 +6,7 @@
 
         <title>Логи</title>
 		
+		
 		{{-- <link rel="stylesheet" href="{{mix('assets/css/app.css')}}"> --}}
 		{{-- <link rel="stylesheet" href="{{mix('assets/css/admin.css')}}"> --}}
 
