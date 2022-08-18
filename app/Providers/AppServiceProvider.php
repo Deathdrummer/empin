@@ -5,7 +5,7 @@ use App\View\Components\Data;
 use App\View\Components\Inputs\Button;
 use App\View\Components\Inputs\ButtonsGroup;
 use App\View\Components\Inputs\Checkbox;
-use App\View\Components\inputs\Datepicker;
+use App\View\Components\Inputs\Datepicker;
 use App\View\Components\Inputs\File;
 use App\View\Components\Inputs\Input;
 use App\View\Components\Inputs\InputGroup;
