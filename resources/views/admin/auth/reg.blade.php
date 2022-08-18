@@ -19,19 +19,19 @@
 
 <div id="regForm" class="auth__formblock">
 	<div class="auth__row">
-		<x-input type="text" name="name" value="Dm" class="auth__field" group="auth" />
+		<x-input type="text" name="name" value="" class="auth__field" group="auth" />
 	</div>
 	
 	<div class="auth__row">
-		<x-input type="email" name="email" value="deathdrumer@yandex.ru" class="auth__field" group="auth" label="E-mail" />
+		<x-input type="email" name="email" value="" class="auth__field" group="auth" label="E-mail" />
 	</div>
 	
 	<div class="auth__row">
-		<x-input type="password" name="password" value="DeatH123654" class="auth__field" group="auth" label="Пароль" />
+		<x-input type="password" name="password" value="" class="auth__field" group="auth" label="Пароль" />
 	</div>
 	
 	<div class="auth__row">
-		<x-input type="password" name="password_confirmation" value="DeatH123654" class="auth__field" group="auth" label="Повторить пароль" />
+		<x-input type="password" name="password_confirmation" value="" class="auth__field" group="auth" label="Повторить пароль" />
 	</div>
 	
 	<div class="auth__row">

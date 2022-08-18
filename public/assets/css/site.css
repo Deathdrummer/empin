@@ -3303,7 +3303,7 @@ p {
   display: none;
 }
 .large-checkbox input[type=checkbox] + label {
-  flex: 1 0 auto;
+  flex: 0 0 20px;
   border: 2px solid #a4a4c1;
   border-radius: 3px;
   display: flex;
@@ -3420,7 +3420,7 @@ p {
   display: none;
 }
 .normal-checkbox input[type=checkbox] + label {
-  flex: 1 0 auto;
+  flex: 0 0 16px;
   border: 2px solid #a4a4c1;
   border-radius: 3px;
   display: inline-flex;
@@ -3531,7 +3531,7 @@ p {
   display: none;
 }
 .small-checkbox input[type=checkbox] + label {
-  flex: 1 0 auto;
+  flex: 0 0 14px;
   border: 2px solid #a4a4c1;
   border-radius: 2px;
   display: flex;
@@ -3662,7 +3662,7 @@ p {
   display: none;
 }
 .large-radio input[type=radio] + label {
-  flex: 0 0 auto;
+  flex: 0 0 20px;
   border: 2px solid #a4a4c1;
   border-radius: 50%;
   display: flex;
@@ -3778,7 +3778,7 @@ p {
   display: none;
 }
 .normal-radio input[type=radio] + label {
-  flex: 0 0 auto;
+  flex: 0 0 16px;
   border: 2px solid #a4a4c1;
   border-radius: 50%;
   display: flex;
@@ -3888,7 +3888,7 @@ p {
   display: none;
 }
 .small-radio input[type=radio] + label {
-  flex: 0 0 auto;
+  flex: 0 0 14px;
   border: 2px solid #a4a4c1;
   border-radius: 50%;
   display: flex;

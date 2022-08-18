@@ -15,11 +15,11 @@
 
 <div id="authForm" class="auth__formblock">
 	<div class="auth__row">
-		<x-input type="email" name="email" value="deathdrumer@yandex.ru" class="auth__field" group="auth" label="E-mail" />
+		<x-input type="email" name="email" value="" class="auth__field" group="auth" label="E-mail" />
 	</div>
 	
 	<div class="auth__row">
-		<x-input type="password" name="password" value="DeatH123654" class="auth__field" group="auth" label="Пароль" />
+		<x-input type="password" name="password" value="" class="auth__field" group="auth" label="Пароль" />
 	</div>
 	
 	<input type="hidden" id="localeInp" name="locale" value="{{App::currentLocale()}}">
