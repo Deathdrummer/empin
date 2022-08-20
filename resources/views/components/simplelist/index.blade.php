@@ -87,7 +87,7 @@
 								<x-button
 									variant="red"
 									class="w3rem"
-									action="simplelistRemoveRow:{{$setting}}.{{$row}}"
+									action="{{$id}}RemoveRow:{{$setting}}.{{$row}}"
 									title="Удалить"
 									><i class="fa-solid fa-trash-can"></i></x-button>									
 							</td>
@@ -102,8 +102,8 @@
 				<td colspan="{{count($titles)+2}}" class="right">
 					<x-button
 						variant="blue"
-						action="simplelistAddRow:#{{$id}},{{$fieldsToButton}},{{$stringOptions}},{{$setting}},{{$group}}"
-						>Добавить</x-button>
+						action="{{$id}}AddRow:#{{$id}},{{$fieldsToButton}},{{$stringOptions}},{{$setting}},{{$group}}"
+						>{{__('ui.add')}}</x-button>
 				</td>
 			</tfoot>
 		</table>
@@ -115,12 +115,114 @@
 
 
 <script type="module">
-	let listId = '#{{$id}}';
+	let id = '{{$id}}',
+		listId = '#{{$id}}',
+		addRowAction = '{{$id}}AddRow',
+		removeRowAction = '{{$id}}RemoveRow';
 	
-	//if ($(listId).find('tr').length == 0) $(listId).empty();
 	
 	$(listId).ddrInputs('change', (input) => {
 		$(input).closest('tr').find('button[new]').removeAttrib('new');
 	});
+	
+	
+	$[addRowAction] = (btn, listSelector, fields, options, setting, group) => {
+		
+		let row = $(listSelector).children('tr').length ? (parseInt($(listSelector).children('tr:last').attr('index')) + 1) : 0;
+		
+		let simplelistAddBtnWait = $(btn).ddrWait({
+			iconHeight: '20px',
+			bgColor: '#ffffff91'
+		});
+		
+		axiosQuery('post', 'ajax/simplelist', {
+			id,
+			row,
+			fields,
+			options,
+			setting,
+			group
+		}, 'text').then(({data, error, status, headers}) => {
+			if (error) {
+				console.log(error);
+				$.notify(error?.message, 'error');
+			}
+			
+			if (data) $(listSelector).append(data);
+			
+			$(listSelector).find('tr[new]').ddrInputs('change', (input) => {
+				$(input).closest('tr').find('button[new]').removeAttrib('new');
+			});
+			
+			$(listSelector).find('tr[new]').removeAttrib('new');
+			
+			simplelistAddBtnWait.destroy();
+		});
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	$[removeRowAction] = (btn, setting) => {
+		let hasRows = !!$(btn).closest('tr').siblings('tr').length;
+		
+		if ($(btn).hasAttr('new')) {
+			if (hasRows) $(btn).closest('tr').remove();
+			else $(btn).closest('tbody').empty();
+			//$.notify('Запись успешно удалена!');
+		} else {
+			
+			ddrPopup({
+				width: 400,
+				html: '<p class="color-red fz16px">Вы действительно хотите удалить запись</p>',
+				buttons: ['Отмена', {action: 'simplelistRemoveRowAction', title: 'Удалить', variant: 'red'}],
+				buttonsAlign: 'center',
+				buttonsGroup: 'small',
+				winClass: 'ddrpopup_dialog',
+				centerMode: true,
+				topClose: false
+			}).then(({state, wait, setTitle, setButtons, loadData, setHtml, setLHtml, dialog, close, onScroll, disableButtons, enableButtons, setWidth}) => { //isClosed
+				$.simplelistRemoveRowAction = () => {
+					close();
+					$(btn).closest('tr').find('input, textarea, select, button').ddrInputs('disable');
+					
+					axiosQuery('delete', 'api/settings', {
+						path: setting,
+					}, 'json').then(({data, error, status, headers}) => {
+						if (error) {
+							console.log(error);
+							$.notify(error?.message, 'error');
+							
+							if (error.errors) {
+								$.each(error.errors, function(field, errors) {
+									$(btn).closest('tr').find('[name="'+field+'"]').ddrInputs('error', errors[0]);
+								});
+							}
+						}
+						
+						if (data) {
+							if (hasRows) $(btn).closest('tr').remove();
+							else $(btn).closest('tbody').empty();
+							$.notify('Запись успешно удалена!');
+						}
+						
+						//$(btn).closest('tr').find('input, textarea, select, button').ddrInputs('enable');
+					});
+				}
+			});		
+		}	
+	}
+	
+	
+	
+	
+	//if ($(listId).find('tr').length == 0) $(listId).empty();
+	
+	
 	
 </script>

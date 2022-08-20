@@ -104,12 +104,12 @@ class Department {
 		
 		$depsUsers = User::whereIn('department_id', $depsIds)
 			->get()
-			->mapWithKeys(function ($item, $key) use($userFields) {
+			->mapWithKeysMany(function ($item, $key) use($userFields) {
 				return [$item['department_id'] => [
 						$item['id'] => $this->_buildUserArray($item, $userFields)
 					]
 				];
-			}, true);
+			});
 		
 		return $depsUsers;
 	}

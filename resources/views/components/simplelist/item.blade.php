@@ -1,5 +1,9 @@
 <x-input-group group="{{$group}}">
-	<tr class="h5rem" index="{{$row}}">
+	<tr
+		class="h5rem"
+		index="{{$row}}"
+		new
+		>
 		@if($fields)
 			@foreach($fields as $field)
 				<td class="top pt15px">
@@ -49,7 +53,7 @@
 					new
 					variant="red"
 					class="w3rem"
-					action="simplelistRemoveRow:{{$setting}}.{{$row}}"
+					action="{{$id}}RemoveRow:{{$setting}}.{{$row}}"
 					><i class="fa-solid fa-trash-can"></i></x-button>
 			</td>
 		@else

@@ -76,8 +76,8 @@ class DdrInput {
 		this.proxyData = proxyData;
 		
 		if (['change', 'state', 'enable', 'disable', 'addClass', 'removeClass'].indexOf(method) !== -1) {
-			this.selector = items;
 			if (items.length == 1 && ['input', 'select', 'textarea', 'button', '[contenteditable]', '[datepicker]'].indexOf(items[0]?.tagName?.toLowerCase()) == -1) {
+				this.selector = items;
 				items = items.find('input, select, textarea, button, [contenteditable], [datepicker]');
 			}
 		}

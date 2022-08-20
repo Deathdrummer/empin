@@ -12,6 +12,7 @@ return [
 	'close' 				=> 'Close',
 	'done' 					=> 'Done',
 	'apply' 				=> 'Apply',
+	'add' 					=> 'Add',
 	'save' 					=> 'Save',
 	'delete' 				=> 'Delete',
 	'cancel' 				=> 'Cancel',

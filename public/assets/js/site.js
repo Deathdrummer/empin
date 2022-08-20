@@ -6518,9 +6518,8 @@ var DdrInput = /*#__PURE__*/function () {
     if (['change', 'state', 'enable', 'disable', 'addClass', 'removeClass'].indexOf(method) !== -1) {
       var _items$, _items$$tagName;
 
-      this.selector = items;
-
       if (items.length == 1 && ['input', 'select', 'textarea', 'button', '[contenteditable]', '[datepicker]'].indexOf((_items$ = items[0]) === null || _items$ === void 0 ? void 0 : (_items$$tagName = _items$.tagName) === null || _items$$tagName === void 0 ? void 0 : _items$$tagName.toLowerCase()) == -1) {
+        this.selector = items;
         items = items.find('input, select, textarea, button, [contenteditable], [datepicker]');
       }
     }

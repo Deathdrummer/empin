@@ -272,27 +272,29 @@ class AppServiceProvider extends ServiceProvider
 		
 		
 		
-		
-		/* Collection::macro('restructure', function($callback) {
-			$data = $this->toArray();
-			
-			
+		/**
+		 * Run an associative map over each of the items.
+		 *
+		 * The callback should return an associative array with a single key / value pair.
+		 *
+		 * @template TMapWithKeysKey of array-key
+		 * @template TMapWithKeysValue
+		 *
+		 * @param  callable(TModel, TKey): array<TMapWithKeysKey, TMapWithKeysValue>  $callback
+		 * @return static<TMapWithKeysKey, TMapWithKeysValue>
+		 */
+		Collection::macro('mapWithKeysMany', function (callable $callback) {
 			$result = [];
-			// $results[$groupKey] = new static;
-			foreach ($data as $key => $value) {
+			foreach ($this->items as $key => $value) {
 				$assoc = $callback($value, $key);
-				
 				foreach ($assoc as $mapKey => $mapValue) {
-					if (isset($result[$mapKey])) $result[$mapKey] = array_merge_recursive($result[$mapKey], $mapValue); 
+					if (isset($result[$mapKey])) $result[$mapKey] = array_replace_recursive($result[$mapKey], $mapValue); 
 					else $result[$mapKey] = $mapValue;
 				}
 			}
-
+			
 			return new static($result);
-		}); */
-		
-		
-		
+		});
 		
     }
 }

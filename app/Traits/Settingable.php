@@ -4,9 +4,12 @@ use App\Services\Settings;
 use Illuminate\Support\Str;
 
 trait Settingable {
+	
+	
+	private $settingsData = [];
 
 	
-	/**
+	/** Добавить данные из настроек в глобальную переменную data
 	 * чтобы получить сразу несколько данных из настроек - можно передать любое количество массовов: [
 	 *		'setting'	=> 'contract-types',
 	 *		'key'		=> 'id',
@@ -20,8 +23,41 @@ trait Settingable {
 	 * @return void
 	 */
 	private function addSettingToGlobalData($setting = null, ?string $key = null, ?string $value = null, $filter = null) {
-		if (!$setting) throw new \Exception('addSettingToGlobalData не переданы параметры');
 		if (!isset($this->data)) throw new \Exception('addSettingToGlobalData не объявлена переменная data');
+		$this->_getSettings($setting, $key, $value, $filter);
+		$this->data = array_replace_recursive($this->data, $this->settingsData);
+	}
+	
+	
+	
+	/** Получить данные из настроек и вернуть их 
+	 * чтобы получить сразу несколько данных из настроек - можно передать любое количество массовов: [
+	 *		'setting'	=> 'contract-types',
+	 *		'key'		=> 'id',
+	 *		'value'		=> 'title',
+	 *		'filter'	=> 'id:3'
+	 * ] 
+	 * @param mixed $setting
+	 * @param string $key
+	 * @param string $value
+	 * @param string $filter
+	 * @return array
+	 */
+	public function getSettings($setting = null, ?string $key = null, ?string $value = null, $filter = null): array {
+		$this->_getSettings($setting, $key, $value, $filter);
+		return $this->settingsData;
+	}
+	
+	
+	
+	
+	
+	/**
+	 * @param 
+	 * @return 
+	 */
+	public function _getSettings($setting = null, ?string $key = null, ?string $value = null, $filter = null) {
+		if (!$setting) throw new \Exception('addSettingToGlobalData не переданы параметры');
 		
 		$settingsService = app()->make(Settings::class);
 		
@@ -46,7 +82,7 @@ trait Settingable {
 			
 			
 			if (!$dataFromSettings = $settingsService->getMany($keyedSettings->keys()->all())) {
-				foreach ($ranameMap->all() as $set => $rename) $this->data[$rename ?? $set] = false;
+				foreach ($ranameMap->all() as $set => $rename) $this->settingsData[$rename ?? $set] = false;
 				return false;
 			}
 			
@@ -67,7 +103,7 @@ trait Settingable {
 				
 				$settingValue = $this->_restructureData($settingValue, $key, $val);
 				
-				$this->data[$rename ?? $setting] = $settingValue->toArray();
+				$this->settingsData[$rename ?? $setting] = $settingValue->toArray();
 			});
 			
 		} else {
@@ -75,14 +111,14 @@ trait Settingable {
 			[$sName, $sRename] = $this->_parseSettingString($setting);
 			
 			if (!$fromSettingsData = $settingsService->get($sName)) {
-				$this->data[$sRename ?? $sName] = false;
+				$this->settingsData[$sRename ?? $sName] = false;
 				return false;
 			} 
 			
 			if ($filter) $fromSettingsData = $this->_setFilter($fromSettingsData, $filter);
 			
 			if (!$fromSettingsData) {
-				$this->data[$sRename ?? $sName] = false;
+				$this->settingsData[$sRename ?? $sName] = false;
 				return false;
 			}
 			
@@ -90,9 +126,18 @@ trait Settingable {
 			
 			$fromSettingsData = $this->_restructureData($fromSettingsData, $key, $value);
 			
-			$this->data[$sRename ?? $sName] = $fromSettingsData->toArray();
+			$this->settingsData[$sRename ?? $sName] = $fromSettingsData->toArray();
 		}
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	
@@ -127,11 +172,22 @@ trait Settingable {
 	 */
 	private function _restructureData($data, $key, $value) {
 		if ($key && !$value) {
-			$data = $data->keyBy($key);
+			if (Str::contains($key , ':')) {
+				[$key, $comand] = splitString($key, ':');
+			}
+			if (isset($comand) && $comand == 'many') {
+				$data = $data->mapToGroups(function ($item) use($key) {
+					return [$item[$key] => $item];
+				});
+			} else {
+				$data = $data->keyBy($key);
+			}
+			
 		} elseif (!$key && $value) {
-			$data = $data->mapWithKeys(function ($item, $k) use($key, $value) {
+			$data = $data->mapWithKeys(function ($item, $k) use($value) {
 				return [$k => $item[$value]];
 			});
+			
 		}  elseif ($key && $value) {
 			$data = $data->mapWithKeys(function ($item) use($key, $value) {
 				return [$item[$key] => $item[$value]];

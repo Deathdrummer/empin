@@ -3,12 +3,13 @@
 use App\Http\Filters\ContractFilter;
 use App\Models\Contract as ContractModel;
 use App\Models\ContractData;
+use App\Traits\Settingable;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Builder;
 
 class Contract {
-	
+	use Settingable; 
 	
 	
 	/**
@@ -28,7 +29,7 @@ class Contract {
 		
 		$filter = app()->make(ContractFilter::class, compact('queryParams'));
 		$data = ContractModel::filter($filter)->get();
-		return $data->mapWithKeys(function($item) {
+		return $data->mapWithKeysMany(function($item) {
 			return [$item['id'] => [
 				'id'				=> $item['id'] ?? null,
 				'title'				=> $item['title'] ?? null,
@@ -48,7 +49,7 @@ class Contract {
 				'updated_at' 		=> $item['updated_at'] ?? null,
 				'object_id' 		=> $item['object_id'] ?? null
 			]];
-		}, true);
+		});
 	}
 	
 	
@@ -78,7 +79,13 @@ class Contract {
 			->orderBy($sortField, $sortOrder)
 			->get();
 		
-		return $data->mapWithKeys(function($item) {
+		
+		
+		$settingsData = $this->getSettings('contracts-deadlines:deadlines', 'group:many');
+		logger($settingsData);
+		
+		
+		return $data->mapWithKeysMany(function($item) {
 			$color = null;
 			
 			
@@ -89,9 +96,9 @@ class Contract {
 				$dateNow = $carbon->now()->setTime(0, 0, 0);
 				$dateEnd = $carbon->create($item['date_end']);
 				$color = match (true) {
-					$dateNow <= $dateEnd->subMonths(2) => '#0f0',
-					$dateNow > $dateEnd->subMonths(2) && $dateNow <= $dateEnd->subMonths(1) => '#ff0',
-					$dateNow > $dateEnd->subMonths(1) => '#f00',
+					$dateNow <= $dateEnd->subMonths(2) => '#91f191',
+					$dateNow > $dateEnd->subMonths(2) && $dateNow <= $dateEnd->subMonths(1) => '#f7e858',
+					$dateNow > $dateEnd->subMonths(1) => '#ffacac',
 					default => 'transparent'
 				};
 			}
@@ -148,7 +155,7 @@ class Contract {
 				'departments' 		=> $departments
 				
 			]];
-		}, true);
+		});
 	}
 	
 	

@@ -2301,102 +2301,6 @@ $(function () {
       });
     }, saveTOut);
   };
-
-  $.simplelistAddRow = function (btn, listSelector, fields, options, setting, group) {
-    var row = $(listSelector).children('tr').length ? parseInt($(listSelector).children('tr:last').attr('index')) + 1 : 0;
-    var simplelistAddBtnWait = $(btn).ddrWait({
-      iconHeight: '20px',
-      bgColor: '#ffffff91'
-    });
-    axiosQuery('post', 'ajax/simplelist', {
-      row: row,
-      fields: fields,
-      options: options,
-      setting: setting,
-      group: group
-    }, 'text').then(function (_ref2) {
-      var data = _ref2.data,
-          error = _ref2.error,
-          status = _ref2.status,
-          headers = _ref2.headers;
-
-      if (error) {
-        console.log(error);
-        $.notify(error === null || error === void 0 ? void 0 : error.message, 'error');
-      }
-
-      if (data) $(listSelector).append(data);
-      simplelistAddBtnWait.destroy();
-    });
-  };
-
-  $.simplelistRemoveRow = function (btn, setting) {
-    var hasRows = !!$(btn).closest('tr').siblings('tr').length;
-
-    if ($(btn).hasAttr('new')) {
-      if (hasRows) $(btn).closest('tr').remove();else $(btn).closest('tbody').empty(); //$.notify('Запись успешно удалена!');
-    } else {
-      ddrPopup({
-        width: 400,
-        html: '<p class="color-red fz16px">Вы действительно хотите удалить запись</p>',
-        buttons: ['Отмена', {
-          action: 'simplelistRemoveRowAction',
-          title: 'Удалить',
-          variant: 'red'
-        }],
-        buttonsAlign: 'center',
-        buttonsGroup: 'small',
-        winClass: 'ddrpopup_dialog',
-        centerMode: true,
-        topClose: false
-      }).then(function (_ref3) {
-        var state = _ref3.state,
-            wait = _ref3.wait,
-            setTitle = _ref3.setTitle,
-            setButtons = _ref3.setButtons,
-            loadData = _ref3.loadData,
-            setHtml = _ref3.setHtml,
-            setLHtml = _ref3.setLHtml,
-            dialog = _ref3.dialog,
-            close = _ref3.close,
-            onScroll = _ref3.onScroll,
-            disableButtons = _ref3.disableButtons,
-            enableButtons = _ref3.enableButtons,
-            setWidth = _ref3.setWidth;
-
-        //isClosed
-        $.simplelistRemoveRowAction = function () {
-          close();
-          $(btn).closest('tr').find('input, textarea, select, button').ddrInputs('disable');
-          axiosQuery('delete', 'api/settings', {
-            path: setting
-          }, 'json').then(function (_ref4) {
-            var data = _ref4.data,
-                error = _ref4.error,
-                status = _ref4.status,
-                headers = _ref4.headers;
-
-            if (error) {
-              console.log(error);
-              $.notify(error === null || error === void 0 ? void 0 : error.message, 'error');
-
-              if (error.errors) {
-                $.each(error.errors, function (field, errors) {
-                  $(btn).closest('tr').find('[name="' + field + '"]').ddrInputs('error', errors[0]);
-                });
-              }
-            }
-
-            if (data) {
-              if (hasRows) $(btn).closest('tr').remove();else $(btn).closest('tbody').empty();
-              $.notify('Запись успешно удалена!');
-            } //$(btn).closest('tr').find('input, textarea, select, button').ddrInputs('enable');
-
-          });
-        };
-      });
-    }
-  };
 });
 
 /***/ }),
@@ -6838,9 +6742,8 @@ var DdrInput = /*#__PURE__*/function () {
     if (['change', 'state', 'enable', 'disable', 'addClass', 'removeClass'].indexOf(method) !== -1) {
       var _items$, _items$$tagName;
 
-      this.selector = items;
-
       if (items.length == 1 && ['input', 'select', 'textarea', 'button', '[contenteditable]', '[datepicker]'].indexOf((_items$ = items[0]) === null || _items$ === void 0 ? void 0 : (_items$$tagName = _items$.tagName) === null || _items$$tagName === void 0 ? void 0 : _items$$tagName.toLowerCase()) == -1) {
+        this.selector = items;
         items = items.find('input, select, textarea, button, [contenteditable], [datepicker]');
       }
     }

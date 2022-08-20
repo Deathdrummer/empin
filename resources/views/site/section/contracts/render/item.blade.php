@@ -3,7 +3,7 @@
 		@cando('contract-col-period:site')
 			<td class="center">
 				<div
-					class="circle d-inline-block w3rem-5px h3rem-5px"
+					class="circle d-inline-block w2rem-5px h2rem-5px"
 					style="background-color: {{$color}};"
 					></div>
 			</td>
@@ -110,7 +110,7 @@
 					@cando('contract-col-to-archive:site')
 						<x-button
 							variant="{{$ready_to_archive ? 'green' : 'neutral'}}"
-							:animation="$ready_to_archive ? 'fa-shake' : false"
+							{{-- :animation="$ready_to_archive ? 'fa-shake' : false" --}}
 							animationDuration="2s"
 							action="toArchiveContractAction:{{$id}}"
 							title="Отправить в архив"

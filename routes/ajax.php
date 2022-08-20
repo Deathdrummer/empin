@@ -35,7 +35,8 @@ Route::controller(TabsController::class)->middleware(['lang'])->group(function()
 
 Route::middleware(['isajax:admin', 'lang'])->post('/simplelist', function(Request $request) {
 	
-	['row' => $row, 'fields' => $fieldsRaw, 'options' => $rawOptions, 'setting' => $setting, 'group' => $group] = $request->validate([
+	['id' => $id, 'row' => $row, 'fields' => $fieldsRaw, 'options' => $rawOptions, 'setting' => $setting, 'group' => $group] = $request->validate([
+		'id'		=> 'required|string',
 		'row'		=> 'required|numeric',
 		'fields'	=> 'required|string',
 		'options' 	=> 'string|nullable',
@@ -46,7 +47,7 @@ Route::middleware(['isajax:admin', 'lang'])->post('/simplelist', function(Reques
 	
 	$options = [];
 	if ($rawOptions) {
-		$optionsString = str_replace('::', ',', $rawOptions);	
+		$optionsString = str_replace('::', ',', htmlspecialchars_decode($rawOptions));	
 			
 		$opsData = splitString($optionsString, '|');
 		
@@ -64,6 +65,8 @@ Route::middleware(['isajax:admin', 'lang'])->post('/simplelist', function(Reques
 	}
 	
 	
+	
+	
 	$fieldsData = splitString($fieldsRaw, '|');
 
 	$fields = [];
@@ -76,7 +79,7 @@ Route::middleware(['isajax:admin', 'lang'])->post('/simplelist', function(Reques
 		];
 	}
 	
-	return view('components.simplelist.item', compact('fields', 'setting', 'row', 'group', 'options'));
+	return view('components.simplelist.item', compact('id', 'fields', 'setting', 'row', 'group', 'options'));
 });
 
 
