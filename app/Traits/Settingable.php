@@ -41,10 +41,11 @@ trait Settingable {
 	 * @param string $key
 	 * @param string $value
 	 * @param string $filter
-	 * @return array
+	 * @return mixed
 	 */
-	public function getSettings($setting = null, ?string $key = null, ?string $value = null, $filter = null): array {
+	public function getSettings($setting = null, ?string $key = null, ?string $value = null, $filter = null): mixed {
 		$this->_getSettings($setting, $key, $value, $filter);
+		
 		if (isset($key)) {
 			$k = splitString($setting, ':');
 			$key = array_pop($k);
