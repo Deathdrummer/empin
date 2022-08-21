@@ -88,20 +88,23 @@ class Contract {
 		
 		
 		$deadlines = $this->getSettings('contracts-deadlines:deadlines', 'group:many');
-		// logger($deadlines);
 		
 		return $data->mapWithKeysMany(function($item) use($deadlines) {
-			$deadlineCondition = $this->datetime->checkDiapason($item['date_end'], $deadlines['contracts'], [
-				'minSign' 		=> 'min_sign',
-				'minDateCount'	=> 'min_count',
-				'minDateType' 	=> 'min_datetype',
-				'maxSign' 		=> 'max_sign',
-				'maxDateCount'	=> 'max_count',
-				'maxDateType' 	=> 'max_datetype'
-			], ['name', 'color']);
 			
-			$color = $deadlineCondition['color'] ?: null;
-			$name = $deadlineCondition['name'] ?: '';
+			if (isset($deadlines['contracts'])) {
+				$deadlineCondition = $this->datetime->checkDiapason($item['date_end'], $deadlines['contracts'], [
+					'minSign' 		=> 'min_sign',
+					'minDateCount'	=> 'min_count',
+					'minDateType' 	=> 'min_datetype',
+					'maxSign' 		=> 'max_sign',
+					'maxDateCount'	=> 'max_count',
+					'maxDateType' 	=> 'max_datetype'
+				], ['name', 'color']);
+				
+				$color = $deadlineCondition['color'] ?: null;
+				$name = $deadlineCondition['name'] ?: '';
+			}
+			
 			
 			$departments = $item->departments->mapWithKeys(function($dep) {
 				
@@ -147,8 +150,8 @@ class Contract {
 				'created_a' 		=> $item['created_a'] ?? null,
 				'updated_at' 		=> $item['updated_at'] ?? null,
 				'object_id' 		=> $item['object_id'] ?? null,
-				'color' 			=> $color,
-				'name' 				=> $name,
+				'color' 			=> $color ?? null,
+				'name' 				=> $name ?? '',
 				'has_deps_to_send'	=> $item['has_deps_to_send'] ?? null,
 				'ready_to_archive'	=> $item['hide_count'] != 0 && $item['hide_count'] == $item->departments->count(),
 				
