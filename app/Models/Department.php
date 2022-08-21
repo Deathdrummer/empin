@@ -1,11 +1,12 @@
 <?php namespace App\Models;
 
+use App\Models\Traits\Collectionable;
 use App\Models\Traits\Filterable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Department extends Model {
-    use HasFactory, Filterable;
+    use HasFactory, Filterable, Collectionable;
 	
 	/**
      * Таблица

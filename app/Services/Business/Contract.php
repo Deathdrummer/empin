@@ -3,13 +3,20 @@
 use App\Http\Filters\ContractFilter;
 use App\Models\Contract as ContractModel;
 use App\Models\ContractData;
+use App\Services\DateTime;
 use App\Traits\Settingable;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Builder;
 
 class Contract {
 	use Settingable; 
+	
+	private $datetime;
+	
+	public function __construct(DateTime $datetime) {
+		$this->datetime = $datetime;
+	}
+	
 	
 	
 	/**
@@ -80,37 +87,29 @@ class Contract {
 			->get();
 		
 		
+		$deadlines = $this->getSettings('contracts-deadlines:deadlines', 'group:many');
+		// logger($deadlines);
 		
-		$settingsData = $this->getSettings('contracts-deadlines:deadlines', 'group:many');
-		logger($settingsData);
-		
-		
-		return $data->mapWithKeysMany(function($item) {
-			$color = null;
+		return $data->mapWithKeysMany(function($item) use($deadlines) {
+			$deadlineCondition = $this->datetime->checkDiapason($item['date_end'], $deadlines['contracts'], [
+				'minSign' 		=> 'min_sign',
+				'minDateCount'	=> 'min_count',
+				'minDateType' 	=> 'min_datetype',
+				'maxSign' 		=> 'max_sign',
+				'maxDateCount'	=> 'max_count',
+				'maxDateType' 	=> 'max_datetype'
+			], ['name', 'color']);
 			
-			
-			if (!$item['date_end']) {
-				$color = '#0f0';
-			} else {
-				$carbon = new Carbon;
-				$dateNow = $carbon->now()->setTime(0, 0, 0);
-				$dateEnd = $carbon->create($item['date_end']);
-				$color = match (true) {
-					$dateNow <= $dateEnd->subMonths(2) => '#91f191',
-					$dateNow > $dateEnd->subMonths(2) && $dateNow <= $dateEnd->subMonths(1) => '#f7e858',
-					$dateNow > $dateEnd->subMonths(1) => '#ffacac',
-					default => 'transparent'
-				};
-			}
-			
+			$color = $deadlineCondition['color'] ?: null;
+			$name = $deadlineCondition['name'] ?: '';
 			
 			$departments = $item->departments->mapWithKeys(function($dep) {
 				
 				if ($dep['pivot']['steps']) {
 					foreach ($dep['pivot']['steps'] as $stepId => $step) {
-						$carbon = new Carbon;
-						$dateNow = $carbon->now()->setTime(0, 0, 0);
-						$dateEnd = $carbon->create($step['deadline']);
+						//$carbon = new Carbon;
+						//$dateNow = $carbon->now()->setTime(0, 0, 0);
+						//$dateEnd = $carbon->create($step['deadline']);
 						
 					}
 				}
@@ -149,6 +148,7 @@ class Contract {
 				'updated_at' 		=> $item['updated_at'] ?? null,
 				'object_id' 		=> $item['object_id'] ?? null,
 				'color' 			=> $color,
+				'name' 				=> $name,
 				'has_deps_to_send'	=> $item['has_deps_to_send'] ?? null,
 				'ready_to_archive'	=> $item['hide_count'] != 0 && $item['hide_count'] == $item->departments->count(),
 				

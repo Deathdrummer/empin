@@ -8,8 +8,8 @@
 			>
 			<x-simplelist
 				setting="contracts-deadlines"
-				fieldset="Цвет:w4rem|color|color,Название:w20rem|input|name,Меньше (условие):w20rem|select|less_condition,Меньше (кол-во):w10rem|number|less_count,Меньше (единица даты):w15rem|select|less_datetype,Больше (условие):w20rem|select|more_condition,Больше (кол-во):w10rem|number|more_count,Больше (единица даты):w15rem|select|more_datetype,Группа:w15rem|select|group"
-				options="less_condition;<:меньше,=:равно,<=:меньше или равно|more_condition;>:больше,=:равно,>=:больше или равно|less_datetype;h:часов,d:дней,w:недель,m:месяцев,y:лет|more_datetype;h:часов,d:дней,w:недель,m:месяцев,y:лет|group;contracts:Контракты,steps:Этапы"
+				fieldset="Цвет:w6rem|color|color,Название:w20rem|input|name,Мин (условие):w20rem|select|min_sign,Мин (кол-во):w10rem|number|min_count,Мин (единица даты):w15rem|select|min_datetype,Макс (условие):w20rem|select|max_sign,Макс (кол-во):w10rem|number|max_count,Макс (единица даты):w15rem|select|max_datetype,Группа:w15rem|select|group"
+				options="min_sign;>:больше,=:равно,>=:больше или равно|max_sign;<:меньше,<=:меньше или равно|max_datetype;h:часов,d:дней,w:недель,m:месяцев,y:лет|min_datetype;h:часов,d:дней,w:недель,m:месяцев,y:лет|group;contracts:Контракты,steps:Этапы"
 				group="small"
 			 />
 		</x-card>

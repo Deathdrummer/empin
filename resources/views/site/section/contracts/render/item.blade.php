@@ -2,10 +2,13 @@
 	@if(!$isArchive)
 		@cando('contract-col-period:site')
 			<td class="center">
-				<div
-					class="circle d-inline-block w2rem-5px h2rem-5px"
-					style="background-color: {{$color}};"
-					></div>
+				@isset($color)
+					<div
+						class="circle d-inline-block w2rem-5px h2rem-5px"
+						style="background-color: {{$color}};"
+						title="{{$name}}"
+						></div>
+				@endisset
 			</td>
 		@endcando
 	@endif

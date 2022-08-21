@@ -1,5 +1,6 @@
 <?php namespace App\Models;
 
+use App\Models\Traits\Collectionable;
 use App\Models\Traits\Filterable;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -7,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
 class Contract extends Model {
-    use HasFactory, Filterable;
+    use HasFactory, Filterable, Collectionable;
 	
 	
 	/**

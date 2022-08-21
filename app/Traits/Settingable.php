@@ -45,6 +45,12 @@ trait Settingable {
 	 */
 	public function getSettings($setting = null, ?string $key = null, ?string $value = null, $filter = null): array {
 		$this->_getSettings($setting, $key, $value, $filter);
+		if (isset($key)) {
+			$k = splitString($setting, ':');
+			$key = array_pop($k);
+			return isset($this->settingsData[$key]) ? $this->settingsData[$key] : $this->settingsData;
+		} 
+		
 		return $this->settingsData;
 	}
 	

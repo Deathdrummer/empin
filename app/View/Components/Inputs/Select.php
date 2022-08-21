@@ -66,7 +66,6 @@ class Select extends Component {
 			}
 		}
 		
-		
 		$this->options = $ops;
 		
 		$this->setAction($action);
@@ -80,7 +79,7 @@ class Select extends Component {
 	 * @return 
 	 */
 	public function setSelected($value = false, $settings = false, $setting = false) {
-		if ($value) return $value;
+		if ($value) return htmlspecialchars_decode($value, ENT_QUOTES|ENT_HTML5);
 		if (!$setting || !$settings) return false;
 		return data_get($settings, $setting);
 	}
