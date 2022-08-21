@@ -91,6 +91,8 @@ class Contract {
 		$deadlinesContracts = $this->getSettings('contracts-deadlines');
 		$deadlinesSteps = $this->getSettings('steps-deadlines');
 		
+		logger($deadlinesSteps);
+		
 		return $data->mapWithKeysMany(function($item) use($deadlinesContracts, $deadlinesSteps) {
 			if ($deadlinesContracts) {
 				$deadlineContractsCondition = $this->datetime->checkDiapason($item['date_end'], $deadlinesContracts, [
@@ -117,7 +119,12 @@ class Contract {
 						$dateStart = Carbon::create($dep['pivot']['updated_show'] ?? $item['date_start']);
 						$deadLine = $dateStart->addDays($step['deadline']);
 						
-						$steps[$stepId]['color'] = $dateNow >= $deadLine ? '#fff7c9' : 'transparent';
+						$steps[$stepId]['color'] = match(true) {
+							$dateNow < $deadLine => $deadlinesSteps['before'],
+							$dateNow == $deadLine => $deadlinesSteps['current'],
+							$dateNow > $deadLine => $deadlinesSteps['after'],
+							default => 'transparent'
+						};
 					}
 				}
 				

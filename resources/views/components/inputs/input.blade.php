@@ -16,6 +16,7 @@
 	'showrows' 		=> false,
     'action'        => 'setSetting',
     'icon'        	=> null,
+    'clearcolor'	=> null,
     'tag'        	=> null,
 ])
 
@@ -27,7 +28,7 @@
 		($group ? $group.'-' : '').'input-'.$type => $type,
 		($group ? $group.'-' : '').'input_noempty' => $setValue($value, $settings, $setting),
 		($group ? $group.'-' : '').'input_disabled' => $group && ($disabled || !$enabled),
-		($group ? $group.'-' : '').'input_iconed' => $icon,
+		($group ? $group.'-' : '').'input_iconed' => $icon || $clearcolor,
 	])}}>
 	
 	@if($label)
@@ -57,6 +58,18 @@
 		{{$tag}}
 		>
 	
+	@isset($clearcolor)
+		<div
+			clearcolor
+			@class([
+				'clearcolor',
+				$group.'-clearcolor' => $group
+			])
+			onclick="$.clearColor{{$id}}(this)"
+			><i class="fa-solid fa-ban" title="Очистить цвет"></i></div>
+	@endif
+	
+	
 	@if($type === 'password')
 		<div showpassword @class([
 			'showpassword',
@@ -67,3 +80,27 @@
 	@endif
 	<div class="{{($group ? $group.'-' : '').'input__errorlabel'}} noselect" errorlabel></div>
 </div>
+
+
+
+
+<script type="module">
+	let clearcolor = '{{$clearcolor}}',
+		input = $('#{{$id}}'),
+		setting = '{{$setting}}';
+	
+	if (clearcolor) {
+		let clearAction = 'clearColor{{$id}}';
+		
+		$[clearAction] = (clearbtn) => {
+			$(input).removeAttrib('value');
+			$(input).setAttrib('color', '#0000');
+			$(input).trigger('input');
+			$['setSetting'](input[0], setting);
+			setTimeout(() => {
+				$(input).removeAttrib('color');
+			}, 300);
+		}
+	}
+	
+</script>

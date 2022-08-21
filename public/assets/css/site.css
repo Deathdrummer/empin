@@ -697,6 +697,13 @@ p {
     min-width: 40px;
   }
 }
+.auth-input-color.auth-input_iconed {
+  min-width: 85px;
+}
+.auth-input-color.auth-input_iconed > input::-webkit-color-swatch {
+  border-radius: 3px;
+  border-right: 1px solid #cadbf1;
+}
 .auth-showpassword {
   width: 20px;
   height: 100%;
@@ -737,6 +744,48 @@ p {
   color: #a5b6b7;
 }
 .auth-showpassword > *:hover {
+  color: #659fa3;
+}
+.auth-clearcolor {
+  width: 27px;
+  height: calc(34px  / 1.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+@media screen and (min-width: 576px) {
+  .auth-clearcolor {
+    height: calc(36px  / 1.6);
+  }
+}
+@media screen and (min-width: 768px) {
+  .auth-clearcolor {
+    height: calc(38px  / 1.6);
+  }
+}
+@media screen and (min-width: 992px) {
+  .auth-clearcolor {
+    height: calc(40px  / 1.6);
+  }
+}
+@media screen and (min-width: 1200px) {
+  .auth-clearcolor {
+    height: calc(40px / 1.6);
+  }
+}
+@media screen and (min-width: 1400px) {
+  .auth-clearcolor {
+    height: calc(40px / 1.6);
+  }
+}
+.auth-clearcolor > * {
+  cursor: pointer;
+  color: #2f2f4a;
+}
+.auth-clearcolor > *:hover {
   color: #659fa3;
 }
 
@@ -1221,6 +1270,16 @@ p {
     min-width: 40px;
   }
 }
+.large-input-color > input::-webkit-color-swatch {
+  border: none;
+  border-radius: 3px;
+}
+.large-input-color.large-input_iconed {
+  min-width: 85px;
+}
+.large-input-color.large-input_iconed > input::-webkit-color-swatch {
+  border-right: 1px solid #cadbf1;
+}
 .large-showpassword {
   width: 20px;
   height: 100%;
@@ -1262,6 +1321,50 @@ p {
 }
 .large-showpassword > *:hover {
   color: #659fa3;
+}
+.large-clearcolor {
+  width: 27px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  right: 7px;
+  top: 0;
+}
+@media screen and (min-width: 576px) {
+  .large-clearcolor {
+    height: 36px;
+  }
+}
+@media screen and (min-width: 768px) {
+  .large-clearcolor {
+    height: 38px;
+  }
+}
+@media screen and (min-width: 992px) {
+  .large-clearcolor {
+    height: 40px;
+  }
+}
+@media screen and (min-width: 1200px) {
+  .large-clearcolor {
+    height: 40px;
+  }
+}
+@media screen and (min-width: 1400px) {
+  .large-clearcolor {
+    height: 40px;
+  }
+}
+.large-clearcolor > * {
+  cursor: pointer;
+  color: #a5a5c9;
+  font-size: 24px;
+  transition: color 0.16s;
+}
+.large-clearcolor > *:hover {
+  color: #5e5e7e;
 }
 
 .normal-input {
@@ -1680,33 +1783,43 @@ p {
   font-weight: 400;
 }
 .normal-input-color > input {
-  min-width: 34px;
+  min-width: calc(34px  / 1.4);
   cursor: pointer;
 }
 @media screen and (min-width: 576px) {
   .normal-input-color > input {
-    min-width: 36px;
+    min-width: calc(36px  / 1.4);
   }
 }
 @media screen and (min-width: 768px) {
   .normal-input-color > input {
-    min-width: 38px;
+    min-width: calc(38px  / 1.4);
   }
 }
 @media screen and (min-width: 992px) {
   .normal-input-color > input {
-    min-width: 40px;
+    min-width: calc(40px  / 1.4);
   }
 }
 @media screen and (min-width: 1200px) {
   .normal-input-color > input {
-    min-width: 40px;
+    min-width: calc(40px / 1.4);
   }
 }
 @media screen and (min-width: 1400px) {
   .normal-input-color > input {
-    min-width: 40px;
+    min-width: calc(40px / 1.4);
   }
+}
+.normal-input-color > input::-webkit-color-swatch {
+  border: none;
+  border-radius: 3px;
+}
+.normal-input-color.normal-input_iconed {
+  min-width: 65px;
+}
+.normal-input-color.normal-input_iconed > input::-webkit-color-swatch {
+  border-right: 1px solid #cadbf1;
 }
 .normal-showpassword {
   width: 20px;
@@ -1749,6 +1862,50 @@ p {
 }
 .normal-showpassword > *:hover {
   color: #659fa3;
+}
+.normal-clearcolor {
+  width: 27px;
+  height: calc(34px  / 1.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  right: 2px;
+  top: 0;
+}
+@media screen and (min-width: 576px) {
+  .normal-clearcolor {
+    height: calc(36px  / 1.4);
+  }
+}
+@media screen and (min-width: 768px) {
+  .normal-clearcolor {
+    height: calc(38px  / 1.4);
+  }
+}
+@media screen and (min-width: 992px) {
+  .normal-clearcolor {
+    height: calc(40px  / 1.4);
+  }
+}
+@media screen and (min-width: 1200px) {
+  .normal-clearcolor {
+    height: calc(40px / 1.4);
+  }
+}
+@media screen and (min-width: 1400px) {
+  .normal-clearcolor {
+    height: calc(40px / 1.4);
+  }
+}
+.normal-clearcolor > * {
+  cursor: pointer;
+  color: #a5a5c9;
+  font-size: 18px;
+  transition: color 0.16s;
+}
+.normal-clearcolor > *:hover {
+  color: #5e5e7e;
 }
 
 .small-input {
@@ -2170,33 +2327,43 @@ p {
   font-weight: 400;
 }
 .small-input-color > input {
-  min-width: 34px;
+  min-width: calc(34px  / 1.6);
   cursor: pointer;
 }
 @media screen and (min-width: 576px) {
   .small-input-color > input {
-    min-width: 36px;
+    min-width: calc(36px  / 1.6);
   }
 }
 @media screen and (min-width: 768px) {
   .small-input-color > input {
-    min-width: 38px;
+    min-width: calc(38px  / 1.6);
   }
 }
 @media screen and (min-width: 992px) {
   .small-input-color > input {
-    min-width: 40px;
+    min-width: calc(40px  / 1.6);
   }
 }
 @media screen and (min-width: 1200px) {
   .small-input-color > input {
-    min-width: 40px;
+    min-width: calc(40px / 1.6);
   }
 }
 @media screen and (min-width: 1400px) {
   .small-input-color > input {
-    min-width: 40px;
+    min-width: calc(40px / 1.6);
   }
+}
+.small-input-color > input::-webkit-color-swatch {
+  border: none;
+  border-radius: 3px;
+}
+.small-input-color.small-input_iconed {
+  min-width: 60px;
+}
+.small-input-color.small-input_iconed > input::-webkit-color-swatch {
+  border-right: 1px solid #cadbf1;
 }
 .small-showpassword {
   width: 20px;
@@ -2239,6 +2406,49 @@ p {
 }
 .small-showpassword > *:hover {
   color: #659fa3;
+}
+.small-clearcolor {
+  width: 27px;
+  height: calc(34px  / 1.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+@media screen and (min-width: 576px) {
+  .small-clearcolor {
+    height: calc(36px  / 1.6);
+  }
+}
+@media screen and (min-width: 768px) {
+  .small-clearcolor {
+    height: calc(38px  / 1.6);
+  }
+}
+@media screen and (min-width: 992px) {
+  .small-clearcolor {
+    height: calc(40px  / 1.6);
+  }
+}
+@media screen and (min-width: 1200px) {
+  .small-clearcolor {
+    height: calc(40px / 1.6);
+  }
+}
+@media screen and (min-width: 1400px) {
+  .small-clearcolor {
+    height: calc(40px / 1.6);
+  }
+}
+.small-clearcolor > * {
+  cursor: pointer;
+  color: #a5a5c9;
+  transition: color 0.16s;
+}
+.small-clearcolor > *:hover {
+  color: #5e5e7e;
 }
 
 .white-input:not([class^=input-color]) > input {

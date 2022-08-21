@@ -72,6 +72,8 @@ $(function() {
 				
 				if (type == 'checkbox') {
 					value = $(item).is(':checked') ? 1 : 0;
+				} else if (type == 'color') {
+					value = $(item).attr('color') || $(item).val() || null;
 				} else {
 					value = $(item).val() || null;
 				}

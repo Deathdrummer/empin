@@ -163,6 +163,14 @@
 			> input
 				+resp(min-width, $inputHeight)
 				cursor: pointer
+			
+			&.auth-input_iconed
+				min-width: 85px
+				
+				> input
+					&::-webkit-color-swatch
+						border-radius: $borderRadius
+						border-right: 1px solid #cadbf1
 	
 	
 	
@@ -188,7 +196,23 @@
 			&:hover
 				color: #659fa3
 
-
+	
+	&-clearcolor
+		width: 27px
+		+addict(height, $inputHeight, '/ 1.6')
+		display: flex
+		align-items: center
+		justify-content: center
+		position: absolute
+		right: 0
+		top: 0
+		
+		> *
+			cursor: pointer
+			color: #2f2f4a
+			
+			&:hover
+				color: #659fa3
 
 
 
@@ -331,6 +355,19 @@
 			> input
 				+resp(min-width, $inputHeight)
 				cursor: pointer
+				
+				&::-webkit-color-swatch
+					border: none
+					border-radius: $borderRadius
+					
+			
+			&.large-input_iconed
+				min-width: 85px
+				
+				> input
+					&::-webkit-color-swatch
+						
+						border-right: 1px solid #cadbf1
 		
 		
 		
@@ -353,6 +390,25 @@
 			
 			&:hover
 				color: #659fa3
+	
+	&-clearcolor
+		width: 27px
+		+resp(height, $inputHeight)
+		display: flex
+		align-items: center
+		justify-content: center
+		position: absolute
+		right: 7px
+		top: 0
+		
+		> *
+			cursor: pointer
+			color: #a5a5c9
+			font-size: 24px
+			transition: color 0.16s 
+			
+			&:hover
+				color: #5e5e7e
 	
 	
 
@@ -503,8 +559,19 @@
 		
 		&-color
 			> input
-				+resp(min-width, $inputHeight)
+				+addict(min-width, $inputHeight, '/ 1.4')
 				cursor: pointer
+				
+				&::-webkit-color-swatch
+					border: none
+					border-radius: $borderRadius
+			
+			&.normal-input_iconed
+				min-width: 65px
+				
+				> input
+					&::-webkit-color-swatch
+						border-right: 1px solid #cadbf1
 		
 		
 		
@@ -528,6 +595,26 @@
 			
 			&:hover
 				color: #659fa3
+	
+	
+	&-clearcolor
+		width: 27px
+		+addict(height, $inputHeight, '/ 1.4')
+		display: flex
+		align-items: center
+		justify-content: center
+		position: absolute
+		right: 2px
+		top: 0
+		
+		> *
+			cursor: pointer
+			color: #a5a5c9
+			font-size: 18px
+			transition: color 0.16s 
+			
+			&:hover
+				color: #5e5e7e
 	
 	
 	
@@ -680,8 +767,19 @@
 		
 		&-color
 			> input
-				+resp(min-width, $inputHeight)
+				+addict(min-width, $inputHeight, '/ 1.6')
 				cursor: pointer
+				
+				&::-webkit-color-swatch
+					border: none
+					border-radius: $borderRadius
+			
+			&.small-input_iconed
+				min-width: 60px
+				
+				> input
+					&::-webkit-color-swatch
+						border-right: 1px solid #cadbf1
 		
 		
 		
@@ -705,6 +803,25 @@
 			
 			&:hover
 				color: #659fa3
+	
+	
+	&-clearcolor
+		width: 27px
+		+addict(height, $inputHeight, '/ 1.6')
+		display: flex
+		align-items: center
+		justify-content: center
+		position: absolute
+		right: 0
+		top: 0
+		
+		> *
+			cursor: pointer
+			color: #a5a5c9
+			transition: color 0.16s 
+			
+			&:hover
+				color: #5e5e7e
 	
 	
 
