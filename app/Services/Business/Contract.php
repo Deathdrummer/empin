@@ -91,7 +91,7 @@ class Contract {
 		
 		return $data->mapWithKeysMany(function($item) use($deadlines) {
 			
-			if (isset($deadlines)) {
+			if ($deadlines) {
 				$deadlineCondition = $this->datetime->checkDiapason($item['date_end'], $deadlines, [
 					'minSign' 		=> 'min_sign',
 					'minDateCount'	=> 'min_count',
