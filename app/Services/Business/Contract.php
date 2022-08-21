@@ -87,12 +87,12 @@ class Contract {
 			->get();
 		
 		
-		$deadlines = $this->getSettings('contracts-deadlines:deadlines', 'group:many');
+		$deadlines = $this->getSettings('contracts-deadlines');
 		
 		return $data->mapWithKeysMany(function($item) use($deadlines) {
 			
-			if (isset($deadlines['contracts'])) {
-				$deadlineCondition = $this->datetime->checkDiapason($item['date_end'], $deadlines['contracts'], [
+			if (isset($deadlines)) {
+				$deadlineCondition = $this->datetime->checkDiapason($item['date_end'], $deadlines, [
 					'minSign' 		=> 'min_sign',
 					'minDateCount'	=> 'min_count',
 					'minDateType' 	=> 'min_datetype',

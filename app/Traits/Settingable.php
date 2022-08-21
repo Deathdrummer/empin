@@ -52,6 +52,14 @@ trait Settingable {
 			return isset($this->settingsData[$key]) ? $this->settingsData[$key] : $this->settingsData;
 		} 
 		
+		if (!is_array($setting)) {
+			if (!Str::contains($setting, ':')) return isset($this->settingsData[$setting]) ? $this->settingsData[$setting] : $this->settingsData;
+			
+			$k = splitString($setting, ':');
+			$key = array_pop($k);
+			return isset($this->settingsData[$key]) ? $this->settingsData[$key] : $this->settingsData;
+		}
+		
 		return $this->settingsData;
 	}
 	
