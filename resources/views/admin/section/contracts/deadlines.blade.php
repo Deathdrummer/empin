@@ -29,19 +29,19 @@
 						<fieldset class="fieldset">
 							<legend>Цвета дедлайнов этапов</legend>
 							
-							<x-input-group group="small">
+							<x-input-group group="normal">
 								<div class="row gx-30" gx="30">
 									<div class="col-auto">
 										<p class="mb6px">Перед дедлайном</p>
-										<x-input type="color" variant="neutral" setting="steps-deadlines.before" clearcolor />
+										<x-input type="color" variant="neutral" class="w15rem" setting="steps-deadlines.before" clearcolor />
 									</div>
 									<div class="col-auto">
 										<p class="mb6px">День дедлайна</p>
-										<x-input type="color" variant="neutral" setting="steps-deadlines.current" clearcolor />
+										<x-input type="color" variant="neutral" class="w15rem" setting="steps-deadlines.current" clearcolor />
 									</div>
 									<div class="col-auto">
 										<p class="mb6px">После дедлайна</p>
-										<x-input type="color" variant="neutral" setting="steps-deadlines.after" clearcolor />
+										<x-input type="color" variant="neutral" class="w15rem" setting="steps-deadlines.after" clearcolor />
 									</div>
 								</div>
 							</x-input-group>

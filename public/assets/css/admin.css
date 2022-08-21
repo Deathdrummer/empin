@@ -7447,6 +7447,10 @@ section {
   height: 100%;
   position: relative;
   overflow-y: hidden;
+  touch-callout: none;
+  -webkit-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
 }
 .ddrtabsnav::after {
   content: "";
