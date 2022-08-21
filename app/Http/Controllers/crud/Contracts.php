@@ -298,7 +298,11 @@ class Contracts extends Controller {
 		$contract->fill($validFields);
 		$contract->save();
 		
-		$contractDepartments = $this->_buildDepartments($request, $id);
+		$tableShowDepsData = $contract->departments()->get()->mapWithKeys(function($item) {
+			return [$item['id'] => !!$item['pivot']['show']];
+		})->toArray();
+		
+		$contractDepartments = $this->_buildDepartments($request, $id, $tableShowDepsData);
 		
 		$assignedUsers = $this->_buildAssignedUsers($request, $id); // формирование массива для обновления\вставки ответственных
 		
@@ -428,7 +432,7 @@ class Contracts extends Controller {
 	 * @param int  $contractId
 	 * @return mixed
 	 */
-	private function _buildDepartments(Request $request = null, int $contractId = null): mixed {
+	private function _buildDepartments(Request $request = null, int $contractId = null, $tableShowDepsData = null): mixed {
 		if (!$departmentsData = $request->input('departments')) return [];
 		foreach ($departmentsData as $dId => $department) {
 			if (!$department) {
@@ -454,15 +458,19 @@ class Contracts extends Controller {
 			$depsSteps = [];
 			foreach ($department['steps'] as $stepId => $step) {
 				$depsSteps[] = [
-					'step_id' 		=> $stepId,
-					'deadline' 		=> $step['deadline'] ?? null,
+					'step_id'	=> $stepId,
+					'deadline'	=> $step['deadline'] ?? null,
 				];
 			}
 			
+			$show = $department['show'] ? 1 : 0;
 			$depsData[$deptId] = [
 				'steps'	=> json_encode($depsSteps, JSON_UNESCAPED_UNICODE),
-				'show'	=> $department['show'] ? 1 : 0
+				'show'	=> $show
 			];
+			
+			if ($show && !$tableShowDepsData[$deptId]) $depsData[$deptId]['updated_show'] = now()->setTime(0, 0, 0);
+			elseif (!$show) $depsData[$deptId]['updated_show'] = null;
 		}
 		
 		return $depsData;

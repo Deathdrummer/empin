@@ -5,6 +5,7 @@ use App\Models\Contract as ContractModel;
 use App\Models\ContractData;
 use App\Services\DateTime;
 use App\Traits\Settingable;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -87,12 +88,12 @@ class Contract {
 			->get();
 		
 		
-		$deadlines = $this->getSettings('contracts-deadlines');
+		$deadlinesContracts = $this->getSettings('contracts-deadlines');
+		$deadlinesSteps = $this->getSettings('steps-deadlines');
 		
-		return $data->mapWithKeysMany(function($item) use($deadlines) {
-			
-			if ($deadlines) {
-				$deadlineCondition = $this->datetime->checkDiapason($item['date_end'], $deadlines, [
+		return $data->mapWithKeysMany(function($item) use($deadlinesContracts, $deadlinesSteps) {
+			if ($deadlinesContracts) {
+				$deadlineContractsCondition = $this->datetime->checkDiapason($item['date_end'], $deadlinesContracts, [
 					'minSign' 		=> 'min_sign',
 					'minDateCount'	=> 'min_count',
 					'minDateType' 	=> 'min_datetype',
@@ -100,25 +101,25 @@ class Contract {
 					'maxDateCount'	=> 'max_count',
 					'maxDateType' 	=> 'max_datetype'
 				], ['name', 'color']);
-				
-				$color = $deadlineCondition['color'] ?: null;
-				$name = $deadlineCondition['name'] ?: '';
+				$color = $deadlineContractsCondition['color'] ?? null;
+				$name = $deadlineContractsCondition['name'] ?? '';
 			}
 			
 			
-			$departments = $item->departments->mapWithKeys(function($dep) {
+			$departments = $item->departments->mapWithKeys(function($dep) use($item, $deadlinesSteps) {
+				$steps = null;
 				
-				if ($dep['pivot']['steps']) {
+				if ($dep['pivot']['steps'] && $deadlinesSteps) {
 					foreach ($dep['pivot']['steps'] as $stepId => $step) {
-						//$carbon = new Carbon;
-						//$dateNow = $carbon->now()->setTime(0, 0, 0);
-						//$dateEnd = $carbon->create($step['deadline']);
+						$steps[$stepId] = $step;
+						$dateNow = now()->setTime(0, 0, 0);
 						
+						$dateStart = Carbon::create($dep['pivot']['updated_show'] ?? $item['date_start']);
+						$deadLine = $dateStart->addDays($step['deadline']);
+						
+						$steps[$stepId]['color'] = $dateNow >= $deadLine ? '#fff7c9' : 'transparent';
 					}
 				}
-				
-				
-				
 				
 				return [$dep['id'] => [
 					'id' 				=> $dep['id'] ?? null,
@@ -126,10 +127,9 @@ class Contract {
 					'assigned_primary'	=> $dep['assigned_primary'] ?? null,
 					'show'				=> $dep['pivot']['show'] ?? null,
 					'hide'				=> $dep['pivot']['hide'] ?? null,
-					'steps'				=> $dep['pivot']['steps'] ?? null,
+					'steps'				=> $steps,
 				]];
 			});
-			
 			
 			
 			return [$item['id'] => [

@@ -204,7 +204,7 @@ class Contracts extends Controller {
 		]);
 		
 		$contract = Contract::find($contractId);
-		$statData = $contract->departments()->syncWithoutDetaching([$departmentId => ['show' => 1]]);
+		$statData = $contract->departments()->syncWithoutDetaching([$departmentId => ['show' => 1, 'updated_show' => now()->setTime(0, 0, 0)]]);
 		
 		return response()->json($statData['updated']);
 	}

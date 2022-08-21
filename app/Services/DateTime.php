@@ -7,13 +7,12 @@ class DateTime {
 	
 	
 	
-	
 	/**
 	 * @param 
 	 * @return 
 	 */
 	public function checkDiapason($datePoint = null, $conditions = null, $map = null, $returnFields = null) {
-		if (!$datePoint || !$conditions || !$map || !$returnFields) throw new \Exception('DateTime -> checkDiapason не переданы параметры');
+		if (!$datePoint || !$conditions || !$map) return false;
 		if (is_array($conditions)) $conditions = collect($conditions);
 		
 		$conditions = $conditions->mapToGroups(function($item) {
@@ -121,7 +120,8 @@ class DateTime {
 	 * @return array|string
 	 */
 	private function _buildResponse($condition = null, $returnFields = null, $oneField = false) {
-		if (!$condition || !$returnFields) throw new \Exception('DateTime -> _buildResponse не переданы параметры');
+		if (!$condition) throw new \Exception('DateTime -> _buildResponse не переданы параметры');
+		if (is_null($returnFields)) return true;
 		if (!is_array($returnFields)) $returnFields = pregSplit($returnFields);
 		
 		$returnData = [];

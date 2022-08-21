@@ -191,7 +191,7 @@
 									@foreach($dept['steps'] as $step)
 										@isset($contract['departments'][$dept['id']]['steps'][$step['id']])
 											@if($step['type'] == 1)
-												<td class="center">
+												<td class="center" style="background-color: {{$contract['departments'][$dept['id']]['steps'][$step['id']]['color']}};">
 													@if($edited)
 														<x-checkbox
 															group="normal"
@@ -212,7 +212,7 @@
 													@endif
 												</td>
 											@elseif($step['type'] == 2)
-												<td>
+												<td style="background-color: {{$contract['departments'][$dept['id']]['steps'][$step['id']]['color']}};">
 													@if($edited)
 														<x-textarea
 															group="small"
@@ -228,7 +228,7 @@
 													@endif
 												</td>
 											@elseif($step['type'] == 3)
-												<td>
+												<td style="background-color: {{$contract['departments'][$dept['id']]['steps'][$step['id']]['color']}};">
 													@if($edited)
 														<x-select
 															group="small"
@@ -247,7 +247,7 @@
 													@endif
 												</td>
 											@elseif($step['type'] == 4)
-												<td>
+												<td style="background-color: {{$contract['departments'][$dept['id']]['steps'][$step['id']]['color']}};">
 													@if($edited)
 														<x-input
 															group="small"
