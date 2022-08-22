@@ -90,8 +90,9 @@ if (! function_exists('arrTakeItem')) {
 if (! function_exists('splitString')) {
 	/**
 	 * Разбивает строку по заданному разделителя
-	 * @param array $arr массив
+	 * @param string $str строка
 	 * @param array $separator разделитель
+	 * @param array $strict строгий режим
 	 * @return array|null
 	*/
 	function splitString(?string $str = null, $separator, $strict = false): array|null {
@@ -116,7 +117,7 @@ if (! function_exists('splitString')) {
 if (! function_exists('pregSplit')) {
 	/**
 	 * Разбивает строку по разделителям: пробел , ; |
-	 * @param array $arr массив
+	 * @param array|null $arr массив
 	 * @param array $separator разделитель
 	 * @return array|null
 	*/
