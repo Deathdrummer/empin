@@ -21,9 +21,9 @@ class EloquentCollection extends Collection {
 
         foreach ($this->items as $key => $value) {
             $assoc = $callback($value, $key);
-
             foreach ($assoc as $mapKey => $mapValue) {
-                $result[$mapKey] = $mapValue;
+                if (isset($result[$mapKey])) $result[$mapKey] = array_replace_recursive($result[$mapKey], $mapValue); 
+				else $result[$mapKey] = $mapValue;
             }
         }
 

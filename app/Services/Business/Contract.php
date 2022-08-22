@@ -91,8 +91,6 @@ class Contract {
 		$deadlinesContracts = $this->getSettings('contracts-deadlines');
 		$deadlinesSteps = $this->getSettings('steps-deadlines');
 		
-		logger($deadlinesSteps);
-		
 		return $data->mapWithKeysMany(function($item) use($deadlinesContracts, $deadlinesSteps) {
 			if ($deadlinesContracts) {
 				$deadlineContractsCondition = $this->datetime->checkDiapason($item['date_end'], $deadlinesContracts, [

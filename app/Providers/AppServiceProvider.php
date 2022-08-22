@@ -285,6 +285,7 @@ class AppServiceProvider extends ServiceProvider
 		 */
 		Collection::macro('mapWithKeysMany', function (callable $callback) {
 			$result = [];
+			
 			foreach ($this->items as $key => $value) {
 				$assoc = $callback($value, $key);
 				foreach ($assoc as $mapKey => $mapValue) {
