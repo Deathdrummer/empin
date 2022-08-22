@@ -42,13 +42,17 @@ class Contracts extends Controller {
 	public function list(Request $request) {
 		$list = $this->contract->getWithDepartments($request);
 		
+		//logger($list->toArray());
+		
 		if ($list->isEmpty()) return $this->render('list');
 		
 		$alldeps = $this->department->getWithSteps($request);
 		
 		$this->_addDepsUsersToData($alldeps);
 		
-		$contractdata = $this->contract->buildData();
+		$contractdata = $this->contract->buildData($list->keys());
+		
+		
 		
 		$this->addSettingToGlobalData([[
 			'setting'	=> 'contract-customers:customers',

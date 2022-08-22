@@ -6,6 +6,7 @@
 					<tr>
 						<td class="w30rem"><strong>Название</strong></td>
 						<td></td>
+						<td class="w9rem" title="Отобразить только для назначенных"><strong>Отобр. только для назн.</strong></td>
 						<td class="w8rem" title="Сортировка"><strong>Сорт.</strong></td>
 						<td class="w6rem"><strong>Этапы</strong></td>
 						<td class="w10rem center"><strong>Действия</strong></td>

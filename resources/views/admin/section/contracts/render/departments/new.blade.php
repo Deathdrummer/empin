@@ -4,6 +4,12 @@
 			<x-input name="name" class="w100" placeholder="Название" />
 		</td>
 		<td></td>
+		<td class="center">
+			<x-checkbox
+				name="show_only_assigned"
+				group="large"
+				/>
+		</td>
 		<td>
 			<x-input name="sort" type="number" class="w100" placeholder="0" showrows />
 		</td>

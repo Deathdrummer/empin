@@ -3,6 +3,8 @@
 use App\Http\Filters\ContractFilter;
 use App\Models\Contract as ContractModel;
 use App\Models\ContractData;
+use App\Models\Department;
+use App\Services\Business\Department as DepartmentService;
 use App\Services\DateTime;
 use App\Traits\Settingable;
 use Carbon\Carbon;
@@ -13,9 +15,11 @@ class Contract {
 	use Settingable; 
 	
 	private $datetime;
+	private $department;
 	
-	public function __construct(DateTime $datetime) {
+	public function __construct(DateTime $datetime, DepartmentService $department) {
 		$this->datetime = $datetime;
+		$this->department = $department;
 	}
 	
 	
@@ -77,6 +81,16 @@ class Contract {
 		$sortField = $request->get('sort_field', 'id');
 		$sortOrder = $request->get('sort_order', 'asc');
 		
+		
+		$onlyAssignedContractsIds = match (true) {
+			$this->department->checkShowOnlyAssigned() => ContractData::select('contract_id')->where([
+				'data' 	=> auth('site')->user()->id,
+				'type'	=> 3
+			])->get()->pluck('contract_id'),
+			default => false
+		};
+		
+		
 		$data = ContractModel::filter($filter)
 			->withCount(['departments as has_deps_to_send' => function (Builder $query) {
 				$query->where(['show' => 0, 'hide' => 0]);
@@ -84,6 +98,9 @@ class Contract {
 				$query->where('hide', 1);
 			}])
 			->with('departments')
+			->when($onlyAssignedContractsIds, function ($query) use($onlyAssignedContractsIds) {
+				return $query->whereIn('id', $onlyAssignedContractsIds);
+			})
 			->orderBy($sortField, $sortOrder)
 			->get();
 		
@@ -157,7 +174,7 @@ class Contract {
 				'object_id' 		=> $item['object_id'] ?? null,
 				'color' 			=> $color ?? null,
 				'name' 				=> $name ?? '',
-				'has_deps_to_send'	=> $item['has_deps_to_send'] ?? null,
+				'has_deps_to_send'	=> !!$item['has_deps_to_send'] ?? null,
 				'ready_to_archive'	=> $item['hide_count'] != 0 && $item['hide_count'] == $item->departments->count(),
 				
 				'departments' 		=> $departments
@@ -176,8 +193,10 @@ class Contract {
 	 * @param 
 	 * @return 
 	 */
-	public function buildData() {
-		$cdata = ContractData::all();
+	public function buildData($contractsIds = null) {
+		if (!$contractsIds) $cdata = ContractData::all();
+		else $cdata = ContractData::whereIn('contract_id', $contractsIds)->get();
+		
 		if ($cdata->isEmpty()) return [];
 		$contractdata = [];
 		foreach ($cdata->toArray() as $item) {

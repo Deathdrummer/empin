@@ -4,6 +4,13 @@
 			<x-input name="name" class="w100" value="{{$name}}" placeholder="Название" />
 		</td>
 		<td></td>
+		<td class="center">
+			<x-checkbox
+				name="show_only_assigned"
+				group="large"
+				:checked="$show_only_assigned ?? null"
+				/>
+		</td>
 		<td>
 			<x-input name="sort" type="number" class="w100" value="{{$sort}}" placeholder="0" showrows />
 		</td>

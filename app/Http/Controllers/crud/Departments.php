@@ -189,8 +189,9 @@ class Departments extends Controller {
         		'required',
 				Rule::unique('departments')->ignore(Department::where('id', $id)->first()),
 			],
-			'assigned_primary'	=> 'numeric|nullable',
-			'sort'				=> 'numeric'
+			'assigned_primary'		=> 'numeric|nullable',
+			'show_only_assigned'	=> 'boolean|nullable',
+			'sort'					=> 'numeric'
 		]);
 		
 		Department::where('id', $id)->update($validFields);
