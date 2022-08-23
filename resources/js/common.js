@@ -28,7 +28,8 @@ jQuery(function() {
 			value = isContentEditable ? getContenteditable(this) : $(this).val(),
 			group = hasGroup ? $(this).attr('inpgroup')+'-' : '',
 			wrapperClass = isContentEditable ? 'contenteditable' : (findWrapByInputType.indexOf(type) !== -1 ? type : tag),
-			wrapperSelector = $(this).closest('.'+wrapperClass);	
+			wrapperSelector = $(this).closest('.'+wrapperClass),
+			isCleared = $(wrapperSelector).hasClass('cleared');	
 			
 			if (group) $(wrapperSelector).addClass(group+wrapperClass);
 		
@@ -37,14 +38,14 @@ jQuery(function() {
 			if (['checkbox'].indexOf(wrapperClass) !== -1 && ['input'].indexOf(eventType) !== -1) {
 				let noChecked = typeof $(this).attr('checked') !== 'undefined';
 				
-				if ($(wrapperSelector).find('[errorlabel]').length) $(wrapperSelector).find('[errorlabel]').empty();
-				if ($(wrapperSelector).hasClass(group+wrapperClass+'_error')) $(wrapperSelector).removeClass(group+wrapperClass+'_error');
-				$(wrapperSelector).addClass(group+wrapperClass+'_changed');
+				if (!isCleared) if ($(wrapperSelector).find('[errorlabel]').length) $(wrapperSelector).find('[errorlabel]').empty();
+				if (!isCleared) if ($(wrapperSelector).hasClass(group+wrapperClass+'_error')) $(wrapperSelector).removeClass(group+wrapperClass+'_error');
+				if (!isCleared) $(wrapperSelector).addClass(group+wrapperClass+'_changed');
 				
 				if (noChecked) {
-					$(wrapperSelector).removeClass(group+wrapperClass+'_checked');
+					if (!isCleared) $(wrapperSelector).removeClass(group+wrapperClass+'_checked');
 				} else {
-					$(wrapperSelector).addClass(group+wrapperClass+'_checked');
+					if (!isCleared) $(wrapperSelector).addClass(group+wrapperClass+'_checked');
 				}
 				
 				if ($(this)[0].hasAttribute('checked')) {
@@ -64,7 +65,7 @@ jQuery(function() {
 				if ($(wrapperSelector).find('[errorlabel]').length) $(wrapperSelector).find('[errorlabel]').empty();
 				if ($(wrapperSelector).hasClass(group+wrapperClass+'_error')) $(wrapperSelector).removeClass(group+wrapperClass+'_error');
 				
-				$(wrapperSelector).addClass(group+wrapperClass+'_checked');
+				if (!isCleared) $(wrapperSelector).addClass(group+wrapperClass+'_checked');
 				
 			} else if (['checkbox', 'radio'].indexOf(wrapperClass) === -1) {
 				if (['focusin', 'focus'].indexOf(eventType) !== -1) {
@@ -78,10 +79,12 @@ jQuery(function() {
 					if ($(wrapperSelector).find('[errorlabel]').length) $(wrapperSelector).find('[errorlabel]').empty();
 					if ($(wrapperSelector).hasClass(group+wrapperClass+'_error')) $(wrapperSelector).removeClass(group+wrapperClass+'_error');
 					
-					$(wrapperSelector).addClass(group+wrapperClass+'_changed');
+					if (!isCleared) $(wrapperSelector).addClass(group+wrapperClass+'_changed');
 					
-					if (value !== null && value.length) $(wrapperSelector).addClass(group+wrapperClass+'_noempty');
-					else $(wrapperSelector).removeClass(group+wrapperClass+'_noempty');
+					if (!isCleared) {
+						if (value !== null && value.length) $(wrapperSelector).addClass(group+wrapperClass+'_noempty');
+						else $(wrapperSelector).removeClass(group+wrapperClass+'_noempty');
+					}
 				}
 			}
 		}

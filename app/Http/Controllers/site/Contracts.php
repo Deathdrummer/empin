@@ -79,11 +79,12 @@ class Contracts extends Controller {
 		$departmentId = $request->get('department_id');
 		
 		$edited = ($canEditAll && !$isArchive) || $isDepartment;
+		$searched = $request->has('search') && $request->get('search');
 		
 		$sortField = $request->get('sort_field', 'id');
 		$sortOrder = $request->get('sort_order', 'asc');
 		
-		return $this->render('list', compact('list', 'alldeps', 'contractdata', 'edited', 'departmentId', 'isArchive', 'sortField', 'sortOrder'));
+		return $this->render('list', compact('list', 'alldeps', 'contractdata', 'edited', 'departmentId', 'isArchive', 'sortField', 'sortOrder', 'searched'));
 	}
 	
 	

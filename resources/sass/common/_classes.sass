@@ -1,6 +1,7 @@
 @import "./bootstrap/functions"
 @import "./bootstrap/variables"
 @import "@sass/common/mixins/scrollbar"
+@import "@sass/common/mixins/button"
 
 
 
@@ -83,6 +84,94 @@
 
 .circle
 	border-radius: 50%
+
+
+
+
+
+
+
+
+
+
+
+
+.bg
+	&-blue
+		background-color: #1bdbe0
+	
+		&-hovered
+			+ddrBtn((normal: (color: #fff), hover: (bg: #17babe, color: #fff, animate: 0.16s), active: (bg: #16afb2, color: #fff)))
+	
+	
+	&-gray
+		background-color: #d8d8d8
+	
+		&-hovered
+			+ddrBtn((normal: (color: #fff), hover: (bg: #c5c5c5, color: #fff, animate: 0.16s), active: (bg: #bfbfbf, color: #fff)))
+				
+				
+	&-neutral
+		background-color: #9ea8bf
+	
+		&-hovered
+			+ddrBtn((normal: (color: #fff), hover: (bg: #959fb7, color: #fff, animate: 0.16s), active: (bg: #828faf, color: #fff)))
+		
+		
+	&-green
+		background-color: #38ce3c
+	
+		&-hovered
+			+ddrBtn((normal: (color: #fff), hover: (bg: #2cb430, color: #fff, animate: 0.16s), active: (bg: #2aa92d, color: #fff)))
+			
+		
+	&-red
+		background-color: #ff7a90
+	
+		&-hovered
+			+ddrBtn((normal: (color: #fff), hover: (bg: #f37186, color: #fff, animate: 0.16s), active: (bg: #ff1a41, color: #fff)))
+	
+	
+	&-yellow
+		background-color: #ffde73
+	
+		&-hovered
+			+ddrBtn((normal: (color: #ad8400), hover: (bg: #ffd54d, color: #ad8400, animate: 0.16s), active: (bg: #ffd240, color: #ad8400)))
+	
+	
+	&-purple
+		background-color: #b08ad7
+	
+		&-hovered
+			+ddrBtn((normal: (color: #fff), hover: (bg: #a07bc5, color: #fff, animate: 0.16s), active: (bg: #8d67b3, color: #fff)))
+	
+	
+	&-light
+		background-color: #f8fafb
+	
+		&-hovered
+			+ddrBtn((normal: (color: #8f9ba7), hover: (bg: #f3f6f7, color: #8f9ba7, animate: 0.16s), active: (bg: #e9eeef, color: #8f9ba7)))
+	
+	
+	&-dark
+		background-color: #3e4b5b
+	
+		&-hovered
+			+ddrBtn((normal: (color: #fff), hover: (bg: #2f3844, color: #fff, animate: 0.16s), active: (bg: #29323d, color: #fff)))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -11,6 +11,7 @@ class ContractFilter extends AbstractFilter {
     //public const HIDE = 'hide';
     //public const SHOW = 'show';
     public const PIVOT = 'pivot';
+    public const SEARCH = 'search';
 
     protected function getCallbacks(): array {
         return [
@@ -21,6 +22,7 @@ class ContractFilter extends AbstractFilter {
            	//self::HIDE => [$this, 'hide'],
             //self::SHOW => [$this, 'show'],
             self::PIVOT => [$this, 'pivot'],
+            self::SEARCH => [$this, 'search'],
         ];
     }
 	
@@ -89,6 +91,17 @@ class ContractFilter extends AbstractFilter {
 			}
 		});
 	}
+	
+	
+	
+	
+	public function search(Builder $builder, $value) {
+		$builder->where(function (Builder $query) use($value) {
+			$query->orWhere('title', 'like', '%'.$value.'%');
+			$query->orWhere('titul', 'like', '%'.$value.'%');
+			$query->orWhere('contract', 'like', '%'.$value.'%');
+		});
+    }
 	
 	
 }

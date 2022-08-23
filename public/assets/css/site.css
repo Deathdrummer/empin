@@ -267,10 +267,20 @@ p {
   align-items: center;
   justify-content: center;
   height: calc(100% - 2px);
+}
+.input .postfix_icon-colored {
   background-color: #fff5b8;
 }
-.input .postfix_icon i {
+.input .postfix_icon-colored i {
   color: #5a511a;
+}
+.input .postfix_icon-hovered.postfix_icon-colored:hover {
+  background-color: #ffef91;
+  transition: background-color 0.16s;
+}
+.input .postfix_icon-hovered.postfix_icon-colored:active {
+  background-color: #f3dc53;
+  transition: background-color 0s;
 }
 
 .auth-input {
@@ -6692,6 +6702,7 @@ table tfoot tr td.right {
   align-items: center;
   justify-content: center;
   min-height: 20px;
+  height: 100%;
   cursor: pointer;
 }
 .chooser__item:hover.chooser_color-neutral {
@@ -7484,6 +7495,10 @@ section {
   transition: background-color 0.3s, border-color 0.3s, color 0.3s, box-shadow 0.3s, fill 0.3s;
   display: flex;
 }
+.hovered i {
+  color: #647f8b;
+  fill: #647f8b;
+}
 .hovered:hover {
   background-color: #f2f6f9;
   border-color: #ecf0f3;
@@ -7491,10 +7506,18 @@ section {
   fill: #2d5364;
   transition: background-color 0.16s, border-color 0.16s, color 0.16s, box-shadow 0.16s, fill 0.16s;
 }
+.hovered:hover i {
+  color: #2d5364;
+  fill: #2d5364;
+}
 .hovered:active, .hovered.active {
   background-color: #e9eff3;
   border-color: #d9e4eb;
   color: #005a83;
   fill: #005a83;
   transition: background-color 0s, border-color 0s, color 0s, box-shadow 0s, fill 0s;
+}
+.hovered:active i, .hovered.active i {
+  color: #005a83;
+  fill: #005a83;
 }

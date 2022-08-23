@@ -2,7 +2,7 @@
 	'id'    => 'chooser'.rand(0,9999999),
 	'many'  => null,
 	//'disabled'  => $groupDisabled,
-	//'group'     => $groupWrap,
+	'group'     => null,
 	//'variant'   => $groupVariant,
 	//'rounded'   => $groupRounded,
 	//'px'        => $groupPx,
@@ -16,11 +16,13 @@
 	id="{{$id}}"
 	{{$attributes->filter(fn ($value, $key) => $key == 'class')->class([
 		'chooser',
-		'noselect'
+		'noselect',
+		'chooser-'.$group => $group
 	])}}>
 	<div
 		@class([
 			'row',
+			'h100',
 			'gx-'.$gx,
 		])>
 		{{$slot}}

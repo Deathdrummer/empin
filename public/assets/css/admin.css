@@ -267,10 +267,20 @@ p {
   align-items: center;
   justify-content: center;
   height: calc(100% - 2px);
+}
+.input .postfix_icon-colored {
   background-color: #fff5b8;
 }
-.input .postfix_icon i {
+.input .postfix_icon-colored i {
   color: #5a511a;
+}
+.input .postfix_icon-hovered.postfix_icon-colored:hover {
+  background-color: #ffef91;
+  transition: background-color 0.16s;
+}
+.input .postfix_icon-hovered.postfix_icon-colored:active {
+  background-color: #f3dc53;
+  transition: background-color 0s;
 }
 
 .auth-input {
@@ -6692,6 +6702,7 @@ table tfoot tr td.right {
   align-items: center;
   justify-content: center;
   min-height: 20px;
+  height: 100%;
   cursor: pointer;
 }
 .chooser__item:hover.chooser_color-neutral {

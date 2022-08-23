@@ -14,19 +14,22 @@
 	'group' 		=> $groupWrap,
 	'label' 		=> null,
 	'showrows' 		=> false,
-    'action'        => 'setSetting',
-    'icon'        	=> null,
-    'clearcolor'	=> null,
-    'tag'        	=> null,
+	'action'        => 'setSetting',
+	'icon'        	=> null,
+	'iconbg'     	=> null,
+	'clearcolor'	=> null,
+	'tag'        	=> null,
+	'cleared'		=> null,
 ])
 
 
 
 <div {{$attributes->class([
 		'input',
+		'cleared' => $cleared,
 		$group.'-input' => $group,
 		($group ? $group.'-' : '').'input-'.$type => $type,
-		($group ? $group.'-' : '').'input_noempty' => $setValue($value, $settings, $setting),
+		($group ? $group.'-' : '').'input_noempty' => !$cleared && $setValue($value, $settings, $setting),
 		($group ? $group.'-' : '').'input_disabled' => $group && ($disabled || !$enabled),
 		($group ? $group.'-' : '').'input_iconed' => $icon || $clearcolor,
 	])}}>
@@ -39,7 +42,7 @@
 				($group ? $group.'-' : '').'input__label-'.$type => $type,
 				'noselect'
 			])
-		 	for="{{$id}}"
+			for="{{$id}}"
 		 >{{$label}}</label>	
 	@endif
 	
@@ -75,12 +78,22 @@
 			'showpassword',
 			$group.'-showpassword' => $group
 		])><i class="fa-solid fa-eye-slash" title="Показать пароль"></i></div>
+	
 	@elseif($icon)
-		<div class="postfix_icon"><i class="fa-solid fa-{{$icon}}"></i></div>
+		<div
+			@class([
+				'postfix_icon',
+				'postfix_icon-hovered postfix_icon-colored' => $iconActionFunc && !$iconbg,
+				'bg-'.$iconbg => $iconbg,
+				'bg-'.$iconbg.'-hovered' => $iconbg && $iconActionFunc,
+				'pointer' => $iconActionFunc
+			])
+			@if($iconActionFunc)onclick="$.{{$iconActionFunc}}(this{{$iconActionParams ? ', '.$iconActionParams : null}})" @endif
+			><i class="fa-solid fa-{{$icon}}"></i></div>
 	@endif
+	
 	<div class="{{($group ? $group.'-' : '').'input__errorlabel'}} noselect" errorlabel></div>
 </div>
-
 
 
 

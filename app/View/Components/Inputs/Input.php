@@ -10,6 +10,9 @@ class Input extends Component {
 	public $name;
 	public $value;
 	public $placeholder;
+	
+	public $iconActionFunc; // Функция экшена иконки
+	public $iconActionParams;
 	//public $group;
 	
 	
@@ -19,7 +22,15 @@ class Input extends Component {
      *
      * @return void
      */
-    public function __construct(string $type = 'text', string $name = '', ?string $value = null, ?string $placeholder = null/*, ?string $group = null*/, ?string $action = null) {
+    public function __construct(
+		string $type = 'text',
+		string $name = '',
+		?string $value = null,
+		?string $placeholder = null,
+		/*, ?string $group = null*/
+		?string $action = null,
+		?string $iconaction = null
+	) {
         $dataTypes = collect([
 			'text' 		=> 'текст',
 			'password' 	=> 'пароль',
@@ -38,6 +49,13 @@ class Input extends Component {
         //$this->group = $group;
         
         $this->setAction($action);
+        
+		if ($iconaction) {
+			['function' => $iconActionFunc, 'params' => $iconActionParams] = $this->setAction($iconaction, true);
+			$this->iconActionFunc = $iconActionFunc ?? null;
+			$this->iconActionParams = $iconActionParams ?? null;
+		}
+		
     }
 	
 	
@@ -54,6 +72,9 @@ class Input extends Component {
 		if (!$setting || !$settings) return false;
 		return data_get($settings, $setting);
 	}
+	
+	
+	
 	
 
     /**

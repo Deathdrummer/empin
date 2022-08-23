@@ -45613,6 +45613,349 @@ template {
   border-radius: 50%;
 }
 
+.bg-blue {
+  background-color: #1bdbe0;
+}
+.bg-blue-hovered {
+  display: unset;
+  vertical-align: middle;
+  word-spacing: normal;
+  cursor: pointer;
+  padding: all;
+  line-height: all;
+  border-radius: all;
+  color: #fff;
+  fill: #fff;
+}
+.bg-blue-hovered i {
+  color: #fff;
+  fill: #fff;
+}
+.bg-blue-hovered:hover {
+  background-color: #17babe;
+  color: #fff;
+  fill: #fff;
+  transition: background-color 0.16s, border-color 0.16s, color 0.16s, box-shadow 0.16s, fill 0.16s;
+}
+.bg-blue-hovered:hover i {
+  color: #fff;
+  fill: #fff;
+}
+.bg-blue-hovered:active, .bg-blue-hovered.active {
+  background-color: #16afb2;
+  color: #fff;
+  fill: #fff;
+  transition: background-color 0s, border-color 0s, color 0s, box-shadow 0s, fill 0s;
+}
+.bg-blue-hovered:active i, .bg-blue-hovered.active i {
+  color: #fff;
+  fill: #fff;
+}
+.bg-gray {
+  background-color: #d8d8d8;
+}
+.bg-gray-hovered {
+  display: unset;
+  vertical-align: middle;
+  word-spacing: normal;
+  cursor: pointer;
+  padding: all;
+  line-height: all;
+  border-radius: all;
+  color: #fff;
+  fill: #fff;
+}
+.bg-gray-hovered i {
+  color: #fff;
+  fill: #fff;
+}
+.bg-gray-hovered:hover {
+  background-color: #c5c5c5;
+  color: #fff;
+  fill: #fff;
+  transition: background-color 0.16s, border-color 0.16s, color 0.16s, box-shadow 0.16s, fill 0.16s;
+}
+.bg-gray-hovered:hover i {
+  color: #fff;
+  fill: #fff;
+}
+.bg-gray-hovered:active, .bg-gray-hovered.active {
+  background-color: #bfbfbf;
+  color: #fff;
+  fill: #fff;
+  transition: background-color 0s, border-color 0s, color 0s, box-shadow 0s, fill 0s;
+}
+.bg-gray-hovered:active i, .bg-gray-hovered.active i {
+  color: #fff;
+  fill: #fff;
+}
+.bg-neutral {
+  background-color: #9ea8bf;
+}
+.bg-neutral-hovered {
+  display: unset;
+  vertical-align: middle;
+  word-spacing: normal;
+  cursor: pointer;
+  padding: all;
+  line-height: all;
+  border-radius: all;
+  color: #fff;
+  fill: #fff;
+}
+.bg-neutral-hovered i {
+  color: #fff;
+  fill: #fff;
+}
+.bg-neutral-hovered:hover {
+  background-color: #959fb7;
+  color: #fff;
+  fill: #fff;
+  transition: background-color 0.16s, border-color 0.16s, color 0.16s, box-shadow 0.16s, fill 0.16s;
+}
+.bg-neutral-hovered:hover i {
+  color: #fff;
+  fill: #fff;
+}
+.bg-neutral-hovered:active, .bg-neutral-hovered.active {
+  background-color: #828faf;
+  color: #fff;
+  fill: #fff;
+  transition: background-color 0s, border-color 0s, color 0s, box-shadow 0s, fill 0s;
+}
+.bg-neutral-hovered:active i, .bg-neutral-hovered.active i {
+  color: #fff;
+  fill: #fff;
+}
+.bg-green {
+  background-color: #38ce3c;
+}
+.bg-green-hovered {
+  display: unset;
+  vertical-align: middle;
+  word-spacing: normal;
+  cursor: pointer;
+  padding: all;
+  line-height: all;
+  border-radius: all;
+  color: #fff;
+  fill: #fff;
+}
+.bg-green-hovered i {
+  color: #fff;
+  fill: #fff;
+}
+.bg-green-hovered:hover {
+  background-color: #2cb430;
+  color: #fff;
+  fill: #fff;
+  transition: background-color 0.16s, border-color 0.16s, color 0.16s, box-shadow 0.16s, fill 0.16s;
+}
+.bg-green-hovered:hover i {
+  color: #fff;
+  fill: #fff;
+}
+.bg-green-hovered:active, .bg-green-hovered.active {
+  background-color: #2aa92d;
+  color: #fff;
+  fill: #fff;
+  transition: background-color 0s, border-color 0s, color 0s, box-shadow 0s, fill 0s;
+}
+.bg-green-hovered:active i, .bg-green-hovered.active i {
+  color: #fff;
+  fill: #fff;
+}
+.bg-red {
+  background-color: #ff7a90;
+}
+.bg-red-hovered {
+  display: unset;
+  vertical-align: middle;
+  word-spacing: normal;
+  cursor: pointer;
+  padding: all;
+  line-height: all;
+  border-radius: all;
+  color: #fff;
+  fill: #fff;
+}
+.bg-red-hovered i {
+  color: #fff;
+  fill: #fff;
+}
+.bg-red-hovered:hover {
+  background-color: #f37186;
+  color: #fff;
+  fill: #fff;
+  transition: background-color 0.16s, border-color 0.16s, color 0.16s, box-shadow 0.16s, fill 0.16s;
+}
+.bg-red-hovered:hover i {
+  color: #fff;
+  fill: #fff;
+}
+.bg-red-hovered:active, .bg-red-hovered.active {
+  background-color: #ff1a41;
+  color: #fff;
+  fill: #fff;
+  transition: background-color 0s, border-color 0s, color 0s, box-shadow 0s, fill 0s;
+}
+.bg-red-hovered:active i, .bg-red-hovered.active i {
+  color: #fff;
+  fill: #fff;
+}
+.bg-yellow {
+  background-color: #ffde73;
+}
+.bg-yellow-hovered {
+  display: unset;
+  vertical-align: middle;
+  word-spacing: normal;
+  cursor: pointer;
+  padding: all;
+  line-height: all;
+  border-radius: all;
+  color: #ad8400;
+  fill: #ad8400;
+}
+.bg-yellow-hovered i {
+  color: #ad8400;
+  fill: #ad8400;
+}
+.bg-yellow-hovered:hover {
+  background-color: #ffd54d;
+  color: #ad8400;
+  fill: #ad8400;
+  transition: background-color 0.16s, border-color 0.16s, color 0.16s, box-shadow 0.16s, fill 0.16s;
+}
+.bg-yellow-hovered:hover i {
+  color: #ad8400;
+  fill: #ad8400;
+}
+.bg-yellow-hovered:active, .bg-yellow-hovered.active {
+  background-color: #ffd240;
+  color: #ad8400;
+  fill: #ad8400;
+  transition: background-color 0s, border-color 0s, color 0s, box-shadow 0s, fill 0s;
+}
+.bg-yellow-hovered:active i, .bg-yellow-hovered.active i {
+  color: #ad8400;
+  fill: #ad8400;
+}
+.bg-purple {
+  background-color: #b08ad7;
+}
+.bg-purple-hovered {
+  display: unset;
+  vertical-align: middle;
+  word-spacing: normal;
+  cursor: pointer;
+  padding: all;
+  line-height: all;
+  border-radius: all;
+  color: #fff;
+  fill: #fff;
+}
+.bg-purple-hovered i {
+  color: #fff;
+  fill: #fff;
+}
+.bg-purple-hovered:hover {
+  background-color: #a07bc5;
+  color: #fff;
+  fill: #fff;
+  transition: background-color 0.16s, border-color 0.16s, color 0.16s, box-shadow 0.16s, fill 0.16s;
+}
+.bg-purple-hovered:hover i {
+  color: #fff;
+  fill: #fff;
+}
+.bg-purple-hovered:active, .bg-purple-hovered.active {
+  background-color: #8d67b3;
+  color: #fff;
+  fill: #fff;
+  transition: background-color 0s, border-color 0s, color 0s, box-shadow 0s, fill 0s;
+}
+.bg-purple-hovered:active i, .bg-purple-hovered.active i {
+  color: #fff;
+  fill: #fff;
+}
+.bg-light {
+  background-color: #f8fafb;
+}
+.bg-light-hovered {
+  display: unset;
+  vertical-align: middle;
+  word-spacing: normal;
+  cursor: pointer;
+  padding: all;
+  line-height: all;
+  border-radius: all;
+  color: #8f9ba7;
+  fill: #8f9ba7;
+}
+.bg-light-hovered i {
+  color: #8f9ba7;
+  fill: #8f9ba7;
+}
+.bg-light-hovered:hover {
+  background-color: #f3f6f7;
+  color: #8f9ba7;
+  fill: #8f9ba7;
+  transition: background-color 0.16s, border-color 0.16s, color 0.16s, box-shadow 0.16s, fill 0.16s;
+}
+.bg-light-hovered:hover i {
+  color: #8f9ba7;
+  fill: #8f9ba7;
+}
+.bg-light-hovered:active, .bg-light-hovered.active {
+  background-color: #e9eeef;
+  color: #8f9ba7;
+  fill: #8f9ba7;
+  transition: background-color 0s, border-color 0s, color 0s, box-shadow 0s, fill 0s;
+}
+.bg-light-hovered:active i, .bg-light-hovered.active i {
+  color: #8f9ba7;
+  fill: #8f9ba7;
+}
+.bg-dark {
+  background-color: #3e4b5b;
+}
+.bg-dark-hovered {
+  display: unset;
+  vertical-align: middle;
+  word-spacing: normal;
+  cursor: pointer;
+  padding: all;
+  line-height: all;
+  border-radius: all;
+  color: #fff;
+  fill: #fff;
+}
+.bg-dark-hovered i {
+  color: #fff;
+  fill: #fff;
+}
+.bg-dark-hovered:hover {
+  background-color: #2f3844;
+  color: #fff;
+  fill: #fff;
+  transition: background-color 0.16s, border-color 0.16s, color 0.16s, box-shadow 0.16s, fill 0.16s;
+}
+.bg-dark-hovered:hover i {
+  color: #fff;
+  fill: #fff;
+}
+.bg-dark-hovered:active, .bg-dark-hovered.active {
+  background-color: #29323d;
+  color: #fff;
+  fill: #fff;
+  transition: background-color 0s, border-color 0s, color 0s, box-shadow 0s, fill 0s;
+}
+.bg-dark-hovered:active i, .bg-dark-hovered.active i {
+  color: #fff;
+  fill: #fff;
+}
+
 .border-left {
   border-left: 1px solid !important;
 }

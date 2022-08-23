@@ -25,10 +25,21 @@
 		align-items: center
 		justify-content: center
 		height: calc(100% - 2px) 
-		background-color: #fff5b8
 		
-		i
-			color: #5a511a
+		&-colored
+			background-color: #fff5b8
+		
+			i
+				color: #5a511a
+		
+		&-hovered.postfix_icon-colored
+			&:hover
+				background-color: #ffef91
+				transition: background-color 0.16s
+			
+			&:active
+				background-color: #f3dc53
+				transition: background-color 0s
 			
 
 

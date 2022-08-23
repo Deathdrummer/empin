@@ -9,13 +9,44 @@
 		loading
 		>
 		
-		<x-chooser class="h24px mb2rem" variant="neutral" px="20">
-			<x-chooser.item action="getListAction:0" active>Все активные договоры</x-chooser.item>
-			@if($user->department->id)
-				<x-chooser.item action="getListAction:{{$user->department->id}}">{{$user->department->name ?? 'Без названия'}}</x-chooser.item>
-			@endif
-			<x-chooser.item action="getListAction:-1">Архив</x-chooser.item>
-		</x-chooser>
+		<div class="row mb2rem gx-30">
+			<div class="col-auto">
+				<x-chooser variant="neutral" group="normal" px="20">
+					<x-chooser.item action="getListAction:0" active>Все активные договоры</x-chooser.item>
+					@if($user->department->id)
+						<x-chooser.item action="getListAction:{{$user->department->id}}">{{$user->department->name ?? 'Без названия'}}</x-chooser.item>
+					@endif
+					<x-chooser.item action="getListAction:-1">Архив</x-chooser.item>
+				</x-chooser>
+			</div>
+			
+			<div class="col-auto">
+				<x-input
+					id="contractsSearchField"
+					group="normal"
+					type="search"
+					class="w40rem"
+					action="contractsSearch"
+					icon="magnifying-glass"
+					{{-- iconaction="contractsSearch:1" --}}
+					iconbg="light"
+					placeholder="Поиск..."
+					cleared
+					/>
+				
+				<x-button
+					id="clearSearch"
+					group="normal"
+					variant="red"
+					disabled
+					action="clearContractsSearch"
+					class="w4rem ml5px"
+					title="Очестить поиск"
+					><i class="fa-solid fa-xmark"></i></x-button>
+			</div>
+		</div>
+		
+				
 				
 		<div id="contractsList"></div>
 	</x-card>
@@ -26,7 +57,8 @@
 	
 	let currentList = 0,
 		sortField = ddrStore('site-contracts-sortfield') || 'id',
-		sortOrder = ddrStore('site-contracts-sortorder') || 'desc'; 
+		sortOrder = ddrStore('site-contracts-sortorder') || 'desc',
+		search = null; 
 	
 	getList(true);
 	
@@ -37,6 +69,40 @@
 		currentList = list;
 		getList();
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	let searchContractsTOut;
+	$.contractsSearch = (btn, isIcon) => {
+		clearTimeout(searchContractsTOut);
+		
+		
+		$('#clearSearch').ddrInputs('enable');
+		
+		searchContractsTOut = setTimeout(() => {
+			search = $(btn).val();
+			getList();
+		}, 300);
+	}
+	
+	
+	$.clearContractsSearch = (btn) => {
+		$('#contractsSearchField').val('');
+		search = null;
+		getList();
+		$(btn).ddrInputs('disable');
+	}
+	
+	
+	
+	
+	
 	
 	
 	
@@ -355,6 +421,7 @@
 		
 		params['sort_field'] = sortField;
 		params['sort_order'] = sortOrder;
+		params['search'] = search;
 		
 		
 		if (!init) {
