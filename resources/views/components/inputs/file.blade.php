@@ -18,5 +18,12 @@
 		<div class="{{$group ? $group.'-' : ''}}file__image" ddrfileimage></div>
 		<p class="{{$group ? $group.'-' : ''}}file__empty">{{$setEmptyText()}}</p>
 	</label>
-	<input type="file" name="{{$name}}" id="{{$id}}" {{$setInpGroup()}} {{$isMultiple()}}>
+	<input
+		type="file"
+		name="{{$name}}"
+		id="{{$id}}"
+		{{$setInpGroup()}}
+		{{$isMultiple()}}
+		{{$tagParam ? $tag.'='.$tagParam.'' : $tag}}
+		>
 </div>

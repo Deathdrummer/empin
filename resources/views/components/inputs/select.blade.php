@@ -12,7 +12,6 @@
 	'group' 		=> $groupWrap,
 	'label' 		=> null,
     'action'        => 'setSetting',
-    'tag'        	=> null
 ])
 
 
@@ -41,7 +40,7 @@
 		@if($disabled || !$enabled)disabled @endif
 		@if($setting)oninput="$.{{$action}}(this, '{{$setting}}')" @endif
 		@if(isset($actionFunc) && !$setting)oninput="$.{{$actionFunc}}(this{{isset($actionParams) ? ', '.$actionParams : null}})" @endif
-		{{$tag}}
+		{{$tagParam ? $tag.'='.$tagParam.'' : $tag}}
 		>
 		@if ($options && $choose && ($emptyHasValue || (!$hasActive && !$value && !$setSelected($value, $settings, $setting))))
 			<option value=""{{!$hasActive ? 'selected' : ''}} {{$chooseEmpty ? '' : 'disabled'}}>{{$choose}}</option>

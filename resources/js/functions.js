@@ -283,7 +283,13 @@ window.ddrHash = function(str, seed = 0) {
 */
 window.storeArray = function(storeArr = [], value, stat = true) {
 	if (stat) {
-		storeArr.push(value);
+		if (_.isArray(value)) {
+			$.each(value, (item) => {
+				storeArr.push(value);
+			});
+		} else {
+			storeArr.push(value);
+		}
 	} else {
 		_.pull(storeArr, value);
 	}

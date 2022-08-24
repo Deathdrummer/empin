@@ -8,125 +8,135 @@
 						@if(!$isArchive)
 							@cando('contract-col-period:site')
 								<td
-									class="w6rem sort {{$sortField == 'date_end' ? 'sort-'.$sortOrder : ''}}"
+									class="w6rem sort {{$sortField == 'date_end' ? 'sort-'.$sortOrder : ''}} vertical-center"
 									onclick="$.sorting(this, 'date_end')"
 									noscroll
-									><strong class="fz10px lh90 d-block mt2px" title="Срок исполнения договора">Срок исполн. договора</strong></td>
+									><strong class="fz10px lh90 d-block text-center" title="Срок исполнения договора">Срок исполн. договора</strong></td>
 							@endcando
 						@endif
 						
 						@cando('contract-col-object_id:site')
 							<td
-								class="w6rem sort {{$sortField == 'id' ? 'sort-'.$sortOrder : ''}}"
+								class="w10rem sort {{$sortField == 'id' ? 'sort-'.$sortOrder : ''}} vertical-center"
 								onclick="$.sorting(this, 'id')"
 								noscroll
-								><strong class="fz10px lh90 d-block mt2px">Номер объекта</strong></td>
+								><strong class="fz10px lh90 d-block text-center">Номер объекта</strong></td>
 						@endcando
 						
 						@cando('contract-col-title:site')
 							<td
-								class="w6rem sort {{$sortField == 'title' ? 'sort-'.$sortOrder : ''}}"
+								class="w15rem sort {{$sortField == 'title' ? 'sort-'.$sortOrder : ''}} vertical-center"
 								onclick="$.sorting(this, 'title')"
 								noscroll
-								><strong class="fz10px lh90 d-block mt2px">Название / заявитель</strong></td>
+								><strong class="fz10px lh90 d-block text-center">Название / заявитель</strong></td>
 						@endcando
 						
 						@cando('contract-col-titul:site')
 							<td
-								class="w20rem sort {{$sortField == 'titul' ? 'sort-'.$sortOrder : ''}}"
+								class="w20rem sort {{$sortField == 'titul' ? 'sort-'.$sortOrder : ''}} vertical-center"
 								onclick="$.sorting(this, 'titul')"
 								noscroll
-								><strong class="fz10px lh90 d-block mt2px">Титул</strong></td>
+								><strong class="fz10px lh90 d-block text-center">Титул</strong></td>
 						@endcando
 						
 						@cando('contract-col-contract:site')
 							<td
-								class="sort {{$sortField == 'contract' ? 'sort-'.$sortOrder : ''}}"
+								class="w6rem sort {{$sortField == 'contract' ? 'sort-'.$sortOrder : ''}} vertical-center"
 								onclick="$.sorting(this, 'contract')"
 								noscroll
-								><strong class="fz10px lh90 d-block mt2px">Номер договора</strong></td>
+								><strong class="fz10px lh90 d-block text-center">Номер договора</strong></td>
 						@endcando
 						
 						@cando('contract-col-subcontracting:site')
 							<td
-								class="sort {{$sortField == 'subcontracting' ? 'sort-'.$sortOrder : ''}}"
+								class="sort {{$sortField == 'subcontracting' ? 'sort-'.$sortOrder : ''}} vertical-center"
 								onclick="$.sorting(this, 'subcontracting')"
 								noscroll
-								><strong class="fz10px lh90 d-block mt2px wodrbreak">Субподряд</strong></td>
+								><strong class="fz10px lh90 d-block text-center wodrbreak">Субподряд</strong></td>
 						@endcando
 						
 						@cando('contract-col-customer:site')
 							<td
-								class="sort {{$sortField == 'customer' ? 'sort-'.$sortOrder : ''}}"
+								class="sort {{$sortField == 'customer' ? 'sort-'.$sortOrder : ''}} vertical-center"
 								onclick="$.sorting(this, 'customer')"
 								noscroll
-								><strong class="fz10px lh90 d-block mt2px">Заказчик</strong></td>
+								><strong class="fz10px lh90 d-block text-center">Заказчик</strong></td>
 						@endcando
 						
 						@cando('contract-col-locality:site')
 							<td
-								class="sort {{$sortField == 'locality' ? 'sort-'.$sortOrder : ''}}"
+								class="sort {{$sortField == 'locality' ? 'sort-'.$sortOrder : ''}} vertical-center"
 								onclick="$.sorting(this, 'locality')"
 								noscroll
-								><strong class="fz10px lh90 d-block mt2px">Населенный пункт</strong></td>
+								><strong class="fz10px lh90 d-block text-center">Населенный пункт</strong></td>
 						@endcando
 						
 						@cando('contract-col-price:site')
 							<td
-								class="sort {{$sortField == 'price' ? 'sort-'.$sortOrder : ''}}"
+								class="sort {{$sortField == 'price' ? 'sort-'.$sortOrder : ''}} vertical-center"
 								onclick="$.sorting(this, 'price')"
 								noscroll
-								><strong class="fz10px lh90 d-block mt2px">Стоимость договора</strong></td>
+								><strong class="fz10px lh90 d-block text-center">Стоимость договора</strong></td>
 						@endcando
 						
 						@cando('contract-col-date_start:site')
 							<td
-								class="w6rem sort {{$sortField == 'date_start' ? 'sort-'.$sortOrder : ''}}"
+								class="w6rem sort {{$sortField == 'date_start' ? 'sort-'.$sortOrder : ''}} vertical-center"
 								onclick="$.sorting(this, 'date_start')"
 								noscroll
-								><strong class="fz10px lh90 d-block mt2px">Дата начала договора</strong></td>
+								><strong class="fz10px lh90 d-block text-center">Дата начала договора</strong></td>
 						@endcando
 						
 						@cando('contract-col-date_end:site')
 							<td
-								class="w6rem sort {{$sortField == 'date_end' ? 'sort-'.$sortOrder : ''}}"
+								class="w6rem sort {{$sortField == 'date_end' ? 'sort-'.$sortOrder : ''}} vertical-center"
 								onclick="$.sorting(this, 'date_end')"
 								noscroll
-								><strong class="fz10px lh90 d-block mt2px">Дата окончания договора</strong></td>
+								><strong class="fz10px lh90 d-block text-center">Дата окончания договора</strong></td>
 						@endcando
 						
 						@cando('contract-col-hoz_method:site')
 							<td
-								class="w4rem sort {{$sortField == 'hoz_method' ? 'sort-'.$sortOrder : ''}}"
+								class="w4rem sort {{$sortField == 'hoz_method' ? 'sort-'.$sortOrder : ''}} vertical-center"
 								onclick="$.sorting(this, 'hoz_method')"
 								noscroll
-								><strong class="fz10px lh90 d-block mt2px wodrbreak">Хоз способ</strong></td>
+								><strong class="fz10px lh90 d-block text-center wodrbreak">Хоз способ</strong></td>
 						@endcando
 						
 						@cando('contract-col-type:site')
 							<td
-								class="w5rem sort {{$sortField == 'type' ? 'sort-'.$sortOrder : ''}}"
+								class="w5rem sort {{$sortField == 'type' ? 'sort-'.$sortOrder : ''}} vertical-center"
 								onclick="$.sorting(this, 'type')"
 								noscroll
-								><strong class="fz10px lh90 d-block mt2px">Тип договора</strong></td>
+								><strong class="fz10px lh90 d-block text-center">Тип договора</strong></td>
 						@endcando
 						
 						@cando('contract-col-contractor:site')
 							<td
-								class="sort {{$sortField == 'contractor' ? 'sort-'.$sortOrder : ''}}"
+								class="sort {{$sortField == 'contractor' ? 'sort-'.$sortOrder : ''}} vertical-center"
 								onclick="$.sorting(this, 'contractor')"
 								noscroll
-								><strong class="fz10px lh90 d-block mt2px">Исполнитель</strong></td>
+								><strong class="fz10px lh90 d-block text-center">Исполнитель</strong></td>
 						@endcando
 						
-						@isset($departmentId)
-							@cananydo('contract-col-hiding:site, contract-col-sending:site')
-								<td class="w8rem"><strong class="fz10px lh90 d-block mt2px">Действия</strong></td>
-							@endcananydo
-						@elseif(!$isArchive)
-							@cananydo('contract-col-sending-all:site, contract-col-to-archive:site')
-								<td class="w8rem"><strong class="fz10px lh90 d-block mt2px">Действия</strong></td>
-							@endcananydo
+						@if($searched)
+							<td class="w7rem vertical-center">
+								<strong class="fz10px lh90 d-block text-center">Добавить в выборку</strong>
+							</td>
+						@else
+							@isset($departmentId)
+								@cananydo('contract-col-hiding:site, contract-col-sending:site')
+									<td class="w8rem vertical-center">
+										<strong class="fz10px lh90 d-block text-center">Действия</strong>
+									</td>
+								@endcananydo
+							@elseif(!$isArchive)
+								@cananydo('contract-col-sending-all:site, contract-col-to-archive:site')
+									<td class="w8rem vertical-center">
+										<strong class="fz10px lh90 d-block text-center">Действия</strong>
+									</td>
+								@endcananydo
+							@endif
 						@endif
 					</tr>
 				</thead>
@@ -175,9 +185,10 @@
 											'w20rem' => (in_array($step['type'], [2,3])),
 											'w15rem' => (in_array($step['type'], [4])),
 											'pl3px',
-											'pr3px'
+											'pr3px',
+											'vertical-center'
 										])>
-										<p class="fz10px lh90">{{$step['name']}}</p>
+										<p class="fz10px lh90 text-center">{{$step['name']}}</p>
 									</td>
 								@empty	
 								@endforelse

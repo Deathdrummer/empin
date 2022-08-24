@@ -1,11 +1,16 @@
 <?php namespace App\View\Components\Inputs;
 
+use App\Traits\HasComponent;
 use Illuminate\View\Component;
 
 class Button extends Component {
+	use HasComponent;
 	
 	public $action;
     public $actionParams;
+	
+	public $tag;
+	public $tagParam;
     
     
     /**
@@ -13,7 +18,10 @@ class Button extends Component {
      *
      * @return void
      */
-    public function __construct(?string $action = null) {
+    public function __construct(
+		?string $action = null,
+		?string $tag = null
+	) {
         $actData = explode(':', $action);
         $this->action = array_shift($actData) ?? null;
         $params = implode(':', $actData) ?? null;
@@ -27,6 +35,11 @@ class Button extends Component {
             }
         }
         $this->actionParams = $paramsStrData ? implode(', ', $paramsStrData) : null;
+		
+		
+		[$t, $tValue] = $this->buildTag($tag);
+		$this->tag = $t ?? null;
+		$this->tagParam = $tValue ?? null;
     }
     
     

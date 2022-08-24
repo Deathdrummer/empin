@@ -11,19 +11,33 @@ class Radio extends Component {
 	public $value;
 	public $current;
 	
+	public $tag;
+	public $tagParam;
+	
 	
 	/**
      * Create a new component instance.
      *
      * @return void
      */
-    public function __construct(mixed $value = null, mixed $current = null, ?string $label = null, ?bool $checked = null, ?string $action = null) {
+    public function __construct(
+		mixed $value = null,
+		mixed $current = null,
+		?string $label = null,
+		?bool $checked = null,
+		?string $action = null,
+		?string $tag = null
+	) {
         $this->label = htmlspecialchars_decode($label, ENT_QUOTES|ENT_HTML5);
 		$this->checked = $checked;
 		$this->value = $value;
 		$this->current = $current;
 		
 		$this->setAction($action);
+		
+		[$t, $tValue] = $this->buildTag($tag);
+		$this->tag = $t ?? null;
+		$this->tagParam = $tValue ?? null;
     }
 	
 	

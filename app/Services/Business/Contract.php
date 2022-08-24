@@ -80,6 +80,7 @@ class Contract {
 		
 		$sortField = $request->get('sort_field', 'id');
 		$sortOrder = $request->get('sort_order', 'asc');
+		$selectedContracts = $request->get('selected_contracts', []);
 		
 		
 		$onlyAssignedContractsIds = match (true) {
@@ -108,7 +109,7 @@ class Contract {
 		$deadlinesContracts = $this->getSettings('contracts-deadlines');
 		$deadlinesSteps = $this->getSettings('steps-deadlines');
 		
-		return $data->mapWithKeysMany(function($item) use($deadlinesContracts, $deadlinesSteps) {
+		return $data->mapWithKeysMany(function($item) use($deadlinesContracts, $deadlinesSteps, $selectedContracts) {
 			if ($deadlinesContracts) {
 				$deadlineContractsCondition = $this->datetime->checkDiapason($item['date_end'], $deadlinesContracts, [
 					'minSign' 		=> 'min_sign',
@@ -176,6 +177,7 @@ class Contract {
 				'name' 				=> $name ?? '',
 				'has_deps_to_send'	=> !!$item['has_deps_to_send'] ?? null,
 				'ready_to_archive'	=> $item['hide_count'] != 0 && $item['hide_count'] == $item->departments->count(),
+				'selected'			=> in_array($item['id'], $selectedContracts),
 				
 				'departments' 		=> $departments
 				

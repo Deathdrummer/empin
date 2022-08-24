@@ -11,7 +11,6 @@
 	'group' 	=> $groupWrap,
 	'label' 	=> null,
     'action' 	=> 'setSetting',
-    'tag' 		=> null,
 ])
 
 
@@ -32,7 +31,7 @@
 		@isset($group) inpgroup="{{$group}}" @endisset
 		@if($setting)oninput="$.{{$action}}(this{{isset($actionParams) ? ', '.$actionParams : null}})"@endif
 		@if($actionFunc && !$setting)oninput="$.{{$actionFunc}}(this{{isset($actionParams) ? ', '.$actionParams : null}})" @endif
-		{{$tag}}
+		{{$tagParam ? $tag.'='.$tagParam.'' : $tag}}
 		>
 	
 	<label class="noselect" for="{{$id}}"></label>

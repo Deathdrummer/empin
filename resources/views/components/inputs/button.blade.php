@@ -17,7 +17,6 @@
     'px'		=> $groupPx,
     'w'			=> $groupW,
     'title'		=> null,
-    'tag'   	=> null,
     'animation'	=> null,
     'animationDuration'	=> '1s',
 ])
@@ -46,7 +45,7 @@
 			$animation => $animation
 		])
 		style="--fa-animation-duration: {{$animationDuration}};"
-		{{$tag}}
+		{{$tagParam ? $tag.'='.$tagParam.'' : $tag}}
 		>{{$slot}}</button>
 </div>
 @if($groupWrap)</div>@endif

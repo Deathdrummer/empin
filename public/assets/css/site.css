@@ -6379,6 +6379,7 @@ table thead tr td {
   position: relative;
   padding-left: 10px;
   padding-right: 10px;
+  padding-top: 5px;
   padding-bottom: 15px;
   min-height: 20px;
   font-size: 14px;
@@ -6398,49 +6399,22 @@ table thead tr td + td::before {
 table thead tr td.center {
   text-align: center;
 }
+table thead tr td.vertical-top {
+  vertical-align: top;
+}
+table thead tr td.vertical-center {
+  vertical-align: middle;
+  padding-bottom: 5px;
+}
+table thead tr td.vertical-top {
+  vertical-align: bottom;
+}
 table thead tr td.sort {
   position: relative;
-}
-table thead tr td.sort::after {
-  position: absolute;
-  left: calc(50% - 6px);
-  font-size: 20px;
-  line-height: 20px;
   cursor: pointer;
-  z-index: 10;
 }
-table thead tr td.sort:not(.sort-asc):not(.sort-desc) {
-  font-family: "Font Awesome 6 Free";
-  font-weight: 900;
-}
-table thead tr td.sort:not(.sort-asc):not(.sort-desc)::after {
-  content: "\f0dc";
-}
-table thead tr td.sort:not(.sort-asc):not(.sort-desc)::after {
-  bottom: -11px;
-  color: #f5f3f3;
-}
-table thead tr td.sort-asc {
-  font-family: "Font Awesome 6 Free";
-  font-weight: 900;
-}
-table thead tr td.sort-asc::after {
-  content: "\f0d8";
-}
-table thead tr td.sort-asc::after {
-  bottom: -12px;
-  color: #6b84bd;
-}
-table thead tr td.sort-desc {
-  font-family: "Font Awesome 6 Free";
-  font-weight: 900;
-}
-table thead tr td.sort-desc::after {
-  content: "\f0d7";
-}
-table thead tr td.sort-desc::after {
-  bottom: -9px;
-  color: #6b84bd;
+table thead tr td.sort-asc > *, table thead tr td.sort-desc > * {
+  color: #00c4ff;
 }
 table tbody:empty {
   height: 60px;

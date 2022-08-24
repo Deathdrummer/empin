@@ -13,7 +13,9 @@ class Input extends Component {
 	
 	public $iconActionFunc; // Функция экшена иконки
 	public $iconActionParams;
-	//public $group;
+	
+	public $tag;
+	public $tagParam;
 	
 	
 	
@@ -29,7 +31,8 @@ class Input extends Component {
 		?string $placeholder = null,
 		/*, ?string $group = null*/
 		?string $action = null,
-		?string $iconaction = null
+		?string $iconaction = null,
+		?string $tag = null,
 	) {
         $dataTypes = collect([
 			'text' 		=> 'текст',
@@ -46,7 +49,10 @@ class Input extends Component {
         $this->name = $name;
         $this->value = htmlspecialchars_decode($value, ENT_QUOTES|ENT_HTML5);
         $this->placeholder = $placeholder ?? __('auth.typing').' '.$dataTypes->get($type);
-        //$this->group = $group;
+        
+		[$t, $tValue] = $this->buildTag($tag);
+		$this->tag = $t ?? null;
+		$this->tagParam = $tValue ?? null;
         
         $this->setAction($action);
         

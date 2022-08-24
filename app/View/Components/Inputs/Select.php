@@ -15,7 +15,8 @@ class Select extends Component {
 	public $chooseEmpty; // можно ли выбрать пустое значение
 	public $emptyHasValue; // если выбрано значение - то пустое все равно отображается или наоборот
 	
-	
+	public $tag;
+	public $tagParam;
 	
 	
 	/**
@@ -23,7 +24,16 @@ class Select extends Component {
      *
      * @return void
      */
-    public function __construct(string $name = '', mixed $options = false, string $choose = 'Выбрать...', string $empty = null, $chooseEmpty = null, $emptyHasValue = null, ?string $action = null) {
+    public function __construct(
+		string $name = '',
+		mixed $options = false,
+		string $choose = 'Выбрать...',
+		string $empty = null,
+		$chooseEmpty = null,
+		$emptyHasValue = null,
+		?string $action = null,
+		?string $tag = null
+	) {
         $this->name = $name;
         
         $this->choose = $choose;
@@ -69,6 +79,10 @@ class Select extends Component {
 		$this->options = $ops;
 		
 		$this->setAction($action);
+		
+		[$t, $tValue] = $this->buildTag($tag);
+		$this->tag = $t ?? null;
+		$this->tagParam = $tValue ?? null;
     }
 	
 	

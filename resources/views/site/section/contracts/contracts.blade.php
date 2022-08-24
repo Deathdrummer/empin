@@ -9,7 +9,7 @@
 		loading
 		>
 		
-		<div class="row mb2rem gx-30">
+		<div class="row mb2rem gx-30 align-items-center">
 			<div class="col-auto">
 				<x-chooser variant="neutral" group="normal" px="20">
 					<x-chooser.item action="getListAction:0" active>Все активные договоры</x-chooser.item>
@@ -32,6 +32,7 @@
 					iconbg="light"
 					placeholder="Поиск..."
 					cleared
+					tag="tool:56"
 					/>
 				
 				<x-button
@@ -43,6 +44,34 @@
 					class="w4rem ml5px"
 					title="Очестить поиск"
 					><i class="fa-solid fa-xmark"></i></x-button>
+			</div>
+			
+			<div class="col-auto">
+				<x-checkbox
+					class="mt3px"
+					id="searchWithArchive"
+					group="large"
+					label="Включить в поиск архив"
+					action="searchWithArchive"
+					/>
+			</div>
+			
+			<div class="col-auto">
+				<x-buttons-group group="normal">
+					<x-button
+						variant="neutral"
+						action=""
+						title="Список подборок"
+						>подборки</x-button>
+					
+					<x-button
+						variant="neutral"
+						action=""
+						title="Добавить выбранные в подборку"
+						><i class="fa-solid fa-plus"></i></x-button>
+				</x-buttons-group>
+					
+				
 			</div>
 		</div>
 		
@@ -58,7 +87,9 @@
 	let currentList = 0,
 		sortField = ddrStore('site-contracts-sortfield') || 'id',
 		sortOrder = ddrStore('site-contracts-sortorder') || 'desc',
-		search = null; 
+		search = null,
+		searchWithArchive = false,
+		selectedContracts = [];
 	
 	getList(true);
 	
@@ -73,15 +104,19 @@
 	
 	
 	
-	
+	$('#contractsList').find('[addcontracttoselection]').each((item) => {
+		let id = $(item).attr('[addcontracttoselection]');
+		console.log(id);
+	});
 	
 	
 	
 	
 	let searchContractsTOut;
-	$.contractsSearch = (btn, isIcon) => {
+	$.contractsSearch = (btn) => {
 		clearTimeout(searchContractsTOut);
 		
+		searchWithArchive = $('#searchWithArchive').is(':checked');
 		
 		$('#clearSearch').ddrInputs('enable');
 		
@@ -95,11 +130,28 @@
 	$.clearContractsSearch = (btn) => {
 		$('#contractsSearchField').val('');
 		search = null;
+		
+		selectedContracts = [];
+		
 		getList();
 		$(btn).ddrInputs('disable');
 	}
 	
 	
+	$.searchWithArchive = (input) => {
+		searchWithArchive = $('#searchWithArchive').is(':checked');
+		if ($('#contractsSearchField').val() != '') getList();
+	}
+	
+	
+	
+	$.addContractToSelection = (input, id) => {
+		if ($(input).is(':checked')) {
+			selectedContracts.push(id);
+		} else {
+			_.pull(selectedContracts, id);
+		}
+	}
 	
 	
 	
@@ -407,6 +459,19 @@
 	
 	function getList(init) {
 		let params = {}, listWait;
+		
+		
+		if (currentList == -1 || currentList > 0) {
+			searchWithArchive = false;
+			$('#searchWithArchive').ddrInputs('disable');
+			$('#searchWithArchive').ddrInputs('checked', false);
+		} else {
+			$('#searchWithArchive').ddrInputs('enable');
+		}
+		
+		
+		//-----------------------------------
+		
 		if (currentList > 0) {
 			params['archive'] = 0;
 			params['department_id'] = currentList;
@@ -416,13 +481,17 @@
 				hide: 0
 			};
 		} else {
-			params['archive'] = currentList == -1 ? 1 : 0;
+			params['archive'] = currentList == -1 ? 1 : (searchWithArchive ? null : 0);
 		}
 		
 		params['sort_field'] = sortField;
 		params['sort_order'] = sortOrder;
 		params['search'] = search;
+		params['selected_contracts'] = selectedContracts;
 		
+		
+		
+		//-----------------------------------
 		
 		if (!init) {
 			listWait = $('#contractsList').ddrWait({

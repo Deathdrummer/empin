@@ -22,6 +22,7 @@ table
 				position: relative
 				padding-left: 10px
 				padding-right: 10px
+				padding-top: 5px
 				padding-bottom: 15px
 				min-height: 20px
 				font-size: 14px
@@ -42,42 +43,58 @@ table
 				&.center
 					text-align: center
 				
+				&.vertical
+					&-top
+						vertical-align: top
+						
+					&-center
+						vertical-align: middle
+						padding-bottom: 5px
+					
+					&-top
+						vertical-align: bottom
+				
 				
 				
 				&.sort
 					position: relative
+					cursor: pointer
 					
-					&::after
-						position: absolute
-						left: calc(50% - 6px)
-						font-size: 20px
-						line-height: 20px
-						cursor: pointer
-						z-index: 10
-						
+					&-asc, &-desc
+						> *
+							color: #00c4ff
 					
-					&:not(.sort-asc):not(.sort-desc)
-						+fontAwesome('\f0dc')
-						
-						&::after
-							bottom: -11px	
-							color: #f5f3f3
-					
-					
-					&-asc
-						+fontAwesome('\f0d8')
-						
-						&::after
-							bottom: -12px
-							color: #6b84bd
-						
-					
-					&-desc
-						+fontAwesome('\f0d7')
-						
-						&::after
-							bottom: -9px
-							color: #6b84bd
+					// &::after
+					// 	position: absolute
+					// 	left: calc(50% - 6px)
+					// 	font-size: 20px
+					// 	line-height: 20px
+					// 	cursor: pointer
+					// 	z-index: 10
+					// 	
+					// 
+					// &:not(.sort-asc):not(.sort-desc)
+					// 	+fontAwesome('\f0dc')
+					// 	
+					// 	&::after
+					// 		bottom: -11px	
+					// 		color: #f5f3f3
+					// 
+					// 
+					// &-asc
+					// 	+fontAwesome('\f0d8')
+					// 	
+					// 	&::after
+					// 		bottom: -12px
+					// 		color: #6b84bd
+					// 	
+					// 
+					// &-desc
+					// 	+fontAwesome('\f0d7')
+					// 	
+					// 	&::after
+					// 		bottom: -9px
+					// 		color: #6b84bd
 					
 						
 						

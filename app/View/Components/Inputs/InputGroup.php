@@ -1,9 +1,11 @@
 <?php namespace App\View\Components\Inputs;
 
+use App\Traits\HasComponent;
 use Illuminate\View\Component;
 
 class InputGroup extends Component {
-    
+    use HasComponent;
+	
     public $groupWrap;
     public $nameGroup;
     
@@ -13,7 +15,10 @@ class InputGroup extends Component {
      *
      * @return void
      */
-    public function __construct(?string $group = null, ?string $name = null) {
+    public function __construct(
+		?string $group = null,
+		?string $name = null
+	) {
         $this->groupWrap = $group;
         $this->nameGroup = $name;
     }

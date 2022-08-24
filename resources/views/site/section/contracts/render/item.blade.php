@@ -84,14 +84,18 @@
 	
 	
 	@if($searched)
-		<td>
-			<p>search</p>
+		<td class="center">
+			<x-checkbox
+				group="large"
+				:checked="$selected"
+				action="addContractToSelection:{{$id}}"
+				/>
 		</td>
 	@else
 		@isset($departmentId)
 			@cananydo('contract-col-hiding:site, contract-col-sending:site')
 				<td class="center">
-					<x-buttons-group group="verysmall" w="2rem-7px" gx="5" px="1" tag="noscroll">
+					<x-buttons-group group="verysmall" w="2rem-7px" gx="5" px="1" tag="noscroll:45">
 						@cando('contract-col-hiding:site')
 							<x-button
 								variant="light"

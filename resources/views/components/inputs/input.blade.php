@@ -18,7 +18,6 @@
 	'icon'        	=> null,
 	'iconbg'     	=> null,
 	'clearcolor'	=> null,
-	'tag'        	=> null,
 	'cleared'		=> null,
 ])
 
@@ -58,7 +57,7 @@
 		@if($setting)oninput="$.{{$action}}(this, '{{$setting}}', {{$savedelay}})" @endif
 		@if(isset($actionFunc) && !$setting)oninput="$.{{$actionFunc}}(this{{isset($actionParams) ? ', '.$actionParams : null}})" @endif
 		@if($showrows)showrows @endif
-		{{$tag}}
+		{{$tagParam ? $tag.'='.$tagParam.'' : $tag}}
 		>
 	
 	@isset($clearcolor)

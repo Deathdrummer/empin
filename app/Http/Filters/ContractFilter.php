@@ -7,9 +7,6 @@ class ContractFilter extends AbstractFilter {
     public const ID = 'id';
     public const CONTRACT_ID = 'contract_id';
     public const ARCHIVE = 'archive';
-    //public const DEPARTMENT_ID = 'department_id';
-    //public const HIDE = 'hide';
-    //public const SHOW = 'show';
     public const PIVOT = 'pivot';
     public const SEARCH = 'search';
 
@@ -18,9 +15,6 @@ class ContractFilter extends AbstractFilter {
             self::ID => [$this, 'id'],
             self::CONTRACT_ID => [$this, 'id'],
             self::ARCHIVE => [$this, 'archive'],
-            //self::DEPARTMENT_ID => [$this, 'departmentId'],
-           	//self::HIDE => [$this, 'hide'],
-            //self::SHOW => [$this, 'show'],
             self::PIVOT => [$this, 'pivot'],
             self::SEARCH => [$this, 'search'],
         ];
@@ -39,39 +33,6 @@ class ContractFilter extends AbstractFilter {
     public function archive(Builder $builder, $value) {
         $builder->where('archive', $value);
     }
-	
-	
-	//public function departmentId(Builder $builder, $value) {
-	//	$values = splitString($value, ',', true);
-	//	$firstValue = array_shift($values);
-	//	
-	//	$builder->whereRelation('departments', function(Builder $query) use($firstValue) {
-	//		$query->where('department_id', $firstValue)
-	//			->where('show', 1)
-	//			->where('hide', 0);
-	//	});
-	//	
-	//	
-	//	/* $builder->whereRelation('departments', 'department_id', $firstValue);
-	//	if ($values) {
-	//		foreach ($values as $value) {
-	//			$builder->orWhereRelation('departments', 'department_id', $value);
-	//		}
-	//	} */
-    //}
-	
-	
-	
-	
-	//public function hide(Builder $builder, $value) {
-	//	$builder->whereRelation('departments', 'hide', $value);
-	//}
-	//
-	//public function show(Builder $builder, $value) {
-	//	$builder->whereRelation('departments', 'show', $value);
-	//}
-	
-	
 	
 	
 	

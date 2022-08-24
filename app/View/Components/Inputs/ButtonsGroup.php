@@ -1,9 +1,11 @@
 <?php namespace App\View\Components\Inputs;
 
+use App\Traits\HasComponent;
 use Illuminate\View\Component;
 
 class ButtonsGroup extends Component {
-    
+    use HasComponent;
+	
 	public $groupWrap;
     public $groupRounded;
     public $groupPx;
@@ -13,6 +15,7 @@ class ButtonsGroup extends Component {
     public $groupDisabled;
     public $groupVariant;
     public $tag;
+    public $tagParam;
     
     
     /**
@@ -30,7 +33,7 @@ class ButtonsGroup extends Component {
 		?bool $rounded = null,
 		?string $variant = null,
         ?string $tag = null,
-		) {
+	) {
         $this->groupWrap = $group;
         $this->groupRounded = isset($rounded);
         $this->groupPx = $px;
@@ -39,7 +42,10 @@ class ButtonsGroup extends Component {
         $this->gy = $gy;
         $this->groupDisabled = $disabled;
         $this->groupVariant = $variant;
-        $this->tag = $tag;
+		
+		[$t, $value] = $this->buildTag($tag);
+		$this->tag = $t ?? null;
+        $this->tagParam = $value ?? null;
     }
 
     /**
@@ -49,7 +55,7 @@ class ButtonsGroup extends Component {
      */
     public function render() {
         return <<<'blade'
-			<div @class(['row', 'buttons-group', $groupWrap.'-buttons-group' => $groupWrap, 'gx-'.$gx => $gx !== null, 'gy-'.$gy => $gy !== null]) {{$tag}}>{{$slot}}</div>
+			<div @class(['row', 'buttons-group', $groupWrap.'-buttons-group' => $groupWrap, 'gx-'.$gx => $gx !== null, 'gy-'.$gy => $gy !== null]) {{$tagParam ? $tag.'='.$tagParam.'' : $tag}}>{{$slot}}</div>
 		blade;
     }
 }

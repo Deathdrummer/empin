@@ -9,6 +9,9 @@ class Checkbox extends Component {
 	public $name;
 	public $label;
 	public $checked;
+	
+	public $tag;
+	public $tagParam;
     
 	
 	
@@ -17,13 +20,23 @@ class Checkbox extends Component {
      *
      * @return void
      */
-    public function __construct(string $name = '', ?string $label = null, ?bool $checked = null, ?string $action = null) {
+    public function __construct(
+		string $name = '',
+		?string $label = null,
+		?bool $checked = null,
+		?string $action = null,
+		?string $tag = null
+	) {
         $this->name = $name;
         $this->label = htmlspecialchars_decode($label, ENT_QUOTES|ENT_HTML5);
         $this->checked = $checked;
         
         
         $this->setAction($action);
+		
+		[$t, $tValue] = $this->buildTag($tag);
+		$this->tag = $t ?? null;
+		$this->tagParam = $tValue ?? null;
     }
 	
 	

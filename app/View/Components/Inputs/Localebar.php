@@ -1,10 +1,12 @@
 <?php namespace App\View\Components\inputs;
 
+use App\Traits\HasComponent;
 use Illuminate\Support\Facades\App;
 use Illuminate\View\Component;
 
 class Localebar extends Component {
-    
+    use HasComponent;
+	
 	public $locales = [];
 	public $currentLocale;
 	

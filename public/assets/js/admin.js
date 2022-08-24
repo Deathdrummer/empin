@@ -2883,7 +2883,13 @@ window.storeArray = function () {
   var stat = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
 
   if (stat) {
-    storeArr.push(value);
+    if (_.isArray(value)) {
+      $.each(value, function (item) {
+        storeArr.push(value);
+      });
+    } else {
+      storeArr.push(value);
+    }
   } else {
     _.pull(storeArr, value);
   }
