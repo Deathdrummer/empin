@@ -12,7 +12,7 @@
 			<x-button
 				variant="green"
 				action="selectionBuildList:{{$id}}"
-				:enabled="$contracts_count"
+				:enabled="$contracts_count ?? false"
 				title="Сформировать список подборки"
 				>Сформировать</x-button>
 			
@@ -20,7 +20,7 @@
 				variant="neutral"
 				w="2rem-5px"
 				action="selectionBuildToEdit:{{$id}}"
-				:enabled="$contracts_count"
+				:enabled="$contracts_count ?? false"
 				title="Редактировать список подборки"
 				><i class="fa-solid fa-pen-to-square"></i></x-button>
 		</x-buttons-group>
