@@ -80,6 +80,7 @@ class Selections extends Controller {
 		
 		
 		$list = Selection::where(['account_id' => auth('site')->user()->id])
+			->withCount('contracts')
 			->orderBy('_sort', 'ASC')
 			->get();
 		
