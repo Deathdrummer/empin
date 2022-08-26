@@ -86,6 +86,16 @@
 	border-radius: 50%
 
 
+.iconed
+	display: inline-flex
+	align-items: center
+	justify-content: center
+	
+	&-noempty
+		&:empty
+			visibility: hidden
+
+
 
 
 
@@ -200,6 +210,9 @@
 			border-width: #{$px}px !important
 	
 	
+	&-rounded-circle
+		border-radius: 50% !important
+	
 	@for $px from 1 through 10
 		&-rounded-#{$px}px, &-radius-#{$px}px
 			border-radius: #{$px}px !important
@@ -244,6 +257,8 @@
 	&-dark
 		border-color: #a5b5b5 !important
 	
+	&-white
+		border-color: #fff !important
 	
 
 

@@ -28,13 +28,16 @@
 @isset($dialog)
 	<div class="ddrpopup__dialog" ddrpopupdialog>
 	 	<div class="popupdialog" ddrpopupdialogwin>
-	 		<div class="popupdialog__message">{{__($dialog['text'])}}</div>
+	 		<p class="popupdialog__message">{{__($dialog['text'])}}</p>
 	 		<div class="popupdialog__buttons">
 	 			@isset($dialog['buttons'])
-	 				@foreach($dialog['buttons'] as $title)
+	 				@foreach($dialog['buttons'] as $btn)
 						<x-button
-						id="ddrpopupDialogBtn{{$loop->index}}"
-						>{{__($title)}}</x-button>
+							group="verysmall"
+							:variant="$btn[1] ?? 'neutral'"
+							px="6"
+							id="ddrpopupDialogBtn{{$loop->index}}"
+							>{{__($btn[0])}}</x-button>
 					@endforeach
 	 			@endisset
 	 		</div>

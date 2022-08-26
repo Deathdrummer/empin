@@ -3,7 +3,7 @@
 use App\Http\Controllers\Controller;
 use App\Models\Contract;
 use App\Models\ContractData;
-use App\Models\Department;
+use App\Models\Selection;
 use App\Services\Business\Department as DepartmentService;
 use App\Services\Business\Contract as ContractService;
 use App\Traits\Renderable;
@@ -42,9 +42,23 @@ class Contracts extends Controller {
 	public function list(Request $request) {
 		$list = $this->contract->getWithDepartments($request);
 		
-		//logger($list->toArray());
+		$headers = [];
+		$selection = null;
 		
-		if ($list->isEmpty()) return $this->render('list');
+		if ($request->has('selection')) {
+			$counts = $this->contract->getCounts($request);
+			$selectioned = $request->has('selection');
+			$selection = $request->get('selection', null);
+			
+			$headers = [
+				'x-count-contracts-all' => $counts['all'],
+				'x-count-contracts-department' => $counts['department'],
+				'x-count-contracts-archive' => $counts['archive']
+			];
+		}
+		
+		
+		if ($list->isEmpty()) return $this->renderWithHeaders('list', [], $headers);
 		
 		$alldeps = $this->department->getWithSteps($request);
 		
@@ -81,10 +95,37 @@ class Contracts extends Controller {
 		$edited = ($canEditAll && !$isArchive) || $isDepartment;
 		$searched = $request->has('search') && $request->get('search');
 		
+		
 		$sortField = $request->get('sort_field', 'id');
 		$sortOrder = $request->get('sort_order', 'asc');
 		
-		return $this->render('list', compact('list', 'alldeps', 'contractdata', 'edited', 'departmentId', 'isArchive', 'sortField', 'sortOrder', 'searched'));
+		$selectionEdited = $request->has('edit_selection') && $request->get('edit_selection');
+		
+		$selectionsResult = Selection::where('account_id', auth('site')->user()->id)->orderBy('_sort', 'ASC')->get();
+		$allSelections = $selectionsResult->mapWithKeys(function($item) {
+			return [$item['id'] => $item['title']];
+		})->toArray();
+		
+		
+		
+		return $this->renderWithHeaders(
+			'list',
+			compact(
+				'list',
+				'alldeps',
+				'contractdata',
+				'edited',
+				'departmentId',
+				'isArchive',
+				'sortField',
+				'sortOrder',
+				'searched',
+				'allSelections',
+				'selectionEdited',
+				'selection'
+			),
+			$headers
+		);
 	}
 	
 	

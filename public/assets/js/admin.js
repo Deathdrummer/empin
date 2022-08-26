@@ -7578,7 +7578,9 @@ window.ddrPopup = function () {
       if (!text || !params.buttons || _typeof(params.buttons) != 'object') throw new Error('ddrPopup -> dialog ошибка - данные переданы неверно!');
       if (params && typeof params == 'function') cb = params;
       var buttonsData = params.buttons || false;
-      params.buttons = Object.keys(params.buttons); //params.buttons = _.mapValues(buttonsData, function(val) { return _.isFunction(val) ? false : val; });
+      params.buttons = _.mapValues(Object.keys(params.buttons), function (btnStr) {
+        return btnStr.split('|');
+      });
 
       _insertDialog(text, params, function (data) {
         _setDialogPositing();
@@ -8119,6 +8121,7 @@ window.ddrPopup = function () {
   function _closeDialog() {
     $(ddrPopupSelector).find('[ddrpopupdialog]').remove();
     controller.abort();
+    controller = new AbortController();
   }
 
   ;

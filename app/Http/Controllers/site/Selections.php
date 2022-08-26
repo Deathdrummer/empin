@@ -1,16 +1,12 @@
-<?php namespace App\Http\Controllers\crud;
+<?php namespace App\Http\Controllers\site;
 
 use App\Http\Controllers\Controller;
-
-use App\Models\Department;
-
-use App\Models\Step;
+use App\Models\Selection;
 use App\Traits\HasCrudController;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
-
-class Steps extends Controller {
+class Selections extends Controller {
 	use HasCrudController;
 	
 	/**
@@ -51,9 +47,6 @@ class Steps extends Controller {
 	
 	
 	
-	
-	
-	
 	/**
 	 * @param 
 	 * @return 
@@ -72,38 +65,36 @@ class Steps extends Controller {
 	
 	
 	
-	
-	
-	
-	
-    /**
+	/**
      * Вывод всех записей
      *
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request) {
 		[
-			'views' 		=> $viewPath,
-			'department_id'	=> $deptId
+			'views'		=> $viewPath,
 		] = $request->validate([
-			'views'			=> 'string|required',
-			'department_id'	=> 'numeric|required',
+			'views'		=> 'string|required',
 		]);
-		
 		if (!$viewPath) return response()->json(['no_view' => true]);
-        
-		$list = Step::where('department_id', $deptId)
-					->orderBy('_sort', 'ASC')
-					->get();
 		
+		
+		$list = Selection::where(['account_id' => auth('site')->user()->id])
+			->orderBy('_sort', 'ASC')
+			->get();
+		
+
 		$itemView = $viewPath.'.item';
 		
-		return $this->viewWithLastSortIndex(Step::class, $viewPath.'.list', compact(['list', 'itemView']), '_sort');
+		return $this->viewWithLastSortIndex(Selection::class, $viewPath.'.list', compact('list', 'itemView'), '_sort');
     }
 	
 	
+    
 	
-    /**
+	
+	
+	/**
      * Показ формы создания
      *
      * @return \Illuminate\Http\Response
@@ -124,8 +115,9 @@ class Steps extends Controller {
 	
 	
 	
-
-    /**
+	
+	
+	/**
      * Создание ресурса
      *
      * @param  \Illuminate\Http\Request  $request
@@ -145,11 +137,10 @@ class Steps extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function store_show(Request $request) {
+		if (!$item = $this->_storeRequest($request)) return response()->json(false);
 		$viewPath = $request->input('views');
-		
-		$item = $this->_storeRequest($request);
-		
 		if (!$viewPath) return response()->json(['no_view' => true]);
+
 		return $this->view($viewPath.'.item', $item);
     }
 	
@@ -159,27 +150,24 @@ class Steps extends Controller {
 		if (!$request) return false;
 		
 		$validFields = $request->validate([
-			'name'	=> [
-        		'string',
-        		'required',
-				Rule::unique('steps')->where(function ($query) use($request) {
-					return $query->where(['department_id' => $request->department_id]);
-				})
-			],
-			'type'			=> 'numeric|required',
-			'department_id' => 'numeric|required',
-			'deadline' 		=> 'present',
-			'sort'			=> 'required|present',
-			'_sort'			=> 'required|regex:/[0-9]+/'
+			'title'	=> 'required|string',
+			'_sort'	=> 'required|regex:/[0-9]+/'
 		]);
 		
-		return Step::create($validFields);
+		if (!$created = Selection::create($validFields)) return false;
+		return $created;
 	}
 	
 	
 	
-
-    /**
+	
+	
+	
+	
+	
+	
+	
+	/**
      * Показ определенной записи
      *
      * @param  int  $id
@@ -218,37 +206,95 @@ class Steps extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id) {
+		
 		$validFields = $request->validate([
-			'name'	=> [
+			'title'	=> [
         		'string',
         		'required',
-				Rule::unique('steps')->where(function ($query) use($request) {
-					return $query->where(['department_id' => $request->department_id]);
-				})->ignore(Step::where('id', $id)->first())
+				Rule::unique('contracts_selections')->ignore(Selection::where('id', $id)->first()),
 			],
-			'type'			=> 'numeric|required',
-			'department_id' => 'numeric|required',
-			'deadline' 		=> 'present',
-			'sort'			=> 'required|present',
+			'_sort'					=> 'numeric'
 		]);
 		
-	    $updateStat = Step::where('id', $id)->update($validFields);
-		return response()->json($updateStat);
+		Selection::where('id', $id)->update($validFields);
+		
+		return response()->json(true);
     }
 	
 	
 	
 	
 	
-    /**
+	
+	
+	
+	
+	
+	
+	/**
      * Удаление записи
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function destroy(?int $id = null) {
-		$stat = Step::destroy($id);
+		if (!$id) return response()->json(false);
+		$stat = Selection::destroy($id);
 		return response()->json($stat);
     }
 	
+	
+	
+	
+	
+	//------------------------------------------------------------------------------
+	
+	
+	
+	
+	/**
+	 * @param 
+	 * @return 
+	 */
+	public function add_contract(Request $request) {
+		[
+			'contractId' 	=> $contractId,
+			'selectionId' 	=> $selectionId
+		] = $request->validate([
+			'contractId' 	=> 'required|numeric',
+			'selectionId' 	=> 'required|numeric'
+		]);
+		
+		$selection = Selection::find($selectionId);
+		$statData = $selection->contracts()->syncWithoutDetaching($contractId);
+		return response()->json($statData);
+	}
+	
+	
+	
+	
+	/**
+	 * @param 
+	 * @return 
+	 */
+	public function remove_contract(Request $request) {
+		[
+			'contractId' 	=> $contractId,
+			'selectionId' 	=> $selectionId
+		] = $request->validate([
+			'contractId' 	=> 'required|numeric',
+			'selectionId' 	=> 'required|numeric'
+		]);
+		
+		$selection = Selection::find($selectionId);
+		$statData = $selection->contracts()->detach($contractId);
+		return response()->json($statData);
+		
+	}
+	
+	
+	
+	
+	
+
 }

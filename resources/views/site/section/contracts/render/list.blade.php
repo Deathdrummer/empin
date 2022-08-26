@@ -41,7 +41,7 @@
 						
 						@cando('contract-col-contract:site')
 							<td
-								class="w6rem sort {{$sortField == 'contract' ? 'sort-'.$sortOrder : ''}} vertical-center"
+								class="w10rem sort {{$sortField == 'contract' ? 'sort-'.$sortOrder : ''}} vertical-center"
 								onclick="$.sorting(this, 'contract')"
 								noscroll
 								><strong class="fz10px lh90 d-block text-center">Номер договора</strong></td>
@@ -119,8 +119,12 @@
 								><strong class="fz10px lh90 d-block text-center">Исполнитель</strong></td>
 						@endcando
 						
-						@if($searched)
+						@if($selectionEdited || ($selectionEdited && $searched))
 							<td class="w7rem vertical-center">
+								<strong class="fz10px lh90 d-block text-center">Удалить из выборки</strong>
+							</td>
+						@elseif($searched)
+							<td class="w15rem vertical-center">
 								<strong class="fz10px lh90 d-block text-center">Добавить в выборку</strong>
 							</td>
 						@else

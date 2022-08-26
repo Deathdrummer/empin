@@ -4,6 +4,7 @@ use App\Http\Filters\ContractFilter;
 use App\Models\Contract as ContractModel;
 use App\Models\ContractData;
 use App\Models\Department;
+use App\Models\Selection;
 use App\Services\Business\Department as DepartmentService;
 use App\Services\DateTime;
 use App\Traits\Settingable;
@@ -78,16 +79,25 @@ class Contract {
 	public function getWithDepartments(Request $request) {
 		$filter = app()->make(ContractFilter::class, ['queryParams' => $request->except(['sort_field', 'sort_order'])]);
 		
+		
 		$sortField = $request->get('sort_field', 'id');
 		$sortOrder = $request->get('sort_order', 'asc');
-		$selectedContracts = $request->get('selected_contracts', []);
+		$selection = $request->get('selection', null);
+		
+		if (!$userId = auth('site')->user()->id) return false;
 		
 		
 		$onlyAssignedContractsIds = match (true) {
 			$this->department->checkShowOnlyAssigned() => ContractData::select('contract_id')->where([
-				'data' 	=> auth('site')->user()->id,
+				'data' 	=> $userId,
 				'type'	=> 3
 			])->get()->pluck('contract_id'),
+			default => false
+		};
+		
+		
+		$selectionContracts = match (true) {
+			!is_null($selection) => Selection::where('id', $selection)->with('contracts:id')->first(),
 			default => false
 		};
 		
@@ -99,17 +109,32 @@ class Contract {
 				$query->where('hide', 1);
 			}])
 			->with('departments')
+			->with(['selections' => function ($query) use($userId) {
+				$query->where('account_id', $userId);
+			}])
+			/* ->with('selections') */
 			->when($onlyAssignedContractsIds, function ($query) use($onlyAssignedContractsIds) {
 				return $query->whereIn('id', $onlyAssignedContractsIds);
+			})
+			->when($selectionContracts, function ($query) use($selectionContracts) {
+				return $query->whereIn('id', $selectionContracts->contracts->pluck('id'));
 			})
 			->orderBy($sortField, $sortOrder)
 			->get();
 		
 		
+		// Список подборок для каждого договора, в которых он уже добавлен
+		//$contractsSelections = [];
+		//foreach ($data as $item) $contractsSelections[$item['id']] = $item->selections->pluck('id')->toArray();
+		
+		
+		
+		
+		
 		$deadlinesContracts = $this->getSettings('contracts-deadlines');
 		$deadlinesSteps = $this->getSettings('steps-deadlines');
 		
-		return $data->mapWithKeysMany(function($item) use($deadlinesContracts, $deadlinesSteps, $selectedContracts) {
+		return $data->mapWithKeysMany(function($item) use($deadlinesContracts, $deadlinesSteps) {
 			if ($deadlinesContracts) {
 				$deadlineContractsCondition = $this->datetime->checkDiapason($item['date_end'], $deadlinesContracts, [
 					'minSign' 		=> 'min_sign',
@@ -177,13 +202,80 @@ class Contract {
 				'name' 				=> $name ?? '',
 				'has_deps_to_send'	=> !!$item['has_deps_to_send'] ?? null,
 				'ready_to_archive'	=> $item['hide_count'] != 0 && $item['hide_count'] == $item->departments->count(),
-				'selected'			=> in_array($item['id'], $selectedContracts),
-				
+				//'selected'			=> in_array($item['id'], $selectedContracts),
+				'selections'		=> $item->selections->pluck('id')->toArray() ?? [],
 				'departments' 		=> $departments
 				
 			]];
 		});
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	/**
+	 * @param 
+	 * @return 
+	 */
+	public function getCounts(Request $request) {
+		
+		//$filter = app()->make(ContractFilter::class, ['queryParams' => $request->except(['sort_field', 'sort_order', 'archive', 'department_id'])]);
+		
+		$selectionContracts = Selection::with('contracts')
+			->where('id', $request->input('selection'))
+			->first();
+		
+		$contractsIds = [];
+		foreach ($selectionContracts->contracts as $item) {
+			$contractsIds[] = $item->pivot->contract_id;
+		}
+		
+		
+		$data = ContractModel::select(['id', 'archive'])
+			->whereIn('id', $contractsIds)
+			->withCount(['departments' => function(Builder $query) {
+				$query->where('id', auth('site')->user()->department_id);
+			}])
+			->withExists(['departments AS hide' => function(Builder $query) {
+				$query->where('hide', 1);
+			}])
+			->withExists(['departments AS show' => function(Builder $query) {
+				$query->where('show', 1);
+			}])
+			->get()
+			->toArray();
+		
+		
+		$countData = ['all' => 0, 'department' => 0, 'archive' => 0];
+		
+		foreach ($data as $item) {
+			if ($item['archive'] == 1) {
+				$countData['archive'] += 1;
+			} elseif ($item['departments_count'] > 0 && $item['show'] == 1 && $item['hide'] == 0) {
+				$countData['department'] += 1;
+			}/*  else {
+				$countData['all'] += 1;
+			} */
+			
+			if ($item['archive'] == 0) {
+				$countData['all'] += 1;
+			}
+		}
+		
+		return $countData;
+	}
+	
+	
+	
+	
+	
+	
 	
 	
 	

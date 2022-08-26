@@ -11,12 +11,73 @@
 		
 		<div class="row mb2rem gx-30 align-items-center">
 			<div class="col-auto">
-				<x-chooser variant="neutral" group="normal" px="20">
-					<x-chooser.item action="getListAction:0" active>Все активные договоры</x-chooser.item>
+				<x-chooser variant="neutral" group="normal" px="10">
+					<x-chooser.item
+						id="chooserAll"
+						action="getListAction:0"
+						class="pl3rem"
+						active
+						>Все активные договоры 
+							<strong
+								class="
+									ml5px
+									iconed
+									iconed-noempty
+									border-rounded-8px
+									border-all
+									border-white
+									bg-yellow
+									color-dark
+									w2rem-2px
+									h2rem-2px
+									fz13px
+									lh100"
+								selectionscounts
+								></strong></x-chooser.item>
 					@if($user->department->id)
-						<x-chooser.item action="getListAction:{{$user->department->id}}">{{$user->department->name ?? 'Без названия'}}</x-chooser.item>
+						<x-chooser.item
+							id="chooserDepartment"
+							class="pl3rem"
+							action="getListAction:{{$user->department->id}}"
+							>{{$user->department->name ?? 'Без названия'}}
+							<strong
+								class="
+									ml5px
+									iconed
+									iconed-noempty
+									border-rounded-8px
+									border-all
+									border-white
+									bg-yellow
+									color-dark
+									w2rem-2px
+									h2rem-2px
+									fz13px
+									lh100"
+								selectionscounts
+								></strong></x-chooser.item>
 					@endif
-					<x-chooser.item action="getListAction:-1">Архив</x-chooser.item>
+					<x-chooser.item
+						id="chooserArchive"
+						class="pl3rem"
+						action="getListAction:-1"
+						>Архив
+						<strong
+							class="
+								ml5px
+								iconed
+								iconed-noempty
+								border-rounded-8px
+								border-all
+								border-white
+								bg-yellow
+								color-dark
+								w2rem-2px
+								h2rem-2px
+								fz13px
+								lh100"
+								selectionscounts
+								></strong></x-chooser.item>
 				</x-chooser>
 			</div>
 			
@@ -41,7 +102,7 @@
 					variant="red"
 					disabled
 					action="clearContractsSearch"
-					class="w4rem ml5px"
+					w="3rem"
 					title="Очестить поиск"
 					><i class="fa-solid fa-xmark"></i></x-button>
 			</div>
@@ -57,21 +118,23 @@
 			</div>
 			
 			<div class="col-auto">
-				<x-buttons-group group="normal">
-					<x-button
-						variant="neutral"
-						action=""
-						title="Список подборок"
-						>подборки</x-button>
-					
-					<x-button
-						variant="neutral"
-						action=""
-						title="Добавить выбранные в подборку"
-						><i class="fa-solid fa-plus"></i></x-button>
-				</x-buttons-group>
-					
+				<x-button
+					group="normal"
+					variant="neutral"
+					action="openSelectionsWin"
+					title="Список подборок"
+					tag="selectionsbtn"
+					>Подборки</x-button>
 				
+				<x-button
+					group="normal"
+					w="3rem"
+					variant="red"
+					action="clearSelection"
+					title="Отменить подборку"
+					tag="selectionsbtn"
+					disabled
+					><i class="fa-solid fa-xmark"></i></x-button>
 			</div>
 		</div>
 		
@@ -84,14 +147,17 @@
 
 <script type="module">
 	
-	let currentList = 0,
+	let abortCtrl,
+		currentList = 0,
 		sortField = ddrStore('site-contracts-sortfield') || 'id',
 		sortOrder = ddrStore('site-contracts-sortorder') || 'desc',
 		search = null,
-		searchWithArchive = false,
-		selectedContracts = [];
+		selection = null,
+		editSelection = null,
+		searchWithArchive = false;
 	
-	getList(true);
+	
+	getList({init: true});
 	
 	
 	
@@ -104,11 +170,18 @@
 	
 	
 	
-	$('#contractsList').find('[addcontracttoselection]').each((item) => {
-		let id = $(item).attr('[addcontracttoselection]');
-		console.log(id);
-	});
 	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	//---------------------------------------------------- Фильтры
 	
 	
 	
@@ -131,8 +204,6 @@
 		$('#contractsSearchField').val('');
 		search = null;
 		
-		selectedContracts = [];
-		
 		getList();
 		$(btn).ddrInputs('disable');
 	}
@@ -145,12 +216,216 @@
 	
 	
 	
-	$.addContractToSelection = (input, id) => {
-		if ($(input).is(':checked')) {
-			selectedContracts.push(id);
-		} else {
-			_.pull(selectedContracts, id);
-		}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	//------------------------------------------------- Подборки
+	
+	
+	$.openSelectionsWin = (openSelectionBtn) => {
+		ddrPopup({
+			title: 'Подборки договоров',
+			width: 800,
+			buttons: ['Закрыть', {action: 'selectionAdd', title: 'Создать'}],
+			disabledButtons: true,
+			winClass: 'ddrpopup_white'
+		}).then(async ({state, wait, setTitle, setButtons, loadData, setHtml, setLHtml, dialog, close, onScroll, disableButtons, enableButtons, setWidth}) => { //isClosed
+			wait();
+			const viewsPath = 'site.section.contracts.render.selections';
+			
+			let init = await axiosQuery('get', 'site/selections/init', {views: viewsPath});
+			
+			if (init.error) {
+				console.log(init.error);
+				wait(false);
+				return false;
+			}
+			
+			setHtml(init.data, () => {
+				$('#selectionsList').ddrWait({
+					iconHeight: '26px',
+					bgColor: '#ffffffd6'
+				});
+				
+				$.ddrCRUD({
+					container: '#selectionsList',
+					itemToIndex: 'tr',
+					route: 'site/selections',
+					//params: {
+					//	list: {department_id: deptId},
+					//	store: {department_id: deptId},
+					//},
+					viewsPath,
+				}).then(({error, list, changeInputs, create, store, storeWithShow, update, destroy, remove, query, getParams}) => {
+					wait(false);
+					enableButtons(true);
+					changeInputs({'[save], [update]': 'enable'});
+					
+					
+					
+					$.selectionAdd = (btn) => {
+						let selectionAddBtnWait = $(btn).ddrWait({
+							iconHeight: '18px',
+							bgColor: '#ffffff91'
+						});
+						
+						create((data, container, {error}) => {
+							selectionAddBtnWait.destroy();
+							if (data) $(container).append(data);
+							if (error) $.notify(error.message, 'error');
+						});
+					}
+					
+					
+					
+					$.selectionSave = (btn) => {
+						let row = $(btn).closest('tr');
+					
+						let selectionSaveWait = $(row).ddrWait({
+							iconHeight: '26px',
+							bgColor: '#ffffffd6'
+						});
+						
+						storeWithShow(row, (data, container, {error}) => {
+							if (data) {
+								$(row).replaceWith(data);
+								$.notify('Запись успешно сохранена!');
+							}
+							
+							if (error) {
+								selectionSaveWait.destroy();
+								$.notify(error.message, 'error');
+							} 
+							
+							if (error.errors) {
+								$.each(error.errors, function(field, errors) {
+									$(row).find('[name="'+field+'"]').ddrInputs('error', errors[0]);
+								});
+							}
+						});
+					}
+					
+					
+					
+					$.selectionUpdate = (btn, id) => {
+						let row = $(btn).closest('tr');
+						
+						let updateSelectionWait = $(row).ddrWait({
+							iconHeight: '15px',
+							bgColor: '#ffffff91'
+						});
+					
+						update(id, row, (data, container, {error}) => {
+							if (data) {
+								$(row).find('[update]').ddrInputs('disable');
+								$(row).find('input, select, textarea').ddrInputs('state', 'clear');
+								$.notify('Запись успешно обновлена!');
+							}
+							
+							if (error) $.notify(error.message, 'error');
+							
+							if (error.errors) {
+								$.each(error.errors, function(field, errors) {
+									$(row).find('[name="'+field+'"]').ddrInputs('error', errors[0]);
+								});
+							}
+							
+							updateSelectionWait.destroy();
+						});
+					}
+					
+					
+					
+					$.selectionRemove = (btn, id) => {
+						let row = $(btn).closest('tr');
+						
+						if (!id) {
+							remove(row);
+						} else {
+							dialog('Удалить подборку?', {
+								buttons: {
+									'Удалить|red': function({closeDialog}) {
+										closeDialog();
+										
+										let removeSelectionWait = $(row).ddrWait({
+											iconHeight: '15px',
+											bgColor: '#ffffff91'
+										});
+										
+										destroy(id, function(stat) {
+											if (stat) {
+												remove(row);
+												$.notify('Запись успешно удалена!');
+											} else {
+												$.notify('Ошибка удаления записи!', 'error');
+											} 
+											
+											removeSelectionWait.destroy();
+										});
+									},
+									'Отмена|light': function({closeDialog}) {
+										closeDialog();
+									}
+								}
+							});
+						}
+					}
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					//--------------------------------- Действия со списками
+					
+					
+					$.selectionBuildList = (btn, id) => {
+						$('[selectionsbtn]').ddrInputs('disable');
+						close();
+						selection = id;
+						editSelection = null;
+						getList({
+							withCounts: true,
+							callback: function() {
+								$('[selectionsbtn]').ddrInputs('enable');
+							}
+						});
+					}
+					
+					
+					
+					
+					
+					
+					$.selectionBuildToEdit = (btn, id) => {
+						$('[selectionsbtn]').ddrInputs('disable');
+						close();
+						selection = id;
+						editSelection = true;
+						getList({
+							withCounts: true,
+							callback: function() {
+								$('[selectionsbtn]').ddrInputs('enable');
+							}
+						});
+					}
+					
+					
+				});
+			});
+		});
 	}
 	
 	
@@ -160,7 +435,103 @@
 	
 	
 	
-	// сортировка
+	
+	
+	
+	
+	
+	$.addContractToSelection = (select, contractId) => {
+		let selectionId = parseInt($(select).val());
+		
+		$(select).ddrInputs('disable');
+		axiosQuery('put', 'site/selections/add_contract', {contractId, selectionId}).then(({data, error, status, headers}) => {
+			if (error) {
+				$.notify('Ошибка добавления в подборку!', 'error');
+				console.log(error?.message, error.errors);
+				$(select).ddrInputs('error');
+			} else {
+				$(select).find('option[value="'+selectionId+'"]').setAttrib('disabled');
+				$(select).ddrInputs('enable');
+				$.notify('Договор успешно добавлен в подборку!');
+			}
+		});
+	}
+	
+	
+	
+	
+	
+	
+	
+	$.removeContractFromSelection = (btn, contractId, selectionId) => {
+		$(btn).ddrInputs('disable');
+		$('[selectionsbtn]').ddrInputs('disable');
+		
+		axiosQuery('put', 'site/selections/remove_contract', {contractId, selectionId}).then(({data, error, status, headers}) => {
+			if (error) {
+				$.notify('Ошибка удаления из подборки!', 'error');
+				console.log(error?.message, error.errors);
+			} else {
+				$.notify('Договор успешно удален из подборки!');
+				getList({
+					withCounts: true,
+					callback: function() {
+						$('[selectionsbtn]').ddrInputs('enable');
+					}
+				});
+			}
+		});
+	}
+	
+	
+	
+	
+	
+	
+	
+	$.clearSelection = (btn) => {
+		selection = null;
+		editSelection = null;
+		
+		getList({
+			callback: function() {
+				$(btn).ddrInputs('disable');
+				$('#chooserAll').find('[selectionscounts]').empty();
+				$('#chooserDepartment').find('[selectionscounts]').empty();
+				$('#chooserArchive').find('[selectionscounts]').empty();
+			}
+		});
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	//-------------------------------------------------  сортировка
+	
 	$.sorting = (cell, sfield) => {
 		$(cell).closest('[sorts]').find('.sort-asc, .sort-desc').removeClass('sort-asc sort-desc');
 		if (sortField == sfield) {
@@ -179,6 +550,16 @@
 		
 		getList();
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	
@@ -454,12 +835,36 @@
 	
 	
 	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	//-----------------------------------------------------------------------------------------------------
 	
 	
-	function getList(init) {
-		let params = {}, listWait;
+	function getList(settings) {
+		if (abortCtrl instanceof AbortController) abortCtrl.abort();
 		
+		let {
+			init,
+			withCounts,
+			callback
+		} = _.assign({
+			init: false,
+			withCounts: false,
+			callback: false
+		}, settings),
+			params = {},
+			listWait;
 		
 		if (currentList == -1 || currentList > 0) {
 			searchWithArchive = false;
@@ -487,7 +892,8 @@
 		params['sort_field'] = sortField;
 		params['sort_order'] = sortOrder;
 		params['search'] = search;
-		params['selected_contracts'] = selectedContracts;
+		params['selection'] = selection;
+		params['edit_selection'] = editSelection;
 		
 		
 		
@@ -504,13 +910,23 @@
 			
 		}
 		
-		axiosQuery('get', 'site/contracts', params).then(({data, error, status, headers}) => {
+		abortCtrl = new AbortController();
+		axiosQuery('get', 'site/contracts', params, 'text', abortCtrl).then(({data, error, status, headers}) => {
 			$('#contractsList').html(data);
 			if (init) $('#contractsCard').card('ready');
 			else listWait.destroy();
 			
 			$('[stepprice]').number(true, 2, '.', ' ');
+			
+			if (withCounts && headers) {
+				$('#chooserAll').find('[selectionscounts]').text(headers['x-count-contracts-all'] > 0 ? headers['x-count-contracts-all'] : '');
+				$('#chooserDepartment').find('[selectionscounts]').text(headers['x-count-contracts-department'] > 0 ? headers['x-count-contracts-department'] : '');
+				$('#chooserArchive').find('[selectionscounts]').text(headers['x-count-contracts-archive'] > 0 ? headers['x-count-contracts-archive'] : '');
+			}
+			
+			if (callback && typeof callback == 'function') callback();
 		});
+		
 	}
 	
 	

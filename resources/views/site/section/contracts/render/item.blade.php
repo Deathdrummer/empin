@@ -82,14 +82,33 @@
 	@endcando
 	
 	
-	
-	@if($searched)
+	@if($selectionEdited || ($selectionEdited && $searched))
 		<td class="center">
-			<x-checkbox
+			<x-button
+				variant="red"
+				group="small"
+				action="removeContractFromSelection:{{$id}},{{$selection}}"
+				title="Удалить из подборки"
+				><i class="fa-solid fa-trash-can"></i></x-button>
+		</td>
+	
+	@elseif($searched)
+		<td class="center">
+			<x-select
+				group="small"
+				class="w100"
+				:options="$allSelections"
+				:exclude="$selections ?? []"
+				choose="Выбрать..."
+				empty="Нет подборок"
+				no-choose-has-value
+				action="addContractToSelection:{{$id}}"
+				/>
+			{{-- <x-checkbox
 				group="large"
 				:checked="$selected"
 				action="addContractToSelection:{{$id}}"
-				/>
+				/> --}}
 		</td>
 	@else
 		@isset($departmentId)

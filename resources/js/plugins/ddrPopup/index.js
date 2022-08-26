@@ -106,10 +106,10 @@ window.ddrPopup = function(settings = {}, callback = false) {
 			if (!text || !params.buttons || typeof params.buttons != 'object') throw new Error('ddrPopup -> dialog ошибка - данные переданы неверно!');
 			if (params && typeof params == 'function') cb = params;
 			let buttonsData = params.buttons || false;
-			params.buttons = Object.keys(params.buttons);
 			
-			//params.buttons = _.mapValues(buttonsData, function(val) { return _.isFunction(val) ? false : val; });
-			
+			params.buttons = _.mapValues(Object.keys(params.buttons), function(btnStr) {
+				return btnStr.split('|');
+			});
 			
 			_insertDialog(text, params, function(data) {
 				_setDialogPositing();
@@ -413,6 +413,7 @@ window.ddrPopup = function(settings = {}, callback = false) {
 	
 	function _insertDialog(text = null, params = {}, callback = false) {
 		let dialogData = _.assign({text}, params);
+		
 		_getLayout({dialog: dialogData}).then(function({data: layoutDoc, status: lStat, headers: lHeaders}) {
 			let dialog = $(layoutDoc).find('[ddrpopupdialog]').length ? $(layoutDoc).find('[ddrpopupdialog]')[0].outerHTML : dialog;
 			_setContent({dialog});
@@ -600,6 +601,7 @@ window.ddrPopup = function(settings = {}, callback = false) {
 	function _closeDialog() {
 		$(ddrPopupSelector).find('[ddrpopupdialog]').remove();
 		controller.abort();
+		controller  = new AbortController();
 	};
 	
 	

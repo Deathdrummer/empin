@@ -102,9 +102,9 @@ class Settings {
 		
 		$setting = Setting::firstOrNew(['key' => $keyToFind]);
 		
-		$settignValue = $setting->value;
+		$settingValue = $setting->value;
 		
-		if ($path) $setting->value = json_encode(data_set($settignValue, $path, $value), JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);
+		if ($path) $setting->value = json_encode(data_set($settingValue, $path, $value), JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);
 		else $setting->value = is_array($value) ? json_encode($value, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES) : $value;
 		if ($group) $setting->group = $group;
 		$stat = $setting->save();
@@ -126,16 +126,16 @@ class Settings {
 		['key' => $keyToFind, 'path' => $pathToFind] = $this->parseKey($path);
 		
 		$setting = Setting::where('key', $keyToFind)->first();
-		$settignValue = $setting->value;
+		$settingValue = $setting->value;
 		
 		if (!is_null($pathToFind)) {
-			Arr::forget($settignValue, $pathToFind);
+			Arr::forget($settingValue, $pathToFind);
 			
-			if (is_array($settignValue) && empty($settignValue)) {
+			if (is_array($settingValue) && empty($settingValue)) {
 				return $setting->delete();
 			}
 			
-			$setting->value = json_encode($settignValue, JSON_UNESCAPED_UNICODE);
+			$setting->value = json_encode($settingValue, JSON_UNESCAPED_UNICODE);
 			return $setting->save();
 		} 
 		

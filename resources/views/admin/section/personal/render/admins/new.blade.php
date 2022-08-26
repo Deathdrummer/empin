@@ -7,7 +7,7 @@
 			<x-input name="email" value="{{isset($email) ? $email : ''}}" class="w100"  placeholder="E-mail сотрудника" />
 		</td>
 		<td>
-			<x-select name="role" class="w100" :options="$data['roles']" choose="Роль не выбрана" empty="Нет ролей" no-choose-has-value no-choose-has-value  />
+			<x-select name="role" class="w100" :options="$data['roles']" choose="Роль не выбрана" empty="Нет ролей" no-choose-has-value no-choose-has-value />
 		</td>
 		<td></td>
 		<td class="center"><span class="color-gray">-</span></td>

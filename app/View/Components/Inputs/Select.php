@@ -27,6 +27,7 @@ class Select extends Component {
     public function __construct(
 		string $name = '',
 		mixed $options = false,
+		array $exclude = [],
 		string $choose = 'Выбрать...',
 		string $empty = null,
 		$chooseEmpty = null,
@@ -34,6 +35,7 @@ class Select extends Component {
 		?string $action = null,
 		?string $tag = null
 	) {
+		
         $this->name = $name;
         
         $this->choose = $choose;
@@ -49,6 +51,7 @@ class Select extends Component {
 		if ($options && is_array($options)) {
 			if (Arr::isAssoc($options)) {
 				foreach ($options as $value => $title) {
+					if (in_array($value, $exclude)) continue;
 					$ops[] = [
 						'value' => htmlspecialchars_decode($value, ENT_QUOTES|ENT_HTML5),
 						'title' => htmlspecialchars_decode($title, ENT_QUOTES|ENT_HTML5),
@@ -59,6 +62,7 @@ class Select extends Component {
 					$value = isset($item['value']) ? htmlspecialchars_decode($item['value'], ENT_QUOTES|ENT_HTML5) : null;
 					$title = isset($item['title']) ? htmlspecialchars_decode($item['title'], ENT_QUOTES|ENT_HTML5) : null;
 					
+					if (in_array($value, $exclude)) continue;
 					$ops[] = [
 						'value' 	=> $value ?? $title,
 						'title' 	=> $title ?? $value,
@@ -68,6 +72,7 @@ class Select extends Component {
 				}
 			} else {
 				foreach ($options as $item) {
+					if (in_array($item, $exclude)) continue;
 					$ops[] = [
 						'value' => htmlspecialchars_decode($item, ENT_QUOTES|ENT_HTML5),
 						'title' => htmlspecialchars_decode($item, ENT_QUOTES|ENT_HTML5),

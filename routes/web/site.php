@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\site\Contracts;
+use App\Http\Controllers\site\Selections;
 use App\Http\Controllers\UserController;
 use App\Http\Requests\Auth\UserEmailVerificationRequest;
 use App\Models\Section;
@@ -259,13 +260,32 @@ Route::post('/lang', function (Request $request) {
 
 
 Route::prefix('site')->middleware(['lang', 'isajax:site'])->group(function() {
+	
+	// Договоры
 	Route::get('/contracts', [Contracts::class, 'list']);
 	Route::put('/contracts', [Contracts::class, 'set_data']);
 	Route::post('/contracts/hide', [Contracts::class, 'hide']);
 	Route::post('/contracts/to_archive', [Contracts::class, 'to_archive']);
 	Route::get('/contracts/departments', [Contracts::class, 'departments']);
 	Route::post('/contracts/send', [Contracts::class, 'send']);
+	
+	
+	
+	// Подборки
+	Route::get('/selections/init', [Selections::class, 'init']);
+	Route::put('/selections/add_contract', [Selections::class, 'add_contract']);
+	Route::put('/selections/remove_contract', [Selections::class, 'remove_contract']);
+	Route::post('/selections/store_show', [Selections::class, 'store_show']);
+	Route::resource('selections', Selections::class);
+	
 });
+
+
+
+
+
+
+
 
 
 

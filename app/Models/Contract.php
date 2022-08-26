@@ -123,6 +123,21 @@ class Contract extends Model {
 	
 	
 	
+	/**
+	 * @param 
+	 * @return 
+	 */
+	public function selections() {
+		return $this->belongsToMany(
+			Selection::class,
+			'contract_selection_contract',
+			'contract_id',
+			'selection_id',
+			'id',
+			'id');
+	}
+	
+	
 	
 	
 	

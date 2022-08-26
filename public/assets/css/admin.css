@@ -6600,8 +6600,9 @@ table tfoot tr td.right {
   border: 1px solid #eee;
   border-radius: 3px;
 }
-.ddrpopup__dialog__buttons {
+.ddrpopup__dialog .popupdialog__buttons {
   margin-top: 15px;
+  text-align: right;
 }
 .ddrpopup__header {
   padding-left: 40px;
@@ -6696,6 +6697,10 @@ table tfoot tr td.right {
 }
 .chooser__item_active.chooser_color-neutral:not(.chooser__item_many) {
   cursor: default;
+}
+.chooser__item span {
+  display: inline-flex;
+  align-items: center;
 }
 .chooser_color-neutral {
   background-color: #f7f7fb;
