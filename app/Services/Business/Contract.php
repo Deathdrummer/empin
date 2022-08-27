@@ -384,7 +384,7 @@ class Contract {
 	 * @return 
 	 */
 	public function getUserColums() {
-		return auth('site')->user()->contract_colums;
+		return auth('site')->user()->contract_colums ?: [];
 	}
 	
 	
