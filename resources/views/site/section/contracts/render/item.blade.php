@@ -2,13 +2,25 @@
 	@if(!$isArchive)
 		@cando('contract-col-period:site')
 			<td class="center">
-				@isset($color)
-					<div
-						class="circle d-inline-block w2rem-5px h2rem-5px"
-						style="background-color: {{$color}};"
-						title="{{$name}}"
-						></div>
-				@endisset
+				<div
+					@class([
+						'circle',
+						'd-inline-block',
+						'border-all',
+						'border-gray-300' => $color_forced === null,
+						'border-green border-width-2px' => $color_forced !== null,
+						'border-rounded-circle',
+						'w2rem-5px',
+						'h2rem-5px',
+						'pointer' => auth('site')->user()->can('force-set-contract-color:site'),
+					])
+					@if(isset($color) || isset($color_forced)) style="background-color: {{$color_forced ?: $color}};" @endif
+					title="{{$name_forced ?: $name}}"
+					noscroll
+					dcolor="{{$color}}"
+					dname="{{$name}}"
+					@cando('force-set-contract-color:site')onmousedown="$.openColorsStatuses(this, '{{$id}}')"@endcando
+					></div>
 			</td>
 		@endcando
 	@endif

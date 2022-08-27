@@ -46082,6 +46082,9 @@ template {
 .border-white {
   border-color: #fff !important;
 }
+.border-green {
+  border-color: #00e94a !important;
+}
 
 .horisontal {
   overflow-x: scroll;
@@ -103792,4 +103795,41 @@ template {
   .lh-xxl-200 {
     line-height: 2em !important;
   }
+}
+.tippy-box {
+  background-color: #fff !important;
+  box-shadow: 0 0 11px -2px rgba(0, 0, 0, 0.2117647059);
+  border: 1px solid #d3d3d3;
+}
+
+.tippy-box > .tippy-svg-arrow {
+  fill: #fff !important;
+}
+
+.tippy-box[data-placement^=top] > .tippy-arrow {
+  color: #fff !important;
+}
+.tippy-box[data-placement^=top] > .tippy-arrow::before {
+  border-top-color: #fff !important;
+}
+
+.tippy-box[data-placement^=bottom] > .tippy-arrow {
+  color: #fff !important;
+}
+.tippy-box[data-placement^=bottom] > .tippy-arrow::before {
+  border-bottom-color: #fff !important;
+}
+
+.tippy-box[data-placement^=left] > .tippy-arrow {
+  color: #fff !important;
+}
+.tippy-box[data-placement^=left] > .tippy-arrow::before {
+  border-left-color: #fff !important;
+}
+
+.tippy-box[data-placement^=right] > .tippy-arrow {
+  color: #fff !important;
+}
+.tippy-box[data-placement^=right] > .tippy-arrow::before {
+  border-right-color: #fff !important;
 }

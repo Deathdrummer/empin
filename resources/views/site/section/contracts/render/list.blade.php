@@ -8,8 +8,8 @@
 						@if(!$isArchive)
 							@cando('contract-col-period:site')
 								<td
-									class="w6rem sort {{$sortField == 'date_end' ? 'sort-'.$sortOrder : ''}} vertical-center"
-									onclick="$.sorting(this, 'date_end')"
+									class="w6rem sort {{$sortField == 'deadline_color_key' ? 'sort-'.$sortOrder : ''}} vertical-center"
+									onclick="$.sorting(this, 'deadline_color_key')"
 									noscroll
 									><strong class="fz10px lh90 d-block text-center" title="Срок исполнения договора">Срок исполн. договора</strong></td>
 							@endcando

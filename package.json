@@ -32,7 +32,8 @@
         "locutus": "^2.0.16",
         "path": "^0.12.7",
         "style-module": "^1.0.0",
-        "tapjs": "^1.0.9"
+        "tapjs": "^1.0.9",
+        "tippy.js": "^6.3.7"
     },
     "browserslist": {
         "production": [

@@ -8209,7 +8209,8 @@ $.fn.ddrWait = function () {
     icon: '',
     iconHeight: '50px',
     bgColor: '#fffe',
-    iconColor: 'hue-rotate(333deg)'
+    iconColor: 'hue-rotate(333deg)',
+    tag: null
   }, params),
       text = _$assign.text,
       fontSize = _$assign.fontSize,
@@ -8218,6 +8219,7 @@ $.fn.ddrWait = function () {
       iconHeight = _$assign.iconHeight,
       iconColor = _$assign.iconColor,
       bgColor = _$assign.bgColor,
+      tag = _$assign.tag,
       _styleModule = (0,style_module__WEBPACK_IMPORTED_MODULE_0__.styleModule)({
     ddrwaitwrapper: {
       position: 'relative'
@@ -8264,7 +8266,7 @@ $.fn.ddrWait = function () {
   var labelHtml = text ? '<p class="' + ddrwaitText + '">' + text + '</p>' : '',
       iconHtml = '<img src="/assets/images/loading.gif" ddrwaiticon class="' + ddrwaitIcon + '">';
   $(block).addClass(ddrwaitwrapper);
-  $(block).append('<div class="' + ddrwaitBlock + ' noselect" id="' + ddrwBId + '"><div class="' + ddrwaitContent + '">' + iconHtml + labelHtml + '</div></div>');
+  $(block).append('<div class="' + ddrwaitBlock + ' noselect" id="' + ddrwBId + '"' + (tag ? ' ' + tag : '') + '><div class="' + ddrwaitContent + '">' + iconHtml + labelHtml + '</div></div>');
   if (isBtn) $(block).ddrInputs('disable');
   $('#' + ddrwBId).ready(function () {
     $('#' + ddrwBId).addClass(ddrwaitBlockVisible);

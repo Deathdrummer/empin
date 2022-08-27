@@ -135,6 +135,11 @@ class Contract {
 		$deadlinesSteps = $this->getSettings('steps-deadlines');
 		
 		return $data->mapWithKeysMany(function($item) use($deadlinesContracts, $deadlinesSteps) {
+			if (!is_null($item['deadline_color_key'] )) {
+				$forcedColor = $deadlinesContracts[$item['deadline_color_key']]['color']?? null;
+				$forcedName = $deadlinesContracts[$item['deadline_color_key']]['name'] ?? '';
+			}
+			
 			if ($deadlinesContracts) {
 				$deadlineContractsCondition = $this->datetime->checkDiapason($item['date_end'], $deadlinesContracts, [
 					'minSign' 		=> 'min_sign',
@@ -200,6 +205,9 @@ class Contract {
 				'object_id' 		=> $item['object_id'] ?? null,
 				'color' 			=> $color ?? null,
 				'name' 				=> $name ?? '',
+				'color_forced' 		=> $forcedColor ?? null,
+				'name_forced' 		=> $forcedName ?? '',
+				
 				'has_deps_to_send'	=> !!$item['has_deps_to_send'] ?? null,
 				'ready_to_archive'	=> $item['hide_count'] != 0 && $item['hide_count'] == $item->departments->count(),
 				//'selected'			=> in_array($item['id'], $selectedContracts),
@@ -301,6 +309,29 @@ class Contract {
 		}
 		return $contractdata;
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	/**
+	 * @param 
+	 * @return 
+	 */
+	public function setStatus($contractId = false, $key = null) {
+		if (!$contractId) return false;
+		$contract = ContractModel::find($contractId);
+		$contract->deadline_color_key = $key;
+		return $contract->save();
+	}
+	
+	
+	
 	
 	
 	

@@ -267,6 +267,10 @@ Route::prefix('site')->middleware(['lang', 'isajax:site'])->group(function() {
 	Route::post('/contracts/hide', [Contracts::class, 'hide']);
 	Route::post('/contracts/to_archive', [Contracts::class, 'to_archive']);
 	Route::get('/contracts/departments', [Contracts::class, 'departments']);
+	
+	Route::get('/contracts/statuses', [Contracts::class, 'statuses']);
+	Route::put('/contracts/set_status', [Contracts::class, 'set_status']);
+	
 	Route::post('/contracts/send', [Contracts::class, 'send']);
 	
 	

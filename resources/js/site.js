@@ -13,6 +13,7 @@ require('@plugins/ddrDatepicker');
 require('@plugins/ddrCRUD');
 require('@plugins/card');
 require('@plugins/ddrScrollX');
+require('@plugins/tooltip');
 
 
 

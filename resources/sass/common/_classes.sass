@@ -8,6 +8,8 @@
 
 
 
+
+
 .noselect, [noselect]
 	touch-callout: none
 	user-select: none
@@ -259,6 +261,9 @@
 	
 	&-white
 		border-color: #fff !important
+	
+	&-green
+		border-color: #00e94a !important
 	
 
 
@@ -625,3 +630,52 @@ $bPoints: map-remove($grid-breakpoints, xs)
 		@for $i from 1 through 20
 			.lh-#{$breakpoint}-#{$i * 10}
 				line-height: #{$i / 10}em !important
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.tippy-box
+	background-color: #fff !important
+	box-shadow: 0 0 11px -2px #00000036
+	border: 1px solid #d3d3d3
+
+.tippy-box > .tippy-svg-arrow
+	fill: #fff !important
+
+.tippy-box[data-placement^='top'] 
+	& > .tippy-arrow
+		color: #fff !important
+		
+		&::before
+			border-top-color: #fff !important
+
+.tippy-box[data-placement^='bottom'] 
+	& > .tippy-arrow
+		color: #fff !important
+		
+		&::before
+			border-bottom-color: #fff !important
+
+.tippy-box[data-placement^='left'] 
+	& > .tippy-arrow
+		color: #fff !important
+		
+		&::before
+			border-left-color: #fff !important
+
+.tippy-box[data-placement^='right'] 
+	& > .tippy-arrow
+		color: #fff !important
+		
+		&::before
+			border-right-color: #fff !important

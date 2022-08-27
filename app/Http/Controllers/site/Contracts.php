@@ -264,6 +264,55 @@ class Contracts extends Controller {
 	
 	
 	
+	
+	/**
+	 * @param 
+	 * @return 
+	 */
+	public function statuses(Request $request) {
+		if (!auth('site')->user()->can('force-set-contract-color:site')) return response()->json(false);
+		$this->addSettingToGlobalData('contracts-deadlines:deadlineStatuses');
+		return $this->render('deadline_statuses', $request->all());
+	}
+	
+	
+	
+	
+	
+	
+	/**
+	 * @param 
+	 * @return 
+	 */
+	public function set_status(Request $request) {
+		[
+			'contractId'	=> $contractId,
+			'key' 			=> $key
+		] = $request->validate([
+			'contractId' 	=> 'required|numeric',
+			'key' 			=> 'present|nullable'
+		]);
+		
+		$stat = $this->contract->setStatus($contractId, $key);
+		return response()->json($stat);
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	/**
 	 * Добавить сотрудников отделов для выпадающего списка
 	 * @param 

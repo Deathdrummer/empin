@@ -4,14 +4,15 @@ $.fn.ddrWait = function(params = null) {
 	let block = this,
 		isBtn = block[0]?.tagName?.toLowerCase() == 'button',
 		ddrwBId = 'ddrWaitBlock'+random(9,99999),
-		{text, fontSize, fontColor, icon, iconHeight, iconColor, bgColor} = _.assign({
+		{text, fontSize, fontColor, icon, iconHeight, iconColor, bgColor, tag} = _.assign({
 			text: '',
 			fontSize: '16px',
 			fontColor: '#7a9699',
 			icon: '',
 			iconHeight: '50px',
 			bgColor: '#fffe',
-			iconColor: 'hue-rotate(333deg)'
+			iconColor: 'hue-rotate(333deg)',
+			tag: null
 		}, params),
 		{ddrwaitwrapper, ddrwaitBlock, ddrwaitBlockVisible, ddrwaitContent, ddrwaitIcon, ddrwaitText} = styleModule({
 			ddrwaitwrapper: {
@@ -55,7 +56,7 @@ $.fn.ddrWait = function(params = null) {
 		iconHtml = '<img src="/assets/images/loading.gif" ddrwaiticon class="'+ddrwaitIcon+'">';
 	
 	$(block).addClass(ddrwaitwrapper);
-	$(block).append('<div class="'+ddrwaitBlock+' noselect" id="'+ddrwBId+'"><div class="'+ddrwaitContent+'">'+iconHtml+labelHtml+'</div></div>');
+	$(block).append('<div class="'+ddrwaitBlock+' noselect" id="'+ddrwBId+'"'+(tag ? ' '+tag : '')+'><div class="'+ddrwaitContent+'">'+iconHtml+labelHtml+'</div></div>');
 	if (isBtn) $(block).ddrInputs('disable');
 	
 	$('#'+ddrwBId).ready(() => {

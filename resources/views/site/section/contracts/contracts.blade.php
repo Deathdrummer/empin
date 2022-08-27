@@ -111,7 +111,7 @@
 				<x-checkbox
 					class="mt3px"
 					id="searchWithArchive"
-					group="large"
+					group="normal"
 					label="Включить в поиск архив"
 					action="searchWithArchive"
 					/>
@@ -142,7 +142,11 @@
 				
 		<div id="contractsList"></div>
 	</x-card>
-
+<div id="toolbar-options" hidden>
+   <a href="#"><i class="fa fa-plane"></i></a>
+   <a href="#"><i class="fa fa-car"></i></a>
+   <a href="#"><i class="fa fa-bicycle"></i></a>
+</div>
 </section>
 
 <script type="module">
@@ -434,12 +438,6 @@
 	
 	
 	
-	
-	
-	
-	
-	
-	
 	$.addContractToSelection = (select, contractId) => {
 		let selectionId = parseInt($(select).val());
 		
@@ -553,6 +551,91 @@
 	
 	
 	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	//-------------------------------------------------  Указание сцета статуса
+	let statusesTooltip, contractId;
+	$.openColorsStatuses = (btn, cId) => {
+		contractId = cId;
+		statusesTooltip = $(btn).tooltip({
+			cls: 'w30rem',
+			placement: 'auto',
+			tag: 'noscroll',
+			minWidth: '320px',
+			minHeight: '110px',
+			wait: {
+				iconHeight: '40px'
+			},
+			onShow: function({reference, popper, show, hide, destroy, waitDetroy, setContent, setData, setProps}) {
+				loadStatusesData((data) => {
+					setData(data);
+					waitDetroy();
+				});
+			}
+		});
+	}
+	
+	let statusesData;
+	function loadStatusesData(callback = false) {
+		if (!callback) return;
+		/*if (statusesData) {
+			callback(statusesData);
+			return;
+		} */
+		
+		axiosQuery('get', 'site/contracts/statuses', {contract_id: contractId}).then(({data, error, status, headers}) => {
+			if (!data) {
+				$.notify('Запрещено!', 'error');
+				statusesTooltip.destroy();
+				return;
+			}
+			statusesData = data;
+			callback(statusesData);
+		}).catch((e) => {
+			console.log(e);
+		});
+	}
+	
+	
+	
+	
+	
+	
+	$.setColorStatus = (key, color, name) => {
+		statusesTooltip.wait();
+		axiosQuery('put', 'site/contracts/set_status', {contractId, key}).then(({data, error, status, headers}) => {
+			let dColor = $(statusesTooltip.reference).attr('dcolor'),
+				dName = $(statusesTooltip.reference).attr('dname');
+			
+			if (color) {
+				$(statusesTooltip.reference).css('background-color', color);
+				$(statusesTooltip.reference).attr('title', name);
+				
+				$(statusesTooltip.reference).removeClass('border-gray-300');
+				$(statusesTooltip.reference).addClass('border-green border-width-2px');
+			} else {
+				$(statusesTooltip.reference).css('background-color', dColor);
+				$(statusesTooltip.reference).attr('title', dName);
+				
+				$(statusesTooltip.reference).removeClass('border-green border-width-2px');
+				$(statusesTooltip.reference).addClass('border-gray-300');
+			} 
+			
+			statusesTooltip.destroy();
+		}).catch((e) => {
+			console.log(e);
+		});
+	}
 	
 	
 	
