@@ -1,6 +1,6 @@
 <tr class="h6rem">
 	@if(!$isArchive)
-		@if(auth('site')->user()->can('contract-col-period:site') && in_array('period', $userColums))
+		@if(auth('site')->user()->can('contract-col-period:site') && (empty($userColums) || in_array('period', $userColums)))
 			<td class="center">
 				<div
 					@class([
@@ -25,15 +25,15 @@
 		@endif
 	@endif
 	
-	@if(auth('site')->user()->can('contract-col-object_id:site') && in_array('object_id', $userColums))
+	@if(auth('site')->user()->can('contract-col-object_id:site') && (empty($userColums) || in_array('object_id', $userColums)))
 		<td><strong class="fz14px">{{$object_id}}</strong></td>
 	@endif
 	
-	@if(auth('site')->user()->can('contract-col-title:site') && in_array('title', $userColums))
+	@if(auth('site')->user()->can('contract-col-title:site') && (empty($userColums) || in_array('title', $userColums)))
 		<td><p>{{$title}}</p></td>
 	@endif
 	
-	@if(auth('site')->user()->can('contract-col-titul:site') && in_array('titul', $userColums))
+	@if(auth('site')->user()->can('contract-col-titul:site') && (empty($userColums) || in_array('titul', $userColums)))
 		<td class="pr2px">
 			<div class="scrollblock scrollblock-auto h5rem pr3px">
 				<p class="format fz12px">{{$titul}}</p>
@@ -41,11 +41,11 @@
 		</td>
 	@endif
 	
-	@if(auth('site')->user()->can('contract-col-contract:site') && in_array('contract', $userColums))
+	@if(auth('site')->user()->can('contract-col-contract:site') && (empty($userColums) || in_array('contract', $userColums)))
 		<td><p>{{$contract}}</p></td>
 	@endif
 	
-	@if(auth('site')->user()->can('contract-col-subcontracting:site') && in_array('subcontracting', $userColums))
+	@if(auth('site')->user()->can('contract-col-subcontracting:site') && (empty($userColums) || in_array('subcontracting', $userColums)))
 		<td class="center">
 			@if($subcontracting)
 				<i class="fa-solid fa-circle-check color-green fz16px"></i>
@@ -53,31 +53,31 @@
 		</td>
 	@endif
 	
-	@if(auth('site')->user()->can('contract-col-customer:site') && in_array('customer', $userColums))
+	@if(auth('site')->user()->can('contract-col-customer:site') && (empty($userColums) || in_array('customer', $userColums)))
 		<td><p>{{$customers[$customer]}}</p></td>
 	@endif
 	
-	@if(auth('site')->user()->can('contract-col-locality:site') && in_array('locality', $userColums))
+	@if(auth('site')->user()->can('contract-col-locality:site') && (empty($userColums) || in_array('locality', $userColums)))
 		<td><p>{{$localities[$locality]}}</p></td>
 	@endif
 	
-	@if(auth('site')->user()->can('contract-col-price:site') && in_array('price', $userColums))
+	@if(auth('site')->user()->can('contract-col-price:site') && (empty($userColums) || in_array('price', $userColums)))
 		<td class="text-end"><p>@number($price, 2) @symbal(money)</p></td>
 	@endif
 	
-	@if(auth('site')->user()->can('contract-col-date_start:site') && in_array('date_start', $userColums))
+	@if(auth('site')->user()->can('contract-col-date_start:site') && (empty($userColums) || in_array('date_start', $userColums)))
 		<td>
 			<p>{{dateFormatter($date_start, 'd.m.y')}}</p>
 		</td>
 	@endif
 	
-	@if(auth('site')->user()->can('contract-col-date_end:site') && in_array('date_end', $userColums))
+	@if(auth('site')->user()->can('contract-col-date_end:site') && (empty($userColums) || in_array('date_end', $userColums)))
 		<td>
 			<p>{{dateFormatter($date_end, 'd.m.y')}}</p>
 		</td>
 	@endif
 	
-	@if(auth('site')->user()->can('contract-col-hoz_method:site') && in_array('hoz_method', $userColums))
+	@if(auth('site')->user()->can('contract-col-hoz_method:site') && (empty($userColums) || in_array('hoz_method', $userColums)))
 		<td class="center">
 			@if($hoz_method)
 				<i class="fa-solid fa-circle-check color-green fz16px"></i>
@@ -85,11 +85,11 @@
 		</td>
 	@endif
 	
-	@if(auth('site')->user()->can('contract-col-type:site') && in_array('type', $userColums))
+	@if(auth('site')->user()->can('contract-col-type:site') && (empty($userColums) || in_array('type', $userColums)))
 		<td><p>{{$types[$type]}}</p></td>
 	@endif
 	
-	@if(auth('site')->user()->can('contract-col-contractor:site') && in_array('contractor', $userColums))
+	@if(auth('site')->user()->can('contract-col-contractor:site') && (empty($userColums) || in_array('contractor', $userColums)))
 		<td><p>{{$contractors[$contractor]}}</p></td>
 	@endif
 	

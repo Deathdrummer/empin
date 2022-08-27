@@ -345,7 +345,7 @@ class Contract {
 	 */
 	public function getContractColums() {
 		$allColums = collect([
-			'period' 			=> 'Период',
+			'period' 			=> 'Срок исполнения договора',
 			'object_id' 		=> 'Номер объекта',
 			'title' 			=> 'Название/заявитель',
 			'titul' 			=> 'Титул',
@@ -362,7 +362,7 @@ class Contract {
 			'archive' 			=> 'В архиве',
 		]);
 		
-		$contractColums = auth('site')->user()->contract_colums;
+		$contractColums = $this->getUserColums();
 		
 		$columsData = $allColums->mapWithKeys(function($title, $field) use($contractColums) {
 			return [$field => [
