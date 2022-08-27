@@ -136,6 +136,15 @@
 					disabled
 					><i class="fa-solid fa-xmark"></i></x-button>
 			</div>
+			
+			<div class="col-auto ms-auto">
+				<x-button
+					group="normal"
+					variant="purple"
+					action="openSetColumsWin"
+					title="Отображение столбцов"
+					><i class="fa-solid fa-table-columns"></i></x-button>
+			</div>
 		</div>
 		
 				
@@ -486,7 +495,6 @@
 	
 	
 	
-	
 	$.clearSelection = (btn) => {
 		selection = null;
 		editSelection = null;
@@ -548,6 +556,74 @@
 		
 		getList();
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	//------------------------------------------------- Отображение столбцов
+	$.openSetColumsWin = (btn) => {
+		ddrPopup({
+			title: 'Отображение столбцов',
+			width: 500,
+			buttons: ['Закрыть', {action: 'setContractsColums', title: 'Прменить'}],
+			winClass: 'ddrpopup_white'
+		}).then(({state, wait, setTitle, setButtons, loadData, setHtml, setLHtml, dialog, close, onScroll, disableButtons, enableButtons, setWidth}) => { //isClosed
+			wait();
+			axiosQuery('get', 'site/contracts/colums').then(({data, error, status, headers}) => {
+				
+				if (error) {
+					$.notify('Ошибка удаления из подборки!', 'error');
+					console.log(error?.message, error?.errors);
+				} 
+				
+				setHtml(data);
+				wait(false);
+			});
+			
+			$.setContractsColums = (_) => {
+				wait();
+				let checkedColums = [];
+				$('#contractColumnList').find('[contractcolumn]:checked').each(function(k, item) {
+					checkedColums.push($(item).attr('contractcolumn'));
+				});
+				
+				axiosQuery('put', 'site/contracts/colums', {checkedColums}).then(({data, error, status, headers}) => {
+					if (error) {
+						$.notify('Ошибка удаления из подборки!', 'error');
+						console.log(error?.message, error.errors);
+						wait(false);
+					} else {
+						$.notify('Договор успешно удален из подборки!');
+						getList({
+							callback: function() {
+								//$('[selectionsbtn]').ddrInputs('enable');
+							}
+						});
+						close();
+					}
+					
+				});
+			}
+			
+		});
+	}
+	
+	
+	
+			
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	

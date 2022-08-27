@@ -1,6 +1,6 @@
 <tr class="h6rem">
 	@if(!$isArchive)
-		@cando('contract-col-period:site')
+		@if(auth('site')->user()->can('contract-col-period:site') && in_array('period', $userColums))
 			<td class="center">
 				<div
 					@class([
@@ -22,76 +22,76 @@
 					@cando('force-set-contract-color:site')onmousedown="$.openColorsStatuses(this, '{{$id}}')"@endcando
 					></div>
 			</td>
-		@endcando
+		@endif
 	@endif
 	
-	@cando('contract-col-object_id:site')
+	@if(auth('site')->user()->can('contract-col-object_id:site') && in_array('object_id', $userColums))
 		<td><strong class="fz14px">{{$object_id}}</strong></td>
-	@endcando
+	@endif
 	
-	@cando('contract-col-title:site')
+	@if(auth('site')->user()->can('contract-col-title:site') && in_array('title', $userColums))
 		<td><p>{{$title}}</p></td>
-	@endcando
+	@endif
 	
-	@cando('contract-col-titul:site')
+	@if(auth('site')->user()->can('contract-col-titul:site') && in_array('titul', $userColums))
 		<td class="pr2px">
 			<div class="scrollblock scrollblock-auto h5rem pr3px">
 				<p class="format fz12px">{{$titul}}</p>
 			</div>
 		</td>
-	@endcando
+	@endif
 	
-	@cando('contract-col-contract:site')
+	@if(auth('site')->user()->can('contract-col-contract:site') && in_array('contract', $userColums))
 		<td><p>{{$contract}}</p></td>
-	@endcando
+	@endif
 	
-	@cando('contract-col-subcontracting:site')
+	@if(auth('site')->user()->can('contract-col-subcontracting:site') && in_array('subcontracting', $userColums))
 		<td class="center">
 			@if($subcontracting)
 				<i class="fa-solid fa-circle-check color-green fz16px"></i>
 			@endif
 		</td>
-	@endcando
+	@endif
 	
-	@cando('contract-col-customer:site')
+	@if(auth('site')->user()->can('contract-col-customer:site') && in_array('customer', $userColums))
 		<td><p>{{$customers[$customer]}}</p></td>
-	@endcando
+	@endif
 	
-	@cando('contract-col-locality:site')
+	@if(auth('site')->user()->can('contract-col-locality:site') && in_array('locality', $userColums))
 		<td><p>{{$localities[$locality]}}</p></td>
-	@endcando
+	@endif
 	
-	@cando('contract-col-price:site')
+	@if(auth('site')->user()->can('contract-col-price:site') && in_array('price', $userColums))
 		<td class="text-end"><p>@number($price, 2) @symbal(money)</p></td>
-	@endcando
+	@endif
 	
-	@cando('contract-col-date_start:site')
+	@if(auth('site')->user()->can('contract-col-date_start:site') && in_array('date_start', $userColums))
 		<td>
 			<p>{{dateFormatter($date_start, 'd.m.y')}}</p>
 		</td>
-	@endcando
+	@endif
 	
-	@cando('contract-col-date_end:site')
+	@if(auth('site')->user()->can('contract-col-date_end:site') && in_array('date_end', $userColums))
 		<td>
 			<p>{{dateFormatter($date_end, 'd.m.y')}}</p>
 		</td>
-	@endcando
+	@endif
 	
-	@cando('contract-col-hoz_method:site')
+	@if(auth('site')->user()->can('contract-col-hoz_method:site') && in_array('hoz_method', $userColums))
 		<td class="center">
 			@if($hoz_method)
 				<i class="fa-solid fa-circle-check color-green fz16px"></i>
 			@endif
 		</td>
-	@endcando
+	@endif
 	
-	@cando('contract-col-type:site')
+	@if(auth('site')->user()->can('contract-col-type:site') && in_array('type', $userColums))
 		<td><p>{{$types[$type]}}</p></td>
-	@endcando
+	@endif
 	
-	@cando('contract-col-contractor:site')
+	@if(auth('site')->user()->can('contract-col-contractor:site') && in_array('contractor', $userColums))
 		<td><p>{{$contractors[$contractor]}}</p></td>
-	@endcando
+	@endif
 	
 	
 	@if($selectionEdited || ($selectionEdited && $searched))

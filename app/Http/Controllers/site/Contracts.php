@@ -65,7 +65,7 @@ class Contracts extends Controller {
 		$this->_addDepsUsersToData($alldeps);
 		
 		$contractdata = $this->contract->buildData($list->keys());
-		
+		$userColums = $this->contract->getUserColums();
 		
 		
 		$this->addSettingToGlobalData([[
@@ -122,7 +122,8 @@ class Contracts extends Controller {
 				'searched',
 				'allSelections',
 				'selectionEdited',
-				'selection'
+				'selection',
+				'userColums'
 			),
 			$headers
 		);
@@ -298,6 +299,34 @@ class Contracts extends Controller {
 	}
 	
 	
+	
+	
+	
+	
+	
+	
+	
+	
+	/**
+	 * @param 
+	 * @return 
+	 */
+	public function colums() {
+		$colums = $this->contract->getContractColums();
+		return $this->render('colums', compact('colums'));
+	}
+	
+	
+	
+	
+	/**
+	 * @param 
+	 * @return 
+	 */
+	public function set_colums(Request $request) {
+		$stat = $this->contract->setUserColums($request);
+		return response()->json($stat);
+	}
 	
 	
 	

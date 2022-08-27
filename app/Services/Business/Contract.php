@@ -5,6 +5,7 @@ use App\Models\Contract as ContractModel;
 use App\Models\ContractData;
 use App\Models\Department;
 use App\Models\Selection;
+use App\Models\User;
 use App\Services\Business\Department as DepartmentService;
 use App\Services\DateTime;
 use App\Traits\Settingable;
@@ -329,6 +330,78 @@ class Contract {
 		$contract->deadline_color_key = $key;
 		return $contract->save();
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	/**
+	 * @param 
+	 * @return 
+	 */
+	public function getContractColums() {
+		$allColums = collect([
+			'period' 			=> 'Период',
+			'object_id' 		=> 'Номер объекта',
+			'title' 			=> 'Название/заявитель',
+			'titul' 			=> 'Титул',
+			'contract' 			=> 'Номер договора',
+			'subcontracting' 	=> 'Субподряд',
+			'customer' 			=> 'Заказчик',
+			'locality' 			=> 'Населенный пункт',
+			'price' 			=> 'Стоимость договора',
+			'date_start' 		=> 'Дата начала договора',
+			'date_end' 			=> 'Дата окончания договора',
+			'hoz_method' 		=> 'Хоз способ',
+			'type' 				=> 'Тип договора',
+			'contractor' 		=> 'Исполнтель',
+			'archive' 			=> 'В архиве',
+		]);
+		
+		$contractColums = auth('site')->user()->contract_colums;
+		
+		$columsData = $allColums->mapWithKeys(function($title, $field) use($contractColums) {
+			return [$field => [
+				'title'		=> $title,
+				'checked'	=> in_array($field, $contractColums)
+			]];
+		});
+		
+		return $columsData;
+	}
+	
+	
+	
+	
+	
+	
+	/**
+	 * @param 
+	 * @return 
+	 */
+	public function getUserColums() {
+		return auth('site')->user()->contract_colums;
+	}
+	
+	
+	
+	
+	
+	/**
+	 * @param 
+	 * @return 
+	 */
+	public function setUserColums(Request $request) {
+		$colums = $request->get('checkedColums');
+		$user = User::find(auth('site')->user()->id);
+		$user->contract_colums = $colums;
+		return $user->save();
+	}
+	
 	
 	
 	

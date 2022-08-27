@@ -48,6 +48,16 @@ class User extends Authenticatable implements MustVerifyEmail {
 	
 	
 	/**
+     * Атрибуты, которые должны быть типизированы. (Конвертация полей при добавлении и получении)
+	 *
+     * @var array
+     */
+	protected $casts = [
+        'contract_colums' => 'array'
+    ];
+	
+	
+	/**
      * Скрытые поля (нельзя менять)
 	 *
      * @var array
