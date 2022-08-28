@@ -337,6 +337,21 @@ class Contracts extends Controller {
 	
 	
 	
+	/**
+	 * @param 
+	 * @return 
+	 */
+	public function check_new(Request $request) {
+		$stat = $this->contract->checkNew($request);
+		return response()->json($stat);
+	}
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	

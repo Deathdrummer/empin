@@ -628,6 +628,21 @@
 	
 	
 	
+	//------------------------------------------------- Убрать отметку нового договора
+	$.checkNewContract = (tr, contractId) => {
+		axiosQuery('put', 'site/contracts/check_new', {contract_id: contractId}).then(({data, error, status, headers}) => {
+			if (!data) {
+				$.notify('Запрещено!', 'error');
+				return;
+			}
+			
+			$(tr).removeClass('clear bg-yellow-light');
+		}).catch((e) => {
+			console.log(e);
+		});
+		
+		
+	}
 	
 	
 	
@@ -639,7 +654,16 @@
 	
 	
 	
-	//-------------------------------------------------  Указание сцета статуса
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	//-------------------------------------------------  Указание цвета статуса
 	let statusesTooltip, contractId;
 	$.openColorsStatuses = (btn, cId) => {
 		contractId = cId;
@@ -698,12 +722,12 @@
 				$(statusesTooltip.reference).attr('title', name);
 				
 				$(statusesTooltip.reference).removeClass('border-gray-300');
-				$(statusesTooltip.reference).addClass('border-green border-width-2px');
+				$(statusesTooltip.reference).addClass('border-blue border-width-2px');
 			} else {
 				$(statusesTooltip.reference).css('background-color', dColor);
 				$(statusesTooltip.reference).attr('title', dName);
 				
-				$(statusesTooltip.reference).removeClass('border-green border-width-2px');
+				$(statusesTooltip.reference).removeClass('border-blue border-width-2px');
 				$(statusesTooltip.reference).addClass('border-gray-300');
 			} 
 			

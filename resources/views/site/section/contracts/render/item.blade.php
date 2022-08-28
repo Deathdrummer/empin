@@ -1,4 +1,10 @@
-<tr class="h6rem">
+<tr
+	@class([
+		'h6rem',
+		'clear bg-yellow-light' => $is_new
+	])
+	@if($is_new)ondblclick="$.checkNewContract(this, '{{$id}}')"@endif
+	>
 	@if(!$isArchive)
 		@if(auth('site')->user()->can('contract-col-period:site') && (empty($userColums) || in_array('period', $userColums)))
 			<td class="center">
@@ -8,7 +14,7 @@
 						'd-inline-block',
 						'border-all',
 						'border-gray-300' => $color_forced === null,
-						'border-green border-width-2px' => $color_forced !== null,
+						'border-blue border-width-2px' => $color_forced !== null,
 						'border-rounded-circle',
 						'w2rem-5px',
 						'h2rem-5px',

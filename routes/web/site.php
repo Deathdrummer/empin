@@ -276,6 +276,8 @@ Route::prefix('site')->middleware(['lang', 'isajax:site'])->group(function() {
 	
 	Route::post('/contracts/send', [Contracts::class, 'send']);
 	
+	Route::put('/contracts/check_new', [Contracts::class, 'check_new']);
+	
 	
 	
 	// Подборки

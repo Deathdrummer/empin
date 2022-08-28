@@ -45626,7 +45626,7 @@ template {
   background-color: #1bdbe0;
 }
 .bg-blue-hovered {
-  display: unset;
+  display: revert;
   vertical-align: middle;
   word-spacing: normal;
   cursor: pointer;
@@ -45664,7 +45664,7 @@ template {
   background-color: #d8d8d8;
 }
 .bg-gray-hovered {
-  display: unset;
+  display: revert;
   vertical-align: middle;
   word-spacing: normal;
   cursor: pointer;
@@ -45702,7 +45702,7 @@ template {
   background-color: #9ea8bf;
 }
 .bg-neutral-hovered {
-  display: unset;
+  display: revert;
   vertical-align: middle;
   word-spacing: normal;
   cursor: pointer;
@@ -45740,7 +45740,7 @@ template {
   background-color: #38ce3c;
 }
 .bg-green-hovered {
-  display: unset;
+  display: revert;
   vertical-align: middle;
   word-spacing: normal;
   cursor: pointer;
@@ -45778,7 +45778,7 @@ template {
   background-color: #ff7a90;
 }
 .bg-red-hovered {
-  display: unset;
+  display: revert;
   vertical-align: middle;
   word-spacing: normal;
   cursor: pointer;
@@ -45816,7 +45816,7 @@ template {
   background-color: #ffde73;
 }
 .bg-yellow-hovered {
-  display: unset;
+  display: revert;
   vertical-align: middle;
   word-spacing: normal;
   cursor: pointer;
@@ -45850,11 +45850,49 @@ template {
   color: #ad8400;
   fill: #ad8400;
 }
+.bg-yellow-light {
+  background-color: #fbf4d7;
+}
+.bg-yellow-light-hovered {
+  display: revert;
+  vertical-align: middle;
+  word-spacing: normal;
+  cursor: pointer;
+  padding: all;
+  line-height: all;
+  border-radius: all;
+  color: #ad8400;
+  fill: #ad8400;
+}
+.bg-yellow-light-hovered i {
+  color: #ad8400;
+  fill: #ad8400;
+}
+.bg-yellow-light-hovered:hover {
+  background-color: #f7efcf;
+  color: #ad8400;
+  fill: #ad8400;
+  transition: background-color 0.16s, border-color 0.16s, color 0.16s, box-shadow 0.16s, fill 0.16s;
+}
+.bg-yellow-light-hovered:hover i {
+  color: #ad8400;
+  fill: #ad8400;
+}
+.bg-yellow-light-hovered:active, .bg-yellow-light-hovered.active {
+  background-color: #f1e8c6;
+  color: #ad8400;
+  fill: #ad8400;
+  transition: background-color 0s, border-color 0s, color 0s, box-shadow 0s, fill 0s;
+}
+.bg-yellow-light-hovered:active i, .bg-yellow-light-hovered.active i {
+  color: #ad8400;
+  fill: #ad8400;
+}
 .bg-purple {
   background-color: #b08ad7;
 }
 .bg-purple-hovered {
-  display: unset;
+  display: revert;
   vertical-align: middle;
   word-spacing: normal;
   cursor: pointer;
@@ -45892,7 +45930,7 @@ template {
   background-color: #f8fafb;
 }
 .bg-light-hovered {
-  display: unset;
+  display: revert;
   vertical-align: middle;
   word-spacing: normal;
   cursor: pointer;
@@ -45930,7 +45968,7 @@ template {
   background-color: #3e4b5b;
 }
 .bg-dark-hovered {
-  display: unset;
+  display: revert;
   vertical-align: middle;
   word-spacing: normal;
   cursor: pointer;
@@ -46084,6 +46122,9 @@ template {
 }
 .border-green {
   border-color: #00e94a !important;
+}
+.border-blue {
+  border-color: #00abff !important;
 }
 
 .horisontal {

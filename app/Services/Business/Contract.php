@@ -208,6 +208,8 @@ class Contract {
 				'name' 				=> $name ?? '',
 				'color_forced' 		=> $forcedColor ?? null,
 				'name_forced' 		=> $forcedName ?? '',
+				'is_new' 			=> $item['is_new'] ?? null,
+				
 				
 				'has_deps_to_send'	=> !!$item['has_deps_to_send'] ?? null,
 				'ready_to_archive'	=> $item['hide_count'] != 0 && $item['hide_count'] == $item->departments->count(),
@@ -328,6 +330,24 @@ class Contract {
 		if (!$contractId) return false;
 		$contract = ContractModel::find($contractId);
 		$contract->deadline_color_key = $key;
+		return $contract->save();
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	/**
+	 * @param 
+	 * @return 
+	 */
+	public function checkNew(Request $request) {
+		if (!$contractId = $request->input('contract_id')) return false;
+		$contract = ContractModel::find($contractId);
+		$contract->is_new = 0;
 		return $contract->save();
 	}
 	
