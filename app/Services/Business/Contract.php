@@ -220,7 +220,6 @@ class Contract {
 				//'selected'			=> in_array($item['id'], $selectedContracts),
 				'selections'		=> $item->selections->pluck('id')->toArray() ?? [],
 				'departments' 		=> $departments
-				
 			]];
 		});
 		

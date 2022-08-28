@@ -12,7 +12,7 @@ class User {
 	 * @return 
 	 */
 	public function getPinnedContracts() {
-		$userContracts = $this->_getData();
+		if (!$userContracts = $this->_getData()) return false;
 		
 		return $userContracts->mapWithKeys(function($item) {
 			return [$item['id'] => $item->pivot['pinned']];
@@ -28,7 +28,7 @@ class User {
 	 * @return 
 	 */
 	public function getViewedContracts() {
-		$userContracts = $this->_getData();
+		if (!$userContracts = $this->_getData()) return false;
 		
 		return $userContracts->mapWithKeys(function($item) {
 			return [$item['id'] => $item->pivot['pinned']];
@@ -44,25 +44,15 @@ class User {
 	 * @return 
 	 */
 	public function getContractsData() {
-		$userContracts = $this->_getData();
-		
 		$data = ['viewed' => [], 'pinned' => []];
+		if (!$userContracts = $this->_getData()) return $data;
+		
 		foreach ($userContracts as $item) {
 			$data['viewed'][$item['id']] = $item->pivot['viewed'];
 			if ($item->pivot['pinned']) $data['pinned'][] = $item['id'];
 		}
 		
 		return $data;
-		
-		// return $userContracts->mapWithKeysMany(function($item) {
-		// 	
-		// 	$row['viewed'] = [$item['id'] => $item->pivot['viewed']];
-		// 	
-		// 	return $row;
-		// 	/* 	'pinned' => [$item['id'] => $item->pivot['pinned'] == 1 ?],
-		// 		'viewed' => [$item['id'] => $item->pivot['viewed']],
-		// 	]; */
-		// });
 	}
 	
 	
