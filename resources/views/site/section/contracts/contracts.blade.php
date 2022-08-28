@@ -594,11 +594,11 @@
 				
 				axiosQuery('put', 'site/contracts/colums', {checkedColums}).then(({data, error, status, headers}) => {
 					if (error) {
-						$.notify('Ошибка удаления из подборки!', 'error');
+						$.notify('Ошибка установки столбцов!', 'error');
 						console.log(error?.message, error.errors);
 						wait(false);
 					} else {
-						$.notify('Договор успешно удален из подборки!');
+						$.notify('Столбцы успешно заданы!');
 						getList({
 							callback: function() {
 								//$('[selectionsbtn]').ddrInputs('enable');
@@ -755,9 +755,6 @@
 	let contractSetDataTOut, oldInputId = null;
 	$.contractSetData = (input, contractId, departmentId, stepId, type) => {
 		let cell = $(input).closest('td');
-			/*waitCell = $(cell).ddrWait({
-				iconHeight: '20px'
-			});*/
 		
 		$(input).ddrInputs('addClass', 'notouch');
 		let inputId = $(input).attr('id');
@@ -794,20 +791,13 @@
 					console.log(error?.message, error.errors);
 				}
 				
-				
 				if (type == 1) {
 					if (value == 1) {
-						let bgColor = $(cell).css('background-color');
-						$(cell).setAttrib('deadlinecolor', bgColor);
 						$(cell).css('background-color', 'transparent');
 					} else {
-						let bgColor = $(cell).attr('deadlinecolor');
-						$(cell).removeAttrib('deadlinecolor');
-						$(cell).css('background-color', bgColor);
+						$(cell).css('background-color', $(cell).attr('deadlinecolor'));
 					}
 				}
-				
-				//waitCell.destroy();
 				
 				$(input).ddrInputs('removeClass', 'notouch');
 				oldInputId = null;

@@ -45,6 +45,8 @@ class Contracts extends Controller {
 	public function list(Request $request) {
 		$list = $this->contract->getWithDepartments($request);
 		
+		//logger($list->toArray());
+		
 		$headers = [];
 		$selection = null;
 		
@@ -108,7 +110,6 @@ class Contracts extends Controller {
 		$allSelections = $selectionsResult->mapWithKeys(function($item) {
 			return [$item['id'] => $item['title']];
 		})->toArray();
-		
 		
 		
 		return $this->renderWithHeaders(

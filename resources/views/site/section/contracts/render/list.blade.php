@@ -208,8 +208,8 @@
 											@if($step['type'] == 1)
 												<td
 													class="center"
-													@if(!$contractdata[$contract['id']][$dept['id']][$step['id']]['data'] ?? true)
-													style="background-color: {{$contract['departments'][$dept['id']]['steps'][$step['id']]['color']}};"
+													@if(!($contractdata[$contract['id']][$dept['id']][$step['id']]['data'] ?? false))
+													style="background-color: {{$contract['departments'][$dept['id']]['steps'][$step['id']]['color'] ?? null}};"
 													@endif
 													deadlinecolor="{{$contract['departments'][$dept['id']]['steps'][$step['id']]['color'] ?? null}}"
 													>
@@ -222,7 +222,7 @@
 															/>
 													@else
 														@isset($contractdata[$contract['id']][$dept['id']][$step['id']]['data'])
-															@if($contractdata[$contract['id']][$dept['id']][$step['id']]['data'])
+															@if($contractdata[$contract['id']][$dept['id']][$step['id']]['data'] ?? null)
 																<i class="fa-solid fa-square-check color-green fz19px"></i>
 															@else
 																<div class="checkbox-empty checkbox-empty-normal border-gray-400"></div>
