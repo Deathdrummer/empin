@@ -6,6 +6,7 @@ use App\Models\ContractData;
 use App\Models\Selection;
 use App\Services\Business\Department as DepartmentService;
 use App\Services\Business\Contract as ContractService;
+use App\Services\Business\User as UserService;
 use App\Traits\Renderable;
 use App\Traits\Settingable;
 use Illuminate\Http\Request;
@@ -16,12 +17,14 @@ class Contracts extends Controller {
 	protected $renderPath = 'site.section.contracts.render';
 	protected $data = [];
 	protected $department;
+	protected $user;
 	//protected $contracts;
 	
 	
-	public function __construct(DepartmentService $department, ContractService $contract) {
+	public function __construct(DepartmentService $department, ContractService $contract, UserService $user) {
 		$this->department = $department;
 		$this->contract = $contract;
+		$this->user = $user;
 	}
 	
 	

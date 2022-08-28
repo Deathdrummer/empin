@@ -6685,6 +6685,10 @@ function _classPrivateMethodGet(receiver, privateSet, fn) { if (!privateSet.has(
 			- clear: убрать ошибки, изененность
 		- addClass: добавить класс к обертке инпута
 		- мremoveClass: убрать класс у обертки инпута
+		
+		
+		- сделать элемент некликабельным, напрмер, чекбокс:
+			$(input).ddrInputs('addClass', 'notouch');
 */
 $.fn.ddrInputs = function () {
   var method = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;

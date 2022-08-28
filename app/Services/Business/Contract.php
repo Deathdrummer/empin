@@ -7,6 +7,7 @@ use App\Models\Department;
 use App\Models\Selection;
 use App\Models\User;
 use App\Services\Business\Department as DepartmentService;
+use App\Services\Business\User as UserService;
 use App\Services\DateTime;
 use App\Traits\Settingable;
 use Carbon\Carbon;
@@ -18,10 +19,12 @@ class Contract {
 	
 	private $datetime;
 	private $department;
+	private $user;
 	
-	public function __construct(DateTime $datetime, DepartmentService $department) {
+	public function __construct(DateTime $datetime, DepartmentService $department, UserService $user) {
 		$this->datetime = $datetime;
 		$this->department = $department;
+		$this->user = $user;
 	}
 	
 	
@@ -74,8 +77,8 @@ class Contract {
 	
 	
 	/**
-	 * @param 
-	 * @return 
+	 * @param Request $request
+	 * @return mixed
 	 */
 	public function getWithDepartments(Request $request) {
 		$filter = app()->make(ContractFilter::class, ['queryParams' => $request->except(['sort_field', 'sort_order'])]);
@@ -123,19 +126,20 @@ class Contract {
 			->orderBy($sortField, $sortOrder)
 			->get();
 		
+		if ($data->isEmpty()) return false;
+		
 		
 		// Список подборок для каждого договора, в которых он уже добавлен
 		//$contractsSelections = [];
 		//foreach ($data as $item) $contractsSelections[$item['id']] = $item->selections->pluck('id')->toArray();
 		
 		
-		
-		
+		['pinned' => $pinned, 'viewed' => $viewed] = $this->user->getContractsData();
 		
 		$deadlinesContracts = $this->getSettings('contracts-deadlines');
 		$deadlinesSteps = $this->getSettings('steps-deadlines');
 		
-		return $data->mapWithKeysMany(function($item) use($deadlinesContracts, $deadlinesSteps) {
+		$buildedData = $data->mapWithKeysMany(function($item) use($deadlinesContracts, $deadlinesSteps, $viewed, $pinned) {
 			if (!is_null($item['deadline_color_key'] )) {
 				$forcedColor = $deadlinesContracts[$item['deadline_color_key']]['color']?? null;
 				$forcedName = $deadlinesContracts[$item['deadline_color_key']]['name'] ?? '';
@@ -208,8 +212,8 @@ class Contract {
 				'name' 				=> $name ?? '',
 				'color_forced' 		=> $forcedColor ?? null,
 				'name_forced' 		=> $forcedName ?? '',
-				'is_new' 			=> $item['is_new'] ?? null,
-				
+				'is_new' 			=> isset($viewed[$item['id']]) ? $viewed[$item['id']] == 0 : true,
+				'pinned'			=> in_array($item['id'], $pinned) ? -$item['id'] : null,
 				
 				'has_deps_to_send'	=> !!$item['has_deps_to_send'] ?? null,
 				'ready_to_archive'	=> $item['hide_count'] != 0 && $item['hide_count'] == $item->departments->count(),
@@ -219,10 +223,24 @@ class Contract {
 				
 			]];
 		});
+		
+		$pinnedItems = $buildedData->filter(function ($item) {
+			return $item['pinned'] < 0;
+		});
+		
+		if ($pinnedItems->isEmpty()) return $buildedData;
+		
+		// Если нужно зафиксировать сортировку закрепленных договоров
+		/* $pinnedItems = $pinnedItems->sortBy(function ($item) {
+			return $item['pinned'] < 0 ? -$item['pinned'] : false;
+		}); */
+		
+		
+		return $pinnedItems->union($buildedData);
 	}
 	
 	
-	
+	// [$sortField, $sortOrder]
 	
 	
 	
@@ -345,10 +363,7 @@ class Contract {
 	 * @return 
 	 */
 	public function checkNew(Request $request) {
-		if (!$contractId = $request->input('contract_id')) return false;
-		$contract = ContractModel::find($contractId);
-		$contract->is_new = 0;
-		return $contract->save();
+		return $this->user->checkContractAsViewed($request);
 	}
 	
 	

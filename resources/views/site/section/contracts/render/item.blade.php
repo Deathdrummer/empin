@@ -1,7 +1,7 @@
 <tr
 	@class([
 		'h6rem',
-		'clear bg-yellow-light' => $is_new
+		'clear bg-yellow-light' => $is_new && !$isArchive
 	])
 	@if($is_new)ondblclick="$.checkNewContract(this, '{{$id}}')"@endif
 	>

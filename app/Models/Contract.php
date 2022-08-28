@@ -142,6 +142,24 @@ class Contract extends Model {
 	
 	
 	
+	/**
+     * Аккаунты договора
+     */
+	public function accounts() {
+		return $this->belongsToMany(
+			User::class,
+			'user_contract',
+			'account_id',
+			'contract_id',
+			'id',
+			'id')
+			->as('pivot')
+			->withPivot('viewed', 'pinned');
+	}
+	
+	
+	
+	
 	
 	
 	

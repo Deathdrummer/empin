@@ -26,6 +26,8 @@ return new class extends Migration {
             $table->integer('type')->nullable()->comment('Тип договора');
             $table->integer('contractor')->nullable()->comment('Исполнтель');
             $table->integer('archive')->nullable()->comment('В архиве');
+            $table->unsignedInteger('deadline_color_key')->nullable()->default(null)->comment('Принудительное присвоение цвета дедлайна (передается позиция цвета из настроек)');
+            $table->unsignedInteger('is_new')->default(1)->comment('Пометка договора как нового');
 			$table->bigInteger('_sort')->default(0);
 			$table->timestamps();
         });

@@ -206,7 +206,13 @@
 									@foreach($dept['steps'] as $step)
 										@isset($contract['departments'][$dept['id']]['steps'][$step['id']])
 											@if($step['type'] == 1)
-												<td class="center" style="background-color: {{$contract['departments'][$dept['id']]['steps'][$step['id']]['color']}};">
+												<td
+													class="center"
+													@if(!$contractdata[$contract['id']][$dept['id']][$step['id']]['data'] ?? true)
+													style="background-color: {{$contract['departments'][$dept['id']]['steps'][$step['id']]['color']}};"
+													@endif
+													deadlinecolor="{{$contract['departments'][$dept['id']]['steps'][$step['id']]['color'] ?? null}}"
+													>
 													@if($edited)
 														<x-checkbox
 															group="normal"
@@ -227,7 +233,11 @@
 													@endif
 												</td>
 											@elseif($step['type'] == 2)
-												<td style="background-color: {{$contract['departments'][$dept['id']]['steps'][$step['id']]['color']}};">
+												<td
+													{{-- @if(!$contractdata[$contract['id']][$dept['id']][$step['id']]['data'] ?? true)
+													style="background-color: {{$contract['departments'][$dept['id']]['steps'][$step['id']]['color']}};"
+													@endif --}}
+													>
 													@if($edited)
 														<x-textarea
 															group="small"
@@ -243,7 +253,11 @@
 													@endif
 												</td>
 											@elseif($step['type'] == 3)
-												<td style="background-color: {{$contract['departments'][$dept['id']]['steps'][$step['id']]['color']}};">
+												<td
+													{{-- @if(!$contractdata[$contract['id']][$dept['id']][$step['id']]['data'] ?? true)
+													style="background-color: {{$contract['departments'][$dept['id']]['steps'][$step['id']]['color']}};"
+													@endif --}}
+													>
 													@if($edited)
 														<x-select
 															group="small"
@@ -262,7 +276,11 @@
 													@endif
 												</td>
 											@elseif($step['type'] == 4)
-												<td style="background-color: {{$contract['departments'][$dept['id']]['steps'][$step['id']]['color']}};">
+												<td
+													{{-- @if(!$contractdata[$contract['id']][$dept['id']][$step['id']]['data'] ?? true)
+													style="background-color: {{$contract['departments'][$dept['id']]['steps'][$step['id']]['color']}};"
+													@endif --}}
+													>
 													@if($edited)
 														<x-input
 															group="small"

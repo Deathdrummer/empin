@@ -82,6 +82,30 @@ class User extends Authenticatable implements MustVerifyEmail {
 	
 	
 	
+	
+	
+	/**
+     * Договоры аккаунта
+     */
+	public function contracts() {
+		return $this->belongsToMany(
+			Contract::class,
+			'user_contract',
+			'account_id',
+			'contract_id',
+			'id',
+			'id')
+			->as('pivot')
+			->withPivot('viewed', 'pinned');
+	}
+			
+	
+	
+	
+	
+	
+	
+	
 	/**
 	 * @param 
 	 * @return 

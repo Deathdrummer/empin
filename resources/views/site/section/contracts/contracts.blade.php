@@ -754,6 +754,11 @@
 	// Заполнение данных договоров
 	let contractSetDataTOut, oldInputId = null;
 	$.contractSetData = (input, contractId, departmentId, stepId, type) => {
+		let cell = $(input).closest('td');
+			/*waitCell = $(cell).ddrWait({
+				iconHeight: '20px'
+			});*/
+		
 		$(input).ddrInputs('addClass', 'notouch');
 		let inputId = $(input).attr('id');
 		if (oldInputId == inputId) clearTimeout(contractSetDataTOut);
@@ -788,6 +793,22 @@
 					$.notify('Ошибка сохранения данных!', 'error');
 					console.log(error?.message, error.errors);
 				}
+				
+				
+				if (type == 1) {
+					if (value == 1) {
+						let bgColor = $(cell).css('background-color');
+						$(cell).setAttrib('deadlinecolor', bgColor);
+						$(cell).css('background-color', 'transparent');
+					} else {
+						let bgColor = $(cell).attr('deadlinecolor');
+						$(cell).removeAttrib('deadlinecolor');
+						$(cell).css('background-color', bgColor);
+					}
+				}
+				
+				//waitCell.destroy();
+				
 				$(input).ddrInputs('removeClass', 'notouch');
 				oldInputId = null;
 			});
