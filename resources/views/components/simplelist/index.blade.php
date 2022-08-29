@@ -7,6 +7,8 @@
 	'id'        => 'simplist'.rand(0,9999999),
 	'group'     => 'normal',
 	'setting'   => false,
+	'onRemove'	=> false,
+	'oncreate'	=> false,
 ])
 
 
@@ -36,19 +38,34 @@
 					<tr class="h5rem" index="{{$row}}">
 						@if($fields)
 							@foreach($fields as $field)
-								<td class="top pt15px">
+								<td
+									@class([
+										'top' => !$field['readonly'],
+										'pt15px'
+									])
+									>
 									@if($field['type'] == 'select' && isset($options[$field['name']]))
-										<x-dynamic-component
-											:component="$field['type']"
-											setting="{{$setting}}.{{$row}}.{{$field['name']}}"
-											:options="isset($options[$field['name']]) ? $options[$field['name']] : []"
-											empty="Ничего нет"
-											choose="Не выбран"
-											choose-empty
-											empty-has-value
-											value="{{$value[$field['name']] ?? null}}"
-											class="w100"
-											/>
+										@if($field['readonly'])
+											<p
+												class=""
+												field="{{$field['name']}}"
+												value="{{$value[$field['name']] ?? null}}"
+												>{{$value[$field['name']]}}</p>
+										@else
+											<x-dynamic-component
+												:component="$field['type']"
+												setting="{{$setting}}.{{$row}}.{{$field['name']}}"
+												:options="isset($options[$field['name']]) ? $options[$field['name']] : []"
+												empty="Ничего нет"
+												choose="Не выбран"
+												choose-empty
+												empty-has-value
+												value="{{$value[$field['name']] ?? null}}"
+												class="w100"
+												tag="field:{{$field['name']}}"
+												/>
+										@endif
+											
 									
 									@elseif($field['type'] == 'radio' && isset($options[$field['name']]))
 										
@@ -59,26 +76,45 @@
 												label="{{$label}}"
 												value="{{$value}}"
 												class="w100"
+												tag="field:{{$field['name']}}"
 												/>
 										@empty
 										@endforelse
 										
 									@elseif(in_array($field['type'], ['text', 'password', 'number' , 'search', 'date', 'tel', 'url', 'color']))			
-										<x-dynamic-component
-											component="input"
-											:type="$field['type']"
-											setting="{{$setting}}.{{$row}}.{{$field['name']}}"
-											value="{{$value[$field['name']] ?? null}}"
-											showrows="{{$field['type'] == 'number'}}"
-											class="w100"
-											/>
+										@if($field['readonly'])
+											<p
+												class=""
+												field="{{$field['name']}}"
+												value="{{$value[$field['name']] ?? null}}"
+												>{{$value[$field['name']]}}</p>
+										@else
+											<x-dynamic-component
+												component="input"
+												:type="$field['type']"
+												setting="{{$setting}}.{{$row}}.{{$field['name']}}"
+												value="{{$value[$field['name']] ?? null}}"
+												showrows="{{$field['type'] == 'number'}}"
+												class="w100"
+												tag="field:{{$field['name']}}"
+												/>
+										@endif
 									@else
-										<x-dynamic-component
-											:component="$field['type']"
-											setting="{{$setting}}.{{$row}}.{{$field['name']}}"
-											value="{{$value[$field['name']] ?? null}}"
-											class="w100"
-											/>
+										@if($field['readonly'])
+											<p
+												class=""
+												field="{{$field['name']}}"
+												value="{{$value[$field['name']] ?? null}}"
+												>{{$value[$field['name']]}}</p>
+										@else
+											<x-dynamic-component
+												:component="$field['type']"
+												setting="{{$setting}}.{{$row}}.{{$field['name']}}"
+												value="{{$value[$field['name']] ?? null}}"
+												class="w100"
+												tag="field:{{$field['name']}}"
+												/>
+										@endif
 									@endif
 								</td>
 							@endforeach
@@ -118,7 +154,8 @@
 	let id = '{{$id}}',
 		listId = '#{{$id}}',
 		addRowAction = '{{$id}}AddRow',
-		removeRowAction = '{{$id}}RemoveRow';
+		removeRowAction = '{{$id}}RemoveRow',
+		onRemoveFunc = '{{$onRemove}}';
 	
 	
 	$(listId).ddrInputs('change', (input) => {
@@ -164,10 +201,6 @@
 	
 	
 	
-	
-	
-	
-	
 	$[removeRowAction] = (btn, setting) => {
 		let hasRows = !!$(btn).closest('tr').siblings('tr').length;
 		
@@ -206,9 +239,20 @@
 						}
 						
 						if (data) {
-							if (hasRows) $(btn).closest('tr').remove();
-							else $(btn).closest('tbody').empty();
-							$.notify('Запись успешно удалена!');
+							if (onRemoveFunc) {
+								$[onRemoveFunc]($(btn).closest('tr'), () => {
+									if (hasRows) $(btn).closest('tr').remove();
+									else $(btn).closest('tbody').empty();
+									$.notify('Запись успешно удалена!');
+								});
+								//if (!callback || typeof callback !== 'function') return;
+								//callback();
+								
+							} else {
+								if (hasRows) $(btn).closest('tr').remove();
+								else $(btn).closest('tbody').empty();
+								$.notify('Запись успешно удалена!');
+							}	
 						}
 						
 						//$(btn).closest('tr').find('input, textarea, select, button').ddrInputs('enable');

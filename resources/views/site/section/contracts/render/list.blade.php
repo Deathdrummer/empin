@@ -144,7 +144,7 @@
 						@endif
 					</tr>
 				</thead>
-				<tbody>
+				<tbody id="contractsList">
 					@foreach ($list as $item)
 						@include('site.section/contracts.render.item', $item)
 					@endforeach

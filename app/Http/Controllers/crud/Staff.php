@@ -315,6 +315,7 @@ class Staff extends Controller {
 		if (!$user = User::find($valid['user'])) return response()->json(false);
 		
 		$allPermissions = Permission::where('guard_name', $valid['guard'])
+			->where('group', '!=', null)
 			->orderBy('sort', 'ASC')
 			->get()
 			->groupBy('group');

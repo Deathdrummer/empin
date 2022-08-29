@@ -11,7 +11,13 @@
 								'ddrtabsnav__item_active' => $loop->first
 							])
 							ddrtabsitem="permissionsTab{{$group}}"
-							>{{$data['permissions_groups'][$group]}}</li>
+							>
+							@isset($data['permissions_groups'][$group])
+								<span>{{$data['permissions_groups'][$group]}}</span>
+							@else
+								<span class="color-red">Группа удалена</span>
+							@endisset
+						</li>
 					@endforeach
 				</ul>
 			</div>

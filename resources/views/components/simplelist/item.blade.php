@@ -16,6 +16,7 @@
 							choose="Не выбран"
 							choose-empty
 							class="w100"
+							tag="field:{{$field['name']}}"
 							/>
 					@elseif($field['type'] == 'radio' && isset($options[$field['name']]))
 						
@@ -26,6 +27,7 @@
 								label="{{$label}}"
 								value="{{$value}}"
 								class="w100"
+								tag="field:{{$field['name']}}"
 								/>
 						@empty
 						@endforelse
@@ -37,12 +39,14 @@
 							setting="{{$setting}}.{{$row}}.{{$field['name']}}"
 							class="w100"
 							showrows="{{$field['type'] == 'number'}}"
+							tag="field:{{$field['name']}}"
 							/>
 					@else
 						<x-dynamic-component
 							:component="$field['type']"
 							setting="{{$setting}}.{{$row}}.{{$field['name']}}"
 							class="w100"
+							tag="field:{{$field['name']}}"
 							/>
 					@endif
 				</td>

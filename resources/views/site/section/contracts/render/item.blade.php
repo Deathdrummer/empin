@@ -3,30 +3,53 @@
 		'h6rem',
 		'clear bg-yellow-light' => $is_new && !$isArchive
 	])
-	@if($is_new)ondblclick="$.checkNewContract(this, '{{$id}}')"@endif
+	@if($is_new)ondblclick="$.checkNewContract(this, '{{$id}}');"@endif
+	contractid="{{$id}}"
 	>
 	@if(!$isArchive)
 		@if(auth('site')->user()->can('contract-col-period:site') && (empty($userColums) || in_array('period', $userColums)))
 			<td class="center">
-				<div
-					@class([
-						'circle',
-						'd-inline-block',
-						'border-all',
-						'border-gray-300' => $color_forced === null,
-						'border-blue border-width-2px' => $color_forced !== null,
-						'border-rounded-circle',
-						'w2rem-5px',
-						'h2rem-5px',
-						'pointer' => auth('site')->user()->can('force-set-contract-color:site'),
-					])
-					@if(isset($color) || isset($color_forced)) style="background-color: {{$color_forced ?: $color}};" @endif
-					title="{{$name_forced ?: $name}}"
-					noscroll
-					dcolor="{{$color}}"
-					dname="{{$name}}"
-					@cando('force-set-contract-color:site')onmousedown="$.openColorsStatuses(this, '{{$id}}')"@endcando
-					></div>
+				<div class="cell">
+					<i
+						onclick="$.pinContract(this, {{$id}}, {{$pinned ? 0 : 1}});"
+						@class([
+							'fa-solid',
+							'fa-thumbtack',
+							'fa-rotate-by',
+							'icon',
+							'icon-left',
+							'icon-top',
+							'icon-hidden' => !$pinned,
+							'color-green' => $pinned,
+							'color-gray-300' => !$pinned,
+							'color-gray-500-hovered' => !$pinned,
+							'pointer'
+						])
+						style="--fa-rotate-angle: 40deg;"
+						noscroll
+						title="{{$pinned ? 'Открепить договор' : 'Закрепить договор'}}"
+						></i>
+					<div
+						@class([
+							'circle',
+							'd-inline-block',
+							'border-all',
+							'border-gray-300' => $color_forced === null,
+							'border-blue border-width-2px' => $color_forced !== null,
+							'border-rounded-circle',
+							'w2rem-5px',
+							'h2rem-5px',
+							'pointer' => auth('site')->user()->can('force-set-contract-color:site'),
+						])
+						@if(isset($color) || isset($color_forced)) style="background-color: {{$color_forced ?: $color}};" @endif
+						title="{{$name_forced ?: $name}}"
+						noscroll
+						dcolor="{{$color}}"
+						dname="{{$name}}"
+						@cando('force-set-contract-color:site')onmousedown="$.openColorsStatuses(this, '{{$id}}')"@endcando
+						></div>
+				</div>
+					
 			</td>
 		@endif
 	@endif

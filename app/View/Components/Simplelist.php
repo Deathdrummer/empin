@@ -24,13 +24,19 @@ class Simplelist extends Component {
 		
 		$titles = []; $fields = []; $fieldsToBtn = [];
 		foreach ($fieldsData as $field) {
-			[$title, $type, $name] = splitString($field, '|');
+			$d = splitString($field, '|');
+			
+			$title = $d[0] ?? null;
+			$type = $d[1] ?? null;
+			$name = $d[2] ?? null;
+			$readStat = $d[3] ?? null;
 			
 			$titles[] = splitString($title, ':');
 			
 			$fields[] = [
-				'type' => $type, 
-				'name' => $name
+				'type' 		=> $type, 
+				'name' 		=> $name,
+				'readonly' 	=> $readStat,
 			];
 			
 			$fieldsToBtn[] = $type.':'.$name;

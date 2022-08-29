@@ -629,8 +629,61 @@
 	
 	
 	//------------------------------------------------- Убрать отметку нового договора
-	$.checkNewContract = (tr, contractId) => {
-		axiosQuery('put', 'site/contracts/check_new', {contract_id: contractId}).then(({data, error, status, headers}) => {
+	$.checkNewContract = (e, tr, contractId) => {
+		console.log(e);
+		
+		
+		
+		
+		/*ddrPopup({
+			url,
+			params,
+			title, // заголовок
+			width, // ширина окна
+			html, // контент
+			lhtml, // контент из языковых файлов
+			buttons, // массив кнопок
+			buttonsAlign, // выравнивание вправо
+			disabledButtons, // при старте все кнопки кроме закрытия будут disabled
+			closeByBackdrop, // Закрывать окно по фону либо только по [ddrpopupclose]
+			changeWidthAnimationDuration, // ms
+			buttonsGroup, // группа для кнопок
+			winClass, // добавить класс к модальному окну
+			centerMode, // контент по центру
+			topClose, // верхняя кнопка закрыть
+			frameOnly // Без загрузки данных, только каркас
+		}).then(({state, wait, setTitle, setButtons, loadData, setHtml, setLHtml, dialog, close, onScroll, disableButtons, enableButtons, setWidth}) => { //isClosed
+			wait();
+			
+			Promise.all([
+				axiosQuery('put', 'site/contracts/check_new', {contract_id: contractId}),
+				axiosQuery('get', 'site/contracts/common_info', {contract_id: contractId}),
+			]).then();
+			
+			
+			axiosQuery('put', 'site/contracts/check_new', {contract_id: contractId}).then(({data, error, status, headers}) => {
+				wait(false);
+				if (!data) {
+					$.notify('Не удалось пометить договор как прочитанный!', 'error');
+					return;
+				}
+				
+				$(tr).removeClass('clear bg-yellow-light');
+			}).catch((e) => {
+				console.log(e);
+			});		
+		});*/
+		
+		
+		
+			
+		
+		
+	}
+	
+	
+	
+	/*axiosQuery('put', 'site/contracts/pin', {contract_id: contractId, stat: 1}).then(({data, error, status, headers}) => {
 			if (!data) {
 				$.notify('Запрещено!', 'error');
 				return;
@@ -639,14 +692,21 @@
 			$(tr).removeClass('clear bg-yellow-light');
 		}).catch((e) => {
 			console.log(e);
-		});
-		
-		
+		});*/
+	
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	$.pinContract = (btn, contractId) => {
+		console.log(contractId);
 	}
-	
-	
-	
-	
 	
 	
 	
@@ -1117,6 +1177,16 @@
 				$('#chooserDepartment').find('[selectionscounts]').text(headers['x-count-contracts-department'] > 0 ? headers['x-count-contracts-department'] : '');
 				$('#chooserArchive').find('[selectionscounts]').text(headers['x-count-contracts-archive'] > 0 ? headers['x-count-contracts-archive'] : '');
 			}
+			
+			
+			/*if ($('#contractsList').find('[contractid]').length) {
+				$('#contractsList').find('[contractid]').each((k, row) => {
+					let contractId = $(row).attr('contractid');
+					$(row).find('td:first .cell').prepend();
+				});
+			}*/
+				
+				
 			
 			if (callback && typeof callback == 'function') callback();
 		});

@@ -130,6 +130,7 @@ Route::resource('roles', Roles::class);
 // Разрешения
 Route::post('/permissions/sections', [Permissions::class, 'sections']);
 Route::put('/permissions/sections', [Permissions::class, 'section_save']);
+Route::delete('/permissions/sections', [Permissions::class, 'section_remove']);
 Route::post('/permissions/store_show', [Permissions::class, 'store_show']);
 Route::resource('permissions', Permissions::class);
 

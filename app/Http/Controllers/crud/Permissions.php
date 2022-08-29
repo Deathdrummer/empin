@@ -63,8 +63,7 @@ class Permissions extends Controller {
 		if (!$viewPath) return response()->json(['no_view' => true]);
         
 		$list = Permission::where('guard_name', $validData['guard'])
-					->whereNot('name', 'like', 'site-section-%')
-					->whereNot('name', 'like', 'admin-section-%')
+					->whereNot('name', 'like', 'section-%')
 					->orderBy('sort', 'ASC')
 					->get();
 				
@@ -298,6 +297,20 @@ class Permissions extends Controller {
 		Artisan::call('optimize:clear');
 		return $ids;
 	}
+	
+	
+	
+	
+	
+	/**
+	 * @param 
+	 * @return 
+	 */
+	public function section_remove(Request $request) {
+		$group = $request->input('group');
+		return Permission::where(['group' => $group])->update(['group' => null]);
+	}
+	
 	
 	
 	

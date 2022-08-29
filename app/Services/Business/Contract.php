@@ -369,6 +369,16 @@ class Contract {
 	
 	
 	
+	/**
+	 * @param 
+	 * @return 
+	 */
+	public function pin(Request $request) {
+		return $this->user->pinContract($request);
+	}
+	
+	
+	
 	
 	
 	

@@ -354,7 +354,30 @@ class Contracts extends Controller {
 	
 	
 	
+	/**
+	 * @param 
+	 * @return 
+	 */
+	public function pin(Request $request) {
+		$stat = $this->contract->pin($request);
+		return response()->json($stat);
+	}
 	
+	
+	
+	
+	
+	
+	
+	
+	/** Общая информация
+	 * @param 
+	 * @return 
+	 */
+	public function get_common_info() {
+		$fieldsToInfo = $this->getSettings('contracts-common-info:fields');
+		logger($fieldsToInfo->toArray());
+	}
 	
 	
 	
