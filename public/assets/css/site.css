@@ -6564,7 +6564,7 @@ table tbody:empty::after {
   position: absolute;
   width: 100%;
   left: 0;
-  display: flex;
+  display: revert;
   justify-content: center;
   align-items: center;
   widt: 100%;

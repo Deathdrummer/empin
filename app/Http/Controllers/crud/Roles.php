@@ -230,7 +230,12 @@ class Roles extends Controller {
 			'role'	=> 'required|numeric'
 		]);
 		
-		$permissions = Permission::where('guard_name', $valid['guard'])->get()->groupBy('group');
+		$permissions = Permission::where('guard_name', $valid['guard'])
+			->where('group', '!=', null)
+			->orderBy('sort', 'ASC')
+			->get()
+			->groupBy('group');
+		
 		$rolePermissions = Role::where('id', $valid['role'])->first()->permissions->keyBy('id');
 		
 		$this->addSettingToGlobalData('permissions_groups', 'id', 'name');
