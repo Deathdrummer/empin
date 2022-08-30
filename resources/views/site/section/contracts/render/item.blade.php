@@ -11,7 +11,8 @@
 			<td class="center">
 				<div class="cell">
 					<i
-						onclick="$.pinContract(this, {{$id}}, {{$pinned ? 0 : 1}});"
+						onclick="$.pinContract(this, {{$id}});"
+						pinned="{{$pinned ? 0 : 1}}"
 						@class([
 							'fa-solid',
 							'fa-thumbtack',
