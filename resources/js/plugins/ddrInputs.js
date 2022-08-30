@@ -506,30 +506,47 @@ class DdrInput {
 	
 	
 	
-	change(callback = null) {
+	change(callback = null, tOut = 0) {
 		if (!this.inputs) return false;
-
+		
 		this.inputs.forEach(({item, tag, type, group, wrapperClass, wrapperSelector}) => {
-			
+			let changeTOut;
 			if (type === 'contenteditable') {
 				let keyDownVal;
 				$(item).on('keyup keydown', function(e) {
 					let thisItem = this;
-					
 					if (e.type == 'keydown') {
 						keyDownVal = $(thisItem).html();
 					} else if (e.type == 'keyup') {
 						let thisKeyUpVal = $(thisItem).html();
 						if (keyDownVal !== thisKeyUpVal) {
 							keyDownVal = thisKeyUpVal;
-							if (callback && typeof callback === 'function') callback(this);
+							
+							if (tOut) {
+								clearTimeout(changeTOut);
+								changeTOut = setTimeout(() => {
+									if (callback && typeof callback === 'function') callback(this);
+								}, tOut);
+							} else {
+								if (callback && typeof callback === 'function') callback(this);
+							}
 						}
 					}
 				});
 			} else {
-				$(item).on('input datepicker', function(event) {
-					if (callback && typeof callback === 'function') callback(this);
-				});
+				clearTimeout(changeTOut);
+				changeTOut = setTimeout(() => {
+					$(item).on('input datepicker', function(event) {
+						if (tOut) {
+							clearTimeout(changeTOut);
+							changeTOut = setTimeout(() => {
+								if (callback && typeof callback === 'function') callback(this);
+							}, tOut);
+						} else {
+							if (callback && typeof callback === 'function') callback(this);
+						}
+					});
+				}, tOut);
 			}	
 		});	
 	}

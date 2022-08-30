@@ -446,7 +446,7 @@
 	
 	
 	
-	
+	//------------------------------------------------- Добавить договор в подборку
 	$.addContractToSelection = (select, contractId) => {
 		let selectionId = parseInt($(select).val());
 		
@@ -469,7 +469,7 @@
 	
 	
 	
-	
+	//------------------------------------------------- Удалить договор из подборки
 	$.removeContractFromSelection = (btn, contractId, selectionId) => {
 		$(btn).ddrInputs('disable');
 		$('[selectionsbtn]').ddrInputs('disable');
@@ -494,7 +494,7 @@
 	
 	
 	
-	
+	//------------------------------------------------- отменить текущую подборку
 	$.clearSelection = (btn) => {
 		selection = null;
 		editSelection = null;
@@ -628,73 +628,75 @@
 	
 	
 	
-	//------------------------------------------------- Убрать отметку нового договора
-	$.checkNewContract = (e, tr, contractId) => {
-		console.log(e);
+	//------------------------------------------------- Убрать отметку нового договора и открыть окно с общей информацией
+	$.openContractInfo = (tr, contractId) => {
+		let isNew = $(tr).attr('isnew');
 		
-		
-		
-		
-		/*ddrPopup({
-			url,
-			params,
-			title, // заголовок
-			width, // ширина окна
-			html, // контент
-			lhtml, // контент из языковых файлов
-			buttons, // массив кнопок
-			buttonsAlign, // выравнивание вправо
-			disabledButtons, // при старте все кнопки кроме закрытия будут disabled
-			closeByBackdrop, // Закрывать окно по фону либо только по [ddrpopupclose]
-			changeWidthAnimationDuration, // ms
-			buttonsGroup, // группа для кнопок
-			winClass, // добавить класс к модальному окну
-			centerMode, // контент по центру
-			topClose, // верхняя кнопка закрыть
-			frameOnly // Без загрузки данных, только каркас
+		ddrPopup({
+			title: 'Общая информация', 
+			width: 800,
+			buttons: ['Закрыть'],
 		}).then(({state, wait, setTitle, setButtons, loadData, setHtml, setLHtml, dialog, close, onScroll, disableButtons, enableButtons, setWidth}) => { //isClosed
 			wait();
 			
-			Promise.all([
-				axiosQuery('put', 'site/contracts/check_new', {contract_id: contractId}),
-				axiosQuery('get', 'site/contracts/common_info', {contract_id: contractId}),
-			]).then();
-			
-			
-			axiosQuery('put', 'site/contracts/check_new', {contract_id: contractId}).then(({data, error, status, headers}) => {
-				wait(false);
-				if (!data) {
-					$.notify('Не удалось пометить договор как прочитанный!', 'error');
-					return;
-				}
-				
-				$(tr).removeClass('clear bg-yellow-light');
-			}).catch((e) => {
-				console.log(e);
-			});		
-		});*/
-		
-		
-		
-			
-		
+			if (isNew) {
+				Promise.all([
+					axiosQuery('put', 'site/contracts/check_new', {contract_id: contractId}, 'json'),
+					axiosQuery('get', 'site/contracts/common_info', {contract_id: contractId})
+				]).then(([{data: checkNewData, error: checkNewError}, {data: commonInfoData, error: commonInfoError}]) => {
+					checkNewContract(checkNewData, checkNewError, tr);
+					getCommonInfo(commonInfoData, commonInfoError, contractId, setHtml);
+					wait(false);
+				});
+			} else {
+				axiosQuery('get', 'site/contracts/common_info', {contract_id: contractId}).then(({data, error, status, headers}) => {
+					getCommonInfo(data, error, contractId, setHtml);
+					wait(false);
+				}).catch((e) => {
+					console.log(e);
+					wait(false);
+				});
+			}
+		});
 		
 	}
 	
 	
 	
-	/*axiosQuery('put', 'site/contracts/pin', {contract_id: contractId, stat: 1}).then(({data, error, status, headers}) => {
-			if (!data) {
-				$.notify('Запрещено!', 'error');
-				return;
-			}
-			
-			$(tr).removeClass('clear bg-yellow-light');
-		}).catch((e) => {
-			console.log(e);
-		});*/
+	function checkNewContract(data, error, tr) {
+		if (!data) {
+			$.notify('Не удалось пометить договор как прочитанный!', 'error');
+			console.log(error?.message, error?.errors);
+			return;
+		}
+		
+		$(tr).removeClass('clear bg-yellow-light');
+	}
 	
-
+	function getCommonInfo(data, error, contractId, setHtml) {
+		if (error) {
+			$.notify('Не удалось получить информацию договора!', 'error');
+			console.log(error?.message, error?.errors);
+			return;
+		}
+		
+		setHtml(data, null, () => {
+			$('#commonInfoFields').ddrInputs('change', (field) => {
+				let fieldId = $(field).attr('commoninfofield'),
+					fieldValue = $(field).val();
+				
+				axiosQuery('put', 'site/contracts/common_info', {contract_id: contractId, field_id: fieldId, value: fieldValue}, 'json')
+					.then(({data, error, status, headers}) => {
+						if (!data) {
+							$.notify('Не удалось сохранить данные!', 'error');
+							console.log(error?.message, error?.errors);
+						}
+					}).catch((e) => {
+						console.log(e);
+					});
+			}, 300);
+		});
+	}
 	
 	
 	
@@ -704,6 +706,16 @@
 	
 	
 	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	//------------------------------------------------- Закрепить/открепить договор
 	$.pinContract = (btn, contractId) => {
 		let pinned = $(btn).attr('pinned');
 		
@@ -789,7 +801,6 @@
 	
 	
 	
-	
 	$.setColorStatus = (key, color, name) => {
 		statusesTooltip.wait();
 		axiosQuery('put', 'site/contracts/set_status', {contractId, key}).then(({data, error, status, headers}) => {
@@ -830,7 +841,7 @@
 	
 	
 	
-	// Заполнение данных договоров
+	//-------------------------------------------------  Заполнение данных договоров
 	let contractSetDataTOut, oldInputId = null;
 	$.contractSetData = (input, contractId, departmentId, stepId, type) => {
 		let cell = $(input).closest('td');
@@ -889,7 +900,7 @@
 	
 	
 	
-	// создать договор
+	//-------------------------------------------------  создать договор
 	$.contractNew = () => {
 		ddrPopup({
 			title: 'Новый договор',
@@ -1015,7 +1026,7 @@
 	
 	
 	
-	// Скрыть договор
+	//-------------------------------------------------  Скрыть договор
 	$.hideContractAction = (btn, contractId, departmentId) => {
 		let row = $(btn).closest('tr');
 		ddrPopup({
@@ -1044,7 +1055,7 @@
 	
 	
 	
-	// Отправить договор в архив
+	//-------------------------------------------------  Отправить договор в архив
 	$.toArchiveContractAction = (btn, contractId) => {
 		let row = $(btn).closest('tr');
 		ddrPopup({
@@ -1076,7 +1087,7 @@
 	
 	
 	
-	// Отправить договор в другой отдел
+	//-------------------------------------------------  Отправить договор в другой отдел
 	$.sendContractAction = (rowBtn, contractId) => {
 		ddrPopup({
 			title: 'Отправить договор в отдел',

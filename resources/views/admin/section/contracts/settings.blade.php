@@ -1,7 +1,7 @@
 <section>
 	<x-settings>
-		<div class="row row-cols-2 g-10">
-			<div class="col">
+		<div class="row g-10">
+			<div class="col-12">
 				<x-card
 					loading
 					ready
@@ -10,9 +10,10 @@
 					>
 					<x-simplelist
 						setting="contracts-common-info"
-						fieldset="Название поля:w30rem|text|name,Тип поля:w20rem|select|type,Количество строк:w10rem|number|rows_count"
+						fieldset="ID:w7rem|number|id|1,Название поля:w30rem|text|name,Тип поля:w20rem|select|type,Количество строк:w10rem|number|rows_count,Описание:w30rem|textarea|desc"
 						options="type;input:Однострочное поле,textarea:Многострочное поле"
 						group="small"
+						onRemove="clearCommonInfo"
 					 />
 				</x-card>
 			</div>
@@ -24,52 +25,17 @@
 
 
 
-
-
-
-
-
-
-
-
 <script type="module">
-	
-	
-	$.openPopupWin = () => {
-		ddrPopup({
-			
-			title: 'Тестовый заголовок',
-			width: 400, // ширина окна
-			html: '<p>Контентная часть</p>', // контент
-			buttons: ['ui.close', {action: 'tesTest', title: 'Просто кнопка'}],
-			buttonsAlign: 'center', // выравнивание вправо
-			//disabledButtons, // при старте все кнопки кроме закрытия будут disabled
-			//closeByBackdrop, // Закрывать окно только по кнопкам [ddrpopupclose]
-			//changeWidthAnimationDuration, // ms
-			//buttonsGroup, // группа для кнопок
-			//winClass, // добавить класс к модальному окну
-			//centerMode, // контент по центру
-			//topClose // верхняя кнопка закрыть
-		}).then(({state, wait, setTitle, setButtons, loadData, setHtml, setLHtml, dialog, close, onScroll, disableButtons, enableButtons, setWidth}) => { //isClosed
-						
+	$.clearCommonInfo = (tr, done) => {
+		let fieldId = $(tr).find('[field="id"]').attr('value') || $(tr).find('[field="id"]').val();
+		axiosQuery('delete', 'site/contracts/common_info', {field_id: parseInt(fieldId)}, 'json').then(({data, error, status, headers}) => {
+			if (!data) {
+				$.notify('Не удалось очистить информацию о договорах!', 'error');
+				console.log(error?.message, error?.errors);
+			}
+			done();
+		}).catch((e) => {
+			console.log(e);
 		});
 	}
-	
-	
-	//$('button').ddrInputs('disable');
-	
-	
-	/*$('#testRool').ddrInputs('error', 'error');
-	$('#testSelect').ddrInputs('error', 'error');
-	$('#testCheckbox').ddrInputs('error', 'error');
-	
-	
-	$('#openPopup').on(tapEvent, function() {
-		ddrPopup({
-			title: 'auth.greetengs',
-			lhtml: 'auth.agreement'
-		}).then(({wait}) => {
-			//wait();
-		});
-	});*/
 </script>

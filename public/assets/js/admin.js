@@ -7288,6 +7288,7 @@ var DdrInput = /*#__PURE__*/function () {
     key: "change",
     value: function change() {
       var callback = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+      var tOut = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
       if (!this.inputs) return false;
       this.inputs.forEach(function (_ref14) {
         var item = _ref14.item,
@@ -7296,10 +7297,13 @@ var DdrInput = /*#__PURE__*/function () {
             group = _ref14.group,
             wrapperClass = _ref14.wrapperClass,
             wrapperSelector = _ref14.wrapperSelector;
+        var changeTOut;
 
         if (type === 'contenteditable') {
           var keyDownVal;
           $(item).on('keyup keydown', function (e) {
+            var _this = this;
+
             var thisItem = this;
 
             if (e.type == 'keydown') {
@@ -7309,14 +7313,34 @@ var DdrInput = /*#__PURE__*/function () {
 
               if (keyDownVal !== thisKeyUpVal) {
                 keyDownVal = thisKeyUpVal;
-                if (callback && typeof callback === 'function') callback(this);
+
+                if (tOut) {
+                  clearTimeout(changeTOut);
+                  changeTOut = setTimeout(function () {
+                    if (callback && typeof callback === 'function') callback(_this);
+                  }, tOut);
+                } else {
+                  if (callback && typeof callback === 'function') callback(this);
+                }
               }
             }
           });
         } else {
-          $(item).on('input datepicker', function (event) {
-            if (callback && typeof callback === 'function') callback(this);
-          });
+          clearTimeout(changeTOut);
+          changeTOut = setTimeout(function () {
+            $(item).on('input datepicker', function (event) {
+              var _this2 = this;
+
+              if (tOut) {
+                clearTimeout(changeTOut);
+                changeTOut = setTimeout(function () {
+                  if (callback && typeof callback === 'function') callback(_this2);
+                }, tOut);
+              } else {
+                if (callback && typeof callback === 'function') callback(this);
+              }
+            });
+          }, tOut);
         }
       });
     }

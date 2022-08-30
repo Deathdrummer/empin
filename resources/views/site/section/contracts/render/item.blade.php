@@ -3,7 +3,8 @@
 		'h6rem',
 		'clear bg-yellow-light' => $is_new && !$isArchive
 	])
-	@if($is_new)ondblclick="$.checkNewContract(this, '{{$id}}');"@endif
+	ondblclick="$.openContractInfo(this, '{{$id}}');"
+	isnew="{{$is_new ? 1 : 0}}"
 	contractid="{{$id}}"
 	>
 	@if(!$isArchive)

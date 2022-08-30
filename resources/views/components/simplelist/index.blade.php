@@ -38,10 +38,15 @@
 					<tr class="h5rem" index="{{$row}}">
 						@if($fields)
 							@foreach($fields as $field)
+								{{-- @if(!isset($value[$field['name']]))
+									<td><p class="color-gray text-center">-</p></td>
+									@continue
+								@endif --}}
 								<td
 									@class([
-										'top' => !$field['readonly'],
-										'pt15px'
+										'top',
+										'pt2rem' => $field['readonly'],
+										'pt15px' => !$field['readonly'],
 									])
 									>
 									@if($field['type'] == 'select' && isset($options[$field['name']]))
@@ -50,7 +55,7 @@
 												class=""
 												field="{{$field['name']}}"
 												value="{{$value[$field['name']] ?? null}}"
-												>{{$value[$field['name']]}}</p>
+												>{!!$value[$field['name']] ?? '<p class="color-gray text-center">-</p>'!!}</p>
 										@else
 											<x-dynamic-component
 												:component="$field['type']"
@@ -87,7 +92,7 @@
 												class=""
 												field="{{$field['name']}}"
 												value="{{$value[$field['name']] ?? null}}"
-												>{{$value[$field['name']]}}</p>
+												>{!!$value[$field['name']] ?? '<p class="color-gray text-center">-</p>'!!}</p>
 										@else
 											<x-dynamic-component
 												component="input"
@@ -105,7 +110,7 @@
 												class=""
 												field="{{$field['name']}}"
 												value="{{$value[$field['name']] ?? null}}"
-												>{{$value[$field['name']]}}</p>
+												>{!!$value[$field['name']] ?? '<p class="color-gray text-center">-</p>'!!}</p>
 										@else
 											<x-dynamic-component
 												:component="$field['type']"

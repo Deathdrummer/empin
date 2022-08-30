@@ -3,6 +3,7 @@
 use App\Http\Controllers\Controller;
 use App\Models\Contract;
 use App\Models\ContractData;
+use App\Models\ContractInfo;
 use App\Models\Selection;
 use App\Services\Business\Department as DepartmentService;
 use App\Services\Business\Contract as ContractService;
@@ -10,6 +11,7 @@ use App\Services\Business\User as UserService;
 use App\Traits\Renderable;
 use App\Traits\Settingable;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 
 class Contracts extends Controller {
 	use Renderable, Settingable;
@@ -374,10 +376,78 @@ class Contracts extends Controller {
 	 * @param 
 	 * @return 
 	 */
-	public function get_common_info() {
-		$fieldsToInfo = $this->getSettings('contracts-common-info:fields');
-		logger($fieldsToInfo->toArray());
+	public function get_common_info(Request $request) {
+		if (!$contractId = $request->input('contract_id')) return false;
+		$fields = $this->getSettings('contracts-common-info');
+		
+		$data = [];
+		$contractInfo = ContractInfo::select('data')
+			->where('contract_id', $contractId)
+			->first();
+			
+		if (isset($contractInfo['data']) && is_array($contractInfo['data'])) {
+			foreach ($contractInfo['data'] as $fieldId => $value) {
+				$data[$fieldId] = $value;
+			}
+		}
+		
+		return $this->render('common_info', compact('fields', 'data'));
 	}
+	
+	
+	
+	
+	
+	/** Общая информация задать
+	 * @param 
+	 * @return 
+	 */
+	public function set_common_info(Request $request) {
+		$contractId = $request->input('contract_id');
+		$fieldId = $request->input('field_id');
+		$value = $request->input('value');
+		
+		$contractInfo = ContractInfo::firstOrNew(['contract_id' => $contractId]);
+		$data = $contractInfo->data;
+		if ($value) {
+			$contractInfo->data = data_set($data, $fieldId, $value);
+		} else {
+			Arr::forget($data, $fieldId);
+			$contractInfo->data = $data;
+		}
+		$stat = $contractInfo->save();
+		return $stat;
+	}
+	
+	
+	
+	
+	
+	/** Общая информация очистить
+	 * @param 
+	 * @return 
+	 */
+	public function clear_common_info(Request $request) {
+		$fieldId = $request->input('field_id');
+		
+		foreach (ContractInfo::cursor() as $contractInfo) {
+			$data = $contractInfo->data;
+			Arr::forget($data, $fieldId);
+			if (!empty($data)) {
+				$contractInfo->data = $data;
+				$contractInfo->save();
+			} else {
+				$contractInfo->delete();
+			}
+		}
+		return true;
+	}
+	
+	
+	
+	
+	
+	
 	
 	
 	
