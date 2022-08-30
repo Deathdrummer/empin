@@ -6784,6 +6784,9 @@ table tfoot tr td.right {
 .ddrpopup_white {
   background-color: #fff !important;
 }
+.ddrpopup_chat {
+  background-color: #fff !important;
+}
 
 .fieldset {
   padding: 1rem;
@@ -7642,4 +7645,88 @@ section {
 .hovered:active i, .hovered.active i {
   color: #005a83;
   fill: #005a83;
+}
+
+.chat {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  min-height: 400px;
+  height: 70vh;
+  overflow-y: scroll;
+}
+.chat::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.chat::-webkit-scrollbar-track {
+  background-color: #e6eaed;
+  border-radius: 2px;
+}
+.chat::-webkit-scrollbar-thumb {
+  background-color: #bfcfdb;
+  width: 13px;
+  height: 13px;
+  border-radius: 2px;
+}
+.chat::-webkit-scrollbar-thumb:hover {
+  background-color: #9eb7c9;
+}
+.chat::-webkit-resizer {
+  display: none;
+  width: 0px;
+  height: 0px;
+  background: transparent;
+  border-radius: 2px;
+}
+.chat__item {
+  display: flex;
+}
+.chat__item:first-of-type {
+  margin-top: auto;
+}
+.chat__item:not(:first-of-type) {
+  margin-top: 2rem;
+}
+.chat__item > div {
+  max-width: 70%;
+}
+.chat__item > div > * {
+  white-space: pre-line;
+}
+.chat__item-left {
+  justify-content: flex-start;
+  transform: translateX(10px);
+}
+.chat__item-left > div {
+  position: relative;
+  background-color: #f0f5f7;
+}
+.chat__item-left > div::after {
+  content: "";
+  position: absolute;
+  left: -10px;
+  bottom: 0;
+  width: 0;
+  height: 0;
+  border-bottom: 14px solid #f0f5f7;
+  border-left: 14px solid transparent;
+}
+.chat__item-right {
+  justify-content: flex-end;
+  transform: translateX(-10px);
+}
+.chat__item-right > div {
+  position: relative;
+  background-color: #f1f7d7;
+}
+.chat__item-right > div::after {
+  content: "";
+  position: absolute;
+  right: -10px;
+  bottom: 0;
+  width: 0;
+  height: 0;
+  border-bottom: 14px solid #f0f5f7;
+  border-right: 14px solid transparent;
 }

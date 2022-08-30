@@ -15,7 +15,7 @@
 		- state: комплексный метод, команды:
 			- clear: убрать ошибки, изененность
 		- addClass: добавить класс к обертке инпута
-		- мremoveClass: убрать класс у обертки инпута
+		- removeClass: убрать класс у обертки инпута
 		
 		
 		- сделать элемент некликабельным, напрмер, чекбокс:
@@ -80,11 +80,12 @@ class DdrInput {
 		this.proxyData = proxyData;
 		
 		if (['change', 'state', 'enable', 'disable', 'addClass', 'removeClass'].indexOf(method) !== -1) {
-			if (items.length == 1 && ['input', 'select', 'textarea', 'button', '[contenteditable]', '[datepicker]'].indexOf(items[0]?.tagName?.toLowerCase()) == -1) {
+			if (items.length == 1 && (['input', 'select', 'textarea', 'button'].indexOf(items[0]?.tagName?.toLowerCase()) == -1 && !$(items).hasAttr('contenteditable') && !$(items).hasAttr('datepicker'))) {
 				this.selector = items;
 				items = items.find('input, select, textarea, button, [contenteditable], [datepicker]');
 			}
 		}
+		
 		
 		let allData = [];
 		items.each(function(k, item) {

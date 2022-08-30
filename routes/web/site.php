@@ -283,6 +283,9 @@ Route::prefix('site')->middleware(['lang', 'isajax:site'])->group(function() {
 	Route::put('/contracts/common_info', [Contracts::class, 'set_common_info']);
 	Route::delete('/contracts/common_info', [Contracts::class, 'clear_common_info']);
 	
+	Route::get('/contracts/chat', [Contracts::class, 'chat_get']);
+	Route::put('/contracts/chat', [Contracts::class, 'chat_send']);
+	
 	
 	
 	// Подборки

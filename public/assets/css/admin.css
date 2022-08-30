@@ -6784,6 +6784,9 @@ table tfoot tr td.right {
 .ddrpopup_white {
   background-color: #fff !important;
 }
+.ddrpopup_chat {
+  background-color: #fff !important;
+}
 
 .fieldset {
   padding: 1rem;

@@ -610,3 +610,78 @@ section
 	border: 1px solid
 	+ddrBtn((normal: (bg: #fff, border: #eaecf1, color: #647f8b, animate: 0.3s), hover: (bg: #f2f6f9, border: #ecf0f3, color: #2d5364, animate: 0.16s), active: (bg: #e9eff3, border: #d9e4eb, color: #005a83)))
 	display: flex
+	
+	
+	
+
+
+
+
+
+
+
+
+
+
+.chat
+	display: flex
+	flex-direction: column
+	align-items: stretch
+	min-height: 400px
+	height: 70vh
+	overflow-y: scroll
+	+scrollbar(#e6eaed, #bfcfdb, 6px, 2px, 2px)
+	
+	&__item
+		display: flex
+		
+		&:first-of-type
+			margin-top: auto
+		
+		&:not(:first-of-type)
+			margin-top: 2rem
+		
+		> div
+			max-width: 70%
+			
+			> *
+				white-space: pre-line
+		
+		&-left
+			justify-content: flex-start
+			transform: translateX(10px)
+			
+			> div
+				position: relative
+				background-color: #f0f5f7
+				
+				&::after
+					content: ''
+					position: absolute
+					left: -10px
+					bottom: 0
+					width: 0
+					height: 0
+					border-bottom: 14px solid #f0f5f7
+					border-left: 14px solid transparent
+				
+				
+			
+		&-right
+			justify-content: flex-end
+			transform: translateX(-10px)
+			
+			> div
+				position: relative
+				background-color: #f1f7d7
+				
+				&::after
+					content: ''
+					position: absolute
+					right: -10px
+					bottom: 0
+					width: 0
+					height: 0
+					border-bottom: 14px solid #f0f5f7
+					border-right: 14px solid transparent
+				

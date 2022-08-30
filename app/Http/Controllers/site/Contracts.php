@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Controller;
 use App\Models\Contract;
+use App\Models\ContractChat;
 use App\Models\ContractData;
 use App\Models\ContractInfo;
 use App\Models\Selection;
@@ -442,6 +443,65 @@ class Contracts extends Controller {
 		}
 		return true;
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	/**
+	 * @param 
+	 * @return 
+	 */
+	public function chat_get(Request $request) {
+		$contractId = $request->get('contract_id');
+		$accountId = auth('site')->user()->id;
+		
+		$messages = ContractChat::where('contract_id', $contractId)
+			->get()
+			->map(function($item) use($accountId) {
+				$item['self'] = $item['account_id'] == $accountId;
+				return $item;
+			});
+		
+		return $this->render('chat.list', compact('messages', 'contractId'));
+	}
+	
+	
+	
+	
+	
+	
+	
+	/**
+	 * @param 
+	 * @return 
+	 */
+	public function chat_send(Request $request) {
+		$contractId = $request->input('contract_id');
+		$message = $request->input('message');
+		$self = true;
+		
+		$stat = ContractChat::create([
+			'contract_id' 	=> $contractId,
+			'account_id' 	=> auth('site')->user()->id,
+			'message' 		=> $message,
+		]);
+		
+		if ($stat) return $this->render('chat.item', compact('message', 'self'));
+		return response()->json(false);
+	}
+	
+	
+	
+	
 	
 	
 	

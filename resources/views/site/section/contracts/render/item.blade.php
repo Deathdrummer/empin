@@ -168,6 +168,7 @@
 								title="Скрыть"
 								><i class="fa-solid fa-eye-slash"></i></x-button>
 						@endcando
+						
 						@cando('contract-col-sending:site')
 							<x-button
 								variant="blue"
@@ -175,6 +176,14 @@
 								:enabled="$has_deps_to_send ?? false"
 								title="Отправить в другой отдел"
 								><i class="fa-solid fa-angles-right"></i></x-button>
+						@endcando
+						
+						@cando('contract-col-chat:site')
+							<x-button
+								variant="light"
+								action="contractChatAction:{{$id}},{{$title}}"
+								title="Чат договора"
+								><i class="fa-solid fa-comments"></i></x-button>
 						@endcando
 					</x-buttons-group>
 				</td>
@@ -192,6 +201,7 @@
 								title="Отправить в архив"
 								><i class="fa-solid fa-box-archive"></i></x-button>
 						@endcando
+						
 						@cando('contract-col-sending-all:site')
 							<x-button
 								variant="blue"
@@ -199,6 +209,14 @@
 								:enabled="$has_deps_to_send ?? false"
 								title="Отправить в другой отдел"
 								><i class="fa-solid fa-angles-right"></i></x-button>
+						@endcando
+						
+						@cando('contract-col-chat:site')
+							<x-button
+								variant="light"
+								action="contractChatAction:{{$id}},{{$title}}"
+								title="Чат договора"
+								><i class="fa-solid fa-comments"></i></x-button>
 						@endcando
 					</x-buttons-group>
 				</td>

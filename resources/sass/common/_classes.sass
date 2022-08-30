@@ -361,8 +361,20 @@
 		width: #{$px}px !important
 		max-width: #{$px}px !important
 	
+	.mimw-#{$px}px, .mimw#{$px}px
+		min-width: #{$px}px !important
+	
+	.maxw-#{$px}px, .maxw#{$px}px
+		max-width: #{$px}px !important
+	
 	.h-#{$px}px, .h#{$px}px
 		height: #{$px}px !important
+		max-height: #{$px}px !important
+	
+	.minh-#{$px}px, .minh#{$px}px
+		min-height: #{$px}px !important
+	
+	.maxh-#{$px}px, .maxh#{$px}px
 		max-height: #{$px}px !important
 
 
@@ -374,8 +386,20 @@ $bPoints: map-remove($grid-breakpoints, xs)
 				width: #{$px}px !important
 				max-width: #{$px}px !important
 			
+			.minw-#{$breakpoint}-#{$px}px
+				min-width: #{$px}px !important
+			
+			.maxw-#{$breakpoint}-#{$px}px
+				max-width: #{$px}px !important
+			
 			.h-#{$breakpoint}-#{$px}px
 				height: #{$px}px !important
+				max-height: #{$px}px !important
+			
+			.minh-#{$breakpoint}-#{$px}px
+				min-height: #{$px}px !important
+			
+			.maxh-#{$breakpoint}-#{$px}px
 				max-height: #{$px}px !important
 	
 	
@@ -388,8 +412,20 @@ $bPoints: map-remove($grid-breakpoints, xs)
 		width: #{$percent*5%} !important
 		max-width: #{$percent*5%} !important
 	
+	.minw-#{$percent*5}, .minw#{$percent*5}
+		min-width: #{$percent*5%} !important
+	
+	.maxw-#{$percent*5}, .maxw#{$percent*5}
+		max-width: #{$percent*5%} !important
+	
 	.h-#{$percent*5}, .h#{$percent*5}
 		height: #{$percent*5%} !important
+		max-height: #{$percent*5%} !important
+	
+	.minh-#{$percent*5}, .minh#{$percent*5}
+		min-height: #{$percent*5%} !important
+	
+	.maxh-#{$percent*5}, .maxh#{$percent*5}
 		max-height: #{$percent*5%} !important
 
 
@@ -401,8 +437,20 @@ $bPoints: map-remove($grid-breakpoints, xs)
 				width: #{$percent*5%} !important
 				max-width: #{$percent*5%} !important
 			
+			.minw-#{$breakpoint}-#{$percent*5}
+				min-width: #{$percent*5%} !important
+			
+			.maxw-#{$breakpoint}-#{$percent*5}
+				max-width: #{$percent*5%} !important
+			
 			.h-#{$breakpoint}-#{$percent*5}
 				height: #{$percent*5%} !important
+				max-height: #{$percent*5%} !important
+			
+			.minh-#{$breakpoint}-#{$percent*5}
+				min-height: #{$percent*5%} !important
+			
+			.maxh-#{$breakpoint}-#{$percent*5}
 				max-height: #{$percent*5%} !important
 				
 		
@@ -417,6 +465,21 @@ $bPoints: map-remove($grid-breakpoints, xs)
 			&-#{$px}px, &#{$px}px
 				width: calc(#{$rem}rem + #{$px}px) !important
 	
+	.minw-#{$rem}rem, .minw#{$rem}rem
+		min-width: #{$rem}rem !important
+		
+		@for $px from 1 through 9
+			&-#{$px}px, &#{$px}px
+				min-width: calc(#{$rem}rem + #{$px}px) !important
+
+	.maxw-#{$rem}rem, .maxw#{$rem}rem
+		max-width: #{$rem}rem !important
+		
+		@for $px from 1 through 9
+			&-#{$px}px, &#{$px}px
+				max-width: calc(#{$rem}rem + #{$px}px) !important
+	
+	
 	.h-#{$rem}rem, .h#{$rem}rem
 		height: #{$rem}rem !important
 		
@@ -424,12 +487,45 @@ $bPoints: map-remove($grid-breakpoints, xs)
 			&-#{$px}px, &#{$px}px
 				height: calc(#{$rem}rem + #{$px}px) !important
 
+	.minh-#{$rem}rem, .minh#{$rem}rem
+		min-height: #{$rem}rem !important
+		
+		@for $px from 1 through 9
+			&-#{$px}px, &#{$px}px
+				min-height: calc(#{$rem}rem + #{$px}px) !important
+	
+	.maxh-#{$rem}rem, .maxh#{$rem}rem
+		max-height: #{$rem}rem !important
+		
+		@for $px from 1 through 9
+			&-#{$px}px, &#{$px}px
+				max-height: calc(#{$rem}rem + #{$px}px) !important
+			
+			
+
+
+
 
 .w-50rem, .w50rem
 	width: 50rem !important
+
+.minw-50rem, .minw50rem
+	min-width: 50rem !important
+
+.maxw-50rem, .maxw50rem
+	max-width: 50rem !important
+	
 	
 .h-50rem, .h50rem
 	height: 50rem !important
+
+.minh-50rem, .minh50rem
+	min-height: 50rem !important
+
+.maxh-50rem, .maxh50rem
+	max-height: 50rem !important
+
+
 		
 		
 
@@ -446,6 +542,26 @@ $bPoints: map-remove($grid-breakpoints, xs)
 						width: calc(#{$rem}rem + #{$px}px) !important
 						max-width: calc(#{$rem}rem + #{$px}px) !important
 			
+			
+			.minw-#{$breakpoint}-#{$rem}rem
+				min-width: #{$rem}rem !important
+				
+				@for $px from 1 through 9
+					&-#{$px}px
+						min-width: calc(#{$rem}rem + #{$px}px) !important
+					
+					
+			.maxw-#{$breakpoint}-#{$rem}rem
+				max-width: #{$rem}rem !important
+				
+				@for $px from 1 through 9
+					&-#{$px}px
+						max-width: calc(#{$rem}rem + #{$px}px) !important
+			
+			
+			
+			
+			
 			.h-#{$breakpoint}-#{$rem}rem
 				height: #{$rem}rem !important
 				max-height: #{$rem}rem !important
@@ -453,6 +569,20 @@ $bPoints: map-remove($grid-breakpoints, xs)
 				@for $px from 1 through 9
 					&-#{$px}px
 						height: calc(#{$rem}rem + #{$px}px) !important
+						max-height: calc(#{$rem}rem + #{$px}px) !important
+			
+			.minh-#{$breakpoint}-#{$rem}rem
+				min-height: #{$rem}rem !important
+				
+				@for $px from 1 through 9
+					&-#{$px}px
+						min-height: calc(#{$rem}rem + #{$px}px) !important
+			
+			.maxh-#{$breakpoint}-#{$rem}rem
+				max-height: #{$rem}rem !important
+				
+				@for $px from 1 through 9
+					&-#{$px}px
 						max-height: calc(#{$rem}rem + #{$px}px) !important
 
 

@@ -750,6 +750,96 @@
 	
 	
 	
+	//-------------------------------------------------  Чат договора
+	let sendMessStat;
+	$.contractChatAction = (btn, contractId, title) => {
+		ddrPopup({
+			title: '<small class="fz12px color-gray">Чат договора:</small> «'+title+'»',
+			width: 800,
+			buttons: ['Закрыть'],
+			winClass: 'ddrpopup_chat'
+		}).then(({state/* isClosed */, wait, setTitle, setButtons, loadData, setHtml, setLHtml, dialog, close, onScroll, disableButtons, enableButtons, setWidth}) => {
+			wait();
+			
+			axiosQuery('get', 'site/contracts/chat', {contract_id: contractId}).then(({data, error, status, headers}) => {
+				
+				if (error) {
+					$.notify('Не удалось загрузить чат!', 'error');
+					console.log(error?.message, error?.errors);
+					return;
+				}
+				
+				setHtml(data, () => {
+					wait(false);
+					
+					let chatVisibleHeight = $('#chatMessageList').outerHeight(),
+						chatScrollHeight = $('#chatMessageList')[0].scrollHeight;
+					$('#chatMessageList').scrollTop(chatScrollHeight - chatVisibleHeight);
+					
+					$('#chatMessageBlock').ddrInputs('change', () => {
+						let mess = getContenteditable('#chatMessageBlock');
+						
+						if (mess && !sendMessStat) {
+							sendMessStat = true;
+							$('#chatSendMesageBtn').ddrInputs('enable');
+						} else if (!mess && sendMessStat) {
+							sendMessStat = false;
+							$('#chatSendMesageBtn').ddrInputs('disable');
+						}
+					});
+				});
+				
+			}).catch((e) => {
+				console.log(e);
+			});
+			
+		});
+	}
+	
+	
+	
+	
+	$.chatSendMesage = (btn, contractId) => {
+		let message = getContenteditable('#chatMessageBlock');
+		if (!message) return;
+		axiosQuery('put', 'site/contracts/chat', {contract_id: contractId, message}).then(({data, error, status, headers}) => {
+			if (error) {
+				$.notify('Не удалось отправить сообщение!', 'error');
+				console.log(error?.message, error?.errors);
+				return;
+			}
+			
+			$('#chatMessageBlock').empty();
+			$('#chatSendMesageBtn').ddrInputs('disable');
+			$('#chatMessageList').append(data);
+			sendMessStat = false;
+			
+			let chatVisibleHeight = $('#chatMessageList').outerHeight(),
+				chatScrollHeight = $('#chatMessageList')[0].scrollHeight,
+				scrollTop = chatScrollHeight - chatVisibleHeight;
+			
+			if (scrollTop > 0) {
+				$('#chatMessageList').stop().animate({
+				    scrollTop: scrollTop,
+				}, 200, 'swing', function() {
+				    
+				});
+			}
+			
+		}).catch((e) => {
+			console.log(e);
+		});
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	

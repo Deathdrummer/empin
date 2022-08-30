@@ -130,13 +130,13 @@
 						@else
 							@isset($departmentId)
 								@cananydo('contract-col-hiding:site, contract-col-sending:site')
-									<td class="w8rem vertical-center">
+									<td class="w12rem vertical-center">
 										<strong class="fz10px lh90 d-block text-center">Действия</strong>
 									</td>
 								@endcananydo
 							@elseif(!$isArchive)
 								@cananydo('contract-col-sending-all:site, contract-col-to-archive:site')
-									<td class="w8rem vertical-center">
+									<td class="w12rem vertical-center">
 										<strong class="fz10px lh90 d-block text-center">Действия</strong>
 									</td>
 								@endcananydo
