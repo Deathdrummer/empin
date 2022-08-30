@@ -6610,6 +6610,10 @@ table tbody tr td.center {
 table tbody tr td.top {
   vertical-align: top;
 }
+table tfoot {
+  position: relative;
+  z-index: 10;
+}
 table tfoot tr td {
   padding-top: 10px;
 }
