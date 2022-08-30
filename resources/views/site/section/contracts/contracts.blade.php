@@ -725,10 +725,10 @@
 				return;
 			}
 			if (pinned == 1) {
-				$(btn).removeClass('color-gray-300 color-gray-500-hovered icon-hidden').addClass('color-green');
+				$(btn).removeClass('color-gray-300 color-gray-500-hovered icon-hidden').addClass('color-gray-500');
 				$(btn).setAttrib('pinned', 0);
 			} else {
-				$(btn).removeClass('color-green').addClass('color-gray-300 color-gray-500-hovered icon-hidden');
+				$(btn).removeClass('color-gray-500').addClass('color-gray-300 color-gray-500-hovered icon-hidden');
 				$(btn).setAttrib('pinned', 1);
 			}
 			

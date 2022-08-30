@@ -15,6 +15,7 @@
 						onclick="$.pinContract(this, {{$id}});"
 						pinned="{{$pinned ? 0 : 1}}"
 						@class([
+							'fz10px',
 							'fa-solid',
 							'fa-thumbtack',
 							'fa-rotate-by',
@@ -22,12 +23,14 @@
 							'icon-left',
 							'icon-top',
 							'icon-hidden' => !$pinned,
-							'color-green' => $pinned,
+							'color-gray-500' => $pinned,
 							'color-gray-300' => !$pinned,
-							'color-gray-500-hovered' => !$pinned,
-							'pointer'
+							'color-gray-400-hovered' => !$pinned,
+							'pointer',
+							'mt4px',
+							'ml4px'
 						])
-						style="--fa-rotate-angle: 40deg;"
+						style="--fa-rotate-angle: -40deg;"
 						noscroll
 						title="{{$pinned ? 'Открепить договор' : 'Закрепить договор'}}"
 						></i>

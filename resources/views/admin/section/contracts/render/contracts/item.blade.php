@@ -3,7 +3,7 @@
 		<td><strong>{{$object_id}}</strong></td>
 		<td><p>{{$title}}</p></td>
 		<td>
-			<div class="scrollblock h5rem">
+			<div class="scrollblock scrollblock-auto h5rem">
 				<p class="format fz12px">{{$titul}}</p>
 			</div>
 		</td>
