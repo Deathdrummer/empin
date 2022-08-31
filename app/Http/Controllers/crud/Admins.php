@@ -293,8 +293,8 @@ class Admins extends Controller {
 		
 		$allPermissions = Permission::where('guard_name', $valid['guard'])
 			->whereNot('group', null)
-			->orderBy('sort', 'ASC')
 			->get()
+			->sortBy('sort', SORT_NATURAL)
 			->groupBy('group');
 			
 		$userPermissions = $user->getAllPermissions()->groupBy('id');

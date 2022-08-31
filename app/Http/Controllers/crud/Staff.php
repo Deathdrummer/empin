@@ -316,8 +316,8 @@ class Staff extends Controller {
 		
 		$allPermissions = Permission::where('guard_name', $valid['guard'])
 			->where('group', '!=', null)
-			->orderBy('sort', 'ASC')
 			->get()
+			->sortBy('sort', SORT_NATURAL)
 			->groupBy('group');
 			
 		$userPermissions = $user->getAllPermissions()->groupBy('id');
