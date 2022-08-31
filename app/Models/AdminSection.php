@@ -110,7 +110,7 @@ class AdminSection extends Model {
 	 * @return Collection
 	 */
 	public function getSections($activeNav = false): Collection {
-		$navData = [];
+		$navData = collect([]);
 		$sections = $this->select('id', 'section', 'title', 'parent_id', 'nav')
 						->where('visible', 1)
 						->orderBy('_sort', 'ASC')
