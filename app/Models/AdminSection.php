@@ -117,7 +117,7 @@ class AdminSection extends Model {
 						->get()
 						->filter(function ($item) {
 							if (auth('admin')->check() && auth('admin')->user()->is_main_admin) return true;
-							return auth('admin')->check() && auth('admin')->user()->can('admin-section-'.$item['section']);
+							return auth('admin')->check() && auth('admin')->user()->can('section-'.$item['section'].'admin');
 						});
 			
 		if ($sections->isEmpty()) return $navData;
