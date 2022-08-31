@@ -47,20 +47,6 @@
 				</x-card>
 			</div>
 			
-			<div class="col">
-				<x-card
-					loading
-					ready
-					title="Населенный пункт"
-					desc="Вспомогательные списки для работы с данными"
-					>
-					<x-simplelist
-						setting="contract-locality"
-						fieldset="ID:w7rem|number|id,Название:w36rem|input|name"
-						group="small"
-					 />
-				</x-card>
-			</div>
 		</div>
 	</x-settings>
 	
