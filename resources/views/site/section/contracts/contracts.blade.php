@@ -770,6 +770,7 @@
 				}
 				
 				setHtml(data, () => {
+					sendMessStat = false;
 					wait(false);
 					
 					let chatVisibleHeight = $('#chatMessageList').outerHeight(),
