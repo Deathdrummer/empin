@@ -6,15 +6,22 @@
 		'mr1rem',
 	])
 	>
+	
+	<div class="chat__avatar">
+		<p class="color-black fz20px">{{$account_id}}</p>
+	</div>
+	
 	<div
 		@class([
+			'chat__post',
 			'p1rem',	
 			'border-all',
 			'border-light',
-			'border-rounded-10px',
 		])
 		>
-		<p>{{$message}}</p>
+		<strong class="chat__author">{{$name ?? null}}</strong>
+		<p class="chat__message">{{$message}}</p>
+		<small class="fz10px color-gray-500 chat__date mt5px">@date($created_at) г.</small>
 	</div>
 	
 </div>

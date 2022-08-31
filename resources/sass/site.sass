@@ -634,6 +634,7 @@ section
 	
 	&__item
 		display: flex
+		align-items: flex-end
 		
 		&:first-of-type
 			margin-top: auto
@@ -641,25 +642,21 @@ section
 		&:not(:first-of-type)
 			margin-top: 2rem
 		
-		> div
-			max-width: 70%
-			
-			> *
-				white-space: pre-line
 		
 		&-left
 			justify-content: flex-start
-			transform: translateX(10px)
 			
-			> div
+			.chat__post
 				position: relative
 				background-color: #f0f5f7
+				border-radius: 10px 10px 10px 0px !important
+				transform: translateX(10px)
 				
 				&::after
 					content: ''
 					position: absolute
 					left: -10px
-					bottom: 0
+					bottom: -1px
 					width: 0
 					height: 0
 					border-bottom: 14px solid #f0f5f7
@@ -668,20 +665,52 @@ section
 				
 			
 		&-right
-			justify-content: flex-end
-			transform: translateX(-10px)
+			justify-content: flex-start
+			flex-direction: row-reverse
+			//transform: translateX(-10px)
 			
-			> div
+			.chat__post
 				position: relative
 				background-color: #f1f7d7
+				border-radius: 10px 10px 0px 10px !important
+				transform: translateX(-10px)
 				
 				&::after
 					content: ''
 					position: absolute
 					right: -10px
-					bottom: 0
+					bottom: -1px
 					width: 0
 					height: 0
 					border-bottom: 14px solid #f0f5f7
 					border-right: 14px solid transparent
-				
+		
+	
+	
+	&__post
+		max-width: 70%
+		
+		> *
+			white-space: pre-line
+			
+	&__avatar
+		width: 40px
+		height: 40px
+		display: flex
+		align-items: center
+		justify-content: center
+		background-color: #f3f5e5
+		border-radius: 50%
+	
+	&__author
+		font-size: 13px
+		display: block
+		margin-bottom: 5px
+		color: #44938b
+	
+	&__message
+		
+	
+	&__date
+		display: block
+		text-align: right

@@ -56,7 +56,7 @@ class Datepicker extends Component {
 	 * @return 
 	 */
 	public function setValue($value = null, $settings = null, $setting = null) {
-		if ($value) return Carbon::parse($value)->format('Y-m-d') ;
+		if ($value) return Carbon::parse($value)->format('Y-m-d');
 		if (!$setting || !$settings) return false;
 		$sett = data_get($settings, $setting);
 		return Carbon::parse($sett)->format('Y-m-d');

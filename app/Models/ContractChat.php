@@ -40,4 +40,13 @@ class ContractChat extends Model {
      */
 	public $timestamps = true;
 	
+	
+	
+	/**
+     * Получить аккаунт, связанный с сообщением.
+     */
+    public function user() {
+        return $this->hasOne(User::class, 'id', 'account_id');
+    }
+	
 }

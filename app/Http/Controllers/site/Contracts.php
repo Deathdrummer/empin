@@ -11,6 +11,7 @@ use App\Services\Business\Contract as ContractService;
 use App\Services\Business\User as UserService;
 use App\Traits\Renderable;
 use App\Traits\Settingable;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 
@@ -465,9 +466,12 @@ class Contracts extends Controller {
 		$accountId = auth('site')->user()->id;
 		
 		$messages = ContractChat::where('contract_id', $contractId)
+			->with('user')
 			->get()
 			->map(function($item) use($accountId) {
 				$item['self'] = $item['account_id'] == $accountId;
+				$item['name'] = $item['user']['pseudoname'] ?? $item['user']['name'] ?? 'Анонимный сотрудник';
+				$item['date'] = Carbon::parse($item['created_at'])->format('Y-m-d');
 				return $item;
 			});
 		
@@ -487,15 +491,17 @@ class Contracts extends Controller {
 	public function chat_send(Request $request) {
 		$contractId = $request->input('contract_id');
 		$message = $request->input('message');
-		$self = true;
 		
-		$stat = ContractChat::create([
+		$createdMessage = ContractChat::create([
 			'contract_id' 	=> $contractId,
 			'account_id' 	=> auth('site')->user()->id,
 			'message' 		=> $message,
 		]);
 		
-		if ($stat) return $this->render('chat.item', compact('message', 'self'));
+		$createdMessage['self'] = true;
+		$createdMessage['name'] = $createdMessage->user['pseudoname'] ?? $createdMessage->user['name'] ?? 'Анонимный сотрудник';
+		
+		if ($createdMessage) return $this->render('chat.item', $createdMessage);
 		return response()->json(false);
 	}
 	
