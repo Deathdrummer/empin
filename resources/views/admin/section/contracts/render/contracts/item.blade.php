@@ -8,7 +8,7 @@
 			</div>
 		</td>
 		<td><p>{{$data['customers'][$customer]}}</p></td>
-		<td><p>{{$data['locality'][$locality]}}</p></td>
+		<td><p>{{$locality}}</p></td>
 		<td class="text-end"><p>@number($price, 2) @symbal(money)</p></td>
 		<td>
 			<p>@date($created_at) г.</p>

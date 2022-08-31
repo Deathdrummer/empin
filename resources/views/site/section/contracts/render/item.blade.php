@@ -92,7 +92,7 @@
 	@endif
 	
 	@if(auth('site')->user()->can('contract-col-locality:site') && (empty($userColums) || in_array('locality', $userColums)))
-		<td><p>{{$localities[$locality]}}</p></td>
+		<td><p>{{$locality}}</p></td>
 	@endif
 	
 	@if(auth('site')->user()->can('contract-col-price:site') && (empty($userColums) || in_array('price', $userColums)))

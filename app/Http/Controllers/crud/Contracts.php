@@ -156,7 +156,7 @@ class Contracts extends Controller {
 			'date_start' 		=> 'required|date_format:d-m-Y',
 			'date_end' 			=> 'required|date_format:d-m-Y',
 			'customer' 			=> 'required|numeric',
-			'locality' 			=> 'required|numeric',
+			'locality' 			=> 'required|string',
 			'contractor' 		=> 'required|numeric',
 			'type' 				=> 'required|numeric',
 			'subcontracting'	=> 'boolean|nullable',
@@ -284,7 +284,7 @@ class Contracts extends Controller {
 			'date_start' 		=> 'required|date_format:d-m-Y',
 			'date_end' 			=> 'required|date_format:d-m-Y',
 			'customer' 			=> 'required|numeric',
-			'locality' 			=> 'required|numeric',
+			'locality' 			=> 'required|string',
 			'contractor' 		=> 'required|numeric',
 			'type' 				=> 'required|numeric',
 			'subcontracting'	=> 'boolean|nullable',
@@ -404,10 +404,6 @@ class Contracts extends Controller {
 			'value'		=> 'title'
 		], [
 			'setting'	=> 'contract-contractors:contractors',
-			'key'		=> 'id',
-			'value'		=> 'name'
-		], [
-			'setting'	=> 'contract-locality:locality',
 			'key'		=> 'id',
 			'value'		=> 'name'
 		]]);

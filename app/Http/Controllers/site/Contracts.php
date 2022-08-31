@@ -89,10 +89,6 @@ class Contracts extends Controller {
 			'setting'	=> 'contract-contractors:contractors',
 			'key'		=> 'id',
 			'value'		=> 'name'
-		], [
-			'setting'	=> 'contract-locality:localities',
-			'key'		=> 'id',
-			'value'		=> 'name'
 		]]);
 		
 		

@@ -49,8 +49,12 @@
 				</div>
 				
 				<div class="form__item">
+					{{-- <label class="form__label color-dark">Населенный пункт</label>
+					<x-select :options="$data['locality']" name="locality" value="{{$locality ?? null}}" class="w100" /> --}}
+					
+					
 					<label class="form__label color-dark">Населенный пункт</label>
-					<x-select :options="$data['locality']" name="locality" value="{{$locality ?? null}}" class="w100" />
+					<x-input name="locality" value="{{$locality ?? null}}" class="w100" />
 				</div>
 				
 				<div class="form__item">
