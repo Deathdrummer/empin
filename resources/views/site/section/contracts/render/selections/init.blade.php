@@ -5,6 +5,9 @@
 				<td>
 					<strong class="d-block fz12px lh90">Название подборки</strong>
 				</td>
+				<td class="w6rem">
+					<strong class="d-block fz12px lh90">Кол-во договоров</strong>
+				</td>
 				<td class="w16rem">
 					<strong class="d-block fz12px lh90">Действия со списками</strong>
 				</td>

@@ -6,6 +6,14 @@
 			:value="$title"
 			class="w100"
 			/>
+			
+	</td>
+	<td class="center">
+		@if($contracts_count)
+			<strong class="color-green fz14px">{{$contracts_count}}</strong>
+		@else
+			<p class="color-gray-500">-</p>
+		@endif
 	</td>
 	<td class="center">
 		<x-buttons-group group="small" gx="5">
@@ -26,7 +34,13 @@
 		</x-buttons-group>
 	</td>
 	<td class="center">
-		<x-button group="verysmall" variant="light" action="selectionSendMessages:{{$id}}" title="Отправить сообщения в чаты договоров">
+		<x-button
+			group="verysmall"
+			variant="light"
+			action="selectionSendMessages:{{$id}}"
+			title="Отправить сообщения в чаты договоров"
+			:enabled="$contracts_count ?? false"
+			>
 			<i class="fa-solid fa-comments"></i>
 		</x-button>
 	</td>

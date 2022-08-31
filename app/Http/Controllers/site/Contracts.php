@@ -538,6 +538,8 @@ class Contracts extends Controller {
 		$selection = Selection::find($selectionId);
 		$contracts = $selection->contracts->pluck('id');
 		
+		if ($contracts->isEmpty()) return response()->json(-1);
+		
 		$insertData = [];
 		$now = now();
 		foreach ($contracts as $contractId) {

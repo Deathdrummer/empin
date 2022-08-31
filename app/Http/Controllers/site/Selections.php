@@ -84,6 +84,8 @@ class Selections extends Controller {
 			->orderBy('_sort', 'ASC')
 			->get();
 		
+		logger('dfgdfgdfgdfgdfg');
+		
 
 		$itemView = $viewPath.'.item';
 		
