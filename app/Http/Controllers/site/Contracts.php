@@ -245,6 +245,24 @@ class Contracts extends Controller {
 	 * @param  int  $id 
 	 * @return 
 	 */
+	public function to_work(Request $request) {
+		['contractId' => $contractId] = $request->validate(['contractId' => 'required|numeric']);
+		$contract = Contract::find($contractId);
+		$contract->archive = 0;
+		$stat = $contract->save();
+		return response()->json($stat);
+	}
+	
+	
+	
+	
+	
+	
+	/**
+	 * @param  Request $request
+	 * @param  int  $id 
+	 * @return 
+	 */
 	public function send(Request $request) {
 		[
 			'contractId' 	=> $contractId,
@@ -500,6 +518,42 @@ class Contracts extends Controller {
 		if ($createdMessage) return $this->render('chat.item', $createdMessage);
 		return response()->json(false);
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	/** Отправить в чаты договоров из подборки
+	 * @param 
+	 * @return 
+	 */
+	public function chat_send_many(Request $request) {
+		$selectionId = $request->input('selectionId');
+		$message = $request->input('message');
+		
+		$selection = Selection::find($selectionId);
+		$contracts = $selection->contracts->pluck('id');
+		
+		$insertData = [];
+		$now = now();
+		foreach ($contracts as $contractId) {
+			$insertData[] = [
+				'contract_id' 	=> $contractId,
+				'account_id' 	=> auth('site')->user()->id,
+				'message' 		=> $message,
+				'created_at'	=> $now,
+    			'updated_at'	=> $now,
+			];
+		}
+		
+		$inserted = ContractChat::insert($insertData);
+		return response()->json($inserted);
+	}
+	
 	
 	
 	

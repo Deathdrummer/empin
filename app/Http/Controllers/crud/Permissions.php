@@ -142,7 +142,9 @@ class Permissions extends Controller {
 
 		$validFields['guard_name'] = $guard;
 		
-		return Permission::create($validFields);
+		$createdPermission = Permission::create($validFields);
+		Artisan::call('optimize:clear');
+		return $createdPermission;
 	}
 	
 	

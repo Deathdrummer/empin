@@ -398,6 +398,76 @@
 					
 					
 					
+					$.selectionSendMessages = (sendMessDialogBtn, selectionId) => {
+						$(sendMessDialogBtn).ddrInputs('disable');
+						console.log(selectionId);
+						let sendMessAbortCtrl = new AbortController();
+						let html = '<strong class="d-block mb5px">Сообщение:</strong>\
+									<div class="textarea normal-textarea w40rem" id="sendMessDialogField">\
+										<textarea name="" rows="5" class="w100"></textarea>\
+									</div>'
+						
+						dialog(html, {
+							buttons: {
+								'Отправить': ({closeDialog}) => {
+									let sendMessDialogWait = $('#sendMessDialogField').ddrWait();
+									$('#ddrpopupDialogBtn0').ddrInputs('disable');
+									
+									let message = $('#sendMessDialogField').find('textarea').val();
+									
+									axiosQuery('put', 'site/contracts/chats', {selectionId, message}, 'json', sendMessAbortCtrl)
+										.then(({data, error, status, headers}) => {
+											if (error) {
+												$.notify('Ошибка отправки сообщений!', 'error');
+												return;
+											}
+											
+											if (data) {
+												$.notify('Сообщение успешно отправлено во все чаты договоров!');
+												closeDialog();
+												$(sendMessDialogBtn).ddrInputs('enable');
+											
+											} else {
+												$.notify('Не удалось отправить сообщение в чаты договоров!', 'error');
+												sendMessDialogWait.destroy();
+											}
+											
+										}).catch((e) => {
+											console.log(e);
+										});
+								},
+								'Отмена|red': ({closeDialog}) => {
+									$(sendMessDialogBtn).ddrInputs('enable');
+									closeDialog();
+									sendMessAbortCtrl.abort();
+								} 
+							},
+							callback() {
+								$('#ddrpopupDialogBtn0').ddrInputs('disable');
+								
+								let isEmpty = true;	
+								$('#sendMessDialogField').ddrInputs('change', (textarea) => {
+									if ($(textarea).val() && isEmpty) {
+										$('#ddrpopupDialogBtn0').ddrInputs('enable');
+										isEmpty = false;
+									} else if (!$(textarea).val() && !isEmpty) {
+										$('#ddrpopupDialogBtn0').ddrInputs('disable');
+										isEmpty = true;
+									}
+								});
+							}
+						});
+						
+						
+						// dialog
+						// closeDialog
+					}
+					
+					
+					
+					
+					
+					
 					
 					
 					
@@ -821,9 +891,9 @@
 			
 			if (scrollTop > 0) {
 				$('#chatMessageList').stop().animate({
-				    scrollTop: scrollTop,
+					scrollTop: scrollTop,
 				}, 200, 'swing', function() {
-				    
+					
 				});
 			}
 			
@@ -948,19 +1018,19 @@
 			switch(type) {
 				case 1: //  чекбокс
 					value = $(input).is(':checked') ? 1 : 0;
-			    	break;
-			    
-			    case 2: //  текст
+					break;
+				
+				case 2: //  текст
 					value = $(input).val();
-			    	break;
-			    
-			    case 3: // вып. список
+					break;
+				
+				case 3: // вып. список
 					value = parseInt($(input).val());
-			    	break;
-			    
-			    case 4: // сумма.
+					break;
+				
+				case 4: // сумма.
 					value = parseFloat($(input).val());
-			    	break;
+					break;
 
 				default:
 					break;
@@ -1170,6 +1240,35 @@
 			}
 		});
 	}
+	
+	
+	
+	
+	//-------------------------------------------------  Вернуть договор из архива
+	$.returnContractToWorkAction = (btn, contractId) => {
+		let row = $(btn).closest('tr');
+		ddrPopup({
+			width: 400, // ширина окна
+			html: '<p class="fz18px color-green">Вы действительно хотите вернуть договор в работу?</p>', // контент
+			buttons: ['ui.cancel', {title: 'Вернуть', variant: 'green', action: 'returnContractToWorkBtn'}],
+			centerMode: true,
+			winClass: 'ddrpopup_dialog'
+		}).then(({close, wait}) => {
+			$.returnContractToWorkBtn = (_) => {
+				wait();
+				axiosQuery('post', 'site/contracts/to_work', {contractId}, 'json').then(({data, error, status, headers}) => {
+					if (data) {
+						getList();
+						$.notify('Договор успешно возвращен в работу!');
+					} else {
+						$.notify('Ошибка! Договор не был возвращен в работу!', 'error');
+					}
+					close();
+				});
+			}
+		});
+	}
+	
 	
 	
 	

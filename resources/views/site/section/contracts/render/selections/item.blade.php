@@ -26,6 +26,11 @@
 		</x-buttons-group>
 	</td>
 	<td class="center">
+		<x-button group="verysmall" variant="light" action="selectionSendMessages:{{$id}}" title="Отправить сообщения в чаты договоров">
+			<i class="fa-solid fa-comments"></i>
+		</x-button>
+	</td>
+	<td class="center">
 		<x-buttons-group group="verysmall" w="2rem-5px" gx="5">
 			<x-button variant="blue" action="selectionUpdate:{{$id}}" disabled update title="Обновить"><i class="fa-solid fa-save"></i></x-button>
 			<x-button variant="red" action="selectionRemove:{{$id}}" remove title="Удалить"><i class="fa-solid fa-trash-can"></i></x-button>

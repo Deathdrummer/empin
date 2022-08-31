@@ -7611,6 +7611,7 @@ window.ddrPopup = function () {
       });
 
       _insertDialog(text, params, function (data) {
+        // buttons callback
         _setDialogPositing();
 
         var dialogH = $(ddrPopupSelector).find('[ddrpopupdialogwin]').outerHeight();
@@ -7638,6 +7639,7 @@ window.ddrPopup = function () {
           $(ddrPopupSelector).find('[ddrpopupdialog]').remove();
         });
         if (cb && typeof cb == 'function') cb(data);
+        if (params.callback && typeof params.callback == 'function') params.callback(data);
       });
     },
     close: function close() {

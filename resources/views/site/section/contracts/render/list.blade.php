@@ -140,6 +140,12 @@
 										<strong class="fz10px lh90 d-block text-center">Действия</strong>
 									</td>
 								@endcananydo
+							@elseif($isArchive)
+								@cando('contract-col-return-to-work:site')
+									<td class="w7rem vertical-center">
+										<strong class="fz10px lh90 d-block text-center">Действия</strong>
+									</td>
+								@endcando
 							@endif
 						@endif
 					</tr>

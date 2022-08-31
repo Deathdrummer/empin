@@ -157,7 +157,7 @@
 				/> --}}
 		</td>
 	@else
-		@isset($departmentId)
+		@if(isset($departmentId))
 			@cananydo('contract-col-hiding:site, contract-col-sending:site')
 				<td class="center">
 					<x-buttons-group group="verysmall" w="2rem-7px" gx="5" px="1" tag="noscroll:45">
@@ -221,7 +221,18 @@
 					</x-buttons-group>
 				</td>
 			@endcananydo
-		@endisset
+		@elseif($isArchive)
+			@cando('contract-col-return-to-work:site')
+				<td class="center">
+					<x-button
+						group="verysmall"
+						variant="light"
+						action="returnContractToWorkAction:{{$id}}"
+						title="Вернуть договор в работу"
+						><i class="fa-solid fa-arrow-rotate-left"></i></x-button>
+				</td>
+			@endcando
+		@endif
 	@endif
 		
 </tr>

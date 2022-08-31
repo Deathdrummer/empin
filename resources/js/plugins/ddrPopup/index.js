@@ -111,7 +111,7 @@ window.ddrPopup = function(settings = {}, callback = false) {
 				return btnStr.split('|');
 			});
 			
-			_insertDialog(text, params, function(data) {
+			_insertDialog(text, params, function(data) { // buttons callback
 				_setDialogPositing();
 				let dialogH = $(ddrPopupSelector).find('[ddrpopupdialogwin]').outerHeight();
 				$(ddrPopupSelector).scroll(function() {
@@ -136,6 +136,7 @@ window.ddrPopup = function(settings = {}, callback = false) {
 				
 				
 				if (cb && typeof cb == 'function') cb(data); 
+				if (params.callback && typeof params.callback == 'function') params.callback(data); 
 			});
 		},
 		close() {

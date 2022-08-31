@@ -28,7 +28,7 @@
 @isset($dialog)
 	<div class="ddrpopup__dialog" ddrpopupdialog>
 	 	<div class="popupdialog" ddrpopupdialogwin>
-	 		<p class="popupdialog__message">{{__($dialog['text'])}}</p>
+	 		<p class="popupdialog__message">{!!__($dialog['text'])!!}</p>
 	 		<div class="popupdialog__buttons">
 	 			@isset($dialog['buttons'])
 	 				@foreach($dialog['buttons'] as $btn)

@@ -266,6 +266,7 @@ Route::prefix('site')->middleware(['lang', 'isajax:site'])->group(function() {
 	Route::put('/contracts', [Contracts::class, 'set_data']);
 	Route::post('/contracts/hide', [Contracts::class, 'hide']);
 	Route::post('/contracts/to_archive', [Contracts::class, 'to_archive']);
+	Route::post('/contracts/to_work', [Contracts::class, 'to_work']);
 	Route::get('/contracts/departments', [Contracts::class, 'departments']);
 	
 	Route::get('/contracts/statuses', [Contracts::class, 'statuses']);
@@ -285,6 +286,7 @@ Route::prefix('site')->middleware(['lang', 'isajax:site'])->group(function() {
 	
 	Route::get('/contracts/chat', [Contracts::class, 'chat_get']);
 	Route::put('/contracts/chat', [Contracts::class, 'chat_send']);
+	Route::put('/contracts/chats', [Contracts::class, 'chat_send_many']);
 	
 	
 	
