@@ -9,6 +9,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Notifications\Notifiable;
+use Symfony\Component\Mime\Encoder\IdnAddressEncoder;
 
 class AdminUser extends Authenticatable implements MustVerifyEmail {
 	use HasFactory, Notifiable, HasRoles, Collectionable;
@@ -27,6 +28,16 @@ class AdminUser extends Authenticatable implements MustVerifyEmail {
      * @var string
      */
 	protected $guard = 'admin';
+	
+	
+	
+	/**
+     * Динамически создаваемые поля в выборке
+	 *
+     * @var string
+     */
+	//protected $appends = ['email_cyrillic'];
+	
 	
 	
 	/**
@@ -71,14 +82,28 @@ class AdminUser extends Authenticatable implements MustVerifyEmail {
 	
 	
 	
+	
+	
 	/**
 	 * @param 
 	 * @return 
 	 */
-	//public function getPasswordAttribute($password) {
-	//	return 'dima';
-	//	//$this->attributes['password'] = 'dima';
+	public function getEmailAttribute($email) {
+		return decodeEmail($email);
+	}
+	
+	
+	
+	/**
+	 * @param 
+	 * @return 
+	 */
+	//public function setEmailAttribute($email) {
+	//	$encoder = new IdnAddressEncoder();
+	//	$this->attributes['email'] = $encoder->encodeString($email);
 	//}
+	
+	
 	
 	
 	

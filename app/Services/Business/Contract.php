@@ -49,6 +49,7 @@ class Contract {
 		return $data->mapWithKeysMany(function($item) {
 			return [$item['id'] => [
 				'id'				=> $item['id'] ?? null,
+				'object_number'		=> $item['object_number'] ?? null,
 				'title'				=> $item['title'] ?? null,
 				'titul' 			=> $item['titul'] ?? null,
 				'contract' 			=> $item['contract'] ?? null,
@@ -63,8 +64,7 @@ class Contract {
 				'contractor' 		=> $item['contractor'] ?? null,
 				'archive' 			=> $item['archive'] ?? null,
 				'created_a' 		=> $item['created_a'] ?? null,
-				'updated_at' 		=> $item['updated_at'] ?? null,
-				'object_id' 		=> $item['object_id'] ?? null
+				'updated_at' 		=> $item['updated_at'] ?? null
 			]];
 		});
 	}
@@ -192,6 +192,7 @@ class Contract {
 			
 			return [$item['id'] => [
 				'id'				=> $item['id'] ?? null,
+				'object_number'		=> $item['object_number'] ?? null,
 				'title'				=> $item['title'] ?? null,
 				'titul' 			=> $item['titul'] ?? null,
 				'contract' 			=> $item['contract'] ?? null,
@@ -207,7 +208,6 @@ class Contract {
 				'archive' 			=> $item['archive'] ?? null,
 				'created_a' 		=> $item['created_a'] ?? null,
 				'updated_at' 		=> $item['updated_at'] ?? null,
-				'object_id' 		=> $item['object_id'] ?? null,
 				'color' 			=> $color ?? null,
 				'name' 				=> $name ?? '',
 				'color_forced' 		=> $forcedColor ?? null,
@@ -390,7 +390,7 @@ class Contract {
 	public function getContractColums() {
 		$allColums = collect([
 			'period' 			=> 'Срок исполнения договора',
-			'object_id' 		=> 'Номер объекта',
+			'object_number' 	=> 'Номер объекта',
 			'title' 			=> 'Название/заявитель',
 			'titul' 			=> 'Титул',
 			'contract' 			=> 'Номер договора',

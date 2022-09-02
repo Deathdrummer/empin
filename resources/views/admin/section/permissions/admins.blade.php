@@ -5,8 +5,8 @@
 				<thead>
 					<tr>
 						<td class="w50rem"><strong>Системное название</strong></td>
-						<td class="w50rem"><strong>Имя</strong></td>
-						<td class="w30rem"><strong>Раздел</strong></td>
+						<td class="w50rem"><strong>Название</strong></td>
+						<td class="w30rem"><strong>Группа прав</strong></td>
 						<td></td>
 						<td class="w10rem center"><strong>Действия</strong></td>
 					</tr>

@@ -59,55 +59,75 @@
 		@endif
 	@endif
 	
-	@if(auth('site')->user()->can('contract-col-object_id:site') && (empty($userColums) || in_array('object_id', $userColums)))
-		<td><strong class="fz14px">{{$object_id}}</strong></td>
+	@if(auth('site')->user()->can('contract-col-object_number:site') && (empty($userColums) || in_array('object_number', $userColums)))
+		<td><strong class="fz12px">{{$object_number ?? '-'}}</strong></td>
 	@endif
 	
 	@if(auth('site')->user()->can('contract-col-title:site') && (empty($userColums) || in_array('title', $userColums)))
-		<td><p>{{$title}}</p></td>
+		<td><p class="fz12px lh110">{{$title ?? '-'}}</p></td>
 	@endif
 	
 	@if(auth('site')->user()->can('contract-col-titul:site') && (empty($userColums) || in_array('titul', $userColums)))
 		<td class="pr2px">
-			<div class="scrollblock scrollblock-auto h5rem pr3px">
-				<p class="format fz12px">{{$titul}}</p>
+			<div class="scrollblock-hidden h5rem pr3px">
+				<p class="format fz12px">{{$titul ?? '-'}}</p>
 			</div>
 		</td>
 	@endif
 	
 	@if(auth('site')->user()->can('contract-col-contract:site') && (empty($userColums) || in_array('contract', $userColums)))
-		<td><p>{{$contract}}</p></td>
+		<td><p class="fz12px lh110">{{$contract ?? '-'}}</p></td>
 	@endif
 	
 	@if(auth('site')->user()->can('contract-col-subcontracting:site') && (empty($userColums) || in_array('subcontracting', $userColums)))
 		<td class="center">
-			@if($subcontracting)
+			@if(isset($subcontracting) && $subcontracting)
 				<i class="fa-solid fa-circle-check color-green fz16px"></i>
 			@endif
 		</td>
 	@endif
 	
 	@if(auth('site')->user()->can('contract-col-customer:site') && (empty($userColums) || in_array('customer', $userColums)))
-		<td><p>{{$customers[$customer]}}</p></td>
+		<td>
+			@if(isset($customer) && isset($data['customers'][$customer]))
+				<p class="fz12px lh90">{{$customers[$customer]}}</p>
+			@else
+				<p class="color-gray">-</p>
+			@endif
+		</td>
 	@endif
 	
 	@if(auth('site')->user()->can('contract-col-locality:site') && (empty($userColums) || in_array('locality', $userColums)))
-		<td><p>{{$locality}}</p></td>
+		<td><p class="fz12px lh90">{{$locality ?? '-'}}</p></td>
 	@endif
 	
 	@if(auth('site')->user()->can('contract-col-price:site') && (empty($userColums) || in_array('price', $userColums)))
-		<td class="text-end"><p>@number($price, 2) @symbal(money)</p></td>
+		<td class="text-end">
+			@isset($price)
+				<p class="fz12px lh90">@number($price, 2) @symbal(money)</p>
+			@else
+				<p class="color-gray">-</p>
+			@endisset
+		</td>
 	@endif
 	
 	@if(auth('site')->user()->can('contract-col-date_start:site') && (empty($userColums) || in_array('date_start', $userColums)))
 		<td>
-			<p>{{dateFormatter($date_start, 'd.m.y')}}</p>
+			@isset($date_start)
+				<p class="fz12px lh90">{{dateFormatter($date_start, 'd.m.y')}}</p>
+			@else
+				<p class="color-gray">-</p>
+			@endisset
 		</td>
 	@endif
 	
 	@if(auth('site')->user()->can('contract-col-date_end:site') && (empty($userColums) || in_array('date_end', $userColums)))
 		<td>
-			<p>{{dateFormatter($date_end, 'd.m.y')}}</p>
+			@isset($date_start)
+				<p class="fz12px lh90">{{dateFormatter($date_end, 'd.m.y')}}</p>
+			@else
+				<p class="color-gray">-</p>
+			@endisset
 		</td>
 	@endif
 	
@@ -120,11 +140,23 @@
 	@endif
 	
 	@if(auth('site')->user()->can('contract-col-type:site') && (empty($userColums) || in_array('type', $userColums)))
-		<td><p>{{$types[$type]}}</p></td>
+		<td class="right">
+			@if(isset($type) && isset($types[$type]))
+				<p class="fz12px lh110">{{$types[$type]}}</p>
+			@else
+				<p class="color-gray">-</p>
+			@endif
+		</td>
 	@endif
 	
 	@if(auth('site')->user()->can('contract-col-contractor:site') && (empty($userColums) || in_array('contractor', $userColums)))
-		<td><p>{{$contractors[$contractor]}}</p></td>
+		<td>
+			@if(isset($contractor) && isset($contractors[$contractor]))
+				<p class="fz12px lh90">{{$contractors[$contractor]}}</p>
+			@else
+				<p class="color-gray">-</p>
+			@endif
+		</td>
 	@endif
 	
 	
@@ -181,7 +213,7 @@
 						@cando('contract-col-chat:site')
 							<x-button
 								variant="light"
-								action="contractChatAction:{{$id}},{{$title}}"
+								action="contractChatAction:{{$id}},{{$title ?? 'Без названия'}}"
 								title="Чат договора"
 								><i class="fa-solid fa-comments"></i></x-button>
 						@endcando
@@ -214,7 +246,7 @@
 						@cando('contract-col-chat:site')
 							<x-button
 								variant="light"
-								action="contractChatAction:{{$id}},{{$title}}"
+								action="contractChatAction:{{$id}},{{$title ?? 'Без названия'}}"
 								title="Чат договора"
 								><i class="fa-solid fa-comments"></i></x-button>
 						@endcando

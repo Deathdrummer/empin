@@ -19,6 +19,7 @@ use App\View\Components\Tabs;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
@@ -30,10 +31,14 @@ class AppServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function register()
-    {
+    public function register() {
         //$this->app->bind(\App\Contracts\Rool::class, \App\Services\DdrService::class);
     }
+	
+	
+	
+	
+	
 
     /**
      * Bootstrap any application services.
@@ -296,6 +301,7 @@ class AppServiceProvider extends ServiceProvider
 			
 			return new static($result);
 		});
+		
 		
     }
 }

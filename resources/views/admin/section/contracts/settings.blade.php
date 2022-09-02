@@ -5,8 +5,8 @@
 				<x-card
 					loading
 					ready
-					title="Общая информация"
-					desc="Настройка полей общей информации договоров"
+					title="Окно дополнительной информации о договоре"
+					desc="Настройка полей модального окна"
 					>
 					<x-simplelist
 						setting="contracts-common-info"

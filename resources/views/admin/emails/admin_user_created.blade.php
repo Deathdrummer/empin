@@ -1,10 +1,10 @@
-<h2>Вы зарегистрироны в системе.</h2>
-
-Вам Выдан доступ:
-<p>Email: {{$adminUser['email']}}</p>
-
 @isset($adminUser['password'])
-<p>Ваш пароль: {{$adminUser['password']}}</p>
+	<h2>Вы зарегистрироны в системе.</h2>
+	<p>Email: {{$adminUser['email']}}</p>
+	<p>Ваш пароль: {{$adminUser['password']}}</p>
+	<p><a href="{{url('/admin')}}">Войти в систему</a></p>
 @else
-<p>Пароль необходимо будет восстановить с помощью ссылки <strong>"забыли пароль?"</strong></p>
+	<h2>Воостановление доступа</h2>
+	<h4>Аккаунт: <strong>{{$adminUser['email']}}</strong></h4>
+	<p>Пароль можно восстановить <a href="{{url('/admin')}}"><strong>здесь</strong></a> кликнув на ссылку: <strong>"забыли пароль?"</strong></p>
 @endisset

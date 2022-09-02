@@ -51,9 +51,9 @@
 					loading="{{__('ui.loading')}}"
 					ready
 					>
-					<div class="mb15px"><x-input placeholder="Введите значение" group="large" label="Большой инпут" setting="common:large" /></div>
-					<div class="mb15px"><x-input placeholder="Введите значение" group="normal" label="Нормальны инпут" setting="common:normal" /></div>
-					<div class="mb15px"><x-input placeholder="Введите значение" group="small" label="Мамленький инпут" setting="common:small" /></div>
+					<div class="mb15px"><x-input type="password" placeholder="Введите значение" group="large" label="Большой инпут" setting="common:large" /></div>
+					<div class="mb15px"><x-input type="password" placeholder="Введите значение" group="normal" label="Нормальны инпут" setting="common:normal" /></div>
+					<div class="mb15px"><x-input type="password" placeholder="Введите значение" group="small" label="Мамленький инпут" setting="common:small" /></div>
 				</x-card>
 			</div>
 			

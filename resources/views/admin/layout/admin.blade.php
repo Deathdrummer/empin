@@ -4,7 +4,12 @@
 			<div class="header__left">
 				<div class="header__block">
 					<div class="header__logo">
-						<img src="{{asset('assets/images/ampin_light.png')}}" class="w15rem" alt="">
+						<img
+							src="{{asset('assets/images/ampin_light.png')}}"
+							class="w15rem"
+							alt="{{$company_name ?? 'ЭМПИН'}}"
+							title="{{$company_name ?? 'ЭМПИН'}}"
+							>
 						{{-- <p>{{$settings['company_name']}}</p> --}}
 						{{-- <p>{{$company_name}}</p> --}}
 					</div>
@@ -20,11 +25,11 @@
 							<p class="header__pagetitle" id="sectionTitle"></p>
 						</div>
 					</div>
-					<div class="col-auto ms-auto">
+					{{-- <div class="col-auto">
 						<div class="header__block">
 							<x-localebar group="large" />
 						</div>
-					</div>
+					</div> --}}
 					{{-- <div class="col-auto">
 						<div class="header__block">
 							@unlessverify('admin')
@@ -32,7 +37,7 @@
 							@endverify
 						</div>
 					</div> --}}
-					<div class="col-auto">
+					<div class="col-auto ms-auto">
 						<div class="header__block">
 							<div class="header__logout noselect" logout>
 								<i class="fa-solid fa-arrow-right-from-bracket"></i>

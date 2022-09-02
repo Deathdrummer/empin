@@ -76,7 +76,7 @@ class Staff extends Controller {
 			->withExists(['roles as hasRoles', 'permissions as hasPermissions'])
 			->orderBy('_sort', 'ASC')
 			->get();
-			
+		
 		$this->_addRolesToData();
 		$this->_addDepartmentsToData();
 		
@@ -142,6 +142,8 @@ class Staff extends Controller {
 	private function _storeRequest($request = null) {
 		if (!$request) return false;
 		
+		$request->merge(['email' => encodeEmail($request->input('email'))]);
+		
 		$validFields = $request->validate([
 			'email' 		=> 'email|required|unique:users,email',
 			'pseudoname'	=> 'string|required|max:50|unique:users,pseudoname',
@@ -151,12 +153,13 @@ class Staff extends Controller {
 		]);
 		
 		$role = $request->input('role');
-		$validFields['password'] = Str::random(8);
+		$validFields['password'] = Str::random(12);
 		
 		if (!$user = User::create($validFields)) return response()->json(false);
 		
 		if ($role) $user->assignRole($role);
 		
+		$validFields['email'] = decodeEmail($validFields['email']);
 		Mail::to($user->email)->send(new UserCreated($validFields));
 		
 		return User::with('roles:id')->withExists(['roles as hasRoles', 'permissions as hasPermissions'])->find($user->id);
@@ -315,14 +318,19 @@ class Staff extends Controller {
 		if (!$user = User::find($valid['user'])) return response()->json(false);
 		
 		$allPermissions = Permission::where('guard_name', $valid['guard'])
-			->where('group', '!=', null)
+			->whereNot('group', null)
 			->get()
 			->sortBy('sort', SORT_NATURAL)
 			->groupBy('group');
-			
-		$userPermissions = $user->getAllPermissions()->groupBy('id');
 		
-		$this->addSettingToGlobalData('permissions_groups', 'id', 'name');
+		$userPermissions = $user->getAllPermissions()->pluck('id')->toArray();
+		
+		$this->addSettingToGlobalData('permissions_groups:groups', 'id', null, 'group:'.$valid['guard']);
+		
+		usort($this->data['groups'], function($a, $b) {
+			if (!isset($a['sort']) || !isset($b['sort'])) return 0;
+			return strnatcmp($a['sort'], $b['sort']);
+		});
 		
 		return $this->view($valid['view'], ['permissions' => $allPermissions, 'user_permissions' => $userPermissions, 'user' => $valid['user']]);
 	}

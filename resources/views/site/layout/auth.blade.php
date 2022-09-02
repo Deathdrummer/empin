@@ -98,6 +98,7 @@
 		$('#authForm').ddrFormSubmit({
 			url: '/login',
 			callback({no_auth = null, redirect = null, message = null, errors = null, status = null}, stat, headers) {	
+				$('#authForm').ddrInputs('state', 'clear');
 				
 				if (redirect) location.href = redirect;
 				else authWaitAuth.destroy();
@@ -107,13 +108,14 @@
 					$('#authFormBlock').find('input').ddrInputs('error');
 				}
 				
-				if (errors) {	
+				if (errors) {
 					$.each(errors, function(item, text) {
 						$('[name="'+item+'"]').ddrInputs('error', text[0]);
 					});
 				} else if (message) {
 					$.notify(message, 'error');
 				}
+				
 			},
 			fail(data, status) {
 				authWaitAuth.destroy();
@@ -130,6 +132,8 @@
 		$('#regForm').ddrFormSubmit({
 			url: '/register',
 			callback({reg = false, message = null, errors = null, status = null}, stat, headers) {
+				$('#regForm').ddrInputs('state', 'clear');
+				
 				if (reg) pageReload();
 				else authWaitReg.destroy();
 				
@@ -158,6 +162,8 @@
 		$('#forgotPasswordForm').ddrFormSubmit({
 			url: '/forgot-password',
 			callback({message = null, errors = null, status = false}, stat, headers) {
+				$('#forgotPasswordForm').ddrInputs('state', 'clear');
+				
 				if (errors) {
 					$.each(errors, function(item, text) {
 						$('[name="'+item+'"]').ddrInputs('error', text[0]);
@@ -180,6 +186,8 @@
 		$('#resetPasswordForm').ddrFormSubmit({
 			url: '/reset-password',
 			callback({redirect = false, errors = false, message = null, status = null}, stat, headers) {
+				$('#resetPasswordForm').ddrInputs('state', 'clear');
+				
 				if (redirect) location.href = redirect;
 			
 				if (errors) {

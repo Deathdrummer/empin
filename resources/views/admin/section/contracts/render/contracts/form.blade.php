@@ -4,6 +4,26 @@
 		<div class="row g-30">
 			<div class="col-5">
 				<div class="form">
+					<div class="form__item pb3rem mb1px">
+						<label class="form__label color-dark fz16px">Номер договора</label>
+						@if($guard == 'site')
+							<strong class="fz14px d-block mt4px">{{$new_object_number ?? $object_number ?? null}}</strong>
+							@isset($new_object_number)
+								<input type="hidden" name="object_number" value="{{$new_object_number}}">
+							@endisset
+						@elseif($guard == 'admin')
+							<x-input
+								id="objectNumber"
+								name="object_number"
+								type="number"
+								value="{{$new_object_number ?? $object_number ?? null}}"
+								class="w10rem"
+								placeholder="00000"
+								showrows
+								/>
+						@endif
+					</div>
+					
 					<div class="form__item">
 						<label class="form__label color-dark">Название / заявитель</label>
 						<x-input name="title" value="{{$title ?? null}}" class="w100" />
@@ -23,11 +43,11 @@
 				
 				<div class="form__item">
 					<label class="form__label color-dark">Стоимость договора</label>
-					<x-input name="price" value="{{$price ?? null}}" icon="ruble-sign" class="w100" />
+					<x-input name="price" value="{{$price ?? 0}}" icon="ruble-sign" class="w100" />
 				</div>
 			</div>
 			
-			<div class="col-4">
+			<div class="col-5">
 					
 				
 				<div class="form__item">
@@ -68,7 +88,7 @@
 				</div>
 			</div>
 			
-			<div class="col-3">
+			<div class="col-2">
 				<div class="form__item">
 					<x-checkbox name="subcontracting" :checked="$subcontracting ?? null" label="Субподряд" />
 				</div>

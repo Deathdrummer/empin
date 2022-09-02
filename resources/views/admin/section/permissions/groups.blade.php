@@ -10,7 +10,7 @@
 					>
 					<x-simplelist
 						setting="permissions_groups"
-						fieldset="ID группы:w5rem|number|id|1,Название группы:w50rem|text|name,Группа пользователей:w30rem|select|group"
+						fieldset="ID группы:w5rem|number|id|1,Название группы прав:w50rem|text|name,Пользователи:w30rem|select|group,Сортировка:w5rem|number|sort"
 						options="group;admin:Администраторы,site:Сотрудники"
 						group="small"
 						onRemove="removePermissionpGroup"

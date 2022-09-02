@@ -9,7 +9,7 @@ use App\Models\User;
 use App\Traits\HasCrudController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-
+use Illuminate\Validation\Rule;
 
 class Contracts extends Controller {
 	use HasCrudController;
@@ -72,9 +72,9 @@ class Contracts extends Controller {
 		$list = Contract::where(function($query) use($archiveFilter) {
 				if (!is_null($archiveFilter)) $query->where('archive', $archiveFilter);
 			})
-			->orderBy('_sort', 'ASC')
+			->orderBy('_sort', 'DESC')
 			->get();
-			
+		
 		$this->_buildDataFromSettings();
 		
 		$itemView = $viewPath.'.item';
@@ -92,10 +92,12 @@ class Contracts extends Controller {
     public function create(Request $request) {
 		[
 			'views' => $viewPath,
-			'newItemIndex' => $newItemIndex
+			'newItemIndex' => $newItemIndex,
+			'guard' => $guard,
 		] = $request->validate([
 			'views' 		=> 'string|required',
 			'newItemIndex'	=> 'numeric|required',
+			'guard'			=> 'string|required',
 		]);
 		
 		$this->_buildDataFromSettings();
@@ -106,8 +108,16 @@ class Contracts extends Controller {
 		
 		$this->_addDepsUsersToData($departments);
 		
+		$lastContractId = Contract::max('id');
+		$newObjectNumber = Str::padLeft(($lastContractId + 1), 5, 0);
+		
 		if (!$viewPath) return response()->json(['no_view' => true]);
-        return $this->view($viewPath.'.form', ['index' => $newItemIndex, 'departments' => $departments]);
+        return $this->view($viewPath.'.form', [
+			'index' => $newItemIndex,
+			'departments' => $departments,
+			'new_object_number' => $newObjectNumber,
+			'guard' => $guard
+		]);
     }
 	
 	
@@ -148,22 +158,28 @@ class Contracts extends Controller {
 	private function _storeRequest($request = null) {
 		if (!$request) return false;
 		
+		$request->merge(['object_number' => Str::padLeft($request->input('object_number'), 5, 0)]);
+		
 		$validFields = $request->validate([
+			'object_number'		=> 'required|string|unique:contracts,object_number',
 			'title' 			=> 'required|string',
-			'titul' 			=> 'required|string',
-			'contract' 			=> 'required|string',
-			'price' 			=> 'required|numeric',
-			'date_start' 		=> 'required|date_format:d-m-Y',
-			'date_end' 			=> 'required|date_format:d-m-Y',
-			'customer' 			=> 'required|numeric',
-			'locality' 			=> 'required|string',
-			'contractor' 		=> 'required|numeric',
-			'type' 				=> 'required|numeric',
+			'titul' 			=> 'nullable|string',
+			'contract' 			=> 'nullable|string',
+			'price' 			=> 'nullable|numeric',
+			'date_start' 		=> 'nullable|date_format:d-m-Y',
+			'date_end' 			=> 'nullable|date_format:d-m-Y',
+			'customer' 			=> 'nullable|numeric',
+			'locality' 			=> 'nullable|string',
+			'contractor' 		=> 'nullable|numeric',
+			'type' 				=> 'nullable|numeric',
 			'subcontracting'	=> 'boolean|nullable',
 			'hoz_method' 		=> 'boolean|nullable',
 			'departments' 		=> 'array|exclude',
 			'_sort'				=> 'exclude|regex:/[0-9]+/'
 		]);
+		
+		
+		
 		
 		
 		if (!isset($validFields['_sort'])) {
@@ -218,9 +234,11 @@ class Contracts extends Controller {
      */
     public function edit(Request $request, $id) {
 		[
-			'views' => $viewPath
+			'views' => $viewPath,
+			'guard' => $guard,
 		] = $request->validate([
-			'views' => 'string|required'
+			'views' => 'string|required',
+			'guard' => 'string|required'
 		]);
 		
 		if (!$viewPath) return response()->json(['no_view' => true]);
@@ -260,7 +278,8 @@ class Contracts extends Controller {
         return $this->view($viewPath.'.form', [
 			'departments' 			=> $departments,
 			'deps_assigned_users'	=> $depsAssignedUsers,
-			'cd' 					=> $contrDeps
+			'cd' 					=> $contrDeps,
+			'guard' 				=> $guard
 		], $contractData->toArray());
     }
 	
@@ -277,16 +296,21 @@ class Contracts extends Controller {
      */
     public function update(Request $request, $id) {
 		$validFields = $request->validate([
+			'object_number'		=> [
+        		'string',
+        		'required',
+				Rule::unique('contracts')->ignore(Contract::where('id', $id)->first()),
+			],
 			'title' 			=> 'required|string',
-			'titul' 			=> 'required|string',
-			'contract' 			=> 'required|string',
-			'price' 			=> 'required|numeric',
-			'date_start' 		=> 'required|date_format:d-m-Y',
-			'date_end' 			=> 'required|date_format:d-m-Y',
-			'customer' 			=> 'required|numeric',
-			'locality' 			=> 'required|string',
-			'contractor' 		=> 'required|numeric',
-			'type' 				=> 'required|numeric',
+			'titul' 			=> 'nullable|string',
+			'contract' 			=> 'nullable|string',
+			'price' 			=> 'nullable|numeric',
+			'date_start' 		=> 'nullable|date_format:d-m-Y',
+			'date_end' 			=> 'nullable|date_format:d-m-Y',
+			'customer' 			=> 'nullable|numeric',
+			'locality' 			=> 'nullable|string',
+			'contractor' 		=> 'nullable|numeric',
+			'type' 				=> 'nullable|numeric',
 			'subcontracting'	=> 'boolean|nullable',
 			'hoz_method' 		=> 'boolean|nullable',
 			'departments' 		=> 'array|exclude',

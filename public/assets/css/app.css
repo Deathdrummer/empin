@@ -43987,7 +43987,7 @@ input[type=month] {
 
 input::-ms-reveal,
 input::-ms-clear {
-  display: none;
+  display: none !important;
 }
 
 fieldset {
@@ -45578,24 +45578,24 @@ template {
   display: none !important;
 }
 
-.scrollblock::-webkit-scrollbar {
+.scrollblock:not(.scrollblock-hidden)::-webkit-scrollbar {
   width: 4px;
   height: 4px;
 }
-.scrollblock::-webkit-scrollbar-track {
+.scrollblock:not(.scrollblock-hidden)::-webkit-scrollbar-track {
   background-color: #e6eaed;
   border-radius: 1px;
 }
-.scrollblock::-webkit-scrollbar-thumb {
+.scrollblock:not(.scrollblock-hidden)::-webkit-scrollbar-thumb {
   background-color: #bfcfdb;
   width: 13px;
   height: 13px;
   border-radius: 0;
 }
-.scrollblock::-webkit-scrollbar-thumb:hover {
+.scrollblock:not(.scrollblock-hidden)::-webkit-scrollbar-thumb:hover {
   background-color: #9eb7c9;
 }
-.scrollblock::-webkit-resizer {
+.scrollblock:not(.scrollblock-hidden)::-webkit-resizer {
   display: none;
   width: 0px;
   height: 0px;
@@ -45604,6 +45604,33 @@ template {
 }
 .scrollblock:not(.scrollblock-auto) {
   overflow-y: scroll;
+}
+.scrollblock-hidden {
+  overflow-y: scroll;
+}
+.scrollblock-hidden::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+.scrollblock-hidden::-webkit-scrollbar-track {
+  background-color: transparent;
+  border-radius: 1px;
+}
+.scrollblock-hidden::-webkit-scrollbar-thumb {
+  background-color: transparent;
+  width: 13px;
+  height: 13px;
+  border-radius: 0;
+}
+.scrollblock-hidden::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0);
+}
+.scrollblock-hidden::-webkit-resizer {
+  display: none;
+  width: 0px;
+  height: 0px;
+  background: transparent;
+  border-radius: 1px;
 }
 .scrollblock-auto {
   overflow-y: auto;

@@ -4,11 +4,11 @@
 			<table class="w100">
 				<thead>
 					<tr>
-						<td class="w30rem"><strong>Название</strong></td>
+						<td class="w40rem"><strong>Название отдела</strong></td>
 						<td></td>
-						<td class="w9rem" title="Отобразить только для назначенных"><strong>Отобр. только для назн.</strong></td>
+						<td class="w14rem"><strong>Этапы договора в зоне ответственности отдела</strong></td>
+						<td class="w13rem" title="Если галочка проставлена, то в данном отделе сотрудники могут видеть не все договоры, которые сейчас в работе в отделе, а только те из них, в которых они назначены ответственными"><strong>Отображать договоры только ответственным</strong></td>
 						<td class="w8rem" title="Сортировка"><strong>Сорт.</strong></td>
-						<td class="w6rem"><strong>Этапы</strong></td>
 						<td class="w10rem center"><strong>Действия</strong></td>
 					</tr>
 				</thead>

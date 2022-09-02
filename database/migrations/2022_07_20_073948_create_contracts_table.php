@@ -12,14 +12,15 @@ return new class extends Migration {
      */
     public function up() {
         Schema::create('contracts', function (Blueprint $table) {
-            $table->id()->comment('Номер объекта');
+            $table->id();
+			$table->integer('object_number')->unsigned()->unique()->default(null)->comment('Номер объекта');
             $table->string('title')->nullable()->comment('Название/заявитель');
             $table->string('titul')->nullable()->comment('Титул');
             $table->string('contract', 30)->nullable()->comment('Номер договора');
             $table->integer('subcontracting')->unsigned()->default(0)->comment('Субподряд');
             $table->integer('customer')->nullable()->comment('Заказчик');
             $table->string('locality')->nullable()->comment('Населенный пункт');
-            $table->decimal('price', 10, 2)->default(0)->comment('Стоимость договора');
+            $table->decimal('price', 10, 2)->nullable()->default(0)->comment('Стоимость договора');
 			$table->timestamp('date_start')->nullable()->comment('Дата начала договора');
 			$table->timestamp('date_end')->nullable()->comment('Дата окончания договора');
             $table->boolean('hoz_method')->default(false)->comment('Хоз способ');

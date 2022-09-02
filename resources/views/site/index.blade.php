@@ -26,9 +26,9 @@
 		
 		{{-- <script defer src="{{mix('assets/js/app.js')}}"></script> --}}
 	
-		<link rel="shortcut icon" href="{{asset('assets/images/shopdevelop_logo.png')}}" />
+		<link rel="shortcut icon" href="{{asset('favicon.png')}}" />
 		
-		<title>ЭМПИН</title>
+		<title>{{$company_name ?? 'ЭМПИН'}}</title>
 	</head>
     
 	<body>

@@ -7,9 +7,9 @@
 		<p class="auth__greetengs">{{__('auth.greetengs')}}</p>
 		<p class="auth__subgreetengs mb24px">{{__('auth.subgreetengs')}}</p>
 	</div>
-	<div class="col-auto">
+	{{-- <div class="col-auto">
 		<x-localebar group="auth" />
-	</div>
+	</div> --}}
 </div>
 
 		
@@ -18,7 +18,7 @@
 
 <div id="regForm" class="auth__formblock">
 	<div class="auth__row">
-		<x-input type="text" name="name" value="" class="auth__field" group="auth" />
+		<x-input type="text" name="name" value="" class="auth__field" group="auth" label="Ваше имя" />
 	</div>
 	
 	<div class="auth__row">

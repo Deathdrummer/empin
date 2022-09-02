@@ -70,7 +70,7 @@ Route::post('/forgot-password', function (Request $request) {
 })->middleware(['lang', 'guest:site'])->name('site.password.email');
 
 Route::get('/reset-password/{token}', function ($token, Request $request) {
-    return view('site.index', ['reset' => true, 'token' => $token, 'email' => $request->email]);
+    return view('site.index', ['reset' => true, 'token' => $token, 'email' => encodeEmail($request->email)]);
 })->middleware(['lang', 'guest:site'])->name('site.password.reset');
 
 Route::post('/reset-password', function (Request $request) {
@@ -125,16 +125,16 @@ Route::post('/reset-password', function (Request $request) {
 Route::middleware(['lang'])->get('/{section?}', function (Request $request, $section = null) {
 	if (!Auth::guard('site')->check() && $section) return redirect()->route('site');
 	
-	$activeNav = $section ?: 'common';
+	$settingsService = App::make(Settings::class);
+	$settings = $settingsService->getMany('company_name', 'site_start_page', 'show_nav'); // прописать настройки для вывода в общий шаблон личного кабинета
+	
+	$activeNav = $section ?: ($settings['site_start_page'] ?? 'common');
 	
 	$locale = App::currentLocale();
 	
 	$nav = auth('site')->check() ? (new Section)->getSections($activeNav) : [];
 	
 	$user = Auth::guard('site')->user();
-	
-	$settingsService = App::make(Settings::class);
-	$settings = $settingsService->getMany('company_name'); // прописать настройки для вывода в общий шаблон личного кабинета
 	
 	return view('site.index', compact('locale', 'user', 'nav', 'activeNav'), $settings->all());
 })->name('site');

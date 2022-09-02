@@ -5,62 +5,71 @@
 				<div class="col-auto">
 					<div class="header__block">
 						<div class="header__logo">
-							<div><img src="{{asset('assets/images/ampin.png')}}" class="w15rem" alt=""></div>
+							<div>
+								<img
+									src="{{asset('assets/images/ampin.png')}}"
+									class="w15rem"
+									alt="{{$company_name ?? 'ЭМПИН'}}"
+									title="{{$company_name ?? 'ЭМПИН'}}"
+									>
+							</div>
 							{{-- <p>{{$company_name}}</p> --}}
 						</div>
 					</div>
 				</div>
-				<div class="col-auto">
-					<div class="header__block">
-						
-						<div class="header__nav" headernav>
-							<div class="headernav__handler" touch="header__nav_opened">
-								<i class="fa-solid fa-grip"></i>
-								<p>Меню</p>
+				@if(isset($show_nav) && $show_nav)
+					<div class="col-auto">
+						<div class="header__block">
+							
+							<div class="header__nav" headernav>
+								<div class="headernav__handler" touch="header__nav_opened">
+									<i class="fa-solid fa-grip fz40px"></i>
+									{{-- <p>Меню</p> --}}
+								</div>
+								
+								
+								<nav class="headernav noselect">
+									<div class="headernav__item">
+										@isset($nav)
+											{{-- <p>sectionTitle</p> --}}
+											<ul>
+												@foreach($nav as $item)
+													@if (!isset($item['section']))
+														@continue
+													@endif
+													
+													<li @class([
+															'active' => $activeNav == $item['section'],
+															'opened' => isset($item['active'])
+														])
+														loadsection="{{$item['section']}}"
+														><span>{{$item['title']}}</span></li>
+														
+												@endforeach
+											</ul>
+										@endif
+									</div>
+									
+									{{-- 
+									{% for sectionTitle, sectionsList in sections %}
+										<div class="main_nav_item">
+											<p>{{sectionTitle}}</p>
+											<ul>
+												{% for url, title in sectionsList %}
+													<li data-block="{{url}}">{% if title is iterable %}{{title.title}}{% else %}{{title}}{% endif %}</li>
+												{% endfor %}
+											</ul>
+										</div>
+									{% endfor %} --}}
+								</nav>
 							</div>
 							
 							
-							<nav class="headernav noselect">
-								<div class="headernav__item">
-									@isset($nav)
-										{{-- <p>sectionTitle</p> --}}
-										<ul>
-											@foreach($nav as $item)
-												@if (!isset($item['section']))
-													@continue
-												@endif
-												
-												<li @class([
-														'active' => $activeNav == $item['section'],
-														'opened' => isset($item['active'])
-													])
-													loadsection="{{$item['section']}}"
-													><span>{{$item['title']}}</span></li>
-													
-											@endforeach
-										</ul>
-									@endif
-								</div>
-								
-								{{-- 
-								{% for sectionTitle, sectionsList in sections %}
-									<div class="main_nav_item">
-										<p>{{sectionTitle}}</p>
-										<ul>
-											{% for url, title in sectionsList %}
-												<li data-block="{{url}}">{% if title is iterable %}{{title.title}}{% else %}{{title}}{% endif %}</li>
-											{% endfor %}
-										</ul>
-									</div>
-								{% endfor %} --}}
-							</nav>
-						</div>
-						
-						
-						
 							
+								
+						</div>
 					</div>
-				</div>
+				@endif
 				<div class="col-auto">
 					<div class="header__line"></div>
 				</div>
@@ -69,11 +78,11 @@
 						<p class="header__pagetitle" id="sectionTitle"></p>
 					</div>
 				</div>
-				<div class="col-auto ms-auto">
+				{{-- <div class="col-auto ms-auto">
 					<div class="header__block">
 						<x-localebar group="large" />
 					</div>
-				</div>
+				</div> --}}
 				{{-- <div class="col-auto">
 					<div class="header__block">
 						@unlessverify('site')
@@ -81,6 +90,14 @@
 						@endverify
 					</div>
 				</div> --}}
+				
+				
+				
+				<div class="col-auto ms-auto">
+					<div class="header__block">
+						<p class="fz16px "><strong>{{$user->pseudoname ?? $user->name}}</strong></p>
+					</div>
+				</div>
 				<div class="col-auto">
 					<div class="header__block">
 						<div class="header__logout noselect" logout>
@@ -120,7 +137,8 @@
 @push('scripts')
 <script type="module">
 	let loadSectionController,
-		uriSegment = getUrlSegment(0);
+		uriSegment = getUrlSegment(0),
+		startPage = '{{$site_start_page}}';
 	
 	loadSection(uriSegment);
 	
@@ -279,7 +297,7 @@
 		//console.log(history.state['section']);
 		//history.replaceState({page: 3}, "title 3", "?page=3")
 		
-		section = section || 'common';
+		section = section || startPage;
 		
 		let getSection = axiosQuery('post', '/get_section', {section});
 		

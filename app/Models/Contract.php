@@ -55,6 +55,7 @@ class Contract extends Model {
      * @var array
      */
 	protected $fillable = [
+		'object_number',
 		'title',
 		'titul',
 		'contract',
@@ -73,14 +74,6 @@ class Contract extends Model {
 	];
 	
 	
-	
-	
-	/**
-     * Аксессоры, добавляемые к массиву модели.
-     *
-     * @var array
-     */
-    protected $appends = ['object_id'];
 	
 	
 	
@@ -163,17 +156,6 @@ class Contract extends Model {
 	
 	
 	
-	
-	
-	
-	/**
-	 * @param 
-	 * @return 
-	 */
-	public function getObjectIdAttribute() {
-		return Str::of($this->attributes['id'])->padLeft(5, '0');
-		//$this->attributes['id'] = Str::of($value)->padLeft(5, '0');
-	}
 	
 	
 	

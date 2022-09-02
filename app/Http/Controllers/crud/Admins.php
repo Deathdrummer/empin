@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Symfony\Component\Mime\Encoder\IdnAddressEncoder;
 
 class Admins extends Controller {
 	use HasCrudController;
@@ -32,7 +33,6 @@ class Admins extends Controller {
 	
 	
 	public function __construct() {
-		
 		$this->middleware('throttle:5,1')->only([
 			'send_email'
 		]);
@@ -78,7 +78,6 @@ class Admins extends Controller {
 			->where('is_main_admin', '!=', 1)
 			->orderBy('_sort', 'ASC')
 			->get();
-		
 		
 		$this->addRolesToData();
 		
@@ -142,20 +141,23 @@ class Admins extends Controller {
 	private function _storeRequest($request = null) {
 		if (!$request) return false;
 		
+		$request->merge(['email' => encodeEmail($request->input('email'))]);
+		
 		$validFields = $request->validate([
 			'email' 		=> 'email|required|unique:admin_users,email',
 			'pseudoname'	=> 'string|required|max:50|unique:admin_users,pseudoname',
 			'role'			=> 'numeric|nullable|exclude',
 			'_sort'			=> 'required|regex:/[0-9]+/'
 		]);
-		
+
 		$role = $request->input('role');
-		$validFields['password'] = Str::random(8);
+		$validFields['password'] = Str::random(12);
 		
 		if (!$adminUser = AdminUser::create($validFields)) return response()->json(false);
-		
+
 		if ($role) $adminUser->assignRole($role);
 		
+		$validFields['email'] = decodeEmail($validFields['email']);
 		Mail::to($adminUser->email)->send(new AdminUserCreated($validFields));
 		
 		return AdminUser::with('roles:id')->withExists(['roles as hasRoles', 'permissions as hasPermissions'])->find($adminUser->id);
@@ -237,6 +239,7 @@ class Admins extends Controller {
 	public function send_email(Request $request) {
 		if (!$id = $request->input('id')) return response()->json(false);
 		if (!$user = AdminUser::select('email')->where('id', $id)->first()) return response()->json(false);
+		$user['email'] = encodeEmail($user['email']);
 		$stat = Mail::to($user->email)->send(new AdminUserCreated($user));
 		return response()->json($stat);
 	}
@@ -297,9 +300,14 @@ class Admins extends Controller {
 			->sortBy('sort', SORT_NATURAL)
 			->groupBy('group');
 			
-		$userPermissions = $user->getAllPermissions()->groupBy('id');
+		$userPermissions = $user->getAllPermissions()->pluck('id')->toArray();
 		
-		$this->addSettingToGlobalData('permissions_groups', 'id', 'name');
+		$this->addSettingToGlobalData('permissions_groups:groups', 'id', null, 'group:'.$valid['guard']);
+
+		usort($this->data['groups'], function($a, $b) {
+			if (!isset($a['sort']) || !isset($b['sort'])) return 0;
+			return strnatcmp($a['sort'], $b['sort']);
+		});
 		
 		return $this->view($valid['view'], ['permissions' => $allPermissions, 'user_permissions' => $userPermissions, 'user' => $valid['user']]);
 	}

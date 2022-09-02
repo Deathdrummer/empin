@@ -12,10 +12,19 @@ return [
 	| these language lines according to your application's requirements.
 	|
 	*/
-	'admin'					=> 'Admin Panel',
+	'admin_panel'			=> 'Admin Panel',
 	'greetengs'             => 'Dashboard',
 	'subgreetengs'          => 'Sign in to continue.',
 	'company_name'          => 'AMPIN',
+	
+	'admin_panel'			=> 'Admin account',
+	'admin_panel_desc'		=> 'Sign in',
+	'personal_cabinet'		=> 'Personal account',
+	'personal_cabinet_desc'	=> 'Sign in',
+	'greetengs'             => 'Greetengs!',
+	'subgreetengs'          => 'Sign in to continue.',
+	'company_name'          => 'EMPIN',
+	
 	
 	'sign_in'               => 'Sign in',
 	'reg'                   => 'Register',

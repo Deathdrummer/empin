@@ -191,14 +191,18 @@
 	
 	
 	&-showpassword
-		width: 20px
-		height: 100%
+		background: #fff
+		//+addict(width, $inputHeight, '-2px')
+		+resp(width, $inputHeight)
+		height: calc(100% - 2px)
 		display: flex
 		align-items: center
 		justify-content: center
 		position: absolute
-		+resp(right, $inputPaddingX)
-		top: 0
+		top: 1px
+		right: 1px
+		border-radius: $borderRadius
+		z-index: 10
 		
 		> *
 			cursor: pointer
@@ -251,7 +255,7 @@
 				+placeholder((color: $hpColor, focusColor: $hpColorFocus, disabledColor: $hpColorDisable, durationHover: $phDurationHover, durationLeave: $phDurationLeave))
 		
 		
-		&:not(.large-input-color):not(.large-input-number)
+		&:not(.large-input-color):not(.large-input-number):not(.large-input-password)
 			> input
 				+resp(padding-left, $inputPaddingX, (padding-right: 0))
 		
@@ -259,7 +263,7 @@
 			> input
 				+resp(padding-left, $inputPaddingX)
 		
-		&:not(.large-input_iconed)
+		&:not(.large-input_iconed):not(.large-input-password)
 			> input
 				+resp(padding-right, $inputPaddingX)
 		
@@ -273,6 +277,11 @@
 			> input
 				+resp(padding-left, $inputPaddingX)
 				padding-right: 3px
+		
+		&-password
+			> input
+				//+resp(padding-left, $inputPaddingX)
+				padding-right: 30px
 		
 		
 		&-datepicker
@@ -386,14 +395,17 @@
 		
 		
 	&-showpassword
-		width: 20px
-		height: 100%
+		height: calc(100% - 2px)
+		width: 30px
 		display: flex
 		align-items: center
 		justify-content: center
 		position: absolute
-		+resp(right, $inputPaddingX)
-		top: 0
+		//+resp(right, $inputPaddingX)
+		right: 1px
+		top: 1px
+		border-radius: $borderRadius !important
+		//background: #000
 		
 		> *
 			cursor: pointer

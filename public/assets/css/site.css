@@ -818,38 +818,41 @@ p {
   border-right: 1px solid #cadbf1;
 }
 .auth-showpassword {
-  width: 20px;
-  height: 100%;
+  background: #fff;
+  width: 34px;
+  height: calc(100% - 2px);
   display: flex;
   align-items: center;
   justify-content: center;
   position: absolute;
-  right: 10px;
-  top: 0;
+  top: 1px;
+  right: 1px;
+  border-radius: 3px;
+  z-index: 10;
 }
 @media screen and (min-width: 576px) {
   .auth-showpassword {
-    right: 10px;
+    width: 36px;
   }
 }
 @media screen and (min-width: 768px) {
   .auth-showpassword {
-    right: 10px;
+    width: 38px;
   }
 }
 @media screen and (min-width: 992px) {
   .auth-showpassword {
-    right: 10px;
+    width: 40px;
   }
 }
 @media screen and (min-width: 1200px) {
   .auth-showpassword {
-    right: 10px;
+    width: 40px;
   }
 }
 @media screen and (min-width: 1400px) {
   .auth-showpassword {
-    right: 10px;
+    width: 40px;
   }
 }
 .auth-showpassword > * {
@@ -1032,36 +1035,36 @@ p {
   -ms-transition: color 0.1s;
   transition: color 0.1s;
 }
-.large-input:not(.large-input-color):not(.large-input-number) > input {
+.large-input:not(.large-input-color):not(.large-input-number):not(.large-input-password) > input {
   padding-left: 10px;
   padding-right: 10px;
 }
 @media screen and (min-width: 576px) {
-  .large-input:not(.large-input-color):not(.large-input-number) > input {
+  .large-input:not(.large-input-color):not(.large-input-number):not(.large-input-password) > input {
     padding-left: 10px;
     padding-right: 10px;
   }
 }
 @media screen and (min-width: 768px) {
-  .large-input:not(.large-input-color):not(.large-input-number) > input {
+  .large-input:not(.large-input-color):not(.large-input-number):not(.large-input-password) > input {
     padding-left: 10px;
     padding-right: 10px;
   }
 }
 @media screen and (min-width: 992px) {
-  .large-input:not(.large-input-color):not(.large-input-number) > input {
+  .large-input:not(.large-input-color):not(.large-input-number):not(.large-input-password) > input {
     padding-left: 10px;
     padding-right: 10px;
   }
 }
 @media screen and (min-width: 1200px) {
-  .large-input:not(.large-input-color):not(.large-input-number) > input {
+  .large-input:not(.large-input-color):not(.large-input-number):not(.large-input-password) > input {
     padding-left: 10px;
     padding-right: 10px;
   }
 }
 @media screen and (min-width: 1400px) {
-  .large-input:not(.large-input-color):not(.large-input-number) > input {
+  .large-input:not(.large-input-color):not(.large-input-number):not(.large-input-password) > input {
     padding-left: 10px;
     padding-right: 10px;
   }
@@ -1094,31 +1097,31 @@ p {
     padding-left: 10px;
   }
 }
-.large-input:not(.large-input_iconed) > input {
+.large-input:not(.large-input_iconed):not(.large-input-password) > input {
   padding-right: 10px;
 }
 @media screen and (min-width: 576px) {
-  .large-input:not(.large-input_iconed) > input {
+  .large-input:not(.large-input_iconed):not(.large-input-password) > input {
     padding-right: 10px;
   }
 }
 @media screen and (min-width: 768px) {
-  .large-input:not(.large-input_iconed) > input {
+  .large-input:not(.large-input_iconed):not(.large-input-password) > input {
     padding-right: 10px;
   }
 }
 @media screen and (min-width: 992px) {
-  .large-input:not(.large-input_iconed) > input {
+  .large-input:not(.large-input_iconed):not(.large-input-password) > input {
     padding-right: 10px;
   }
 }
 @media screen and (min-width: 1200px) {
-  .large-input:not(.large-input_iconed) > input {
+  .large-input:not(.large-input_iconed):not(.large-input-password) > input {
     padding-right: 10px;
   }
 }
 @media screen and (min-width: 1400px) {
-  .large-input:not(.large-input_iconed) > input {
+  .large-input:not(.large-input_iconed):not(.large-input-password) > input {
     padding-right: 10px;
   }
 }
@@ -1178,6 +1181,9 @@ p {
   .large-input-number > input {
     padding-left: 10px;
   }
+}
+.large-input-password > input {
+  padding-right: 30px;
 }
 .large-input-datepicker .icon {
   position: absolute;
@@ -1394,39 +1400,15 @@ p {
   border-right: 1px solid #cadbf1;
 }
 .large-showpassword {
-  width: 20px;
-  height: 100%;
+  height: calc(100% - 2px);
+  width: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
   position: absolute;
-  right: 10px;
-  top: 0;
-}
-@media screen and (min-width: 576px) {
-  .large-showpassword {
-    right: 10px;
-  }
-}
-@media screen and (min-width: 768px) {
-  .large-showpassword {
-    right: 10px;
-  }
-}
-@media screen and (min-width: 992px) {
-  .large-showpassword {
-    right: 10px;
-  }
-}
-@media screen and (min-width: 1200px) {
-  .large-showpassword {
-    right: 10px;
-  }
-}
-@media screen and (min-width: 1400px) {
-  .large-showpassword {
-    right: 10px;
-  }
+  right: 1px;
+  top: 1px;
+  border-radius: 3px !important;
 }
 .large-showpassword > * {
   cursor: pointer;
@@ -6538,6 +6520,9 @@ table thead tr td + td::before {
 table thead tr td.center {
   text-align: center;
 }
+table thead tr td.right {
+  text-align: right;
+}
 table thead tr td.vertical-top {
   vertical-align: top;
 }
@@ -6545,7 +6530,7 @@ table thead tr td.vertical-center {
   vertical-align: middle;
   padding-bottom: 5px;
 }
-table thead tr td.vertical-top {
+table thead tr td.vertical-bottom {
   vertical-align: bottom;
 }
 table thead tr td.sort {
@@ -6607,8 +6592,21 @@ table tbody tr td + td::after {
 table tbody tr td.center {
   text-align: center;
 }
+table tbody tr td.right {
+  text-align: right;
+}
 table tbody tr td.top {
   vertical-align: top;
+}
+table tbody tr td.vertical-top {
+  vertical-align: top;
+}
+table tbody tr td.vertical-center {
+  vertical-align: middle;
+  padding-bottom: 5px;
+}
+table tbody tr td.vertical-bottom {
+  vertical-align: bottom;
 }
 table tfoot {
   position: relative;
@@ -7439,6 +7437,7 @@ section {
 .auth__logo {
   display: flex;
   align-items: center;
+  justify-content: center;
 }
 .auth__logo > div {
   padding-right: 10px;
@@ -7737,7 +7736,7 @@ section {
 .chat__avatar {
   width: 40px;
   height: 40px;
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: center;
   background-color: #f3f5e5;

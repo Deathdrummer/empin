@@ -89,7 +89,11 @@ class Contracts extends Controller {
 			'setting'	=> 'contract-contractors:contractors',
 			'key'		=> 'id',
 			'value'		=> 'name'
+		], [
+			'setting'	=> 'contract-list-titles-row-height:rowHeight',
+			'key'		=> ':single',
 		]]);
+		
 		
 		
 		$canEditAll = auth('site')->user()->can('dostup-ko-vsem-otdelam:site');

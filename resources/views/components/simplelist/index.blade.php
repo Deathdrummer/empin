@@ -26,7 +26,7 @@
 				<tr>
 					@if($titles)
 						@foreach($titles as $title)
-							<td class="{{isset($title[1]) ? $title[1] : ''}}"><strong>{{$title[0]}}</strong></td>
+							<td class="{{isset($title[1]) ? $title[1] : ''}}"><strong class="fz13px lh90 d-block">{{$title[0]}}</strong></td>
 						@endforeach
 					@endif
 					<td class="p-0"></td>

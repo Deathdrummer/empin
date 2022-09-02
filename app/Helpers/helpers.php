@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Str;
-
+use Symfony\Component\Mime\Encoder\IdnAddressEncoder;
 
 if (! function_exists('translit')) {
     /**
@@ -297,3 +297,57 @@ if (! function_exists('dateFormatter')) {
 		echo now()->parse($date)->format($format);
 	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//------------------------------------------------------------
+
+
+
+if (! function_exists('encodeEmail')) {
+	/**
+	 * Конвертирует Email адрес из кириллицы в UTF-8
+	 * @param string  $address
+	 * @return string
+	*/
+	function encodeEmail(string $address): string {
+		$encoder = new IdnAddressEncoder();
+		return $encoder->encodeString($address);
+	}
+}
+
+
+
+
+if (! function_exists('decodeEmail')) {
+	/**
+	 * Конвертирует Email адрес обратно в кириллицу
+	 * @param string  $address
+	 * @return string
+	*/
+	function decodeEmail(string $address): string {
+		$i = strrpos($address, '@');
+        if (false !== $i) {
+            $local = substr($address, 0, $i);
+            $domain = substr($address, $i + 1);
+            $address = sprintf('%s@%s', $local, idn_to_utf8($domain, \IDNA_DEFAULT | \IDNA_USE_STD3_RULES | \IDNA_CHECK_BIDI | \IDNA_CHECK_CONTEXTJ | \IDNA_NONTRANSITIONAL_TO_ASCII, \INTL_IDNA_VARIANT_UTS46));
+        }
+		
+        return $address;
+	}
+}
+
+

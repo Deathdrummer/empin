@@ -5,6 +5,15 @@
 		</td>
 		<td></td>
 		<td class="center">
+			<x-button
+				variant="neutral"
+				group="small"
+				w="3rem"
+				action="departmentSteps:{{$id}}"
+				title="Этапы отдела"
+				><i class="fa-brands fa-buffer"></i></x-button>
+		</td>
+		<td class="center">
 			<x-checkbox
 				name="show_only_assigned"
 				group="large"
@@ -13,9 +22,6 @@
 		</td>
 		<td>
 			<x-input name="sort" type="number" class="w100" value="{{$sort}}" placeholder="0" showrows />
-		</td>
-		<td class="center">
-			<x-button variant="neutral" group="small" w="3rem" action="departmentSteps:{{$id}}" title="Этапы отдела"><i class="fa-brands fa-buffer"></i></x-button>
 		</td>
 		<td class="center">
 			<x-buttons-group group="small" w="3rem">

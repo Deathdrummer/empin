@@ -12,8 +12,11 @@ return [
 	| these language lines according to your application's requirements.
 	|
 	*/
-	'admin'					=> 'Административная панель',
-	'greetengs'             => 'Административная панель',
+	'admin_panel'			=> 'Личный кабинет администратора',
+	'admin_panel_desc'		=> 'Вход в систему',
+	'personal_cabinet'		=> 'Личный кабинет сотрудника',
+	'personal_cabinet_desc'	=> 'Вход в систему',
+	'greetengs'             => 'Добро пожаловать!',
 	'subgreetengs'          => 'Войти в систему',
 	'company_name'          => 'ЭМПИН',
 	

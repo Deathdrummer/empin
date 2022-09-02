@@ -127,6 +127,7 @@
 					>Подборки</x-button>
 				
 				<x-button
+					id="selectionsClearBtn"
 					group="normal"
 					w="3rem"
 					variant="red"
@@ -134,6 +135,7 @@
 					title="Отменить подборку"
 					tag="selectionsbtn"
 					disabled
+					hidden
 					><i class="fa-solid fa-xmark"></i></x-button>
 			</div>
 			
@@ -400,8 +402,9 @@
 					
 					$.selectionSendMessages = (sendMessDialogBtn, selectionId) => {
 						$(sendMessDialogBtn).ddrInputs('disable');
-						console.log(selectionId);
+						
 						let sendMessAbortCtrl = new AbortController();
+						
 						let html = '<strong class="d-block mb5px">Сообщение:</strong>\
 									<div class="textarea normal-textarea w40rem" id="sendMessDialogField">\
 										<textarea name="" rows="5" class="w100"></textarea>\
@@ -463,9 +466,6 @@
 							}
 						});
 						
-						
-						// dialog
-						// closeDialog
 					}
 					
 					
@@ -488,6 +488,7 @@
 							withCounts: true,
 							callback: function() {
 								$('[selectionsbtn]').ddrInputs('enable');
+								$('#selectionsClearBtn').removeAttrib('hidden');
 							}
 						});
 					}
@@ -506,6 +507,7 @@
 							withCounts: true,
 							callback: function() {
 								$('[selectionsbtn]').ddrInputs('enable');
+								$('#selectionsClearBtn').removeAttrib('hidden');
 							}
 						});
 					}
@@ -571,12 +573,14 @@
 	
 	//------------------------------------------------- отменить текущую подборку
 	$.clearSelection = (btn) => {
+		$('[selectionsbtn]').ddrInputs('disable');
 		selection = null;
 		editSelection = null;
 		
 		getList({
 			callback: function() {
-				$(btn).ddrInputs('disable');
+				$(btn).setAttrib('hidden');
+				$('[selectionsbtn]').ddrInputs('enable');
 				$('#chooserAll').find('[selectionscounts]').empty();
 				$('#chooserDepartment').find('[selectionscounts]').empty();
 				$('#chooserArchive').find('[selectionscounts]').empty();
@@ -1078,7 +1082,7 @@
 		}).then(({state, wait, setTitle, setButtons, loadData, setHtml, setLHtml, dialog, close, onScroll, disableButtons, enableButtons, setWidth}) => { //isClosed
 			wait();
 			
-			axiosQuery('get', 'ajax/contracts/create', {views: 'admin.section.contracts.render.contracts', newItemIndex: 0})
+			axiosQuery('get', 'ajax/contracts/create', {views: 'admin.section.contracts.render.contracts', newItemIndex: 0, guard: 'site'})
 				.then(({data, error, status, headers}) => {
 					if (error) {
 						$.notify(error.message, 'error');

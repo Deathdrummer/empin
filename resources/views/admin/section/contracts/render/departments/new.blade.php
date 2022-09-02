@@ -4,6 +4,7 @@
 			<x-input name="name" class="w100" placeholder="Название" />
 		</td>
 		<td></td>
+		<td class="center"><span class="color-gray">-</span></td>
 		<td class="center">
 			<x-checkbox
 				name="show_only_assigned"
@@ -13,7 +14,6 @@
 		<td>
 			<x-input name="sort" type="number" class="w100" placeholder="0" showrows />
 		</td>
-		<td class="center"><span class="color-gray">-</span></td>
 		<td class="center">
 			<x-buttons-group group="small" w="3rem">
 				<x-button variant="blue" action="departmentSave" title="Сохранить" disabled save><i class="fa-solid fa-floppy-disk"></i></x-button>

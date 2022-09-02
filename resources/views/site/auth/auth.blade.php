@@ -5,12 +5,12 @@
 
 <div class="row mb24px">
 	<div class="col">
-		<p class="auth__greetengs">{{__('auth.greetengs')}}</p>
-		<p class="auth__subgreetengs">{{__('auth.subgreetengs')}}</p>
+		<p class="auth__greetengs">{{__('auth.personal_cabinet')}}</p>
+		<p class="auth__subgreetengs">{{__('auth.personal_cabinet_desc')}}</p>
 	</div>
-	<div class="col-auto">
+	{{-- <div class="col-auto">
 		<x-localebar group="auth" />
-	</div>
+	</div> --}}
 </div>
 
 <div id="authForm" class="auth__formblock">

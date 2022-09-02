@@ -118,7 +118,11 @@ trait Settingable {
 				
 				$settingValue = $this->_restructureData($settingValue, $key, $val);
 				
-				$this->settingsData[$rename ?? $setting] = $settingValue->toArray();
+				$this->settingsData[$rename ?? $setting] = match (gettype($settingValue)) {
+					'object'	=> $settingValue->toArray(),
+					default 	=> $settingValue
+				};
+				
 			});
 			
 		} else {
@@ -141,7 +145,10 @@ trait Settingable {
 			
 			$fromSettingsData = $this->_restructureData($fromSettingsData, $key, $value);
 			
-			$this->settingsData[$sRename ?? $sName] = $fromSettingsData->toArray();
+			$this->settingsData[$sRename ?? $sName] = match (gettype($fromSettingsData)) {
+				'object'	=> $fromSettingsData->toArray(),
+				default 	=> $fromSettingsData
+			};
 		}
 	}
 	
@@ -194,6 +201,9 @@ trait Settingable {
 				$data = $data->mapToGroups(function ($item) use($key) {
 					return [$item[$key] => $item];
 				});
+			
+			} elseif (isset($comand) && $comand == 'single') {
+				$data = $data[0];
 			} else {
 				$data = $data->keyBy($key);
 			}

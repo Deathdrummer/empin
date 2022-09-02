@@ -4,7 +4,7 @@
 		<div class="table table_inline border-all border-light border-2px border-rounded-3px h100">
 			<table>
 				<thead>
-					<tr class="h7rem" sorts>
+					<tr class="h{{$rowHeight}}rem" sorts>
 						@if(!$isArchive)
 							@if(auth('site')->user()->can('contract-col-period:site') && (empty($userColums) || in_array('period', $userColums)))
 								<td
@@ -15,9 +15,9 @@
 							@endif
 						@endif
 						
-						@if(auth('site')->user()->can('contract-col-object_id:site') && (empty($userColums) || in_array('object_id', $userColums)))
+						@if(auth('site')->user()->can('contract-col-object_number:site') && (empty($userColums) || in_array('object_number', $userColums)))
 							<td
-								class="w10rem sort {{$sortField == 'id' ? 'sort-'.$sortOrder : ''}} vertical-center"
+								class="w7rem sort {{$sortField == 'id' ? 'sort-'.$sortOrder : ''}} vertical-center"
 								onclick="$.sorting(this, 'id')"
 								noscroll
 								><strong class="fz10px lh90 d-block text-center">Номер объекта</strong></td>
@@ -175,7 +175,7 @@
 		<x-horisontal.item class="h100">
 			<div class="table table_inline border-all border-gray border-2px border-rounded-3px h100">
 				<table class="">
-					<thead class="h7rem">
+					<thead class="h{{$rowHeight}}rem">
 						<tr>
 							<td
 								colspan="{{count($dept['steps'])}}"
@@ -192,7 +192,7 @@
 								@forelse($dept['steps'] as $step)
 									<td @class([
 											'w8rem' => ($step['type'] == 1),
-											'w20rem' => (in_array($step['type'], [2,3])),
+											'w16rem' => (in_array($step['type'], [2,3])),
 											'w15rem' => (in_array($step['type'], [4])),
 											'pl3px',
 											'pr3px',

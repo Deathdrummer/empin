@@ -16,11 +16,11 @@
 	<input type="hidden" name="token" value="{{$token}}">
 	<input type="hidden" name="email" value="{{$email}}">
 	
-	<div class="auth__row" id="forgotPasswordForm">
+	<div class="auth__row">
 		<x-input type="password" name="password" placeholder="Новый пароль" class="auth__field" group="auth" label="Новый пароль" />
 	</div>
 	
-	<div class="auth__row" id="forgotPasswordForm">
+	<div class="auth__row">
 		<x-input type="password" name="password_confirmation" placeholder="Новый пароль еще раз" class="auth__field" group="auth" label="Повторить новый пароль" />
 	</div>
 	

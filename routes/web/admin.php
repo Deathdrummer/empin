@@ -71,7 +71,7 @@ Route::post('/forgot-password', function (Request $request) {
 })->middleware(['lang', 'guest:admin'])->name('admin.password.email');
 
 Route::get('/reset-password/{token}', function ($token, Request $request) {
-    return view('admin.index', ['reset' => true, 'token' => $token, 'email' => $request->email]);
+    return view('admin.index', ['reset' => true, 'token' => $token, 'email' => encodeEmail($request->email)]);
 })->middleware(['lang', 'guest:admin'])->name('admin.password.reset');
 
 Route::post('/reset-password', function (Request $request) {

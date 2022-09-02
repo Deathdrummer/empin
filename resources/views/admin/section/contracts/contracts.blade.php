@@ -24,6 +24,7 @@
 						<td class="w8rem"><strong class="lh90 d-block">Номер объекта</strong></td>
 						<td class="w20rem"><strong>Название / заявитель</strong></td>
 						<td><strong>Титул</strong></td>
+						<td><strong>Номер договора</strong></td>
 						<td class="w20rem"><strong>Заказчик</strong></td>
 						<td class="w20rem"><strong>Населенный пункт</strong></td>
 						<td class="w14rem"><strong class="lh90 d-block">Стоимость договора</strong></td>
@@ -53,10 +54,12 @@
 		container: '#contractsList',
 		itemToIndex: 'tr',
 		route: 'ajax/contracts',
-		//params: {
-		//	list: {archive: 0/*department_id: deptId*/},
-		//	//store: {department_id: deptId},
-		//},
+		params: {
+			//list: {archive: 0/*department_id: deptId*/},
+			create: {guard: 'admin'},
+			edit: {guard: 'admin'}
+			//store: {department_id: deptId},
+		},
 		viewsPath: 'admin.section.contracts.render.contracts',
 	}).then(({error, list, changeInputs, create, store, storeWithShow, edit, update, destroy, query, getParams, abort, remove}) => {
 		
@@ -119,8 +122,21 @@
 					if (data) setHtml(data, () => {
 						enableButtons('close');
 						$('input[name="price"]').number(true, 2, '.', ' ');
+						
+						$('#objectNumber').ddrInputs('change', function(item) {
+							let value = $(item).val(),
+								number = parseInt(value),
+								slice = String(number).slice(0, 5),
+								formatValue = slice.padStart(5, '0');
+							$(item).val(formatValue);
+						});
+						
+						let isEnabledBtns = false;
 						$('#contractForm').ddrInputs('change', function(item) {
-							enableButtons(false);
+							if (!isEnabledBtns) {
+								enableButtons(false);
+								isEnabledBtns = true;
+							}
 						});
 					});
 					if (error) $.notify(error.message, 'error');
@@ -178,13 +194,29 @@
 						setHtml(data, () => {
 							enableButtons('close');
 							$('input[name="price"]').number(true, 2, '.', ' ');
+							
+							$('#objectNumber').ddrInputs('change', function(item) {
+								let value = $(item).val(),
+									number = parseInt(value),
+									slice = String(number).slice(0, 5),
+									formatValue = slice.padStart(5, '0');
+								$(item).val(formatValue);
+							});
+							
+							let isEnabledBtns = false;
 							$('#contractForm').ddrInputs('change', function(item) {
-								enableButtons(false);
+								if (!isEnabledBtns) {
+									enableButtons(false);
+									isEnabledBtns = true;
+								}
 							});
 						});
 					} 
 					if (error) $.notify(error.message, 'error');
 				});
+				
+				
+				
 				
 				
 				$.contractUpdate = (_, id) => {

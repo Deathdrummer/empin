@@ -11,12 +11,12 @@
 						class="ddrtabsnav__item ddrtabsnav__item_active"
 						onclick="$.loadPermissionsSection(this, 'admin')"
 						ddrtabsitem="testTab1"
-						>Админ. панель</li>
+						>Личный кабинет АДМИНИСТРАТОРОВ</li>
 					<li
 						class="ddrtabsnav__item"
 						onclick="$.loadPermissionsSection(this, 'site')"
 						ddrtabsitem="testTab2"
-						>Личный кабинет</li>
+						>Личный кабинет СОТРУДНИКОВ</li>
 				</ul>
 			</div>
 			
