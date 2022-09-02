@@ -1075,7 +1075,7 @@
 		ddrPopup({
 			title: 'Новый договор',
 			width: 1300,
-			buttons: ['Отмена', {action: 'contractStore', title: 'Создать'}],
+			buttons: ['Отмена', {action: 'contractStore', title: 'Создать', id: 'contractStoreBtn'}],
 			disabledButtons: true, // при старте все кнопки кроме закрытия будут disabled
 			closeByBackdrop: false, // Закрывать окно по фону либо только по [ddrpopupclose]
 			winClass: 'ddrpopup_white'
@@ -1166,24 +1166,29 @@
 				let form = $(formSelector).ddrForm(formSelector);
 				
 				axiosQuery('post', 'ajax/contracts', form, 'text').then(({data, error, status, headers}) => {
-					if (data) {
-						$.notify('договор успешно создан!');
-						if (currentList != -1) getList();
-						close();
+					if (error.errors) {
+						console.log(error.errors);
+						$.each(error.errors, function(field, errors) {
+							if (field == 'object_number') {
+								$('#contractStoreBtn').ddrInputs('disable');
+								$.notify('Нельзя создать договор с таким номером объекта', 'error');
+							} 
+							
+							$(formSelector).find('[name="'+field+'"]').ddrInputs('error', errors[0]);
+						});
 					}
 					
 					if (error) {
 						$.notify(error.message, 'error');
 						wait(false);
-					} 
-					
-					if (error.errors) {
-						console.log(error.errors);
-						$.each(error.errors, function(field, errors) {
-							if (field == 'object_number') $.notify('Нельзя создать договор с таким номером объекта', 'error');
-							$(formSelector).find('[name="'+field+'"]').ddrInputs('error', errors[0]);
-						});
 					}
+					
+					if (data) {
+						$.notify('Договор успешно создан!');
+						if (currentList != -1) getList();
+						close();
+					}
+					
 				}).catch((e) => {
 					console.log(e);
 				});
