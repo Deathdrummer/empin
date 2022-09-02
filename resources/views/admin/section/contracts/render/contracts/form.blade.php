@@ -5,7 +5,7 @@
 			<div class="col-5">
 				<div class="form">
 					<div class="form__item pb3rem mb1px">
-						<label class="form__label color-dark fz16px">Номер договора</label>
+						<label class="form__label color-dark fz16px">Номер объекта</label>
 						@if($guard == 'site')
 							<strong class="fz14px d-block mt4px">{{$new_object_number ?? $object_number ?? null}}</strong>
 							@isset($new_object_number)
@@ -21,6 +21,12 @@
 								placeholder="00000"
 								showrows
 								/>
+								<input
+									id="hiddenObjectNumber"
+									type="hidden"
+									name="object_number"
+									value="{{$new_object_number ?? $object_number ?? null}}"
+									>
 						@endif
 					</div>
 					

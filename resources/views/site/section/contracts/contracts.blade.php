@@ -1180,6 +1180,7 @@
 					if (error.errors) {
 						console.log(error.errors);
 						$.each(error.errors, function(field, errors) {
+							if (field == 'object_number') $.notify('Нельзя создать договор с таким номером объекта', 'error');
 							$(formSelector).find('[name="'+field+'"]').ddrInputs('error', errors[0]);
 						});
 					}

@@ -13,7 +13,7 @@ return new class extends Migration {
     public function up() {
         Schema::create('contracts', function (Blueprint $table) {
             $table->id();
-			$table->integer('object_number')->unsigned()->unique()->default(null)->comment('Номер объекта');
+			$table->string('object_number', 6)->unsigned()->unique()->default(null)->comment('Номер объекта');
             $table->string('title')->nullable()->comment('Название/заявитель');
             $table->string('titul')->nullable()->comment('Титул');
             $table->string('contract', 30)->nullable()->comment('Номер договора');
@@ -30,6 +30,7 @@ return new class extends Migration {
             $table->unsignedInteger('deadline_color_key')->nullable()->default(null)->comment('Принудительное присвоение цвета дедлайна (передается позиция цвета из настроек)');
             $table->unsignedInteger('is_new')->default(1)->comment('Пометка договора как нового');
 			$table->bigInteger('_sort')->default(0);
+			$table->unsignedInteger('last_id')->default(null)->comment('Запоминание последнего ID для формирования номера объкта нового договора');
 			$table->timestamps();
         });
     }

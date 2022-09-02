@@ -295,6 +295,8 @@ class Contracts extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id) {
+		$request->merge(['object_number' => Str::padLeft($request->input('object_number'), 5, 0)]);
+		
 		$validFields = $request->validate([
 			'object_number'		=> [
         		'string',
