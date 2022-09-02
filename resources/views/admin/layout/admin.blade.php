@@ -103,7 +103,7 @@
 				<div class="row g-10">
 					<div class="col-auto">
 						<div class="footer__block">
-							<p>ЭМПИН {{date('Y')}} г.</p>
+							{{-- <p>ЭМПИН {{date('Y')}} г.</p> --}}
 						</div>
 					</div>
 				</div>

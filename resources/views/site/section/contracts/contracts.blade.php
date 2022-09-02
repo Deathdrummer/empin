@@ -34,7 +34,7 @@
 									lh100"
 								selectionscounts
 								></strong></x-chooser.item>
-					@if($user->department->id)
+					@if(isset($user->department->id) && !is_null($user->department->id))
 						<x-chooser.item
 							id="chooserDepartment"
 							class="pl3rem"
