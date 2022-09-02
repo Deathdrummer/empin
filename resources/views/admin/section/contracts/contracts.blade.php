@@ -156,7 +156,7 @@
 					
 					storeWithShow(form, (data, container, {error}) => {
 						if (data) {
-							$('#contractsList').append(data);
+							$('#contractsList').prepend(data); // настроить, если нужно вставлять запись в начало или конец списка
 							$.notify('договор успешно создан!');
 							close();
 						}
