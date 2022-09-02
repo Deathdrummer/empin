@@ -138,7 +138,7 @@
 <script type="module">
 	let loadSectionController,
 		uriSegment = getUrlSegment(0),
-		startPage = '{{$site_start_page}}';
+		startPage = '{{$site_start_page ?? 'common'}}';
 	
 	loadSection(uriSegment);
 	
