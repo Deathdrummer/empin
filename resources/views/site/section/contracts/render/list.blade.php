@@ -4,7 +4,7 @@
 		<div class="table table_inline border-all border-light border-2px border-rounded-3px h100">
 			<table>
 				<thead>
-					<tr class="h{{$rowHeight}}rem" sorts>
+					<tr class="h{{$rowHeight ?? '7'}}rem" sorts>
 						@if(!$isArchive)
 							@if(auth('site')->user()->can('contract-col-period:site') && (empty($userColums) || in_array('period', $userColums)))
 								<td
@@ -175,7 +175,7 @@
 		<x-horisontal.item class="h100">
 			<div class="table table_inline border-all border-gray border-2px border-rounded-3px h100">
 				<table class="">
-					<thead class="h{{$rowHeight}}rem">
+					<thead class="h{{$rowHeight ?? '7'}}rem">
 						<tr>
 							<td
 								colspan="{{count($dept['steps'])}}"
