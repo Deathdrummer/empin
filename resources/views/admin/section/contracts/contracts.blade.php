@@ -124,7 +124,7 @@
 						$('input[name="price"]').number(true, 2, '.', ' ');
 						
 						const maxObjectNumber = parseInt($("#hiddenObjectNumber").val());
-						console.log(maxObjectNumber);
+						
 						$('#objectNumber').ddrInputs('change', function(item) {
 							let value = $(item).val(),
 								number = parseInt(value),
