@@ -17,8 +17,8 @@
 						
 						@if(auth('site')->user()->can('contract-col-object_number:site') && (empty($userColums) || in_array('object_number', $userColums)))
 							<td
-								class="w7rem sort {{$sortField == 'id' ? 'sort-'.$sortOrder : ''}} vertical-center"
-								onclick="$.sorting(this, 'id')"
+								class="w7rem sort {{$sortField == 'object_number' ? 'sort-'.$sortOrder : ''}} vertical-center"
+								onclick="$.sorting(this, 'object_number')"
 								noscroll
 								><strong class="fz10px lh90 d-block text-center">Номер объекта</strong></td>
 						@endif

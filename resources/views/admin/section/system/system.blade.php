@@ -10,6 +10,7 @@
 						<li class="ddrtabsnav__item ddrtabsnav__item_active" ddrtabsitem="testTab1">Заголовки и названия</li>
 						<li class="ddrtabsnav__item" ddrtabsitem="testTab2">Настройки страниц</li>
 						<li class="ddrtabsnav__item" ddrtabsitem="testTab3">Размеры</li>
+						<li class="ddrtabsnav__item" ddrtabsitem="testTab4">Договор</li>
 					</ul>
 				</div>
 				
@@ -66,6 +67,18 @@
 							showrows
 							group="large"
 							setting="contract-list-titles-row-height"
+							/>
+					</div>
+					
+					
+					<div class="ddrtabscontent__item" ddrtabscontentitem="testTab4">
+						<p class="color-gray mb1rem">Порядковый номер обекта при создании договора</p>
+						<x-input
+							class="w16rem"
+							type="number"
+							showrows
+							group="large"
+							setting="last-contract-object-number"
 							/>
 					</div>
 				</div>

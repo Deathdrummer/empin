@@ -93,11 +93,18 @@ class Settings {
 	/**
 	 * @param string  $group
 	 * @param string  $key
-	 * @param string|array  $value
+	 * @param null|string|array  $value
 	 * @return bool
 	 */
-	public function set(?string $group = null, ?string $key = null, mixed $value = null): bool {
-		if (!$group || !$key) return false;
+	public function set(?string $group = null, ?string $key = null, mixed $value = false): bool {
+		if (!$key) return false;
+		
+		if ($value === false) {
+			$value = $key;
+			$key = $group;
+			$group = false;
+		}
+		
 		['key' => $keyToFind, 'path' => $path] = $this->parseKey($key);
 		
 		$setting = Setting::firstOrNew(['key' => $keyToFind]);
@@ -110,6 +117,9 @@ class Settings {
 		$stat = $setting->save();
 		return $stat;
 	}
+	
+	
+	
 	
 	
 	

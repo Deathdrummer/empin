@@ -6,6 +6,7 @@ use App\Models\Contract;
 use App\Models\ContractData;
 use App\Models\Department;
 use App\Models\User;
+use App\Services\Settings;
 use App\Traits\HasCrudController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -27,11 +28,13 @@ class Contracts extends Controller {
      * @var array
      */
 	protected $data = [];
+	protected $settings;
 	
 	
 	
-	public function __construct() {
-		
+	
+	public function __construct(Settings $settings) {
+		$this->settings = $settings;
 		/* 
 		$this->middleware('throttle:10,1')->only([
 			'store_show',
@@ -49,6 +52,7 @@ class Contracts extends Controller {
 		]); */
 		
 	}
+	
 	
 	
 	
@@ -108,7 +112,7 @@ class Contracts extends Controller {
 		
 		$this->_addDepsUsersToData($departments);
 		
-		$lastContractId = Contract::max('id');
+		$lastContractId = $this->settings->get('last-contract-object-number');
 		$newObjectNumber = Str::padLeft(($lastContractId + 1), 5, 0);
 		
 		if (!$viewPath) return response()->json(['no_view' => true]);
@@ -179,9 +183,6 @@ class Contracts extends Controller {
 		]);
 		
 		
-		
-		
-		
 		if (!isset($validFields['_sort'])) {
 			$maxSort = Contract::max('_sort');
 			$validFields['_sort'] = $maxSort + 1;
@@ -202,6 +203,12 @@ class Contracts extends Controller {
 		}
 		
 		$createdContract->departments()->attach($contractDepartments);
+		
+		
+		$lastContractObjectNumber = $this->settings->get('last-contract-object-number');
+		if ($createdContract['object_number'] > $lastContractObjectNumber) {
+			$this->settings->set('last-contract-object-number', (int)$validFields['object_number']);
+		}
 		
 		return $createdContract;
 	}
@@ -360,6 +367,12 @@ class Contracts extends Controller {
 		
 		// так как refresh не работает, пришлось повторно получить модель
 		// $contract = Contract::withExists('departments as has_departments')->find($id);
+		
+		
+		$lastContractObjectNumber = $this->settings->get('last-contract-object-number');
+		if ((int)$validFields['object_number'] > $lastContractObjectNumber) {
+			$this->settings->set('last-contract-object-number', (int)$validFields['object_number']);
+		}
 		
 		return $this->view($viewPath.'.item', $contract);
     }

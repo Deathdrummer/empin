@@ -123,17 +123,10 @@
 						enableButtons('close');
 						$('input[name="price"]').number(true, 2, '.', ' ');
 						
-						const maxObjectNumber = parseInt($("#hiddenObjectNumber").val());
-						
 						$('#objectNumber').ddrInputs('change', function(item) {
 							let value = $(item).val(),
 								number = parseInt(value),
 								sliceNumber = parseInt(String(number).slice(0, 5));
-								
-							if (sliceNumber > maxObjectNumber) {
-								$.notify('Нельзя задавать номер объекта больше '+String(maxObjectNumber).padStart(5, '0'), 'error');
-								sliceNumber = maxObjectNumber;
-							} 
 								
 							$(item).val(String(sliceNumber).padStart(5, '0'));
 						});

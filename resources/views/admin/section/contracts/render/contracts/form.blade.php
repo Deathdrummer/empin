@@ -21,12 +21,6 @@
 								placeholder="00000"
 								showrows
 								/>
-								<input
-									id="hiddenObjectNumber"
-									type="hidden"
-									name="object_number"
-									value="{{$new_object_number ?? $object_number ?? null}}"
-									>
 						@endif
 					</div>
 					
