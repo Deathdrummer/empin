@@ -8,7 +8,8 @@
 				<div class="ddrtabs__nav">
 					<ul class="ddrtabsnav" ddrtabsnav>
 						<li class="ddrtabsnav__item ddrtabsnav__item_active" ddrtabsitem="testTab1">Заголовки и названия</li>
-						<li class="ddrtabsnav__item" ddrtabsitem="testTab2">Размеры</li>
+						<li class="ddrtabsnav__item" ddrtabsitem="testTab2">Настройки страниц</li>
+						<li class="ddrtabsnav__item" ddrtabsitem="testTab3">Размеры</li>
 					</ul>
 				</div>
 				
@@ -22,30 +23,42 @@
 									setting="company_name"
 									/>
 							</div>
-							<div class="col-auto">
+						</div>
+					</div>
+					
+					
+					<div class="ddrtabscontent__item" ddrtabscontentitem="testTab2">
+						<div class="row row-cols-1 gy-20">
+							<div class="col">
 								<x-input
+									class="w30rem"
 									label="Стартовая страница"
 									group="large"
 									setting="site_start_page"
 									/>
 							</div>
-							<div class="col-auto">
+							
+							<div class="col">
+								<x-input
+									class="w30rem"
+									label="Стартовая страница админ панели"
+									group="large"
+									setting="admin_start_page"
+									/>
+							</div>
+							
+							<div class="col">
 								<x-checkbox
-									label="Показывать главное меню"
+									label="Показывать главное меню в ЛК"
 									group="large"
 									setting="show_nav"
 									/>
 							</div>
 						</div>
-						
-							
-							
-								
-								
-								
-							
 					</div>
-					<div class="ddrtabscontent__item" ddrtabscontentitem="testTab2">
+					
+					
+					<div class="ddrtabscontent__item" ddrtabscontentitem="testTab3">
 						<p class="color-gray mb1rem">Высота строки заголовков в списке договоров</p>
 						<x-input
 							label="rem"

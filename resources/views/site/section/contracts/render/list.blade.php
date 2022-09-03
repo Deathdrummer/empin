@@ -176,7 +176,7 @@
 			<div class="table table_inline border-all border-gray border-2px border-rounded-3px h100">
 				<table>
 					<thead>
-						<tr class="h{{$rowHeight ?? '7'}}rem">
+						<tr class="h3rem">
 							<td
 								colspan="{{count($dept['steps'])}}"
 								class="pb5px pt4px"
@@ -188,7 +188,11 @@
 							</td>
 						</tr>
 						@if($dept['steps'])
-							<tr>
+							<tr
+								@class([
+									'h'.($rowHeight - 3).'rem'
+								])
+								>
 								@forelse($dept['steps'] as $step)
 									<td @class([
 											'w8rem' => ($step['type'] == 1),

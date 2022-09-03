@@ -121,7 +121,7 @@ Route::post('/reset-password', function (Request $request) {
 
 
 
-// сайт 
+// сайт prefix('site') уже подключен
 Route::middleware(['lang'])->get('/{section?}', function (Request $request, $section = null) {
 	if (!Auth::guard('site')->check() && $section) return redirect()->route('site');
 	

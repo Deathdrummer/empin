@@ -122,17 +122,18 @@ Route::post('/reset-password', function (Request $request) {
 Route::middleware(['lang'])->get('/{section?}', function (Request $request, $section = null) {
 	if (!Auth::guard('admin')->check() && $section) return redirect()->route('admin');
 	
-	$activeNav = $section ?: 'common';
+	$settingsService = App::make(Settings::class);
+	$settings = $settingsService->getMany('company_name', 'admin_start_page'); // прописать настройки для вывода в общий шаблон админ. панели
 	
-	$nav = auth('admin')->check() ?  (new AdminSection)->getSections($activeNav) : [];
+	$activeNav = $section ?: ($settings['admin_start_page'] ?? 'common');
 	
-	$hasMainAdmin = AdminUser::where('is_main_admin', true)->count() > 0;
 	$locale = App::currentLocale();
 	
-	$user = Auth::guard('admin')->user();
+	$nav = auth('admin')->check() ? (new AdminSection)->getSections($activeNav) : [];
 	
-	$settingsService = App::make(Settings::class);
-	$settings = $settingsService->getMany('company_name'); // прописать настройки для вывода в общий шаблон админ. панели
+	$hasMainAdmin = AdminUser::where('is_main_admin', true)->count() > 0;
+	
+	$user = Auth::guard('admin')->user();
 	
 	return view('admin.index', compact('locale', 'hasMainAdmin', 'user', 'nav', 'activeNav'), $settings->all());
 })->name('admin');

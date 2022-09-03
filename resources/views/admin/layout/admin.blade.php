@@ -118,7 +118,8 @@
 @push('scripts')
 <script type="module">
 	let loadSectionController,
-		uriSegment = getUrlSegment(1);
+		uriSegment = getUrlSegment(1),
+		startPage = '{{$admin_start_page ?? 'common'}}';
 		
 	loadSection(uriSegment);
 	
@@ -303,7 +304,7 @@
 		//console.log(history.state['section']);
 		//history.replaceState({page: 3}, "title 3", "?page=3")
 		
-		section = section || 'common';
+		section = section || startPage;
 		
 		let getSection = axiosQuery('post', '/admin/get_section', {section}, 'text', loadSectionController);
 		
