@@ -24,10 +24,14 @@ class UserController extends Controller {
 	 * @return 
 	 */
 	public function login(Request $request) {
+		
+		$request->merge(['email' => encodeEmail($request->input('email'))]);
+		
 		$authFields = $request->validate([
 			'email' 	=> 'required|email|exists:users,email',
 			'password' 	=> 'required|string'
 		]);
+		
 		if (!Auth::guard('site')->attempt($authFields, true)) return response()->json(['no_auth' => __('auth.failed')]);
 		
 		if (!Auth::guard('site')->user()->email_verified_at) {
