@@ -47,7 +47,6 @@ class Contracts extends Controller {
 	 * @return 
 	 */
 	public function list(Request $request) {
-		
 		$list = $this->contract->getWithDepartments($request);
 		
 		$headers = [];

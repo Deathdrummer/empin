@@ -87,7 +87,7 @@ class Department {
 	public function checkShowOnlyAssigned() {
 		if (auth('site')->user()->can('show-all-departments-to-assigned:site')) return false;
 		$result = DepartmentModel::select('show_only_assigned')->where('id', auth('site')->user()->department_id)->first();
-		return !!$result['show_only_assigned'] ?? false;
+		return isset($result['show_only_assigned']) ? !!$result['show_only_assigned'] : false;
 	}
 	
 	

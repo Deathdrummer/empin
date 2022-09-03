@@ -83,7 +83,6 @@ class Contract {
 	public function getWithDepartments(Request $request) {
 		$filter = app()->make(ContractFilter::class, ['queryParams' => $request->except(['sort_field', 'sort_order'])]);
 		
-		
 		$sortField = $request->get('sort_field', 'id');
 		$sortOrder = $request->get('sort_order', 'asc');
 		$selection = $request->get('selection', null);
@@ -98,7 +97,6 @@ class Contract {
 			])->get()->pluck('contract_id'),
 			default => false
 		};
-		
 		
 		$selectionContracts = match (true) {
 			!is_null($selection) => Selection::where('id', $selection)->with('contracts:id')->first(),
