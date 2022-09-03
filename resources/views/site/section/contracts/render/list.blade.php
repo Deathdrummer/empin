@@ -174,9 +174,9 @@
 		@endif
 		<x-horisontal.item class="h100">
 			<div class="table table_inline border-all border-gray border-2px border-rounded-3px h100">
-				<table class="h{{$rowHeight ?? '7'}}rem">
+				<table>
 					<thead>
-						<tr>
+						<tr class="h{{$rowHeight ?? '7'}}rem">
 							<td
 								colspan="{{count($dept['steps'])}}"
 								class="pb5px pt4px"
