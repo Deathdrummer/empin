@@ -206,8 +206,9 @@ class Contracts extends Controller {
 		
 		
 		$lastContractObjectNumber = $this->settings->get('last-contract-object-number');
+		
 		if (!$lastContractObjectNumber || $createdContract['object_number'] > $lastContractObjectNumber) {
-			$this->settings->set('last-contract-object-number', (int)$validFields['object_number']);
+			$this->settings->set('system', 'last-contract-object-number', (int)$validFields['object_number']);
 		}
 		
 		return $createdContract;
@@ -371,7 +372,7 @@ class Contracts extends Controller {
 		
 		$lastContractObjectNumber = $this->settings->get('last-contract-object-number');
 		if (!$lastContractObjectNumber || (int)$validFields['object_number'] > $lastContractObjectNumber) {
-			$this->settings->set('last-contract-object-number', (int)$validFields['object_number']);
+			$this->settings->set('system', 'last-contract-object-number', (int)$validFields['object_number']);
 		}
 		
 		return $this->view($viewPath.'.item', $contract);
