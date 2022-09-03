@@ -1,9 +1,9 @@
 <?php
 
 return [
-	'week_days' 			=> 'Вс|Пн|Вт|Ср|Чт|Пт|Сб',
-	'monthes_names' 		=> 'Янв|Фев|Мар|Апр|Май|Июн|Июл|Авг|Сен|Окт|Ноя|Дек',
-	'monthes_names_full'	=> 'января|феваля|марта|апреля|мая|июня|июля|августа|сенября|октября|ноября|декабря',
+	'week_days' 			=> 'Sun|Mon|Tue|Wed|Thu|Fry|Sat',
+	'monthes_names' 		=> 'jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec',
+	'monthes_names_full'	=> 'january|february|march|april|may|june|july|august|september|october|november|december',
 	'write_year'			=> 'Введите год',
 	'locales'				=> [
 		'ru'	=> 'Русский',
