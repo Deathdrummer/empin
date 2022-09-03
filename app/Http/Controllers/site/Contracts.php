@@ -66,7 +66,7 @@ class Contracts extends Controller {
 		}
 		
 		
-		if ($list->isEmpty()) return $this->renderWithHeaders('list', [], $headers);
+		if (!$list || $list->isEmpty()) return $this->renderWithHeaders('list', [], $headers);
 		
 		$alldeps = $this->department->getWithSteps($request);
 		

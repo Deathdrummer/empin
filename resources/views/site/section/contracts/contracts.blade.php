@@ -706,10 +706,13 @@
 	
 	
 	
+
+	
 	
 	//------------------------------------------------- Убрать отметку нового договора и открыть окно с общей информацией
 	$.openContractInfo = (tr, contractId) => {
 		let isNew = $(tr).attr('isnew');
+		
 		
 		ddrPopup({
 			title: 'Общая информация', 
@@ -717,6 +720,13 @@
 			buttons: ['Закрыть'],
 		}).then(({state, wait, setTitle, setButtons, loadData, setHtml, setLHtml, dialog, close, onScroll, disableButtons, enableButtons, setWidth}) => { //isClosed
 			wait();
+			
+			// закрытие окна по нажатию клавиши ESC
+			$(document).one('keydown', (e) => {
+				if (e.keyCode == 27) {
+					close();
+				}
+			});
 			
 			if (isNew) {
 				Promise.all([
