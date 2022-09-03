@@ -67,8 +67,9 @@
 	
 	
 	
-	console.log(currentDate);
-	//console.log(currentDate, new Date(currentDate), currentDate ? new Date(currentDate) : null);
+	console.log(currentDate, new Date(currentDate), new Date(currentDate.replace(/ /g,"T")));
+	
+	
 	
 	const ops = {
 		//position: 'bl', // 'tr', 'tl', 'br', 'bl', 'c' Этот параметр позиционирует календарь относительно поля <input>
@@ -78,7 +79,7 @@
 		customDays: weekDays,
 		customMonths: monthesNames,
 		//alwaysShow: true,
-		dateSelected: currentDate ? new Date(currentDate) : null,
+		dateSelected: currentDate ? new Date(currentDate.replace(/ /g,"T")) : null,
 		//maxDate: new Date(2099, 0, 1),
 		//minDate: new Date(2018, 0, 1),
 		//startDate: new Date(2022, 0, 1),
