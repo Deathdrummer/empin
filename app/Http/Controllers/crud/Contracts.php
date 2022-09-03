@@ -295,6 +295,7 @@ class Contracts extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id) {
+		
 		$request->merge(['object_number' => Str::padLeft($request->input('object_number'), 5, 0)]);
 		
 		$validFields = $request->validate([
@@ -456,6 +457,7 @@ class Contracts extends Controller {
 	 */
 	private function _buildDepartments(Request $request = null, int $contractId = null, $tableShowDepsData = null): mixed {
 		if (!$departmentsData = $request->input('departments')) return [];
+		
 		foreach ($departmentsData as $dId => $department) {
 			if (!$department) {
 				unset($departmentsData[$dId]);
@@ -491,7 +493,7 @@ class Contracts extends Controller {
 				'show'	=> $show
 			];
 			
-			if ($show && !$tableShowDepsData[$deptId]) $depsData[$deptId]['updated_show'] = now()->setTime(0, 0, 0);
+			if ($show && !isset($tableShowDepsData[$deptId])) $depsData[$deptId]['updated_show'] = now()->setTime(0, 0, 0);
 			elseif (!$show) $depsData[$deptId]['updated_show'] = null;
 		}
 		
