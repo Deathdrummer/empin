@@ -65,10 +65,7 @@
 		setting = '{{$setting}}';
 	
 	
-	
-	
-	console.log(currentDate, new Date(currentDate), new Date(currentDate.replace(/ /g,"T")), new Date(currentDate.replace(/-/g, '/')));
-	
+	let dateSelected = currentDate ? (new Date(currentDate.replace(/ /g,"T")) || new Date(currentDate.replace(/-/g, '/'))) : null;
 	
 	
 	const ops = {
@@ -79,7 +76,7 @@
 		customDays: weekDays,
 		customMonths: monthesNames,
 		//alwaysShow: true,
-		dateSelected: currentDate ? new Date(currentDate.replace(/ /g,"T")) : null,
+		dateSelected: dateSelected,
 		//maxDate: new Date(2099, 0, 1),
 		//minDate: new Date(2018, 0, 1),
 		//startDate: new Date(2022, 0, 1),
