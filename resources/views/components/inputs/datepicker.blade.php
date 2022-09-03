@@ -67,7 +67,7 @@
 	
 	
 	
-	console.log(currentDate, new Date(currentDate), new Date(currentDate.replace(/ /g,"T")));
+	console.log(currentDate, new Date(currentDate), new Date(currentDate.replace(/ /g,"T")), new Date(currentDate.replace(/-/g, '/')));
 	
 	
 	
