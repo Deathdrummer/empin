@@ -64,7 +64,11 @@
 		onselectFn = '{{$onselect}}',
 		setting = '{{$setting}}';
 	
-	console.log(currentDate, new Date(currentDate), currentDate ? new Date(currentDate) : null);
+	
+	
+	
+	console.log(currentDate);
+	//console.log(currentDate, new Date(currentDate), currentDate ? new Date(currentDate) : null);
 	
 	const ops = {
 		//position: 'bl', // 'tr', 'tl', 'br', 'bl', 'c' Этот параметр позиционирует календарь относительно поля <input>
