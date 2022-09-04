@@ -42,7 +42,7 @@
 		@if(isset($actionFunc) && !$setting)oninput="$.{{$actionFunc}}(this{{isset($actionParams) ? ', '.$actionParams : null}})" @endif
 		{{$tagParam ? $tag.'='.$tagParam.'' : $tag}}
 		>
-		@if ($options && $choose && ($emptyHasValue || (!$hasActive && !$value && !$setSelected($value, $settings, $setting))))
+		@if ($options && $choose && ($emptyHasValue || (!$hasActive && $value !== null && !$setSelected($value, $settings, $setting))))
 			<option value=""{{!$hasActive ? 'selected' : ''}} {{$chooseEmpty ? '' : 'disabled'}}>{{$choose}}</option>
 		@endif
 		@forelse ($options as $item)

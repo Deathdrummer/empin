@@ -6552,7 +6552,6 @@ table tbody:empty::after {
   display: revert;
   justify-content: center;
   align-items: center;
-  widt: 100%;
   color: #eee;
   text-align: center;
   border-bottom: 1px solid #fbfbfb;

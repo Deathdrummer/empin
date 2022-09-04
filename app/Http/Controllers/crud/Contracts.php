@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Contract;
 use App\Models\ContractData;
 use App\Models\Department;
+use App\Models\StepPattern;
 use App\Models\User;
 use App\Services\Settings;
 use App\Traits\HasCrudController;
@@ -104,6 +105,8 @@ class Contracts extends Controller {
 			'guard'			=> 'string|required',
 		]);
 		
+		if (!$viewPath) return response()->json(['no_view' => true]);
+		
 		$this->_buildDataFromSettings();
 		
 		$departments = Department::with(['steps' => function($query) {
@@ -115,12 +118,16 @@ class Contracts extends Controller {
 		$lastContractId = $this->settings->get('last-contract-object-number');
 		$newObjectNumber = Str::padLeft(($lastContractId + 1), 5, 0);
 		
-		if (!$viewPath) return response()->json(['no_view' => true]);
+		$stepsdata = StepPattern::select('rules')->where('customer', 0)->first();
+		$stepspattern = $stepsdata['rules'];
+		
+		
         return $this->view($viewPath.'.form', [
 			'index' => $newItemIndex,
 			'departments' => $departments,
 			'new_object_number' => $newObjectNumber,
-			'guard' => $guard
+			'guard' => $guard,
+			'stepspattern' => $stepspattern
 		]);
     }
 	
@@ -414,6 +421,20 @@ class Contracts extends Controller {
 	
 	
 	
+	
+	
+	
+	
+	
+	/**
+	 * @param 
+	 * @return 
+	 */
+	public function set_customer_rules(Request $request) {
+		$customer = $request->input('customer');
+		$stepsdata = StepPattern::select('rules')->where('customer', $customer)->first();
+		return response()->json($stepsdata['rules'] ?? null);
+	}
 	
 	
 	

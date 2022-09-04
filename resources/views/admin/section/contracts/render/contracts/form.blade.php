@@ -65,7 +65,7 @@
 				
 				<div class="form__item">
 					<label class="form__label color-dark">Заказчик</label>
-					<x-select :options="$data['customers']" name="customer" value="{{$customer ?? null}}" class="w100" />
+					<x-select id="contractCustomer" :options="$data['customers']" name="customer" value="{{$customer ?? null}}" class="w100" />
 				</div>
 				
 				<div class="form__item">
@@ -107,7 +107,7 @@
 				
 				<fieldset class="fieldset">
 					<legend>Отделы и этапы</legend>
-					<div class="row row-cols-{{count($departments) < 4 ? 4 : count($departments)}} g-15">
+					<div class="row row-cols-{{count($departments) < 4 ? 4 : count($departments)}} g-15" id="contractFormDepsSteps">
 						@foreach($departments as $dept)
 							<div class="col">
 								<div @class([
@@ -151,11 +151,11 @@
 													<div class="col">
 														<x-checkbox
 															name="departments[{{$dept['id']}}][steps][{{$step['id']}}][choosed]"
-															:checked="$cd[$dept['id']]['steps'][$step['id']]['show'] ?? null"
+															:checked="$cd[$dept['id']]['steps'][$step['id']]['show'] ?? in_array($step['id'], $stepspattern[$dept['id']] ?? []) ?? null"
 															group="small"
 															:label="$step['name']"
 															action="chechStep:{{$step['type'] == 3 ? 1 : 0}}"
-															tag="stepcheck"
+															tag="stepcheck:{{$dept['id']}}|{{$step['id']}}"
 															/>
 														
 														@if($step['type'] == 3)
@@ -163,14 +163,14 @@
 																:options="$data['deps_users'][$dept['id']] ?? null"
 																name="assigned[dep_{{$dept['id']}}][step_{{$step['id']}}]"
 																:value="$deps_assigned_users[$dept['id']] ?? null"
-																:enabled="$cd[$dept['id']]['steps'][$step['id']]['show'] ?? false"
+																:enabled="$cd[$dept['id']]['steps'][$step['id']]['show'] ?? in_array($step['id'], $stepspattern[$dept['id']] ?? []) ?? false"
 																
 																label="Ответственный"
 																empty="Нет сотрудников"
 																choose="Сотрудник не выбран"
 																choose-empty
 																empty-has-value
-																tag="stepassignedselect"
+																tag="stepassignedselect:{{$dept['id']}}|{{$step['id']}}"
 																group="small"
 																class="w100 mt8px"
 																/>
@@ -187,9 +187,9 @@
 																showrows
 																title="Дедлайн"
 																:value="$cd[$dept['id']]['steps'][$step['id']]['deadline'] ?? $step['deadline']"
-																:enabled="$cd[$dept['id']]['steps'][$step['id']]['show'] ?? false"
+																:enabled="$cd[$dept['id']]['steps'][$step['id']]['show'] ?? in_array($step['id'], $stepspattern[$dept['id']] ?? []) ?? false"
 																placeholder="0"
-																tag="stepdeadline"
+																tag="stepdeadline:{{$dept['id']}}|{{$step['id']}}"
 																class="w5rem ml5px"
 																/>
 														</div>
@@ -202,7 +202,7 @@
 									@endif	
 									
 									@if(count($dept->steps) || $dept['assigned_primary'])
-										<div class="h8rem mt-auto border-top border-light d-flex flex-column justify-content-end">
+										<div class="h4rem mt-auto border-top border-light d-flex flex-column justify-content-end">
 											{{-- @if($dept['assigned_primary'] && count($dept->steps))
 												<div>
 													<x-select
@@ -226,7 +226,7 @@
 													<x-checkbox
 														name="departments[{{$dept['id']}}][show]"
 														:checked="$cd[$dept['id']]['show'] ?? null"
-														:disabled="empty($cd[$dept['id']]['steps'])"
+														:disabled="empty($cd[$dept['id']]['steps']) && !in_array($dept['id'], array_keys($stepspattern) ?? [])"
 														label="Отобразить в отделе"
 														tag="showindepartment"
 														/>

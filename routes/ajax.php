@@ -7,6 +7,7 @@ use App\Http\Controllers\crud\Permissions;
 use App\Http\Controllers\crud\Roles;
 use App\Http\Controllers\crud\Staff;
 use App\Http\Controllers\crud\Steps;
+use App\Http\Controllers\crud\StepsPatterns;
 use App\Http\Controllers\TabsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -138,9 +139,12 @@ Route::resource('permissions', Permissions::class);
 
 
 
+
 // Отделы
 Route::post('/departments/store_show', [Departments::class, 'store_show']);
 Route::resource('departments', Departments::class);
+
+
 
 
 
@@ -151,7 +155,20 @@ Route::resource('steps', Steps::class);
 
 
 
+
+
+// Шаблоны этапов
+Route::get('/steps_patterns/steps', [StepsPatterns::class, 'steps']);
+Route::post('/steps_patterns/steps', [StepsPatterns::class, 'steps_save']);
+Route::post('/steps_patterns/store_show', [StepsPatterns::class, 'store_show']);
+Route::resource('steps_patterns', StepsPatterns::class);
+
+
+
+
+
 // Договоры
 Route::get('/contracts/to_archive/{id}', [Contracts::class, 'to_archive']);
+Route::get('/contracts/set_customer_rules', [Contracts::class, 'set_customer_rules']);
 Route::post('/contracts/store_show', [Contracts::class, 'store_show']);
 Route::resource('contracts', Contracts::class);

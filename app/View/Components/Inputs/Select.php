@@ -9,6 +9,7 @@ class Select extends Component {
 	
 	public $name;
 	public $options;
+	public $optionsType;
 	public $choose;
 	public $empty;
 	public $hasActive;
@@ -27,6 +28,7 @@ class Select extends Component {
     public function __construct(
 		string $name = '',
 		mixed $options = false,
+		mixed $optionsType = null,
 		array $exclude = [],
 		string $choose = 'Выбрать...',
 		string $empty = null,
@@ -49,7 +51,7 @@ class Select extends Component {
 		$ops = [];
 		
 		if ($options && is_array($options)) {
-			if (Arr::isAssoc($options)) {
+			if (Arr::isAssoc($options) || $optionsType == 'assoc') {
 				foreach ($options as $value => $title) {
 					if (in_array($value, $exclude)) continue;
 					$ops[] = [
@@ -98,7 +100,7 @@ class Select extends Component {
 	 * @return 
 	 */
 	public function setSelected($value = false, $settings = false, $setting = false) {
-		if ($value) return htmlspecialchars_decode($value, ENT_QUOTES|ENT_HTML5);
+		if ($value !== false) return htmlspecialchars_decode($value, ENT_QUOTES|ENT_HTML5);
 		if (!$setting || !$settings) return false;
 		return data_get($settings, $setting);
 	}

@@ -9616,7 +9616,7 @@ function _classPrivateMethodGet(receiver, privateSet, fn) { if (!privateSet.has(
 		- file: работа с файлами
 		- change: событие изменения поля или полей
 		- state: комплексный метод, команды:
-			- clear: убрать ошибки, изененность
+			- clear: убрать ошибки, иземенность
 		- addClass: добавить класс к обертке инпута
 		- removeClass: убрать класс у обертки инпута
 		
@@ -11191,12 +11191,13 @@ $.fn.ddrWait = function () {
     ddrwaitBlock: {
       position: 'absolute',
       top: 0,
+      bottom: 0,
       left: 0,
+      right: 0,
+      width: 'revert',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      width: '100%',
-      height: '100%',
       backgroundColor: bgColor,
       opacity: 0,
       borderRadius: 'inherit',

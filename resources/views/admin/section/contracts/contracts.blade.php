@@ -138,6 +138,53 @@
 								isEnabledBtns = true;
 							}
 						});
+						
+						
+						$('#contractCustomer').on('input', (input) => {
+							let customer = $(input.target).val();
+							$(input.target).ddrInputs('disable');
+							
+							let contractFormDepsStepsWait = $('#contractFormDepsSteps').ddrWait();
+							
+							
+							axiosQuery('get', 'ajax/contracts/set_customer_rules', {customer}, 'json').then(({data, error, status, headers}) => {
+								$(input.target).ddrInputs('enable');
+								
+								if (data) {
+									$('#contractFormDepsSteps').find('[stepcheck]').ddrInputs('checked', false);
+									$('#contractFormDepsSteps').find('[stepassignedselect]').ddrInputs('selected', false);
+									$('#contractFormDepsSteps').find('[stepassignedselect], [stepdeadline]').ddrInputs('state', 'clear');
+									
+									$('#contractFormDepsSteps').find('[stepdeadline]').ddrInputs('disable');
+									$('#contractFormDepsSteps').find('[stepassignedselect]').ddrInputs('disable');
+									
+									$('#contractFormDepsSteps').find('[showindepartment]').ddrInputs('checked', false);
+									$('#contractFormDepsSteps').find('[showindepartment]').ddrInputs('disable');
+									
+									
+									$.each(data, (dept, steps) => {
+										$.each(steps, (k, step) => {
+											$('[stepcheck="'+dept+'|'+step+'"]').ddrInputs('checked');
+											$('[stepassignedselect="'+dept+'|'+step+'"]').ddrInputs('enable');
+											$('[stepdeadline="'+dept+'|'+step+'"]').ddrInputs('enable');
+										});
+										
+										
+										let showindepartment = $('[stepcheck^="'+dept+'|"]').closest('[depblock]').find('[showindepartment]');
+										$(showindepartment).ddrInputs('enable');
+									});
+									
+								}
+								
+								contractFormDepsStepsWait.destroy();
+								
+							}).catch((e) => {
+								console.log(e);
+								$(input.target).ddrInputs('enable');
+							});
+						});
+						
+						
 					});
 					if (error) $.notify(error.message, 'error');
 				});
@@ -210,6 +257,54 @@
 									isEnabledBtns = true;
 								}
 							});
+							
+							
+							
+							
+							$('#contractCustomer').on('input', (input) => {
+								let customer = $(input.target).val();
+								$(input.target).ddrInputs('disable');
+								
+								let contractFormDepsStepsWait = $('#contractFormDepsSteps').ddrWait();
+								
+								
+								axiosQuery('get', 'ajax/contracts/set_customer_rules', {customer}, 'json').then(({data, error, status, headers}) => {
+									$(input.target).ddrInputs('enable');
+									
+									if (data) {
+										$('#contractFormDepsSteps').find('[stepcheck]').ddrInputs('checked', false);
+										$('#contractFormDepsSteps').find('[stepassignedselect]').ddrInputs('selected', false);
+										$('#contractFormDepsSteps').find('[stepassignedselect], [stepdeadline]').ddrInputs('state', 'clear');
+										
+										$('#contractFormDepsSteps').find('[stepdeadline]').ddrInputs('disable');
+										$('#contractFormDepsSteps').find('[stepassignedselect]').ddrInputs('disable');
+										
+										$('#contractFormDepsSteps').find('[showindepartment]').ddrInputs('checked', false);
+										$('#contractFormDepsSteps').find('[showindepartment]').ddrInputs('disable');
+										
+										
+										$.each(data, (dept, steps) => {
+											$.each(steps, (k, step) => {
+												$('[stepcheck="'+dept+'|'+step+'"]').ddrInputs('checked');
+												$('[stepassignedselect="'+dept+'|'+step+'"]').ddrInputs('enable');
+												$('[stepdeadline="'+dept+'|'+step+'"]').ddrInputs('enable');
+											});
+											
+											
+											let showindepartment = $('[stepcheck^="'+dept+'|"]').closest('[depblock]').find('[showindepartment]');
+											$(showindepartment).ddrInputs('enable');
+										});
+										
+									}
+									
+									contractFormDepsStepsWait.destroy();
+									
+								}).catch((e) => {
+									console.log(e);
+									$(input.target).ddrInputs('enable');
+								});
+							});
+							
 						});
 					} 
 					if (error) $.notify(error.message, 'error');

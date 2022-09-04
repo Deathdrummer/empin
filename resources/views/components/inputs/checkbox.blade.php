@@ -40,6 +40,8 @@
 		for="{{$id}}"
 		@class([
 			'checkbox__label',
+			'lh90',
+			'd-inline-block',
 			$group.'-checkbox__label' => $group,
 			'noselect'
 		])
