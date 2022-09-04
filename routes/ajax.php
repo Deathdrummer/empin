@@ -160,6 +160,7 @@ Route::resource('steps', Steps::class);
 // Шаблоны этапов
 Route::get('/steps_patterns/steps', [StepsPatterns::class, 'steps']);
 Route::post('/steps_patterns/steps', [StepsPatterns::class, 'steps_save']);
+Route::delete('/steps_patterns/steps', [StepsPatterns::class, 'steps_remove']);
 Route::post('/steps_patterns/store_show', [StepsPatterns::class, 'store_show']);
 Route::resource('steps_patterns', StepsPatterns::class);
 

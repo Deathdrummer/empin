@@ -12,6 +12,7 @@
 						setting="contract-customers"
 						fieldset="ID:w7rem|number|id,Имя:w20rem|text|name"
 						{{-- options="name_type;foo:fooval,bar:barval|name_radio;foo:rool,bar:tool" --}}
+						onRemove="removeCustomerAction"
 						group="small"
 					 />
 				</x-card>
@@ -135,6 +136,21 @@
 
 
 <script type="module">
+	
+	$.removeCustomerAction = (tr, done) => {
+		let customerId = $(tr).find('[field="id"]').val();
+		axiosQuery('delete', 'ajax/steps_patterns/steps', {customer: customerId}, 'json').then(({data, error, status, headers}) => {
+			if (error) {
+				console.log(error?.message, error?.errors);
+			}
+			
+			done();
+		}).catch((e) => {
+			console.log(e);
+		});
+	}
+	
+	
 	
 	
 	$.openPopupWin = () => {

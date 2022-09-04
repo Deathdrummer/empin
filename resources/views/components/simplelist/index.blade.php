@@ -8,7 +8,7 @@
 	'group'     => 'normal',
 	'setting'   => false,
 	'onRemove'	=> false,
-	'oncreate'	=> false,
+	'onСreate'	=> false,
 ])
 
 
@@ -160,7 +160,8 @@
 		listId = '#{{$id}}',
 		addRowAction = '{{$id}}AddRow',
 		removeRowAction = '{{$id}}RemoveRow',
-		onRemoveFunc = '{{$onRemove}}';
+		onRemoveFunc = '{{$onRemove}}',
+		onCreateFunc = '{{$onСreate}}';
 	
 	
 	$(listId).ddrInputs('change', (input) => {
@@ -199,6 +200,10 @@
 			$(listSelector).find('tr[new]').removeAttrib('new');
 			
 			simplelistAddBtnWait.destroy();
+			
+			if (onCreateFunc) {
+				$[onCreateFunc]($(btn).closest('tr'), btn, listSelector, fields, options, setting, group);
+			}
 		});
 	}
 	
@@ -257,7 +262,7 @@
 								if (hasRows) $(btn).closest('tr').remove();
 								else $(btn).closest('tbody').empty();
 								$.notify('Запись успешно удалена!');
-							}	
+							}
 						}
 						
 						//$(btn).closest('tr').find('input, textarea, select, button').ddrInputs('enable');

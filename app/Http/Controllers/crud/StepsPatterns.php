@@ -281,5 +281,18 @@ class StepsPatterns extends Controller {
 	
 	
 	
+	/**
+	 * @param 
+	 * @return 
+	 */
+	public function steps_remove(Request $request) {
+		$customer = $request->input('customer');
+		$stat = StepPattern::where('customer', $customer)->delete();
+		return response()->json($stat);
+	}
+	
+	
+	
+	
 	
 }
