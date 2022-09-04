@@ -294,7 +294,8 @@ class Contracts extends Controller {
 			'departments' 			=> $departments,
 			'deps_assigned_users'	=> $depsAssignedUsers,
 			'cd' 					=> $contrDeps,
-			'guard' 				=> $guard
+			'guard' 				=> $guard,
+			'stepspattern' 			=> [],
 		], $contractData->toArray());
     }
 	
