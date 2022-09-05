@@ -7,6 +7,7 @@ use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\View;
 use Throwable;
@@ -48,6 +49,8 @@ class Handler extends ExceptionHandler
      * @return void
      */
     public function register() {
+		
+		
         
        // $this->renderable(function (NotFoundHttpException $e, $request) {
        //     if ($request->is('api/*')) {
@@ -67,10 +70,31 @@ class Handler extends ExceptionHandler
         
         
         
-        //$this->reportable(function (Throwable $e) {
-        //    logger('reportable');
-        //});
-		//
+        $this->reportable(function (Throwable $exception) {
+			//getMessage
+			//getCode
+			//getFile
+			//getLine
+			//getTrace
+			//getPrevious
+			//getTraceAsString
+			
+			Log::error('file: '.$exception->getFile().' line: '.$exception->getLine());
+			
+        //
+			//if ($this->isHttpException($exception) && !$request->expectsJson()) {
+			//	return $details;
+			//} elseif($request->expectsJson()) {
+			//	$locale = new Locale('admin');
+			//	$locale->set();
+			//	$errData = $details->getData();
+			//	$errData->status = $details->getStatusCode();
+			//	$errData->message = __('errors.'.$errData->status) ?: $details->message;
+			//	return response()->json($errData);
+			//}
+			//return $details;
+        });
+		
         //$this->renderable(function ($request) {
         //    logger('renderable');
         //    //return response()->view('errors.invalid-order', [], 500);
