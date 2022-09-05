@@ -7,6 +7,7 @@
 				<p class="format fz12px">{{$titul ?? '-'}}</p>
 			</div>
 		</td>
+		<td><p>{{$applicant ?? '-'}}</p></td>
 		<td><p>{{$contract ?? '-'}}</p></td>
 		<td class="breakword">
 			<div class="scrollblock-hidden h5rem vertical-center">

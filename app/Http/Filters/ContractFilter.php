@@ -60,6 +60,7 @@ class ContractFilter extends AbstractFilter {
 		$builder->where(function (Builder $query) use($value) {
 			$query->orWhere('object_number', 'like', '%'.$value.'%');
 			$query->orWhere('title', 'like', '%'.$value.'%');
+			$query->orWhere('applicant', 'like', '%'.$value.'%');
 			$query->orWhere('titul', 'like', '%'.$value.'%');
 			$query->orWhere('contract', 'like', '%'.$value.'%');
 		});

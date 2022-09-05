@@ -31,6 +31,14 @@
 								><strong class="fz10px lh90 d-block text-center">Название / заявитель</strong></td>
 						@endif
 						
+						@if(auth('site')->user()->can('contract-col-applicant:site') && (empty($userColums) || in_array('applicant', $userColums)))
+							<td
+								class="w10rem sort{{$sortField == 'applicant' ? ' sort-'.$sortOrder : ''}} vertical-center"
+								onclick="$.sorting(this, 'applicant')"
+								noscroll
+								><strong class="fz10px lh90 d-block text-center">Заявитель</strong></td>
+						@endif
+						
 						@if(auth('site')->user()->can('contract-col-titul:site') && (empty($userColums) || in_array('titul', $userColums)))
 							<td
 								class="w20rem sort{{$sortField == 'titul' ? ' sort-'.$sortOrder : ''}} vertical-center"

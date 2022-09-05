@@ -4,8 +4,8 @@
 		<div class="row g-30">
 			<div class="col-5">
 				<div class="form">
-					<div class="form__item pb3rem mb1px">
-						<label class="form__label color-dark fz16px">Номер объекта</label>
+					<div class="form__item">
+						<label class="form__label color-dark">Номер объекта</label>
 						@if($guard == 'site')
 							<strong class="fz14px d-block mt4px">{{$new_object_number ?? $object_number ?? null}}</strong>
 							@isset($new_object_number)
@@ -30,8 +30,13 @@
 					</div>
 					
 					<div class="form__item">
+						<label class="form__label color-dark">Заявитель</label>
+						<x-input name="applicant" value="{{$applicant ?? null}}" class="w100" />
+					</div>
+					
+					<div class="form__item">
 						<label class="form__label color-dark">Титул</label>
-						<x-textarea name="titul" value="{{$titul ?? null}}" class="w100" />
+						<x-textarea name="titul" value="{{$titul ?? null}}" class="w100" rows="5" />
 					</div>
 					
 					<div class="form__item">
@@ -40,61 +45,65 @@
 					</div>
 					
 				</div>
-				
-				<div class="form__item">
-					<label class="form__label color-dark">Стоимость договора</label>
-					<x-input name="price" value="{{$price ?? 0}}" icon="ruble-sign" class="w100" />
+			</div>
+			
+			
+			<div class="col-5">	
+				<div class="form">
+					<div class="form__item">
+						<div class="row row-cols-2 g-10">
+							<div class="col">
+								<label class="form__label color-dark">Дата начала договора</label>
+								<x-datepicker name="date_start" date="{{$date_start ?? null}}" calendarid="cntractForm{{$data['rand_id']}}" class="w100" />
+							</div>
+							<div class="col">
+								<label class="form__label color-dark">Дата окончания договора</label>
+								<x-datepicker name="date_end" date="{{$date_end ?? null}}" calendarid="cntractForm{{$data['rand_id']}}" class="w100" />
+							</div>
+						</div>	
+					</div>
+					
+					<div class="form__item">
+						<label class="form__label color-dark">Заказчик</label>
+						<x-select id="contractCustomer" :options="$data['customers']" name="customer" value="{{$customer ?? null}}" class="w100" />
+					</div>
+					
+					<div class="form__item">
+						{{-- <label class="form__label color-dark">Населенный пункт</label>
+						<x-select :options="$data['locality']" name="locality" value="{{$locality ?? null}}" class="w100" /> --}}
+						
+						
+						<label class="form__label color-dark">Населенный пункт</label>
+						<x-input name="locality" value="{{$locality ?? null}}" class="w100" />
+					</div>
+					
+					<div class="form__item">
+						<label class="form__label color-dark">Исполнтель</label>
+						<x-select :options="$data['contractors']" name="contractor" value="{{$contractor ?? null}}" class="w100" />
+					</div>
+					
+					<div class="form__item">
+						<label class="form__label color-dark">Тип договора</label>
+						<x-select :options="$data['types']" name="type" value="{{$type ?? null}}" class="w100" />
+					</div>
+					
+					<div class="form__item">
+						<label class="form__label color-dark">Стоимость договора</label>
+						<x-input name="price" value="{{$price ?? 0}}" icon="ruble-sign" iconbg="yellow" class="w100" />
+					</div>
 				</div>
 			</div>
 			
-			<div class="col-5">
-					
-				
-				<div class="form__item">
-					<div class="row row-cols-2 g-10">
-						<div class="col">
-							<label class="form__label color-dark">Дата начала договора</label>
-							<x-datepicker name="date_start" date="{{$date_start ?? null}}" calendarid="cntractForm{{$data['rand_id']}}" class="w100" />
-						</div>
-						<div class="col">
-							<label class="form__label color-dark">Дата окончания договора</label>
-							<x-datepicker name="date_end" date="{{$date_end ?? null}}" calendarid="cntractForm{{$data['rand_id']}}" class="w100" />
-						</div>
-					</div>	
-				</div>
-				
-				<div class="form__item">
-					<label class="form__label color-dark">Заказчик</label>
-					<x-select id="contractCustomer" :options="$data['customers']" name="customer" value="{{$customer ?? null}}" class="w100" />
-				</div>
-				
-				<div class="form__item">
-					{{-- <label class="form__label color-dark">Населенный пункт</label>
-					<x-select :options="$data['locality']" name="locality" value="{{$locality ?? null}}" class="w100" /> --}}
-					
-					
-					<label class="form__label color-dark">Населенный пункт</label>
-					<x-input name="locality" value="{{$locality ?? null}}" class="w100" />
-				</div>
-				
-				<div class="form__item">
-					<label class="form__label color-dark">Исполнтель</label>
-					<x-select :options="$data['contractors']" name="contractor" value="{{$contractor ?? null}}" class="w100" />
-				</div>
-				
-				<div class="form__item">
-					<label class="form__label color-dark">Тип договора</label>
-					<x-select :options="$data['types']" name="type" value="{{$type ?? null}}" class="w100" />
-				</div>
-			</div>
 			
 			<div class="col-2">
-				<div class="form__item">
-					<x-checkbox name="subcontracting" :checked="$subcontracting ?? null" label="Субподряд" />
-				</div>
-				
-				<div class="form__item">
-					<x-checkbox name="hoz_method" :checked="$hoz_method ?? null" label="Хоз способ" />
+				<div class="form">
+					<div class="form__item">
+						<x-checkbox name="subcontracting" :checked="$subcontracting ?? null" label="Субподряд" />
+					</div>
+					
+					<div class="form__item">
+						<x-checkbox name="hoz_method" :checked="$hoz_method ?? null" label="Хоз способ" />
+					</div>
 				</div>
 			</div>
 		</div>

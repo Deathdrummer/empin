@@ -67,6 +67,10 @@
 		<td><p class="fz12px lh110">{{$title ?? '-'}}</p></td>
 	@endif
 	
+	@if(auth('site')->user()->can('contract-col-applicant:site') && (empty($userColums) || in_array('applicant', $userColums)))
+		<td><p class="fz12px lh110">{{$applicant ?? '-'}}</p></td>
+	@endif
+	
 	@if(auth('site')->user()->can('contract-col-titul:site') && (empty($userColums) || in_array('titul', $userColums)))
 		<td class="pr2px">
 			<div class="scrollblock-hidden h5rem pr3px">

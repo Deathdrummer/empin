@@ -6,7 +6,6 @@ use App\Models\Traits\Filterable;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
 
 class Contract extends Model {
     use HasFactory, Filterable, Collectionable, Dateable;
@@ -58,6 +57,7 @@ class Contract extends Model {
 	protected $fillable = [
 		'object_number',
 		'title',
+		'applicant',
 		'titul',
 		'contract',
 		'price',

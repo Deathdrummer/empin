@@ -24,6 +24,7 @@
 						<td class="w8rem"><strong class="lh90 d-block">Номер объекта</strong></td>
 						<td class="w20rem"><strong>Название / заявитель</strong></td>
 						<td><strong>Титул</strong></td>
+						<td><strong>Заявитель</strong></td>
 						<td><strong>Номер договора</strong></td>
 						<td class="w20rem"><strong>Заказчик</strong></td>
 						<td class="w20rem"><strong>Населенный пункт</strong></td>
