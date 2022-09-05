@@ -8,12 +8,14 @@
 			</div>
 		</td>
 		<td><p>{{$contract ?? '-'}}</p></td>
-		<td>
-			@if(isset($customer) && isset($data['customers'][$customer]))
-				<p>{{$data['customers'][$customer]}}</p></td>
-			@else
-				<p class="color-gray">-</p>
-			@endif
+		<td class="breakword">
+			<div class="scrollblock-hidden h5rem vertical-center">
+				@if(isset($customer) && isset($data['customers'][$customer]))
+					<p>{{$data['customers'][$customer]}}</p></td>
+				@else
+					<p class="color-gray">-</p>
+				@endif
+			</div>
 		<td><p>{{$locality ?? '-'}}</p></td>
 		<td class="text-end">
 			@isset($price)

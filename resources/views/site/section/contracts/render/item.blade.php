@@ -79,21 +79,15 @@
 		<td><p class="fz12px lh110">{{$contract ?? '-'}}</p></td>
 	@endif
 	
-	@if(auth('site')->user()->can('contract-col-subcontracting:site') && (empty($userColums) || in_array('subcontracting', $userColums)))
-		<td class="center">
-			@if(isset($subcontracting) && $subcontracting)
-				<i class="fa-solid fa-circle-check color-green fz16px"></i>
-			@endif
-		</td>
-	@endif
-	
 	@if(auth('site')->user()->can('contract-col-customer:site') && (empty($userColums) || in_array('customer', $userColums)))
-		<td>
-			@if(isset($customer) && isset($data['customers'][$customer]))
-				<p class="fz12px lh90">{{$customers[$customer]}}</p>
-			@else
-				<p class="color-gray">-</p>
-			@endif
+		<td class="breakword">
+			<div class="scrollblock-hidden h5rem">
+				@if(isset($customer) && isset($customers[$customer]))
+					<p class="fz12px lh90">{{$customers[$customer]}}</p>
+				@else
+					<p class="color-gray">-</p>
+				@endif
+			</div>
 		</td>
 	@endif
 	
@@ -139,8 +133,16 @@
 		</td>
 	@endif
 	
+	@if(auth('site')->user()->can('contract-col-subcontracting:site') && (empty($userColums) || in_array('subcontracting', $userColums)))
+		<td class="center">
+			@if(isset($subcontracting) && $subcontracting)
+				<i class="fa-solid fa-circle-check color-green fz16px"></i>
+			@endif
+		</td>
+	@endif
+	
 	@if(auth('site')->user()->can('contract-col-type:site') && (empty($userColums) || in_array('type', $userColums)))
-		<td class="right">
+		<td class="center">
 			@if(isset($type) && isset($types[$type]))
 				<p class="fz12px lh110">{{$types[$type]}}</p>
 			@else
@@ -150,7 +152,7 @@
 	@endif
 	
 	@if(auth('site')->user()->can('contract-col-contractor:site') && (empty($userColums) || in_array('contractor', $userColums)))
-		<td>
+		<td class="center">
 			@if(isset($contractor) && isset($contractors[$contractor]))
 				<p class="fz12px lh90">{{$contractors[$contractor]}}</p>
 			@else

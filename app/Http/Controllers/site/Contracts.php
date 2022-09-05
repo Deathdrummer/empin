@@ -92,6 +92,7 @@ class Contracts extends Controller {
 			'key'		=> ':single',
 		]]);
 		
+		logger($this->data);
 		
 		
 		$canEditAll = auth('site')->user()->can('dostup-ko-vsem-otdelam:site');

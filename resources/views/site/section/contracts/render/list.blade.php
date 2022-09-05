@@ -8,7 +8,7 @@
 						@if(!$isArchive)
 							@if(auth('site')->user()->can('contract-col-period:site') && (empty($userColums) || in_array('period', $userColums)))
 								<td
-									class="w6rem sort {{$sortField == 'deadline_color_key' ? 'sort-'.$sortOrder : ''}} vertical-center"
+									class="w6rem sort{{$sortField == 'deadline_color_key' ? ' sort-'.$sortOrder : ''}} vertical-center"
 									onclick="$.sorting(this, 'deadline_color_key')"
 									noscroll
 									><strong class="fz10px lh90 d-block text-center" title="Срок исполнения договора">Срок исполн. договора</strong></td>
@@ -17,7 +17,7 @@
 						
 						@if(auth('site')->user()->can('contract-col-object_number:site') && (empty($userColums) || in_array('object_number', $userColums)))
 							<td
-								class="w7rem sort {{$sortField == 'object_number' ? 'sort-'.$sortOrder : ''}} vertical-center"
+								class="w7rem sort{{$sortField == 'object_number' ? ' sort-'.$sortOrder : ''}} vertical-center"
 								onclick="$.sorting(this, 'object_number')"
 								noscroll
 								><strong class="fz10px lh90 d-block text-center">Номер объекта</strong></td>
@@ -25,7 +25,7 @@
 						
 						@if(auth('site')->user()->can('contract-col-title:site') && (empty($userColums) || in_array('title', $userColums)))
 							<td
-								class="w15rem sort {{$sortField == 'title' ? 'sort-'.$sortOrder : ''}} vertical-center"
+								class="w15rem sort{{$sortField == 'title' ? ' sort-'.$sortOrder : ''}} vertical-center"
 								onclick="$.sorting(this, 'title')"
 								noscroll
 								><strong class="fz10px lh90 d-block text-center">Название / заявитель</strong></td>
@@ -33,7 +33,7 @@
 						
 						@if(auth('site')->user()->can('contract-col-titul:site') && (empty($userColums) || in_array('titul', $userColums)))
 							<td
-								class="w20rem sort {{$sortField == 'titul' ? 'sort-'.$sortOrder : ''}} vertical-center"
+								class="w20rem sort{{$sortField == 'titul' ? ' sort-'.$sortOrder : ''}} vertical-center"
 								onclick="$.sorting(this, 'titul')"
 								noscroll
 								><strong class="fz10px lh90 d-block text-center">Титул</strong></td>
@@ -41,23 +41,15 @@
 						
 						@if(auth('site')->user()->can('contract-col-contract:site') && (empty($userColums) || in_array('contract', $userColums)))
 							<td
-								class="w10rem sort {{$sortField == 'contract' ? 'sort-'.$sortOrder : ''}} vertical-center"
+								class="w10rem sort{{$sortField == 'contract' ? ' sort-'.$sortOrder : ''}} vertical-center"
 								onclick="$.sorting(this, 'contract')"
 								noscroll
 								><strong class="fz10px lh90 d-block text-center">Номер договора</strong></td>
 						@endif
 						
-						@if(auth('site')->user()->can('contract-col-subcontracting:site') && (empty($userColums) || in_array('subcontracting', $userColums)))
-							<td
-								class="sort {{$sortField == 'subcontracting' ? 'sort-'.$sortOrder : ''}} vertical-center"
-								onclick="$.sorting(this, 'subcontracting')"
-								noscroll
-								><strong class="fz10px lh90 d-block text-center wodrbreak">Субподряд</strong></td>
-						@endif
-						
 						@if(auth('site')->user()->can('contract-col-customer:site') && (empty($userColums) || in_array('customer', $userColums)))
 							<td
-								class="sort {{$sortField == 'customer' ? 'sort-'.$sortOrder : ''}} vertical-center"
+								class="w25rem sort{{$sortField == 'customer' ? ' sort-'.$sortOrder : ''}} vertical-center"
 								onclick="$.sorting(this, 'customer')"
 								noscroll
 								><strong class="fz10px lh90 d-block text-center">Заказчик</strong></td>
@@ -65,7 +57,7 @@
 						
 						@if(auth('site')->user()->can('contract-col-locality:site') && (empty($userColums) || in_array('locality', $userColums)))
 							<td
-								class="sort {{$sortField == 'locality' ? 'sort-'.$sortOrder : ''}} vertical-center"
+								class="w15rem sort{{$sortField == 'locality' ? ' sort-'.$sortOrder : ''}} vertical-center"
 								onclick="$.sorting(this, 'locality')"
 								noscroll
 								><strong class="fz10px lh90 d-block text-center">Населенный пункт</strong></td>
@@ -73,7 +65,7 @@
 						
 						@if(auth('site')->user()->can('contract-col-price:site') && (empty($userColums) || in_array('price', $userColums)))
 							<td
-								class="sort {{$sortField == 'price' ? 'sort-'.$sortOrder : ''}} vertical-center"
+								class="w11rem sort{{$sortField == 'price' ? ' sort-'.$sortOrder : ''}} vertical-center"
 								onclick="$.sorting(this, 'price')"
 								noscroll
 								><strong class="fz10px lh90 d-block text-center">Стоимость договора</strong></td>
@@ -81,7 +73,7 @@
 						
 						@if(auth('site')->user()->can('contract-col-date_start:site') && (empty($userColums) || in_array('date_start', $userColums)))
 							<td
-								class="w6rem sort {{$sortField == 'date_start' ? 'sort-'.$sortOrder : ''}} vertical-center"
+								class="w6rem sort{{$sortField == 'date_start' ? ' sort-'.$sortOrder : ''}} vertical-center"
 								onclick="$.sorting(this, 'date_start')"
 								noscroll
 								><strong class="fz10px lh90 d-block text-center">Дата начала договора</strong></td>
@@ -89,7 +81,7 @@
 						
 						@if(auth('site')->user()->can('contract-col-date_end:site') && (empty($userColums) || in_array('date_end', $userColums)))
 							<td
-								class="w6rem sort {{$sortField == 'date_end' ? 'sort-'.$sortOrder : ''}} vertical-center"
+								class="w6rem sort{{$sortField == 'date_end' ? ' sort-'.$sortOrder : ''}} vertical-center"
 								onclick="$.sorting(this, 'date_end')"
 								noscroll
 								><strong class="fz10px lh90 d-block text-center">Дата окончания договора</strong></td>
@@ -97,15 +89,23 @@
 						
 						@if(auth('site')->user()->can('contract-col-hoz_method:site') && (empty($userColums) || in_array('hoz_method', $userColums)))
 							<td
-								class="w4rem sort {{$sortField == 'hoz_method' ? 'sort-'.$sortOrder : ''}} vertical-center"
+								class="w4rem sort{{$sortField == 'hoz_method' ? ' sort-'.$sortOrder : ''}} vertical-center"
 								onclick="$.sorting(this, 'hoz_method')"
 								noscroll
 								><strong class="fz10px lh90 d-block text-center wodrbreak">Хоз способ</strong></td>
 						@endif
 						
+						@if(auth('site')->user()->can('contract-col-subcontracting:site') && (empty($userColums) || in_array('subcontracting', $userColums)))
+							<td
+								class="w4rem sort{{$sortField == 'subcontracting' ? ' sort-'.$sortOrder : ''}} vertical-center"
+								onclick="$.sorting(this, 'subcontracting')"
+								noscroll
+								><strong class="fz10px lh90 d-block text-center wodrbreak">Субподряд</strong></td>
+						@endif
+						
 						@if(auth('site')->user()->can('contract-col-type:site') && (empty($userColums) || in_array('type', $userColums)))
 							<td
-								class="w5rem sort {{$sortField == 'type' ? 'sort-'.$sortOrder : ''}} vertical-center"
+								class="w5rem sort{{$sortField == 'type' ? ' sort-'.$sortOrder : ''}} vertical-center"
 								onclick="$.sorting(this, 'type')"
 								noscroll
 								><strong class="fz10px lh90 d-block text-center">Тип договора</strong></td>
@@ -113,7 +113,7 @@
 						
 						@if(auth('site')->user()->can('contract-col-contractor:site') && (empty($userColums) || in_array('contractor', $userColums)))
 							<td
-								class="sort {{$sortField == 'contractor' ? 'sort-'.$sortOrder : ''}} vertical-center"
+								class="sort{{$sortField == 'contractor' ? ' sort-'.$sortOrder : ''}} vertical-center"
 								onclick="$.sorting(this, 'contractor')"
 								noscroll
 								><strong class="fz10px lh90 d-block text-center">Исполнитель</strong></td>
