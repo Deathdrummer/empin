@@ -433,8 +433,20 @@ class Contracts extends Controller {
 	 */
 	public function set_customer_rules(Request $request) {
 		$customer = $request->input('customer');
-		$stepsdata = StepPattern::select('rules')->where('customer', $customer)->first();
-		return response()->json($stepsdata['rules'] ?? null);
+		$stepsdata = StepPattern::select(['rules', 'customer'])
+			->whereIn('customer', [0, $customer])
+			->get()
+			->mapWithKeys(function($item) {
+				return[$item['customer'] => $item['rules']];
+			})->toArray();
+		
+		$rules = match (true) {
+			isset($stepsdata[$customer]) && !is_null($stepsdata[$customer]) => $stepsdata[$customer],
+			isset($stepsdata[0]) && !is_null($stepsdata[0]) => $stepsdata[0],
+			default => false
+		};
+		
+		return response()->json($rules);
 	}
 	
 	
