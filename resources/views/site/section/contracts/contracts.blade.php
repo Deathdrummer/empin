@@ -866,6 +866,8 @@
 						chatScrollHeight = $('#chatMessageList')[0].scrollHeight;
 					$('#chatMessageList').scrollTop(chatScrollHeight - chatVisibleHeight);
 					
+					$('#chatMessageBlock').focus();
+					
 					$('#chatMessageBlock').ddrInputs('change', () => {
 						let mess = getContenteditable('#chatMessageBlock');
 						
