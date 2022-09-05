@@ -210,7 +210,6 @@ class Departments extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function destroy(?int $id = null) {
-		logger($id);
 		$stat = Department::destroy($id);
 		return response()->json($stat);
     }

@@ -26,6 +26,7 @@ class AdminUserCreated extends Mailable {
      * @return $this
      */
     public function build() {
+		$this->subject(config('app.name').' Регистрация в системе');
         return $this->view('admin.emails.admin_user_created');
     }
 }

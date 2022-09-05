@@ -24,6 +24,7 @@ class UserCreated extends Mailable {
      * @return $this
      */
     public function build() {
+		$this->subject(config('app.name').' Регистрация в системе');
         return $this->view('site.emails.user_created');
     }
 }

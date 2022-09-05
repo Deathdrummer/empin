@@ -3,6 +3,8 @@
 use App\Mail\ResetPassword;
 use App\Mail\VerifyEmail;
 use App\Models\Traits\Collectionable;
+use App\Models\Traits\Dateable;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -12,7 +14,7 @@ use Illuminate\Notifications\Notifiable;
 use Symfony\Component\Mime\Encoder\IdnAddressEncoder;
 
 class AdminUser extends Authenticatable implements MustVerifyEmail {
-	use HasFactory, Notifiable, HasRoles, Collectionable;
+	use HasFactory, Notifiable, HasRoles, Collectionable, Dateable;
 	/**
      * Таблица
 	 *
@@ -28,15 +30,6 @@ class AdminUser extends Authenticatable implements MustVerifyEmail {
      * @var string
      */
 	protected $guard = 'admin';
-	
-	
-	
-	/**
-     * Динамически создаваемые поля в выборке
-	 *
-     * @var string
-     */
-	//protected $appends = ['email_cyrillic'];
 	
 	
 	
@@ -98,12 +91,9 @@ class AdminUser extends Authenticatable implements MustVerifyEmail {
 	 * @param 
 	 * @return 
 	 */
-	//public function setEmailAttribute($email) {
-	//	$encoder = new IdnAddressEncoder();
-	//	$this->attributes['email'] = $encoder->encodeString($email);
-	//}
-	
-	
+	public function getEmailVerifiedAtAttribute($value) {
+		return Carbon::create($value)->timezone('Europe/Moscow');
+	}
 	
 	
 	

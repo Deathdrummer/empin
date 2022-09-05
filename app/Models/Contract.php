@@ -1,6 +1,7 @@
 <?php namespace App\Models;
 
 use App\Models\Traits\Collectionable;
+use App\Models\Traits\Dateable;
 use App\Models\Traits\Filterable;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -8,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
 class Contract extends Model {
-    use HasFactory, Filterable, Collectionable;
+    use HasFactory, Filterable, Collectionable, Dateable;
 	
 	
 	/**
@@ -178,6 +179,7 @@ class Contract extends Model {
 	public function setDateEndAttribute($value) {
 		$this->attributes['date_end'] = Carbon::parse($value);
 	}
+	
 	
 	
 }

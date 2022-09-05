@@ -3,16 +3,17 @@
 use App\Mail\ResetPassword;
 use App\Mail\VerifyEmail;
 use App\Models\Traits\Collectionable;
+use App\Models\Traits\Dateable;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Notifications\Notifiable;
-use Symfony\Component\Mime\Encoder\IdnAddressEncoder;
 
 class User extends Authenticatable implements MustVerifyEmail {
-	use HasFactory, Notifiable, HasRoles, Collectionable;
+	use HasFactory, Notifiable, HasRoles, Collectionable, Dateable;
 	
 	/**
      * Таблица
@@ -135,6 +136,15 @@ class User extends Authenticatable implements MustVerifyEmail {
 		return decodeEmail($email);
 	}
 	
+	
+	
+	/**
+	 * @param 
+	 * @return 
+	 */
+	public function getEmailVerifiedAtAttribute($value) {
+		return Carbon::create($value)->timezone('Europe/Moscow');
+	}
 	
 	
 	/**

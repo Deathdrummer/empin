@@ -100,7 +100,7 @@ Route::middleware(['isajax:admin', 'lang'])->post('/simplelist', function(Reques
 // Адинистраторы
 Route::post('/admins/permissions', [Admins::class, 'permissions']);
 Route::put('/admins/permissions', [Admins::class, 'set_permissions']);
-Route::post('/admins/send_email', [Admins::class, 'send_email']);
+Route::middleware('lang')->post('/admins/send_email', [Admins::class, 'send_email']);
 Route::post('/admins/store_show', [Admins::class, 'store_show']);
 Route::resource('admins', Admins::class);
 
@@ -109,7 +109,7 @@ Route::resource('admins', Admins::class);
 // Персонал
 Route::post('/staff/permissions', [Staff::class, 'permissions']);
 Route::put('/staff/permissions', [Staff::class, 'set_permissions']);
-Route::post('/staff/send_email', [Staff::class, 'send_email']);
+Route::middleware('lang')->post('/staff/send_email', [Staff::class, 'send_email']);
 Route::post('/staff/store_show', [Staff::class, 'store_show']);
 Route::resource('staff', Staff::class);
 

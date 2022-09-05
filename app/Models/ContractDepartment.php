@@ -1,5 +1,6 @@
 <?php namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 
 class ContractDepartment extends Pivot {
@@ -18,4 +19,17 @@ class ContractDepartment extends Pivot {
 		}
 		return $result;
 	}
+	
+	
+	
+	
+	/**
+	 * @param 
+	 * @return 
+	 */
+	public function getUpdatedShowAtAttribute($value) {
+		return Carbon::create($value)->timezone('Europe/Moscow');
+	}
+	
+	
 }
