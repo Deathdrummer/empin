@@ -57,7 +57,7 @@
 						
 						@if(auth('site')->user()->can('contract-col-customer:site') && (empty($userColums) || in_array('customer', $userColums)))
 							<td
-								class="w25rem sort{{$sortField == 'customer' ? ' sort-'.$sortOrder : ''}} vertical-center"
+								class="w15rem sort{{$sortField == 'customer' ? ' sort-'.$sortOrder : ''}} vertical-center"
 								onclick="$.sorting(this, 'customer')"
 								noscroll
 								><strong class="fz10px lh90 d-block text-center">Заказчик</strong></td>
@@ -121,7 +121,7 @@
 						
 						@if(auth('site')->user()->can('contract-col-contractor:site') && (empty($userColums) || in_array('contractor', $userColums)))
 							<td
-								class="sort{{$sortField == 'contractor' ? ' sort-'.$sortOrder : ''}} vertical-center"
+								class="w10rem sort{{$sortField == 'contractor' ? ' sort-'.$sortOrder : ''}} vertical-center"
 								onclick="$.sorting(this, 'contractor')"
 								noscroll
 								><strong class="fz10px lh90 d-block text-center">Исполнитель</strong></td>

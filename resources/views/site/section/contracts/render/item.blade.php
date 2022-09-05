@@ -64,15 +64,15 @@
 	@endif
 	
 	@if(auth('site')->user()->can('contract-col-title:site') && (empty($userColums) || in_array('title', $userColums)))
-		<td><p class="fz12px lh110">{{$title ?? '-'}}</p></td>
+		<td class="breakword"><p class="fz12px lh110">{{$title ?? '-'}}</p></td>
 	@endif
 	
 	@if(auth('site')->user()->can('contract-col-applicant:site') && (empty($userColums) || in_array('applicant', $userColums)))
-		<td><p class="fz12px lh110">{{$applicant ?? '-'}}</p></td>
+		<td class="breakword"><p class="fz12px lh110">{{$applicant ?? '-'}}</p></td>
 	@endif
 	
 	@if(auth('site')->user()->can('contract-col-titul:site') && (empty($userColums) || in_array('titul', $userColums)))
-		<td class="pr2px">
+		<td class="pr2px breakword">
 			<div class="scrollblock-hidden h5rem pr3px">
 				<p class="format fz12px">{{$titul ?? '-'}}</p>
 			</div>
@@ -80,7 +80,7 @@
 	@endif
 	
 	@if(auth('site')->user()->can('contract-col-contract:site') && (empty($userColums) || in_array('contract', $userColums)))
-		<td><p class="fz12px lh110">{{$contract ?? '-'}}</p></td>
+		<td class="breakword"><p class="fz12px lh110">{{$contract ?? '-'}}</p></td>
 	@endif
 	
 	@if(auth('site')->user()->can('contract-col-customer:site') && (empty($userColums) || in_array('customer', $userColums)))
@@ -96,7 +96,7 @@
 	@endif
 	
 	@if(auth('site')->user()->can('contract-col-locality:site') && (empty($userColums) || in_array('locality', $userColums)))
-		<td><p class="fz12px lh90">{{$locality ?? '-'}}</p></td>
+		<td class="breakword"><p class="fz12px lh90">{{$locality ?? '-'}}</p></td>
 	@endif
 	
 	@if(auth('site')->user()->can('contract-col-price:site') && (empty($userColums) || in_array('price', $userColums)))
@@ -146,7 +146,7 @@
 	@endif
 	
 	@if(auth('site')->user()->can('contract-col-type:site') && (empty($userColums) || in_array('type', $userColums)))
-		<td class="center">
+		<td class="center breakword">
 			@if(isset($type) && isset($types[$type]))
 				<p class="fz12px lh110">{{$types[$type]}}</p>
 			@else
@@ -156,7 +156,7 @@
 	@endif
 	
 	@if(auth('site')->user()->can('contract-col-contractor:site') && (empty($userColums) || in_array('contractor', $userColums)))
-		<td class="center">
+		<td class="center breakword">
 			@if(isset($contractor) && isset($contractors[$contractor]))
 				<p class="fz12px lh90">{{$contractors[$contractor]}}</p>
 			@else
