@@ -320,10 +320,11 @@ if (! function_exists('dateFormatter')) {
 if (! function_exists('encodeEmail')) {
 	/**
 	 * Конвертирует Email адрес из кириллицы в UTF-8
-	 * @param string  $address
+	 * @param string|null  $address
 	 * @return string
 	*/
-	function encodeEmail(string $address): string {
+	function encodeEmail(?string $address): string {
+		if (!$address) return $address;
 		$encoder = new IdnAddressEncoder();
 		return $encoder->encodeString($address);
 	}
@@ -335,10 +336,11 @@ if (! function_exists('encodeEmail')) {
 if (! function_exists('decodeEmail')) {
 	/**
 	 * Конвертирует Email адрес обратно в кириллицу
-	 * @param string  $address
+	 * @param string|null  $address
 	 * @return string
 	*/
-	function decodeEmail(string $address): string {
+	function decodeEmail(?string $address): mixed {
+		if (!$address) return $address;
 		$i = strrpos($address, '@');
         if (false !== $i) {
             $local = substr($address, 0, $i);
