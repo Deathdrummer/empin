@@ -2,7 +2,7 @@
 <x-horisontal space="2rem" ignore="[noscroll], select, input, textarea">
 	<x-horisontal.item class="h100">
 		<div class="table table_inline border-all border-light border-2px border-rounded-3px h100">
-			<table>
+			<table id="toolrool">
 				<thead>
 					<tr class="h{{$rowHeight ?? '7'}}rem" sorts>
 						@if(!$isArchive)
@@ -139,18 +139,21 @@
 							@isset($departmentId)
 								@cananydo('contract-col-hiding:site, contract-col-sending:site')
 									<td class="w12rem vertical-center">
+										<div class="w12rem h1rem bg-green"></div>
 										<strong class="fz10px lh90 d-block text-center">Действия</strong>
 									</td>
 								@endcananydo
 							@elseif(!$isArchive)
 								@cananydo('contract-col-sending-all:site, contract-col-to-archive:site')
 									<td class="w12rem vertical-center">
+										<div class="w12rem h1rem bg-green"></div>
 										<strong class="fz10px lh90 d-block text-center">Действия</strong>
 									</td>
 								@endcananydo
 							@elseif($isArchive)
 								@cando('contract-col-return-to-work:site')
 									<td class="w7rem vertical-center">
+										<div class="w12rem h1rem bg-green"></div>
 										<strong class="fz10px lh90 d-block text-center">Действия</strong>
 									</td>
 								@endcando

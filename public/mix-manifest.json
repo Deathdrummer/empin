@@ -1,6 +1,6 @@
 {
     "/assets/js/admin.js": "/assets/js/admin.js?id=49e2808cce26e3e59c729d0dd0e88ef3",
-    "/assets/js/site.js": "/assets/js/site.js?id=705452b05e0d4b5768f2b8bcd0a5354c",
+    "/assets/js/site.js": "/assets/js/site.js?id=2c440366f5935107ac437604a3bc8c65",
     "/assets/css/site.css": "/assets/css/site.css?id=920e9be656eab72ff7c356b44cb869de",
     "/assets/css/admin.css": "/assets/css/admin.css?id=94d38fe3cc338eec17e0528d1b47da2e",
     "/assets/css/app.css": "/assets/css/app.css?id=a5eebb4f391e81e1e355948ecfd54b00",
@@ -115,5 +115,7 @@
     "/assets/fonts/fontawesome/fa-solid-900.ttf": "/assets/fonts/fontawesome/fa-solid-900.ttf?id=049ce078cc76ac740d55085e27008d02",
     "/assets/fonts/fontawesome/fa-solid-900.woff2": "/assets/fonts/fontawesome/fa-solid-900.woff2?id=d0d39acc7b54ab04c9e1af5798a0f816",
     "/assets/fonts/fontawesome/fa-v4compatibility.ttf": "/assets/fonts/fontawesome/fa-v4compatibility.ttf?id=12c356ac726e8e2bc1c28ce1a04ab4d7",
-    "/assets/fonts/fontawesome/fa-v4compatibility.woff2": "/assets/fonts/fontawesome/fa-v4compatibility.woff2?id=5bb25ae8c661619d1b32c029e4048cb6"
+    "/assets/fonts/fontawesome/fa-v4compatibility.woff2": "/assets/fonts/fontawesome/fa-v4compatibility.woff2?id=5bb25ae8c661619d1b32c029e4048cb6",
+    "/assets/js/plugins/ddrTable.js": "/assets/js/plugins/ddrTable.js?id=100dadd9cdc65b9631a71bf20bd93fd6",
+    "/assets/js/plugins/ddrScrollEvents.js": "/assets/js/plugins/ddrScrollEvents.js?id=2f88bc9c733c7cfb791941e9ad70fe31"
 }
