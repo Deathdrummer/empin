@@ -157,9 +157,9 @@ class Contracts extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function store_show(Request $request) {
-		if (!$item = $this->_storeRequest($request)) return response()->json(false);
 		$viewPath = $request->input('views');
 		if (!$viewPath) return response()->json(['no_view' => true]);
+		if (!$item = $this->_storeRequest($request)) return response()->json(false);
 		$this->_buildDataFromSettings();
 		return $this->view($viewPath.'.item', $item);
     }

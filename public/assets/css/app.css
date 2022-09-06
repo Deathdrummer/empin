@@ -45515,6 +45515,18 @@ template {
           user-select: none;
 }
 
+.select-text {
+  touch-callout: unset;
+  -webkit-user-select: text;
+      -ms-user-select: text;
+          user-select: text;
+}
+.select-all {
+  touch-callout: unset;
+  -webkit-user-select: all;
+          user-select: all;
+}
+
 .notouch, [notouch] {
   pointer-events: none;
 }

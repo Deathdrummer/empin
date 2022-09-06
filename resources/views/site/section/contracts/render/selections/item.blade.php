@@ -9,7 +9,7 @@
 			
 	</td>
 	<td class="center">
-		@if($contracts_count)
+		@if(isset($contracts_count) && $contracts_count)
 			<strong class="color-green fz14px">{{$contracts_count}}</strong>
 		@else
 			<p class="color-gray-500">-</p>

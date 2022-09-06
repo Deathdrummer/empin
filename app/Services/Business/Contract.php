@@ -33,7 +33,7 @@ class Contract {
 	 * @param 
 	 * @return 
 	 */
-	public function get(Request $request) {
+	public function get(Request $request, $one = false) {
 		
 		$queryParams = $request->only([
 			'id',
@@ -43,10 +43,12 @@ class Contract {
 			'show'
 		]);
 		
+		$contractId = $request->input('id') ?: $request->input('contract_id');
+		
 		
 		$filter = app()->make(ContractFilter::class, compact('queryParams'));
 		$data = ContractModel::filter($filter)->get();
-		return $data->mapWithKeysMany(function($item) {
+		$result = $data->mapWithKeysMany(function($item) {
 			return [$item['id'] => [
 				'id'				=> $item['id'] ?? null,
 				'object_number'		=> $item['object_number'] ?? null,
@@ -68,6 +70,9 @@ class Contract {
 				'updated_at' 		=> $item['updated_at'] ?? null
 			]];
 		});
+		
+		if ($one) return $result[$contractId];
+		return $result;
 	}
 	
 	

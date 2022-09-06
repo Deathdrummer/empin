@@ -81,7 +81,7 @@ class User {
 	 */
 	public function pinContract(Request $request) {
 		if (!$contractId = $request->input('contract_id')) return false;
-		$pinStat = $request->input('stat', 1);
+		$pinStat = (int)$request->input('stat', 1);
 		$userContracts = Usermodel::find(auth('site')->user()->id)->contracts();
 		$stat = $userContracts->sync([$contractId => ['pinned' => $pinStat]], false);
 		return $stat;

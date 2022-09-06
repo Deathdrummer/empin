@@ -76,20 +76,20 @@ class Contracts extends Controller {
 		
 		
 		$this->addSettingToGlobalData([[
-			'setting'	=> 'contract-customers:customers',
-			'key'		=> 'id',
-			'value'		=> 'name'
-		], [
-			'setting'	=> 'contract-types:types',
-			'key'		=> 'id',
-			'value'		=> 'title'
-		], [
-			'setting'	=> 'contract-contractors:contractors',
-			'key'		=> 'id',
-			'value'		=> 'name'
-		], [
-			'setting'	=> 'contract-list-titles-row-height:rowHeight',
-			'key'		=> ':single',
+				'setting'	=> 'contract-customers:customers',
+				'key'		=> 'id',
+				'value'		=> 'name'
+			], [
+				'setting'	=> 'contract-types:types',
+				'key'		=> 'id',
+				'value'		=> 'title'
+			], [
+				'setting'	=> 'contract-contractors:contractors',
+				'key'		=> 'id',
+				'value'		=> 'name'
+			], [
+				'setting'	=> 'contract-list-titles-row-height:rowHeight',
+				'key'		=> ':single',
 		]]);
 		
 		$canEditAll = auth('site')->user()->can('dostup-ko-vsem-otdelam:site');
@@ -400,14 +400,30 @@ class Contracts extends Controller {
 		$contractInfo = ContractInfo::select('data')
 			->where('contract_id', $contractId)
 			->first();
-			
+		
+		$this->addSettingToGlobalData([[
+				'setting'	=> 'contract-customers:customers',
+				'key'		=> 'id',
+				'value'		=> 'name'
+			], [
+				'setting'	=> 'contract-types:types',
+				'key'		=> 'id',
+				'value'		=> 'title'
+			], [
+				'setting'	=> 'contract-contractors:contractors',
+				'key'		=> 'id',
+				'value'		=> 'name'
+		]]);
+		
+		$contract = $this->contract->get($request, true);
+		
 		if (isset($contractInfo['data']) && is_array($contractInfo['data'])) {
 			foreach ($contractInfo['data'] as $fieldId => $value) {
 				$data[$fieldId] = $value;
 			}
 		}
 		
-		return $this->render('common_info', compact('fields', 'data'));
+		return $this->render('common_info', compact('fields', 'data', 'contract'));
 	}
 	
 	
@@ -439,7 +455,7 @@ class Contracts extends Controller {
 	
 	
 	
-	/** Общая информация очистить
+	/** Общая информация очистить данные полей, которые удалили
 	 * @param 
 	 * @return 
 	 */

@@ -806,7 +806,7 @@
 	
 	//------------------------------------------------- Закрепить/открепить договор
 	$.pinContract = (btn, contractId) => {
-		let pinned = $(btn).attr('pinned');
+		let pinned = parseInt($(btn).attr('pinned'));
 		
 		axiosQuery('put', 'site/contracts/pin', {contract_id: contractId, stat: pinned}, 'json').then(({data, error, status, headers}) => {
 			if (!data) {
@@ -815,10 +815,10 @@
 			}
 			if (pinned == 1) {
 				$(btn).removeClass('color-gray-300 color-gray-500-hovered icon-hidden').addClass('color-gray-500');
-				$(btn).setAttrib('pinned', 0);
+				$(btn).setAttrib('pinned', '0');
 			} else {
 				$(btn).removeClass('color-gray-500').addClass('color-gray-300 color-gray-500-hovered icon-hidden');
-				$(btn).setAttrib('pinned', 1);
+				$(btn).setAttrib('pinned', '1');
 			}
 			
 			$.notify('Договор успешно '+(pinned == 1 ? 'закреплен' : 'откреплен'));

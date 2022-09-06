@@ -185,7 +185,7 @@
 				:exclude="$selections ?? []"
 				choose="Выбрать..."
 				empty="Нет подборок"
-				no-choose-has-value
+				empty-has-value
 				action="addContractToSelection:{{$id}}"
 				/>
 			{{-- <x-checkbox

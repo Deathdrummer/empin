@@ -61,4 +61,5 @@ class ContractInfo extends Model {
         'data' => 'array',
     ];
 	
+	
 }
