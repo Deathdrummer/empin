@@ -7,7 +7,7 @@
 	
 	&_inline
 		display: inline-table
-		width: max-content
+		width: min-content
 	
 	//&:not(.table_inline)
 	//	table
@@ -68,6 +68,11 @@ table
 				min-height: 20px
 				font-size: 14px
 				+font('Fira Sans', 400)
+				
+				&::after
+					content: ''
+					display: block
+					width: inherit
 				
 				
 				+ td

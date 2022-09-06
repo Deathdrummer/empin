@@ -6454,7 +6454,7 @@ p {
 }
 .table_inline {
   display: inline-table;
-  width: max-content;
+  width: min-content;
 }
 
 table {
@@ -6507,6 +6507,11 @@ table thead tr td {
   font-size: 14px;
   font-family: Fira Sans, sans-serif;
   font-weight: 400;
+}
+table thead tr td::after {
+  content: "";
+  display: block;
+  width: inherit;
 }
 table thead tr td + td::before {
   content: "";

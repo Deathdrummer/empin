@@ -139,21 +139,18 @@
 							@isset($departmentId)
 								@cananydo('contract-col-hiding:site, contract-col-sending:site')
 									<td class="w12rem vertical-center">
-										<div class="w12rem h1rem bg-green"></div>
 										<strong class="fz10px lh90 d-block text-center">Действия</strong>
 									</td>
 								@endcananydo
 							@elseif(!$isArchive)
 								@cananydo('contract-col-sending-all:site, contract-col-to-archive:site')
 									<td class="w12rem vertical-center">
-										<div class="w12rem h1rem bg-green"></div>
 										<strong class="fz10px lh90 d-block text-center">Действия</strong>
 									</td>
 								@endcananydo
 							@elseif($isArchive)
 								@cando('contract-col-return-to-work:site')
 									<td class="w7rem vertical-center">
-										<div class="w12rem h1rem bg-green"></div>
 										<strong class="fz10px lh90 d-block text-center">Действия</strong>
 									</td>
 								@endcando
