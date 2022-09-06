@@ -90,7 +90,8 @@
 						<p
 							@class([
 								'fz14px',
-								'mb8px'	=> !isset($field['desc'])
+								'mb8px'	=> !isset($field['desc']),
+								'mb4px'	=> isset($field['desc'])
 							])
 							><strong>{{$field['name']}}</strong></p>
 						
