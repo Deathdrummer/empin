@@ -6454,6 +6454,7 @@ p {
 }
 .table_inline {
   display: inline-table;
+  width: max-content;
 }
 
 table {
