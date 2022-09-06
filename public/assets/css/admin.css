@@ -6499,10 +6499,10 @@ table td > .cell .icon-hidden {
 table thead tr td {
   vertical-align: top;
   position: relative;
-  padding-left: 10px;
-  padding-right: 10px;
+  padding-left: 0;
+  padding-right: 0;
   padding-top: 5px;
-  padding-bottom: 15px;
+  padding-bottom: 5px;
   min-height: 20px;
   font-size: 14px;
   font-family: Fira Sans, sans-serif;
@@ -6510,8 +6510,10 @@ table thead tr td {
 }
 table thead tr td::after {
   content: "";
-  display: block;
   width: inherit;
+  display: block;
+  height: 10px;
+  background-color: #444;
 }
 table thead tr td + td::before {
   content: "";

@@ -81,7 +81,7 @@
 						
 						@if(auth('site')->user()->can('contract-col-date_start:site') && (empty($userColums) || in_array('date_start', $userColums)))
 							<td
-								class="w6rem sort{{$sortField == 'date_start' ? ' sort-'.$sortOrder : ''}} vertical-center"
+								class="w8rem sort{{$sortField == 'date_start' ? ' sort-'.$sortOrder : ''}} vertical-center"
 								onclick="$.sorting(this, 'date_start')"
 								noscroll
 								><strong class="fz10px lh90 d-block text-center">Дата начала договора</strong></td>
@@ -89,7 +89,7 @@
 						
 						@if(auth('site')->user()->can('contract-col-date_end:site') && (empty($userColums) || in_array('date_end', $userColums)))
 							<td
-								class="w6rem sort{{$sortField == 'date_end' ? ' sort-'.$sortOrder : ''}} vertical-center"
+								class="w8rem sort{{$sortField == 'date_end' ? ' sort-'.$sortOrder : ''}} vertical-center"
 								onclick="$.sorting(this, 'date_end')"
 								noscroll
 								><strong class="fz10px lh90 d-block text-center">Дата окончания договора</strong></td>
@@ -113,7 +113,7 @@
 						
 						@if(auth('site')->user()->can('contract-col-type:site') && (empty($userColums) || in_array('type', $userColums)))
 							<td
-								class="w5rem sort{{$sortField == 'type' ? ' sort-'.$sortOrder : ''}} vertical-center"
+								class="w8rem sort{{$sortField == 'type' ? ' sort-'.$sortOrder : ''}} vertical-center"
 								onclick="$.sorting(this, 'type')"
 								noscroll
 								><strong class="fz10px lh90 d-block text-center">Тип договора</strong></td>
@@ -206,8 +206,6 @@
 											'w8rem' => ($step['type'] == 1),
 											'w16rem' => (in_array($step['type'], [2,3])),
 											'w15rem' => (in_array($step['type'], [4])),
-											'pl3px',
-											'pr3px',
 											'vertical-center'
 										])>
 										<p class="fz10px lh90 text-center">{{$step['name']}}</p>

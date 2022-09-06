@@ -64,7 +64,7 @@
 	@endif
 	
 	@if(auth('site')->user()->can('contract-col-title:site') && (empty($userColums) || in_array('title', $userColums)))
-		<td class="breakword"><p class="fz12px lh110">{{$title ?? '-'}}</p></td>
+		<td class="breakword"><p class="fz12px lh110">{{Str::of($title ?? '-')->limit(60, '...')}}</p></td>
 	@endif
 	
 	@if(auth('site')->user()->can('contract-col-applicant:site') && (empty($userColums) || in_array('applicant', $userColums)))
@@ -85,13 +85,11 @@
 	
 	@if(auth('site')->user()->can('contract-col-customer:site') && (empty($userColums) || in_array('customer', $userColums)))
 		<td class="breakword">
-			<div class="scrollblock-hidden h5rem">
-				@if(isset($customer) && isset($customers[$customer]))
-					<p class="fz12px lh90">{{$customers[$customer]}}</p>
-				@else
-					<p class="color-gray">-</p>
-				@endif
-			</div>
+			@if(isset($customer) && isset($customers[$customer]))
+				<p class="fz12px lh90">{{Str::of($customers[$customer])->limit(60, '...')}}</p>
+			@else
+				<p class="color-gray">-</p>
+			@endif
 		</td>
 	@endif
 	

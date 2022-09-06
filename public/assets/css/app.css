@@ -45619,6 +45619,8 @@ template {
 }
 .scrollblock-hidden {
   overflow-y: scroll;
+  display: flex;
+  align-items: center;
 }
 .scrollblock-hidden::-webkit-scrollbar {
   width: 4px;
