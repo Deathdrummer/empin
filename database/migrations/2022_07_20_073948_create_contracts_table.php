@@ -15,7 +15,7 @@ return new class extends Migration {
             $table->id();
 			$table->string('object_number', 6)->unsigned()->unique()->default(null)->comment('Номер объекта');
             $table->string('title')->nullable()->comment('Название/заявитель');
-            $table->string('titul')->nullable()->comment('Титул');
+            $table->text('titul')->nullable()->comment('Титул');
             $table->string('contract', 30)->nullable()->comment('Номер договора');
             $table->integer('subcontracting')->unsigned()->default(0)->comment('Субподряд');
             $table->integer('customer')->nullable()->comment('Заказчик');

@@ -2,15 +2,91 @@
 	<x-card
 		id="contractsCard"
 		class="noselect"
-		title="Договоры"
-		cando="sozdanie-dogovora:site"
-		button="Новый договор"
-		action="contractNew"
 		loading
 		>
 		
+		
 		<div class="row mb2rem gx-30 align-items-center">
 			<div class="col-auto">
+				<x-input
+					id="contractsSearchField"
+					group="normal"
+					type="search"
+					class="w40rem"
+					action="contractsSearch"
+					icon="magnifying-glass"
+					{{-- iconaction="contractsSearch:1" --}}
+					iconbg="light"
+					placeholder="Поиск..."
+					cleared
+					tag="tool:56"
+					/>
+				
+				<x-button
+					id="clearSearch"
+					group="normal"
+					variant="red"
+					disabled
+					action="clearContractsSearch"
+					w="3rem"
+					title="Очестить поиск"
+					><i class="fa-solid fa-xmark"></i></x-button>
+			</div>
+			
+			<div class="col-auto">
+				<x-checkbox
+					class="mt3px"
+					id="searchWithArchive"
+					group="normal"
+					label="Включить в поиск архив"
+					action="searchWithArchive"
+					/>
+			</div>
+			
+			<div class="col-auto">
+				<x-button
+					group="normal"
+					variant="neutral"
+					action="openSelectionsWin"
+					title="Список подборок"
+					tag="selectionsbtn"
+					>Подборки</x-button>
+				
+				<x-button
+					id="selectionsClearBtn"
+					group="normal"
+					w="3rem"
+					variant="red"
+					action="clearSelection"
+					title="Отменить подборку"
+					tag="selectionsbtn"
+					disabled
+					hidden
+					><i class="fa-solid fa-xmark"></i></x-button>
+			</div>
+			
+			<div class="col-auto ms-auto">
+				<x-button
+					group="normal"
+					variant="purple"
+					action="openSetColumsWin"
+					title="Отображение столбцов"
+					><i class="fa-solid fa-table-columns"></i></x-button>
+			</div>
+			
+			<div class="col-auto">
+				@cando('sozdanie-dogovora:site')
+					<x-button
+						group="normal"
+						variant="green"
+						action="contractNew"
+						>Новый договор</x-button>
+				@endcando
+			</div>
+		</div>
+		
+		<div class="row mb2rem">
+			<div class="col">
 				<x-chooser variant="neutral" group="normal" px="10">
 					<x-chooser.item
 						id="chooserAll"
@@ -80,75 +156,7 @@
 								></strong></x-chooser.item>
 				</x-chooser>
 			</div>
-			
-			<div class="col-auto">
-				<x-input
-					id="contractsSearchField"
-					group="normal"
-					type="search"
-					class="w40rem"
-					action="contractsSearch"
-					icon="magnifying-glass"
-					{{-- iconaction="contractsSearch:1" --}}
-					iconbg="light"
-					placeholder="Поиск..."
-					cleared
-					tag="tool:56"
-					/>
-				
-				<x-button
-					id="clearSearch"
-					group="normal"
-					variant="red"
-					disabled
-					action="clearContractsSearch"
-					w="3rem"
-					title="Очестить поиск"
-					><i class="fa-solid fa-xmark"></i></x-button>
-			</div>
-			
-			<div class="col-auto">
-				<x-checkbox
-					class="mt3px"
-					id="searchWithArchive"
-					group="normal"
-					label="Включить в поиск архив"
-					action="searchWithArchive"
-					/>
-			</div>
-			
-			<div class="col-auto">
-				<x-button
-					group="normal"
-					variant="neutral"
-					action="openSelectionsWin"
-					title="Список подборок"
-					tag="selectionsbtn"
-					>Подборки</x-button>
-				
-				<x-button
-					id="selectionsClearBtn"
-					group="normal"
-					w="3rem"
-					variant="red"
-					action="clearSelection"
-					title="Отменить подборку"
-					tag="selectionsbtn"
-					disabled
-					hidden
-					><i class="fa-solid fa-xmark"></i></x-button>
-			</div>
-			
-			<div class="col-auto ms-auto">
-				<x-button
-					group="normal"
-					variant="purple"
-					action="openSetColumsWin"
-					title="Отображение столбцов"
-					><i class="fa-solid fa-table-columns"></i></x-button>
-			</div>
 		</div>
-		
 				
 				
 		<div id="contractsList"></div>

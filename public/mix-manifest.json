@@ -25,7 +25,9 @@
     "/assets/js/plugins/ddrPopup/index.js": "/assets/js/plugins/ddrPopup/index.js?id=1af2d2443e92edc0d823d6096460cab5",
     "/assets/js/plugins/ddrPopup.css": "/assets/js/plugins/ddrPopup.css?id=60e6af3ea99d501ff9edbf2e7e1347bf",
     "/assets/js/plugins/ddrPopup.js": "/assets/js/plugins/ddrPopup.js?id=bbc3a7261a27c95ead18d2f406038caa",
+    "/assets/js/plugins/ddrScrollEvents.js": "/assets/js/plugins/ddrScrollEvents.js?id=2f88bc9c733c7cfb791941e9ad70fe31",
     "/assets/js/plugins/ddrScrollX.js": "/assets/js/plugins/ddrScrollX.js?id=97cab8d7d05b16a4ec69f0dfc73a4f1c",
+    "/assets/js/plugins/ddrTable.js": "/assets/js/plugins/ddrTable.js?id=100dadd9cdc65b9631a71bf20bd93fd6",
     "/assets/js/plugins/ddrWaitBlock.js": "/assets/js/plugins/ddrWaitBlock.js?id=d8570cbd0fc5bfdfbd63b7ff6c8fe9ff",
     "/assets/js/plugins/dropdown.js": "/assets/js/plugins/dropdown.js?id=4895f949b67e0d75f79ac8fc7e4c5d24",
     "/assets/js/plugins/jquery.maskedinput.js": "/assets/js/plugins/jquery.maskedinput.js?id=c6872c9f6bb2cf68b582f9eaf3045db6",
@@ -115,7 +117,5 @@
     "/assets/fonts/fontawesome/fa-solid-900.ttf": "/assets/fonts/fontawesome/fa-solid-900.ttf?id=049ce078cc76ac740d55085e27008d02",
     "/assets/fonts/fontawesome/fa-solid-900.woff2": "/assets/fonts/fontawesome/fa-solid-900.woff2?id=d0d39acc7b54ab04c9e1af5798a0f816",
     "/assets/fonts/fontawesome/fa-v4compatibility.ttf": "/assets/fonts/fontawesome/fa-v4compatibility.ttf?id=12c356ac726e8e2bc1c28ce1a04ab4d7",
-    "/assets/fonts/fontawesome/fa-v4compatibility.woff2": "/assets/fonts/fontawesome/fa-v4compatibility.woff2?id=5bb25ae8c661619d1b32c029e4048cb6",
-    "/assets/js/plugins/ddrTable.js": "/assets/js/plugins/ddrTable.js?id=100dadd9cdc65b9631a71bf20bd93fd6",
-    "/assets/js/plugins/ddrScrollEvents.js": "/assets/js/plugins/ddrScrollEvents.js?id=2f88bc9c733c7cfb791941e9ad70fe31"
+    "/assets/fonts/fontawesome/fa-v4compatibility.woff2": "/assets/fonts/fontawesome/fa-v4compatibility.woff2?id=5bb25ae8c661619d1b32c029e4048cb6"
 }
