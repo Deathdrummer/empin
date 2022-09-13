@@ -4,6 +4,7 @@ use App\Http\Controllers\site\Contracts;
 use App\Http\Controllers\site\Selections;
 use App\Http\Controllers\UserController;
 use App\Http\Requests\Auth\UserEmailVerificationRequest;
+use App\Models\Department as DepartmentModel;
 use App\Models\Section;
 use App\Models\User;
 use App\Services\Settings;
@@ -203,7 +204,9 @@ Route::middleware(['lang', 'auth:site', 'isajax:site'])->post('/get_section', fu
 	
 	$user = Auth::guard('site')->user();
 	
-	$data = array_merge($settingsData->toArray(), ['user' => $user]);
+	$departments = DepartmentModel::select(['id', 'name'])->orderBy('_sort', 'ASC')->get();
+	
+	$data = array_merge($settingsData->toArray(), ['user' => $user, 'departments' => $departments]);
 	
 	return response()->view('site.section.'.$sectionPath, $data/* сюда данные */, 200)->header('X-Page-Title', json_encode($pageTitle));
 });

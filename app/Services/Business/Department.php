@@ -9,7 +9,6 @@ use Illuminate\Database\Eloquent\Builder;
 class Department {
 	
 	
-	
 	/**
 	 * @param Request  $request
 	 * @return 
@@ -41,6 +40,7 @@ class Department {
 	
 	/**
 	 * @param Request  $request
+	 * @param string  $sort
 	 * @return 
 	 */
 	public function get(Request $request, $sort = 'ASC') {

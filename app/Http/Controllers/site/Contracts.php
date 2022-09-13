@@ -58,9 +58,9 @@ class Contracts extends Controller {
 			$selection = $request->get('selection', null);
 			
 			$headers = [
-				'x-count-contracts-all' => $counts['all'],
-				'x-count-contracts-department' => $counts['department'],
-				'x-count-contracts-archive' => $counts['archive']
+				'x-count-contracts-all' => $counts['all'] ?? null,
+				'x-count-contracts-departments' => json_encode($counts['departments']) ?? null,
+				'x-count-contracts-archive' => $counts['archive'] ?? null
 			];
 		}
 		

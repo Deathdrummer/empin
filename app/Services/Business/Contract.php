@@ -272,9 +272,7 @@ class Contract {
 		
 		$data = ContractModel::select(['id', 'archive'])
 			->whereIn('id', $contractsIds)
-			->withCount(['departments' => function(Builder $query) {
-				$query->where('id', auth('site')->user()->department_id);
-			}])
+			->with('departments:id')
 			->withExists(['departments AS hide' => function(Builder $query) {
 				$query->where('hide', 1);
 			}])
@@ -283,16 +281,24 @@ class Contract {
 			}])
 			->get()
 			->toArray();
+			
+		foreach($data as $k => $item) {
+			$data[$k]['departments'] = array_column($item['departments'], 'id');
+		}
 		
 		
-		$countData = ['all' => 0, 'department' => 0, 'archive' => 0];
+		$countData = ['all' => 0, 'departments' => [], 'archive' => 0];
 		
 		foreach ($data as $item) {
 			if ($item['archive'] == 1) {
 				$countData['archive'] += 1;
-			} elseif ($item['departments_count'] > 0 && $item['show'] == 1 && $item['hide'] == 0) {
-				$countData['department'] += 1;
-			}/*  else {
+			} elseif (count($item['departments']) && $item['show'] == 1 && $item['hide'] == 0) {
+				foreach($item['departments'] as $dep) {
+					if (!isset($countData['departments'][$dep])) $countData['departments'][$dep] = 0;
+					$countData['departments'][$dep] += 1;
+				}
+				
+			}/*  else { // это чтобы показывать количество БЕЗ учета тех, что ейчас в отделах
 				$countData['all'] += 1;
 			} */
 			

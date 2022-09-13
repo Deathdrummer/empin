@@ -110,9 +110,37 @@
 									lh100"
 								selectionscounts
 								></strong></x-chooser.item>
-					@if(isset($user->department->id) && !is_null($user->department->id))
-						<x-chooser.item
-							id="chooserDepartment"
+					
+					@if(auth('site')->user()->can('can-see-all-departments:site'))
+						@if(!is_null($departments) && !empty($departments))
+							@foreach($departments as $dep)
+								<x-chooser.item
+									chooserdepartment="{{$dep->id}}"
+									class="pl3rem"
+									tag="chooserd epartment"
+									action="getListAction:{{$dep->id}}"
+									>{{$dep->name ?? 'Без названия'}}
+									<strong
+										class="
+											ml5px
+											iconed
+											iconed-noempty
+											border-rounded-8px
+											border-all
+											border-white
+											bg-yellow
+											color-dark
+											w2rem-2px
+											h2rem-2px
+											fz13px
+											lh100"
+										selectionscounts
+										></strong></x-chooser.item>
+							@endforeach
+						@endif
+					@elseif(isset($user->department->id) && !is_null($user->department->id))
+					<x-chooser.item
+							chooserdepartment="{{$user->department->id}}"
 							class="pl3rem"
 							action="getListAction:{{$user->department->id}}"
 							>{{$user->department->name ?? 'Без названия'}}
@@ -133,6 +161,8 @@
 								selectionscounts
 								></strong></x-chooser.item>
 					@endif
+					
+					
 					<x-chooser.item
 						id="chooserArchive"
 						class="pl3rem"
@@ -590,7 +620,7 @@
 				$(btn).setAttrib('hidden');
 				$('[selectionsbtn]').ddrInputs('enable');
 				$('#chooserAll').find('[selectionscounts]').empty();
-				$('#chooserDepartment').find('[selectionscounts]').empty();
+				$('[chooserdepartment]').find('[selectionscounts]').empty();
 				$('#chooserArchive').find('[selectionscounts]').empty();
 			}
 		});
@@ -1472,12 +1502,19 @@
 			if (init) $('#contractsCard').card('ready');
 			else listWait.destroy();
 			
+			
+			
+			
 			$('[stepprice]').number(true, 2, '.', ' ');
 			
 			if (withCounts && headers) {
 				$('#chooserAll').find('[selectionscounts]').text(headers['x-count-contracts-all'] > 0 ? headers['x-count-contracts-all'] : '');
-				$('#chooserDepartment').find('[selectionscounts]').text(headers['x-count-contracts-department'] > 0 ? headers['x-count-contracts-department'] : '');
 				$('#chooserArchive').find('[selectionscounts]').text(headers['x-count-contracts-archive'] > 0 ? headers['x-count-contracts-archive'] : '');
+				
+				let depsCounts = JSON.parse(headers['x-count-contracts-departments']);
+				$.each(depsCounts, function(depId, count) {
+					$('[chooserdepartment="'+depId+'"]').find('[selectionscounts]').text(count > 0 ? count : '');
+				});
 			}
 			
 			
