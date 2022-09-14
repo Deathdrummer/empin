@@ -12,6 +12,17 @@
 	//&:not(.table_inline)
 	//	table
 	//		width: 100%
+	
+	&.table_fixwidth
+		table
+			thead
+				tr
+					td
+						&::after
+							content: ''
+							width: inherit
+							display: block
+							//transform: scaleX(0.95)
 
 table
 	width: 100%
@@ -70,11 +81,6 @@ table
 				font-size: 14px
 				+font('Fira Sans', 400)
 				
-				&::after
-					content: ''
-					width: inherit
-					display: block
-					//transform: scaleX(0.95)
 				
 				+ td
 					&::before

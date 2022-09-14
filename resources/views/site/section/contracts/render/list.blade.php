@@ -1,8 +1,8 @@
 @isset($list)
 <x-horisontal space="2rem" ignore="[noscroll], select, input, textarea">
 	<x-horisontal.item class="h100">
-		<div class="table table_inline border-all border-light border-2px border-rounded-3px h100">
-			<table id="toolrool">
+		<div class="table table_fixwidth border-all border-light border-2px border-rounded-3px h100">
+			<table>
 				<thead>
 					<tr class="h{{$rowHeight ?? '7'}}rem" sorts>
 						@if(!$isArchive)
@@ -181,7 +181,7 @@
 			@continue
 		@endif
 		<x-horisontal.item class="h100">
-			<div class="table table_inline border-all border-gray border-2px border-rounded-3px h100">
+			<div class="table table_fixwidth border-all border-gray border-2px border-rounded-3px h100">
 				<table>
 					<thead>
 						<tr class="h3rem">

@@ -14,6 +14,9 @@
 				<td class="w7rem" title="Отправить сообщение в чаты договоров подборки">
 					<strong class="d-block fz12px lh90">Отпр. сообщ.</strong>
 				</td>
+				<td class="w7rem" title="Поделиться подборкой с другими сотрудниками">
+					<strong class="d-block fz12px lh90">Поделиться</strong>
+				</td>
 				<td class="w9rem">
 					<strong class="d-block fz12px lh90">Действия</strong>
 				</td>

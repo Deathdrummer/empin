@@ -287,7 +287,7 @@
 	$.openSelectionsWin = (openSelectionBtn) => {
 		ddrPopup({
 			title: 'Подборки договоров',
-			width: 800,
+			width: 1000,
 			buttons: ['Закрыть', {action: 'selectionAdd', title: 'Создать'}],
 			disabledButtons: true,
 			winClass: 'ddrpopup_white'
@@ -437,7 +437,7 @@
 					
 					
 					
-					
+					//--------------------------------- Отправить сообщение в чаты с договорами данной подборки
 					$.selectionSendMessages = (sendMessDialogBtn, selectionId) => {
 						$(sendMessDialogBtn).ddrInputs('disable');
 						
@@ -505,6 +505,43 @@
 						});
 						
 					}
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					//--------------------------------- Поделиться подборкой с другими сотрудниками
+					let statusesTooltip;
+					$.selectionShare = (btn, id) => {
+						statusesTooltip = $(btn).tooltip({
+							cls: 'w30rem',
+							placement: 'auto',
+							tag: 'noscroll',
+							minWidth: '320px',
+							minHeight: '110px',
+							wait: {
+								iconHeight: '40px'
+							},
+							onShow: function({reference, popper, show, hide, destroy, waitDetroy, setContent, setData, setProps}) {
+								loadStatusesData((data) => {
+									setData(data);
+									waitDetroy();
+								});
+							}
+						});
+					}
+					
+					
+					
+					
+					
+					
 					
 					
 					
@@ -1525,9 +1562,6 @@
 				});
 			}*/
 			
-			//$('#toolrool').ddrTable();
-			
-				
 			
 			if (callback && typeof callback == 'function') callback();
 		});
