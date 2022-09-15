@@ -6456,7 +6456,7 @@ p {
   display: inline-table;
   width: min-content;
 }
-.table.table_fixwidth table thead tr td::after {
+.table_fixwidth table thead tr td::after {
   content: "";
   width: inherit;
   display: block;
