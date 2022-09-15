@@ -6460,6 +6460,7 @@ p {
   content: "";
   width: inherit;
   display: block;
+  transform: scaleX(0.95);
 }
 
 table {
