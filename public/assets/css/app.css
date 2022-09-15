@@ -46201,7 +46201,7 @@ template {
   flex-wrap: nowrap;
 }
 .horisontal__item {
-  flex: 0 0 auto;
+  flex: 0 1 auto;
   display: inline-block;
 }
 .horisontal__item:first-of-type {

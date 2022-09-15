@@ -6459,8 +6459,6 @@ p {
 .table_fixwidth table thead tr td::after {
   content: "";
   width: inherit;
-  height: 20px;
-  background-color: #777;
   display: block;
 }
 
