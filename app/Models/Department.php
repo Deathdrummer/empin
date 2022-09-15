@@ -65,6 +65,16 @@ class Department extends Model {
 	
 	
 	
+	/**
+     * Получить этапы к отделу.
+     */
+    public function users() {
+        return $this->hasMany(User::class, 'department_id', 'id')/* ->orderBy('_sort', 'ASC') */;
+    }
+	
+	
+	
+	
 	
 	/**
      * Получить договоры к отделу.
@@ -80,7 +90,6 @@ class Department extends Model {
 			->using(ContractDepartment::class)
 			->withPivot('show');
     }
-	
 	
 	
 	

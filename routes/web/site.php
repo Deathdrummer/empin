@@ -298,7 +298,13 @@ Route::prefix('site')->middleware(['lang', 'isajax:site'])->group(function() {
 	Route::put('/selections/add_contract', [Selections::class, 'add_contract']);
 	Route::put('/selections/remove_contract', [Selections::class, 'remove_contract']);
 	Route::post('/selections/store_show', [Selections::class, 'store_show']);
+	
+	Route::get('/selections/users_to_share', [Selections::class, 'users_to_share']);
+	Route::post('/selections/share', [Selections::class, 'share']);
+	
 	Route::resource('selections', Selections::class);
+	
+	
 	
 });
 

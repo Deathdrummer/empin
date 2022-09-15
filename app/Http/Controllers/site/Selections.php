@@ -1,7 +1,10 @@
 <?php namespace App\Http\Controllers\site;
 
 use App\Http\Controllers\Controller;
+use App\Models\ContractSelection;
 use App\Models\Selection;
+use App\Services\Business\User as UserService;
+use App\Services\Business\Department as DepartmentService;
 use App\Traits\HasCrudController;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -22,11 +25,13 @@ class Selections extends Controller {
      * @var array
      */
 	protected $data = [];
+	protected $user;
+	protected $department;
 	
 	
-	
-	public function __construct() {
-		
+	public function __construct(UserService $user, DepartmentService $department) {
+		$this->user = $user;
+		$this->department = $department;
 		/* 
 		$this->middleware('throttle:10,1')->only([
 			'store_show',
@@ -295,6 +300,86 @@ class Selections extends Controller {
 	
 	
 	
+	
+	
+	
+	
+	
+	/**
+	 * @param 
+	 * @return 
+	 */
+	public function users_to_share(Request $request) {
+		[
+			'views' => $viewsPath,
+			'selection_id' => $selectionId,
+		] = $request->validate([
+			'views'			=> 'string|required',
+			'selection_id'	=> 'numeric|required',
+		]);
+		
+		$depsUsers = $this->user->getWithDepartments();
+		$departments = $this->department->getAll();
+		
+		return $this->view($viewsPath.'.users', compact('depsUsers', 'departments', 'selectionId'));
+	}
+	
+	
+	
+	
+	
+	
+	/**
+	 * @param 
+	 * @return 
+	 */
+	public function share(Request $request) {
+		$departmentId = $request->input('department_id', null);
+		$userId = $request->input('user_id', null);
+		$selectionId = $request->input('selection_id', null);
+		
+		if (!$selectionId)return response()->json(false);
+		
+		if ($departmentId) {
+			$users = $this->user->getWithDepartments($departmentId)->toArray();
+			$usersIds = array_column(reset($users), 'id');
+			
+			foreach ($usersIds as $userId) {
+				$this->_shareSelection($selectionId, $userId);
+			}
+			return response()->json(true);
+		}
+		
+		if ($userId) {
+			$this->_shareSelection($selectionId, $userId);
+			return response()->json(true);
+		}
+	}
+	
+	
+	
+	
+	
+	
+	/**
+	 * @param 
+	 * @return 
+	 */
+	private function _shareSelection($selectionId, $userId) {
+		$row = ContractSelection::find($selectionId);
+		$maxSelectionSort = ContractSelection::where('account_id', $userId)->max('_sort') ?: 0;
+		
+		$created = ContractSelection::create([
+			'account_id'	=> $userId,
+			'title'			=> $row->title,
+			'_sort'			=> $maxSelectionSort + 1,
+		]);
+		
+		$selection = Selection::find($created->id);
+		$selection->contracts()->attach($row->contracts->pluck('id'));
+		
+		return true;
+	}
 	
 	
 

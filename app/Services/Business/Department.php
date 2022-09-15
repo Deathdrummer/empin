@@ -9,6 +9,21 @@ use Illuminate\Database\Eloquent\Builder;
 class Department {
 	
 	
+	
+	
+	/**
+	 * @param Request  $request
+	 * @param string  $sort
+	 * @return 
+	 */
+	public function getAll() {
+		return DepartmentModel::orderBy('_sort', 'ASC')->get();
+	}
+	
+	
+	
+	
+	
 	/**
 	 * @param Request  $request
 	 * @return 
@@ -73,6 +88,25 @@ class Department {
 			->orderBy('_sort', 'ASC')
 			->get();
 	}
+	
+	
+	
+	
+	
+	
+	
+	/**
+	 * @param Request  $request
+	 * @return 
+	 */
+	public function getWithUsers($depId = false) {
+		return DepartmentModel::with(['users' => function($query) {
+				$query->orderBy('_sort', 'ASC');
+			}])
+			->orderBy('_sort', 'ASC')
+			->get();
+	}
+	
 	
 	
 	

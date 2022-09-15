@@ -143170,3 +143170,11 @@ template {
 .tippy-box[data-placement^=right] > .tippy-arrow::before {
   border-right-color: #fff !important;
 }
+
+.tippy-content {
+  text-align: initial;
+}
+
+.ddrlist__item:first-of-type {
+  margin-top: 0 !important;
+}

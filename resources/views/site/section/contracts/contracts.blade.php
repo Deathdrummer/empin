@@ -291,7 +291,7 @@
 			buttons: ['Закрыть', {action: 'selectionAdd', title: 'Создать'}],
 			disabledButtons: true,
 			winClass: 'ddrpopup_white'
-		}).then(async ({state, wait, setTitle, setButtons, loadData, setHtml, setLHtml, dialog, close, onScroll, disableButtons, enableButtons, setWidth}) => { //isClosed
+		}).then(async ({state, wait, setTitle, setButtons, loadData, setHtml, setLHtml, dialog, close, query, onScroll, disableButtons, enableButtons, setWidth}) => { //isClosed
 			wait();
 			const viewsPath = 'site.section.contracts.render.selections';
 			
@@ -517,25 +517,89 @@
 					
 					
 					//--------------------------------- Поделиться подборкой с другими сотрудниками
-					let statusesTooltip;
-					$.selectionShare = (btn, id) => {
+					let statusesTooltip, destroyTooltip;
+					$.selectionShare = (btn, selection_id) => {
 						statusesTooltip = $(btn).tooltip({
 							cls: 'w30rem',
 							placement: 'auto',
 							tag: 'noscroll',
 							minWidth: '320px',
-							minHeight: '110px',
+							minHeight: '200px',
 							wait: {
 								iconHeight: '40px'
 							},
 							onShow: function({reference, popper, show, hide, destroy, waitDetroy, setContent, setData, setProps}) {
-								loadStatusesData((data) => {
+								
+								destroyTooltip = destroy;
+								
+								query({method: 'get', route: 'users_to_share', data: {views: viewsPath, selection_id}, responseType: 'text'}, (data, container, {error, status, headers}) => {
 									setData(data);
 									waitDetroy();
 								});
+								
+								
+								
+								/*axiosQuery('get', 'site/selections/users_to_share').then(({data, error, status, headers}) => {
+									setData(data);
+									waitDetroy();
+								}).catch((e) => {
+									waitDetroy();
+								});*/
+								/*loadStatusesData((data) => {
+									setData(data);
+									waitDetroy();
+								});*/
 							}
 						});
+						
+						
+						
+						$.shareSelectionDepartment = (__, selectionId, deptId) => {
+							destroyTooltip();
+							
+							let shareSelectionWait = $(btn).closest('tr').ddrWait({
+								iconHeight: '25px'
+							});
+							
+							query({
+								method: 'post',
+								route: 'share',
+								data: {
+									department_id: deptId,
+									selection_id: selectionId
+								}
+							}, (data, container, {error, status, headers}) => {
+								shareSelectionWait.destroy();
+								$.notify('Подборка успешно отправлена всем сотрудникам отдела!');
+							});
+						}
+						
+						
+						$.shareSelectionUser = (__, selectionId, userId) => {
+							destroyTooltip();
+							let shareSelectionWait = $(btn).closest('tr').ddrWait({
+								iconHeight: '25px'
+							});
+							
+							query({
+								method: 'post',
+								route: 'share',
+								data: {
+									user_id: userId,
+									selection_id: selectionId
+								}
+							}, (data, container, {error, status, headers}) => {
+								shareSelectionWait.destroy();
+								$.notify('Подборка успешно отправлена сотруднику!');
+							});
+						}
+						
 					}
+					
+					
+					
+					
+						
 					
 					
 					
