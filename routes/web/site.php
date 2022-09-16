@@ -53,11 +53,12 @@ Route::post('/email/verification-notification', function (Request $request) {
 
 // Сброс пароля
 Route::get('/forgot-password', function (Request $request) {
-	$email = $request->input('email');
+	$email = encodeEmail($request->input('email'));
 	return view('site.auth.forgot-password', ['email' => $email]);
 })->middleware('lang', 'guest:site')->name('password.request');
 
 Route::post('/forgot-password', function (Request $request) {
+	$request->merge(['email' => encodeEmail($request->input('email'))]);
 	$request->validate(['email' => 'required|email|exists:users,email']);
     $status = Password::broker('users')->sendResetLink($request->only('email'), function($user, $token) {
 		$user->sendPasswordResetNotification($token, 'site');
