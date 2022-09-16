@@ -239,7 +239,7 @@
 	
 	
 	let searchContractsTOut;
-	$.contractsSearch = (btn) => {
+	$.contractsSearch = (field) => {
 		clearTimeout(searchContractsTOut);
 		
 		searchWithArchive = $('#searchWithArchive').is(':checked');
@@ -247,10 +247,22 @@
 		$('#clearSearch').ddrInputs('enable');
 		
 		searchContractsTOut = setTimeout(() => {
-			search = $(btn).val();
-			getList({
-				withCounts: true
-			});
+			search = $(field).val();
+			if (search == '') {
+				search = null;
+				getList({
+					callback: function() {
+						$('#clearSearch').ddrInputs('disable');
+						$('#chooserAll').find('[selectionscounts]').empty();
+						$('[chooserdepartment]').find('[selectionscounts]').empty();
+						$('#chooserArchive').find('[selectionscounts]').empty();
+					}
+				});
+			} else {
+				getList({
+					withCounts: true
+				});
+			}
 		}, 300);
 	}
 	
@@ -258,8 +270,13 @@
 	$.clearContractsSearch = (btn) => {
 		$('#contractsSearchField').val('');
 		search = null;
-		
-		getList();
+		getList({
+			callback: function() {
+				$('#chooserAll').find('[selectionscounts]').empty();
+				$('[chooserdepartment]').find('[selectionscounts]').empty();
+				$('#chooserArchive').find('[selectionscounts]').empty();
+			}
+		});
 		$(btn).ddrInputs('disable');
 	}
 	
