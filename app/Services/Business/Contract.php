@@ -273,29 +273,28 @@ class Contract {
 		$data = ContractModel::select(['id', 'archive'])
 			->whereIn('id', $contractsIds)
 			->with('departments:id')
-			->withExists(['departments AS hide' => function(Builder $query) {
+			/* ->withExists(['departments AS hide' => function(Builder $query) {
 				$query->where('hide', 1);
 			}])
 			->withExists(['departments AS show' => function(Builder $query) {
 				$query->where('show', 1);
-			}])
+			}]) */
 			->get()
 			->toArray();
-			
-		foreach($data as $k => $item) {
-			$data[$k]['departments'] = array_column($item['departments'], 'id');
-		}
 		
+		/* foreach($data as $k => $item) {
+			$data[$k]['departments'] = array_column($item['departments'], 'id');
+		} */
 		
 		$countData = ['all' => 0, 'departments' => [], 'archive' => 0];
 		
 		foreach ($data as $item) {
 			if ($item['archive'] == 1) {
 				$countData['archive'] += 1;
-			} elseif (count($item['departments']) && $item['show'] == 1 && $item['hide'] == 0) {
+			} elseif (count($item['departments'])) {
 				foreach($item['departments'] as $dep) {
-					if (!isset($countData['departments'][$dep])) $countData['departments'][$dep] = 0;
-					$countData['departments'][$dep] += 1;
+					if (!isset($countData['departments'][$dep['id']])) $countData['departments'][$dep['id']] = 0;
+					if ($dep['pivot']['show'] == 1 && $dep['pivot']['hide'] == 0) $countData['departments'][$dep['id']] += 1;
 				}
 				
 			}/*  else { // это чтобы показывать количество БЕЗ учета тех, что ейчас в отделах

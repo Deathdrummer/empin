@@ -1599,6 +1599,13 @@
 		
 		abortCtrl = new AbortController();
 		axiosQuery('get', 'site/contracts', params, 'text', abortCtrl).then(({data, error, status, headers}) => {
+			
+			if (error) {
+				$.notify(error.message, 'error');
+				wait(false);
+				return;
+			}
+			
 			$('#contractsList').html(data);
 			if (init) $('#contractsCard').card('ready');
 			else listWait.destroy();

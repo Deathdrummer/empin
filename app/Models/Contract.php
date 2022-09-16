@@ -108,7 +108,7 @@ class Contract extends Model {
 			'id')
 			->as('pivot')
 			->using(ContractDepartment::class)
-			->withPivot('show', 'steps', 'updated_show');
+			->withPivot('show', 'hide', 'steps', 'updated_show');
 	}
 	
 	
