@@ -56,13 +56,23 @@ class Contracts extends Controller {
 			$counts = $this->contract->getCounts($request);
 			$selectioned = $request->has('selection');
 			$selection = $request->get('selection', null);
-			
 			$headers = [
 				'x-count-contracts-all' => $counts['all'] ?? null,
 				'x-count-contracts-departments' => json_encode($counts['departments']) ?? null,
 				'x-count-contracts-archive' => $counts['archive'] ?? null
 			];
 		}
+		
+		if ($request->has('search') && $list) {
+			$contractsIds = $list->pluck('id');
+			$counts = $this->contract->getCounts($contractsIds);
+			$headers = [
+				'x-count-contracts-all' => $counts['all'] ?? null,
+				'x-count-contracts-departments' => json_encode($counts['departments']) ?? null,
+				'x-count-contracts-archive' => $counts['archive'] ?? null
+			];
+		}
+		
 		
 		
 		if (!$list || $list->isEmpty()) return $this->renderWithHeaders('list', [], $headers);

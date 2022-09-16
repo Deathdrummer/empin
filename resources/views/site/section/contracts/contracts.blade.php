@@ -248,7 +248,9 @@
 		
 		searchContractsTOut = setTimeout(() => {
 			search = $(btn).val();
-			getList();
+			getList({
+				withCounts: true
+			});
 		}, 300);
 	}
 	
@@ -1602,7 +1604,6 @@
 			
 			if (error) {
 				$.notify(error.message, 'error');
-				wait(false);
 				return;
 			}
 			

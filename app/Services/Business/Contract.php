@@ -256,18 +256,26 @@ class Contract {
 	 * @param 
 	 * @return 
 	 */
-	public function getCounts(Request $request) {
+	public function getCounts($request) {
+		
+		
 		
 		//$filter = app()->make(ContractFilter::class, ['queryParams' => $request->except(['sort_field', 'sort_order', 'archive', 'department_id'])]);
-		
-		$selectionContracts = Selection::with('contracts')
-			->where('id', $request->input('selection'))
-			->first();
-		
 		$contractsIds = [];
-		foreach ($selectionContracts->contracts as $item) {
-			$contractsIds[] = $item->pivot->contract_id;
+		
+		if ($request instanceof Request) {
+			$selectionContracts = Selection::with('contracts')
+				->where('id', $request->input('selection'))
+				->first();
+				
+			foreach ($selectionContracts->contracts as $item) {
+				$contractsIds[] = $item->pivot->contract_id;
+			}
+		} else {
+			$contractsIds = $request;
 		}
+		
+		
 		
 		
 		$data = ContractModel::select(['id', 'archive'])
