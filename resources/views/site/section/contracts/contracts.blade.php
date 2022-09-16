@@ -250,12 +250,11 @@
 			search = $(field).val();
 			if (search == '') {
 				search = null;
+				_clearCounts();
 				getList({
 					callback: function() {
 						$('#clearSearch').ddrInputs('disable');
-						$('#chooserAll').find('[selectionscounts]').empty();
-						$('[chooserdepartment]').find('[selectionscounts]').empty();
-						$('#chooserArchive').find('[selectionscounts]').empty();
+						_clearCounts();
 					}
 				});
 			} else {
@@ -272,9 +271,7 @@
 		search = null;
 		getList({
 			callback: function() {
-				$('#chooserAll').find('[selectionscounts]').empty();
-				$('[chooserdepartment]').find('[selectionscounts]').empty();
-				$('#chooserArchive').find('[selectionscounts]').empty();
+				_clearCounts();
 			}
 		});
 		$(btn).ddrInputs('disable');
@@ -291,6 +288,12 @@
 	
 	
 	
+	
+	function _clearCounts() {
+		$('#chooserAll').find('[selectionscounts]').empty();
+		$('[chooserdepartment]').find('[selectionscounts]').empty();
+		$('#chooserArchive').find('[selectionscounts]').empty();
+	}
 	
 	
 	
@@ -739,9 +742,7 @@
 			callback: function() {
 				$(btn).setAttrib('hidden');
 				$('[selectionsbtn]').ddrInputs('enable');
-				$('#chooserAll').find('[selectionscounts]').empty();
-				$('[chooserdepartment]').find('[selectionscounts]').empty();
-				$('#chooserArchive').find('[selectionscounts]').empty();
+				_clearCounts();
 			}
 		});
 	}
