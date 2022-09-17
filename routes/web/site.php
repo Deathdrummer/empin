@@ -302,6 +302,7 @@ Route::prefix('site')->middleware(['lang', 'isajax:site'])->group(function() {
 	
 	Route::get('/selections/users_to_share', [Selections::class, 'users_to_share']);
 	Route::post('/selections/share', [Selections::class, 'share']);
+	Route::post('/selections/unsubscribe', [Selections::class, 'unsubscribe']);
 	
 	Route::resource('selections', Selections::class);
 	

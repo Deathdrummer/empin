@@ -379,8 +379,6 @@ class Selections extends Controller {
 	
 	
 	
-	
-	
 	/**
 	 * @param 
 	 * @return 
@@ -403,10 +401,6 @@ class Selections extends Controller {
 	
 	
 	
-	
-	
-	
-	
 	/**
 	 * @param 
 	 * @return 
@@ -423,6 +417,35 @@ class Selections extends Controller {
 		} 
         return true;
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	/**
+	 * @param 
+	 * @return 
+	 */
+	public function unsubscribe() {
+		$selectionId = request('id');
+
+		$row = ContractSelection::find($selectionId);
+		$userId = auth('site')->user()->id;
+		
+		$subscribed = $row->subscribed;
+		if (!in_array($userId, (array)$subscribed)) return true;
+		
+		if (($key = array_search($userId, $subscribed)) !== false) unset($subscribed[$key]);
+		
+		$row->subscribed = empty($subscribed) ? null : $subscribed;
+		$stat = $row->save();
+		return $stat;
+	}
+	
 	
 	
 

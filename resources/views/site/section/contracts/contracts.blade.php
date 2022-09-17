@@ -457,6 +457,47 @@
 					
 					
 					
+					$.selectionUnsubscribe = (btn, id) => {
+						if (!id) {
+							$.notify('Ошибка! Не удалось отписаться!', 'error');
+							return;
+						}
+						let row = $(btn).closest('tr');
+						
+						dialog('Отписаться от подборки?', {
+							buttons: {
+								'Отписаться|red': function({closeDialog}) {
+									closeDialog();
+									
+									let unsubscribeSelectionWait = $(row).ddrWait({
+										iconHeight: '15px',
+										bgColor: '#ffffff91'
+									});
+									
+									query({
+										method: 'post',
+										route: 'unsubscribe',
+										data: {id}, // это ID записи
+										responseType: 'json'
+									}, (data, container, {error, status, headers}) => {
+										if (!error) {
+											remove(row);
+											$.notify('Отписка успешно выполнена!');
+										} else {
+											$.notify('Ошибка отписки от подборки!', 'error');
+										}
+										unsubscribeSelectionWait.destroy();
+									});
+								},
+								'Отмена|light': function({closeDialog}) {
+									closeDialog();
+								}
+							}
+						});
+					}
+					
+					
+					
 					
 					
 					//--------------------------------- Отправить сообщение в чаты с договорами данной подборки

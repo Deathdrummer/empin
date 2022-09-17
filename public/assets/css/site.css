@@ -6597,7 +6597,7 @@ table tbody tr td + td::after {
 table tbody tr td.center {
   text-align: center;
 }
-table tbody tr td.right {
+table tbody tr td.right, table tbody tr td.end {
   text-align: right;
 }
 table tbody tr td.top {

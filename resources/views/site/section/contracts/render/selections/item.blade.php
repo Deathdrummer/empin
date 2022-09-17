@@ -53,7 +53,7 @@
 			variant="yellow"
 			action="selectionShare:{{$id}}"
 			title="Поделиться подборкой с другими сотрудниками"
-			:enabled="($contracts_count ?? false) && !$subscribed"
+			:enabled="$contracts_count ?? false"
 			>
 			<i class="fa-solid fa-share-nodes"></i>
 		</x-button>
@@ -61,7 +61,11 @@
 	<td class="center">
 		<x-buttons-group group="verysmall" w="2rem-5px" gx="5">
 			<x-button variant="blue" action="selectionUpdate:{{$id}}" disabled update title="Обновить"><i class="fa-solid fa-save"></i></x-button>
-			<x-button variant="red" action="selectionRemove:{{$id}}" remove title="Удалить"><i class="fa-solid fa-trash-can"></i></x-button>
+			@if($subscribed)
+				<x-button variant="red" action="selectionUnsubscribe:{{$id}}" remove title="Отписаться"><i class="fa-solid fa-link-slash"></i></x-button>
+			@else
+				<x-button variant="red" action="selectionRemove:{{$id}}" remove title="Удалить"><i class="fa-solid fa-trash-can"></i></x-button>
+			@endif
 		</x-buttons-group>
 	</td>
 </tr>
