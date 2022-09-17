@@ -324,7 +324,7 @@ if (! function_exists('encodeEmail')) {
 	 * @return string
 	*/
 	function encodeEmail(?string $address): string {
-		if (!$address) return $address;
+		if (!$address) return (string)$address;
 		$encoder = new IdnAddressEncoder();
 		return $encoder->encodeString($address);
 	}
@@ -339,16 +339,15 @@ if (! function_exists('decodeEmail')) {
 	 * @param string|null  $address
 	 * @return string
 	*/
-	function decodeEmail(?string $address): mixed {
-		if (!$address) return $address;
+	function decodeEmail(?string $address): string {
+		if (!$address) return (string)$address;
 		$i = strrpos($address, '@');
         if (false !== $i) {
             $local = substr($address, 0, $i);
             $domain = substr($address, $i + 1);
             $address = sprintf('%s@%s', $local, idn_to_utf8($domain, \IDNA_DEFAULT | \IDNA_USE_STD3_RULES | \IDNA_CHECK_BIDI | \IDNA_CHECK_CONTEXTJ | \IDNA_NONTRANSITIONAL_TO_ASCII, \INTL_IDNA_VARIANT_UTS46));
         }
-		
-        return $address;
+        return (string)$address;
 	}
 }
 
