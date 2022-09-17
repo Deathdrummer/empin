@@ -13,11 +13,14 @@ class User {
 	 * @param 
 	 * @return 
 	 */
-	public function getWithDepartments($depId = false) {
+	public function getWithDepartments($depId = false, $excludeUsers = []) {
 		return Usermodel::select(['id', 'name', 'pseudoname', 'department_id'])
 			->when($depId, function($query) use($depId) {
 				if ($depId == -1) $query->whereNull('department_id');
 				else $query->where('department_id', $depId);
+			})
+			->when($excludeUsers, function($query) use($excludeUsers) {
+				$query->whereNotIn('id', (array)$excludeUsers);
 			})
 			->orderBy('_sort')
 			->get()

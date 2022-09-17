@@ -539,47 +539,36 @@
 					
 					
 					//--------------------------------- Поделиться подборкой с другими сотрудниками
-					let statusesTooltip, destroyTooltip;
+					let statusesTooltip, destroyTooltip, sharePopper;
 					$.selectionShare = (btn, selection_id) => {
 						statusesTooltip = $(btn).tooltip({
 							cls: 'w30rem',
 							placement: 'auto',
 							tag: 'noscroll',
-							minWidth: '320px',
+							minWidth: '360px',
 							minHeight: '200px',
+							duration: [600, 200],
+							trigger: 'click',
 							wait: {
 								iconHeight: '40px'
 							},
 							onShow: function({reference, popper, show, hide, destroy, waitDetroy, setContent, setData, setProps}) {
-								
+								sharePopper = popper;
 								destroyTooltip = destroy;
 								
 								query({method: 'get', route: 'users_to_share', data: {views: viewsPath, selection_id}, responseType: 'text'}, (data, container, {error, status, headers}) => {
 									setData(data);
 									waitDetroy();
 								});
-								
-								
-								
-								/*axiosQuery('get', 'site/selections/users_to_share').then(({data, error, status, headers}) => {
-									setData(data);
-									waitDetroy();
-								}).catch((e) => {
-									waitDetroy();
-								});*/
-								/*loadStatusesData((data) => {
-									setData(data);
-									waitDetroy();
-								});*/
 							}
 						});
 						
-						
-						
-						$.shareSelectionDepartment = (__, selectionId, deptId) => {
-							destroyTooltip();
+						// clone-user subscribe-user clone-user-department subscribe-user-department
+						// тип ID подборки ID отдела или участника
+						$.shareSelection = (type, selectionId, unitId) => {
+							//destroyTooltip();
 							
-							let shareSelectionWait = $(btn).closest('tr').ddrWait({
+							let shareSelectionWait = $(sharePopper).ddrWait({
 								iconHeight: '25px'
 							});
 							
@@ -587,32 +576,24 @@
 								method: 'post',
 								route: 'share',
 								data: {
-									department_id: deptId,
-									selection_id: selectionId
+									type,
+									unitId,
+									selectionId
 								}
 							}, (data, container, {error, status, headers}) => {
-								shareSelectionWait.destroy();
-								$.notify('Подборка успешно отправлена всем сотрудникам отдела!');
-							});
-						}
-						
-						
-						$.shareSelectionUser = (__, selectionId, userId) => {
-							destroyTooltip();
-							let shareSelectionWait = $(btn).closest('tr').ddrWait({
-								iconHeight: '25px'
-							});
-							
-							query({
-								method: 'post',
-								route: 'share',
-								data: {
-									user_id: userId,
-									selection_id: selectionId
+								if (error) {
+									$.notify('Ошибка отправки подборки!', 'error');
+									shareSelectionWait.destroy();
+									return;
 								}
-							}, (data, container, {error, status, headers}) => {
+								
+								if (['clone-user', 'clone-user-department'].indexOf(type) !== -1) {
+									$.notify('Подборка успешно отправлена!');
+								} else {
+									$.notify('Подписка успешно оформлена!');
+								}
+								
 								shareSelectionWait.destroy();
-								$.notify('Подборка успешно отправлена сотруднику!');
 							});
 						}
 						

@@ -1,12 +1,15 @@
 <tr class="h6rem">
 	<td>
-		<x-input
-			name="title"
-			group="small"
-			:value="$title"
-			class="w100"
-			/>
-			
+		@if($subscribed)
+			<p class="fz12px ml6px">{{$title}}</p>
+		@else
+			<x-input
+				name="title"
+				group="small"
+				:value="$title"
+				class="w100"
+				/>
+		@endif	
 	</td>
 	<td class="center">
 		@if(isset($contracts_count) && $contracts_count)
@@ -28,7 +31,7 @@
 				variant="neutral"
 				w="2rem-5px"
 				action="selectionBuildToEdit:{{$id}}"
-				:enabled="$contracts_count ?? false"
+				:enabled="($contracts_count ?? false) && !$subscribed"
 				title="Редактировать список подборки"
 				><i class="fa-solid fa-pen-to-square"></i></x-button>
 		</x-buttons-group>
@@ -50,7 +53,7 @@
 			variant="yellow"
 			action="selectionShare:{{$id}}"
 			title="Поделиться подборкой с другими сотрудниками"
-			:enabled="$contracts_count ?? false"
+			:enabled="($contracts_count ?? false) && !$subscribed"
 			>
 			<i class="fa-solid fa-share-nodes"></i>
 		</x-button>

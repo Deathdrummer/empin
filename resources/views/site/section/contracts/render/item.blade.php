@@ -109,21 +109,21 @@
 	
 	@if(auth('site')->user()->can('contract-col-date_start:site') && (empty($userColums) || in_array('date_start', $userColums)))
 		<td>
-			@isset($date_start)
+			@if(isset($date_start) && $date_start)
 				<p class="fz12px lh90">{{dateFormatter($date_start, 'd.m.y')}}</p>
 			@else
 				<p class="color-gray">-</p>
-			@endisset
+			@endif
 		</td>
 	@endif
 	
 	@if(auth('site')->user()->can('contract-col-date_end:site') && (empty($userColums) || in_array('date_end', $userColums)))
 		<td>
-			@isset($date_start)
+			@if(isset($date_end) && $date_end)
 				<p class="fz12px lh90">{{dateFormatter($date_end, 'd.m.y')}}</p>
 			@else
 				<p class="color-gray">-</p>
-			@endisset
+			@endif
 		</td>
 	@endif
 	

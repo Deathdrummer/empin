@@ -13161,6 +13161,8 @@ $.fn.tooltip = function (params, callback) {
     placement: 'right',
     trigger: 'mousedown',
     interactive: true,
+    duration: [300, 250],
+    hideOnClick: true,
     wait: false,
     maxWidth: 'none',
     minWidth: false,
@@ -13173,6 +13175,8 @@ $.fn.tooltip = function (params, callback) {
       placement = _$assign.placement,
       trigger = _$assign.trigger,
       interactive = _$assign.interactive,
+      duration = _$assign.duration,
+      hideOnClick = _$assign.hideOnClick,
       wait = _$assign.wait,
       maxWidth = _$assign.maxWidth,
       minWidth = _$assign.minWidth,
@@ -13187,6 +13191,8 @@ $.fn.tooltip = function (params, callback) {
     placement: placement,
     trigger: trigger,
     interactive: interactive,
+    duration: duration,
+    hideOnClick: hideOnClick,
     maxWidth: maxWidth,
     onCreate: function onCreate(instance) {
       var _waitStat;

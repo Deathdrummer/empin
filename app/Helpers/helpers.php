@@ -293,7 +293,7 @@ if (! function_exists('dateFormatter')) {
 	 * @return string|null
 	*/
 	function dateFormatter(?string $date = null, ?string $format = null) {
-		if (!$date || !$format) exit(null);
+		if (!$date || !$format) return '';
 		echo now()->parse($date)->format($format);
 	}
 }

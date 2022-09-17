@@ -18,6 +18,7 @@ return new class extends Migration {
 			$table->foreign('account_id')->references('id')->on('users')->onDelete('cascade');
 			
 			$table->string('title');
+			$table->json('subscribed');
 			$table->unsignedBigInteger('_sort')->default(0);
         });
 		

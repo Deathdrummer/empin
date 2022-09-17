@@ -44,6 +44,7 @@ class ContractSelection extends Model {
      */
 	protected $casts = [
         'account_id' => 'integer',
+        'subscribed' => 'array',
     ];
 	
 	

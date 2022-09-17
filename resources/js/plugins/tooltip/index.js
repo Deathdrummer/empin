@@ -8,6 +8,8 @@ $.fn.tooltip = function(params, callback) {
 		placement, // top top-start top-end right right-start right-end bottom bottom-start bottom-end left left-start left-end auto auto-start auto-end
 		trigger,
 		interactive,
+		duration,
+		hideOnClick,
 		wait,
 		maxWidth,
 		minWidth,
@@ -20,6 +22,8 @@ $.fn.tooltip = function(params, callback) {
 		placement: 'right',
 		trigger: 'mousedown',
 		interactive: true,
+		duration: [300, 250],
+		hideOnClick: true,
 		wait: false,
 		maxWidth: 'none',
 		minWidth: false,
@@ -37,6 +41,8 @@ $.fn.tooltip = function(params, callback) {
 		placement,
 		trigger,
 		interactive,
+		duration,
+		hideOnClick,
 		maxWidth,
 		onCreate(instance) { // {reference, popper, show, hide, destroy, setContent, setProps}
 			if (wait) {

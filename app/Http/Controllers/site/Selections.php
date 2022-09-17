@@ -7,6 +7,7 @@ use App\Services\Business\User as UserService;
 use App\Services\Business\Department as DepartmentService;
 use App\Traits\HasCrudController;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Validation\Rule;
 
 class Selections extends Controller {
@@ -83,13 +84,18 @@ class Selections extends Controller {
 		]);
 		if (!$viewPath) return response()->json(['no_view' => true]);
 		
+		$userId = auth('site')->user()->id;
 		
-		$list = Selection::where(['account_id' => auth('site')->user()->id])
+		$list = Selection::where(['account_id' 	=> $userId])
+			->orWhereJsonContains('subscribed', $userId)
 			->withCount('contracts')
 			->orderBy('_sort', 'ASC')
-			->get();
+			->get()
+			->map(function($item) use($userId) {
+				$item['subscribed'] = $item['account_id'] != $userId ? true : false;
+				return $item;
+			});
 		
-
 		$itemView = $viewPath.'.item';
 		
 		return $this->viewWithLastSortIndex(Selection::class, $viewPath.'.list', compact('list', 'itemView'), '_sort');
@@ -318,7 +324,7 @@ class Selections extends Controller {
 			'selection_id'	=> 'numeric|required',
 		]);
 		
-		$depsUsers = $this->user->getWithDepartments();
+		$depsUsers = $this->user->getWithDepartments(false, auth('site')->user()->id);
 		$departments = $this->department->getAll();
 		
 		return $this->view($viewsPath.'.users', compact('depsUsers', 'departments', 'selectionId'));
@@ -334,24 +340,38 @@ class Selections extends Controller {
 	 * @return 
 	 */
 	public function share(Request $request) {
-		$departmentId = $request->input('department_id', null);
-		$userId = $request->input('user_id', null);
-		$selectionId = $request->input('selection_id', null);
+		$type = request('type');
+		$unitId = request('unitId');
+		$selectionId = request('selectionId');
 		
-		if (!$selectionId)return response()->json(false);
+		if (!$selectionId || !$unitId || !$type) return response()->json(false);
 		
-		if ($departmentId) {
-			$users = $this->user->getWithDepartments($departmentId)->toArray();
+		if (in_array($type, ['clone-user-department', 'subscribe-user-department'])) {
+			
+			$users = $this->user->getWithDepartments($unitId)->toArray();
 			$usersIds = array_column(reset($users), 'id');
 			
-			foreach ($usersIds as $userId) {
-				$this->_shareSelection($selectionId, $userId);
+			if ($type == 'clone-user-department') {
+				foreach ($usersIds as $userId) {
+					$this->_cloneSelection($selectionId, $userId);
+				}
+				
+			} elseif ($type == 'subscribe-user-department') {
+				foreach ($usersIds as $userId) {
+					$this->_subscribeSelection($selectionId, $userId);
+				}
 			}
+			
 			return response()->json(true);
-		}
 		
-		if ($userId) {
-			$this->_shareSelection($selectionId, $userId);
+		} elseif(in_array($type, ['clone-user', 'subscribe-user'])) {
+			
+			if ($type == 'clone-user') {
+				$this->_cloneSelection($selectionId, $unitId);
+			} elseif ($type == 'subscribe-user') {
+				$this->_subscribeSelection($selectionId, $unitId);
+			}
+			
 			return response()->json(true);
 		}
 	}
@@ -365,7 +385,7 @@ class Selections extends Controller {
 	 * @param 
 	 * @return 
 	 */
-	private function _shareSelection($selectionId, $userId) {
+	private function _cloneSelection($selectionId, $userId) {
 		$row = ContractSelection::find($selectionId);
 		$maxSelectionSort = ContractSelection::where('account_id', $userId)->max('_sort') ?: 0;
 		
@@ -379,6 +399,29 @@ class Selections extends Controller {
 		$selection->contracts()->attach($row->contracts->pluck('id'));
 		
 		return true;
+	}
+	
+	
+	
+	
+	
+	
+	
+	/**
+	 * @param 
+	 * @return 
+	 */
+	private function _subscribeSelection($selectionId, $userId) {
+		$row = ContractSelection::find($selectionId);
+		
+		$subscribed = $row->subscribed;
+		if (!in_array($userId, (array)$subscribed)) {
+			$subscribed[] = $userId;
+			$row->subscribed = $subscribed;
+        	$stat = $row->save();
+			return $stat;
+		} 
+        return true;
 	}
 	
 	

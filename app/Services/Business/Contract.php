@@ -257,10 +257,6 @@ class Contract {
 	 * @return 
 	 */
 	public function getCounts($request) {
-		
-		
-		
-		//$filter = app()->make(ContractFilter::class, ['queryParams' => $request->except(['sort_field', 'sort_order', 'archive', 'department_id'])]);
 		$contractsIds = [];
 		
 		if ($request instanceof Request) {
@@ -275,25 +271,12 @@ class Contract {
 			$contractsIds = $request;
 		}
 		
-		
-		
-		
 		$data = ContractModel::select(['id', 'archive'])
 			->whereIn('id', $contractsIds)
 			->with('departments:id')
-			/* ->withExists(['departments AS hide' => function(Builder $query) {
-				$query->where('hide', 1);
-			}])
-			->withExists(['departments AS show' => function(Builder $query) {
-				$query->where('show', 1);
-			}]) */
 			->get()
 			->toArray();
-		
-		/* foreach($data as $k => $item) {
-			$data[$k]['departments'] = array_column($item['departments'], 'id');
-		} */
-		
+			
 		$countData = ['all' => 0, 'departments' => [], 'archive' => 0];
 		
 		foreach ($data as $item) {
