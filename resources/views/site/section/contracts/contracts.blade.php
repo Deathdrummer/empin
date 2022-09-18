@@ -248,13 +248,13 @@
 		
 		searchContractsTOut = setTimeout(() => {
 			search = $(field).val();
+			_clearCounts();
 			if (search == '') {
 				search = null;
-				_clearCounts();
 				getList({
+					withCounts: search || selection,
 					callback: function() {
 						$('#clearSearch').ddrInputs('disable');
-						_clearCounts();
 					}
 				});
 			} else {
@@ -269,9 +269,10 @@
 	$.clearContractsSearch = (btn) => {
 		$('#contractsSearchField').val('');
 		search = null;
+		_clearCounts();
 		getList({
+			withCounts: search || selection,
 			callback: function() {
-				_clearCounts();
 			}
 		});
 		$(btn).ddrInputs('disable');
@@ -759,12 +760,12 @@
 		$('[selectionsbtn]').ddrInputs('disable');
 		selection = null;
 		editSelection = null;
-		
+		_clearCounts();
 		getList({
+			withCounts: search || selection,
 			callback: function() {
 				$(btn).setAttrib('hidden');
 				$('[selectionsbtn]').ddrInputs('enable');
-				_clearCounts();
 			}
 		});
 	}
@@ -1652,18 +1653,51 @@
 			else listWait.destroy();
 			
 			
+			if (search) {
+				let findSubStr = $('#contractsList').find('p:Contains("'+search+'")');
+				if (findSubStr) {
+					$.each(findSubStr, function(k, item) {
+						$(item).html($(item).text().replace(new RegExp("(" + preg_quote(search) + ")", 'gi'), '<span class="highlight">$1</span>'));
+					});
+				}
+			}	
 			
 			
 			$('[stepprice]').number(true, 2, '.', ' ');
 			
+			//console.log(headers['x-count-contracts-all'], headers['x-count-contracts-archive'], headers['x-count-contracts-departments']);
+			console.log(withCounts, headers);	
+	
+	
 			if (withCounts && headers) {
-				$('#chooserAll').find('[selectionscounts]').text(headers['x-count-contracts-all'] > 0 ? headers['x-count-contracts-all'] : '');
-				$('#chooserArchive').find('[selectionscounts]').text(headers['x-count-contracts-archive'] > 0 ? headers['x-count-contracts-archive'] : '');
 				
-				let depsCounts = JSON.parse(headers['x-count-contracts-departments']);
-				$.each(depsCounts, function(depId, count) {
-					$('[chooserdepartment="'+depId+'"]').find('[selectionscounts]').text(count > 0 ? count : '');
-				});
+				if (headers['x-count-contracts-all']) {
+					$('#chooserAll').find('[selectionscounts]').text(headers['x-count-contracts-all'] > 0 ? headers['x-count-contracts-all'] : '');
+				} else {
+					$('#chooserAll').find('[selectionscounts]').empty();
+				}
+				
+				if (headers['x-count-contracts-archive']) {
+					$('#chooserArchive').find('[selectionscounts]').text(headers['x-count-contracts-archive'] > 0 ? headers['x-count-contracts-archive'] : '');
+				} else {
+					$('#chooserArchive').find('[selectionscounts]').empty();
+				}
+				
+				
+				if (headers['x-count-contracts-departments']) {
+					let depsCounts = JSON.parse(headers['x-count-contracts-departments']);
+					$.each(depsCounts, function(depId, count) {
+						$('[chooserdepartment="'+depId+'"]').find('[selectionscounts]').text(count > 0 ? count : '');
+					});
+				} else {
+					$('[chooserdepartment]').find('[selectionscounts]').empty();
+				}
+				
+				
+				
+				
+				
+					
 			}
 			
 			
@@ -1683,6 +1717,9 @@
 	
 	
 	
+	function preg_quote (str, delimiter) {
+		return (str + '').replace(new RegExp('[.\\\\+*?\\[\\^\\]$(){}=!<>|:\\' + (delimiter || '') + '-]', 'g'), '\\$&')
+	}
 	
 	
 </script>

@@ -16,7 +16,11 @@ _.mixin({
 window.findWrapByInputType = ['file', 'checkbox', 'radio', 'contenteditable']; // plugins/ddrInputs: искать обрамляющие селекторы по типу, а не по тегу
 
 
-
+jQuery.expr[":"].Contains = jQuery.expr.createPseudo(function(arg) {
+    return function( elem ) {
+        return jQuery(elem).text().toUpperCase().indexOf(arg.toUpperCase()) >= 0;
+    };
+});
 
 /**
  * We'll load the axios HTTP library which allows us to easily issue requests

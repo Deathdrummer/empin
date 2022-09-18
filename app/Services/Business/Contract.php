@@ -3,7 +3,6 @@
 use App\Http\Filters\ContractFilter;
 use App\Models\Contract as ContractModel;
 use App\Models\ContractData;
-use App\Models\Department;
 use App\Models\Selection;
 use App\Models\User;
 use App\Services\Business\Department as DepartmentService;
@@ -244,8 +243,6 @@ class Contract {
 	}
 	
 	
-	// [$sortField, $sortOrder]
-	
 	
 	
 	
@@ -257,28 +254,43 @@ class Contract {
 	 * @return 
 	 */
 	public function getCounts($request) {
-		$contractsIds = [];
+		$filter = app()->make(ContractFilter::class, ['queryParams' => $request->only(['search', 'selection', 'archive'])]);
 		
-		if ($request instanceof Request) {
-			$selectionContracts = Selection::with('contracts')
-				->where('id', $request->input('selection'))
-				->first();
-				
-			foreach ($selectionContracts->contracts as $item) {
-				$contractsIds[] = $item->pivot->contract_id;
-			}
-		} else {
-			$contractsIds = $request;
+		if (!$userId = auth('site')->user()->id) return false;
+		
+		$onlyAssignedContractsIds = match (true) {
+			$this->department->checkShowOnlyAssigned() => ContractData::select('contract_id')->where([
+				'data' 	=> $userId,
+				'type'	=> 3
+			])->get()->pluck('contract_id'),
+			default => false
+		};
+		
+		
+		$selectionContracts = false;
+		if ($request->has('selection')) {
+			$selection = $request->input('selection');
+			$selectionContracts = match (true) {
+				!is_null($selection) => Selection::where('id', $selection)->with('contracts:id')->first(),
+				default => false
+			};
 		}
 		
-		$data = ContractModel::select(['id', 'archive'])
-			->whereIn('id', $contractsIds)
+		
+		$countData = ['all' => 0, 'departments' => [], 'archive' => 0];
+		
+		$data = ContractModel::filter($filter)
 			->with('departments:id')
+			->when($onlyAssignedContractsIds, function ($query) use($onlyAssignedContractsIds) {
+				return $query->whereIn('id', $onlyAssignedContractsIds);
+			})
+			->when($selectionContracts, function ($query) use($selectionContracts) {
+				return $query->whereIn('id', $selectionContracts->contracts->pluck('id'));
+			})
 			->get()
 			->toArray();
 			
-		$countData = ['all' => 0, 'departments' => [], 'archive' => 0];
-		
+			
 		foreach ($data as $item) {
 			if ($item['archive'] == 1) {
 				$countData['archive'] += 1;
@@ -296,6 +308,7 @@ class Contract {
 				$countData['all'] += 1;
 			}
 		}
+			
 		
 		return $countData;
 	}
