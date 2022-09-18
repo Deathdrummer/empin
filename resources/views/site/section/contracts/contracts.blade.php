@@ -668,6 +668,7 @@
 						close();
 						selection = id;
 						editSelection = null;
+						_clearCounts();
 						getList({
 							withCounts: true,
 							callback: function() {
@@ -687,6 +688,7 @@
 						close();
 						selection = id;
 						editSelection = true;
+						_clearCounts();
 						getList({
 							withCounts: true,
 							callback: function() {
