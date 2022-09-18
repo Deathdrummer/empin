@@ -66,7 +66,7 @@ class Contract {
 				'type' 				=> $item['type'] ?? null,
 				'contractor' 		=> $item['contractor'] ?? null,
 				'archive' 			=> $item['archive'] ?? null,
-				'created_a' 		=> $item['created_a'] ?? null,
+				'created_at' 		=> $item['created_at'] ?? null,
 				'updated_at' 		=> $item['updated_at'] ?? null
 			]];
 		});
@@ -211,7 +211,7 @@ class Contract {
 				'type' 				=> $item['type'] ?? null,
 				'contractor' 		=> $item['contractor'] ?? null,
 				'archive' 			=> $item['archive'] ?? null,
-				'created_a' 		=> $item['created_a'] ?? null,
+				'created_at' 		=> $item['created_at'] ?? null,
 				'updated_at' 		=> $item['updated_at'] ?? null,
 				'color' 			=> $color ?? null,
 				'name' 				=> $name ?? '',
