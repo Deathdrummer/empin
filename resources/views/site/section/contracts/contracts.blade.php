@@ -1664,13 +1664,8 @@
 				}
 			}	
 			
-			
 			$('[stepprice]').number(true, 2, '.', ' ');
 			
-			//console.log(headers['x-count-contracts-all'], headers['x-count-contracts-archive'], headers['x-count-contracts-departments']);
-			console.log(withCounts, headers);	
-	
-	
 			if (withCounts && headers) {
 				
 				if (headers['x-count-contracts-all']) {
@@ -1693,23 +1688,8 @@
 					});
 				} else {
 					$('[chooserdepartment]').find('[selectionscounts]').empty();
-				}
-				
-				
-				
-				
-				
-					
+				}	
 			}
-			
-			
-			/*if ($('#contractsList').find('[contractid]').length) {
-				$('#contractsList').find('[contractid]').each((k, row) => {
-					let contractId = $(row).attr('contractid');
-					$(row).find('td:first .cell').prepend();
-				});
-			}*/
-			
 			
 			if (callback && typeof callback == 'function') callback();
 		});
