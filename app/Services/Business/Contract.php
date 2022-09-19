@@ -254,7 +254,7 @@ class Contract {
 	 * @return 
 	 */
 	public function getCounts($request) {
-		$filter = app()->make(ContractFilter::class, ['queryParams' => $request->only(['search', 'selection', 'archive'])]);
+		$filter = app()->make(ContractFilter::class, ['queryParams' => $request->only(['search', 'selection'/* , 'archive' */])]);
 		
 		if (!$userId = auth('site')->user()->id) return false;
 		
@@ -281,16 +281,16 @@ class Contract {
 		
 		$data = ContractModel::filter($filter)
 			->with('departments:id')
-			->when($onlyAssignedContractsIds, function ($query) use($onlyAssignedContractsIds) {
+			/* ->when($onlyAssignedContractsIds, function ($query) use($onlyAssignedContractsIds) {
 				return $query->whereIn('id', $onlyAssignedContractsIds);
-			})
+			}) */
 			->when($selectionContracts, function ($query) use($selectionContracts) {
 				return $query->whereIn('id', $selectionContracts->contracts->pluck('id'));
 			})
 			->get()
 			->toArray();
-			
-			
+		
+		
 		foreach ($data as $item) {
 			if ($item['archive'] == 1) {
 				$countData['archive'] += 1;
