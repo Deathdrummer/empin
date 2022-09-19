@@ -85,7 +85,7 @@
 						
 						<p class="color-gray mb1rem">Ширина полейсписка договоров</p>
 						
-						<div class="row">
+						<div class="row gx-15 gy-20">
 							<div class="col-auto w14rem">
 								<p class="fz10px mb4px">Название / заявитель</p>
 								<x-input
@@ -144,6 +144,16 @@
 									showrows
 									group="small"
 									setting="contract-list-widths.locality"
+									/>
+							</div>
+							<div class="col-auto w14rem">
+								<p class="fz10px mb4px">Стоимость договора</p>
+								<x-input
+									class="w100"
+									type="number"
+									showrows
+									group="small"
+									setting="contract-list-widths.price"
 									/>
 							</div>
 							<div class="col-auto w14rem">

@@ -79,7 +79,8 @@
 						
 						@if(auth('site')->user()->can('contract-col-price:site') && (empty($userColums) || in_array('price', $userColums)))
 							<td
-								class="w11rem sort{{$sortField == 'price' ? ' sort-'.$sortOrder : ''}} vertical-center"
+								style="width:{{isset($listWidth['price']) ? $listWidth['price'] : '110'}}px;"
+								class="sort{{$sortField == 'price' ? ' sort-'.$sortOrder : ''}} vertical-center"
 								onclick="$.sorting(this, 'price')"
 								noscroll
 								><strong class="fz10px lh90 d-block text-center">Стоимость договора</strong></td>
