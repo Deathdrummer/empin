@@ -7,15 +7,15 @@
 			<div class="ddrtabs">
 				<div class="ddrtabs__nav">
 					<ul class="ddrtabsnav" ddrtabsnav>
-						<li class="ddrtabsnav__item ddrtabsnav__item_active" ddrtabsitem="testTab1">Заголовки и названия</li>
-						<li class="ddrtabsnav__item" ddrtabsitem="testTab2">Настройки страниц</li>
-						<li class="ddrtabsnav__item" ddrtabsitem="testTab3">Размеры</li>
-						<li class="ddrtabsnav__item" ddrtabsitem="testTab4">Договор</li>
+						<li class="ddrtabsnav__item ddrtabsnav__item_active" ddrtabsitem="systemTab1">Заголовки и названия</li>
+						<li class="ddrtabsnav__item" ddrtabsitem="systemTab2">Настройки страниц</li>
+						<li class="ddrtabsnav__item" ddrtabsitem="systemTab3">Размеры</li>
+						<li class="ddrtabsnav__item" ddrtabsitem="systemTab4">Договор</li>
 					</ul>
 				</div>
 				
 				<div class="ddrtabs__content ddrtabscontent" ddrtabscontent>
-					<div class="ddrtabscontent__item ddrtabscontent__item_visible" ddrtabscontentitem="testTab1">
+					<div class="ddrtabscontent__item ddrtabscontent__item_visible" ddrtabscontentitem="systemTab1">
 						<div class="row">
 							<div class="col-auto">
 								<x-input
@@ -28,7 +28,7 @@
 					</div>
 					
 					
-					<div class="ddrtabscontent__item" ddrtabscontentitem="testTab2">
+					<div class="ddrtabscontent__item" ddrtabscontentitem="systemTab2">
 						<div class="row row-cols-1 gy-20">
 							<div class="col">
 								<x-input
@@ -59,7 +59,7 @@
 					</div>
 					
 					
-					<div class="ddrtabscontent__item" ddrtabscontentitem="testTab3">
+					<div class="ddrtabscontent__item" ddrtabscontentitem="systemTab3">
 						<p class="color-gray mb1rem">Высота строки заголовков в списке договоров</p>
 						<x-input
 							label="rem"
@@ -71,7 +71,7 @@
 					</div>
 					
 					
-					<div class="ddrtabscontent__item" ddrtabscontentitem="testTab4">
+					<div class="ddrtabscontent__item" ddrtabscontentitem="systemTab4">
 						<p class="color-gray mb1rem">Порядковый номер обекта при создании договора</p>
 						<x-input
 							class="w16rem"
@@ -80,6 +80,93 @@
 							group="large"
 							setting="last-contract-object-number"
 							/>
+						
+						<div class="h3rem"></div>
+						
+						<p class="color-gray mb1rem">Ширина полейсписка договоров</p>
+						
+						<div class="row">
+							<div class="col-auto w14rem">
+								<p class="fz10px mb4px">Название / заявитель</p>
+								<x-input
+									class="w100"
+									type="number"
+									showrows
+									group="small"
+									setting="contract-list-widths.title"
+									/>
+							</div>
+							<div class="col-auto w14rem">
+								<p class="fz10px mb4px">Заявитель</p>
+								<x-input
+									class="w100"
+									type="number"
+									showrows
+									group="small"
+									setting="contract-list-widths.applicant"
+									/>
+							</div>
+							<div class="col-auto w14rem">
+								<p class="fz10px mb4px">Титул</p>
+								<x-input
+									class="w100"
+									type="number"
+									showrows
+									group="small"
+									setting="contract-list-widths.titul"
+									/>
+							</div>
+							<div class="col-auto w14rem">
+								<p class="fz10px mb4px">Номер договора</p>
+								<x-input
+									class="w100"
+									type="number"
+									showrows
+									group="small"
+									setting="contract-list-widths.contract"
+									/>
+							</div>
+							<div class="col-auto w14rem">
+								<p class="fz10px mb4px">Заказчик</p>
+								<x-input
+									class="w100"
+									type="number"
+									showrows
+									group="small"
+									setting="contract-list-widths.customer"
+									/>
+							</div>
+							<div class="col-auto w14rem">
+								<p class="fz10px mb4px">Населенный пункт</p>
+								<x-input
+									class="w100"
+									type="number"
+									showrows
+									group="small"
+									setting="contract-list-widths.locality"
+									/>
+							</div>
+							<div class="col-auto w14rem">
+								<p class="fz10px mb4px">Тип договора</p>
+								<x-input
+									class="w100"
+									type="number"
+									showrows
+									group="small"
+									setting="contract-list-widths.type"
+									/>
+							</div>
+							<div class="col-auto w14rem">
+								<p class="fz10px mb4px">Исполнитель</p>
+								<x-input
+									class="w100"
+									type="number"
+									showrows
+									group="small"
+									setting="contract-list-widths.contractor"
+									/>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>

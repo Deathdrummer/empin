@@ -5353,7 +5353,7 @@ _.mixin({
 
 window.findWrapByInputType = ['file', 'checkbox', 'radio', 'contenteditable']; // plugins/ddrInputs: искать обрамляющие селекторы по типу, а не по тегу
 
-jQuery.expr[":"].Contains = jQuery.expr.createPseudo(function (arg) {
+jQuery.expr[":"].icontains = jQuery.expr.createPseudo(function (arg) {
   return function (elem) {
     return jQuery(elem).text().toUpperCase().indexOf(arg.toUpperCase()) >= 0;
   };

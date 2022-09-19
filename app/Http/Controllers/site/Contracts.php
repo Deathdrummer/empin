@@ -93,7 +93,11 @@ class Contracts extends Controller {
 			], [
 				'setting'	=> 'contract-list-titles-row-height:rowHeight',
 				'key'		=> ':single',
-		]]);
+			], [
+				'setting'	=> 'contract-list-widths:listWidth'
+			]
+		]);
+		
 		
 		$canEditAll = auth('site')->user()->can('dostup-ko-vsem-otdelam:site');
 		$isArchive = $request->has('archive') && $request->get('archive') == 1;

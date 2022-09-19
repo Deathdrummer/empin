@@ -1656,7 +1656,7 @@
 			
 			
 			if (search) {
-				let findSubStr = $('#contractsList').find('p:Contains("'+search+'")');
+				let findSubStr = $('#contractsList').find('p:icontains("'+search+'")');
 				if (findSubStr) {
 					$.each(findSubStr, function(k, item) {
 						$(item).html($(item).text().replace(new RegExp("(" + preg_quote(search) + ")", 'gi'), '<span class="highlight">$1</span>'));
@@ -1667,7 +1667,7 @@
 			$('[stepprice]').number(true, 2, '.', ' ');
 			
 			if (withCounts && headers) {
-				console.log(withCounts, headers);
+				
 				if (headers['x-count-contracts-all']) {
 					$('#chooserAll').find('[selectionscounts]').text(headers['x-count-contracts-all'] > 0 ? headers['x-count-contracts-all'] : '');
 				} else {
