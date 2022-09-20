@@ -32,7 +32,6 @@ class ContractData extends Model {
 	
 	
 	
-	
 	/**
      * Поля разрешенные для редактирования
 	 *

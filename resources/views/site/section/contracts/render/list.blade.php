@@ -221,8 +221,12 @@
 											'w15rem' => (in_array($step['type'], [4]) && !$step['width']),
 											'vertical-center',
 											'pl5px',
-											'pr5px'
-										])>
+											'pr5px',
+											'sort',
+											'sort-'.$sortOrder => $sortField == 'step:'.$step['id']
+										])
+										onclick="$.sorting(this, 'step:{{$step['id']}}')"
+										>
 										<p class="fz10px lh90 text-center breakword">{{$step['name']}}</p>
 									</td>
 								@empty	

@@ -3,6 +3,7 @@
 use App\Http\Filters\ContractFilter;
 use App\Models\Contract as ContractModel;
 use App\Models\ContractData;
+use App\Models\ContractDepartment;
 use App\Models\Selection;
 use App\Models\User;
 use App\Services\Business\Department as DepartmentService;
@@ -91,6 +92,8 @@ class Contract {
 		$sortField = $request->get('sort_field', 'id');
 		$sortOrder = $request->get('sort_order', 'asc');
 		$selection = $request->get('selection', null);
+		$sortStep = strpos($sortField, ':') !== false ? (substr($sortField, strpos($sortField, ':') - strlen($sortField) + 1)) : null;
+		
 		
 		if (!$userId = auth('site')->user()->id) return false;
 		
@@ -126,7 +129,22 @@ class Contract {
 			->when($selectionContracts, function ($query) use($selectionContracts) {
 				return $query->whereIn('id', $selectionContracts->contracts->pluck('id'));
 			})
-			->orderBy($sortField, $sortOrder)
+			->when($sortStep, function ($query) use($sortStep, $sortOrder) {
+				$query->orderBy(ContractData::select('data')
+					->whereColumn('contract_data.contract_id', 'contracts.id')
+					->where('contract_data.step_id', $sortStep),
+					$sortOrder 
+				);
+				
+				$query->orderBy(ContractDepartment::select('show')
+					->whereColumn('contract_department.contract_id', 'contracts.id')
+					->whereRaw('JSON_CONTAINS(`steps`, \'{"step_id":'.$sortStep.'}\')'),
+					$sortOrder 
+				);
+				
+			}, function($query) use($sortField, $sortOrder) {
+				return $query->orderBy($sortField, $sortOrder);
+			})
 			->get();
 		
 		if ($data->isEmpty()) return false;

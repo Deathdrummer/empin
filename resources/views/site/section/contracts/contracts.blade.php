@@ -802,7 +802,8 @@
 	//-------------------------------------------------  сортировка
 	
 	$.sorting = (cell, sfield) => {
-		$(cell).closest('[sorts]').find('.sort-asc, .sort-desc').removeClass('sort-asc sort-desc');
+		$('#contractsList').find('.sort-asc, .sort-desc').removeClass('sort-asc sort-desc');
+		
 		if (sortField == sfield) {
 			sortOrder = sortOrder == 'asc' ? 'desc' : 'asc';
 			ddrStore('site-contracts-sortorder', sortOrder);
@@ -819,6 +820,15 @@
 		
 		getList();
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	
