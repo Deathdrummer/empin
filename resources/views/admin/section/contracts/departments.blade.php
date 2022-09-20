@@ -158,11 +158,14 @@
 		
 		//------------------------------------------------------------------------------ Этапы
 		$.departmentSteps = (btn, deptId) => {
+			
+			let deptName = $(btn).closest('tr').find('[name="name"]').val() || '';
+			
 			ddrPopup({
 				url: 'ajax/steps/init',
 				params: {views: 'admin.section.contracts.render.steps'},
-				title: 'Этапы',
-				width: 800,
+				title: 'Этапы <span class="color-gray-500 fz14px">('+deptName+')</span>',
+				width: 900,
 				//frameOnly: true,
 				//buttons, // массив кнопок
 				//buttonsAlign, // выравнивание вправо

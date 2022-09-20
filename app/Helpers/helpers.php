@@ -95,7 +95,7 @@ if (! function_exists('splitString')) {
 	 * @param array $strict строгий режим
 	 * @return array|null
 	*/
-	function splitString(?string $str = null, $separator, $strict = false): array|null {
+	function splitString(?string $str = null, ?string $separator = null, $strict = false): array|null {
 		if (is_null($str)) return null;
 		$res = preg_split('/\s*\\'.$separator.'\s*/', $str);
 		if (!$strict) return $res ?: null;

@@ -211,13 +211,19 @@
 								])
 								>
 								@forelse($dept['steps'] as $step)
-									<td @class([
-											'w8rem' => ($step['type'] == 1),
-											'w16rem' => (in_array($step['type'], [2,3])),
-											'w15rem' => (in_array($step['type'], [4])),
-											'vertical-center'
+									<td
+										@if($step['width'])
+											style="width:{{$step['width']}}px;"
+										@endif
+										@class([
+											'w8rem' => ($step['type'] == 1 && !$step['width']),
+											'w16rem' => (in_array($step['type'], [2,3]) && !$step['width']),
+											'w15rem' => (in_array($step['type'], [4]) && !$step['width']),
+											'vertical-center',
+											'pl5px',
+											'pr5px'
 										])>
-										<p class="fz10px lh90 text-center">{{$step['name']}}</p>
+										<p class="fz10px lh90 text-center breakword">{{$step['name']}}</p>
 									</td>
 								@empty	
 								@endforelse

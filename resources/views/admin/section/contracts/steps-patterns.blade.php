@@ -157,7 +157,6 @@
 		
 		//------------------------------------------------------------------------------ Этапы
 		$.departmentSteps = (btn, customerId, customerName) => {
-			console.log(customerId);
 			ddrPopup({
 				title: '<small class="color-gray">Установки:</small> '+customerName,
 				width: 1200,

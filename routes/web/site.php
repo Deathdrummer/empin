@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\Period;
 use App\Http\Controllers\site\Contracts;
 use App\Http\Controllers\site\Selections;
 use App\Http\Controllers\UserController;
@@ -109,6 +110,14 @@ Route::post('/reset-password', function (Request $request) {
 
 
 
+
+// тест перечисления enum Period
+/* Route::get('test', function() {
+	$status = Period::tryFrom(request('period'));
+	
+	if ($status) dd($status->date()->locale('ru')->isoFormat('DD MMMM YYYY', 'Do MMMM'));
+	else echo 'no';
+}); */
 
 
 

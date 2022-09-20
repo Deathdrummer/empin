@@ -14,6 +14,9 @@
 		<td>
 			<x-input name="deadline" type="number" class="w100" value="{{$deadline}}" placeholder="0" showrows />
 		</td>
+		<td>
+			<x-input name="width" type="number" class="w100" value="{{$width}}" placeholder="0" showrows />
+		</td>
 		
 		<td></td>
 		<td>

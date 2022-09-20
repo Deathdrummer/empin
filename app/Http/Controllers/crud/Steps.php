@@ -169,6 +169,7 @@ class Steps extends Controller {
 			'type'			=> 'numeric|required',
 			'department_id' => 'numeric|required',
 			'deadline' 		=> 'present',
+			'width' 		=> 'numeric|required',
 			'sort'			=> 'required|present',
 			'_sort'			=> 'required|regex:/[0-9]+/'
 		]);
@@ -229,6 +230,7 @@ class Steps extends Controller {
 			'type'			=> 'numeric|required',
 			'department_id' => 'numeric|required',
 			'deadline' 		=> 'present',
+			'width' 		=> 'numeric|required',
 			'sort'			=> 'required|present',
 		]);
 		
