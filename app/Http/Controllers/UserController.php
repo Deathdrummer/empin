@@ -35,7 +35,6 @@ class UserController extends Controller {
 		if (!Auth::guard('site')->attempt($authFields, true)) return response()->json(['no_auth' => __('auth.failed')]);
 		
 		if (!Auth::guard('site')->user()->email_verified_at) {
-			logger('oool');
 			User::where('id', Auth::guard('site')->user()->id)->update(['email_verified_at' => Date::now()]);
 		}
 		
