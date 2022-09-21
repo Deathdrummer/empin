@@ -1,6 +1,6 @@
 <tr
 	@class([
-		'h6rem',
+		'h5rem',
 		'clear bg-yellow-light' => $is_new && !$isArchive
 	])
 	ondblclick="$.openContractInfo(this, '{{$id}}');"
@@ -73,7 +73,7 @@
 	
 	@if(auth('site')->user()->can('contract-col-titul:site') && (empty($userColums) || in_array('titul', $userColums)))
 		<td class="pr2px breakword">
-			<div class="scrollblock-hidden h5rem pr3px">
+			<div class="scrollblock-hidden h4rem pr3px">
 				<p class="format fz12px">{{$titul ?? '-'}}</p>
 			</div>
 		</td>
