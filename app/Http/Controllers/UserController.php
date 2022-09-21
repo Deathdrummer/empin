@@ -24,7 +24,6 @@ class UserController extends Controller {
 	 * @return 
 	 */
 	public function login(Request $request) {
-		
 		$request->merge(['email' => encodeEmail($request->input('email'))]);
 		
 		$authFields = $request->validate([

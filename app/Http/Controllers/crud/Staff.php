@@ -257,7 +257,7 @@ class Staff extends Controller {
 		//if (!$user = User::select('email', 'temporary_password')->where('id', $id)->first()) return response()->json(false);
 		if (!$user = User::find($id)) return response()->json(false);
 		
-		if ($user->temporary_password) {
+		if (isset($user->temporary_password)) {
 			$password = Crypt::decryptString($user->temporary_password);
 			$user->forceFill([
 				'password' => $password,
@@ -274,7 +274,7 @@ class Staff extends Controller {
 		}
 		
 		
-		$stat = Mail::to($user->email)->send(new UserCreated($user));
+		$stat = Mail::to($user->email)->send(new UserCreated(['email' => $user->email]));
 		return response()->json($stat);
 	}
 	
