@@ -237,7 +237,7 @@
 					<tbody>
 						@if($list)
 							@foreach ($list as $contract)
-								<tr class="h5rem">
+								<tr class="h5rem-4px">
 									@foreach($dept['steps'] as $step)
 										@isset($contract['departments'][$dept['id']]['steps'][$step['id']])
 											@if($step['type'] == 1)
