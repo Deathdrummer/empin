@@ -228,7 +228,11 @@
 				data: {id: userId}
 			}, (stat, container, {error, status, headers}) => {
 				staffSendEmail.destroy();
-				if (stat) $.notify('Письмо успешно отправлено!');
+				if (stat) {
+					$(btn).ddrInputs('removeClass', 'button-green');
+					$(btn).ddrInputs('addClass', 'button-light');
+					$.notify('Письмо успешно отправлено!');
+				} 
 				else {
 					if (status == 429) $.notify('Слишком частая отправка писем!', 'error');
 					else $.notify(error?.message, 'error');

@@ -6566,7 +6566,7 @@ table tbody tr:nth-child(odd):not(.clear) {
   background-color: #fdfdfd;
 }
 table tbody tr:nth-child(even):not(.clear) {
-  background-color: #f7f7f9;
+  background-color: #f9fafb;
 }
 table tbody tr.waiting {
   position: relative;

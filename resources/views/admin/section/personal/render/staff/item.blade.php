@@ -31,7 +31,12 @@
 	</td>
 	<td></td>
 	<td class="center">
-		<x-button variant="neutral" group="small" action="staffSendEmail:{{$id}}" class="px-0 w3rem" title="Выслать доступ повторно">
+		<x-button
+			variant="{{$temporary_password ? 'green' : 'light'}}"
+			group="small"
+			action="staffSendEmail:{{$id}}"
+			class="px-0 w3rem"
+			title="{{$temporary_password ? 'Выслать доступ сотруднику' : 'Выслать доступ повторно'}}">
 			<i class="fa-solid fa-envelope"></i>
 		</x-button>
 	</td>
@@ -39,15 +44,11 @@
 		<x-button variant="neutral" group="small" action="staffSetRules:{{$id}},{{isset($pseudoname) ? $pseudoname : __('custom.anon')}}" class="px-0 w3rem"><i class="fa-solid fa-list-check"></i></x-button>
 	</td>
 	<td class="center">
-		@isset($email_verified_at)
-			@if($email_verified_at)
-				<i class="fa-solid fa-check color-green"></i>
-			@else
-				<i class="fa-solid fa-ban color-red"></i>
-			@endif
+		@if(isset($email_verified_at) && $email_verified_at)
+			<i class="fa-solid fa-check color-green"></i>
 		@else
 			<i class="fa-solid fa-ban color-red"></i>
-		@endisset
+		@endif
 	</td>
 	<td class="center">
 		<x-buttons-group group="small" w="3rem">

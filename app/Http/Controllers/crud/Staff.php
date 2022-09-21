@@ -6,6 +6,7 @@ use App\Models\Department;
 use App\Models\User;
 use App\Traits\HasCrudController;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Permission;
@@ -77,6 +78,8 @@ class Staff extends Controller {
 			->orderBy('_sort', 'ASC')
 			->get();
 		
+		$list->makeVisible('temporary_password');
+		
 		$this->_addRolesToData();
 		$this->_addDepartmentsToData();
 		
@@ -115,8 +118,7 @@ class Staff extends Controller {
 		$item = $this->_storeRequest($request);
 		return response()->json($item);
     }
-	
-	
+    
 	
 	/**
      * Создание ресурса и показ записи
@@ -153,16 +155,25 @@ class Staff extends Controller {
 		]);
 		
 		$role = $request->input('role');
-		$validFields['password'] = Str::random(12);
 		
 		if (!$user = User::create($validFields)) return response()->json(false);
+		$user->forceFill(['temporary_password' => Crypt::encryptString(Str::random(12))])->save();
 		
 		if ($role) $user->assignRole($role);
 		
-		$validFields['email'] = decodeEmail($validFields['email']);
-		Mail::to($user->email)->send(new UserCreated($validFields));
+		//$validFields['email'] = decodeEmail($validFields['email']);
+		//Mail::to($user->email)->send(new UserCreated($validFields));
+		/* 
+		$user = User::with('roles:id')
+			->withExists(['roles as hasRoles', 'permissions as hasPermissions'])
+			->find($user->id); */
 		
-		return User::with('roles:id')->withExists(['roles as hasRoles', 'permissions as hasPermissions'])->find($user->id);
+		$user->load('roles:id');
+		$user->loadExists(['roles as hasRoles', 'permissions as hasPermissions']);
+		
+		$user->fresh();
+		$user->makeVisible('temporary_password');
+		return $user;
 	}
 	
 	
@@ -243,10 +254,36 @@ class Staff extends Controller {
 	 */
 	public function send_email(Request $request) {
 		if (!$id = $request->input('id')) return response()->json(false);
-		if (!$user = User::select('email')->where('id', $id)->first()) return response()->json(false);
-		$stat = Mail::to($user->email)->send(new UserCreated($user));
+		//if (!$user = User::select('email', 'temporary_password')->where('id', $id)->first()) return response()->json(false);
+		if (!$user = User::find($id)) return response()->json(false);
+		
+		$password = Crypt::decryptString($user->temporary_password);
+		
+		$user->forceFill([
+			'password' => $password,
+			'temporary_password' => null
+			])->save();
+		
+		$userData = [
+			'email' => $user->email,
+			'password' => $password,
+		];
+		
+		$stat = Mail::to($user->email)->send(new UserCreated($userData));
 		return response()->json($stat);
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	//----------------------------------------------------------------------------------------
+	
+	
+	
 	
 	
 	

@@ -196,10 +196,10 @@
 						<tr class="h3rem">
 							<td
 								colspan="{{count($dept['steps'])}}"
-								class="pb5px pt4px"
+								class="pt4px vertical-center"
 								>
 								<strong
-									class="fz13px lh100 d-block text-center uppercase"
+									class="fz13px lh100 d-block text-center uppercase mt5px"
 									>{{$dept['name']}}
 								</strong>
 							</td>
