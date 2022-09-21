@@ -1,7 +1,8 @@
 @props([
-	'id'	=> 'horisontal'.rand(0,9999999),
-	'speed'	=> 100,
-	'step'	=> 100,
+	'id'		=> 'horisontal'.rand(0,9999999),
+	'speed'		=> 100,
+	'step'		=> 100,
+	'scroll'	=> true,
 	'ignore'	=> '[noscroll]'
 ])
 
@@ -14,6 +15,7 @@
 
 <script type="module">
 	let selector = '#{{$id}}',
+		scroll = {{$scroll}},
 		ignoreSelectors = '{{$ignore}}',
 		step = '{{$step}}',
 		speed = '{{$speed}}';
@@ -22,5 +24,5 @@
 	//	- шаг прокрутки (для колеса)
 	//	- скорость прокрутки (для колеса)
 	//	- разрешить прокрутку колесом
-	$(selector).ddrScrollX(step, speed, true, ignoreSelectors);
+	$(selector).ddrScrollX(step, speed, scroll, ignoreSelectors);
 </script>
