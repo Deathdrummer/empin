@@ -1,7 +1,7 @@
 <tr
 	@class([
 		'h5rem-4px',
-		'clear bg-yellow-light' => $is_new && !$isArchive
+		//'clear bg-yellow-light' => $is_new && !$isArchive
 	])
 	ondblclick="$.openContractInfo(this, '{{$id}}');"
 	isnew="{{$is_new ? 1 : 0}}"

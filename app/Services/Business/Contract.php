@@ -138,7 +138,7 @@ class Contract {
 				
 				$query->orderBy(ContractDepartment::select('show')
 					->whereColumn('contract_department.contract_id', 'contracts.id')
-					->whereRaw('JSON_CONTAINS(`steps`, \'{"step_id":'.$sortStep.'}\')'),
+					->whereJsonContains('steps', ['step_id' => (int)$sortStep]),
 					$sortOrder 
 				);
 				
