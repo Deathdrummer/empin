@@ -152,7 +152,7 @@ class Selections extends Controller {
 		if (!$item = $this->_storeRequest($request)) return response()->json(false);
 		$viewPath = $request->input('views');
 		if (!$viewPath) return response()->json(['no_view' => true]);
-
+		$item['subscribed'] = false;
 		return $this->view($viewPath.'.item', $item);
     }
 	
