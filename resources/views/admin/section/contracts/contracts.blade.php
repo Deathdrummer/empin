@@ -31,7 +31,7 @@
 						<td class="w14rem"><strong class="lh90 d-block">Стоимость договора</strong></td>
 						<td class="w16rem"><strong>Дата создания</strong></td>
 						<td class="w7rem"><strong>Архив</strong></td>
-						<td class="w9rem center"><strong>Действия</strong></td>
+						<td class="w12rem center"><strong>Действия</strong></td>
 					</tr>
 				</thead>
 				<tbody id="contractsList"></tbody>
@@ -51,6 +51,9 @@
 
 
 <script type="module">
+	
+	const viewsPath = 'admin.section.contracts.render.contracts';
+	
 	$.ddrCRUD({
 		container: '#contractsList',
 		itemToIndex: 'tr',
@@ -61,7 +64,7 @@
 			edit: {guard: 'admin'}
 			//store: {department_id: deptId},
 		},
-		viewsPath: 'admin.section.contracts.render.contracts',
+		viewsPath,
 	}).then(({error, list, changeInputs, create, store, storeWithShow, edit, update, destroy, query, getParams, abort, remove}) => {
 		
 		$('#contractsCard').card('ready');
@@ -454,6 +457,72 @@
 				}
 			});	
 		}
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		//------------------------------------------------------------
+		
+		
+		
+		let statusesTooltip;
+		$.contractStatuses = (btn, id) => {
+			statusesTooltip = $(btn).tooltip({
+				cls: 'w30rem',
+				placement: 'auto',
+				tag: 'noscroll',
+				minWidth: '360px',
+				minHeight: '200px',
+				duration: [200, 200],
+				trigger: 'click',
+				wait: {
+					iconHeight: '40px'
+				},
+				onShow: function({reference, popper, show, hide, destroy, waitDetroy, setContent, setData, setProps}) {
+					query({method: 'get', route: 'get_deps_hidden_statuses', data: {id, views: viewsPath}}, (data, container, {error, status, headers}) => {
+						setData(data);
+						waitDetroy();
+					});
+					
+					
+					
+					$.changeDeptHideStatus = (checkbox, deptId) => {
+						$(checkbox).ddrInputs('disable');
+						let isChecked = $(checkbox).is(':checked');
+						query({method: 'put', route: 'set_dept_hidden_status', data: {contract_id: id, department_id: deptId, hide: isChecked}, responseType: 'json'}, (data, container, {error, status, headers}) => {
+							console.log(data);
+							$(checkbox).ddrInputs('enable');
+							
+							if (error) {
+								$.notify('Не удалось изменить статус договора в отделе', 'error');
+								return;
+							}
+							
+							if (data) {
+								$.notify('Статус успешно изменен!');
+							}
+						});
+					}
+				}
+			});
+		}
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 		
 	});
 	

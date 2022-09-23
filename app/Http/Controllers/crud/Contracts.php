@@ -4,6 +4,7 @@ use App\Http\Controllers\Controller;
 
 use App\Models\Contract;
 use App\Models\ContractData;
+use App\Models\ContractDepartment;
 use App\Models\Department;
 use App\Models\StepPattern;
 use App\Models\User;
@@ -452,6 +453,37 @@ class Contracts extends Controller {
 	}
 	
 	
+	
+	
+	
+	
+	
+	
+	
+	/** Получить статусы по отделам, скрыт ли договор каждом из них
+	 * @param 
+	 * @return 
+	 */
+	public function get_deps_hidden_statuses() {
+		$data = Department::with(['info' => function($query) {
+				$query->where('contract_id', request('id'));
+			}])
+			->get();
+		return $this->view(request('views').'.statuses', ['list' => $data]);
+	}
+	
+	
+	
+	
+	
+	/** задать статус скрытия договора в отделе
+	 * @param 
+	 * @return 
+	 */
+	public function set_dept_hidden_status() {
+		return ContractDepartment::where(['contract_id' => request('contract_id'), 'department_id' => request('department_id')])
+			->update(['hide' => request('hide')]);
+	}
 	
 	
 	

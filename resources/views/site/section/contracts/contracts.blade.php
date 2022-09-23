@@ -589,7 +589,7 @@
 							tag: 'noscroll',
 							minWidth: '360px',
 							minHeight: '200px',
-							duration: [600, 200],
+							duration: [200, 200],
 							trigger: 'click',
 							wait: {
 								iconHeight: '40px'

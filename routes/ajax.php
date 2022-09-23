@@ -171,5 +171,7 @@ Route::resource('steps_patterns', StepsPatterns::class);
 // Договоры
 Route::get('/contracts/to_archive/{id}', [Contracts::class, 'to_archive']);
 Route::get('/contracts/set_customer_rules', [Contracts::class, 'set_customer_rules']);
+Route::get('/contracts/get_deps_hidden_statuses', [Contracts::class, 'get_deps_hidden_statuses']);
+Route::put('/contracts/set_dept_hidden_status', [Contracts::class, 'set_dept_hidden_status']);
 Route::post('/contracts/store_show', [Contracts::class, 'store_show']);
 Route::resource('contracts', Contracts::class);

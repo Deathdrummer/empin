@@ -5,6 +5,16 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 
 class ContractDepartment extends Pivot {
 	
+	
+	
+	/**
+     * учитывать временные поля created_at и updated_at
+	 *
+     * @var string
+     */
+	public $timestamps = false;
+	
+	
 	/**
 	 * @param 
 	 * @return 

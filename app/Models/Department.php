@@ -96,4 +96,15 @@ class Department extends Model {
 	
 	
 	
+	/**
+	 * @param 
+	 * @return 
+	 */
+	public function info() {
+		return $this->hasOne(ContractDepartment::class, 'department_id', 'id');
+	}
+	
+	
+	
+	
 }

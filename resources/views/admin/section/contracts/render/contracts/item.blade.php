@@ -38,6 +38,7 @@
 		</td>
 		<td class="center">
 			<x-buttons-group group="small" w="3rem" gx="5">
+				<x-button variant="yellow" action="contractStatuses:{{$id}}" title="Статусы договора по отделам"><i class="fa-solid fa-list-check"></i></x-button>
 				<x-button variant="purple" action="contractShow:{{$id}},№{{$object_number}}" title="Открыть договор"><i class="fa-solid fa-eye"></i></x-button>
 				<x-button variant="red" action="contractRemove:{{$id}}" title="Удалить"><i class="fa-solid fa-trash-can"></i></x-button>
 			</x-buttons-group>

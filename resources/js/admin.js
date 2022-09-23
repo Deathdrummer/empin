@@ -14,6 +14,7 @@ require('@plugins/ddrCRUD');
 require('@plugins/card');
 require('@plugins/ddrScrollX');
 require('@plugins/ddrFloatingBlock');
+require('@plugins/tooltip');
 
 
 

@@ -9,7 +9,7 @@
 						<td class="w28rem"><strong>Роль</strong></td>
 						<td class="w28rem"><strong>Отдел</strong></td>
 						<td></td>
-						<td class="w7rem center" title="Выслать доступ повторно"><strong>Высл. письм.</strong></td>
+						<td class="w7rem center" title="Выслать доступ сотруднику"><strong>Высл. письм.</strong></td>
 						<td class="w7rem center"><strong>Права</strong></td>
 						<td class="w7rem center" title="Верифицирован"><strong>Вериф.</strong></td>
 						<td class="w10rem center"><strong>Действия</strong></td>
