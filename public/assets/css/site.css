@@ -6456,23 +6456,22 @@ p {
   display: inline-table;
   width: min-content;
 }
-.table_fixwidth table thead tr td::after {
+.table_fixwidth > table thead tr td::after {
   content: "";
   width: inherit;
   display: block;
 }
-
-table {
+.table > table {
   width: 100%;
 }
-table td {
+.table > table > td {
   position: relative;
 }
-table td:hover .cell .icon-hidden {
+.table > table > td:hover .cell .icon-hidden {
   opacity: 1;
   transition: opacity 0.16s;
 }
-table td > .cell {
+.table > table > td > .cell {
   position: absolute;
   top: 0;
   left: 0;
@@ -6482,26 +6481,26 @@ table td > .cell {
   width: 100%;
   display: contents;
 }
-table td > .cell .icon {
+.table > table > td > .cell .icon {
   position: absolute;
 }
-table td > .cell .icon-left {
+.table > table > td > .cell .icon-left {
   left: 4px;
 }
-table td > .cell .icon-right {
+.table > table > td > .cell .icon-right {
   right: 4px;
 }
-table td > .cell .icon-top {
+.table > table > td > .cell .icon-top {
   top: 4px;
 }
-table td > .cell .icon-bottom {
+.table > table > td > .cell .icon-bottom {
   bottom: 4px;
 }
-table td > .cell .icon-hidden {
+.table > table > td > .cell .icon-hidden {
   opacity: 0;
   transition: opacity 0.16s;
 }
-table thead tr td {
+.table > table > thead tr td {
   vertical-align: top;
   position: relative;
   padding-left: 10px;
@@ -6513,7 +6512,7 @@ table thead tr td {
   font-family: Fira Sans, sans-serif;
   font-weight: 400;
 }
-table thead tr td + td::before {
+.table > table > thead tr td + td::before {
   content: "";
   display: block;
   width: 1px;
@@ -6523,33 +6522,33 @@ table thead tr td + td::before {
   top: 0;
   background-color: #f5f5f5;
 }
-table thead tr td.center {
+.table > table > thead tr td.center {
   text-align: center;
 }
-table thead tr td.right {
+.table > table > thead tr td.right {
   text-align: right;
 }
-table thead tr td.vertical-top {
+.table > table > thead tr td.vertical-top {
   vertical-align: top;
 }
-table thead tr td.vertical-center {
+.table > table > thead tr td.vertical-center {
   vertical-align: middle;
   padding-bottom: 5px;
 }
-table thead tr td.vertical-bottom {
+.table > table > thead tr td.vertical-bottom {
   vertical-align: bottom;
 }
-table thead tr td.sort {
+.table > table > thead tr td.sort {
   position: relative;
   cursor: pointer;
 }
-table thead tr td.sort-asc > *, table thead tr td.sort-desc > * {
+.table > table > thead tr td.sort-asc > *, .table > table > thead tr td.sort-desc > * {
   color: #00c4ff;
 }
-table tbody:empty {
+.table > table > tbody:empty {
   height: 60px;
 }
-table tbody:empty::after {
+.table > table > tbody:empty::after {
   content: "Нет данных";
   height: 60px;
   position: absolute;
@@ -6562,16 +6561,16 @@ table tbody:empty::after {
   text-align: center;
   border-bottom: 1px solid #fbfbfb;
 }
-table tbody tr:nth-child(odd):not(.clear) {
+.table > table > tbody > tr:nth-child(odd):not(.clear) {
   background-color: #fdfdfd;
 }
-table tbody tr:nth-child(even):not(.clear) {
+.table > table > tbody > tr:nth-child(even):not(.clear) {
   background-color: #f9fafb;
 }
-table tbody tr.waiting {
+.table > table > tbody > tr.waiting {
   position: relative;
 }
-table tbody tr.waiting::after {
+.table > table > tbody > tr.waiting::after {
   content: "";
   position: absolute;
   left: 0;
@@ -6580,11 +6579,11 @@ table tbody tr.waiting::after {
   height: 100%;
   background-color: rgba(255, 255, 255, 0.8117647059);
 }
-table tbody tr td {
+.table > table > tbody > tr td {
   position: relative;
   padding: 5px 10px;
 }
-table tbody tr td + td::after {
+.table > table > tbody > tr td + td::after {
   content: "";
   display: block;
   width: 1px;
@@ -6594,33 +6593,33 @@ table tbody tr td + td::after {
   top: 4px;
   background-color: #f1eded;
 }
-table tbody tr td.center {
+.table > table > tbody > tr td.center {
   text-align: center;
 }
-table tbody tr td.right, table tbody tr td.end {
+.table > table > tbody > tr td.right, .table > table > tbody > tr td.end {
   text-align: right;
 }
-table tbody tr td.top {
+.table > table > tbody > tr td.top {
   vertical-align: top;
 }
-table tbody tr td.vertical-top {
+.table > table > tbody > tr td.vertical-top {
   vertical-align: top;
 }
-table tbody tr td.vertical-center {
+.table > table > tbody > tr td.vertical-center {
   vertical-align: middle;
   padding-bottom: 5px;
 }
-table tbody tr td.vertical-bottom {
+.table > table > tbody > tr td.vertical-bottom {
   vertical-align: bottom;
 }
-table tfoot {
+.table > table tfoot {
   position: relative;
   z-index: 10;
 }
-table tfoot tr td {
+.table > table tfoot tr td {
   padding-top: 10px;
 }
-table tfoot tr td.right {
+.table > table tfoot tr td.right {
   text-align: right;
 }
 

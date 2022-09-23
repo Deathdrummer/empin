@@ -5,8 +5,8 @@
 		<table>
 			<thead>
 				<tr>
-					<td>Отдел</td>
-					<td class="w6rem">Скрыт</td>
+					<td><strong>Отдел</strong></td>
+					<td class="w6rem"><strong>Скрыт</strong></td>
 				</tr>
 			</thead>
 			<tbody>
