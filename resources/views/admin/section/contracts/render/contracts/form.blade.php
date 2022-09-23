@@ -26,7 +26,7 @@
 					
 					<div class="form__item">
 						<label class="form__label color-dark">Название / заявитель</label>
-						<x-input name="title" value="{{$title ?? null}}" class="w100" />
+						<x-input name="title" value="{{$title ?? null}}" class="w100" uppercase />
 					</div>
 					
 					<div class="form__item">
@@ -74,7 +74,7 @@
 						
 						
 						<label class="form__label color-dark">Населенный пункт</label>
-						<x-input name="locality" value="{{$locality ?? null}}" class="w100" />
+						<x-input name="locality" value="{{$locality ?? null}}" class="w100" uppercase />
 					</div>
 					
 					<div class="form__item">

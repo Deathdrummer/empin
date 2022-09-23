@@ -19,6 +19,7 @@
 	'iconbg'     	=> null,
 	'clearcolor'	=> null,
 	'cleared'		=> null,
+	'uppercase'		=> false
 ])
 
 
@@ -99,7 +100,8 @@
 <script type="module">
 	let clearcolor = '{{$clearcolor}}',
 		input = $('#{{$id}}'),
-		setting = '{{$setting}}';
+		setting = '{{$setting}}',
+		upperCase = '{{$uppercase}}';
 	
 	if (clearcolor) {
 		let clearAction = 'clearColor{{$id}}';
@@ -113,6 +115,14 @@
 				$(input).removeAttrib('color');
 			}, 300);
 		}
+	}
+	
+	
+	
+	if (upperCase) {
+		$(input).on('input', function() {
+			$(this).val($(this).val().toUpperCase());
+		});
 	}
 	
 </script>
