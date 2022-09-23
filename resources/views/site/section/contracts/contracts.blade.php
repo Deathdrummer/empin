@@ -909,7 +909,7 @@
 		
 		
 		ddrPopup({
-			title: 'Общая информация', 
+			title: false, 
 			width: 800,
 			buttons: ['Закрыть'],
 		}).then(({state, wait, setTitle, setButtons, loadData, setHtml, setLHtml, dialog, close, onScroll, disableButtons, enableButtons, setWidth}) => { //isClosed
