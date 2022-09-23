@@ -155,6 +155,38 @@ if (!function_exists('isJson')) {
 
 
 
+if (!function_exists('arrGetIndexFromField')) {
+	/**
+	 * Возвращает индекс элеменa массива по указанному значению указанного поля элеменa массива (стар. getIndexFromFieldValue)
+	 * @param массив
+	 * @param поле
+	 * @param значение
+	 * @return индекс
+	*/
+	function arrGetIndexFromField($array = [], $field = null, $value = null) {
+		if(is_null($array) || is_null($field) || is_null($value)) return false;
+		$res = array_filter($array, function($val, $key) use($field, $value) {
+			return (isset($val[$field]) && $val[$field] == $value);
+		}, ARRAY_FILTER_USE_BOTH);
+		
+		if ($res && count($res) > 1) {
+			$keys = [];
+			while ($item = current($res)) {
+				$keys[] = key($res);
+				next($res);
+			}
+			return $keys;
+		} elseif ($res && count($res) == 1) {
+			return key($res);
+		} else {
+			return false;
+		}
+	}
+}
+
+
+
+
 
 
 

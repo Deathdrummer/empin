@@ -512,13 +512,19 @@ class Contracts extends Controller {
 			'key'		=> 'id',
 			'value'		=> 'title'
 		], [
-			'setting'	=> 'contract-contractors:contractors',
-			'key'		=> 'id',
-			'value'		=> 'name'
+			'setting'	=> 'contract-contractors:contractors'
 		]]);
 		
-		$this->data['rand_id'] = Str::random(20);
 		
+		foreach ($this->data['contractors'] as $k => $item) {
+			$this->data['contractors'][$k] = [
+				'value'		=> $item['id'],
+				'title'		=> $item['name'],
+				'active'	=> $item['active'] ?? null,
+			];
+		}
+			
+		$this->data['rand_id'] = Str::random(20);
 	}
 	
 	
