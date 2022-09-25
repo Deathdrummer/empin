@@ -113,12 +113,17 @@ class Contracts extends Controller {
 		
 		$selectionEdited = $request->has('edit_selection') && $request->get('edit_selection');
 		
-		$selectionsResult = Selection::where('account_id', auth('site')->user()->id)->orderBy('_sort', 'ASC')->get();
-		$allSelections = $selectionsResult->mapWithKeys(function($item) {
-			return [$item['id'] => $item['title']];
-		})->toArray();
 		
 		
+		
+		
+		
+		$allSelections = $searched ? Selection::toChoose()->get()->mapWithKeys(function($item) {
+				return [$item['id'] => $item['title']];
+			})->toArray() : null;
+		
+		
+
 		return $this->renderWithHeaders(
 			'list',
 			compact(

@@ -174,7 +174,7 @@
 				><i class="fa-solid fa-trash-can"></i></x-button>
 		</td>
 	
-	@elseif($searched)
+	@elseif($searched && !$selectionEdited)
 		<td class="center">
 			<x-select
 				group="small"

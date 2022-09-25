@@ -120,7 +120,9 @@ class Contract {
 			}])
 			->with('departments')
 			->with(['selections' => function ($query) use($userId) {
-				$query->where('account_id', $userId);
+				$query->where('account_id', $userId)
+					->orWhereJsonContains('subscribed', $userId)
+					->orderBy('_sort', 'ASC');
 			}])
 			/* ->with('selections') */
 			->when($onlyAssignedContractsIds, function ($query) use($onlyAssignedContractsIds) {

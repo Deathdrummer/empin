@@ -79,4 +79,26 @@ class Selection extends Model {
 	
 	
 	
+	
+	
+	
+	
+	
+	
+	
+	
+	/**
+     * Список подборок для выпадающего списка при присоединении договора к подборке
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return void
+     */
+    public function scopeToChoose($query) {
+		$userId = auth('site')->user()->id;
+        $query->where('account_id', $userId)
+			->orWhereJsonContains('subscribed', $userId)
+			->orderBy('_sort', 'ASC');
+    }
+	
+	
 }

@@ -1,15 +1,15 @@
 <tr class="h6rem">
 	<td>
-		@if($subscribed)
+		{{-- @if($subscribed)
 			<p class="fz12px ml6px">{{$title}}</p>
-		@else
+		@else --}}
 			<x-input
 				name="title"
 				group="small"
 				:value="$title"
 				class="w100"
 				/>
-		@endif	
+		{{-- @endif	 --}}
 	</td>
 	<td class="center">
 		@if(isset($contracts_count) && $contracts_count)
@@ -31,7 +31,7 @@
 				variant="neutral"
 				w="2rem-5px"
 				action="selectionBuildToEdit:{{$id}}"
-				:enabled="($contracts_count ?? false) && !$subscribed"
+				:enabled="($contracts_count ?? false)"
 				title="Редактировать список подборки"
 				><i class="fa-solid fa-pen-to-square"></i></x-button>
 		</x-buttons-group>
