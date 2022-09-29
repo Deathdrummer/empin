@@ -206,8 +206,7 @@ Route::middleware(['lang', 'auth:site', 'isajax:site'])->post('/get_section', fu
 		->first();
 	
 	
-	$settingsData = $settings->getMany($page['settings']) ?: [];
-	
+	$settingsData = $settings->getMany($page['settings'])->toArray() ?: []; // в таблице sections прописывается массив тех настроек, что нужно подгрузить
 	
 	
 	$pageTitle[] = $page ? $page->page_title : null; /* urlencode(__('custom.no_section_header_title')) */
@@ -216,7 +215,11 @@ Route::middleware(['lang', 'auth:site', 'isajax:site'])->post('/get_section', fu
 	
 	$departments = DepartmentModel::select(['id', 'name'])->orderBy('_sort', 'ASC')->get();
 	
-	$data = array_merge($settingsData->toArray(), ['user' => $user, 'departments' => $departments]);
+	//$data = array_merge(, ['user' => $user, 'departments' => $departments]);
+	
+	$data = ['user' => $user, 'departments' => $departments, 'setting' => $settingsData];
+	
+	
 	
 	return response()->view('site.section.'.$sectionPath, $data/* сюда данные */, 200)->header('X-Page-Title', json_encode($pageTitle));
 });

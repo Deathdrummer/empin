@@ -83,7 +83,9 @@
 						
 						<div class="h3rem"></div>
 						
+						
 						<p class="color-gray mb1rem">Ширина полейсписка договоров</p>
+						
 						
 						<div class="row gx-15 gy-20">
 							<div class="col-auto w14rem">
@@ -177,6 +179,19 @@
 									/>
 							</div>
 						</div>
+						
+						<div class="h3rem"></div>
+						
+						<p class="color-gray mb1rem">Количество договоров на одну подгрузку</p>
+						<x-input
+							class="w16rem"
+							type="number"
+							showrows
+							group="large"
+							setting="contracts-per-page"
+							/>
+						
+						
 					</div>
 				</div>
 			</div>

@@ -204,13 +204,12 @@
 		currentList = 0,
 		sortField = ddrStore('site-contracts-sortfield') || 'id',
 		sortOrder = ddrStore('site-contracts-sortorder') || 'desc',
-		limit = 4,
+		limit = {{$setting['contracts-per-page']}} || 10,
 		offset = 0,
 		search = null,
 		selection = null,
 		editSelection = null,
 		searchWithArchive = false;
-	
 	
 	getList({init: true});
 	
