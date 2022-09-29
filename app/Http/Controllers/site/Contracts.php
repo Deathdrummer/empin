@@ -122,8 +122,6 @@ class Contracts extends Controller {
 				return [$item['id'] => $item['title']];
 			})->toArray() : null;
 		
-		
-
 		return $this->renderWithHeaders(
 			'list',
 			compact(

@@ -91,6 +91,8 @@ class Contract {
 		
 		$sortField = $request->get('sort_field', 'id');
 		$sortOrder = $request->get('sort_order', 'asc');
+		$limit = $request->get('limit', 25);
+		$offset = $request->get('offset', 0);
 		$selection = $request->get('selection', null);
 		$sortStep = strpos($sortField, ':') !== false ? (substr($sortField, strpos($sortField, ':') - strlen($sortField) + 1)) : null;
 		
@@ -147,6 +149,8 @@ class Contract {
 			}, function($query) use($sortField, $sortOrder) {
 				return $query->orderBy($sortField, $sortOrder);
 			})
+			->limit($limit)
+			->offset($offset)
 			->get();
 		
 		if ($data->isEmpty()) return false;

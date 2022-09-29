@@ -204,6 +204,8 @@
 		currentList = 0,
 		sortField = ddrStore('site-contracts-sortfield') || 'id',
 		sortOrder = ddrStore('site-contracts-sortorder') || 'desc',
+		limit = 30,
+		offset = 0,
 		search = null,
 		selection = null,
 		editSelection = null,
@@ -219,10 +221,6 @@
 		currentList = list;
 		getList();
 	}
-	
-	
-	
-	
 	
 	
 	
@@ -1582,6 +1580,30 @@
 	
 	
 	
+	let observer = new IntersectionObserver(function(entries, observer) {
+		const { 
+			time,
+			rootBounds,
+			boundingClientRect,
+			intersectionRect,
+			target, 
+			isIntersecting, 
+			isVisible,
+			intersectionRatio 
+		} = entries[0];
+		
+		
+		if (isIntersecting) {
+			offset += limit;
+			getList({append: true});
+		}
+	}, {
+		rootMargin: '0px',
+		threshold: 0.1
+	});
+	
+	
+	
 	
 	
 	
@@ -1599,10 +1621,12 @@
 		let {
 			init,
 			withCounts,
+			append,
 			callback
 		} = _.assign({
 			init: false,
 			withCounts: false,
+			append: false,
 			callback: false
 		}, settings),
 			params = {},
@@ -1615,6 +1639,9 @@
 		} else {
 			$('#searchWithArchive').ddrInputs('enable');
 		}
+		
+		
+		if (!append) offset = 0;
 		
 		
 		//-----------------------------------
@@ -1633,10 +1660,12 @@
 		
 		params['sort_field'] = sortField;
 		params['sort_order'] = sortOrder;
+		params['limit'] = limit;
+		params['offset'] = offset;
+		//params['append'] = append ? 1 : 0;
 		params['search'] = search;
 		params['selection'] = selection;
 		params['edit_selection'] = editSelection;
-		
 		
 		
 		//-----------------------------------
@@ -1652,6 +1681,7 @@
 			
 		}
 		
+		
 		abortCtrl = new AbortController();
 		axiosQuery('get', 'site/contracts', params, 'text', abortCtrl).then(({data, error, status, headers}) => {
 			
@@ -1660,7 +1690,21 @@
 				return;
 			}
 			
-			$('#contractsList').html(data);
+			if (append) {
+				let listData = $(data).find('#contractsListAppend').html();
+				$('#contractsListAppend').append(listData);
+				
+				
+				$('#contractsList').find('[departmentappend]').each(function() {
+					let deptId = $(this).attr('departmentappend');
+					$(this).append($(data).find('[departmentappend="'+deptId+'"]').html());
+				});
+				
+			} else {
+			 	$('#contractsList').html(data);
+			}
+			
+			
 			if (init) $('#contractsCard').card('ready');
 			else listWait.destroy();
 			
@@ -1700,6 +1744,13 @@
 					$('[chooserdepartment]').find('[selectionscounts]').empty();
 				}	
 			}
+			
+			
+			
+			if (init || !append) {
+				observer.observe(document.querySelector('#contractsListFooter'));
+			}
+			
 			
 			if (callback && typeof callback == 'function') callback();
 		});

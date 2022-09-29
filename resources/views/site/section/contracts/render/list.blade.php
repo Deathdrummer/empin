@@ -167,11 +167,12 @@
 						@endif
 					</tr>
 				</thead>
-				<tbody id="contractsList">
+				<tbody id="contractsListAppend">
 					@foreach ($list as $item)
 						@include('site.section/contracts.render.item', $item)
 					@endforeach
 				</tbody>
+				<tfoot id="contractsListFooter"></tfoot>
 			</table>
 		</div>
 	</x-horisontal.item>
@@ -234,7 +235,7 @@
 							</tr>
 						@endif
 					</thead>
-					<tbody>
+					<tbody departmentappend="{{$dept['id']}}">
 						@if($list)
 							@foreach ($list as $contract)
 								<tr class="h5rem-4px">
