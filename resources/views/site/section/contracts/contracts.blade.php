@@ -204,7 +204,7 @@
 		currentList = 0,
 		sortField = ddrStore('site-contracts-sortfield') || 'id',
 		sortOrder = ddrStore('site-contracts-sortorder') || 'desc',
-		limit = 30,
+		limit = 4,
 		offset = 0,
 		search = null,
 		selection = null,
@@ -1641,7 +1641,10 @@
 		}
 		
 		
-		if (!append) offset = 0;
+		if (!append) {
+			offset = 0;
+			//observer = false;
+		} 
 		
 		
 		//-----------------------------------
@@ -1690,8 +1693,11 @@
 				return;
 			}
 			
-			if (append) {
-				let listData = $(data).find('#contractsListAppend').html();
+			if (append && observer instanceof IntersectionObserver) {
+				let listData = $(data).find('#contractsListAppend').html() || false;
+				
+				if (!listData && observer instanceof IntersectionObserver) observer.unobserve(document.querySelector('#contractsListFooter'));
+				
 				$('#contractsListAppend').append(listData);
 				
 				
@@ -1701,7 +1707,7 @@
 				});
 				
 			} else {
-			 	$('#contractsList').html(data);
+				$('#contractsList').html(data);
 			}
 			
 			
@@ -1748,7 +1754,9 @@
 			
 			
 			if (init || !append) {
-				observer.observe(document.querySelector('#contractsListFooter'));
+				if ($(data).find('#contractsListAppend').children('tr').length == limit) {
+					observer.observe(document.querySelector('#contractsListFooter'));
+				}
 			}
 			
 			
