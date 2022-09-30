@@ -1712,7 +1712,7 @@
 			
 			
 			if (init) $('#contractsCard').card('ready');
-			//else listWait.destroy();
+			else listWait.destroy();
 			
 			
 			if (search) {
