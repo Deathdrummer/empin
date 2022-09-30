@@ -1677,7 +1677,8 @@
 				iconHeight: '40px',
 				text: 'Загрузка',
 				fontSize: '14px',
-				bgColor: '#ffffffbb'
+				bgColor: '#ffffffbb',
+				position: 'adaptive'
 			});
 		} else {
 			

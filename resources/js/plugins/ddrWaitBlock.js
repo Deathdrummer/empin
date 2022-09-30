@@ -4,7 +4,7 @@ $.fn.ddrWait = function(params = null) {
 	let block = this,
 		isBtn = block[0]?.tagName?.toLowerCase() == 'button',
 		ddrwBId = 'ddrWaitBlock'+random(9,99999),
-		{text, fontSize, fontColor, icon, iconHeight, iconColor, bgColor, tag} = _.assign({
+		{text, fontSize, fontColor, icon, iconHeight, iconColor, bgColor, position, tag} = _.assign({
 			text: '',
 			fontSize: '16px',
 			fontColor: '#7a9699',
@@ -12,6 +12,7 @@ $.fn.ddrWait = function(params = null) {
 			iconHeight: '50px',
 			bgColor: '#fffe',
 			iconColor: 'hue-rotate(333deg)',
+			position: 'center',
 			tag: null
 		}, params),
 		{ddrwaitwrapper, ddrwaitBlock, ddrwaitBlockVisible, ddrwaitContent, ddrwaitIcon, ddrwaitText} = styleModule({
@@ -26,7 +27,7 @@ $.fn.ddrWait = function(params = null) {
 				right: 0,
 				width: 'revert',
 				display: 'flex',
-				alignItems: 'center',
+				alignItems: position,
 				justifyContent: 'center',
 				backgroundColor: bgColor,
 				opacity: 0,
@@ -52,16 +53,28 @@ $.fn.ddrWait = function(params = null) {
 			}
 		});
 	
+	
 		
 	let labelHtml = text ?  '<p class="'+ddrwaitText+'">'+text+'</p>' : '',
 		iconHtml = '<img src="/assets/images/loading.gif" ddrwaiticon class="'+ddrwaitIcon+'">';
 	
 	$(block).addClass(ddrwaitwrapper);
-	$(block).append('<div class="'+ddrwaitBlock+' noselect" id="'+ddrwBId+'"'+(tag ? ' '+tag : '')+'><div class="'+ddrwaitContent+'">'+iconHtml+labelHtml+'</div></div>');
+	$(block).append('<div class="'+ddrwaitBlock+' noselect" id="'+ddrwBId+'"'+(tag ? ' '+tag : '')+'><div class="'+ddrwaitContent+'" ddrwaitindicator>'+iconHtml+labelHtml+'</div></div>');
 	if (isBtn) $(block).ddrInputs('disable');
 	
 	$('#'+ddrwBId).ready(() => {
 		$('#'+ddrwBId).addClass(ddrwaitBlockVisible);
+		
+		if (position != 'center') {
+			if (position == 'adaptive') {
+				let blockTop = $(block).offset().top,
+					scrTop = $(document).scrollTop();
+				
+				$('[ddrwaitindicator]').css('transform', 'translateY(calc(50vh - ('+iconHeight+' / 2) - ('+blockTop+'px / 2) + '+scrTop+'px))');
+			} else {
+				$('[ddrwaitindicator]').css('transform', 'translateY('+position+')');
+			}
+		}
 	});
 	
 	return {

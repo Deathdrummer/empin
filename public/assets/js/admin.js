@@ -11407,6 +11407,7 @@ $.fn.ddrWait = function () {
     iconHeight: '50px',
     bgColor: '#fffe',
     iconColor: 'hue-rotate(333deg)',
+    position: 'center',
     tag: null
   }, params),
       text = _$assign.text,
@@ -11416,6 +11417,7 @@ $.fn.ddrWait = function () {
       iconHeight = _$assign.iconHeight,
       iconColor = _$assign.iconColor,
       bgColor = _$assign.bgColor,
+      position = _$assign.position,
       tag = _$assign.tag,
       _styleModule = (0,style_module__WEBPACK_IMPORTED_MODULE_0__.styleModule)({
     ddrwaitwrapper: {
@@ -11429,7 +11431,7 @@ $.fn.ddrWait = function () {
       right: 0,
       width: 'revert',
       display: 'flex',
-      alignItems: 'center',
+      alignItems: position,
       justifyContent: 'center',
       backgroundColor: bgColor,
       opacity: 0,
@@ -11464,10 +11466,20 @@ $.fn.ddrWait = function () {
   var labelHtml = text ? '<p class="' + ddrwaitText + '">' + text + '</p>' : '',
       iconHtml = '<img src="/assets/images/loading.gif" ddrwaiticon class="' + ddrwaitIcon + '">';
   $(block).addClass(ddrwaitwrapper);
-  $(block).append('<div class="' + ddrwaitBlock + ' noselect" id="' + ddrwBId + '"' + (tag ? ' ' + tag : '') + '><div class="' + ddrwaitContent + '">' + iconHtml + labelHtml + '</div></div>');
+  $(block).append('<div class="' + ddrwaitBlock + ' noselect" id="' + ddrwBId + '"' + (tag ? ' ' + tag : '') + '><div class="' + ddrwaitContent + '" ddrwaitindicator>' + iconHtml + labelHtml + '</div></div>');
   if (isBtn) $(block).ddrInputs('disable');
   $('#' + ddrwBId).ready(function () {
     $('#' + ddrwBId).addClass(ddrwaitBlockVisible);
+
+    if (position != 'center') {
+      if (position == 'adaptive') {
+        var blockTop = $(block).offset().top,
+            scrTop = $(document).scrollTop();
+        $('[ddrwaitindicator]').css('transform', 'translateY(calc(50vh - (' + iconHeight + ' / 2) - (' + blockTop + 'px / 2) + ' + scrTop + 'px))');
+      } else {
+        $('[ddrwaitindicator]').css('transform', 'translateY(' + position + ')');
+      }
+    }
   });
   return {
     destroy: function destroy() {
