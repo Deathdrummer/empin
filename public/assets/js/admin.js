@@ -11437,6 +11437,7 @@ $.fn.ddrWait = function () {
       opacity: 0,
       borderRadius: 'inherit',
       transition: 'opacity 0.16s',
+      overflowY: 'hidden',
       zIndex: 10
     },
     ddrwaitBlockVisible: {
