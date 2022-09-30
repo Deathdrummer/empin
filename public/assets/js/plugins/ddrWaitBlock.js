@@ -27,7 +27,7 @@ $.fn.ddrWait = function(params = null) {
 				right: 0,
 				width: 'revert',
 				display: 'flex',
-				alignItems: position,
+				alignItems: position == 'adaptive' ? 'flex-start' : position,
 				justifyContent: 'center',
 				backgroundColor: bgColor,
 				opacity: 0,
@@ -66,15 +66,14 @@ $.fn.ddrWait = function(params = null) {
 	$('#'+ddrwBId).ready(() => {
 		$('#'+ddrwBId).addClass(ddrwaitBlockVisible);
 		
-		if (position != 'center') {
-			if (position == 'adaptive') {
-				let blockTop = $(block).offset().top,
-					scrTop = $(document).scrollTop();
-				
-				$('[ddrwaitindicator]').css('transform', 'translateY(calc(50vh - ('+iconHeight+' / 2) - ('+blockTop+'px / 2) + '+scrTop+'px))');
-			} else {
-				$('[ddrwaitindicator]').css('transform', 'translateY('+position+')');
-			}
+		if (position == 'adaptive') {
+			let blockTop = $(block).offset().top,
+				scrTop = $(document).scrollTop(),
+				top = scrTop > blockTop ? (scrTop - blockTop) : blockTop;
+			
+			$('[ddrwaitindicator]').css('transform', 'translateY(calc(50vh - ('+iconHeight+' / 2) + '+top+'px))');
+		} else if (position != 'center') {
+			$('[ddrwaitindicator]').css('transform', 'translateY('+position+')');
 		}
 	});
 	
