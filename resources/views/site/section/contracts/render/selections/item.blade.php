@@ -53,7 +53,7 @@
 			variant="yellow"
 			action="selectionShare:{{$id}}"
 			title="Поделиться подборкой с другими сотрудниками"
-			:enabled="$contracts_count ?? false"
+			:enabled="(($contracts_count ?? false) && !$subscribed)"
 			>
 			<i class="fa-solid fa-share-nodes"></i>
 		</x-button>
