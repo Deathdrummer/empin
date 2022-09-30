@@ -604,7 +604,7 @@
 						
 						// clone-user subscribe-user clone-user-department subscribe-user-department
 						// тип ID подборки ID отдела или участника
-						$.shareSelection = (type, selectionId, unitId) => {
+						$.shareSelection = (type, selectionId, unitId, permission) => {
 							//destroyTooltip();
 							
 							let shareSelectionWait = $(sharePopper).ddrWait({
@@ -617,7 +617,8 @@
 								data: {
 									type,
 									unitId,
-									selectionId
+									selectionId,
+									permission
 								}
 							}, (data, container, {error, status, headers}) => {
 								if (error) {

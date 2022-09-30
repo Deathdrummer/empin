@@ -14,15 +14,22 @@
 					<div class="col">
 						<i
 							class="fa-regular fa-clone pointer color-gray-500 color-blue-hovered"
-							title="Клонировать"
+							title="Клонировать всем сотрудникам отдела"
 							onclick="$.shareSelection('clone-user-department', {{$selectionId}}, {{$department ?: '-1'}})"
 							></i>
 					</div>
 					<div class="col">
 						<i
-							class="fa-solid fa-share pointer color-gray-500 color-blue-hovered"
-							title="Подписать всех сотрудников отдела"
-							onclick="$.shareSelection('subscribe-user-department', {{$selectionId}}, {{$department ?: '-1'}})"
+							class="fa-solid fa-share pointer color-green color-green-hovered"
+							title="Отправить подборку и сделать получателя ПРОСМАТРИВАЮЩИМ. У получателя не будет возможности вносить изменения в подборку"
+							onclick="$.shareSelection('subscribe-user-department', {{$selectionId}}, {{$department ?: '-1'}}, 'read')"
+							></i>
+					</div>
+					<div class="col">
+						<i
+							class="fa-solid fa-share pointer color-orange"
+							title="Отправить подборку и сделать всех получателей РЕДАКТОРАМИ. Изменения вносимые получателем будут синхронизироваться у всех сотрудников у кого есть данная подборка"
+							onclick="$.shareSelection('subscribe-user-department', {{$selectionId}}, {{$department ?: '-1'}}, 'write')"
 							></i>
 					</div>
 				</div>
@@ -43,9 +50,16 @@
 									</div>
 									<div class="col">
 										<i
-											class="fa-solid fa-share pointer color-gray-500 color-blue-hovered"
-											title="Подписать сотрудника"
-											onclick="$.shareSelection('subscribe-user', {{$selectionId}}, {{$user['id']}})"
+											class="fa-solid fa-share pointer color-green color-green-hovered"
+											title="Отправить подборку и сделать всех получателей ПРОСМАТРИВАЮЩИМИ. У получателей не будет возможности вносить изменения в подборку"
+											onclick="$.shareSelection('subscribe-user', {{$selectionId}}, {{$user['id']}}, 'read')"
+											></i>
+									</div>
+									<div class="col">
+										<i
+											class="fa-solid fa-share pointer color-orange"
+											title="Отправить подборку и сделать получателя РЕДАКТОРОМ. Изменения вносимые получателями будут синхронизироваться у всех сотрудников у кого есть данная подборка"
+											onclick="$.shareSelection('subscribe-user', {{$selectionId}}, {{$user['id']}}, 'write')"
 											></i>
 									</div>
 								</div>

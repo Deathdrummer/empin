@@ -48,6 +48,18 @@ class Selection extends Model {
 	
 	
 	/**
+     * Атрибуты, которые должны быть типизированы. (Конвертация полей при добавлении и получении)
+	 *
+     * @var array
+     */
+	protected $casts = [
+        'subscribed' => 'array',
+    ];
+	
+	
+	
+	
+	/**
      * Установка значений в момент создания модели
      *
      * @var array
@@ -96,7 +108,7 @@ class Selection extends Model {
     public function scopeToChoose($query) {
 		$userId = auth('site')->user()->id;
         $query->where('account_id', $userId)
-			->orWhereJsonContains('subscribed', $userId)
+			->orWhereJsonContains('subscribed', ['write' => $userId])
 			->orderBy('_sort', 'ASC');
     }
 	

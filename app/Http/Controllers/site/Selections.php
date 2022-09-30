@@ -87,11 +87,14 @@ class Selections extends Controller {
 		$userId = auth('site')->user()->id;
 		
 		$list = Selection::where(['account_id' 	=> $userId])
-			->orWhereJsonContains('subscribed', $userId)
+			->orWhereJsonContains('subscribed', ['read' => $userId])
+			->orWhereJsonContains('subscribed', ['write' => $userId])
 			->withCount('contracts')
 			->orderBy('_sort', 'ASC')
 			->get()
 			->map(function($item) use($userId) {
+				$item['subscribed_read'] = $item['account_id'] != $userId && in_array($userId, ($item['subscribed']['read'] ?? [])) ? true : false;
+				$item['subscribed_write'] = $item['account_id'] != $userId && in_array($userId, ($item['subscribed']['write'] ?? [])) ? true : false;
 				$item['subscribed'] = $item['account_id'] != $userId ? true : false;
 				return $item;
 			});
@@ -339,10 +342,11 @@ class Selections extends Controller {
 	 * @param 
 	 * @return 
 	 */
-	public function share(Request $request) {
+	public function share() {
 		$type = request('type');
 		$unitId = request('unitId');
 		$selectionId = request('selectionId');
+		$permission = request('permission');
 		
 		if (!$selectionId || !$unitId || !$type) return response()->json(false);
 		
@@ -358,7 +362,7 @@ class Selections extends Controller {
 				
 			} elseif ($type == 'subscribe-user-department') {
 				foreach ($usersIds as $userId) {
-					$this->_subscribeSelection($selectionId, $userId);
+					$this->_subscribeSelection($selectionId, $userId, $permission);
 				}
 			}
 			
@@ -369,7 +373,7 @@ class Selections extends Controller {
 			if ($type == 'clone-user') {
 				$this->_cloneSelection($selectionId, $unitId);
 			} elseif ($type == 'subscribe-user') {
-				$this->_subscribeSelection($selectionId, $unitId);
+				$this->_subscribeSelection($selectionId, $unitId, $permission);
 			}
 			
 			return response()->json(true);
@@ -405,12 +409,14 @@ class Selections extends Controller {
 	 * @param 
 	 * @return 
 	 */
-	private function _subscribeSelection($selectionId, $userId) {
+	private function _subscribeSelection($selectionId, $userId, $permission) {
 		$row = ContractSelection::find($selectionId);
 		
 		$subscribed = $row->subscribed;
-		if (!in_array($userId, (array)$subscribed)) {
-			$subscribed[] = $userId;
+		if (!isset($subscribed[$permission])) $subscribed[$permission] = [];
+		
+		if (!in_array($userId, (array)$subscribed[$permission])) {
+			$subscribed[$permission][] = $userId;
 			$row->subscribed = $subscribed;
         	$stat = $row->save();
 			return $stat;
