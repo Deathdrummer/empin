@@ -6464,14 +6464,14 @@ p {
 .table > table {
   width: 100%;
 }
-.table > table > td {
+.table > table td {
   position: relative;
 }
-.table > table > td:hover .cell .icon-hidden {
+.table > table td:hover .cell .icon-hidden {
   opacity: 1;
   transition: opacity 0.16s;
 }
-.table > table > td > .cell {
+.table > table td > .cell {
   position: absolute;
   top: 0;
   left: 0;
@@ -6481,22 +6481,22 @@ p {
   width: 100%;
   display: contents;
 }
-.table > table > td > .cell .icon {
+.table > table td > .cell .icon {
   position: absolute;
 }
-.table > table > td > .cell .icon-left {
+.table > table td > .cell .icon-left {
   left: 4px;
 }
-.table > table > td > .cell .icon-right {
+.table > table td > .cell .icon-right {
   right: 4px;
 }
-.table > table > td > .cell .icon-top {
+.table > table td > .cell .icon-top {
   top: 4px;
 }
-.table > table > td > .cell .icon-bottom {
+.table > table td > .cell .icon-bottom {
   bottom: 4px;
 }
-.table > table > td > .cell .icon-hidden {
+.table > table td > .cell .icon-hidden {
   opacity: 0;
   transition: opacity 0.16s;
 }
