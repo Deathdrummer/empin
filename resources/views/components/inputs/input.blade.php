@@ -119,9 +119,12 @@
 	
 	
 	
+	
 	if (upperCase) {
 		$(input).on('input', function() {
-			$(this).val($(this).val().toUpperCase());
+			let p = this.selectionStart;
+			this.value=this.value.toUpperCase();
+			this.setSelectionRange(p, p);
 		});
 	}
 	
