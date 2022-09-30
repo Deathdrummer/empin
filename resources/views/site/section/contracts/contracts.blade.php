@@ -840,7 +840,7 @@
 		ddrPopup({
 			title: 'Отображение столбцов',
 			width: 500,
-			buttons: ['Закрыть', {action: 'setContractsColums', title: 'Прменить'}],
+			buttons: ['Закрыть', {action: 'setContractsColums', title: 'Применить'}],
 			winClass: 'ddrpopup_white'
 		}).then(({state, wait, setTitle, setButtons, loadData, setHtml, setLHtml, dialog, close, onScroll, disableButtons, enableButtons, setWidth}) => { //isClosed
 			wait();
