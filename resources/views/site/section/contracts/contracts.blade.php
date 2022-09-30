@@ -1686,7 +1686,7 @@
 		
 		
 		abortCtrl = new AbortController();
-		axiosQuery('get', 'site/contracts', params, 'text', abortCtrl).then(({data, error, status, headers}) => {
+		axiosQuery('get', 'site/contracts', params, 'text', abortCtrl).then(({data, error, status, headers, abort}) => {
 			
 			if (error) {
 				$.notify(error.message, 'error');
@@ -1714,6 +1714,7 @@
 			if (init) $('#contractsCard').card('ready');
 			else listWait.destroy();
 			
+			if (abort) listWait.destroy();
 			
 			if (search) {
 				let findSubStr = $('#contractsList').find('p:icontains("'+search+'")');

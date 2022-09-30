@@ -61,6 +61,7 @@ export default function axiosQuery(method = null, url = false, data = {}, respon
 			}).catch(err => {
 				if (axios.isCancel(err)) {
 					console.log('axiosQuery: запрос отмменен!');
+					resolve({abort: true});
 				} else {
 					console.log('axiosQuery: reject!');
 					reject(err);
