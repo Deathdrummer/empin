@@ -322,15 +322,17 @@ class Selections extends Controller {
 		[
 			'views' => $viewsPath,
 			'selection_id' => $selectionId,
+			'subscribed' => $subscribed,
 		] = $request->validate([
 			'views'			=> 'string|required',
 			'selection_id'	=> 'numeric|required',
+			'subscribed'	=> 'required',
 		]);
 		
 		$depsUsers = $this->user->getWithDepartments(false, auth('site')->user()->id);
 		$departments = $this->department->getAll();
 		
-		return $this->view($viewsPath.'.users', compact('depsUsers', 'departments', 'selectionId'));
+		return $this->view($viewsPath.'.users', compact('depsUsers', 'departments', 'selectionId', 'subscribed'));
 	}
 	
 	

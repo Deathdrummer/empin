@@ -51,9 +51,8 @@
 		<x-button
 			group="verysmall"
 			variant="yellow"
-			action="selectionShare:{{$id}}"
+			action="selectionShare:{{$id}},{{$subscribed}}"
 			title="Поделиться подборкой с другими сотрудниками"
-			:enabled="!$subscribed"
 			>
 			<i class="fa-solid fa-share-nodes"></i>
 		</x-button>

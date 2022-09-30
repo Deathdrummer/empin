@@ -27,9 +27,17 @@
 					</div>
 					<div class="col">
 						<i
-							class="fa-solid fa-share pointer color-orange"
+							@class([
+								'fa-solid',
+								'fa-share',
+								'pointer' => !$subscribed,
+								'color-orange' => !$subscribed,
+								'color-gray-300' => $subscribed
+							])
 							title="Отправить подборку и сделать всех получателей РЕДАКТОРАМИ. Изменения вносимые получателем будут синхронизироваться у всех сотрудников у кого есть данная подборка"
+							@if(!$subscribed)
 							onclick="$.shareSelection('subscribe-user-department', {{$selectionId}}, {{$department ?: '-1'}}, 'write')"
+							@endif
 							></i>
 					</div>
 				</div>
@@ -57,9 +65,17 @@
 									</div>
 									<div class="col">
 										<i
-											class="fa-solid fa-share pointer color-orange"
+											@class([
+												'fa-solid',
+												'fa-share',
+												'pointer' => !$subscribed,
+												'color-orange' => !$subscribed,
+												'color-gray-300' => $subscribed
+											])
 											title="Отправить подборку и сделать получателя РЕДАКТОРОМ. Изменения вносимые получателями будут синхронизироваться у всех сотрудников у кого есть данная подборка"
+											@if(!$subscribed)
 											onclick="$.shareSelection('subscribe-user', {{$selectionId}}, {{$user['id']}}, 'write')"
+											@endif
 											></i>
 									</div>
 								</div>
