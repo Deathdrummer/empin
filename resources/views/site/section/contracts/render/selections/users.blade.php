@@ -32,11 +32,16 @@
 								'fa-share',
 								'pointer' => !$subscribed,
 								'color-orange' => !$subscribed,
-								'color-gray-300' => $subscribed
+								'color-gray-200' => $subscribed
 							])
-							title="Отправить подборку и сделать всех получателей РЕДАКТОРАМИ. Изменения вносимые получателем будут синхронизироваться у всех сотрудников у кого есть данная подборка"
+							@if($subscribed)
+								title="Запрещено"
+							@else
+								title="Отправить подборку и сделать всех получателей РЕДАКТОРАМИ. Изменения вносимые получателем будут синхронизироваться у всех сотрудников у кого есть данная подборка"
+							@endif
+							
 							@if(!$subscribed)
-							onclick="$.shareSelection('subscribe-user-department', {{$selectionId}}, {{$department ?: '-1'}}, 'write')"
+								onclick="$.shareSelection('subscribe-user-department', {{$selectionId}}, {{$department ?: '-1'}}, 'write')"
 							@endif
 							></i>
 					</div>
@@ -70,11 +75,16 @@
 												'fa-share',
 												'pointer' => !$subscribed,
 												'color-orange' => !$subscribed,
-												'color-gray-300' => $subscribed
+												'color-gray-200' => $subscribed
 											])
-											title="Отправить подборку и сделать получателя РЕДАКТОРОМ. Изменения вносимые получателями будут синхронизироваться у всех сотрудников у кого есть данная подборка"
+											@if($subscribed)
+												title="Запрещено"
+											@else
+												title="Отправить подборку и сделать получателя РЕДАКТОРОМ. Изменения вносимые получателями будут синхронизироваться у всех сотрудников у кого есть данная подборка"
+											@endif
+											
 											@if(!$subscribed)
-											onclick="$.shareSelection('subscribe-user', {{$selectionId}}, {{$user['id']}}, 'write')"
+												onclick="$.shareSelection('subscribe-user', {{$selectionId}}, {{$user['id']}}, 'write')"
 											@endif
 											></i>
 									</div>
