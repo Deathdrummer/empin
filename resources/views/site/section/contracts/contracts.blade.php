@@ -579,7 +579,7 @@
 					
 					//--------------------------------- Поделиться подборкой с другими сотрудниками
 					let statusesTooltip, destroyTooltip, sharePopper;
-					$.selectionShare = (btn, selection_id, subscribed) => {
+					$.selectionShare = (btn, selection_id, subscribed = false) => {
 						statusesTooltip = $(btn).tooltip({
 							cls: 'w30rem',
 							placement: 'auto',
@@ -596,6 +596,10 @@
 								destroyTooltip = destroy;
 								
 								query({method: 'get', route: 'users_to_share', data: {views: viewsPath, selection_id, subscribed}, responseType: 'text'}, (data, container, {error, status, headers}) => {
+									if (error) {
+										$.notify(error?.message, 'error');
+										console.log(error?.errors);
+									}
 									setData(data);
 									waitDetroy();
 								});

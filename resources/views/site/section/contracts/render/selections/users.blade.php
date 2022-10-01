@@ -14,14 +14,14 @@
 					<div class="col">
 						<i
 							class="fa-regular fa-clone pointer color-gray-500 color-blue-hovered"
-							title="Клонировать всем сотрудникам отдела"
+							title="Отправить копию всем сотрудникам отдела"
 							onclick="$.shareSelection('clone-user-department', {{$selectionId}}, {{$department ?: '-1'}})"
 							></i>
 					</div>
 					<div class="col">
 						<i
 							class="fa-solid fa-share pointer color-green color-green-hovered"
-							title="Отправить подборку и сделать получателя ПРОСМАТРИВАЮЩИМ. У получателя не будет возможности вносить изменения в подборку"
+							title="Отправить подборку и сделать всех получателей ПРОСМАТРИВАЮЩИМИ. У получателей не будет возможности вносить изменения в подборку"
 							onclick="$.shareSelection('subscribe-user-department', {{$selectionId}}, {{$department ?: '-1'}}, 'read')"
 							></i>
 					</div>
@@ -52,14 +52,14 @@
 									<div class="col">
 										<i
 											class="fa-regular fa-clone pointer color-gray-500 color-blue-hovered"
-											title="Клонировать"
+											title="Отправить копию"
 											onclick="$.shareSelection('clone-user', {{$selectionId}}, {{$user['id']}})"
 											></i>
 									</div>
 									<div class="col">
 										<i
 											class="fa-solid fa-share pointer color-green color-green-hovered"
-											title="Отправить подборку и сделать всех получателей ПРОСМАТРИВАЮЩИМИ. У получателей не будет возможности вносить изменения в подборку"
+											title="Отправить подборку и сделать получателя ПРОСМАТРИВАЮЩИМ. У получателя не будет возможности вносить изменения в подборку"
 											onclick="$.shareSelection('subscribe-user', {{$selectionId}}, {{$user['id']}}, 'read')"
 											></i>
 									</div>
