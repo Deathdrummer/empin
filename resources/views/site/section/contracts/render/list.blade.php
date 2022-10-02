@@ -307,7 +307,7 @@
 															/>
 													@else
 														@isset($contractdata[$contract['id']][$dept['id']][$step['id']]['data'])
-															<p class="fz14px lh90">{{$deps_users[$dept['id']][$contractdata[$contract['id']][$dept['id']][$step['id']]['data']] ?? null}}</p>
+															<p class="fz12px lh100">{{$deps_users[$dept['id']][$contractdata[$contract['id']][$dept['id']][$step['id']]['data']] ?? null}}</p>
 														@endisset
 													@endif
 												</td>

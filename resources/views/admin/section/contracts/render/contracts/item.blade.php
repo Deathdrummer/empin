@@ -1,23 +1,23 @@
 <x-input-group group="normal">
 	<tr class="h6rem">
 		<td><strong>{{$object_number}}</strong></td>
-		<td><p>{{$title ?? '-'}}</p></td>
+		<td><p class="fz12px">{{$title ?? '-'}}</p></td>
 		<td>
 			<div class="scrollblock-hidden h5rem">
 				<p class="format fz12px">{{$titul ?? '-'}}</p>
 			</div>
 		</td>
-		<td><p>{{$applicant ?? '-'}}</p></td>
-		<td><p>{{$contract ?? '-'}}</p></td>
+		<td><p class="fz12px">{{$applicant ?? '-'}}</p></td>
+		<td><p class="fz12px">{{$contract ?? '-'}}</p></td>
 		<td class="breakword">
 			<div class="scrollblock-hidden h5rem vertical-center">
 				@if(isset($customer) && isset($data['customers'][$customer]))
-					<p>{{$data['customers'][$customer]}}</p></td>
+					<p class="fz12px">{{$data['customers'][$customer]}}</p></td>
 				@else
 					<p class="color-gray">-</p>
 				@endif
 			</div>
-		<td><p>{{$locality ?? '-'}}</p></td>
+		<td><p class="fz12px">{{$locality ?? '-'}}</p></td>
 		<td class="text-end">
 			@isset($price)
 				<p>@number($price, 2) @symbal(money)</p></td>
@@ -25,8 +25,8 @@
 				<p class="color-gray">-</p>
 			@endisset
 		<td>
-			<p>@date($created_at) г.</p>
-			<p>в @time($created_at)</p>
+			<p class="fz12px">@date($created_at) г.</p>
+			<p class="fz12px">в @time($created_at)</p>
 		</td>
 		<td class="center">
 			<x-checkbox

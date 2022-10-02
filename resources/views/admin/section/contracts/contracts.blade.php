@@ -22,16 +22,16 @@
 				<thead>
 					<tr>
 						<td class="w8rem"><strong class="lh90 d-block">Номер объекта</strong></td>
-						<td class="w20rem"><strong>Название / заявитель</strong></td>
+						<td class="w18rem"><strong>Название / заявитель</strong></td>
 						<td><strong>Титул</strong></td>
 						<td><strong>Заявитель</strong></td>
 						<td><strong>Номер договора</strong></td>
 						<td class="w20rem"><strong>Заказчик</strong></td>
 						<td class="w20rem"><strong>Населенный пункт</strong></td>
 						<td class="w14rem"><strong class="lh90 d-block">Стоимость договора</strong></td>
-						<td class="w16rem"><strong>Дата создания</strong></td>
+						<td class="w14rem"><strong>Дата создания</strong></td>
 						<td class="w7rem"><strong>Архив</strong></td>
-						<td class="w12rem center"><strong>Действия</strong></td>
+						<td class="w13rem center"><strong>Действия</strong></td>
 					</tr>
 				</thead>
 				<tbody id="contractsList"></tbody>

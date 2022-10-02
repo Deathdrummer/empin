@@ -333,7 +333,6 @@ class Selections extends Controller {
 		$depsUsers = $this->user->getWithDepartments(false, auth('site')->user()->id);
 		$departments = $this->department->getAll()->keyBy('id');
 		
-		logger($departments->toArray());
 		return $this->view($viewsPath.'.users', compact('depsUsers', 'departments', 'selectionId', 'subscribed'));
 	}
 	
