@@ -1488,10 +1488,19 @@
 	
 	//-------------------------------------------------  Отправить договор в архив
 	$.toArchiveContractAction = (btn, contractId) => {
-		let row = $(btn).closest('tr');
+		let row = $(btn).closest('tr'),
+			cd = $(btn).attr('toarchivedata').split(','),
+			html = '';
+		
+		html += '<div>';
+		html += '<p class="fz14px color-darkgray text-start">Номер объекта: <span class="color-black">'+cd[0]+'</span></p>';
+		html += '<p class="fz14px color-darkgray text-start">Название/заявитель: <span class="color-black">'+cd[1]+'</span></p>';
+		html += '<p class="fz18px color-red mt15px">Вы действительно хотите отправить договор в архив?</p>';
+		html += '</div>';
+		
 		ddrPopup({
 			width: 400, // ширина окна
-			html: '<p class="fz18px color-red">Вы действительно хотите отправить договор в архив?</p>', // контент
+			html, // контент
 			buttons: ['ui.cancel', {title: 'Отправить', variant: 'red', action: 'contractToArchiveAction'}],
 			centerMode: true,
 			winClass: 'ddrpopup_dialog'
@@ -1763,7 +1772,36 @@
 				if ($(data).find('#contractsListAppend').children('tr').length == limit) {
 					observer.observe(document.querySelector('#contractsListFooter'));
 				}
+				
+				
+				let elem = $('[scrollfix]'),
+					pos = $(elem).offset().top,
+					shift = 70;
+				
+				$('[scrollfix]').css({
+					'position': 'relative',
+					'z-index': 11,
+					'background-color': '#fff',
+					'transition': 'transform 0s'
+				});
+				
+				let scrTop = 0;
+				$(window).scroll(function() {
+					scrTop = $(window).scrollTop();
+					
+					if (pos - shift < scrTop) $('[scrollfix]').css('transform', 'translateY('+(scrTop - pos + shift)+'px)');
+					else $('[scrollfix]').css('transform', 'translateY(0)');
+				});
+				
+				//$('#commonDataTable').ddrTable();
+				
+				
+				
+				
+				
+				
 			}
+			
 			
 			
 			if (callback && typeof callback == 'function') callback();

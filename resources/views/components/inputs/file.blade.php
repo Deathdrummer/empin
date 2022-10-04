@@ -24,6 +24,6 @@
 		id="{{$id}}"
 		{{$setInpGroup()}}
 		{{$isMultiple()}}
-		{{$tagParam ? $tag.'='.$tagParam.'' : $tag}}
+		@if($tag) {!!$tag!!} @endif
 		>
 </div>

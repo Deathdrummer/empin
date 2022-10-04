@@ -28,7 +28,7 @@
 		fieldset="{{$fieldset}}"
 		@checked($checked ?: $isChecked($settings, $setting)) 
 		@isset($group) inpgroup="{{$group}}" @endisset
-		{{$tagParam ? $tag.'='.$tagParam.'' : $tag}}
+		@if($tag) {!!$tag!!} @endif
 		>
 		
 	<label class="noselect" for="{{$id}}"></label>

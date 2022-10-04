@@ -45,7 +45,7 @@
 			$animation => $animation
 		])
 		style="--fa-animation-duration: {{$animationDuration}};"
-		{{$tagParam ? $tag.'='.$tagParam.'' : $tag}}
+		@if($tag) {!!$tag!!} @endif
 		>{{$slot}}</button>
 </div>
 @if($groupWrap)</div>@endif

@@ -58,7 +58,7 @@
 		@if($setting)oninput="$.{{$action}}(this, '{{$setting}}', {{$savedelay}})" @endif
 		@if(isset($actionFunc) && !$setting)oninput="$.{{$actionFunc}}(this{{isset($actionParams) ? ', '.$actionParams : null}})" @endif
 		@if($showrows)showrows @endif
-		{{$tagParam ? $tag.'='.$tagParam.'' : $tag}}
+		@if($tag) {!!$tag!!} @endif
 		>
 	
 	@isset($clearcolor)

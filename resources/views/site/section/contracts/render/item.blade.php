@@ -235,6 +235,7 @@
 								animationDuration="2s"
 								action="toArchiveContractAction:{{$id}}"
 								title="Отправить в архив"
+								tag="toarchivedata:{{$object_number ?? '-'}},{{$title ?? '-'}}"
 								><i class="fa-solid fa-box-archive"></i></x-button>
 						@endcando
 						

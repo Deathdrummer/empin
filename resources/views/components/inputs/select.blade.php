@@ -40,7 +40,7 @@
 		@if($disabled || !$enabled)disabled @endif
 		@if($setting)oninput="$.{{$action}}(this, '{{$setting}}')" @endif
 		@if(isset($actionFunc) && !$setting)oninput="$.{{$actionFunc}}(this{{isset($actionParams) ? ', '.$actionParams : null}})" @endif
-		{{$tagParam ? $tag.'='.$tagParam.'' : $tag}}
+		@if($tag) {!!$tag!!} @endif
 		>
 		@if ($options && $choose && ($emptyHasValue || (!$hasActive && $value !== null && !$setSelected($value, $settings, $setting))))
 			<option value=""{{!$hasActive ? 'selected' : ''}} {{$chooseEmpty ? '' : 'disabled'}}>{{$choose}}</option>

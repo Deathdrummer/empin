@@ -12,7 +12,6 @@ $.fn.ddrScrollX = function(scrollStep, scrollSpeed, enableMouseScroll, ignoreSel
 	
 	if (enableMouseScroll != undefined && enableMouseScroll == true) {
 		$(block).mousewheel(function(e) {
-			
 			let tag = e.target?.tagName?.toLowerCase();
 			if (!ignoreSelectors || isHover(ignoreSelectors)) {
 				e.preventDefault();

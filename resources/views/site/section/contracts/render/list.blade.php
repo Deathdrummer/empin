@@ -138,11 +138,11 @@
 						
 						@if($selectionEdited || ($selectionEdited && $searched))
 							<td class="w7rem vertical-center">
-								<strong class="fz10px lh90 d-block text-center">Удалить из выборки</strong>
+								<strong class="fz10px lh90 d-block text-center">Удалить из подборки</strong>
 							</td>
 						@elseif($searched)
 							<td class="w15rem vertical-center">
-								<strong class="fz10px lh90 d-block text-center">Добавить в выборку</strong>
+								<strong class="fz10px lh90 d-block text-center">Добавить в подборку</strong>
 							</td>
 						@else
 							@isset($departmentId)
@@ -193,7 +193,7 @@
 		<x-horisontal.item class="h100">
 			<div class="table table_fixwidth border-all border-gray border-2px border-rounded-3px h100">
 				<table>
-					<thead>
+					<thead scrollfix>
 						<tr class="h3rem">
 							<td
 								colspan="{{count($dept['steps'])}}"

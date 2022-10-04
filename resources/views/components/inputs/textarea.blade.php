@@ -47,7 +47,7 @@
         @if(isset($actionFunc) && !$setting)oninput="$.{{$actionFunc}}(this{{isset($actionParams) ? ', '.$actionParams : null}})" @endif
         @isset($group) inpgroup="{{$group}}" @endisset
         @class(['textarea_noresize' => $noresize])
-        {{$tagParam ? $tag.'='.$tagParam.'' : $tag}}
+        @if($tag) {!!$tag!!} @endif
         >{{$setValue($value, $settings, $setting)}}</textarea>
     <div class="{{($group ? $group.'-' : '').'textarea__errorlabel'}}" errorlabel></div>
 </div>

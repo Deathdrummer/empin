@@ -32,7 +32,7 @@
 		@if($disabled)disabled @endif
 		noedit
 		readonly
-		{{$tagParam ? $tag.'='.$tagParam.'' : $tag}}
+		@if($tag) {!!$tag!!} @endif
 		>
 	<input
 		type="hidden"
