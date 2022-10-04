@@ -157,6 +157,16 @@ class Contract extends Model {
 	
 	
 	
+	/**
+	 * @param 
+	 * @return 
+	 */
+	public function messages() {
+		return $this->hasMany(ContractChat::class, 'contract_id', 'id');
+	}
+	
+	
+	
 	
 	
 	
