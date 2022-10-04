@@ -35,8 +35,7 @@ class Datepicker extends Component {
         $this->group = $group;
 		
 		[$t, $tValue] = $this->buildTag($tag);
-		$this->tag = $t ?? null;
-		$this->tagParam = $tValue ?? null;
+		$this->tag = $tValue ? $t.'="'.$tValue.'"' : $t;
     }
 	
 	

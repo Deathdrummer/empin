@@ -40,8 +40,7 @@ class File extends Component {
         $this->imagesTypes = collect(['images', 'jpeg', 'jpg', 'png', 'apng', 'gif', 'bmp', 'webp']);
 		
 		[$t, $tValue] = $this->buildTag($tag);
-		$this->tag = $t ?? null;
-		$this->tagParam = $tValue ?? null;
+		$this->tag = $tValue ? $t.'="'.$tValue.'"' : $t;
     }
 	
 	

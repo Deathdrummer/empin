@@ -51,8 +51,7 @@ class Input extends Component {
         $this->placeholder = $placeholder ?? __('auth.typing').' '.$dataTypes->get($type);
         
 		[$t, $tValue] = $this->buildTag($tag);
-		$this->tag = $t ?? null;
-		$this->tagParam = $tValue ?? null;
+		$this->tag = $tValue ? $t.'="'.$tValue.'"' : $t;
         
         $this->setAction($action);
         
