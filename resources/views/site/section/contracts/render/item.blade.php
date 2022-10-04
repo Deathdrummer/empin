@@ -250,7 +250,7 @@
 						
 						@cando('contract-col-chat:site')
 							<x-button
-								:variant="$messages_count ? 'green' : 'light'"
+								:variant="$messages_count ? 'yellow' : 'light'"
 								action="contractChatAction:{{$id}},{{$title ?? 'Без названия'}}"
 								title="Чат договора"
 								><i class="fa-solid fa-comments"></i></x-button>
