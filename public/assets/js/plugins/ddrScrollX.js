@@ -23,6 +23,12 @@ $.fn.ddrScrollX = function(scrollStep, scrollSpeed, enableMouseScroll, ignoreSel
 		});
 	}
 	
+	$(block).on('mousedown touchstart touches targetTouches changedTouches', function(e) {
+		console.log('type', e.type);
+	}
+	
+	
+	
 	$(block).on('mousedown touchstart', function(e) {
 		if ([2, 3].indexOf(e.which) !== -1) {
 			e.preventDefault();

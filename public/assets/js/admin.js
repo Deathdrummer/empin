@@ -11336,60 +11336,7 @@ window.ddrPopup = function () {
   \********************************************/
 /***/ (function() {
 
-/*
-	Горизонтальная прокрутка блока мышью и колесиком
-		- шаг прокрутки (для колеса)
-		- скорость прокрутки (для колеса)
-		- разрешить прокрутку колесом
-		- Игнорировать селекторы
-		- добавить блок к синхронному скроллу
-*/
-$.fn.ddrScrollX = function (scrollStep, scrollSpeed, enableMouseScroll, ignoreSelectors, addict) {
-  var block = this,
-      scrollStep = scrollStep || 50,
-      scrollSpeed = scrollSpeed || 100,
-      ignoreSelectors = _.isArray(ignoreSelectors) ? ignoreSelectors.join(', ') : ignoreSelectors;
-
-  if (enableMouseScroll != undefined && enableMouseScroll == true) {
-    $(block).mousewheel(function (e) {
-      var _e$target, _e$target$tagName;
-
-      var tag = (_e$target = e.target) === null || _e$target === void 0 ? void 0 : (_e$target$tagName = _e$target.tagName) === null || _e$target$tagName === void 0 ? void 0 : _e$target$tagName.toLowerCase();
-
-      if (!ignoreSelectors || isHover(ignoreSelectors)) {
-        e.preventDefault();
-        $(this).stop(false, true).animate({
-          scrollLeft: $(this).scrollLeft() + scrollStep * -e.deltaY
-        }, scrollSpeed);
-      }
-    });
-  }
-
-  $(block).on('mousedown touchstart', function (e) {
-    if ([2, 3].indexOf(e.which) !== -1) {
-      e.preventDefault();
-      return;
-    }
-
-    if (!ignoreSelectors || isHover(ignoreSelectors) == false) {
-      $(block).children().css('cursor', 'e-resize');
-      var startX = this.scrollLeft + e.pageX;
-      $(block).on('mousemove touchmove', function (e) {
-        console.log(e.type);
-        var pos = startX - e.pageX;
-        this.scrollLeft = pos;
-        if (addict) $(addict)[0].scrollLeft = pos;
-        return false;
-      });
-    }
-  });
-  $(window).mouseup(function (e) {
-    if (!ignoreSelectors || isHover(ignoreSelectors) == false) {
-      $(block).children().css('cursor', 'default');
-      $(block).off("mousemove");
-    }
-  });
-};
+throw new Error("Module build failed (from ./node_modules/babel-loader/lib/index.js):\nSyntaxError: C:\\Users\\Deathdrumer\\Dropbox\\sites\\laravel.loc\\resources\\js\\plugins\\ddrScrollX.js: Unexpected token, expected \",\" (32:1)\n\n\u001b[0m \u001b[90m 30 |\u001b[39m \t\u001b[0m\n\u001b[0m \u001b[90m 31 |\u001b[39m \t\u001b[0m\n\u001b[0m\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 32 |\u001b[39m \t$(block)\u001b[33m.\u001b[39mon(\u001b[32m'mousedown touchstart'\u001b[39m\u001b[33m,\u001b[39m \u001b[36mfunction\u001b[39m(e) {\u001b[0m\n\u001b[0m \u001b[90m    |\u001b[39m \t\u001b[31m\u001b[1m^\u001b[22m\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m 33 |\u001b[39m \t\t\u001b[36mif\u001b[39m ([\u001b[35m2\u001b[39m\u001b[33m,\u001b[39m \u001b[35m3\u001b[39m]\u001b[33m.\u001b[39mindexOf(e\u001b[33m.\u001b[39mwhich) \u001b[33m!==\u001b[39m \u001b[33m-\u001b[39m\u001b[35m1\u001b[39m) {\u001b[0m\n\u001b[0m \u001b[90m 34 |\u001b[39m \t\t\te\u001b[33m.\u001b[39mpreventDefault()\u001b[33m;\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m 35 |\u001b[39m \t\t\t\u001b[36mreturn\u001b[39m\u001b[33m;\u001b[39m\u001b[0m\n    at instantiate (C:\\Users\\Deathdrumer\\Dropbox\\sites\\laravel.loc\\node_modules\\@babel\\parser\\lib\\index.js:72:32)\n    at constructor (C:\\Users\\Deathdrumer\\Dropbox\\sites\\laravel.loc\\node_modules\\@babel\\parser\\lib\\index.js:358:12)\n    at Parser.raise (C:\\Users\\Deathdrumer\\Dropbox\\sites\\laravel.loc\\node_modules\\@babel\\parser\\lib\\index.js:3335:19)\n    at Parser.unexpected (C:\\Users\\Deathdrumer\\Dropbox\\sites\\laravel.loc\\node_modules\\@babel\\parser\\lib\\index.js:3373:16)\n    at Parser.expect (C:\\Users\\Deathdrumer\\Dropbox\\sites\\laravel.loc\\node_modules\\@babel\\parser\\lib\\index.js:4002:28)\n    at Parser.parseCallExpressionArguments (C:\\Users\\Deathdrumer\\Dropbox\\sites\\laravel.loc\\node_modules\\@babel\\parser\\lib\\index.js:12748:14)\n    at Parser.parseCoverCallAndAsyncArrowHead (C:\\Users\\Deathdrumer\\Dropbox\\sites\\laravel.loc\\node_modules\\@babel\\parser\\lib\\index.js:12663:29)\n    at Parser.parseSubscript (C:\\Users\\Deathdrumer\\Dropbox\\sites\\laravel.loc\\node_modules\\@babel\\parser\\lib\\index.js:12588:19)\n    at Parser.parseSubscripts (C:\\Users\\Deathdrumer\\Dropbox\\sites\\laravel.loc\\node_modules\\@babel\\parser\\lib\\index.js:12557:19)\n    at Parser.parseExprSubscripts (C:\\Users\\Deathdrumer\\Dropbox\\sites\\laravel.loc\\node_modules\\@babel\\parser\\lib\\index.js:12546:17)");
 
 /***/ }),
 
