@@ -1661,7 +1661,10 @@
 		if (!append) {
 			offset = 0;
 			//observer = false;
-		} 
+			$(document).scrollTop(0);
+		} else {
+			
+		}
 		
 		
 		//-----------------------------------
@@ -1699,7 +1702,6 @@
 				position: 'adaptive'
 			});
 		} else {
-			
 		}
 		
 		
