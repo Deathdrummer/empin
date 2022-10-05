@@ -11189,7 +11189,7 @@ $.fn.ddrScrollX = function (scrollStep, scrollSpeed, enableMouseScroll, ignoreSe
     });
   }
 
-  $(block).mousedown(function (e) {
+  $(block).on('mousedown touchstart', function (e) {
     if ([2, 3].indexOf(e.which) !== -1) {
       e.preventDefault();
       return;
@@ -11198,7 +11198,7 @@ $.fn.ddrScrollX = function (scrollStep, scrollSpeed, enableMouseScroll, ignoreSe
     if (!ignoreSelectors || isHover(ignoreSelectors) == false) {
       $(block).children().css('cursor', 'e-resize');
       var startX = this.scrollLeft + e.pageX;
-      $(block).on('mousemove touchmove touches changedTouches targetTouches', function (e) {
+      $(block).on('mousemove touchmove', function (e) {
         console.log(e.type);
         var pos = startX - e.pageX;
         this.scrollLeft = pos;
