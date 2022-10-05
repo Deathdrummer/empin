@@ -3,7 +3,8 @@
 	'speed'		=> 100,
 	'step'		=> 100,
 	'scroll'	=> true,
-	'ignore'	=> '[noscroll]'
+	'ignore'	=> '[noscroll]',
+	'addict'	=> false
 ])
 
 
@@ -17,6 +18,7 @@
 	let selector = '#{{$id}}',
 		scroll = {{$scroll}},
 		ignoreSelectors = '{{$ignore}}',
+		addict = '{{$addict}}',
 		step = '{{$step}}',
 		speed = '{{$speed}}';
 	
@@ -24,5 +26,7 @@
 	//	- шаг прокрутки (для колеса)
 	//	- скорость прокрутки (для колеса)
 	//	- разрешить прокрутку колесом
-	$(selector).ddrScrollX(step, speed, scroll, ignoreSelectors);
+	//	- Игнорировать селекторы
+	//	- добавить блок к синхронному скроллу
+	$(selector).ddrScrollX(step, speed, scroll, ignoreSelectors, addict);
 </script>

@@ -189,7 +189,7 @@
 		</div>
 			
 				
-		<div style="height: 40px;width: 300px; background-color: #aaa;position: sticky; top: 72px; z-index: 11;"></div>	
+		<div id="contractsStickyTitles"></div>	
 		
 		<div id="contractsList"></div>
 		
@@ -1777,11 +1777,61 @@
 					observer.observe(document.querySelector('#contractsListFooter'));
 				}
 				
-				
-				/*let elem = $('[scrollfix]'),
+				let elem = $('[scrollfix]'),
 					pos = $(elem).offset().top,
-					shift = 70;
+					shift = 70,
+					scrTop = 0,
+					isHideTitles = true;
+					
+					
+				let htmlDom = $('#contractsList').html();
+				htmlDom = $(htmlDom).find('tbody').remove().end();
 				
+				$('#contractsStickyTitles').html(htmlDom);
+				
+				$('#contractsStickyTitles').css({
+					'position': 'sticky',
+					'top': '68px',
+					'height': '0px',
+					'opacity': 0,
+					'pointer-events': 'none',
+					'z-index': 11,
+				});
+				
+				$('#contractsStickyTitles').find('.horisontal').removeAttrib('id');
+				
+				$('#contractsStickyTitles').find('.horisontal').css({
+					'overflow-x': 'hidden'
+				});
+				
+				$('#contractsStickyTitles').find('table').css({
+					'background-color': '#fff',
+				});
+				
+				$(window).scroll(function() {
+					
+					scrTop = $(window).scrollTop();
+				
+					if (scrTop > pos - shift && isHideTitles) {
+						$('#contractsStickyTitles').css({'opacity': 1, 'pointer-events': 'auto'});
+						isHideTitles = false;
+						
+					} else if (scrTop < pos - shift && !isHideTitles) {
+						$('#contractsStickyTitles').css({'opacity': 0, 'pointer-events': 'none'});
+						isHideTitles = true;
+						
+					}
+				});
+				
+				
+				
+				
+				
+				//
+				
+				
+				
+				/*
 				$('[scrollfix]').css({
 					'position': 'relative',
 					'z-index': 11,
@@ -1800,8 +1850,8 @@
 					}
 					
 					
-				});
-				*/
+				});*/
+				
 				//$('#commonDataTable').ddrTable();
 				
 				

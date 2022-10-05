@@ -1,5 +1,5 @@
 @isset($list)
-<x-horisontal space="2rem" scroll="false" ignore="[noscroll], select, input, textarea">
+<x-horisontal space="2rem" scroll="false" ignore="[noscroll], select, input, textarea" addict="#contractsStickyTitles .horisontal">
 	<x-horisontal.item class="h100">
 		<div class="table table_fixwidth border-all border-light border-2px border-rounded-3px h100">
 			<table>
