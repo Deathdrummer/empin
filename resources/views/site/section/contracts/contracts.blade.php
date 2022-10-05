@@ -187,16 +187,20 @@
 				</x-chooser>
 			</div>
 		</div>
+			
 				
-				
+		<div style="height: 40px;width: 300px; background-color: #aaa;position: sticky; top: 72px; z-index: 11;"></div>	
+		
 		<div id="contractsList"></div>
+		
+		
+		
 	</x-card>
-<div id="toolbar-options" hidden>
-   <a href="#"><i class="fa fa-plane"></i></a>
-   <a href="#"><i class="fa fa-car"></i></a>
-   <a href="#"><i class="fa fa-bicycle"></i></a>
-</div>
 </section>
+
+
+
+
 
 <script type="module">
 	
@@ -1774,7 +1778,7 @@
 				}
 				
 				
-				let elem = $('[scrollfix]'),
+				/*let elem = $('[scrollfix]'),
 					pos = $(elem).offset().top,
 					shift = 70;
 				
@@ -1788,11 +1792,16 @@
 				let scrTop = 0;
 				$(window).scroll(function() {
 					scrTop = $(window).scrollTop();
+					if (parseInt(scrTop) % 10) {
+						console.log(scrTop);
+						
+						if (pos - shift < scrTop) $('[scrollfix]').css('transform', 'translateY('+(scrTop - pos + shift)+'px)');
+						else $('[scrollfix]').css('transform', 'translateY(0)');
+					}
 					
-					if (pos - shift < scrTop) $('[scrollfix]').css('transform', 'translateY('+(scrTop - pos + shift)+'px)');
-					else $('[scrollfix]').css('transform', 'translateY(0)');
+					
 				});
-				
+				*/
 				//$('#commonDataTable').ddrTable();
 				
 				
