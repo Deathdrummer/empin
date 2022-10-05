@@ -31,7 +31,7 @@ $.fn.ddrScrollX = function(scrollStep, scrollSpeed, enableMouseScroll, ignoreSel
 		if (!ignoreSelectors || isHover(ignoreSelectors) == false) {
 			$(block).children().css('cursor', 'e-resize');
 			var startX = this.scrollLeft + e.pageX;
-			$(block).mousemove(function (e) {
+			$(block).on('mousemove touchmove', function (e) {
 				let pos = startX - e.pageX;
 				this.scrollLeft = pos;
 				if (addict) $(addict)[0].scrollLeft = pos;
