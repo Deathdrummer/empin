@@ -193,7 +193,7 @@
 		
 		<div id="contractsList"></div>
 		
-		
+		<div id="contractsListBottom"></div>
 		
 	</x-card>
 </section>
@@ -1714,7 +1714,7 @@
 			if (append && observer instanceof IntersectionObserver) {
 				let listData = $(data).find('#contractsListAppend').html() || false;
 				
-				if (!listData && observer instanceof IntersectionObserver) observer.unobserve(document.querySelector('#contractsListFooter'));
+				if (!listData && observer instanceof IntersectionObserver) observer.unobserve(document.querySelector('#contractsListBottom'));
 				
 				$('#contractsListAppend').append(listData);
 				
@@ -1774,7 +1774,7 @@
 			
 			if (init || !append) {
 				if ($(data).find('#contractsListAppend').children('tr').length == limit) {
-					observer.observe(document.querySelector('#contractsListFooter'));
+					observer.observe(document.querySelector('#contractsListBottom'));
 				}
 				
 				let elem = $('[scrollfix]'),

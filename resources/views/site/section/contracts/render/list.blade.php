@@ -172,7 +172,6 @@
 						@include('site.section/contracts.render.item', $item)
 					@endforeach
 				</tbody>
-				<tfoot id="contractsListFooter"></tfoot>
 			</table>
 		</div>
 	</x-horisontal.item>
