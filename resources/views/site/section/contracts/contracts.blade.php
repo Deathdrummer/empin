@@ -1827,6 +1827,17 @@
 				
 				
 				
+				let scrollTitles = $('#contractsStickyTitles .horisontal'),
+					scrollList = $('#contractsList .horisontal');
+				
+				$(scrollList).scroll(function() {
+					console.log(this.scrollLeft);
+					$(scrollTitles).scrollLeft(this.scrollLeft);
+				});
+				
+				
+				// 
+				// 
 				
 				
 				//

@@ -23,13 +23,7 @@ $.fn.ddrScrollX = function(scrollStep, scrollSpeed, enableMouseScroll, ignoreSel
 		});
 	}
 	
-	$(block).on('NSMouseMoved NSLeftMouseDragged', function(e) {
-		console.log('type', e.type);
-	});
-	
-	
-	
-	$(block).on('mousedown touchstart', function(e) {
+	$(block).mousedown(function(e) {
 		if ([2, 3].indexOf(e.which) !== -1) {
 			e.preventDefault();
 			return;
@@ -37,7 +31,7 @@ $.fn.ddrScrollX = function(scrollStep, scrollSpeed, enableMouseScroll, ignoreSel
 		if (!ignoreSelectors || isHover(ignoreSelectors) == false) {
 			$(block).children().css('cursor', 'e-resize');
 			var startX = this.scrollLeft + e.pageX;
-			$(block).on('mousemove touchmove', function (e) {
+			$(block).mousemove(function (e) {
 				let pos = startX - e.pageX;
 				this.scrollLeft = pos;
 				if (addict) $(addict)[0].scrollLeft = pos;
