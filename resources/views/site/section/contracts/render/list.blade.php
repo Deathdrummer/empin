@@ -29,8 +29,7 @@
 								class="sort{{$sortField == 'title' ? ' sort-'.$sortOrder : ''}} vertical-center"
 								onclick="$.sorting(this, 'title')"
 								noscroll
-								><strong class="fz10px lh90 d-block text-center">Название / 
-								заявитель</strong></td>
+								><strong class="fz10px lh90 d-block text-center">Название</strong></td>
 						@endif
 						
 						@if(auth('site')->user()->can('contract-col-applicant:site') && (empty($userColums) || in_array('applicant', $userColums)))
