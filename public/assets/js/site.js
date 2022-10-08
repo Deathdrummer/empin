@@ -5655,10 +5655,21 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
 
 window.isIos = /iPhone|iPad|iPod/i.test(navigator.userAgent);
 window.tapEvent = 'ontouchstart' in window && !isIos ? 'tap' : 'click';
+
+$.fn.tripleTap = function (callback) {
+  $(this).on(tapEvent, function (e) {
+    e.preventDefault();
+
+    if (e.detail === 3) {
+      if (callback && typeof callback == 'function') callback(this);
+    }
+  });
+};
 /*
 	Массив данных брейкпоинтов, пример: {sm: 576, md: 768, lg: 992, xl: 1370}
 	либо переменные: breakpointSM, breakpointMD, breakpointLG, breakpointXL
 */
+
 
 window.breakpoints = {};
 ['SM', 'MD', 'LG', 'XL', 'XXL'].forEach(function (brName) {

@@ -901,6 +901,8 @@
 	
 	
 	
+	
+	
 	//------------------------------------------------- Убрать отметку нового договора и открыть окно с общей информацией
 	$.openContractInfo = (tr, contractId) => {
 		let isNew = $(tr).attr('isnew');
@@ -942,7 +944,6 @@
 	}
 	
 	
-	
 	function checkNewContract(data, error, tr) {
 		if (!data) {
 			$.notify('Не удалось пометить договор как прочитанный!', 'error');
@@ -961,6 +962,19 @@
 		}
 		
 		setHtml(data, null, () => {
+			
+			$('[tripleclick]').tripleTap((elem) => {
+				if (window.getSelection) {window.getSelection().removeAllRanges();}
+				else if (document.selection) {document.selection.empty();}
+				
+				let selection = window.getSelection();
+				let txt = document.getElementById("toolp");
+				let range = document.createRange();
+				range.selectNodeContents(txt);
+				selection.removeAllRanges();
+				selection.addRange(range);
+			});
+			
 			$('#commonInfoFields').ddrInputs('change', (field) => {
 				let fieldId = $(field).attr('commoninfofield'),
 					fieldValue = $(field).val();

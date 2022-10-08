@@ -1,6 +1,15 @@
 window.isIos = /iPhone|iPad|iPod/i.test(navigator.userAgent);
 window.tapEvent = (('ontouchstart' in window) && !isIos) ? 'tap' : 'click';
 
+$.fn.tripleTap = function(callback) {
+	$(this).on(tapEvent, function (e) {
+		e.preventDefault();
+	    if (e.detail === 3) {
+	        if (callback && typeof callback == 'function') callback(this);
+	    }
+	});
+}
+	
 
 
 
@@ -83,6 +92,9 @@ window.scroll = function({top = null, bottom = null, both = null}) {
 		scrPos = scrTop;
 	});
 }
+
+
+
 
 
 
