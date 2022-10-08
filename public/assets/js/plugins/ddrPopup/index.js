@@ -224,7 +224,6 @@ window.ddrPopup = function(settings = {}, callback = false) {
 	
 	//if ((!html && !lhtml) && !url) return Promise.reject('-1');
 	
-
 	ddrCssVar('popup-animate-duration', changeWidthAnimationDuration);
 	
 	_setWidth(width);
