@@ -5802,7 +5802,7 @@ $.fn.tripleTap = function (callback) {
   $(this).on(tapEvent, function (e) {
     e.preventDefault();
 
-    if (e.detail === 3) {
+    if (e.detail >= 3) {
       if (callback && typeof callback == 'function') callback(this);
     }
   });
