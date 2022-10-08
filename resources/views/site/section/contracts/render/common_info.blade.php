@@ -13,7 +13,7 @@
 	@cando('contract-col-object_number:site')
 		<div class="col">
 			<p class="color-gray-400 fz13px mb5px noselect">Номер объекта:</p>
-			<p class="breakword select-text" tripleclick id="toolp">{{$contract['object_number'] ?? '-'}}</p>
+			<p class="breakword select-text">{{$contract['object_number'] ?? '-'}}</p>
 		</div>
 	@endcando
 	
@@ -27,7 +27,7 @@
 	@cando('contract-col-applicant:site')
 		<div class="col">
 			<p class="color-gray-400 fz13px mb5px noselect">Заявитель:</p>
-			<p class="breakword select-text">{{$contract['applicant'] ?? '-'}}</p>
+			<p class="breakword select-text" tripleclick id="toolp">{{$contract['applicant'] ?? '-'}}</p>
 		</div>
 	@endcando
 	
