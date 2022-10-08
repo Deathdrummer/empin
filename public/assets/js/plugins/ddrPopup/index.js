@@ -224,7 +224,7 @@ window.ddrPopup = function(settings = {}, callback = false) {
 	
 	//if ((!html && !lhtml) && !url) return Promise.reject('-1');
 	
-	
+
 	ddrCssVar('popup-animate-duration', changeWidthAnimationDuration);
 	
 	_setWidth(width);
@@ -313,13 +313,11 @@ window.ddrPopup = function(settings = {}, callback = false) {
 		html += 	'</div>';
 		html +=	'</div>';
 		
-		
 		if ($('body').find('[ddrpopup]').length) {
 			$('body').find('[ddrpopup]').replaceWith(html);
 		} else {
 			$('body').append(html);
 		}
-		
 		_open();
 	}
 	
@@ -517,7 +515,6 @@ window.ddrPopup = function(settings = {}, callback = false) {
 		clearTimeout(changeWidthAnimationTOut);
 		if (!width) width = '500px';
 		let duration = parseInt(ddrCssVar('popup-animate-duration'));
-		
 		if (_getWinWidth() == parseInt(width)) return false;
 		if (showWait) _showWait();
 		
@@ -535,7 +532,7 @@ window.ddrPopup = function(settings = {}, callback = false) {
 			
 		} else {
 			ddrCssVar('popup-width', width);
-		}	
+		}
 	}
 	
 	
@@ -578,10 +575,10 @@ window.ddrPopup = function(settings = {}, callback = false) {
 	
 
 	function _open() {
-		disableScroll();
 		prObj.isClosed = false;
 		$(ddrPopupSelector).addClass('ddrpopup_opening');
 		$(ddrPopupSelector).find('.ddrpopup__win').addClass('ddrpopup__win_opening');
+		disableScroll();
 	};
 
 	function _close() {

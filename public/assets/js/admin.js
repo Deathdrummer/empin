@@ -6374,11 +6374,14 @@ $.fn.hasAttr = function (a) {
 
 
 window.disableScroll = function () {
-  var scrollPosition = [self.pageXOffset || document.documentElement.scrollLeft || document.body.scrollLeft, self.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop];
-  $('html').setAttrib('scroll-position', scrollPosition.join('|'));
-  $('html').setAttrib('previous-overflow', $('html').css('overflow'));
-  $('html').css('overflow', 'hidden');
-  window.scrollTo(scrollPosition[0], scrollPosition[1]);
+  //var scrollPosition = [
+  //  self.pageXOffset || document.documentElement.scrollLeft || document.body.scrollLeft,
+  //  self.pageYOffset || document.documentElement.scrollTop  || document.body.scrollTop
+  //];
+  //$('html').setAttrib('scroll-position', scrollPosition.join('|'));
+  ddrCssVar('previous-overflow', $('html').css('overflow')); //$('html').setAttrib('previous-overflow', $('html').css('overflow'));
+
+  $('html').css('overflow', 'hidden'); //window.scrollTo(scrollPosition[0], scrollPosition[1]);
 };
 /*
 	Разрешить скролл
@@ -6386,16 +6389,18 @@ window.disableScroll = function () {
 
 
 window.enableScroll = function () {
-  var scrollPosition = $('html').attr('scroll-position');
-
+  /*var scrollPosition = $('html').attr('scroll-position');
   if (scrollPosition) {
-    scrollPosition = scrollPosition.split('|');
-    $('html').css('overflow', $('html').attr('previous-overflow'));
-    $('html').removeAttrib('scroll-position');
-    $('html').removeAttrib('previous-overflow');
-    $('html').removeAttrib('style');
-    window.scrollTo(scrollPosition[0], scrollPosition[1]);
-  }
+  	scrollPosition = scrollPosition.split('|');
+  	$('html').css('overflow', $('html').attr('previous-overflow'));
+  	$('html').removeAttrib('scroll-position');
+  	$('html').removeAttrib('previous-overflow');
+  	$('html').removeAttrib('style');
+  	window.scrollTo(scrollPosition[0], scrollPosition[1]);
+  }*/
+  $('html').css('overflow', ddrCssVar('previous-overflow')); //$('html').removeAttrib('scroll-position');
+  //$('html').removeAttrib('previous-overflow');
+  //$('html').removeAttrib('style');
 };
 /*
 	Зафиксировать элемент при скролле
@@ -7097,10 +7102,9 @@ window.ddrCssVar = function (variable, value) {
 
   if (value !== undefined) {
     return document.documentElement.style.setProperty('--' + v, value);
-    return true;
   }
 
-  return getComputedStyle(document.documentElement).getPropertyValue('--' + v);
+  return document.documentElement.style.getPropertyValue('--' + v); //return getComputedStyle(document.documentElement).getPropertyValue('--'+v);
 };
 /*
 	функция работы с localStorage
@@ -11294,10 +11298,10 @@ window.ddrPopup = function () {
   }
 
   function _open() {
-    disableScroll();
     prObj.isClosed = false;
     $(ddrPopupSelector).addClass('ddrpopup_opening');
     $(ddrPopupSelector).find('.ddrpopup__win').addClass('ddrpopup__win_opening');
+    disableScroll();
   }
 
   ;
@@ -11372,9 +11376,9 @@ $.fn.ddrScrollX = function (scrollStep, scrollSpeed, enableMouseScroll, ignoreSe
     }
 
     if (!ignoreSelectors || isHover(ignoreSelectors) == false) {
-      $(block).children().css('cursor', 'e-resize');
       var startX = this.scrollLeft + e.pageX;
       $(block).mousemove(function (e) {
+        $(block).css('cursor', 'e-resize');
         var pos = startX - e.pageX;
         this.scrollLeft = pos;
         if (addict) $(addict)[0].scrollLeft = pos;
@@ -11382,9 +11386,9 @@ $.fn.ddrScrollX = function (scrollStep, scrollSpeed, enableMouseScroll, ignoreSe
       });
     }
   });
-  $(window).mouseup(function (e) {
+  $(block).mouseup(function (e) {
     if (!ignoreSelectors || isHover(ignoreSelectors) == false) {
-      $(block).children().css('cursor', 'default');
+      $(block).css('cursor', 'default');
       $(block).off("mousemove");
     }
   });

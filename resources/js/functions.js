@@ -659,15 +659,16 @@ $.fn.hasAttr = function(a) {
 	Запретить скролл
 */
 window.disableScroll = function() {
-	var scrollPosition = [
-	  self.pageXOffset || document.documentElement.scrollLeft || document.body.scrollLeft,
-	  self.pageYOffset || document.documentElement.scrollTop  || document.body.scrollTop
-	];
+	//var scrollPosition = [
+	//  self.pageXOffset || document.documentElement.scrollLeft || document.body.scrollLeft,
+	//  self.pageYOffset || document.documentElement.scrollTop  || document.body.scrollTop
+	//];
 
-	$('html').setAttrib('scroll-position', scrollPosition.join('|'));
-	$('html').setAttrib('previous-overflow', $('html').css('overflow'));
+	//$('html').setAttrib('scroll-position', scrollPosition.join('|'));
+	ddrCssVar('previous-overflow', $('html').css('overflow'));
+	//$('html').setAttrib('previous-overflow', $('html').css('overflow'));
 	$('html').css('overflow', 'hidden');
-	window.scrollTo(scrollPosition[0], scrollPosition[1]);
+	//window.scrollTo(scrollPosition[0], scrollPosition[1]);
 }
 
 
@@ -677,7 +678,7 @@ window.disableScroll = function() {
 	Разрешить скролл
 */
 window.enableScroll = function() {
-	var scrollPosition = $('html').attr('scroll-position');
+	/*var scrollPosition = $('html').attr('scroll-position');
 	if (scrollPosition) {
 		scrollPosition = scrollPosition.split('|');
 		$('html').css('overflow', $('html').attr('previous-overflow'));
@@ -685,7 +686,12 @@ window.enableScroll = function() {
 		$('html').removeAttrib('previous-overflow');
 		$('html').removeAttrib('style');
 		window.scrollTo(scrollPosition[0], scrollPosition[1]);
-	}
+	}*/
+	
+	$('html').css('overflow', ddrCssVar('previous-overflow'));
+	//$('html').removeAttrib('scroll-position');
+	//$('html').removeAttrib('previous-overflow');
+	//$('html').removeAttrib('style');
 }
 
 
@@ -1510,9 +1516,9 @@ window.ddrCssVar = function(variable, value) {
 	let v = variable.replace('--', '');
 	if (value !== undefined) {
 		return document.documentElement.style.setProperty('--'+v, value);
-		return true;
 	}
-	return getComputedStyle(document.documentElement).getPropertyValue('--'+v);
+	return document.documentElement.style.getPropertyValue('--'+v);
+	//return getComputedStyle(document.documentElement).getPropertyValue('--'+v);
 }
 
 

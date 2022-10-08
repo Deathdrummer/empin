@@ -23,26 +23,30 @@ $.fn.ddrScrollX = function(scrollStep, scrollSpeed, enableMouseScroll, ignoreSel
 		});
 	}
 	
+	
+	
+	
 	$(block).mousedown(function(e) {
 		if ([2, 3].indexOf(e.which) !== -1) {
 			e.preventDefault();
 			return;
 		} 
 		if (!ignoreSelectors || isHover(ignoreSelectors) == false) {
-			$(block).children().css('cursor', 'e-resize');
-			var startX = this.scrollLeft + e.pageX;
+			let startX = this.scrollLeft + e.pageX;
 			$(block).mousemove(function (e) {
+				$(block).css('cursor', 'e-resize');
 				let pos = startX - e.pageX;
 				this.scrollLeft = pos;
 				if (addict) $(addict)[0].scrollLeft = pos;
 				return false;
 			});
 		}
+		
 	});
 	
-	$(window).mouseup(function (e) {
+	$(block).mouseup(function (e) {
 		if (!ignoreSelectors || isHover(ignoreSelectors) == false) {
-			$(block).children().css('cursor', 'default');
+			$(block).css('cursor', 'default');
 			$(block).off("mousemove");
 		}
 	});

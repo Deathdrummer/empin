@@ -44,4 +44,9 @@ $.event.special.scrollstop.latency = 650;
 
 $(function() {
 	
+	
+	$('body').on('contextmenu', function(e) {
+		e.preventDefault();
+	});
+	
 });

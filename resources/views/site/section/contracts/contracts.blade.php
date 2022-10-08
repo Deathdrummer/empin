@@ -901,18 +901,9 @@
 	
 	
 	
-	
-	
-	
-	
-	
-
-	
-	
 	//------------------------------------------------- Убрать отметку нового договора и открыть окно с общей информацией
 	$.openContractInfo = (tr, contractId) => {
 		let isNew = $(tr).attr('isnew');
-		
 		
 		ddrPopup({
 			title: false, 
@@ -1786,8 +1777,9 @@
 					isHideTitles = true;
 					
 					
-				let htmlDom = $('#contractsList').html();
+				let htmlDom = $('#contractsList').find('.horisontal')[0].outerHTML;
 				htmlDom = $(htmlDom).find('tbody').remove().end();
+				htmlDom = $(htmlDom).find('script').remove().end();
 				
 				$('#contractsStickyTitles').html(htmlDom);
 				
@@ -1811,7 +1803,6 @@
 				});
 				
 				$(window).scroll(function() {
-					
 					scrTop = $(window).scrollTop();
 				
 					if (scrTop > pos - shift && isHideTitles) {
@@ -1821,59 +1812,17 @@
 					} else if (scrTop < pos - shift && !isHideTitles) {
 						$('#contractsStickyTitles').css({'opacity': 0, 'pointer-events': 'none'});
 						isHideTitles = true;
-						
 					}
 				});
-				
 				
 				
 				let scrollTitles = $('#contractsStickyTitles .horisontal'),
 					scrollList = $('#contractsList .horisontal');
 				
 				$(scrollList).scroll(function() {
-					console.log(this.scrollLeft);
 					$(scrollTitles).scrollLeft(this.scrollLeft);
 				});
-				
-				
-				// 
-				// 
-				
-				
-				//
-				
-				
-				
-				/*
-				$('[scrollfix]').css({
-					'position': 'relative',
-					'z-index': 11,
-					'background-color': '#fff',
-					'transition': 'transform 0s'
-				});
-				
-				let scrTop = 0;
-				$(window).scroll(function() {
-					scrTop = $(window).scrollTop();
-					if (parseInt(scrTop) % 10) {
-						console.log(scrTop);
-						
-						if (pos - shift < scrTop) $('[scrollfix]').css('transform', 'translateY('+(scrTop - pos + shift)+'px)');
-						else $('[scrollfix]').css('transform', 'translateY(0)');
-					}
-					
-					
-				});*/
-				
-				//$('#commonDataTable').ddrTable();
-				
-				
-				
-				
-				
-				
 			}
-			
 			
 			
 			if (callback && typeof callback == 'function') callback();

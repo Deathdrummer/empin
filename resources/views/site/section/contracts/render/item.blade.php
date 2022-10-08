@@ -64,11 +64,19 @@
 	@endif
 	
 	@if(auth('site')->user()->can('contract-col-title:site') && (empty($userColums) || in_array('title', $userColums)))
-		<td class="breakword"><p class="fz12px lh110">{{Str::of($title ?? '-')->limit(60, '...')}}</p></td>
+		<td class="breakword">
+			<div class="scrollblock-hidden h4rem-4px pr3px">
+				<p class="fz12px lh110">{{Str::of($title ?? '-')->limit(60, '...')}}</p>
+			</div>
+		</td>
 	@endif
 	
 	@if(auth('site')->user()->can('contract-col-applicant:site') && (empty($userColums) || in_array('applicant', $userColums)))
-		<td class="breakword"><p class="fz12px lh110">{{$applicant ?? '-'}}</p></td>
+		<td class="breakword">
+			<div class="scrollblock-hidden h4rem-4px pr3px">
+				<p class="fz12px lh110">{{$applicant ?? '-'}}</p>
+			</div>
+		</td>
 	@endif
 	
 	@if(auth('site')->user()->can('contract-col-titul:site') && (empty($userColums) || in_array('titul', $userColums)))
