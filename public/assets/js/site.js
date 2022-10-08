@@ -5745,6 +5745,20 @@ window.scroll = function (_ref) {
     scrPos = scrTop;
   });
 };
+
+window.selectText = function (elem) {
+  if (window.getSelection) {
+    window.getSelection().removeAllRanges();
+  } else if (document.selection) {
+    document.selection.empty();
+  }
+
+  var selection = window.getSelection();
+  var range = document.createRange();
+  range.selectNodeContents(elem);
+  selection.removeAllRanges();
+  selection.addRange(range);
+};
 /*
 	Определение устройства: desktop или mobile
 */

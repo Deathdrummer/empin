@@ -963,16 +963,8 @@
 		
 		setHtml(data, null, () => {
 			
-			$('[tripleclick]').tripleTap((elem) => {
-				if (window.getSelection) {window.getSelection().removeAllRanges();}
-				else if (document.selection) {document.selection.empty();}
-				
-				let selection = window.getSelection();
-				let txt = document.getElementById("toolp");
-				let range = document.createRange();
-				range.selectNodeContents(txt);
-				selection.removeAllRanges();
-				selection.addRange(range);
+			$('[tripleselect]').tripleTap((elem) => {
+				selectText(elem);
 			});
 			
 			$('#commonInfoFields').ddrInputs('change', (field) => {
