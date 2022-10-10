@@ -143239,6 +143239,7 @@ template {
 }
 .ddrtable__td {
   height: 100%;
+  vertical-align: middle;
 }
 .ddrtable__td + .ddrtable__td {
   border-left: 1px solid #efefef;
