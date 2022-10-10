@@ -14,7 +14,7 @@
 				</x-table.tr>
 			</x-table.head>
 			<x-table.body>
-				@for ($i = 0; $i < 10; $i++)
+				@for ($i = 0; $i < 1000; $i++)
 				<x-table.tr>
 					<x-table.td><p>body 1</p></x-table.td>
 					<x-table.td><p>body 2</p></x-table.td>
