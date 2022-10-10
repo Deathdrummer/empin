@@ -1,6 +1,5 @@
 @props([
 	'id'    => 'ddrtable'.rand(0,9999999),
-	
 ])
 
 
@@ -16,9 +15,7 @@
 	
 	
 	$(headCells).each(function(index, cell) {
-		//console.log('r');
-		let width = 300; //$(cell).outerWidth();
-		
+		let width = $(cell).outerWidth();
 		$(bodyCells).find('[ddrtabletd]:eq('+index+')').width(width);
 	});
 	
