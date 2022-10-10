@@ -1789,6 +1789,21 @@
 				
 				$('#contractsStickyTitles').html(htmlDom);
 				
+				
+				/*let rool = $('#contractsListAppend').children('tr:first').children('td');
+				
+				$.each(rool, function(k, item) {
+					
+					let i = $(item).css('width') || $(item).outerWidth();
+					console.log(i);
+					
+					$('#contractsStickyTitles').find('thead').children('tr').children('td').eq(k).width($(item).width());
+				});*/
+				
+				
+				//console.log(rool);
+				
+				
 				$('#contractsStickyTitles').css({
 					'position': 'sticky',
 					'top': '68px',

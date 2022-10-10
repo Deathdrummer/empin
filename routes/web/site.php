@@ -205,8 +205,8 @@ Route::middleware(['lang', 'auth:site', 'isajax:site'])->post('/get_section', fu
 			$sectionPath))
 		->first();
 	
-	
-	$settingsData = $settings->getMany($page['settings'])->toArray() ?: []; // в таблице sections прописывается массив тех настроек, что нужно подгрузить
+	// в таблице sections прописывается массив тех настроек, что нужно подгрузить
+	$settingsData = $page['settings'] ? ($settings->getMany($page['settings'])->toArray() ?: []) : []; 
 	
 	
 	$pageTitle[] = $page ? $page->page_title : null; /* urlencode(__('custom.no_section_header_title')) */

@@ -324,7 +324,7 @@
 		flex-wrap: nowrap
 	
 	&__item
-		flex: 0 1 auto
+		flex: 0 0 auto
 		display: inline-block
 		
 		&:first-of-type
@@ -865,3 +865,41 @@ $bPoints: map-remove($grid-breakpoints, xs)
 		&:first-of-type
 			margin-top: 0 !important
 			
+
+
+
+
+
+
+
+
+
+$tableColor: #efefef
+
+.ddrtable
+	border: 1px solid $tableColor
+	
+	.ddrtable__head ~ .ddrtable__body, .ddrtable__body ~ .ddrtable__foot
+		border-top: 1px solid $tableColor
+	
+	
+	
+	&__head
+	
+	&__body
+		+scrollbar(#f9fbfd, #d6dbe0, 6px, 2px, 2px)
+		height: 300px
+		overflow-x: scroll 
+	
+	&__tr
+		display: flex
+		flex-wrap: nowrap
+		
+		+ .ddrtable__tr
+			border-top: 1px solid $tableColor
+		
+	&__td
+		height: 100%
+		
+		+ .ddrtable__td
+			border-left: 1px solid $tableColor
