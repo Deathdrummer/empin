@@ -15,7 +15,7 @@
 	
 	
 	$(headCells).each(function(index, cell) {
-		let width = $(cell).outerWidth();
+		let width = $(cell).width();
 		$(bodyCells).find('[ddrtabletd]:eq('+index+')').width(width);
 	});
 	
