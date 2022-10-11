@@ -878,6 +878,7 @@ $tableColor: #efefef
 
 .ddrtable
 	border: 1px solid $tableColor
+	display: inline-block
 	
 	.ddrtable__head ~ .ddrtable__body, .ddrtable__body ~ .ddrtable__foot
 		border-top: 1px solid $tableColor
@@ -887,9 +888,10 @@ $tableColor: #efefef
 	&__head
 	
 	&__body
-		+scrollbar(#f9fbfd, #d6dbe0, 6px, 2px, 2px)
-		height: 300px
-		overflow-x: scroll 
+		&_scrolled
+			+scrollbar(#f9fbfd, #d6dbe0, 6px)
+			overflow-y: scroll
+			//padding-right: 6px
 	
 	&__tr
 		display: flex
