@@ -106,7 +106,8 @@
 
 <script type="module">
 	
-	$('[ddrtablebody]').on('mouseover', function() {
+	$('[ddrtablebody]').on('mouseover touchenter', function(e) {
+		console.log(e.type);
 		$(this).addClass('ddrtablebody-hovered');
 		$('[ddrtablebody]').not(this).removeClass('ddrtablebody-hovered');
 	});
