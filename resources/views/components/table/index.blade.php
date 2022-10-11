@@ -9,6 +9,7 @@
 
 
 <script type="module">
+	console.log('1');
 	const selector = $('#{{$id}}'),
 		headCells = $(selector).find('[ddrtablehead]').find('[ddrtabletr]').find('[ddrtabletd]'),
 		bodyCells = $(selector).find('[ddrtablebody] [ddrtabletr]');
