@@ -1,3 +1,8 @@
-<div class="ddrtable__foot">
+<div
+	{{$attributes->class([
+		'ddrtable__foot',
+	])}}
+	ddrtablefoot
+	>
 	{{$slot}}
 </div>

@@ -1,23 +1,26 @@
 @props([
 	'id'    => 'ddrtable'.rand(0,9999999),
+	'scrollsync' =>  null
 ])
 
 
-<div class="ddrtable" id="{{$id}}">
+<div class="ddrtable" id="{{$id}}" scrollsync="{{$scrollsync}}">
 	{{$slot}}
 </div>
 
 
 <script type="module">
-	console.log('1');
 	const selector = $('#{{$id}}'),
-		headCells = $(selector).find('[ddrtablehead]').find('[ddrtabletr]').find('[ddrtabletd]'),
+		headCells = $(selector).find('[ddrtablehead]').find('[ddrtabletr][main]').find('[ddrtabletd]').length
+			? $(selector).find('[ddrtablehead]').find('[ddrtabletr][main]').find('[ddrtabletd]')
+			: $(selector).find('[ddrtablehead]').find('[ddrtabletr]').find('[ddrtabletd]'),
 		bodyCells = $(selector).find('[ddrtablebody] [ddrtabletr]');
 	
-	
 	$(headCells).each(function(index, cell) {
-		let width = $(cell).width();
-		$(bodyCells).find('[ddrtabletd]:eq('+index+')').width(width);
+		let width = $(cell).outerWidth();
+		if (width) $(bodyCells).find('[ddrtabletd]:eq('+index+')').css('width', width+'px');
 	});
 	
+	
+	$(selector).find('[ddrtablebody]').addClass('ddrtable__body_visible');
 </script>

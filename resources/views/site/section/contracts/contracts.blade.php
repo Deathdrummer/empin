@@ -104,9 +104,9 @@
 									border-white
 									bg-yellow
 									color-dark
-									w2rem-2px
+									w2rem-8px
 									h2rem-2px
-									fz13px
+									fz12px
 									lh100"
 								selectionscounts
 								></strong></x-chooser.item>
@@ -130,9 +130,9 @@
 											border-white
 											bg-yellow
 											color-dark
-											w2rem-2px
+											w2rem-8px
 											h2rem-2px
-											fz13px
+											fz12px
 											lh100"
 										selectionscounts
 										></strong></x-chooser.item>
@@ -154,9 +154,9 @@
 									border-white
 									bg-yellow
 									color-dark
-									w2rem-2px
+									w2rem-8px
 									h2rem-2px
-									fz13px
+									fz12px
 									lh100"
 								selectionscounts
 								></strong></x-chooser.item>
@@ -178,7 +178,7 @@
 								border-white
 								bg-yellow
 								color-dark
-								w2rem-2px
+								w2rem-8px
 								h2rem-2px
 								fz13px
 								lh100"
@@ -1595,19 +1595,7 @@
 	
 	
 	let observer = new IntersectionObserver(function(entries, observer) {
-		const { 
-			time,
-			rootBounds,
-			boundingClientRect,
-			intersectionRect,
-			target, 
-			isIntersecting, 
-			isVisible,
-			intersectionRatio 
-		} = entries[0];
-		
-		
-		if (isIntersecting) {
+		if (entries[0].isIntersecting) {
 			offset += limit;
 			getList({append: true});
 		}
@@ -1696,7 +1684,7 @@
 				text: 'Загрузка',
 				fontSize: '14px',
 				bgColor: '#ffffffbb',
-				position: 'adaptive'
+				//position: 'adaptive'
 			});
 		} else {
 		}
@@ -1776,7 +1764,7 @@
 					observer.observe(document.querySelector('#contractsListBottom'));
 				}
 				
-				let elem = $('[scrollfix]'),
+				/*let elem = $('[scrollfix]'),
 					pos = $(elem).offset().top,
 					shift = 70,
 					scrTop = 0,
@@ -1790,7 +1778,7 @@
 				$('#contractsStickyTitles').html(htmlDom);
 				
 				
-				/*let rool = $('#contractsListAppend').children('tr:first').children('td');
+				let rool = $('#contractsListAppend').children('tr:first').children('td');
 				
 				$.each(rool, function(k, item) {
 					
@@ -1804,7 +1792,7 @@
 				//console.log(rool);
 				
 				
-				$('#contractsStickyTitles').css({
+				/*$('#contractsStickyTitles').css({
 					'position': 'sticky',
 					'top': '68px',
 					'height': '0px',
@@ -1842,7 +1830,7 @@
 				
 				$(scrollList).scroll(function() {
 					$(scrollTitles).scrollLeft(this.scrollLeft);
-				});
+				});*/
 			}
 			
 			

@@ -1,16 +1,13 @@
-<tr
-	@class([
-		'h5rem-4px',
-		//'clear bg-yellow-light' => $is_new && !$isArchive
-	])
+<x-table.tr
+	class="h5rem-4px"
 	ondblclick="$.openContractInfo(this, '{{$id}}');"
 	isnew="{{$is_new ? 1 : 0}}"
 	contractid="{{$id}}"
 	>
 	@if(!$isArchive)
 		@if(auth('site')->user()->can('contract-col-period:site') && (empty($userColums) || in_array('period', $userColums)))
-			<td class="center">
-				<div class="cell">
+			<x-table.td class="h-center">
+				
 					<i
 						onclick="$.pinContract(this, {{$id}});"
 						pinned="{{$pinned ? 0 : 1}}"
@@ -53,137 +50,137 @@
 						dname="{{$name}}"
 						@cando('force-set-contract-color:site')onmousedown="$.openColorsStatuses(this, '{{$id}}')"@endcando
 						></div>
-				</div>
+				
 					
-			</td>
+			</x-table.td>
 		@endif
 	@endif
 	
 	@if(auth('site')->user()->can('contract-col-object_number:site') && (empty($userColums) || in_array('object_number', $userColums)))
-		<td class="center"><strong class="fz16px">{{$object_number ?? '-'}}</strong></td>
+		<x-table.td class="center"><strong class="fz16px">{{$object_number ?? '-'}}</strong></x-table.td>
 	@endif
 	
 	@if(auth('site')->user()->can('contract-col-title:site') && (empty($userColums) || in_array('title', $userColums)))
-		<td class="breakword">
+		<x-table.td class="breakword">
 			<div class="scrollblock-hidden h4rem-4px pr3px">
 				<p class="fz12px lh110">{{Str::of($title ?? '-')->limit(60, '...')}}</p>
 			</div>
-		</td>
+		</x-table.td>
 	@endif
 	
 	@if(auth('site')->user()->can('contract-col-applicant:site') && (empty($userColums) || in_array('applicant', $userColums)))
-		<td class="breakword">
+		<x-table.td class="breakword">
 			<div class="scrollblock-hidden h4rem-4px pr3px">
 				<p class="fz12px lh110">{{$applicant ?? '-'}}</p>
 			</div>
-		</td>
+		</x-table.td>
 	@endif
 	
 	@if(auth('site')->user()->can('contract-col-titul:site') && (empty($userColums) || in_array('titul', $userColums)))
-		<td class="pr2px breakword">
+		<x-table.td class="pr2px breakword">
 			<div class="scrollblock-hidden h4rem-4px pr3px">
 				<p class="format fz12px">{{$titul ?? '-'}}</p>
 			</div>
-		</td>
+		</x-table.td>
 	@endif
 	
 	@if(auth('site')->user()->can('contract-col-contract:site') && (empty($userColums) || in_array('contract', $userColums)))
-		<td class="breakword"><p class="fz12px lh110">{{$contract ?? '-'}}</p></td>
+		<x-table.td class="breakword"><p class="fz12px lh110">{{$contract ?? '-'}}</p></x-table.td>
 	@endif
 	
 	@if(auth('site')->user()->can('contract-col-customer:site') && (empty($userColums) || in_array('customer', $userColums)))
-		<td class="breakword">
+		<x-table.td class="breakword">
 			@if(isset($customer) && isset($customers[$customer]))
 				<p class="fz12px lh90">{{Str::of($customers[$customer])->limit(60, '...')}}</p>
 			@else
 				<p class="color-gray">-</p>
 			@endif
-		</td>
+		</x-table.td>
 	@endif
 	
 	@if(auth('site')->user()->can('contract-col-locality:site') && (empty($userColums) || in_array('locality', $userColums)))
-		<td class="breakword"><p class="fz12px lh90">{{$locality ?? '-'}}</p></td>
+		<x-table.td class="breakword"><p class="fz12px lh90">{{$locality ?? '-'}}</p></x-table.td>
 	@endif
 	
 	@if(auth('site')->user()->can('contract-col-price:site') && (empty($userColums) || in_array('price', $userColums)))
-		<td class="text-end">
+		<x-table.td class="text-end">
 			@isset($price)
 				<p class="fz12px lh90">@number($price, 2) @symbal(money)</p>
 			@else
 				<p class="color-gray">-</p>
 			@endisset
-		</td>
+		</x-table.td>
 	@endif
 	
 	@if(auth('site')->user()->can('contract-col-date_start:site') && (empty($userColums) || in_array('date_start', $userColums)))
-		<td>
+		<x-table.td>
 			@if(isset($date_start) && $date_start)
 				<p class="fz12px lh90">{{dateFormatter($date_start, 'd.m.y')}}</p>
 			@else
 				<p class="color-gray">-</p>
 			@endif
-		</td>
+		</x-table.td>
 	@endif
 	
 	@if(auth('site')->user()->can('contract-col-date_end:site') && (empty($userColums) || in_array('date_end', $userColums)))
-		<td>
+		<x-table.td>
 			@if(isset($date_end) && $date_end)
 				<p class="fz12px lh90">{{dateFormatter($date_end, 'd.m.y')}}</p>
 			@else
 				<p class="color-gray">-</p>
 			@endif
-		</td>
+		</x-table.td>
 	@endif
 	
 	@if(auth('site')->user()->can('contract-col-hoz_method:site') && (empty($userColums) || in_array('hoz_method', $userColums)))
-		<td class="center">
+		<x-table.td class="center">
 			@if($hoz_method)
 				<i class="fa-solid fa-circle-check color-green fz16px"></i>
 			@endif
-		</td>
+		</x-table.td>
 	@endif
 	
 	@if(auth('site')->user()->can('contract-col-subcontracting:site') && (empty($userColums) || in_array('subcontracting', $userColums)))
-		<td class="center">
+		<x-table.td class="center">
 			@if(isset($subcontracting) && $subcontracting)
 				<i class="fa-solid fa-circle-check color-green fz16px"></i>
 			@endif
-		</td>
+		</x-table.td>
 	@endif
 	
 	@if(auth('site')->user()->can('contract-col-type:site') && (empty($userColums) || in_array('type', $userColums)))
-		<td class="center breakword">
+		<x-table.td class="center breakword">
 			@if(isset($type) && isset($types[$type]))
 				<p class="fz12px lh110">{{$types[$type]}}</p>
 			@else
 				<p class="color-gray">-</p>
 			@endif
-		</td>
+		</x-table.td>
 	@endif
 	
 	@if(auth('site')->user()->can('contract-col-contractor:site') && (empty($userColums) || in_array('contractor', $userColums)))
-		<td class="center breakword">
+		<x-table.td class="center breakword">
 			@if(isset($contractor) && isset($contractors[$contractor]))
 				<p class="fz12px lh90">{{$contractors[$contractor]}}</p>
 			@else
 				<p class="color-gray">-</p>
 			@endif
-		</td>
+		</x-table.td>
 	@endif
 	
 	
 	@if($selectionEdited || ($selectionEdited && $searched))
-		<td class="center">
+		<x-table.td class="center">
 			<x-button
 				variant="red"
 				group="small"
 				action="removeContractFromSelection:{{$id}},{{$selection}}"
 				title="Удалить из подборки"
 				><i class="fa-solid fa-trash-can"></i></x-button>
-		</td>
+		</x-table.td>
 	
 	@elseif($searched && !$selectionEdited)
-		<td class="center">
+		<x-table.td class="center">
 			<x-select
 				group="small"
 				class="w100"
@@ -199,11 +196,11 @@
 				:checked="$selected"
 				action="addContractToSelection:{{$id}}"
 				/> --}}
-		</td>
+		</x-table.td>
 	@else
 		@if(isset($departmentId))
 			@cananydo('contract-col-hiding:site, contract-col-sending:site')
-				<td class="center">
+				<x-table.td class="center">
 					<x-buttons-group group="verysmall" w="2rem-7px" gx="5" px="1" tag="noscroll:45">
 						@cando('contract-col-hiding:site')
 							<x-button
@@ -230,11 +227,11 @@
 								><i class="fa-solid fa-comments"></i></x-button>
 						@endcando
 					</x-buttons-group>
-				</td>
+				</x-table.td>
 			@endcananydo
 		@elseif(!$isArchive)
 			@cananydo('contract-col-sending-all:site, contract-col-to-archive:site')
-				<td class="center">
+				<x-table.td class="center">
 					<x-buttons-group group="verysmall" w="2rem-7px" gx="5" px="1" tag="noscroll">
 						@cando('contract-col-to-archive:site')
 							<x-button
@@ -264,20 +261,19 @@
 								><i class="fa-solid fa-comments"></i></x-button>
 						@endcando
 					</x-buttons-group>
-				</td>
+				</x-table.td>
 			@endcananydo
 		@elseif($isArchive)
 			@cando('contract-col-return-to-work:site')
-				<td class="center">
+				<x-table.td class="center">
 					<x-button
 						group="verysmall"
 						variant="light"
 						action="returnContractToWorkAction:{{$id}}"
 						title="Вернуть договор в работу"
 						><i class="fa-solid fa-arrow-rotate-left"></i></x-button>
-				</td>
+				</x-table.td>
 			@endcando
 		@endif
 	@endif
-		
-</tr>
+</x-table.tr>

@@ -6,17 +6,24 @@
 		
 		
 		<x-horisontal space="2rem" scroll="false">
-			<x-horisontal.item>
-				<x-table>
+			
+			<x-horisontal.item
+				
+				>
+				<x-table scrollsync="contractslistscroll">
 					<x-table.head>
-						<x-table.tr>
-							<x-table.td style="width: 250px;"><p>thead 1</p></x-table.td>
+						<x-table.tr
+							
+							>
+							<x-table.td
+								style="width: 250px;"
+								><p>thead 1</p></x-table.td>
 							<x-table.td style="width: 300px;"><p>thead 2</p></x-table.td>
 							<x-table.td style="width: 130px;"><p>thead 3</p></x-table.td>
 						</x-table.tr>
 					</x-table.head>
 					<x-table.body class="h30rem">
-						@for ($i = 0; $i < 1000; $i++)
+						@for ($i = 0; $i < 30; $i++)
 						<x-table.tr class="h5rem">
 							<x-table.td><p>body 1</p></x-table.td>
 							<x-table.td><p>body 2</p></x-table.td>
@@ -29,7 +36,7 @@
 			</x-horisontal.item>
 			
 			<x-horisontal.item>
-				<x-table>
+				<x-table scrollsync="contractslistscroll">
 					<x-table.head>
 						<x-table.tr>
 							<x-table.td style="width: 250px;"><p>thead 1</p></x-table.td>
@@ -38,7 +45,7 @@
 						</x-table.tr>
 					</x-table.head>
 					<x-table.body class="h30rem">
-						@for ($i = 0; $i < 1000; $i++)
+						@for ($i = 0; $i < 30; $i++)
 						<x-table.tr class="h5rem">
 							<x-table.td><p>body 1</p></x-table.td>
 							<x-table.td><p>body 2</p></x-table.td>
@@ -51,7 +58,7 @@
 			</x-horisontal.item>
 			
 			<x-horisontal.item>
-				<x-table>
+				<x-table scrollsync="contractslistscroll">
 					<x-table.head>
 						<x-table.tr>
 							<x-table.td style="width: 250px;"><p>thead 1</p></x-table.td>
@@ -60,7 +67,7 @@
 						</x-table.tr>
 					</x-table.head>
 					<x-table.body class="h30rem">
-						@for ($i = 0; $i < 1000; $i++)
+						@for ($i = 0; $i < 30; $i++)
 						<x-table.tr class="h5rem">
 							<x-table.td><p>body 1</p></x-table.td>
 							<x-table.td><p>body 2</p></x-table.td>
@@ -73,7 +80,7 @@
 			</x-horisontal.item>
 			
 			<x-horisontal.item>
-				<x-table>
+				<x-table scrollsync="contractslistscroll">
 					<x-table.head>
 						<x-table.tr>
 							<x-table.td style="width: 250px;"><p>thead 1</p></x-table.td>
@@ -82,7 +89,7 @@
 						</x-table.tr>
 					</x-table.head>
 					<x-table.body class="h30rem">
-						@for ($i = 0; $i < 1000; $i++)
+						@for ($i = 0; $i < 30; $i++)
 						<x-table.tr class="h5rem">
 							<x-table.td><p>body 1</p></x-table.td>
 							<x-table.td><p>body 2</p></x-table.td>
@@ -105,21 +112,5 @@
 
 
 <script type="module">
-	
-	$('[ddrtablebody]').on('mouseover touchenter touchstart', function(e) {
-		console.log(e.type);
-		$(this).addClass('ddrtablebody-scrollhandler');
-		$('[ddrtablebody]').not(this).removeClass('ddrtablebody-scrollhandler');
-	});
-	
-	
-	
-	
-	$('[ddrtablebody]').scroll(function() {
-		if ($(this).hasClass('ddrtablebody-scrollhandler') == false) return;
-		let scrTop = $(this).scrollTop();
-		$('[ddrtablebody]').not('.ddrtablebody-scrollhandler').scrollTop(scrTop);
-	});
-	
-	
+	scrollSync('contractslistscroll');
 </script>

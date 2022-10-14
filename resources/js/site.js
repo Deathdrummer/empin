@@ -15,6 +15,7 @@ require('@plugins/card');
 require('@plugins/ddrScrollX');
 require('@plugins/tooltip');
 require('@plugins/ddrTable');
+require('@plugins/blockTable');
 
 
 
