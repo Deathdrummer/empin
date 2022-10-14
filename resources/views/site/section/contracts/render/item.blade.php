@@ -57,7 +57,7 @@
 	@endif
 	
 	@if(auth('site')->user()->can('contract-col-object_number:site') && (empty($userColums) || in_array('object_number', $userColums)))
-		<x-table.td class="center"><strong class="fz16px">{{$object_number ?? '-'}}</strong></x-table.td>
+		<x-table.td class="h-center"><strong class="fz16px">{{$object_number ?? '-'}}</strong></x-table.td>
 	@endif
 	
 	@if(auth('site')->user()->can('contract-col-title:site') && (empty($userColums) || in_array('title', $userColums)))
@@ -133,7 +133,7 @@
 	@endif
 	
 	@if(auth('site')->user()->can('contract-col-hoz_method:site') && (empty($userColums) || in_array('hoz_method', $userColums)))
-		<x-table.td class="center">
+		<x-table.td class="h-center">
 			@if($hoz_method)
 				<i class="fa-solid fa-circle-check color-green fz16px"></i>
 			@endif
@@ -141,7 +141,7 @@
 	@endif
 	
 	@if(auth('site')->user()->can('contract-col-subcontracting:site') && (empty($userColums) || in_array('subcontracting', $userColums)))
-		<x-table.td class="center">
+		<x-table.td class="h-center">
 			@if(isset($subcontracting) && $subcontracting)
 				<i class="fa-solid fa-circle-check color-green fz16px"></i>
 			@endif
@@ -149,7 +149,7 @@
 	@endif
 	
 	@if(auth('site')->user()->can('contract-col-type:site') && (empty($userColums) || in_array('type', $userColums)))
-		<x-table.td class="center breakword">
+		<x-table.td class="h-center breakword">
 			@if(isset($type) && isset($types[$type]))
 				<p class="fz12px lh110">{{$types[$type]}}</p>
 			@else
@@ -159,7 +159,7 @@
 	@endif
 	
 	@if(auth('site')->user()->can('contract-col-contractor:site') && (empty($userColums) || in_array('contractor', $userColums)))
-		<x-table.td class="center breakword">
+		<x-table.td class="h-center breakword">
 			@if(isset($contractor) && isset($contractors[$contractor]))
 				<p class="fz12px lh90">{{$contractors[$contractor]}}</p>
 			@else
@@ -170,7 +170,7 @@
 	
 	
 	@if($selectionEdited || ($selectionEdited && $searched))
-		<x-table.td class="center">
+		<x-table.td class="h-center">
 			<x-button
 				variant="red"
 				group="small"
@@ -180,7 +180,7 @@
 		</x-table.td>
 	
 	@elseif($searched && !$selectionEdited)
-		<x-table.td class="center">
+		<x-table.td class="h-center">
 			<x-select
 				group="small"
 				class="w100"
@@ -200,7 +200,7 @@
 	@else
 		@if(isset($departmentId))
 			@cananydo('contract-col-hiding:site, contract-col-sending:site')
-				<x-table.td class="center">
+				<x-table.td class="h-center">
 					<x-buttons-group group="verysmall" w="2rem-7px" gx="5" px="1" tag="noscroll:45">
 						@cando('contract-col-hiding:site')
 							<x-button
@@ -231,7 +231,7 @@
 			@endcananydo
 		@elseif(!$isArchive)
 			@cananydo('contract-col-sending-all:site, contract-col-to-archive:site')
-				<x-table.td class="center">
+				<x-table.td class="h-center">
 					<x-buttons-group group="verysmall" w="2rem-7px" gx="5" px="1" tag="noscroll">
 						@cando('contract-col-to-archive:site')
 							<x-button
@@ -265,7 +265,7 @@
 			@endcananydo
 		@elseif($isArchive)
 			@cando('contract-col-return-to-work:site')
-				<x-table.td class="center">
+				<x-table.td class="h-center">
 					<x-button
 						group="verysmall"
 						variant="light"
