@@ -23,7 +23,7 @@
 						</x-table.tr>
 					</x-table.head>
 					<x-table.body class="h30rem">
-						@for ($i = 0; $i < 30; $i++)
+						@for ($i = 0; $i < 1000; $i++)
 						<x-table.tr class="h5rem">
 							<x-table.td><p>body 1</p></x-table.td>
 							<x-table.td><p>body 2</p></x-table.td>
@@ -45,7 +45,7 @@
 						</x-table.tr>
 					</x-table.head>
 					<x-table.body class="h30rem">
-						@for ($i = 0; $i < 30; $i++)
+						@for ($i = 0; $i < 1000; $i++)
 						<x-table.tr class="h5rem">
 							<x-table.td><p>body 1</p></x-table.td>
 							<x-table.td><p>body 2</p></x-table.td>
@@ -67,7 +67,7 @@
 						</x-table.tr>
 					</x-table.head>
 					<x-table.body class="h30rem">
-						@for ($i = 0; $i < 30; $i++)
+						@for ($i = 0; $i < 1000; $i++)
 						<x-table.tr class="h5rem">
 							<x-table.td><p>body 1</p></x-table.td>
 							<x-table.td><p>body 2</p></x-table.td>
@@ -89,7 +89,7 @@
 						</x-table.tr>
 					</x-table.head>
 					<x-table.body class="h30rem">
-						@for ($i = 0; $i < 30; $i++)
+						@for ($i = 0; $i < 1000; $i++)
 						<x-table.tr class="h5rem">
 							<x-table.td><p>body 1</p></x-table.td>
 							<x-table.td><p>body 2</p></x-table.td>
