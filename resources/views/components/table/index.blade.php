@@ -22,7 +22,9 @@
 			clientWidth = $(cell)[0].clientWidth,
 			outerWidth = $(cell).outerWidth();
 		console.log(width, outerWidth, offsetWidth, clientWidth);
-		if (clientWidth) $(bodyCells).find('[ddrtabletd]:eq('+index+')').css('width', offsetWidth+'px');
+		
+		let maxValue = Math.max(width, offsetWidth, clientWidth, outerWidth);
+		if (clientWidth) $(bodyCells).find('[ddrtabletd]:eq('+index+')').css('width', maxValue+'px');
 	});
 	
 	

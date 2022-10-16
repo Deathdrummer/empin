@@ -143307,6 +143307,9 @@ template {
 .ddrtable__td.h-center {
   justify-content: center;
 }
+.ddrtable__td.h-center.breakword * {
+  text-align: center;
+}
 .ddrtable__td.h-end {
   justify-content: end;
 }

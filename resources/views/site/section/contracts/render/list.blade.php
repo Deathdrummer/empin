@@ -17,7 +17,7 @@
 								class="w6rem sort{{$sortField == 'deadline_color_key' ? ' sort-'.$sortOrder : ''}}"
 								onclick="$.sorting(this, 'deadline_color_key')"
 								noscroll
-								><strong class="fz10px lh90 d-block text-center" title="Срок исполнения договора">Срок исполн. договора</strong>
+								><strong class="fz10px lh90 d-block text-center wodrbreak" title="Срок исполнения договора">Срок исполн. договора</strong>
 							</x-table.td>
 						@endif
 					@endif
@@ -27,7 +27,7 @@
 							class="w7rem sort{{$sortField == 'object_number' ? ' sort-'.$sortOrder : ''}}"
 							onclick="$.sorting(this, 'object_number')"
 							noscroll
-							><strong class="fz10px lh90 d-block text-center">Номер объекта</strong>
+							><strong class="fz10px lh90 d-block text-center wodrbreak">Номер объекта</strong>
 						</x-table.td>
 					@endif
 					
@@ -37,7 +37,7 @@
 							class="sort{{$sortField == 'title' ? ' sort-'.$sortOrder : ''}}"
 							onclick="$.sorting(this, 'title')"
 							noscroll
-							><strong class="fz10px lh90 d-block text-center">Название</strong>
+							><strong class="fz10px lh90 d-block text-center wodrbreak">Название</strong>
 						</x-table.td>
 					@endif
 					
@@ -47,7 +47,7 @@
 							class="sort{{$sortField == 'applicant' ? ' sort-'.$sortOrder : ''}}"
 							onclick="$.sorting(this, 'applicant')"
 							noscroll
-							><strong class="fz10px lh90 d-block text-center">Заявитель</strong>
+							><strong class="fz10px lh90 d-block text-center wodrbreak">Заявитель</strong>
 						</x-table.td>
 					@endif
 					
@@ -57,7 +57,7 @@
 							class="sort{{$sortField == 'titul' ? ' sort-'.$sortOrder : ''}}"
 							onclick="$.sorting(this, 'titul')"
 							noscroll
-							><strong class="fz10px lh90 d-block text-center">Титул</strong>
+							><strong class="fz10px lh90 d-block text-center wodrbreak">Титул</strong>
 						</x-table.td>
 					@endif
 					
@@ -67,7 +67,7 @@
 							class="sort{{$sortField == 'contract' ? ' sort-'.$sortOrder : ''}}"
 							onclick="$.sorting(this, 'contract')"
 							noscroll
-							><strong class="fz10px lh90 d-block text-center">Номер договора</strong>
+							><strong class="fz10px lh90 d-block text-center wodrbreak">Номер договора</strong>
 						</x-table.td>
 					@endif
 					
@@ -77,7 +77,7 @@
 							class="sort{{$sortField == 'customer' ? ' sort-'.$sortOrder : ''}}"
 							onclick="$.sorting(this, 'customer')"
 							noscroll
-							><strong class="fz10px lh90 d-block text-center">Заказчик</strong>
+							><strong class="fz10px lh90 d-block text-center wodrbreak">Заказчик</strong>
 						</x-table.td>
 					@endif
 					
@@ -87,7 +87,7 @@
 							class="sort{{$sortField == 'locality' ? ' sort-'.$sortOrder : ''}}"
 							onclick="$.sorting(this, 'locality')"
 							noscroll
-							><strong class="fz10px lh90 d-block text-center">Населенный пункт</strong>
+							><strong class="fz10px lh90 d-block text-center wodrbreak">Населенный пункт</strong>
 						</x-table.td>
 					@endif
 					
@@ -97,7 +97,7 @@
 							class="sort{{$sortField == 'price' ? ' sort-'.$sortOrder : ''}}"
 							onclick="$.sorting(this, 'price')"
 							noscroll
-							><strong class="fz10px lh90 d-block text-center">Стоимость договора</strong>
+							><strong class="fz10px lh90 d-block text-center wodrbreak">Стоимость договора</strong>
 						</x-table.td>
 					@endif
 					
@@ -106,7 +106,7 @@
 							class="w6rem sort{{$sortField == 'date_start' ? ' sort-'.$sortOrder : ''}}"
 							onclick="$.sorting(this, 'date_start')"
 							noscroll
-							><strong class="fz10px lh90 d-block text-center">Дата начала договора</strong>
+							><strong class="fz10px lh90 d-block text-center wodrbreak">Дата начала договора</strong>
 						</x-table.td>
 					@endif
 					
@@ -115,7 +115,7 @@
 							class="w6rem sort{{$sortField == 'date_end' ? ' sort-'.$sortOrder : ''}}"
 							onclick="$.sorting(this, 'date_end')"
 							noscroll
-							>< class="fz10px lh90 d-block text-center">Дата окончания договора</strong>
+							><strong class="fz10px lh90 d-block text-center wodrbreak">Дата окончания договора</strong>
 						</x-table.td>
 					@endif
 					
@@ -143,7 +143,7 @@
 							class="sort{{$sortField == 'type' ? ' sort-'.$sortOrder : ''}}"
 							onclick="$.sorting(this, 'type')"
 							noscroll
-							><strong class="fz10px lh90 d-block text-center">Тип договора</strong>
+							><strong class="fz10px lh90 d-block text-center wodrbreak">Тип договора</strong>
 						</x-table.td>
 					@endif
 					
@@ -153,35 +153,35 @@
 							class="sort{{$sortField == 'contractor' ? ' sort-'.$sortOrder : ''}}"
 							onclick="$.sorting(this, 'contractor')"
 							noscroll
-							><strong class="fz10px lh90 d-block text-center">Исполнитель</strong>
+							><strong class="fz10px lh90 d-block text-center wodrbreak">Исполнитель</strong>
 						</x-table.td>
 					@endif
 					
 					@if($selectionEdited || ($selectionEdited && $searched))
 						<x-table.td class="w7rem h-center">
-							<strong class="fz10px lh90 d-block text-center">Удалить из подборки</strong>
+							<strong class="fz10px lh90 d-block text-center wodrbreak">Удалить из подборки</strong>
 						</x-table.td>
 					@elseif($searched)
 						<x-table.td class="w15rem h-center">
-							<strong class="fz10px lh90 d-block text-center">Добавить в подборку</strong>
+							<strong class="fz10px lh90 d-block text-center wodrbreak">Добавить в подборку</strong>
 						</x-table.td>
 					@else
 						@isset($departmentId)
 							@cananydo('contract-col-hiding:site, contract-col-sending:site')
 								<x-table.td class="w11rem h-center">
-									<strong class="fz10px lh90 d-block text-center">Действия</strong>
+									<strong class="fz10px lh90 d-block text-center wodrbreak">Действия</strong>
 								</x-table.td>
 							@endcananydo
 						@elseif(!$isArchive)
 							@cananydo('contract-col-sending-all:site, contract-col-to-archive:site')
 								<x-table.td class="w11rem h-center">
-									<strong class="fz10px lh90 d-block text-center">Действия</strong>
+									<strong class="fz10px lh90 d-block text-center wodrbreak">Действия</strong>
 								</x-table.td>
 							@endcananydo
 						@elseif($isArchive)
 							@cando('contract-col-return-to-work:site')
 								<x-table.td class="w7rem h-center">
-									<strong class="fz10px lh90 d-block text-center">Действия</strong>
+									<strong class="fz10px lh90 d-block text-center wodrbreak">Действия</strong>
 								</x-table.td>
 							@endcando
 						@endif
