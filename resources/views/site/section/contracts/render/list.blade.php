@@ -187,9 +187,9 @@
 				</x-table.tr>
 			</x-table.head>
 			<x-table.body style="height: calc(100vh - 364px);" id="contractsListAppend">
-				@foreach ($list as $item)
+				{{-- @foreach ($list as $item)
 					@include('site.section/contracts.render.item', $item)
-				@endforeach
+				@endforeach --}}
 			</x-table.body>
 		</x-table>
 
