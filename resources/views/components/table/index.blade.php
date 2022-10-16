@@ -17,8 +17,12 @@
 		bodyCells = $(selector).find('[ddrtablebody] [ddrtabletr]');
 	
 	$(headCells).each(function(index, cell) {
-		let width = $(cell).outerWidth();
-		if (width) $(bodyCells).find('[ddrtabletd]:eq('+index+')').css('width', width+'px');
+		let width = $(cell).width(),
+			offsetWidth = $(cell)[0].offsetWidth,
+			clientWidth = $(cell)[0].clientWidth,
+			outerWidth = $(cell).outerWidth();
+		console.log(width, outerWidth, offsetWidth, clientWidth);
+		if (clientWidth) $(bodyCells).find('[ddrtabletd]:eq('+index+')').css('width', offsetWidth+'px');
 	});
 	
 	
