@@ -1,4 +1,202 @@
 @isset($list)
+
+
+<x-table
+			scrollsync="contractslistscroll"
+			>
+			<x-table.head scrollfix>
+				<x-table.tr
+					class="h{{$rowHeight ?? '7'}}rem"
+					sorts
+					>
+					@if(!$isArchive)
+						@if(auth('site')->user()->can('contract-col-period:site') && (empty($userColums) || in_array('period', $userColums)))
+							<x-table.td
+								class="w6rem sort{{$sortField == 'deadline_color_key' ? ' sort-'.$sortOrder : ''}}"
+								onclick="$.sorting(this, 'deadline_color_key')"
+								noscroll
+								><strong class="fz10px lh90 d-block text-center" title="Срок исполнения договора">Срок исполн. договора</strong>
+							</x-table.td>
+						@endif
+					@endif
+					
+					@if(auth('site')->user()->can('contract-col-object_number:site') && (empty($userColums) || in_array('object_number', $userColums)))
+						<x-table.td
+							class="w7rem sort{{$sortField == 'object_number' ? ' sort-'.$sortOrder : ''}}"
+							onclick="$.sorting(this, 'object_number')"
+							noscroll
+							><strong class="fz10px lh90 d-block text-center">Номер объекта</strong>
+						</x-table.td>
+					@endif
+					
+					@if(auth('site')->user()->can('contract-col-title:site') && (empty($userColums) || in_array('title', $userColums)))
+						<x-table.td
+							style="width:{{isset($listWidth['title']) ? $listWidth['title'] : '300'}}px;"
+							class="sort{{$sortField == 'title' ? ' sort-'.$sortOrder : ''}}"
+							onclick="$.sorting(this, 'title')"
+							noscroll
+							><strong class="fz10px lh90 d-block text-center">Название</strong>
+						</x-table.td>
+					@endif
+					
+					@if(auth('site')->user()->can('contract-col-applicant:site') && (empty($userColums) || in_array('applicant', $userColums)))
+						<x-table.td
+							style="width:{{isset($listWidth['applicant']) ? $listWidth['applicant'] : '100'}}px;"
+							class="sort{{$sortField == 'applicant' ? ' sort-'.$sortOrder : ''}}"
+							onclick="$.sorting(this, 'applicant')"
+							noscroll
+							><strong class="fz10px lh90 d-block text-center">Заявитель</strong>
+						</x-table.td>
+					@endif
+					
+					@if(auth('site')->user()->can('contract-col-titul:site') && (empty($userColums) || in_array('titul', $userColums)))
+						<x-table.td
+							style="width:{{isset($listWidth['titul']) ? $listWidth['titul'] : '200'}}px;"
+							class="sort{{$sortField == 'titul' ? ' sort-'.$sortOrder : ''}}"
+							onclick="$.sorting(this, 'titul')"
+							noscroll
+							><strong class="fz10px lh90 d-block text-center">Титул</strong>
+						</x-table.td>
+					@endif
+					
+					@if(auth('site')->user()->can('contract-col-contract:site') && (empty($userColums) || in_array('contract', $userColums)))
+						<x-table.td
+							style="width:{{isset($listWidth['contract']) ? $listWidth['contract'] : '100'}}px;"
+							class="sort{{$sortField == 'contract' ? ' sort-'.$sortOrder : ''}}"
+							onclick="$.sorting(this, 'contract')"
+							noscroll
+							><strong class="fz10px lh90 d-block text-center">Номер договора</strong>
+						</x-table.td>
+					@endif
+					
+					@if(auth('site')->user()->can('contract-col-customer:site') && (empty($userColums) || in_array('customer', $userColums)))
+						<x-table.td
+							style="width:{{isset($listWidth['customer']) ? $listWidth['customer'] : '150'}}px;"
+							class="sort{{$sortField == 'customer' ? ' sort-'.$sortOrder : ''}}"
+							onclick="$.sorting(this, 'customer')"
+							noscroll
+							><strong class="fz10px lh90 d-block text-center">Заказчик</strong>
+						</x-table.td>
+					@endif
+					
+					@if(auth('site')->user()->can('contract-col-locality:site') && (empty($userColums) || in_array('locality', $userColums)))
+						<x-table.td
+							style="width:{{isset($listWidth['locality']) ? $listWidth['locality'] : '150'}}px;"
+							class="sort{{$sortField == 'locality' ? ' sort-'.$sortOrder : ''}}"
+							onclick="$.sorting(this, 'locality')"
+							noscroll
+							><strong class="fz10px lh90 d-block text-center">Населенный пункт</strong>
+						</x-table.td>
+					@endif
+					
+					@if(auth('site')->user()->can('contract-col-price:site') && (empty($userColums) || in_array('price', $userColums)))
+						<x-table.td
+							style="width:{{isset($listWidth['price']) ? $listWidth['price'] : '110'}}px;"
+							class="sort{{$sortField == 'price' ? ' sort-'.$sortOrder : ''}}"
+							onclick="$.sorting(this, 'price')"
+							noscroll
+							><strong class="fz10px lh90 d-block text-center">Стоимость договора</strong>
+						</x-table.td>
+					@endif
+					
+					@if(auth('site')->user()->can('contract-col-date_start:site') && (empty($userColums) || in_array('date_start', $userColums)))
+						<x-table.td
+							class="w6rem sort{{$sortField == 'date_start' ? ' sort-'.$sortOrder : ''}}"
+							onclick="$.sorting(this, 'date_start')"
+							noscroll
+							><strong class="fz10px lh90 d-block text-center">Дата начала договора</strong>
+						</x-table.td>
+					@endif
+					
+					@if(auth('site')->user()->can('contract-col-date_end:site') && (empty($userColums) || in_array('date_end', $userColums)))
+						<x-table.td
+							class="w6rem sort{{$sortField == 'date_end' ? ' sort-'.$sortOrder : ''}}"
+							onclick="$.sorting(this, 'date_end')"
+							noscroll
+							>< class="fz10px lh90 d-block text-center">Дата окончания договора</strong>
+						</x-table.td>
+					@endif
+					
+					@if(auth('site')->user()->can('contract-col-hoz_method:site') && (empty($userColums) || in_array('hoz_method', $userColums)))
+						<x-table.td
+							class="w3rem sort{{$sortField == 'hoz_method' ? ' sort-'.$sortOrder : ''}}"
+							onclick="$.sorting(this, 'hoz_method')"
+							noscroll
+							><strong class="fz10px lh90 d-block text-center wodrbreak">Хоз способ</strong>
+						</x-table.td>
+					@endif
+					
+					@if(auth('site')->user()->can('contract-col-subcontracting:site') && (empty($userColums) || in_array('subcontracting', $userColums)))
+						<x-table.td
+							class="w3rem sort{{$sortField == 'subcontracting' ? ' sort-'.$sortOrder : ''}}"
+							onclick="$.sorting(this, 'subcontracting')"
+							noscroll
+							><strong class="fz10px lh90 d-block text-center wodrbreak">Субподряд</strong>
+						</x-table.td>
+					@endif
+					
+					@if(auth('site')->user()->can('contract-col-type:site') && (empty($userColums) || in_array('type', $userColums)))
+						<x-table.td
+							style="width:{{isset($listWidth['type']) ? $listWidth['type'] : '80'}}px;"
+							class="sort{{$sortField == 'type' ? ' sort-'.$sortOrder : ''}}"
+							onclick="$.sorting(this, 'type')"
+							noscroll
+							><strong class="fz10px lh90 d-block text-center">Тип договора</strong>
+						</x-table.td>
+					@endif
+					
+					@if(auth('site')->user()->can('contract-col-contractor:site') && (empty($userColums) || in_array('contractor', $userColums)))
+						<x-table.td
+							style="width:{{isset($listWidth['contractor']) ? $listWidth['contractor'] : '100'}}px;"
+							class="sort{{$sortField == 'contractor' ? ' sort-'.$sortOrder : ''}}"
+							onclick="$.sorting(this, 'contractor')"
+							noscroll
+							><strong class="fz10px lh90 d-block text-center">Исполнитель</strong>
+						</x-table.td>
+					@endif
+					
+					@if($selectionEdited || ($selectionEdited && $searched))
+						<x-table.td class="w7rem h-center">
+							<strong class="fz10px lh90 d-block text-center">Удалить из подборки</strong>
+						</x-table.td>
+					@elseif($searched)
+						<x-table.td class="w15rem h-center">
+							<strong class="fz10px lh90 d-block text-center">Добавить в подборку</strong>
+						</x-table.td>
+					@else
+						@isset($departmentId)
+							@cananydo('contract-col-hiding:site, contract-col-sending:site')
+								<x-table.td class="w11rem h-center">
+									<strong class="fz10px lh90 d-block text-center">Действия</strong>
+								</x-table.td>
+							@endcananydo
+						@elseif(!$isArchive)
+							@cananydo('contract-col-sending-all:site, contract-col-to-archive:site')
+								<x-table.td class="w11rem h-center">
+									<strong class="fz10px lh90 d-block text-center">Действия</strong>
+								</x-table.td>
+							@endcananydo
+						@elseif($isArchive)
+							@cando('contract-col-return-to-work:site')
+								<x-table.td class="w7rem h-center">
+									<strong class="fz10px lh90 d-block text-center">Действия</strong>
+								</x-table.td>
+							@endcando
+						@endif
+					@endif
+				</x-table.tr>
+			</x-table.head>
+			<x-table.body style="height: calc(100vh - 364px);" id="contractsListAppend">
+				@foreach ($list as $item)
+					@include('site.section/contracts.render.item', $item)
+				@endforeach
+			</x-table.body>
+		</x-table>
+
+
+
+
+
 <x-horisontal space="2rem" scroll="false" ignore="[noscroll], select, input, textarea">
 	<x-horisontal.item class="h100">
 		
@@ -121,10 +319,10 @@
 					
 					@if(auth('site')->user()->can('contract-col-hoz_method:site') && (empty($userColums) || in_array('hoz_method', $userColums)))
 						<x-table.td
-							class="w4rem sort{{$sortField == 'hoz_method' ? ' sort-'.$sortOrder : ''}}"
+							class="w3rem sort{{$sortField == 'hoz_method' ? ' sort-'.$sortOrder : ''}}"
 							onclick="$.sorting(this, 'hoz_method')"
 							noscroll
-							><p>Хоз способ</p>
+							><strong class="fz10px lh90 d-block text-center wodrbreak">Хоз способ</strong>
 						</x-table.td>
 					@endif
 					
