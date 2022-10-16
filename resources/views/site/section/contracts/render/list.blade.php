@@ -115,16 +115,16 @@
 							class="w6rem sort{{$sortField == 'date_end' ? ' sort-'.$sortOrder : ''}}"
 							onclick="$.sorting(this, 'date_end')"
 							noscroll
-							><strong class="fz10px lh90 d-block text-center">Дата окончания договора</strong>
+							>< class="fz10px lh90 d-block text-center">Дата окончания договора</strong>
 						</x-table.td>
 					@endif
 					
 					@if(auth('site')->user()->can('contract-col-hoz_method:site') && (empty($userColums) || in_array('hoz_method', $userColums)))
 						<x-table.td
-							class="w3rem sort{{$sortField == 'hoz_method' ? ' sort-'.$sortOrder : ''}}"
+							class="w4rem sort{{$sortField == 'hoz_method' ? ' sort-'.$sortOrder : ''}}"
 							onclick="$.sorting(this, 'hoz_method')"
 							noscroll
-							><strong class="fz10px lh90 d-block text-center wodrbreak">Хоз способ</strong>
+							><p>Хоз способ</p>
 						</x-table.td>
 					@endif
 					

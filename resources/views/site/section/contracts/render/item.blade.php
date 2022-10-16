@@ -134,9 +134,9 @@
 	
 	@if(auth('site')->user()->can('contract-col-hoz_method:site') && (empty($userColums) || in_array('hoz_method', $userColums)))
 		<x-table.td class="h-center">
-			{{-- @if($hoz_method)
+			@if($hoz_method)
 				<i class="fa-solid fa-circle-check color-green fz16px"></i>
-			@endif --}}
+			@endif
 		</x-table.td>
 	@endif
 	
