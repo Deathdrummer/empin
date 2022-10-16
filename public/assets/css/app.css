@@ -143283,7 +143283,7 @@ template {
 .ddrtable__td {
   height: 100%;
   position: relative;
-  display: flex;
+  display: grid;
   align-items: center;
   padding-left: 5px;
   padding-right: 5px;
