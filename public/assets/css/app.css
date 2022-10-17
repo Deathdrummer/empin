@@ -45681,6 +45681,9 @@ template {
   visibility: hidden;
 }
 
+.bg-white {
+  background-color: #fff;
+}
 .bg-blue {
   background-color: #1bdbe0;
 }
@@ -143285,14 +143288,16 @@ template {
   position: relative;
   display: grid;
   align-items: center;
-  padding-left: 5px;
-  padding-right: 5px;
-  padding-top: 4px;
-  padding-bottom: 4px;
   min-height: 20px;
   font-size: 14px;
   font-family: Fira Sans, sans-serif;
   font-weight: 400;
+}
+.ddrtable__td:not(.nopadding) {
+  padding-left: 5px;
+  padding-right: 5px;
+  padding-top: 4px;
+  padding-bottom: 4px;
 }
 .ddrtable__td + .ddrtable__td {
   border-left: 1px solid #efefef;

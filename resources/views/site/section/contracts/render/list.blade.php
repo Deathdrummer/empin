@@ -212,29 +212,34 @@
 								@continue
 							@endif
 							
-							<x-table.td class="w2rem" ddrtabletdmain></x-table.td>
+							<x-table.td class="w2rem nopadding bg-white" ddrtabletdmain></x-table.td>
 							
 							<x-table.td
 								style="width: {{array_sum(array_column($dept['steps']->toArray() ?? [], 'width'))}}px;"
-								class="h-center v-center"
+								class="v-end nopadding"
 								>
 								
-								<strong
-									class="h2rem-8px fz13px lh100 d-block text-center uppercase border-bottom border-gray-200"
-									>{{$dept['name']}}
-								</strong>
+								<div
+									class="d-flex align-items-end justify-content-center h3rem text-center border-bottom border-gray-200"
+									>
+									<strong
+										class="fz13px lh100 uppercase mb6px"
+										>{{$dept['name']}}
+									</strong>
+								</div>
+									
 								
 								
 								<div
 									@class([
 										'd-flex',
-										'h'.($rowHeight - 3).'rem'
+										'h'.($rowHeight - 3).'rem',
 									])
 									>
 									@forelse($dept['steps'] as $step)
 										<div
 											@class([
-												'h'.($rowHeight - 3).'rem',
+												
 												'border-left' => !$loop->first,
 												'border-gray-200' => !$loop->first,
 												'd-flex align-items-center',
@@ -361,7 +366,7 @@
 									@continue
 								@endif
 								
-								<x-table.td class="w2rem"></x-table.td>
+								<x-table.td class="w2rem bg-white"></x-table.td>
 								
 								@foreach($dept['steps'] as $step)
 									@isset($contract['departments'][$dept['id']]['steps'][$step['id']])
