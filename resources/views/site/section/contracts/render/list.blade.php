@@ -235,14 +235,14 @@
 										'd-flex',
 										'h'.($rowHeight - 3).'rem',
 									])
+									style="margin-left: -1px;"
 									>
 									@forelse($dept['steps'] as $step)
 										<div
 											@class([
-												
 												'border-left' => !$loop->first,
 												'border-gray-200' => !$loop->first,
-												'd-flex align-items-center',
+												'd-flex align-items-center justify-content-center',
 												'w8rem' => ($step['type'] == 1 && !$step['width']),
 												'w16rem' => (in_array($step['type'], [2,3]) && !$step['width']),
 												'w15rem' => (in_array($step['type'], [4]) && !$step['width']),
