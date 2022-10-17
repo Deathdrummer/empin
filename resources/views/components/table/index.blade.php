@@ -11,8 +11,8 @@
 
 <script type="module">
 	const selector = $('#{{$id}}'),
-		headCells = $(selector).find('[ddrtablehead]').find('[ddrtabletr][main]').find('[ddrtabletd]').length
-			? $(selector).find('[ddrtablehead]').find('[ddrtabletr][main]').find('[ddrtabletd]')
+		headCells = $(selector).find('[ddrtablehead]').find('[ddrtabletr]').find('[ddrtabletdmain]').length
+			? $(selector).find('[ddrtablehead]').find('[ddrtabletr]').find('[ddrtabletdmain]')
 			: $(selector).find('[ddrtablehead]').find('[ddrtabletr]').find('[ddrtabletd]'),
 		bodyCells = $(selector).find('[ddrtablebody] [ddrtabletr]');
 	

@@ -1,9 +1,4 @@
-<x-table.tr
-	class="h5rem-4px"
-	ondblclick="$.openContractInfo(this, '{{$id}}');"
-	isnew="{{$is_new ? 1 : 0}}"
-	contractid="{{$id}}"
-	>
+
 	@if(!$isArchive)
 		@if(auth('site')->user()->can('contract-col-period:site') && (empty($userColums) || in_array('period', $userColums)))
 			<x-table.td class="h-center">
@@ -276,4 +271,3 @@
 			@endcando
 		@endif
 	@endif
-</x-table.tr>
