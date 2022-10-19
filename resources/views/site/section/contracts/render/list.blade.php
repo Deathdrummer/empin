@@ -17,6 +17,7 @@
 				<x-table
 					scrollstart="doScrollStart"
 					scrollend="doScrollEnd"
+					scrollpart="doScrollPart"
 					>
 					<x-table.head scrollfix>
 						<x-table.tr

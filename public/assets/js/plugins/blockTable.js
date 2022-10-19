@@ -17,9 +17,10 @@ $.fn.blockTable = function(method = null, ...params) {
 
 class BlockTable {
 	
-	prependData(selector = false, data = false) {
+	prependData(selector = false, data = false, coutItems = 1) {
 		if (!selector || !data) return false;
 		$(selector).find('[ddrtabletr]:first').before(data);
+		$(selector).scrollTop($(selector).find('[ddrtabletr]:first').outerHeight() * coutItems);
 		this.buildTable(selector);
 	}
 	
@@ -31,8 +32,30 @@ class BlockTable {
 	
 	
 	
-	removeRowsBefore() {}
-	removeRowsAfter() {}
+	removeRows(selector = false, removeLimit = false, start = false, count = false) {
+		if (!selector || removeLimit === false || start === false || !count) return false;
+		
+		if ($(selector).find('[ddrtabletr]').length >= removeLimit) {
+			$(selector).find('[ddrtabletr]').slice(start, count).remove();
+		}
+	}
+	
+	
+	removeRowsBefore(selector = false, removeLimit = false, count = false) {
+		if (!selector || removeLimit === false || !count) return false;
+		
+		if ($(selector).find('[ddrtabletr]').length >= removeLimit) {
+			$(selector).find('[ddrtabletr]').slice(0, count).remove();
+		}
+	}
+	
+	removeRowsAfter(selector = false, removeLimit = false, count = false) {
+		if (!selector || removeLimit === false || !count) return false;
+		
+		if ($(selector).find('[ddrtabletr]').length >= removeLimit) {
+			$(selector).find('[ddrtabletr]').slice(-count, $(selector).find('[ddrtabletr]').length).remove();
+		}
+	}
 	
 	
 	/*
@@ -96,21 +119,20 @@ class BlockTable {
 				? $(selector).find('[ddrtablehead]').find('[ddrtabletr]').find('[ddrtabletdmain]')
 				: $(selector).find('[ddrtablehead]').find('[ddrtabletr]').find('[ddrtabletd]'),
 			bodyRows = $(selector).find('[ddrtablebody] [ddrtabletr]'),
-			scrollstartObserver = '{{$scrollstart}}',
-			scrollendObserver = '{{$scrollend}}';
-		
-		const cellsWidths = [];
+			cellsWidths = [];
+			
 		$(headCells).each(function(index, cell) {
 			let width = Math.max($(cell).width(), $(cell)[0].offsetWidth, $(cell)[0].clientWidth, $(cell).outerWidth());
 			cellsWidths.push(width);
 		});
 		
 		if (cellsWidths) {
-			$(bodyRows).each(function(_, row) {
-				$.each(cellsWidths, function(index, width) {
-					$(row).find('[ddrtabletd]:eq('+index+')').css('width', width+'px');
+			$(bodyRows).each(function(rIndex, row) {
+				$.each(cellsWidths, function(cIndex, width) {
+					$(row).find('[ddrtabletd]:eq('+cIndex+')').css('width', width+'px');
 				});
 				$(row).addClass('ddrtable__tr_visible');
+				if (bodyRows.length == rIndex + 1) $(row).setAttrib('ddrtablepartend');
 			});
 		} else {
 			$(bodyRows).find('[ddrtabletd]').css('width', (100 / headCells.length)+'%');

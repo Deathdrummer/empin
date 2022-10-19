@@ -204,6 +204,7 @@
 		sortField = ddrStore('site-contracts-sortfield') || 'id',
 		sortOrder = ddrStore('site-contracts-sortorder') || 'desc',
 		limit = {{$setting['contracts-per-page'] ?? 10}},
+		countShwnLoadings = {{$setting['count-shwn-loadings'] ?? 2}},
 		offset = 0,
 		search = null,
 		selection = null,
@@ -1620,11 +1621,13 @@
 			init,
 			withCounts,
 			append,
+			offset: localOffset,
 			callback
 		} = _.assign({
 			init: false,
 			withCounts: false,
 			append: false,
+			offset: null,
 			callback: false
 		}, settings),
 			params = {},
@@ -1665,12 +1668,14 @@
 		params['sort_field'] = sortField;
 		params['sort_order'] = sortOrder;
 		params['limit'] = limit;
-		params['offset'] = offset;
+		params['offset'] = localOffset != null ? localOffset : offset;
 		params['append'] = append ? 1 : 0;
 		params['search'] = search;
 		params['selection'] = selection;
 		params['edit_selection'] = editSelection;
 		
+		
+		console.log(localOffset, offset);
 		
 		//-----------------------------------
 		
@@ -1695,7 +1700,11 @@
 			}
 			
 			if (append) {
-				$('#contractsList').blockTable('appendData', data);
+				if (append == 'prepend') {
+					$('#contractsList').blockTable('prependData', data, limit);
+				} else if (append == 'append') {
+					$('#contractsList').blockTable('appendData', data);
+				}
 				
 			} else {
 				$('#contractsTable').html(data);
@@ -1836,15 +1845,37 @@
 	
 	
 	$.doScrollStart = (target) => {
-		console.log('doScrollStart');
+		let localOffset = offset - limit * countShwnLoadings;
+		if (localOffset < 0) return;
+		getList({
+			append: 'prepend',
+			offset: (localOffset < 0 ? 0 : localOffset),
+			callback: function() {
+				$('#contractsList').blockTable('removeRowsAfter', ((countShwnLoadings + 1) * limit), limit);
+				offset -= limit;
+			}
+		});
 	}
 	
 	$.doScrollEnd = (target) => {
-		console.log('doScrollEnd');
 		offset += limit;
-		console.log(offset);
-		getList({append: true});
+		getList({
+			append: 'append',
+			callback: function() {
+				$('#contractsList').blockTable('removeRowsBefore', ((countShwnLoadings + 1) * limit), limit);
+			}
+		});
 	}
+	
+	// $.doScrollPart = (target) => {
+	// 	
+	// 	
+	// 	
+	// 	//console.log(target);
+	// 	//offset += limit;
+	// 	//console.log(offset);
+	// 	//getList({append: true});
+	// }
 	
 	
 	
