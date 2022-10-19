@@ -1,5 +1,7 @@
 @aware([
-	'scrollsync' =>  null
+	'scrollsync' =>  null,
+	'scrollstart' =>  null,
+	'scrollend' =>  null,
 ])
 
 
@@ -10,5 +12,11 @@
 	ddrtablebody
 	{{$scrollsync}}
 	>
+	@if($scrollstart)
+		<div id="intersectionTop" class="w100"></div>
+	@endif
 	{{$slot}}
+	@if($scrollend)
+		<div id="intersectionBottom" class="w100"></div>
+	@endif
 </div>

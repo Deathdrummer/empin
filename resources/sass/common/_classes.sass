@@ -895,7 +895,12 @@ $tableColor: #efefef
 		
 	
 	&__body
-		visibility: hidden
+		//visibility: hidden
+		.ddrtable__tr
+			visibility: hidden
+			
+			&_visible
+				visibility: visible
 		
 		&:empty
 			height: 60px
@@ -914,8 +919,8 @@ $tableColor: #efefef
 				border-bottom: 1px solid $tableColor
 			
 		
-		&_visible
-			visibility: visible
+		//&_visible
+			//visibility: visible
 		
 		&_scrolled
 			+scrollbar(#f9fbfd, #d6dbe0, 6px)

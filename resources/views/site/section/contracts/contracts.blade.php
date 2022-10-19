@@ -188,12 +188,7 @@
 			</div>
 		</div>
 			
-				
-		<div id="contractsStickyTitles"></div>	
-		
-		<div id="contractsList"></div>
-		
-		<div id="contractsListBottom"></div>
+		<div id="contractsTable"></div>
 		
 	</x-card>
 </section>
@@ -808,7 +803,7 @@
 	//-------------------------------------------------  сортировка
 	
 	$.sorting = (cell, sfield) => {
-		$('#contractsList').find('.sort-asc, .sort-desc').removeClass('sort-asc sort-desc');
+		$('#contractsTable').find('.sort-asc, .sort-desc').removeClass('sort-asc sort-desc');
 		
 		if (sortField == sfield) {
 			sortOrder = sortOrder == 'asc' ? 'desc' : 'asc';
@@ -1594,15 +1589,16 @@
 	
 	
 	
-	let observer = new IntersectionObserver(function(entries, observer) {
+	/*let observer = new IntersectionObserver(function(entries, observer) {
 		if (entries[0].isIntersecting) {
 			offset += limit;
-			getList({append: true});
+			console.log(offset);
+			//getList({append: true});
 		}
 	}, {
 		rootMargin: '0px',
 		threshold: 0.1
-	});
+	});*/
 	
 	
 	
@@ -1670,7 +1666,7 @@
 		params['sort_order'] = sortOrder;
 		params['limit'] = limit;
 		params['offset'] = offset;
-		//params['append'] = append ? 1 : 0;
+		params['append'] = append ? 1 : 0;
 		params['search'] = search;
 		params['selection'] = selection;
 		params['edit_selection'] = editSelection;
@@ -1679,7 +1675,7 @@
 		//-----------------------------------
 		
 		if (!init) {
-			listWait = $('#contractsList').ddrWait({
+			listWait = $('#contractsTable').ddrWait({
 				iconHeight: '40px',
 				text: 'Загрузка',
 				fontSize: '14px',
@@ -1698,21 +1694,11 @@
 				return;
 			}
 			
-			if (append && observer instanceof IntersectionObserver) {
-				let listData = $(data).find('#contractsListAppend').html() || false;
-				
-				if (!listData && observer instanceof IntersectionObserver) observer.unobserve(document.querySelector('#contractsListBottom'));
-				
-				$('#contractsListAppend').append(listData);
-				
-				
-				$('#contractsList').find('[departmentappend]').each(function() {
-					let deptId = $(this).attr('departmentappend');
-					$(this).append($(data).find('[departmentappend="'+deptId+'"]').html());
-				});
+			if (append) {
+				$('#contractsList').blockTable('appendData', data);
 				
 			} else {
-				$('#contractsList').html(data);
+				$('#contractsTable').html(data);
 			}
 			
 			
@@ -1722,7 +1708,7 @@
 			if (abort) listWait.destroy();
 			
 			if (search) {
-				let findSubStr = $('#contractsList').find('p:icontains("'+search+'")');
+				let findSubStr = $('#contractsTable').find('p:icontains("'+search+'")');
 				if (findSubStr) {
 					$.each(findSubStr, function(k, item) {
 						$(item).html($(item).text().replace(new RegExp("(" + preg_quote(search) + ")", 'gi'), '<span class="highlight">$1</span>'));
@@ -1758,10 +1744,9 @@
 			}
 			
 			
-			
 			if (init || !append) {
-				if ($(data).find('#contractsListAppend').children('tr').length == limit) {
-					observer.observe(document.querySelector('#contractsListBottom'));
+				if ($(data).find('#contractsList').children('[ddrtabletr]').length == limit) {
+					//observer.observe(document.querySelector('#intersectionTop'));
 				}
 				
 				/*let elem = $('[scrollfix]'),
@@ -1771,14 +1756,14 @@
 					isHideTitles = true;
 					
 					
-				let htmlDom = $('#contractsList').find('.horisontal')[0].outerHTML;
+				let htmlDom = $('#contractsTable').find('.horisontal')[0].outerHTML;
 				htmlDom = $(htmlDom).find('tbody').remove().end();
 				htmlDom = $(htmlDom).find('script').remove().end();
 				
 				$('#contractsStickyTitles').html(htmlDom);
 				
 				
-				let rool = $('#contractsListAppend').children('tr:first').children('td');
+				let rool = $('#contractsList').children('tr:first').children('td');
 				
 				$.each(rool, function(k, item) {
 					
@@ -1826,7 +1811,7 @@
 				
 				
 				let scrollTitles = $('#contractsStickyTitles .horisontal'),
-					scrollList = $('#contractsList .horisontal');
+					scrollList = $('#contractsTable .horisontal');
 				
 				$(scrollList).scroll(function() {
 					$(scrollTitles).scrollLeft(this.scrollLeft);
@@ -1845,6 +1830,22 @@
 	function preg_quote (str, delimiter) {
 		return (str + '').replace(new RegExp('[.\\\\+*?\\[\\^\\]$(){}=!<>|:\\' + (delimiter || '') + '-]', 'g'), '\\$&')
 	}
+	
+	
+	
+	
+	
+	$.doScrollStart = (target) => {
+		console.log('doScrollStart');
+	}
+	
+	$.doScrollEnd = (target) => {
+		console.log('doScrollEnd');
+		offset += limit;
+		console.log(offset);
+		getList({append: true});
+	}
+	
 	
 	
 </script>

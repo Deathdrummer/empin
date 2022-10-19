@@ -143208,8 +143208,11 @@ template {
 .ddrtable .ddrtable__head ~ .ddrtable__body, .ddrtable .ddrtable__body ~ .ddrtable__foot {
   border-top: 1px solid #efefef;
 }
-.ddrtable__body {
+.ddrtable__body .ddrtable__tr {
   visibility: hidden;
+}
+.ddrtable__body .ddrtable__tr_visible {
+  visibility: visible;
 }
 .ddrtable__body:empty {
   height: 60px;
@@ -143226,9 +143229,6 @@ template {
   color: #eee;
   text-align: center;
   border-bottom: 1px solid #efefef;
-}
-.ddrtable__body_visible {
-  visibility: visible;
 }
 .ddrtable__body_scrolled {
   overflow-y: scroll;

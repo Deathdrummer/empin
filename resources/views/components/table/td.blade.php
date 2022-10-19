@@ -1,5 +1,5 @@
 <div
-	{{$attributes->whereDoesntStartWith('if')->class([
+	{{$attributes->class([
 		'ddrtable__td',
 	])}}
 	ddrtabletd

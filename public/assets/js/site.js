@@ -7202,41 +7202,130 @@ function axiosQuery() {
   \********************************************/
 /***/ (function() {
 
-/*
-	Синхронизация скролла нескольких таблиц
-		- селектор (должен быть только атрибут)
-*/
-window.scrollSync = function (syncSelector) {
-  var selector = $('[' + syncSelector + ']');
-  var hasScrollCls = false,
-      scrTop = 0;
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-  if ($(selector).length == 0) {
-    throw new Error('scrollSync нет селекторов!');
-    return;
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+
+window.blockTable = function () {
+  var method = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+  var blockTableCls = new BlockTable();
+
+  for (var _len = arguments.length, params = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+    params[_key - 1] = arguments[_key];
   }
 
-  $(selector).on('mouseover touchenter touchstart', function (e) {
-    hasScrollCls = true;
-    $(this).addClass('ddrtablebody-scrollsync');
-    $(selector).not(this).removeClass('ddrtablebody-scrollsync');
-  });
-  $(selector).scroll(function () {
-    if (!hasScrollCls && $(selector).filter('.ddrtablebody-scrollsync').length == 0) {
-      $(this).addClass('ddrtablebody-scrollsync');
-    }
-
-    if ($(this).hasClass('ddrtablebody-scrollsync') == false) return;
-    scrTop = $(this).scrollTop();
-    $(selector).not('.ddrtablebody-scrollsync').scrollTop(scrTop);
-  });
-  $(selector).on('scrollstop', {
-    latency: 30
-  }, function () {
-    scrTop = $(this).scrollTop();
-    $(selector).scrollTop(scrTop);
-  });
+  blockTableCls[method].apply(blockTableCls, params);
 };
+
+$.fn.blockTable = function () {
+  var method = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+  var blockTableCls = new BlockTable();
+
+  for (var _len2 = arguments.length, params = new Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+    params[_key2 - 1] = arguments[_key2];
+  }
+
+  blockTableCls[method].apply(blockTableCls, [this].concat(params));
+};
+
+var BlockTable = /*#__PURE__*/function () {
+  function BlockTable() {
+    _classCallCheck(this, BlockTable);
+  }
+
+  _createClass(BlockTable, [{
+    key: "prependData",
+    value: function prependData() {
+      var selector = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+      var data = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+      if (!selector || !data) return false;
+      $(selector).find('[ddrtabletr]:first').before(data);
+      this.buildTable(selector);
+    }
+  }, {
+    key: "appendData",
+    value: function appendData() {
+      var selector = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+      var data = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+      if (!selector || !data) return false;
+      $(selector).find('[ddrtabletr]:last').after(data);
+      this.buildTable(selector);
+    }
+  }, {
+    key: "removeRowsBefore",
+    value: function removeRowsBefore() {}
+  }, {
+    key: "removeRowsAfter",
+    value: function removeRowsAfter() {}
+    /*
+    	Синхронизация скролла нескольких таблиц
+    		- селектор (должен быть только атрибут)
+    */
+
+  }, {
+    key: "scrollSync",
+    value: function scrollSync(syncSelector) {
+      var selector = $('[' + syncSelector + ']');
+      var hasScrollCls = false,
+          scrTop = 0;
+
+      if ($(selector).length == 0) {
+        throw new Error('scrollSync нет селекторов!');
+        return;
+      }
+
+      $(selector).on('mouseover touchenter touchstart', function (e) {
+        hasScrollCls = true;
+        $(this).addClass('ddrtablebody-scrollsync');
+        $(selector).not(this).removeClass('ddrtablebody-scrollsync');
+      });
+      $(selector).scroll(function () {
+        if (!hasScrollCls && $(selector).filter('.ddrtablebody-scrollsync').length == 0) {
+          $(this).addClass('ddrtablebody-scrollsync');
+        }
+
+        if ($(this).hasClass('ddrtablebody-scrollsync') == false) return;
+        scrTop = $(this).scrollTop();
+        $(selector).not('.ddrtablebody-scrollsync').scrollTop(scrTop);
+      });
+      $(selector).on('scrollstop', {
+        latency: 30
+      }, function () {
+        scrTop = $(this).scrollTop();
+        $(selector).scrollTop(scrTop);
+      });
+    }
+  }, {
+    key: "buildTable",
+    value: function buildTable(listSelector) {
+      var selector = $(listSelector).closest('[ddrtable]'),
+          headCells = $(selector).find('[ddrtablehead]').find('[ddrtabletr]').find('[ddrtabletdmain]').length ? $(selector).find('[ddrtablehead]').find('[ddrtabletr]').find('[ddrtabletdmain]') : $(selector).find('[ddrtablehead]').find('[ddrtabletr]').find('[ddrtabletd]'),
+          bodyRows = $(selector).find('[ddrtablebody] [ddrtabletr]'),
+          scrollstartObserver = '{{$scrollstart}}',
+          scrollendObserver = '{{$scrollend}}';
+      var cellsWidths = [];
+      $(headCells).each(function (index, cell) {
+        var width = Math.max($(cell).width(), $(cell)[0].offsetWidth, $(cell)[0].clientWidth, $(cell).outerWidth());
+        cellsWidths.push(width);
+      });
+
+      if (cellsWidths) {
+        $(bodyRows).each(function (_, row) {
+          $.each(cellsWidths, function (index, width) {
+            $(row).find('[ddrtabletd]:eq(' + index + ')').css('width', width + 'px');
+          });
+          $(row).addClass('ddrtable__tr_visible');
+        });
+      } else {
+        $(bodyRows).find('[ddrtabletd]').css('width', 100 / headCells.length + '%');
+      }
+    }
+  }]);
+
+  return BlockTable;
+}();
 
 /***/ }),
 

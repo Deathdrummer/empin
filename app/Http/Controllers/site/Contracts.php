@@ -113,7 +113,7 @@ class Contracts extends Controller {
 		
 		$selectionEdited = $request->has('edit_selection') && $request->get('edit_selection');
 		
-		
+		$append = $request->has('append') && $request->get('append');
 		
 		
 		
@@ -137,7 +137,8 @@ class Contracts extends Controller {
 				'allSelections',
 				'selectionEdited',
 				'selection',
-				'userColums'
+				'userColums',
+				'append'
 			),
 			$headers
 		);
