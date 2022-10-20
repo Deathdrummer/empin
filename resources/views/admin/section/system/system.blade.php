@@ -182,16 +182,29 @@
 						
 						<div class="h3rem"></div>
 						
-						<p class="color-gray mb1rem">Количество договоров на одну подгрузку</p>
-						<x-input
-							class="w16rem"
-							type="number"
-							showrows
-							group="large"
-							setting="contracts-per-page"
-							/>
 						
-						
+						<div class="row">
+							<div class="col-auto w18rem">
+								<p class="color-gray mb1rem">Количество договоров на одну подгрузку</p>
+								<x-input
+									class="w16rem"
+									type="number"
+									showrows
+									group="large"
+									setting="contracts-per-page"
+									/>
+							</div>
+							<div class="col-auto w18rem">
+								<p class="color-gray mb1rem">Количество видимых подгрузок</p>
+								<x-input
+									class="w16rem"
+									type="number"
+									showrows
+									group="large"
+									setting="count-shown-loadings"
+									/>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>

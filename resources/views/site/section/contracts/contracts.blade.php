@@ -204,7 +204,7 @@
 		sortField = ddrStore('site-contracts-sortfield') || 'id',
 		sortOrder = ddrStore('site-contracts-sortorder') || 'desc',
 		limit = {{$setting['contracts-per-page'] ?? 10}},
-		countShwnLoadings = {{$setting['count-shwn-loadings'] ?? 2}},
+		countShwnLoadings = {{$setting['count-shown-loadings'] ?? 2}},
 		offset = 0,
 		search = null,
 		selection = null,

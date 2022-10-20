@@ -40,11 +40,16 @@ $.notify.defaults({
 
 // Configure time between final scroll event and
 // `scrollstop` event to 650ms (default is 250ms).
-$.event.special.scrollstop.latency = 650;
+$.event.special.scrollstop.latency = 20;
 
 
 $(function() {
 	
+	let scale = 'scale(1)';
+	document.body.style.webkitTransform = scale;    // Chrome, Opera, Safari
+	document.body.style.msTransform = scale;        // IE 9
+	document.body.style.transform = scale;          // General
+	document.body.style.zoom = 1.0;
 	
 	$('body').on('contextmenu', function(e) {
 		e.preventDefault();
