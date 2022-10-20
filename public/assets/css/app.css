@@ -33626,12 +33626,6 @@
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
  * Forked from Normalize.css, licensed MIT (https://github.com/necolas/normalize.css/blob/master/LICENSE.md)
  */
-@media (prefers-reduced-motion: no-preference) {
-  :root {
-    scroll-behavior: smooth;
-  }
-}
-
 :root {
   --ddr-bgColor: rgb(247, 184, 148);
   --ddr-fontColor: rgba(0, 0, 0, 0);
@@ -143258,10 +143252,10 @@ template {
   border-radius: 0;
 }
 .ddrtable__body .ddrtable__tr:nth-child(odd):not(.clear) {
-  background-color: #fdfdfd;
+  background-color: #fff;
 }
 .ddrtable__body .ddrtable__tr:nth-child(even):not(.clear) {
-  background-color: #f9fafb;
+  background-color: #fdfdfd;
 }
 .ddrtable__tr {
   display: flex;
@@ -143324,11 +143318,11 @@ template {
 .ddrtable__td.v-end {
   align-items: end;
 }
-.ddrtable__td.sort {
+.ddrtable__td.sort, .ddrtable__td [ddrtabletdmain].sort {
   position: relative;
   cursor: pointer;
 }
-.ddrtable__td.sort-asc > *, .ddrtable__td.sort-desc > * {
+.ddrtable__td.sort-asc > *, .ddrtable__td.sort-desc > *, .ddrtable__td [ddrtabletdmain].sort-asc > *, .ddrtable__td [ddrtabletdmain].sort-desc > * {
   color: #00c4ff;
 }
 .ddrtable__td:hover .icon-hidden {

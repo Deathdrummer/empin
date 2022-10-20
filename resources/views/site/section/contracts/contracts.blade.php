@@ -1644,7 +1644,6 @@
 		
 		if (!append) {
 			offset = 0;
-			//observer = false;
 			$(document).scrollTop(0);
 		} else {
 			
@@ -1674,8 +1673,6 @@
 		params['selection'] = selection;
 		params['edit_selection'] = editSelection;
 		
-		
-		console.log(localOffset, offset);
 		
 		//-----------------------------------
 		
@@ -1753,81 +1750,6 @@
 			}
 			
 			
-			if (init || !append) {
-				if ($(data).find('#contractsList').children('[ddrtabletr]').length == limit) {
-					//observer.observe(document.querySelector('#intersectionTop'));
-				}
-				
-				/*let elem = $('[scrollfix]'),
-					pos = $(elem).offset().top,
-					shift = 70,
-					scrTop = 0,
-					isHideTitles = true;
-					
-					
-				let htmlDom = $('#contractsTable').find('.horisontal')[0].outerHTML;
-				htmlDom = $(htmlDom).find('tbody').remove().end();
-				htmlDom = $(htmlDom).find('script').remove().end();
-				
-				$('#contractsStickyTitles').html(htmlDom);
-				
-				
-				let rool = $('#contractsList').children('tr:first').children('td');
-				
-				$.each(rool, function(k, item) {
-					
-					let i = $(item).css('width') || $(item).outerWidth();
-					console.log(i);
-					
-					$('#contractsStickyTitles').find('thead').children('tr').children('td').eq(k).width($(item).width());
-				});*/
-				
-				
-				//console.log(rool);
-				
-				
-				/*$('#contractsStickyTitles').css({
-					'position': 'sticky',
-					'top': '68px',
-					'height': '0px',
-					'opacity': 0,
-					'pointer-events': 'none',
-					'z-index': 11,
-				});
-				
-				$('#contractsStickyTitles').find('.horisontal').removeAttrib('id');
-				
-				$('#contractsStickyTitles').find('.horisontal').css({
-					'overflow-x': 'hidden'
-				});
-				
-				$('#contractsStickyTitles').find('table').css({
-					'background-color': '#fff',
-				});
-				
-				$(window).scroll(function() {
-					scrTop = $(window).scrollTop();
-				
-					if (scrTop > pos - shift && isHideTitles) {
-						$('#contractsStickyTitles').css({'opacity': 1, 'pointer-events': 'auto'});
-						isHideTitles = false;
-						
-					} else if (scrTop < pos - shift && !isHideTitles) {
-						$('#contractsStickyTitles').css({'opacity': 0, 'pointer-events': 'none'});
-						isHideTitles = true;
-					}
-				});
-				
-				
-				let scrollTitles = $('#contractsStickyTitles .horisontal'),
-					scrollList = $('#contractsTable .horisontal');
-				
-				$(scrollList).scroll(function() {
-					$(scrollTitles).scrollLeft(this.scrollLeft);
-				});*/
-			}
-			
-			
 			if (callback && typeof callback == 'function') callback();
 		});
 		
@@ -1858,6 +1780,7 @@
 	}
 	
 	$.doScrollEnd = (target) => {
+		if ($('#contractsList').children('[ddrtabletr]').length < limit) return;
 		offset += limit;
 		getList({
 			append: 'append',
