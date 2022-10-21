@@ -74,7 +74,7 @@
 	@if(auth('site')->user()->can('contract-col-titul:site') && (empty($userColums) || in_array('titul', $userColums)))
 		<x-table.td class="pr2px breakword">
 			<div class="scrollblock-hidden maxh4rem-6px pr3px">
-				<p class="format fz12px lh100 mt2px mb2px">{{$titul ?? '-'}}</p>
+				<p class="format fz12px lh100 mt2px mb2px text-justify">{{$titul ?? '-'}}</p>
 			</div>
 		</x-table.td>
 	@endif

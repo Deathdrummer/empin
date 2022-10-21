@@ -45573,6 +45573,10 @@ template {
   text-align: center;
 }
 
+.text-justify {
+  text-align: justify;
+}
+
 .text-end {
   text-align: end;
 }
