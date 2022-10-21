@@ -56,25 +56,25 @@
 	@endif
 	
 	@if(auth('site')->user()->can('contract-col-title:site') && (empty($userColums) || in_array('title', $userColums)))
-		<x-table.td class="breakword">
-			<div class="scrollblock-hidden h4rem-4px pr3px">
-				<p class="fz12px lh110">{{Str::of($title ?? '-')->limit(60, '...')}}</p>
+		<x-table.td class="breakword h-center">
+			<div class="scrollblock-hidden maxh4rem-6px pr3px">
+				<p class="fz12px lh90 mt2px mb2px">{{Str::of($title ?? '-')->limit(60, '...')}}</p>
 			</div>
 		</x-table.td>
 	@endif
 	
 	@if(auth('site')->user()->can('contract-col-applicant:site') && (empty($userColums) || in_array('applicant', $userColums)))
-		<x-table.td class="breakword">
-			<div class="scrollblock-hidden h4rem-4px pr3px">
-				<p class="fz12px lh110">{{$applicant ?? '-'}}</p>
+		<x-table.td class="breakword h-center">
+			<div class="scrollblock-hidden maxh4rem-6px pr3px">
+				<p class="fz12px lh90 mt2px mb2px">{{$applicant ?? '-'}}</p>
 			</div>
 		</x-table.td>
 	@endif
 	
 	@if(auth('site')->user()->can('contract-col-titul:site') && (empty($userColums) || in_array('titul', $userColums)))
 		<x-table.td class="pr2px breakword">
-			<div class="scrollblock-hidden h4rem-4px pr3px">
-				<p class="format fz12px">{{$titul ?? '-'}}</p>
+			<div class="scrollblock-hidden maxh4rem-6px pr3px">
+				<p class="format fz12px mt2px mb2px">{{$titul ?? '-'}}</p>
 			</div>
 		</x-table.td>
 	@endif
@@ -94,7 +94,11 @@
 	@endif
 	
 	@if(auth('site')->user()->can('contract-col-locality:site') && (empty($userColums) || in_array('locality', $userColums)))
-		<x-table.td class="breakword"><p class="fz12px lh90">{{$locality ?? '-'}}</p></x-table.td>
+		<x-table.td class="breakword h-center">
+			<div class="scrollblock-hidden maxh4rem-6px pr3px">
+				<p class="fz12px lh90 mt2px mb2px">{{$locality ?? '-'}}</p>
+			</div>
+		</x-table.td>
 	@endif
 	
 	@if(auth('site')->user()->can('contract-col-price:site') && (empty($userColums) || in_array('price', $userColums)))
