@@ -143202,6 +143202,43 @@ template {
 .ddrtable .ddrtable__head ~ .ddrtable__body, .ddrtable .ddrtable__body ~ .ddrtable__foot {
   border-top: 1px solid #efefef;
 }
+.ddrtable__head .ddrtable__tr.showrows .ddrtable__td.sort, .ddrtable__head .ddrtable__tr.showrows .ddrtable__td [ddrtabletdmain].sort {
+  position: relative;
+  cursor: pointer;
+}
+.ddrtable__head .ddrtable__tr.showrows .ddrtable__td.sort-asc > *, .ddrtable__head .ddrtable__tr.showrows .ddrtable__td.sort-desc > *, .ddrtable__head .ddrtable__tr.showrows .ddrtable__td [ddrtabletdmain].sort-asc > *, .ddrtable__head .ddrtable__tr.showrows .ddrtable__td [ddrtabletdmain].sort-desc > * {
+  color: #00c4ff;
+}
+.ddrtable__head .ddrtable__tr.showrows .ddrtable__td.sort::after, .ddrtable__head .ddrtable__tr.showrows .ddrtable__td [ddrtabletdmain].sort::after {
+  position: absolute;
+  left: calc(50% - 6px);
+  font-size: 20px;
+  line-height: 20px;
+  cursor: pointer;
+  z-index: 10;
+}
+.ddrtable__head .ddrtable__tr.showrows .ddrtable__td.sort-asc, .ddrtable__head .ddrtable__tr.showrows .ddrtable__td [ddrtabletdmain].sort-asc {
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+}
+.ddrtable__head .ddrtable__tr.showrows .ddrtable__td.sort-asc::after, .ddrtable__head .ddrtable__tr.showrows .ddrtable__td [ddrtabletdmain].sort-asc::after {
+  content: "\f0d8";
+}
+.ddrtable__head .ddrtable__tr.showrows .ddrtable__td.sort-asc::after, .ddrtable__head .ddrtable__tr.showrows .ddrtable__td [ddrtabletdmain].sort-asc::after {
+  bottom: -12px;
+  color: #6b84bd;
+}
+.ddrtable__head .ddrtable__tr.showrows .ddrtable__td.sort-desc, .ddrtable__head .ddrtable__tr.showrows .ddrtable__td [ddrtabletdmain].sort-desc {
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+}
+.ddrtable__head .ddrtable__tr.showrows .ddrtable__td.sort-desc::after, .ddrtable__head .ddrtable__tr.showrows .ddrtable__td [ddrtabletdmain].sort-desc::after {
+  content: "\f0d7";
+}
+.ddrtable__head .ddrtable__tr.showrows .ddrtable__td.sort-desc::after, .ddrtable__head .ddrtable__tr.showrows .ddrtable__td [ddrtabletdmain].sort-desc::after {
+  bottom: -9px;
+  color: #6b84bd;
+}
 .ddrtable__body .ddrtable__tr {
   visibility: hidden;
 }

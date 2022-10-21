@@ -1,9 +1,9 @@
 @props([
-	'id'    => 'ddrtable'.rand(0,9999999),
-	'scrollsync' =>  null,
-	'scrollstart' =>  null,
-	'scrollend' =>  null,
-	'scrollpart' =>  null,
+	'id'    		=> 'ddrtable'.rand(0,9999999),
+	'scrollsync' 	=>  null,
+	'scrollstart' 	=>  null,
+	'scrollend' 	=>  null,
+	'scrollpart' 	=>  null,
 ])
 
 
@@ -73,12 +73,12 @@
 			let targetId = target?.target?.id;
 			let targetAttr = target?.target?.attributes;
 			
-			if (targetId == 'intersectionTop') {
+			if ($[scrollstartObserver] && targetId == 'intersectionTop') {
 				$[scrollstartObserver](target);
-			} else if (targetId == 'intersectionBottom') {
+			} else if ($[scrollendObserver] && targetId == 'intersectionBottom') {
 				$[scrollendObserver](target);
 			} else if (target.target.hasAttribute("ddrtablepartend")) {
-				if ($(selector).find('[ddrtablebody]')[0].offsetHeight > $(target.target).position().top) {
+				if ($[scrollpartObserver] && $(selector).find('[ddrtablebody]')[0].offsetHeight > $(target.target).position().top) {
 					$[scrollpartObserver](target);
 				} else {}
 			}

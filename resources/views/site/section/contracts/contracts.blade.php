@@ -204,7 +204,7 @@
 		sortField = ddrStore('site-contracts-sortfield') || 'id',
 		sortOrder = ddrStore('site-contracts-sortorder') || 'desc',
 		limit = {{$setting['contracts-per-page'] ?? 10}},
-		countShwnLoadings = {{$setting['count-shown-loadings'] ?? 2}},
+		countShownLoadings = {{$setting['count-shown-loadings'] ?? 2}},
 		offset = 0,
 		search = null,
 		selection = null,
@@ -212,7 +212,6 @@
 		searchWithArchive = false;
 		
 	getList({init: true});
-	
 	
 	
 	$.getListAction = (btn, isActive, list) => {
@@ -1590,16 +1589,11 @@
 	
 	
 	
-	/*let observer = new IntersectionObserver(function(entries, observer) {
-		if (entries[0].isIntersecting) {
-			offset += limit;
-			console.log(offset);
-			//getList({append: true});
-		}
-	}, {
-		rootMargin: '0px',
-		threshold: 0.1
-	});*/
+	
+	//-------------------------------------------------  Контекстное меню
+	$.testContextMenu = (id, foo, bar) => {
+		console.log(id, foo, bar);
+	}
 	
 	
 	
@@ -1633,6 +1627,7 @@
 			params = {},
 			listWait;
 		
+
 		if (currentList == -1 || currentList > 0) {
 			searchWithArchive = false;
 			$('#searchWithArchive').ddrInputs('disable');
@@ -1696,11 +1691,15 @@
 				return;
 			}
 			
+			const currentCount = headers ? headers['x-count-contracts-current'] : null;
+			
 			if (append) {
-				if (append == 'prepend') {
-					$('#contractsList').blockTable('prependData', data, limit);
-				} else if (append == 'append') {
-					$('#contractsList').blockTable('appendData', data);
+				if (currentCount) {
+					if (append == 'prepend') {
+						$('#contractsList').blockTable('prependData', data, limit);
+					} else if (append == 'append') {
+						$('#contractsList').blockTable('appendData', data);
+					}
 				}
 				
 			} else {
@@ -1713,7 +1712,7 @@
 			
 			if (abort) listWait.destroy();
 			
-			if (search) {
+			if (search && currentCount) {
 				let findSubStr = $('#contractsTable').find('p:icontains("'+search+'")');
 				if (findSubStr) {
 					$.each(findSubStr, function(k, item) {
@@ -1722,9 +1721,9 @@
 				}
 			}	
 			
-			$('[stepprice]').number(true, 2, '.', ' ');
+			if (currentCount) $('[stepprice]').number(true, 2, '.', ' ');
 			
-			if (withCounts && headers) {
+			if (withCounts && headers && currentCount) {
 				
 				if (headers['x-count-contracts-all']) {
 					$('#chooserAll').find('[selectionscounts]').text(headers['x-count-contracts-all'] > 0 ? headers['x-count-contracts-all'] : '');
@@ -1750,11 +1749,17 @@
 			}
 			
 			
-			if (callback && typeof callback == 'function') callback();
+			if (callback && typeof callback == 'function') callback(currentCount);
 		});
 		
 	}
 	
+	
+	
+	
+	
+	
+	//-------------------------------------------------------------------------------------------
 	
 	
 	
@@ -1763,17 +1768,18 @@
 	}
 	
 	
-	
-	
+	let lastLoadCount = null;
 	
 	$.doScrollStart = (target) => {
-		let localOffset = offset - limit * countShwnLoadings;
+		let localOffset = offset - limit * countShownLoadings;
 		if (localOffset < 0) return;
 		getList({
 			append: 'prepend',
 			offset: (localOffset < 0 ? 0 : localOffset),
-			callback: function() {
-				$('#contractsList').blockTable('removeRowsAfter', ((countShwnLoadings + 1) * limit), limit);
+			callback: function(currentCount) {
+				if (!currentCount) return;
+				$('#contractsList').blockTable('removeRowsAfter', (countShownLoadings * limit + (lastLoadCount || limit)), (lastLoadCount || limit));
+				if (lastLoadCount) lastLoadCount = null;
 				offset -= limit;
 			}
 		});
@@ -1784,8 +1790,15 @@
 		offset += limit;
 		getList({
 			append: 'append',
-			callback: function() {
-				$('#contractsList').blockTable('removeRowsBefore', ((countShwnLoadings + 1) * limit), limit);
+			callback: function(currentCount) {
+				if (!currentCount) {
+					offset -= limit;
+					return;
+				} 
+				
+				lastLoadCount = Math.min(limit, currentCount);
+				
+				$('#contractsList').blockTable('removeRowsBefore', (countShownLoadings * limit + lastLoadCount), limit);
 			}
 		});
 	}

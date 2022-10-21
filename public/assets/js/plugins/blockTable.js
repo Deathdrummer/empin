@@ -32,27 +32,27 @@ class BlockTable {
 	
 	
 	
-	removeRows(selector = false, removeLimit = false, start = false, count = false) {
-		if (!selector || removeLimit === false || start === false || !count) return false;
+	removeRows(selector = false, enableRemoveCount = false, start = false, count = false) {
+		if (!selector || enableRemoveCount === false || start === false || !count) return false;
 		
-		if ($(selector).find('[ddrtabletr]').length >= removeLimit) {
+		if ($(selector).find('[ddrtabletr]').length >= enableRemoveCount) {
 			$(selector).find('[ddrtabletr]').slice(start, count).remove();
 		}
 	}
 	
 	
-	removeRowsBefore(selector = false, removeLimit = false, count = false) {
-		if (!selector || removeLimit === false || !count) return false;
+	removeRowsBefore(selector = false, enableRemoveCount = false, count = false) {
+		if (!selector || enableRemoveCount === false || !count) return false;
 		
-		if ($(selector).find('[ddrtabletr]').length >= removeLimit) {
+		if ($(selector).find('[ddrtabletr]').length >= enableRemoveCount) {
 			$(selector).find('[ddrtabletr]').slice(0, count).remove();
 		}
 	}
 	
-	removeRowsAfter(selector = false, removeLimit = false, count = false) {
-		if (!selector || removeLimit === false || !count) return false;
+	removeRowsAfter(selector = false, enableRemoveCount = false, count = false) {
+		if (!selector || enableRemoveCount === false || !count) return false;
 		
-		if ($(selector).find('[ddrtabletr]').length >= removeLimit) {
+		if ($(selector).find('[ddrtabletr]').length >= enableRemoveCount) {
 			$(selector).find('[ddrtabletr]').slice(-count, $(selector).find('[ddrtabletr]').length).remove();
 		}
 	}
@@ -72,19 +72,11 @@ class BlockTable {
 			return;
 		}
 		
-		
-		
-		
-		
-		
 		$(selector).on('mouseover touchenter touchstart', function(e) {
 			hasScrollCls = true;
 			$(this).addClass('ddrtablebody-scrollsync');
 			$(selector).not(this).removeClass('ddrtablebody-scrollsync');
 		});
-		
-		
-		
 		
 		$(selector).scroll(function() {
 			if (!hasScrollCls && $(selector).filter('.ddrtablebody-scrollsync').length == 0) {
@@ -95,8 +87,6 @@ class BlockTable {
 			scrTop = $(this).scrollTop();
 			$(selector).not('.ddrtablebody-scrollsync').scrollTop(scrTop);
 		});
-		
-		
 		
 		$(selector).on('scrollstop', {latency: 30}, function() {
 			scrTop = $(this).scrollTop();
@@ -109,10 +99,9 @@ class BlockTable {
 	
 	
 	
-	
-	
-	
-	
+	/*
+		Сформировать ширину столбцов таблицы
+	*/
 	buildTable(listSelector) {
 		const selector = $(listSelector).closest('[ddrtable]'),
 			headCells = $(selector).find('[ddrtablehead]').find('[ddrtabletr]').find('[ddrtabletdmain]').length

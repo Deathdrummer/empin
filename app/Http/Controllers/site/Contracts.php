@@ -63,7 +63,12 @@ class Contracts extends Controller {
 			$headers = [
 				'x-count-contracts-all' => $counts['all'] ?? null,
 				'x-count-contracts-departments' => json_encode($counts['departments']) ?? null,
-				'x-count-contracts-archive' => $counts['archive'] ?? null
+				'x-count-contracts-archive' => $counts['archive'] ?? null,
+				'x-count-contracts-current' => $list ? $list->count() : null
+			];
+		} else {
+			$headers = [
+				'x-count-contracts-current' => $list ? $list->count() : null
 			];
 		}
 		

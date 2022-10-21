@@ -21,7 +21,7 @@
 					>
 					<x-table.head scrollfix>
 						<x-table.tr
-							class="h{{$rowHeight ?? '7'}}rem"
+							class="{{-- showrows  --}}h{{$rowHeight ?? '7'}}rem"
 							sorts
 							>
 							@if(!$isArchive)
@@ -288,6 +288,7 @@
 								ondblclick="$.openContractInfo(this, '{{$contract['id']}}');"
 								isnew="{{$contract['is_new'] ? 1 : 0}}"
 								contractid="{{$contract['id']}}"
+								contextmenu="testContextMenu:{{$contract['id']}},foo,bar"
 								>
 								@include('site.section/contracts.render.row_common', $contract)
 								@include('site.section/contracts.render.row_departments', compact('contract', 'alldeps'))

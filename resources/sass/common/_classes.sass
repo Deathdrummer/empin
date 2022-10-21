@@ -892,6 +892,49 @@ $tableColor: #efefef
 	
 	
 	&__head
+		.ddrtable__tr
+			&.showrows
+				.ddrtable__td
+					&.sort, [ddrtabletdmain].sort
+						position: relative
+						cursor: pointer
+						
+						&-asc, &-desc
+							> *
+								color: #00c4ff
+								
+						&::after
+							position: absolute
+							left: calc(50% - 6px)
+							font-size: 20px
+							line-height: 20px
+							cursor: pointer
+							z-index: 10
+							
+						
+						&:not(.sort-asc):not(.sort-desc)
+							//+fontAwesome('\f0dc')
+							
+							//&::after
+							//	bottom: -11px	
+							//	color: #f5f3f3
+						
+						
+						&-asc
+							+fontAwesome('\f0d8')
+							
+							&::after
+								bottom: -12px
+								color: #6b84bd
+							
+						
+						&-desc
+							+fontAwesome('\f0d7')
+							
+							&::after
+								bottom: -9px
+								color: #6b84bd
+				
 		
 	
 	&__body
@@ -1012,38 +1055,6 @@ $tableColor: #efefef
 				> *
 					color: #00c4ff
 			
-			// &::after
-			// 	position: absolute
-			// 	left: calc(50% - 6px)
-			// 	font-size: 20px
-			// 	line-height: 20px
-			// 	cursor: pointer
-			// 	z-index: 10
-			// 	
-			// 
-			// &:not(.sort-asc):not(.sort-desc)
-			// 	+fontAwesome('\f0dc')
-			// 	
-			// 	&::after
-			// 		bottom: -11px	
-			// 		color: #f5f3f3
-			// 
-			// 
-			// &-asc
-			// 	+fontAwesome('\f0d8')
-			// 	
-			// 	&::after
-			// 		bottom: -12px
-			// 		color: #6b84bd
-			// 	
-			// 
-			// &-desc
-			// 	+fontAwesome('\f0d7')
-			// 	
-			// 	&::after
-			// 		bottom: -9px
-			// 		color: #6b84bd
-		
 		
 		&:hover
 			.icon-hidden
