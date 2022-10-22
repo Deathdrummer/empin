@@ -19,19 +19,19 @@
 	border-radius: 3px;
 	position: absolute;
 	min-width: 16em;
-	z-index: 1;
+	z-index: 10;
 	background: linear-gradient(145deg, var(--color1), var(--color2));
 	box-shadow: 0px 5px 5px -2px #1413213b;
 	will-change: transform, opacity, filter;
 	transition: transform, opacity, visibility, filter;
-	transition-duration: 0.5s, 0.2s, 0.4s, 0.3s;
+	transition-duration: 0.3s, 0.2s, 0.4s, 0.3s;
 	transition-delay: 0.1s, 0s, 0.4s, 0.2s;
 	transition-timing-function: ease;
 	transform: rotate3d(-1, -1, 0, 30deg) scale(1);
 	transform-origin: 0 0;
 	opacity: 0;
 	visibility: hidden;
-	filter: blur(6px);
+	filter: blur(4px);
 }
 
 .context p,
@@ -43,13 +43,6 @@
 }
 
 
-.context, .context * {
-	-webkit-user-select: none;
-	   -moz-user-select: none;
-	    -ms-user-select: none;
-	        user-select: none;
-	cursor: default;
-}
 .context.is-visible {
 	opacity: 1;
 	transform: none;
@@ -86,7 +79,7 @@
 	bottom: -0.4em;
 }
 .context > li {
-	padding: 0.3em 1.5em 0.35em 2.8em;
+	padding: 0.3em 1.5em 0.3em 0.5em;
 	border-radius: 3px;
 	position: relative;
 	display: flex;
@@ -107,7 +100,6 @@
 }
 .context > li.hilight {
 	font-weight: 500;
-	padding-bottom: 0.5em;
 	color: white;
 }
 .context > li:not(.context > li.nope):hover {
@@ -124,7 +116,7 @@
 	border-radius: 0 3px 3px 3px;
 	visibility: visible;
 }
-.context > li:hover > .f, .context > li.hilight > .f {
+.context > li:hover > .f, .context > li.hilight > .f, .context > li:hover > .icon, .context > li.hilight > .icon {
 	opacity: 1;
 }
 .context > li:last-child {
@@ -140,19 +132,19 @@
 	-webkit-animation: flash 0.5s ease 1;
           animation: flash 0.5s ease 1;
 }
-.context > li:nth-of-type(1) {
-	margin-top: 0.5em;
-}
+
 .context > li .f {
+	font-size: 10px;
 	color: var(--text);
 	opacity: 0.5;
 	transition: all 0.2s ease;
 }
-.context > li i {
-	font-style: normal;
-	text-decoration: underline;
-	-webkit-text-decoration-color: rgba(255, 255, 255, 0.35);
-	        text-decoration-color: rgba(255, 255, 255, 0.35);
+.context > li .icon {
+	font-size: 14px;
+	color: var(--text);
+	margin-right: 8px;
+	opacity: 0.5;
+	transition: all 0.2s ease;
 }
 .context .divline {
 	border-bottom: 1px solid var(--divider);
@@ -166,21 +158,12 @@
 	transform: translateX(-2.4em);
 }
 .context .f[class*=chevron-right] {
-	right: 0;
+	right: 5px;
+	top: calc(50% - 6px);
 	transform: none;
 }
 
-.f.f-circle {
-	fill: red;
-}
 
-span.size {
-	position: absolute;
-	font-size: 0.675em;
-	left: 1.2em;
-	top: 0.8em;
-	text-shadow: aliceblue;
-}
 
 @-webkit-keyframes flash {
 	0% {

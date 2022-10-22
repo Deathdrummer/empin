@@ -6,19 +6,29 @@ import './index.css';
 $(document).on('contextmenu', '[contextmenu]', function(e) {
 	
 	let menuHtml = '';
-		menuHtml += '<ul class="context">';
-		menuHtml +=		'<li class="top">';
+		menuHtml += '<ul class="context noselect">';
+		menuHtml +=		'<li>';
+		menuHtml += 		'<i class="icon fa-fw fa-solid fa-triangle-exclamation"></i>';
 		menuHtml += 		'<p>Foo</p>';
 		menuHtml += 		'<i class="f fa-solid fa-chevron-right"></i>';
 		menuHtml += 		'<ul class="context sub">';
-		menuHtml += 			'<li><p>sub foo</p></li>';
+		menuHtml += 			'<li>';
+		menuHtml += 				'<i class="icon fa-fw fa-solid fa-download"></i>';
+		menuHtml += 				'<p>sub foo</p>';
+		menuHtml += 			'</li>';
 		menuHtml += 			'<li><p>sub bar</p></li>';
 		menuHtml += 			'<li><p>sub rool</p></li>';
 		menuHtml += 		'</ul>';
 		menuHtml += 	'</li>';
 		menuHtml += 	'<li class="divline"></li>';
-		menuHtml += 	'<li class="hilight"><p>Bar</p></li>';
-		menuHtml += 	'<li><p>Rool</p></li>';
+		menuHtml += 	'<li class="hilight">';
+		menuHtml += 		'<i class="icon fa-fw fa-solid fa-download"></i>';
+		menuHtml += 		'<p>Bar</p>';
+		menuHtml += 	'</li>';
+		menuHtml += 	'<li>';
+		menuHtml += 		'<i class="icon fa-fw fa-brands fa-slack"></i>';
+		menuHtml += 		'<p>Rool</p>';
+		menuHtml += 	'</li>';
 		menuHtml +=	'</ul>';
 	
 	
@@ -82,11 +92,16 @@ $(document).on('contextmenu', '[contextmenu]', function(e) {
 		$context.addClass("is-visible");
 		
 		
+		
 		$doc.on("mousedown", function(e) {
+			console.log('0');
 			let $tar = $(e.target);
 			
 			if (!$tar.is( $context ) && !$tar.closest(".context").length) {     
 				$context.removeClass("is-visible");
+				setTimeout(function() {
+					$context.remove();
+				}, 50);
 				$doc.off(e);
 			}
 		});
