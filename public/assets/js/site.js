@@ -7892,25 +7892,44 @@ $(document).on('contextmenu', '[contextmenu]', function (e) {
   menuHtml += '<ul class="context noselect">';
   menuHtml += '<li>';
   menuHtml += '<i class="icon fa-fw fa-solid fa-triangle-exclamation"></i>';
-  menuHtml += '<p>Foo</p>';
+  menuHtml += '<p>Пункт меню 1</p>';
   menuHtml += '<i class="f fa-solid fa-chevron-right"></i>';
   menuHtml += '<ul class="context sub">';
   menuHtml += '<li>';
   menuHtml += '<i class="icon fa-fw fa-solid fa-download"></i>';
-  menuHtml += '<p>sub foo</p>';
+  menuHtml += '<p>Подпункт меню 1</p>';
   menuHtml += '</li>';
-  menuHtml += '<li><p>sub bar</p></li>';
-  menuHtml += '<li><p>sub rool</p></li>';
+  menuHtml += '<li>';
+  menuHtml += '<i class="icon fa-fw fa-solid fa-magnifying-glass"></i>';
+  menuHtml += '<p>Подпункт меню 2</p>';
+  menuHtml += '</li>';
+  menuHtml += '<li>';
+  menuHtml += '<i class="icon fa-fw fa-brands fa-discord"></i>';
+  menuHtml += '<p>Подпункт меню 3</p>';
+  menuHtml += '</li>';
   menuHtml += '</ul>';
   menuHtml += '</li>';
   menuHtml += '<li class="divline"></li>';
   menuHtml += '<li class="hilight">';
   menuHtml += '<i class="icon fa-fw fa-solid fa-download"></i>';
-  menuHtml += '<p>Bar</p>';
+  menuHtml += '<p>Пункт меню 2</p>';
   menuHtml += '</li>';
   menuHtml += '<li>';
   menuHtml += '<i class="icon fa-fw fa-brands fa-slack"></i>';
-  menuHtml += '<p>Rool</p>';
+  menuHtml += '<p>Пункт меню 3</p>';
+  menuHtml += '</li>';
+  menuHtml += '<li class="divline"></li>';
+  menuHtml += '<li class="hilight">';
+  menuHtml += '<i class="icon fa-fw fa-solid fa-download"></i>';
+  menuHtml += '<p>Пункт меню 4</p>';
+  menuHtml += '</li>';
+  menuHtml += '<li>';
+  menuHtml += '<i class="icon fa-fw fa-brands fa-slack"></i>';
+  menuHtml += '<p>Пункт меню 5</p>';
+  menuHtml += '</li>';
+  menuHtml += '<li>';
+  menuHtml += '<i class="icon fa-fw fa-brands fa-slack"></i>';
+  menuHtml += '<p>Пункт меню 6</p>';
   menuHtml += '</li>';
   menuHtml += '</ul>';
 
@@ -13704,7 +13723,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, ":root {\r\n\t--bg: #24262d;\r\n\t--text: #dfe3ff;\r\n\t--color1: #624e7e;\r\n    --color2: #3c2b45;\r\n\t--color1n: #ecf0f4;\r\n\t--color2n: #fff;\r\n\t--colorSub: #5d4d66;\r\n\t--divider: rgba(255,255,255,0.16);\r\n}\r\n\r\n.context {\r\n\tpadding: 0.05em 0.25em;\r\n\tborder: 1px solid transparent;\r\n    border-right-color: rgba(255, 255, 255, 0.15);\r\n    border-bottom-color: rgba(255, 255, 255, 0.15);\r\n    border-left-color: rgba(0, 0, 0, 0.15);\r\n    border-top-color: rgba(0, 0, 0, 0.15);\r\n\tborder-radius: 3px;\r\n\tposition: absolute;\r\n\tmin-width: 16em;\r\n\tz-index: 10;\r\n\tbackground: linear-gradient(145deg, var(--color1), var(--color2));\r\n\tbox-shadow: 0px 5px 5px -2px #1413213b;\r\n\twill-change: transform, opacity, filter;\r\n\ttransition: transform, opacity, visibility, filter;\r\n\ttransition-duration: 0.3s, 0.2s, 0.4s, 0.3s;\r\n\ttransition-delay: 0.1s, 0s, 0.4s, 0.2s;\r\n\ttransition-timing-function: ease;\r\n\ttransform: rotate3d(-1, -1, 0, 30deg) scale(1);\r\n\ttransform-origin: 0 0;\r\n\topacity: 0;\r\n\tvisibility: hidden;\r\n\tfilter: blur(4px);\r\n}\r\n\r\n.context p,\r\n.context span,\r\n.context small,\r\n.context strong,\r\n.context a {\r\n\tcolor: var(--text);\r\n}\r\n\r\n\r\n.context.is-visible {\r\n\topacity: 1;\r\n\ttransform: none;\r\n\ttransition-delay: 0s, 0s, 0s, 0s;\r\n\tvisibility: visible;\r\n\tfilter: none;\r\n}\r\n.context.sub {\r\n\tbackground: var(--colorSub);\r\n\twidth: max-content;\r\n\tmin-width: 10em;\r\n\tleft: 100%;\r\n\ttop: -0.4em;\r\n\ttransform: translateX(-0.7em);\r\n\ttransition: transform, opacity, width, min-width, visibility;\r\n\ttransition-timing-function: ease;\r\n\ttransition-duration: 0.4s, 0.25s, 0.15s, 0.15s, 0.01s;\r\n\ttransition-delay: 0.4s, 0.25s, 0.3s, 0.3s, 0.35s;\r\n\toverflow: hidden;\r\n\tfilter: none;\r\n}\r\n.context.sub .f {\r\n\ttransform: translateX(-2.25em);\r\n}\r\n.context.sub.oppositeX {\r\n\tright: 100%;\r\n\tleft: auto;\r\n\ttransform: translateX(0.7em);\r\n}\r\n.context.sub.oppositeY {\r\n\ttop: auto;\r\n\tbottom: -0.4em;\r\n}\r\n.context > li {\r\n\tpadding: 0.3em 1.5em 0.3em 0.5em;\r\n\tborder-radius: 3px;\r\n\tposition: relative;\r\n\tdisplay: flex;\r\n}\r\n.context > li:before {\r\n\tcontent: \"\";\r\n\tposition: absolute;\r\n\tleft: 0;\r\n\ttop: 0;\r\n\tbottom: 0;\r\n\tright: 0;\r\n\tborder-radius: 3px;\r\n\tz-index: -1;\r\n\tbackground-color: rgba(97, 97, 97, 0.37);\r\n\tmix-blend-mode: color-dodge;\r\n\ttransition: opacity 0.15s cubic-bezier(0.55, 0.06, 0.68, 0.19);\r\n\topacity: 0;\r\n}\r\n.context > li.hilight {\r\n\tfont-weight: 500;\r\n\tcolor: white;\r\n}\r\n.context > li:not(.context > li.nope):hover {\r\n\tcolor: white;\r\n}\r\n.context > li:not(.context > li.nope):hover:before {\r\n\topacity: 1;\r\n\ttransition: opacity 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94);\r\n}\r\n.context > li:not(.context > li.nope):hover .sub {\r\n\topacity: 1;\r\n\ttransform: translateX(0);\r\n\ttransition-delay: 0.2s, 0.25s, 0.2s, 0.2s, 0s;\r\n\tborder-radius: 0 3px 3px 3px;\r\n\tvisibility: visible;\r\n}\r\n.context > li:hover > .f, .context > li.hilight > .f, .context > li:hover > .icon, .context > li.hilight > .icon {\r\n\topacity: 1;\r\n}\r\n.context > li:last-child {\r\n\t margin-bottom: 0.25em;\r\n}\r\n.context > li:first-child {\r\n\tmargin-top: 0.25em;\r\n}\r\n.context > li.nope {\r\n  color: rgba(255, 255, 255, 0.3);\r\n}\r\n.context > li.active {\r\n animation: flash 0.5s ease 1;\r\n}\r\n\r\n.context > li .f {\r\n\tfont-size: 10px;\r\n\tcolor: var(--text);\r\n\topacity: 0.5;\r\n\ttransition: all 0.2s ease;\r\n}\r\n.context > li .icon {\r\n\tfont-size: 14px;\r\n\tcolor: var(--text);\r\n\tmargin-right: 8px;\r\n\topacity: 0.5;\r\n\ttransition: all 0.2s ease;\r\n}\r\n.context .divline {\r\n\tborder-bottom: 1px solid var(--divider);\r\n\tpadding: 0;\r\n\tmargin-top: 0.3em;\r\n\tmargin-bottom: 0.35em;\r\n}\r\n.context .f {\r\n\tfont-style: normal;\r\n\tposition: absolute;\r\n\ttransform: translateX(-2.4em);\r\n}\r\n.context .f[class*=chevron-right] {\r\n\tright: 5px;\r\n\ttop: calc(50% - 6px);\r\n\ttransform: none;\r\n}\r\n\r\n@keyframes flash {\r\n\t0% {\r\n\t\tbackground: rgba(255, 255, 255, 0);\r\n\t}\r\n\t7% {\r\n\t\tbackground: rgba(255, 255, 255, 0.2);\r\n\t}\r\n\t14% {\r\n\t\tbackground: rgba(255, 255, 255, 0);\r\n\t}\r\n\t21% {\r\n\t\tbackground: rgba(255, 255, 255, 0.3);\r\n\t}\r\n}\r\n*,\r\n*:after,\r\n*:before {\r\n\tbox-sizing: border-box;\r\n}\r\n\r\n\r\n\r\n.hide {\r\n\tdisplay: none;\r\n}", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, ":root {\r\n\t--bg: #24262d;\r\n\t--text: #dfe3ff;\r\n\t--color1: #624e7e;\r\n    --color2: #3c2b45;\r\n\t--color1n: #ecf0f4;\r\n\t--color2n: #fff;\r\n\t--colorSub: #5d4d66;\r\n\t--divider: rgba(255,255,255,0.16);\r\n}\r\n\r\n.context {\r\n\tpadding: 0.05em 0.25em;\r\n\tborder: 1px solid transparent;\r\n    border-right-color: rgba(255, 255, 255, 0.15);\r\n    border-bottom-color: rgba(255, 255, 255, 0.15);\r\n    border-left-color: rgba(0, 0, 0, 0.15);\r\n    border-top-color: rgba(0, 0, 0, 0.15);\r\n\tborder-radius: 3px;\r\n\tposition: absolute;\r\n\tmin-width: 16em;\r\n\tz-index: 10;\r\n\tbackground: linear-gradient(145deg, var(--color1), var(--color2));\r\n\tbox-shadow: 0px 5px 5px -2px #1413213b;\r\n\twill-change: transform, opacity, filter;\r\n\ttransition: transform, opacity, visibility, filter;\r\n\ttransition-duration: 0.3s, 0.2s, 0.4s, 0.3s;\r\n\ttransition-delay: 0.1s, 0s, 0.4s, 0.2s;\r\n\ttransition-timing-function: ease;\r\n\ttransform: rotate3d(-1, -1, 0, 30deg) scale(1);\r\n\ttransform-origin: 0 0;\r\n\topacity: 0;\r\n\tvisibility: hidden;\r\n\tfilter: blur(4px);\r\n}\r\n\r\n.context p,\r\n.context span,\r\n.context small,\r\n.context strong,\r\n.context a {\r\n\tcolor: var(--text);\r\n}\r\n\r\n\r\n.context.is-visible {\r\n\topacity: 1;\r\n\ttransform: none;\r\n\ttransition-delay: 0s, 0s, 0s, 0s;\r\n\tvisibility: visible;\r\n\tfilter: none;\r\n}\r\n.context.sub {\r\n\tbackground: var(--colorSub);\r\n\twidth: max-content;\r\n\tmin-width: 10em;\r\n\tleft: 100%;\r\n\ttop: -0.3em;\r\n\ttransform: translateX(-0.7em);\r\n\ttransition: transform, opacity, width, min-width, visibility;\r\n\ttransition-timing-function: ease;\r\n\ttransition-duration: 0.4s, 0.25s, 0.15s, 0.15s, 0.01s;\r\n\ttransition-delay: 0.4s, 0.25s, 0.3s, 0.3s, 0.35s;\r\n\toverflow: hidden;\r\n\tfilter: none;\r\n}\r\n.context.sub .f {\r\n\ttransform: translateX(-2.25em);\r\n}\r\n.context.sub.oppositeX {\r\n\tright: 100%;\r\n\tleft: auto;\r\n\ttransform: translateX(0.7em);\r\n}\r\n.context.sub.oppositeY {\r\n\ttop: auto;\r\n\tbottom: -0.4em;\r\n}\r\n.context > li {\r\n\tpadding: 0.3em 1.5em 0.3em 0.5em;\r\n\tborder-radius: 3px;\r\n\tposition: relative;\r\n\tdisplay: flex;\r\n}\r\n.context > li:before {\r\n\tcontent: \"\";\r\n\tposition: absolute;\r\n\tleft: 0;\r\n\ttop: 0;\r\n\tbottom: 0;\r\n\tright: 0;\r\n\tborder-radius: 3px;\r\n\tz-index: -1;\r\n\tbackground-color: rgba(97, 97, 97, 0.37);\r\n\tmix-blend-mode: color-dodge;\r\n\ttransition: opacity 0.15s cubic-bezier(0.55, 0.06, 0.68, 0.19);\r\n\topacity: 0;\r\n}\r\n.context > li.hilight {\r\n\tfont-weight: 500;\r\n\tcolor: white;\r\n}\r\n.context > li:not(.context > li.nope):hover {\r\n\tcolor: white;\r\n}\r\n.context > li:not(.context > li.nope):hover:before {\r\n\topacity: 1;\r\n\ttransition: opacity 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94);\r\n}\r\n.context > li:not(.context > li.nope):hover .sub {\r\n\topacity: 1;\r\n\ttransform: translateX(0);\r\n\ttransition-delay: 0.2s, 0.25s, 0.2s, 0.2s, 0s;\r\n\tborder-radius: 0 3px 3px 3px;\r\n\tvisibility: visible;\r\n}\r\n.context > li:hover > .f, .context > li.hilight > .f, .context > li:hover > .icon, .context > li.hilight > .icon {\r\n\topacity: 1;\r\n}\r\n.context > li:last-child {\r\n\t margin-bottom: 0.25em;\r\n}\r\n.context > li:first-child {\r\n\tmargin-top: 0.25em;\r\n}\r\n.context > li.nope {\r\n  color: rgba(255, 255, 255, 0.3);\r\n}\r\n.context > li.active {\r\n animation: flash 0.5s ease 1;\r\n}\r\n\r\n.context > li .f {\r\n\tfont-size: 10px;\r\n\tcolor: var(--text);\r\n\topacity: 0.5;\r\n\ttransition: all 0.2s ease;\r\n}\r\n.context > li .icon {\r\n\tfont-size: 14px;\r\n\tcolor: var(--text);\r\n\tmargin-right: 8px;\r\n\topacity: 0.5;\r\n\ttransition: all 0.2s ease;\r\n}\r\n.context .divline {\r\n\tborder-bottom: 1px solid var(--divider);\r\n\tpadding: 0;\r\n\tmargin-top: 0.3em;\r\n\tmargin-bottom: 0.35em;\r\n}\r\n.context .f {\r\n\tfont-style: normal;\r\n\tposition: absolute;\r\n\ttransform: translateX(-2.4em);\r\n}\r\n.context .f[class*=chevron-right] {\r\n\tright: 5px;\r\n\ttop: calc(50% - 6px);\r\n\ttransform: none;\r\n}\r\n\r\n@keyframes flash {\r\n\t0% {\r\n\t\tbackground: rgba(255, 255, 255, 0);\r\n\t}\r\n\t7% {\r\n\t\tbackground: rgba(255, 255, 255, 0.2);\r\n\t}\r\n\t14% {\r\n\t\tbackground: rgba(255, 255, 255, 0);\r\n\t}\r\n\t21% {\r\n\t\tbackground: rgba(255, 255, 255, 0.3);\r\n\t}\r\n}\r\n*,\r\n*:after,\r\n*:before {\r\n\tbox-sizing: border-box;\r\n}\r\n\r\n\r\n\r\n.hide {\r\n\tdisplay: none;\r\n}", ""]);
 // Exports
 /* harmony default export */ __webpack_exports__["default"] = (___CSS_LOADER_EXPORT___);
 
