@@ -7877,117 +7877,6 @@ $.ddrCRUD = function () {
 
 /***/ }),
 
-/***/ "./resources/js/plugins/ddrContextMenu/contextmenu.min.js":
-/*!****************************************************************!*\
-  !*** ./resources/js/plugins/ddrContextMenu/contextmenu.min.js ***!
-  \****************************************************************/
-/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": function() { return /* binding */ ContextMenu; }
-/* harmony export */ });
-function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
-
-function ContextMenu(a, b) {
-  function c(h) {
-    var j = document.createElement("ul");
-    return h.forEach(function (k) {
-      var l = document.createElement("li");
-
-      if (l.menu = f, "undefined" == typeof k.type) {
-        var m = document.createElement("span");
-        m.className = "cm_icon_span", m.innerHTML = "" == ContextUtil.getProperty(k, "icon", "") ? ContextUtil.getProperty(b, "default_icon", "") : ContextUtil.getProperty(k, "icon", "");
-        var n = document.createElement("span");
-        n.className = "cm_text", n.innerHTML = "" == ContextUtil.getProperty(k, "text", "") ? ContextUtil.getProperty(b, "default_text", "item") : ContextUtil.getProperty(k, "text", "");
-        var o = document.createElement("span");
-        if (o.className = "cm_sub_span", "undefined" != typeof k.sub && ("" == ContextUtil.getProperty(b, "sub_icon", "") ? o.innerHTML = "&#155;" : o.innerHTML = ContextUtil.getProperty(b, "sub_icon", "")), l.appendChild(m), l.appendChild(n), l.appendChild(o), !ContextUtil.getProperty(k, "enabled", !0)) l.setAttribute("disabled", "");else {
-          if ("object" == _typeof(k.events)) for (var p = Object.keys(k.events), q = 0; q < p.length; q++) {
-            l.addEventListener(p[q], k.events[p[q]]);
-          }
-          "undefined" != typeof k.sub && l.appendChild(c(k.sub));
-        }
-      } else k.type == ContextMenu.DIVIDER && (l.className = "cm_divider");
-
-      j.appendChild(l);
-    }), j;
-  }
-
-  function d() {
-    f.hide();
-  }
-
-  var f = this,
-      g = ContextMenu.count++;
-  if (this.menu = a, this.contextTarget = null, !(a instanceof Array)) throw new Error("Parameter 1 must be of type Array");
-  if ("undefined" == typeof b) b = {};else if ("object" != _typeof(b)) throw new Error("Parameter 2 must be of type object");
-  window.addEventListener("resize", function () {
-    ContextUtil.getProperty(b, "close_on_resize", !0) && f.hide();
-  }), this.setOptions = function (h) {
-    if ("object" == _typeof(h)) b = h;else throw new Error("Parameter 1 must be of type object");
-  }, this.changeOption = function (h, j) {
-    if ("string" != typeof h) throw new Error("Parameter 1 must be of type string");else if ("undefined" != typeof j) b[h] = j;else throw new Error("Parameter 2 must be set");
-  }, this.getOptions = function () {
-    return b;
-  }, this.reload = function () {
-    if (null == document.getElementById("cm_" + g)) {
-      var h = document.createElement("div");
-      h.className = "cm_container", h.id = "cm_" + g, document.body.appendChild(h);
-    }
-
-    var j = document.getElementById("cm_" + g);
-    j.innerHTML = "", j.appendChild(c(a));
-  }, this.display = function (h, j) {
-    f.contextTarget = "undefined" == typeof j ? h.target : j;
-    var k = document.getElementById("cm_" + g),
-        l = {
-      x: h.clientX,
-      y: h.clientY
-    },
-        m = l.x,
-        n = l.y,
-        o = k.offsetWidth + 4,
-        p = k.offsetHeight + 4,
-        q = window.innerWidth,
-        r = window.innerHeight,
-        s = parseInt(ContextUtil.getProperty(b, "mouse_offset", 2));
-    k.style.left = q - m < o ? q - o + "px" : m + s + "px", k.style.top = r - n < p ? r - p + "px" : n + s + "px";
-    var t = ContextUtil.getSizes(k);
-    q - m < t.width ? k.classList.add("cm_border_right") : k.classList.remove("cm_border_right"), r - n < t.height ? k.classList.add("cm_border_bottom") : k.classList.remove("cm_border_bottom"), k.classList.add("display"), ContextUtil.getProperty(b, "close_on_click", !0) && window.addEventListener("click", d), h.preventDefault();
-  }, this.hide = function () {
-    document.getElementById("cm_" + g).classList.remove("display"), window.removeEventListener("click", d);
-  }, this.reload();
-}
-ContextMenu.count = 0, ContextMenu.DIVIDER = "cm_divider";
-var ContextUtil = {
-  getProperty: function getProperty(a, b, c) {
-    return "undefined" == typeof a[b] ? c : a[b];
-  },
-  getSizes: function getSizes(a) {
-    for (var g, b = a.getElementsByTagName("li"), c = 0, d = 0, f = 0; f < b.length; f++) {
-      g = b[f], g.offsetWidth > c && (c = g.offsetWidth), g.offsetHeight > d && (d = g.offsetHeight);
-    }
-
-    for (var h = c, j = d, f = 0; f < b.length; f++) {
-      var g = b[f],
-          k = g.getElementsByTagName("ul");
-
-      if ("undefined" != typeof k[0]) {
-        var l = ContextUtil.getSizes(k[0]);
-        c + l.width > h && (h = c + l.width), d + l.height > j && (j = d + l.height);
-      }
-    }
-
-    return {
-      width: h,
-      height: j
-    };
-  }
-};
-
-/***/ }),
-
 /***/ "./resources/js/plugins/ddrContextMenu/index.js":
 /*!******************************************************!*\
   !*** ./resources/js/plugins/ddrContextMenu/index.js ***!
@@ -7996,66 +7885,168 @@ var ContextUtil = {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _contextmenu_min_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./contextmenu.min.css */ "./resources/js/plugins/ddrContextMenu/contextmenu.min.css");
+/* harmony import */ var _index_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./index.css */ "./resources/js/plugins/ddrContextMenu/index.css");
 
+$(document).on('contextmenu', '[contextmenu]', function (e) {
+  var menuHtml = '';
+  menuHtml += '<ul class="context">';
+  menuHtml += '<li class="top">';
+  menuHtml += '<p>Foo</p>';
+  menuHtml += '<i class="f fa-solid fa-chevron-right"></i>';
+  menuHtml += '<ul class="context sub">';
+  menuHtml += '<li><p>sub foo</p></li>';
+  menuHtml += '<li><p>sub bar</p></li>';
+  menuHtml += '<li><p>sub rool</p></li>';
+  menuHtml += '</ul>';
+  menuHtml += '</li>';
+  menuHtml += '<li class="divline"></li>';
+  menuHtml += '<li class="hilight"><p>Bar</p></li>';
+  menuHtml += '<li><p>Rool</p></li>';
+  menuHtml += '</ul>';
 
-var ContextMenu = (__webpack_require__(/*! ./contextmenu.min */ "./resources/js/plugins/ddrContextMenu/contextmenu.min.js")["default"]);
+  if ($('body').find('.context').length) {
+    $('body').find('.context').remove();
+  }
 
-var menu;
-$('body').on('contextmenu', '[contextmenu]', function (e) {
-  menu = new ContextMenu([{
-    "text": "Item 1",
-    "icon": "&#9819;",
-    "sub": [{
-      "text": "Item 1.1",
-      "enabled": false
-    }]
-  }, {
-    "text": "Item 2"
-  }]);
-  menu.hide();
-  menu.display(e);
+  $('body').append(menuHtml);
+  var $doc = $(document),
+      $context = $(".context:not(.sub)"),
+      $window = $(window),
+      $sub = $context.find(".sub");
+  $sub.removeClass("oppositeX oppositeY");
+  e.preventDefault();
+  var w = $context.width(),
+      h = $context.height(),
+      x = e.clientX,
+      y = e.clientY,
+      ww = $window.width(),
+      wh = $window.height(),
+      padx = 30,
+      pady = 20,
+      fx = x,
+      fy = y,
+      hitsRight = x + w >= ww - padx,
+      hitsBottom = y + h >= wh - pady;
+
+  if (hitsRight) {
+    fx = ww - w - padx;
+  }
+
+  if (hitsBottom) {
+    fy = wh - h - pady;
+  }
+
+  $context.css({
+    left: fx - 1,
+    top: fy - 1
+  });
+  var sw = $sub.width(),
+      sh = $sub.height(),
+      sx = $sub.offset().left,
+      sy = $sub.offset().top,
+      subHitsRight = sx + sw - padx >= ww - padx,
+      subHitsBottom = sy + sh - pady >= wh - pady;
+
+  if (subHitsRight) {
+    $sub.addClass("oppositeX");
+  }
+
+  if (subHitsBottom) {
+    $sub.addClass("oppositeY");
+  }
+
+  $context.addClass("is-visible");
+  $doc.on("mousedown", function (e) {
+    var $tar = $(e.target);
+
+    if (!$tar.is($context) && !$tar.closest(".context").length) {
+      $context.removeClass("is-visible");
+      $doc.off(e);
+    }
+  });
+  $context.on("mousedown touchstart", "li:not(.nope)", function (e) {
+    console.log('1');
+
+    if (e.which === 1) {
+      var $item = $(this);
+      $item.removeClass("active");
+      setTimeout(function () {
+        $item.addClass("active");
+      }, 10);
+    }
+  });
 });
-/*import "./index.css";
+$(function () {
+  return;
+  var $doc = $(document),
+      $context;
+  $doc.on("contextmenu", function (e) {
+    $context = $(".context:not(.sub)");
+    var $window = $(window),
+        $sub = $context.find(".sub");
+    console.log($context, $sub);
+    $sub.removeClass("oppositeX oppositeY");
+    e.preventDefault();
+    var w = $context.width();
+    var h = $context.height();
+    var x = e.clientX;
+    var y = e.clientY;
+    var ww = $window.width();
+    var wh = $window.height();
+    var padx = 30;
+    var pady = 20;
+    var fx = x;
+    var fy = y;
+    var hitsRight = x + w >= ww - padx;
+    var hitsBottom = y + h >= wh - pady;
 
-$('body').on('contextmenu', '[contextmenu]', function(e) {
-	let d = $(this).attr('contextmenu').split(':'),
-		func = d[0],
-		args = d[1]?.split(',');
-	
-	if (!$[func]) {
-		e.preventDefault();
-		throw new Error('Ошибка! contextmenu -> Указанная функция не создана!');
-	}
-	
-	
-	let cMId = 'ddrContextMenu'+generateCode('Lnlnlnn'),
-		menuHtml = '<div class="ddrcontextmenu" ddrcontextmenuwrap>';
-		menuHtml += '<div class="ddrcontextmenu__block" id="'+cMId+'" style="top:'+e.clientY+'px;left:'+e.clientX+'px;" ddrcontextmenu>';
-		menuHtml += '</div>';
-		menuHtml += '</div>';
-	
-	if ($('body').find('[ddrcontextmenuwrap]').length) {
-		$('body').find('[ddrcontextmenuwrap]').remove();
-	}
-	
-	$('body').append(menuHtml);
-	
-	$('#'+cMId).ddrWait({
-		iconHeight: '40px',
-		iconColor: 'hue-rotate(160deg)'
-	});
-	
-	$[func](...args);
-	
-	$('body').one(tapEvent, function(e) {
-		console.log('one');
-		if ($('body').find('[ddrcontextmenuwrap]').length) {
-			$('body').find('[ddrcontextmenuwrap]').remove();
-		}
-	});
+    if (hitsRight) {
+      fx = ww - w - padx;
+    }
 
-});*/
+    if (hitsBottom) {
+      fy = wh - h - pady;
+    }
+
+    $context.css({
+      left: fx - 1,
+      top: fy - 1
+    });
+    var sw = $sub.width();
+    var sh = $sub.height();
+    var sx = $sub.offset().left;
+    var sy = $sub.offset().top;
+    var subHitsRight = sx + sw - padx >= ww - padx;
+    var subHitsBottom = sy + sh - pady >= wh - pady;
+
+    if (subHitsRight) {
+      $sub.addClass("oppositeX");
+    }
+
+    if (subHitsBottom) {
+      $sub.addClass("oppositeY");
+    }
+
+    $context.addClass("is-visible");
+    $doc.on("mousedown", function (e) {
+      var $tar = $(e.target);
+
+      if (!$tar.is($context) && !$tar.closest(".context").length) {
+        $context.removeClass("is-visible");
+        $doc.off(e);
+      }
+    });
+  });
+  $context.on("mousedown touchstart", "li:not(.nope)", function (e) {
+    if (e.which === 1) {
+      var $item = $(this);
+      $item.removeClass("active");
+      setTimeout(function () {
+        $item.addClass("active");
+      }, 10);
+    }
+  });
+});
 
 /***/ }),
 
@@ -13685,10 +13676,10 @@ ___CSS_LOADER_EXPORT___.push([module.id, ".tippy-box[data-animation=fade][data-s
 
 /***/ }),
 
-/***/ "./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[8].oneOf[1].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[8].oneOf[1].use[2]!./resources/js/plugins/ddrContextMenu/contextmenu.min.css":
-/*!***************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[8].oneOf[1].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[8].oneOf[1].use[2]!./resources/js/plugins/ddrContextMenu/contextmenu.min.css ***!
-  \***************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[8].oneOf[1].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[8].oneOf[1].use[2]!./resources/js/plugins/ddrContextMenu/index.css":
+/*!*****************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[8].oneOf[1].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[8].oneOf[1].use[2]!./resources/js/plugins/ddrContextMenu/index.css ***!
+  \*****************************************************************************************************************************************************************************************************************/
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -13699,7 +13690,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, ".cm_container{position:fixed;opacity:0;transform:scale(0);transition:transform 0.1s;transform-origin:top left;padding:0}.cm_container.display{opacity:1;transform:scale(1)}.cm_container,.cm_container *{box-sizing:border-box}.cm_container *{position:relative}.cm_container ul{list-style-type:none;padding:0;margin:0;background-color:#ccc;box-shadow:0 0 5px #333}.cm_container li{padding:5px 10px;padding-right:1.7em;cursor:pointer;white-space:nowrap}.cm_container li:hover{background-color:#bbb}.cm_container li .cm_icon_span{width:1.5em;height:1.2em;vertical-align:bottom;display:inline-block;border-right:1px solid #aaa;margin-right:5px;padding-right:5px;text-align:center}.cm_container li .cm_sub_span{width:1em;display:inline-block;text-align:center;position:absolute;top:50%;right:.5em;transform:translateY(-50%)}.cm_container li>ul{position:absolute;top:0;left:100%;opacity:0;transition:opacity 0.2s;visibility:hidden}.cm_container li:hover>ul{opacity:1;visibility:visible}.cm_container li.cm_divider{border-bottom:1px solid #aaa;margin:5px;padding:0;cursor:default}.cm_container li.cm_divider:hover{background-color:inherit}.cm_container.cm_border_right>ul ul{left:unset;right:100%}.cm_container.cm_border_bottom>ul ul{top:unset;bottom:0}.cm_container li[disabled=\"\"]{color:#777;cursor:default}.cm_container li[disabled=\"\"]:hover{background-color:inherit}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, ":root {\r\n\t--bg: #24262d;\r\n\t--text: #dfe3ff;\r\n\t--color1: #624e7e;\r\n    --color2: #3c2b45;\r\n\t--color1n: #ecf0f4;\r\n\t--color2n: #fff;\r\n\t--colorSub: #5d4d66;\r\n\t--divider: rgba(255,255,255,0.16);\r\n}\r\n\r\n.context {\r\n\tpadding: 0.05em 0.25em;\r\n\tborder: 1px solid transparent;\r\n    border-right-color: rgba(255, 255, 255, 0.15);\r\n    border-bottom-color: rgba(255, 255, 255, 0.15);\r\n    border-left-color: rgba(0, 0, 0, 0.15);\r\n    border-top-color: rgba(0, 0, 0, 0.15);\r\n\tborder-radius: 3px;\r\n\tposition: absolute;\r\n\tmin-width: 16em;\r\n\tz-index: 1;\r\n\tbackground: linear-gradient(145deg, var(--color1), var(--color2));\r\n\tbox-shadow: 0px 5px 5px -2px #1413213b;\r\n\twill-change: transform, opacity, filter;\r\n\ttransition: transform, opacity, visibility, filter;\r\n\ttransition-duration: 0.5s, 0.2s, 0.4s, 0.3s;\r\n\ttransition-delay: 0.1s, 0s, 0.4s, 0.2s;\r\n\ttransition-timing-function: ease;\r\n\ttransform: rotate3d(-1, -1, 0, 30deg) scale(1);\r\n\ttransform-origin: 0 0;\r\n\topacity: 0;\r\n\tvisibility: hidden;\r\n\tfilter: blur(6px);\r\n}\r\n\r\n.context p,\r\n.context span,\r\n.context small,\r\n.context strong,\r\n.context a {\r\n\tcolor: var(--text);\r\n}\r\n\r\n\r\n.context, .context * {\r\n\t-webkit-user-select: none;\r\n\t    -ms-user-select: none;\r\n\t        user-select: none;\r\n\tcursor: default;\r\n}\r\n.context.is-visible {\r\n\topacity: 1;\r\n\ttransform: none;\r\n\ttransition-delay: 0s, 0s, 0s, 0s;\r\n\tvisibility: visible;\r\n\tfilter: none;\r\n}\r\n.context.sub {\r\n\tbackground: var(--colorSub);\r\n\twidth: max-content;\r\n\tmin-width: 10em;\r\n\tleft: 100%;\r\n\ttop: -0.4em;\r\n\ttransform: translateX(-0.7em);\r\n\ttransition: transform, opacity, width, min-width, visibility;\r\n\ttransition-timing-function: ease;\r\n\ttransition-duration: 0.4s, 0.25s, 0.15s, 0.15s, 0.01s;\r\n\ttransition-delay: 0.4s, 0.25s, 0.3s, 0.3s, 0.35s;\r\n\toverflow: hidden;\r\n\tfilter: none;\r\n}\r\n.context.sub .f {\r\n\ttransform: translateX(-2.25em);\r\n}\r\n.context.sub.oppositeX {\r\n\tright: 100%;\r\n\tleft: auto;\r\n\ttransform: translateX(0.7em);\r\n}\r\n.context.sub.oppositeY {\r\n\ttop: auto;\r\n\tbottom: -0.4em;\r\n}\r\n.context > li {\r\n\tpadding: 0.3em 1.5em 0.35em 2.8em;\r\n\tborder-radius: 3px;\r\n\tposition: relative;\r\n\tdisplay: flex;\r\n}\r\n.context > li:before {\r\n\tcontent: \"\";\r\n\tposition: absolute;\r\n\tleft: 0;\r\n\ttop: 0;\r\n\tbottom: 0;\r\n\tright: 0;\r\n\tborder-radius: 3px;\r\n\tz-index: -1;\r\n\tbackground-color: rgba(97, 97, 97, 0.37);\r\n\tmix-blend-mode: color-dodge;\r\n\ttransition: opacity 0.15s cubic-bezier(0.55, 0.06, 0.68, 0.19);\r\n\topacity: 0;\r\n}\r\n.context > li.hilight {\r\n\tfont-weight: 500;\r\n\tpadding-bottom: 0.5em;\r\n\tcolor: white;\r\n}\r\n.context > li:not(.context > li.nope):hover {\r\n\tcolor: white;\r\n}\r\n.context > li:not(.context > li.nope):hover:before {\r\n\topacity: 1;\r\n\ttransition: opacity 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94);\r\n}\r\n.context > li:not(.context > li.nope):hover .sub {\r\n\topacity: 1;\r\n\ttransform: translateX(0);\r\n\ttransition-delay: 0.2s, 0.25s, 0.2s, 0.2s, 0s;\r\n\tborder-radius: 0 3px 3px 3px;\r\n\tvisibility: visible;\r\n}\r\n.context > li:hover > .f, .context > li.hilight > .f {\r\n\topacity: 1;\r\n}\r\n.context > li:last-child {\r\n\t margin-bottom: 0.25em;\r\n}\r\n.context > li:first-child {\r\n\tmargin-top: 0.25em;\r\n}\r\n.context > li.nope {\r\n  color: rgba(255, 255, 255, 0.3);\r\n}\r\n.context > li.active {\r\n animation: flash 0.5s ease 1;\r\n}\r\n.context > li:nth-of-type(1) {\r\n\tmargin-top: 0.5em;\r\n}\r\n.context > li .f {\r\n\tcolor: var(--text);\r\n\topacity: 0.5;\r\n\ttransition: all 0.2s ease;\r\n}\r\n.context > li i {\r\n\tfont-style: normal;\r\n\ttext-decoration: underline;\r\n\ttext-decoration-color: rgba(255, 255, 255, 0.35);\r\n}\r\n.context .divline {\r\n\tborder-bottom: 1px solid var(--divider);\r\n\tpadding: 0;\r\n\tmargin-top: 0.3em;\r\n\tmargin-bottom: 0.35em;\r\n}\r\n.context .f {\r\n\tfont-style: normal;\r\n\tposition: absolute;\r\n\ttransform: translateX(-2.4em);\r\n}\r\n.context .f[class*=chevron-right] {\r\n\tright: 0;\r\n\ttransform: none;\r\n}\r\n\r\n.f.f-circle {\r\n\tfill: red;\r\n}\r\n\r\nspan.size {\r\n\tposition: absolute;\r\n\tfont-size: 0.675em;\r\n\tleft: 1.2em;\r\n\ttop: 0.8em;\r\n\ttext-shadow: aliceblue;\r\n}\r\n\r\n@keyframes flash {\r\n\t0% {\r\n\t\tbackground: rgba(255, 255, 255, 0);\r\n\t}\r\n\t7% {\r\n\t\tbackground: rgba(255, 255, 255, 0.2);\r\n\t}\r\n\t14% {\r\n\t\tbackground: rgba(255, 255, 255, 0);\r\n\t}\r\n\t21% {\r\n\t\tbackground: rgba(255, 255, 255, 0.3);\r\n\t}\r\n}\r\n*,\r\n*:after,\r\n*:before {\r\n\tbox-sizing: border-box;\r\n}\r\n\r\n\r\n\r\n.hide {\r\n\tdisplay: none;\r\n}", ""]);
 // Exports
 /* harmony default export */ __webpack_exports__["default"] = (___CSS_LOADER_EXPORT___);
 
@@ -24743,17 +24734,17 @@ var update = _laravel_mix_node_modules_style_loader_dist_runtime_injectStylesInt
 
 /***/ }),
 
-/***/ "./resources/js/plugins/ddrContextMenu/contextmenu.min.css":
-/*!*****************************************************************!*\
-  !*** ./resources/js/plugins/ddrContextMenu/contextmenu.min.css ***!
-  \*****************************************************************/
+/***/ "./resources/js/plugins/ddrContextMenu/index.css":
+/*!*******************************************************!*\
+  !*** ./resources/js/plugins/ddrContextMenu/index.css ***!
+  \*******************************************************/
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _node_modules_laravel_mix_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../../node_modules/laravel-mix/node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/laravel-mix/node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
 /* harmony import */ var _node_modules_laravel_mix_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_laravel_mix_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _node_modules_css_loader_dist_cjs_js_ruleSet_1_rules_8_oneOf_1_use_1_node_modules_postcss_loader_dist_cjs_js_ruleSet_1_rules_8_oneOf_1_use_2_contextmenu_min_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../../node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[8].oneOf[1].use[1]!../../../../node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[8].oneOf[1].use[2]!./contextmenu.min.css */ "./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[8].oneOf[1].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[8].oneOf[1].use[2]!./resources/js/plugins/ddrContextMenu/contextmenu.min.css");
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_ruleSet_1_rules_8_oneOf_1_use_1_node_modules_postcss_loader_dist_cjs_js_ruleSet_1_rules_8_oneOf_1_use_2_index_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../../node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[8].oneOf[1].use[1]!../../../../node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[8].oneOf[1].use[2]!./index.css */ "./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[8].oneOf[1].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[8].oneOf[1].use[2]!./resources/js/plugins/ddrContextMenu/index.css");
 
             
 
@@ -24762,11 +24753,11 @@ var options = {};
 options.insert = "head";
 options.singleton = false;
 
-var update = _node_modules_laravel_mix_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_ruleSet_1_rules_8_oneOf_1_use_1_node_modules_postcss_loader_dist_cjs_js_ruleSet_1_rules_8_oneOf_1_use_2_contextmenu_min_css__WEBPACK_IMPORTED_MODULE_1__["default"], options);
+var update = _node_modules_laravel_mix_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_ruleSet_1_rules_8_oneOf_1_use_1_node_modules_postcss_loader_dist_cjs_js_ruleSet_1_rules_8_oneOf_1_use_2_index_css__WEBPACK_IMPORTED_MODULE_1__["default"], options);
 
 
 
-/* harmony default export */ __webpack_exports__["default"] = (_node_modules_css_loader_dist_cjs_js_ruleSet_1_rules_8_oneOf_1_use_1_node_modules_postcss_loader_dist_cjs_js_ruleSet_1_rules_8_oneOf_1_use_2_contextmenu_min_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
+/* harmony default export */ __webpack_exports__["default"] = (_node_modules_css_loader_dist_cjs_js_ruleSet_1_rules_8_oneOf_1_use_1_node_modules_postcss_loader_dist_cjs_js_ruleSet_1_rules_8_oneOf_1_use_2_index_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
 
 /***/ }),
 
