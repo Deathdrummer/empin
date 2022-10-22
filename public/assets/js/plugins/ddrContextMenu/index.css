@@ -2,7 +2,7 @@
 	--bg: #24262d;
 	--text: #dfe3ff;
 	--color1: #624e7e;
-    --color2: #3c2b45;
+	--color2: #3c2b45;
 	--color1n: #ecf0f4;
 	--color2n: #fff;
 	--colorSub: #5d4d66;
@@ -12,10 +12,10 @@
 .context {
 	padding: 0.05em 0.25em;
 	border: 1px solid transparent;
-    border-right-color: rgba(255, 255, 255, 0.15);
-    border-bottom-color: rgba(255, 255, 255, 0.15);
-    border-left-color: rgba(0, 0, 0, 0.15);
-    border-top-color: rgba(0, 0, 0, 0.15);
+	border-right-color: rgba(255, 255, 255, 0.15);
+	border-bottom-color: rgba(255, 255, 255, 0.15);
+	border-left-color: rgba(0, 0, 0, 0.15);
+	border-top-color: rgba(0, 0, 0, 0.15);
 	border-radius: 3px;
 	position: absolute;
 	min-width: 16em;
@@ -57,7 +57,7 @@
 	width: max-content;
 	min-width: 10em;
 	left: 100%;
-	top: -0.3em;
+	top: -0.35em;
 	transform: translateX(-0.7em);
 	transition: transform, opacity, width, min-width, visibility;
 	transition-timing-function: ease;
@@ -79,10 +79,13 @@
 	bottom: -0.4em;
 }
 .context > li {
-	padding: 0.3em 1.5em 0.3em 0.5em;
+	padding: 0.6em 2em 0.6em 0.5em;
 	border-radius: 3px;
 	position: relative;
+	font-size: 14px;
+	line-height: 1em;
 	display: flex;
+	align-items: center;
 }
 .context > li:before {
 	content: "";
@@ -116,7 +119,7 @@
 	border-radius: 0 3px 3px 3px;
 	visibility: visible;
 }
-.context > li:hover > .f, .context > li.hilight > .f, .context > li:hover > .icon, .context > li.hilight > .icon {
+.context > li:not(.context > li.nope):hover > .f, .context > li.hilight > .f, .context > li:not(.context > li.nope):hover > .icon, .context > li.hilight > .icon {
 	opacity: 1;
 }
 .context > li:last-child {
@@ -129,8 +132,9 @@
   color: rgba(255, 255, 255, 0.3);
 }
 .context > li.active {
-	-webkit-animation: flash 0.5s ease 1;
-          animation: flash 0.5s ease 1;
+	/*-webkit-animation: flash 0.5s ease 1;
+		  animation: flash 0.5s ease 1;*/
+	background: rgba(255, 255, 255, 0.2);
 }
 
 .context > li .f {
@@ -140,7 +144,7 @@
 	transition: all 0.2s ease;
 }
 .context > li .icon {
-	font-size: 14px;
+	font-size: inherit;
 	color: var(--text);
 	margin-right: 8px;
 	opacity: 0.5;
@@ -164,7 +168,7 @@
 }
 
 
-
+/*
 @-webkit-keyframes flash {
 	0% {
 		background: rgba(255, 255, 255, 0);
@@ -193,7 +197,7 @@
 	21% {
 		background: rgba(255, 255, 255, 0.3);
 	}
-}
+}*/
 *,
 *:after,
 *:before {
