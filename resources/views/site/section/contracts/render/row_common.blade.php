@@ -56,7 +56,7 @@
 	@endif
 	
 	@if(auth('site')->user()->can('contract-col-title:site') && (empty($userColums) || in_array('title', $userColums)))
-		<x-table.td class="breakword h-center">
+		<x-table.td class="breakword h-start">
 			<div class="scrollblock-hidden maxh4rem-6px pr3px">
 				<p class="fz12px lh100 mt2px mb2px">{{Str::of($title ?? '-')->limit(60, '...')}}</p>
 			</div>
@@ -64,7 +64,7 @@
 	@endif
 	
 	@if(auth('site')->user()->can('contract-col-applicant:site') && (empty($userColums) || in_array('applicant', $userColums)))
-		<x-table.td class="breakword h-center">
+		<x-table.td class="breakword h-start">
 			<div class="scrollblock-hidden maxh4rem-6px pr3px">
 				<p class="fz12px lh100 mt2px mb2px">{{$applicant ?? '-'}}</p>
 			</div>
