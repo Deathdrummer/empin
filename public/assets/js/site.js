@@ -7914,7 +7914,11 @@ $(document).on('contextmenu', '[contextmenu]', function (e) {
 
   var navData = (_$ = $)[func].apply(_$, _toConsumableArray(args));
 
-  if (!navData) throw new Error('Ошибка! contextmenu -> Указанная функция не возвращает данные!');
+  if (!navData.length) {
+    console.warn('contextmenu -> Указанная функция не возвращает данные!');
+    return; //throw new Error('Ошибка! contextmenu -> Указанная функция не возвращает данные!');
+  }
+
   var menuHtml = '<ul class="context noselect">';
   $.each(navData, function (k, item) {
     menuHtml += '<li' + (item.children ? ' class="parent"' : item.callback ? ' onclick="$.contextMenuCallFunc(\'' + item.callback + '\');"' : '') + '>';

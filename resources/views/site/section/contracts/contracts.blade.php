@@ -1592,7 +1592,7 @@
 	$.testContextMenu = (contractId, objectNumber, title, enableToArchive) => {
 		const navData = [];
 		
-		if (enableToArchive) {
+		if (enableToArchive == 1) {
 			navData.push({
 				name: 'Отправить в архив',
 				faIcon: 'fa-solid fa-box-archive',

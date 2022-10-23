@@ -14,7 +14,11 @@ $(document).on('contextmenu', '[contextmenu]', function(e) {
 	
 	const navData = $[func](...args);
 	
-	if (!navData) throw new Error('Ошибка! contextmenu -> Указанная функция не возвращает данные!');
+	if (!navData.length) {
+		console.warn('contextmenu -> Указанная функция не возвращает данные!');
+		return;
+		//throw new Error('Ошибка! contextmenu -> Указанная функция не возвращает данные!');
+	} 
 	
 	
 	let menuHtml = '<ul class="context noselect">';
