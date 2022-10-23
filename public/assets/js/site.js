@@ -7886,66 +7886,59 @@ $.ddrCRUD = function () {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _index_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./index.css */ "./resources/js/plugins/ddrContextMenu/index.css");
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
 
 $(document).on('contextmenu', '[contextmenu]', function (e) {
-  var menuHtml = '';
-  menuHtml += '<ul class="context noselect">';
-  menuHtml += '<li class="parent">';
-  menuHtml += '<i class="icon fa-fw fa-solid fa-triangle-exclamation"></i>';
-  menuHtml += '<p>Пункт меню 1</p>';
-  menuHtml += '<i class="f fa-solid fa-chevron-right"></i>';
-  menuHtml += '<ul class="context sub">';
-  menuHtml += '<li>';
-  menuHtml += '<i class="icon fa-fw fa-solid fa-download"></i>';
-  menuHtml += '<p>Подпункт меню 1</p>';
-  menuHtml += '</li>';
-  menuHtml += '<li>';
-  menuHtml += '<i class="icon fa-fw fa-solid fa-magnifying-glass"></i>';
-  menuHtml += '<p>Подпункт меню 2</p>';
-  menuHtml += '</li>';
-  menuHtml += '<li>';
-  menuHtml += '<i class="icon fa-fw fa-brands fa-discord"></i>';
-  menuHtml += '<p>Подпункт меню 3</p>';
-  menuHtml += '</li>';
-  menuHtml += '</ul>';
-  menuHtml += '</li>';
-  menuHtml += '<li class="divline"></li>';
-  menuHtml += '<li class="hilight">';
-  menuHtml += '<i class="icon fa-fw fa-solid fa-download"></i>';
-  menuHtml += '<p>Пункт меню 2</p>';
-  menuHtml += '</li>';
-  menuHtml += '<li class="parent">';
-  menuHtml += '<i class="icon fa-fw fa-solid fa-triangle-exclamation"></i>';
-  menuHtml += '<p>Пункт меню 3</p>';
-  menuHtml += '<i class="f fa-solid fa-chevron-right"></i>';
-  menuHtml += '<ul class="context sub">';
-  menuHtml += '<li>';
-  menuHtml += '<i class="icon fa-fw fa-solid fa-download"></i>';
-  menuHtml += '<p>Подпункт меню 1</p>';
-  menuHtml += '</li>';
-  menuHtml += '<li>';
-  menuHtml += '<i class="icon fa-fw fa-solid fa-magnifying-glass"></i>';
-  menuHtml += '<p>Подпункт меню 2</p>';
-  menuHtml += '</li>';
-  menuHtml += '<li>';
-  menuHtml += '<i class="icon fa-fw fa-brands fa-discord"></i>';
-  menuHtml += '<p>Подпункт меню 3</p>';
-  menuHtml += '</li>';
-  menuHtml += '</ul>';
-  menuHtml += '</li>';
-  menuHtml += '<li class="divline"></li>';
-  menuHtml += '<li class="hilight">';
-  menuHtml += '<i class="icon fa-fw fa-solid fa-download"></i>';
-  menuHtml += '<p>Пункт меню 4</p>';
-  menuHtml += '</li>';
-  menuHtml += '<li>';
-  menuHtml += '<i class="icon fa-fw fa-brands fa-slack"></i>';
-  menuHtml += '<p>Пункт меню 5</p>';
-  menuHtml += '</li>';
-  menuHtml += '<li>';
-  menuHtml += '<i class="icon fa-fw fa-brands fa-slack"></i>';
-  menuHtml += '<p>Пункт меню 6</p>';
-  menuHtml += '</li>';
+  var _d$, _$;
+
+  var d = $(this).attr('contextmenu').split(':'),
+      func = d[0],
+      args = (_d$ = d[1]) === null || _d$ === void 0 ? void 0 : _d$.split(',');
+
+  if (!$[func]) {
+    e.preventDefault();
+    throw new Error('Ошибка! contextmenu -> Указанная функция не создана!');
+  }
+
+  var data = (_$ = $)[func].apply(_$, _toConsumableArray(args));
+
+  if (!data) throw new Error('Ошибка! contextmenu -> Функция не передает данные!');
+  var menuHtml = '<ul class="context noselect">';
+  $.each(data, function (k, item) {
+    menuHtml += '<li' + (item.children ? ' class="parent"' : item.callback ? ' onclick="' + item.callback + '"' : '') + '>';
+
+    if (item.faIcon) {
+      menuHtml += '<i class="icon fa-fw ' + item.faIcon + '"></i>';
+    }
+
+    menuHtml += '<p>' + item.name + '</p>';
+
+    if (item.children) {
+      menuHtml += '<i class="f fa-solid fa-chevron-right"></i>';
+      menuHtml += '<ul class="context sub">';
+      $.each(item.children, function (k, childItem) {
+        var fff = childItem.callback;
+        menuHtml += '<li' + (childItem.callback ? ' onclick="$.contextMenuCallFunc(' + childItem.callback + ');"' : '') + '>';
+        menuHtml += '<i class="icon fa-fw ' + childItem.faIcon + '"></i>';
+        menuHtml += '<p>' + childItem.name + '</p>';
+        menuHtml += '</li>';
+      });
+      menuHtml += '</ul>';
+    }
+
+    menuHtml += '</li>';
+  });
   menuHtml += '</ul>';
 
   if ($('body').find('.context').length) {
@@ -8001,109 +7994,41 @@ $(document).on('contextmenu', '[contextmenu]', function (e) {
 
   $context.addClass("is-visible");
   $doc.on("mousedown", function (e) {
-    console.log('0');
     var $tar = $(e.target);
 
     if (!$tar.is($context) && !$tar.closest(".context").length) {
       $context.removeClass("is-visible");
       setTimeout(function () {
         $context.remove();
-      }, 50);
+      }, 100);
       $doc.off(e);
     }
   });
-  $context.on("mousedown mouseup touchstart touchend", "li:not(.nope):not(.parent)", function (e) {
+  $context.one("mousedown mouseup touchstart touchend", "li:not(.nope):not(.parent)", function (e) {
     e.stopPropagation();
     if (e.which !== 1) return;
 
     if (hasIn(['mousedown', 'touchstart'], e.type) !== false) {
-      console.log('d');
       $(this).addClass("active");
     } else if (hasIn(['mouseup', 'touchend'], e.type) !== false) {
       $(this).removeClass("active");
-      console.log('u');
     }
 
     console.log('1');
-    /*if (e.which === 1) {
-    	let $item = $(this);
-    	$item.removeClass("active");
-    	setTimeout(function() {
-    		$item.addClass("active");
-    	}, 10);
-    }*/
   });
-});
-$(function () {
-  return;
-  var $doc = $(document),
-      $context;
-  $doc.on("contextmenu", function (e) {
-    $context = $(".context:not(.sub)");
-    var $window = $(window),
-        $sub = $context.find(".sub");
-    console.log($context, $sub);
-    $sub.removeClass("oppositeX oppositeY");
-    e.preventDefault();
-    var w = $context.width();
-    var h = $context.height();
-    var x = e.clientX;
-    var y = e.clientY;
-    var ww = $window.width();
-    var wh = $window.height();
-    var padx = 30;
-    var pady = 20;
-    var fx = x;
-    var fy = y;
-    var hitsRight = x + w >= ww - padx;
-    var hitsBottom = y + h >= wh - pady;
-
-    if (hitsRight) {
-      fx = ww - w - padx;
-    }
-
-    if (hitsBottom) {
-      fy = wh - h - pady;
-    }
-
-    $context.css({
-      left: fx - 1,
-      top: fy - 1
-    });
-    var sw = $sub.width();
-    var sh = $sub.height();
-    var sx = $sub.offset().left;
-    var sy = $sub.offset().top;
-    var subHitsRight = sx + sw - padx >= ww - padx;
-    var subHitsBottom = sy + sh - pady >= wh - pady;
-
-    if (subHitsRight) {
-      $sub.addClass("oppositeX");
-    }
-
-    if (subHitsBottom) {
-      $sub.addClass("oppositeY");
-    }
-
-    $context.addClass("is-visible");
-    $doc.on("mousedown", function (e) {
-      var $tar = $(e.target);
-
-      if (!$tar.is($context) && !$tar.closest(".context").length) {
-        $context.removeClass("is-visible");
-        $doc.off(e);
-      }
-    });
-  });
-  $context.on("mousedown touchstart", "li:not(.nope)", function (e) {
-    if (e.which === 1) {
-      var $item = $(this);
-      $item.removeClass("active");
+  var cbObj = {
+    close: function close() {
+      $context.removeClass("is-visible");
       setTimeout(function () {
-        $item.addClass("active");
-      }, 10);
+        $context.remove();
+      }, 100);
     }
-  });
+  };
+
+  $.contextMenuCallFunc = function () {
+    var func = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+    if (func && typeof func == 'function') func(cbObj);
+  };
 });
 
 /***/ }),
@@ -13748,7 +13673,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, ":root {\r\n\t--bg: #24262d;\r\n\t--text: #dfe3ff;\r\n\t--color1: #624e7e;\r\n\t--color2: #3c2b45;\r\n\t--color1n: #ecf0f4;\r\n\t--color2n: #fff;\r\n\t--colorSub: #5d4d66;\r\n\t--divider: rgba(255,255,255,0.16);\r\n}\r\n\r\n.context {\r\n\tpadding: 0.05em 0.25em;\r\n\tborder: 1px solid transparent;\r\n\tborder-right-color: rgba(255, 255, 255, 0.15);\r\n\tborder-bottom-color: rgba(255, 255, 255, 0.15);\r\n\tborder-left-color: rgba(0, 0, 0, 0.15);\r\n\tborder-top-color: rgba(0, 0, 0, 0.15);\r\n\tborder-radius: 3px;\r\n\tposition: absolute;\r\n\tmin-width: 16em;\r\n\tz-index: 10;\r\n\tbackground: linear-gradient(145deg, var(--color1), var(--color2));\r\n\tbox-shadow: 0px 5px 5px -2px #1413213b;\r\n\twill-change: transform, opacity, filter;\r\n\ttransition: transform, opacity, visibility, filter;\r\n\ttransition-duration: 0.3s, 0.2s, 0.4s, 0.3s;\r\n\ttransition-delay: 0.1s, 0s, 0.4s, 0.2s;\r\n\ttransition-timing-function: ease;\r\n\ttransform: rotate3d(-1, -1, 0, 30deg) scale(1);\r\n\ttransform-origin: 0 0;\r\n\topacity: 0;\r\n\tvisibility: hidden;\r\n\tfilter: blur(4px);\r\n}\r\n\r\n.context p,\r\n.context span,\r\n.context small,\r\n.context strong,\r\n.context a {\r\n\tcolor: var(--text);\r\n}\r\n\r\n\r\n.context.is-visible {\r\n\topacity: 1;\r\n\ttransform: none;\r\n\ttransition-delay: 0s, 0s, 0s, 0s;\r\n\tvisibility: visible;\r\n\tfilter: none;\r\n}\r\n.context.sub {\r\n\tbackground: var(--colorSub);\r\n\twidth: max-content;\r\n\tmin-width: 10em;\r\n\tleft: 100%;\r\n\ttop: -0.35em;\r\n\ttransform: translateX(-0.7em);\r\n\ttransition: transform, opacity, width, min-width, visibility;\r\n\ttransition-timing-function: ease;\r\n\ttransition-duration: 0.4s, 0.25s, 0.15s, 0.15s, 0.01s;\r\n\ttransition-delay: 0.4s, 0.25s, 0.3s, 0.3s, 0.35s;\r\n\toverflow: hidden;\r\n\tfilter: none;\r\n}\r\n.context.sub .f {\r\n\ttransform: translateX(-2.25em);\r\n}\r\n.context.sub.oppositeX {\r\n\tright: 100%;\r\n\tleft: auto;\r\n\ttransform: translateX(0.7em);\r\n}\r\n.context.sub.oppositeY {\r\n\ttop: auto;\r\n\tbottom: -0.4em;\r\n}\r\n.context > li {\r\n\tpadding: 0.6em 2em 0.6em 0.5em;\r\n\tborder-radius: 3px;\r\n\tposition: relative;\r\n\tfont-size: 14px;\r\n\tline-height: 1em;\r\n\tdisplay: flex;\r\n\talign-items: center;\r\n}\r\n.context > li:before {\r\n\tcontent: \"\";\r\n\tposition: absolute;\r\n\tleft: 0;\r\n\ttop: 0;\r\n\tbottom: 0;\r\n\tright: 0;\r\n\tborder-radius: 3px;\r\n\tz-index: -1;\r\n\tbackground-color: rgba(97, 97, 97, 0.37);\r\n\tmix-blend-mode: color-dodge;\r\n\ttransition: opacity 0.15s cubic-bezier(0.55, 0.06, 0.68, 0.19);\r\n\topacity: 0;\r\n}\r\n.context > li.hilight {\r\n\tfont-weight: 500;\r\n\tcolor: white;\r\n}\r\n.context > li:not(.context > li.nope):hover {\r\n\tcolor: white;\r\n}\r\n.context > li:not(.context > li.nope):hover:before {\r\n\topacity: 1;\r\n\ttransition: opacity 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94);\r\n}\r\n.context > li:not(.context > li.nope):hover .sub {\r\n\topacity: 1;\r\n\ttransform: translateX(0);\r\n\ttransition-delay: 0.2s, 0.25s, 0.2s, 0.2s, 0s;\r\n\tborder-radius: 0 3px 3px 3px;\r\n\tvisibility: visible;\r\n}\r\n.context > li:not(.context > li.nope):hover > .f, .context > li.hilight > .f, .context > li:not(.context > li.nope):hover > .icon, .context > li.hilight > .icon {\r\n\topacity: 1;\r\n}\r\n.context > li:last-child {\r\n\t margin-bottom: 0.25em;\r\n}\r\n.context > li:first-child {\r\n\tmargin-top: 0.25em;\r\n}\r\n.context > li.nope {\r\n  color: rgba(255, 255, 255, 0.3);\r\n}\r\n.context > li.active {\r\n\t/*-webkit-animation: flash 0.5s ease 1;\r\n\t\t  animation: flash 0.5s ease 1;*/\r\n\tbackground: rgba(255, 255, 255, 0.2);\r\n}\r\n\r\n.context > li .f {\r\n\tfont-size: 10px;\r\n\tcolor: var(--text);\r\n\topacity: 0.5;\r\n\ttransition: all 0.2s ease;\r\n}\r\n.context > li .icon {\r\n\tfont-size: inherit;\r\n\tcolor: var(--text);\r\n\tmargin-right: 8px;\r\n\topacity: 0.5;\r\n\ttransition: all 0.2s ease;\r\n}\r\n.context .divline {\r\n\tborder-bottom: 1px solid var(--divider);\r\n\tpadding: 0;\r\n\tmargin-top: 0.3em;\r\n\tmargin-bottom: 0.35em;\r\n}\r\n.context .f {\r\n\tfont-style: normal;\r\n\tposition: absolute;\r\n\ttransform: translateX(-2.4em);\r\n}\r\n.context .f[class*=chevron-right] {\r\n\tright: 5px;\r\n\ttop: calc(50% - 6px);\r\n\ttransform: none;\r\n}\r\n\r\n\r\n/*\r\n@-webkit-keyframes flash {\r\n\t0% {\r\n\t\tbackground: rgba(255, 255, 255, 0);\r\n\t}\r\n\t7% {\r\n\t\tbackground: rgba(255, 255, 255, 0.2);\r\n\t}\r\n\t14% {\r\n\t\tbackground: rgba(255, 255, 255, 0);\r\n\t}\r\n\t21% {\r\n\t\tbackground: rgba(255, 255, 255, 0.3);\r\n\t}\r\n}\r\n\r\n@keyframes flash {\r\n\t0% {\r\n\t\tbackground: rgba(255, 255, 255, 0);\r\n\t}\r\n\t7% {\r\n\t\tbackground: rgba(255, 255, 255, 0.2);\r\n\t}\r\n\t14% {\r\n\t\tbackground: rgba(255, 255, 255, 0);\r\n\t}\r\n\t21% {\r\n\t\tbackground: rgba(255, 255, 255, 0.3);\r\n\t}\r\n}*/\r\n*,\r\n*:after,\r\n*:before {\r\n\tbox-sizing: border-box;\r\n}\r\n\r\n\r\n\r\n.hide {\r\n\tdisplay: none;\r\n}", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, ":root {\r\n\t--bg: #24262d;\r\n\t--text: #dfe3ff;\r\n\t--color1: #624e7e;\r\n\t--color2: #3c2b45;\r\n\t--color1n: #ecf0f4;\r\n\t--color2n: #fff;\r\n\t--colorSub: #5d4d66;\r\n\t--divider: rgba(255,255,255,0.16);\r\n}\r\n\r\n.context {\r\n\tpadding: 0.05em 0.25em;\r\n\tborder: 1px solid transparent;\r\n\tborder-right-color: rgba(255, 255, 255, 0.15);\r\n\tborder-bottom-color: rgba(255, 255, 255, 0.15);\r\n\tborder-left-color: rgba(0, 0, 0, 0.15);\r\n\tborder-top-color: rgba(0, 0, 0, 0.15);\r\n\tborder-radius: 3px;\r\n\tposition: absolute;\r\n\tmin-width: 16em;\r\n\tz-index: 10;\r\n\tbackground: linear-gradient(145deg, var(--color1), var(--color2));\r\n\tbox-shadow: 0px 5px 5px -2px #1413213b;\r\n\twill-change: transform, opacity, filter;\r\n\ttransition: transform, opacity, visibility, filter;\r\n\ttransition-duration: 0.3s, 0.2s, 0.4s, 0.3s;\r\n\ttransition-delay: 0.1s, 0s, 0.4s, 0.2s;\r\n\ttransition-timing-function: ease;\r\n\ttransform: rotate3d(-1, -1, 0, 10deg) scale(1);\r\n\ttransform-origin: 0 0;\r\n\topacity: 0;\r\n\tvisibility: hidden;\r\n\tfilter: blur(1px);\r\n}\r\n\r\n.context p,\r\n.context span,\r\n.context small,\r\n.context strong,\r\n.context a {\r\n\tcolor: var(--text);\r\n}\r\n\r\n\r\n.context.is-visible {\r\n\topacity: 1;\r\n\ttransform: none;\r\n\ttransition-delay: 0s, 0s, 0s, 0s;\r\n\tvisibility: visible;\r\n\tfilter: none;\r\n}\r\n.context.sub {\r\n\tbackground: var(--colorSub);\r\n\twidth: max-content;\r\n\tmin-width: 10em;\r\n\tleft: 100%;\r\n\ttop: -0.35em;\r\n\ttransform: translateX(-0.7em);\r\n\ttransition: transform, opacity, width, min-width, visibility;\r\n\ttransition-timing-function: ease;\r\n\ttransition-duration: 0.4s, 0.25s, 0.15s, 0.15s, 0.01s;\r\n\ttransition-delay: 0.4s, 0.25s, 0.3s, 0.3s, 0.35s;\r\n\toverflow: hidden;\r\n\tfilter: none;\r\n}\r\n.context.sub .f {\r\n\ttransform: translateX(-2.25em);\r\n}\r\n.context.sub.oppositeX {\r\n\tright: 100%;\r\n\tleft: auto;\r\n\ttransform: translateX(0.7em);\r\n}\r\n.context.sub.oppositeY {\r\n\ttop: auto;\r\n\tbottom: -0.35em;\r\n}\r\n.context > li {\r\n\tpadding: 0.6em 2em 0.6em 0.5em;\r\n\tborder-radius: 3px;\r\n\tposition: relative;\r\n\tfont-size: 14px;\r\n\tline-height: 1em;\r\n\tdisplay: flex;\r\n\talign-items: center;\r\n}\r\n.context > li:before {\r\n\tcontent: \"\";\r\n\tposition: absolute;\r\n\tleft: 0;\r\n\ttop: 0;\r\n\tbottom: 0;\r\n\tright: 0;\r\n\tborder-radius: 3px;\r\n\tz-index: -1;\r\n\tbackground-color: rgba(97, 97, 97, 0.37);\r\n\tmix-blend-mode: color-dodge;\r\n\ttransition: opacity 0.15s cubic-bezier(0.55, 0.06, 0.68, 0.19);\r\n\topacity: 0;\r\n}\r\n.context > li.hilight {\r\n\tfont-weight: 500;\r\n\tcolor: white;\r\n}\r\n.context > li:not(.context > li.nope):hover {\r\n\tcolor: white;\r\n}\r\n.context > li:not(.context > li.nope):hover:before {\r\n\topacity: 1;\r\n\ttransition: opacity 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94);\r\n}\r\n.context > li:not(.context > li.nope):hover .sub {\r\n\topacity: 1;\r\n\ttransform: translateX(0);\r\n\ttransition-delay: 0.2s, 0.25s, 0.2s, 0.2s, 0s;\r\n\tborder-radius: 0 3px 3px 3px;\r\n\tvisibility: visible;\r\n}\r\n.context > li:not(.context > li.nope):hover > .f, .context > li.hilight > .f, .context > li:not(.context > li.nope):hover > .icon, .context > li.hilight > .icon {\r\n\topacity: 1;\r\n}\r\n.context > li:last-child {\r\n\t margin-bottom: 0.25em;\r\n}\r\n.context > li:first-child {\r\n\tmargin-top: 0.25em;\r\n}\r\n.context > li.nope {\r\n  color: rgba(255, 255, 255, 0.3);\r\n}\r\n.context > li.active {\r\n\t/*-webkit-animation: flash 0.5s ease 1;\r\n\t\t  animation: flash 0.5s ease 1;*/\r\n\tbackground: rgba(255, 255, 255, 0.2);\r\n}\r\n\r\n.context > li .f {\r\n\tfont-size: 10px;\r\n\tcolor: var(--text);\r\n\topacity: 0.5;\r\n\ttransition: all 0.2s ease;\r\n}\r\n.context > li .icon {\r\n\tfont-size: inherit;\r\n\tcolor: var(--text);\r\n\tmargin-right: 8px;\r\n\topacity: 0.5;\r\n\ttransition: all 0.2s ease;\r\n}\r\n.context .divline {\r\n\tborder-bottom: 1px solid var(--divider);\r\n\tpadding: 0;\r\n\tmargin-top: 0.3em;\r\n\tmargin-bottom: 0.35em;\r\n}\r\n.context .f {\r\n\tfont-style: normal;\r\n\tposition: absolute;\r\n\ttransform: translateX(-2.4em);\r\n}\r\n.context .f[class*=chevron-right] {\r\n\tright: 5px;\r\n\ttop: calc(50% - 6px);\r\n\ttransform: none;\r\n}\r\n\r\n\r\n/*\r\n@-webkit-keyframes flash {\r\n\t0% {\r\n\t\tbackground: rgba(255, 255, 255, 0);\r\n\t}\r\n\t7% {\r\n\t\tbackground: rgba(255, 255, 255, 0.2);\r\n\t}\r\n\t14% {\r\n\t\tbackground: rgba(255, 255, 255, 0);\r\n\t}\r\n\t21% {\r\n\t\tbackground: rgba(255, 255, 255, 0.3);\r\n\t}\r\n}\r\n\r\n@keyframes flash {\r\n\t0% {\r\n\t\tbackground: rgba(255, 255, 255, 0);\r\n\t}\r\n\t7% {\r\n\t\tbackground: rgba(255, 255, 255, 0.2);\r\n\t}\r\n\t14% {\r\n\t\tbackground: rgba(255, 255, 255, 0);\r\n\t}\r\n\t21% {\r\n\t\tbackground: rgba(255, 255, 255, 0.3);\r\n\t}\r\n}*/\r\n*,\r\n*:after,\r\n*:before {\r\n\tbox-sizing: border-box;\r\n}\r\n\r\n\r\n\r\n.hide {\r\n\tdisplay: none;\r\n}", ""]);
 // Exports
 /* harmony default export */ __webpack_exports__["default"] = (___CSS_LOADER_EXPORT___);
 
@@ -47096,14 +47021,6 @@ $.notify.defaults({
 
 $.event.special.scrollstop.latency = 20;
 $(function () {
-  var scale = 'scale(1)';
-  document.body.style.webkitTransform = scale; // Chrome, Opera, Safari
-
-  document.body.style.msTransform = scale; // IE 9
-
-  document.body.style.transform = scale; // General
-
-  document.body.style.zoom = 1.0;
   $('body').on('contextmenu', function (e) {
     e.preventDefault();
   });

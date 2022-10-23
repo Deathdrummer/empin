@@ -46,12 +46,6 @@ $.event.special.scrollstop.latency = 20;
 
 $(function() {
 	
-	let scale = 'scale(1)';
-	document.body.style.webkitTransform = scale;    // Chrome, Opera, Safari
-	document.body.style.msTransform = scale;        // IE 9
-	document.body.style.transform = scale;          // General
-	document.body.style.zoom = 1.0;
-	
 	$('body').on('contextmenu', function(e) {
 		e.preventDefault();
 	});

@@ -27,11 +27,11 @@
 	transition-duration: 0.3s, 0.2s, 0.4s, 0.3s;
 	transition-delay: 0.1s, 0s, 0.4s, 0.2s;
 	transition-timing-function: ease;
-	transform: rotate3d(-1, -1, 0, 30deg) scale(1);
+	transform: rotate3d(-1, -1, 0, 10deg) scale(1);
 	transform-origin: 0 0;
 	opacity: 0;
 	visibility: hidden;
-	filter: blur(4px);
+	filter: blur(1px);
 }
 
 .context p,
@@ -76,7 +76,7 @@
 }
 .context.sub.oppositeY {
 	top: auto;
-	bottom: -0.4em;
+	bottom: -0.35em;
 }
 .context > li {
 	padding: 0.6em 2em 0.6em 0.5em;

@@ -1,4 +1,4 @@
-<section contextmenu>
+<section contextmenu="testContextMenu:foo,bar">
 	<x-card
 		id="testCard"
 		
@@ -23,3 +23,41 @@
 		
 	</x-card>
 </section>
+
+
+<script type="module">
+	
+	$.testContextMenu = (id, foo, bar) => {
+		
+		
+		return [
+			{
+				name: 'name 1',
+				faIcon: 'fa-solid fa-triangle-exclamation',
+				children: [
+					{
+						name: 'name 1 1',
+						faIcon: 'fa-solid fa-triangle-exclamation',
+						callback: ({close}) => {
+							console.log('callback');
+							close();
+						}
+					}
+				]
+			},
+			{
+				name: 'name 2',
+				faIcon: 'fa-solid fa-triangle-exclamation',
+			},
+			{
+				name: 'name 3',
+				faIcon: 'fa-solid fa-triangle-exclamation',
+			},
+			{
+				name: 'name 4',
+				faIcon: 'fa-solid fa-triangle-exclamation',
+			}
+		];
+	}
+	
+</script>

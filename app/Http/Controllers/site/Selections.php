@@ -170,6 +170,13 @@ class Selections extends Controller {
 		]);
 		
 		if (!$created = Selection::create($validFields)) return false;
+		
+		$userId = auth('site')->user()->id;
+		
+		$created['subscribed_read'] = $created['account_id'] != $userId && in_array($userId, ($created['subscribed']['read'] ?? [])) ? true : false;
+		$created['subscribed_write'] = $created['account_id'] != $userId && in_array($userId, ($created['subscribed']['write'] ?? [])) ? true : false;
+		$created['subscribed'] = $created['account_id'] != $userId ? true : false;
+		
 		return $created;
 	}
 	
