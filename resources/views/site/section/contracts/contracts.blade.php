@@ -1483,14 +1483,12 @@
 	
 	
 	//-------------------------------------------------  Отправить договор в архив
-	$.toArchiveContractAction = (btn, contractId) => {
-		let row = $(btn).closest('tr'),
-			cd = $(btn).attr('toarchivedata').split(','),
-			html = '';
-		
+	$.toArchiveContractAction = (row, contractId, objectNumber, title) => {
+
+		let html = '';
 		html += '<div>';
-		html += '<p class="fz14px color-darkgray text-start">Номер объекта: <span class="color-black">'+cd[0]+'</span></p>';
-		html += '<p class="fz14px color-darkgray text-start">Название/заявитель: <span class="color-black">'+cd[1]+'</span></p>';
+		html += '<p class="fz14px color-darkgray text-start">Номер объекта: <span class="color-black">'+objectNumber+'</span></p>';
+		html += '<p class="fz14px color-darkgray text-start">Название/заявитель: <span class="color-black">'+title+'</span></p>';
 		html += '<p class="fz18px color-red mt15px">Вы действительно хотите отправить договор в архив?</p>';
 		html += '</div>';
 		
@@ -1591,8 +1589,32 @@
 	
 	
 	//-------------------------------------------------  Контекстное меню
-	$.testContextMenu = (id, foo, bar) => {
-		console.log(id, foo, bar);
+	$.testContextMenu = (contractId, objectNumber, title, enableToArchive) => {
+		const navData = [];
+		
+		if (enableToArchive) {
+			navData.push({
+				name: 'Отправить в архив',
+				faIcon: 'fa-solid fa-box-archive',
+				callback: 'toArchiveContractAction'
+			});
+		}
+		
+		
+		/*{
+			name: 'Отправить в архив',
+			faIcon: 'fa-solid fa-box-archive',
+			children: [
+				{
+					name: 'name 1 1',
+					faIcon: 'fa-solid fa-triangle-exclamation',
+					callback: 'toArchiveContractAction'
+				}
+			]
+		}*/
+		
+		
+		return navData;
 	}
 	
 	

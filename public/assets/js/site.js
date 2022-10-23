@@ -7902,7 +7902,8 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 $(document).on('contextmenu', '[contextmenu]', function (e) {
   var _d$, _$;
 
-  var d = $(this).attr('contextmenu').split(':'),
+  var context = this,
+      d = $(context).attr('contextmenu').split(':'),
       func = d[0],
       args = (_d$ = d[1]) === null || _d$ === void 0 ? void 0 : _d$.split(',');
 
@@ -7911,12 +7912,12 @@ $(document).on('contextmenu', '[contextmenu]', function (e) {
     throw new Error('Ошибка! contextmenu -> Указанная функция не создана!');
   }
 
-  var data = (_$ = $)[func].apply(_$, _toConsumableArray(args));
+  var navData = (_$ = $)[func].apply(_$, _toConsumableArray(args));
 
-  if (!data) throw new Error('Ошибка! contextmenu -> Функция не передает данные!');
+  if (!navData) throw new Error('Ошибка! contextmenu -> Указанная функция не возвращает данные!');
   var menuHtml = '<ul class="context noselect">';
-  $.each(data, function (k, item) {
-    menuHtml += '<li' + (item.children ? ' class="parent"' : item.callback ? ' onclick="' + item.callback + '"' : '') + '>';
+  $.each(navData, function (k, item) {
+    menuHtml += '<li' + (item.children ? ' class="parent"' : item.callback ? ' onclick="$.contextMenuCallFunc(\'' + item.callback + '\');"' : '') + '>';
 
     if (item.faIcon) {
       menuHtml += '<i class="icon fa-fw ' + item.faIcon + '"></i>';
@@ -7928,8 +7929,7 @@ $(document).on('contextmenu', '[contextmenu]', function (e) {
       menuHtml += '<i class="f fa-solid fa-chevron-right"></i>';
       menuHtml += '<ul class="context sub">';
       $.each(item.children, function (k, childItem) {
-        var fff = childItem.callback;
-        menuHtml += '<li' + (childItem.callback ? ' onclick="$.contextMenuCallFunc(' + childItem.callback + ');"' : '') + '>';
+        menuHtml += '<li' + (childItem.callback ? ' onclick="$.contextMenuCallFunc(\'' + childItem.callback + '\');"' : '') + '>';
         menuHtml += '<i class="icon fa-fw ' + childItem.faIcon + '"></i>';
         menuHtml += '<p>' + childItem.name + '</p>';
         menuHtml += '</li>';
@@ -7940,6 +7940,7 @@ $(document).on('contextmenu', '[contextmenu]', function (e) {
     menuHtml += '</li>';
   });
   menuHtml += '</ul>';
+  console.log(menuHtml);
 
   if ($('body').find('.context').length) {
     $('body').find('.context').remove();
@@ -7977,19 +7978,22 @@ $(document).on('contextmenu', '[contextmenu]', function (e) {
     left: fx - 1,
     top: fy - 1
   });
-  var sw = $sub.width(),
-      sh = $sub.height(),
-      sx = $sub.offset().left,
-      sy = $sub.offset().top,
-      subHitsRight = sx + sw - padx >= ww - padx,
-      subHitsBottom = sy + sh - pady >= wh - pady;
 
-  if (subHitsRight) {
-    $sub.addClass("oppositeX");
-  }
+  if ($sub.length) {
+    var sw = $sub.width(),
+        sh = $sub.height(),
+        sx = $sub.offset().left,
+        sy = $sub.offset().top,
+        subHitsRight = sx + sw - padx >= ww - padx,
+        subHitsBottom = sy + sh - pady >= wh - pady;
 
-  if (subHitsBottom) {
-    $sub.addClass("oppositeY");
+    if (subHitsRight) {
+      $sub.addClass("oppositeX");
+    }
+
+    if (subHitsBottom) {
+      $sub.addClass("oppositeY");
+    }
   }
 
   $context.addClass("is-visible");
@@ -8011,23 +8015,27 @@ $(document).on('contextmenu', '[contextmenu]', function (e) {
     if (hasIn(['mousedown', 'touchstart'], e.type) !== false) {
       $(this).addClass("active");
     } else if (hasIn(['mouseup', 'touchend'], e.type) !== false) {
-      $(this).removeClass("active");
-    }
-
-    console.log('1');
-  });
-  var cbObj = {
-    close: function close() {
       $context.removeClass("is-visible");
       setTimeout(function () {
         $context.remove();
       }, 100);
+      $(this).removeClass("active");
     }
-  };
+  });
+  /*const cbObj = {
+  	close() {
+  		$context.removeClass("is-visible");
+  		setTimeout(function() {
+  			$context.remove();
+  		}, 100);
+  	}
+  };*/
 
   $.contextMenuCallFunc = function () {
-    var func = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
-    if (func && typeof func == 'function') func(cbObj);
+    var _$2;
+
+    var cbFunc = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+    if ($[cbFunc] && typeof $[cbFunc] == 'function') (_$2 = $)[cbFunc].apply(_$2, [context].concat(_toConsumableArray(args)));
   };
 });
 

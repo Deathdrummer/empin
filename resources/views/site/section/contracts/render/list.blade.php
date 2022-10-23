@@ -288,7 +288,7 @@
 								ondblclick="$.openContractInfo(this, '{{$contract['id']}}');"
 								isnew="{{$contract['is_new'] ? 1 : 0}}"
 								contractid="{{$contract['id']}}"
-								contextmenu="testContextMenu:{{$contract['id']}},foo,bar"
+								contextmenu="testContextMenu:{{$contract['id']}},{{$contract['object_number'] ?? '-'}},{{$contract['title'] ?? '-'}},{{auth('site')->user()->can('contract-col-to-archive:site') ? '1' : '0'}}"
 								>
 								@include('site.section/contracts.render.row_common', $contract)
 								@include('site.section/contracts.render.row_departments', compact('contract', 'alldeps'))
