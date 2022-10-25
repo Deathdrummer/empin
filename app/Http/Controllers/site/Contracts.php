@@ -127,6 +127,19 @@ class Contracts extends Controller {
 				return [$item['id'] => $item['title']];
 			})->toArray() : null;
 		
+		$user = auth('site')->user();
+		$rules = '';
+		$rules .= ($selectionEdited || ($selectionEdited && $searched) ? '1' : '0');
+		$rules .= ','.($searched && !($selectionEdited ?? false) ? '1' : '0');
+		$rules .= ','.((!$searched && !$selectionEdited && isset($departmentId) && $user->can('contract-col-hiding:site')) ? '1' : '0');
+		$rules .= ','.((!$searched && !$selectionEdited && isset($departmentId) && $user->can('contract-col-sending:site')) ? '1' : '0');
+		$rules .= ','.((!$searched && !$selectionEdited && isset($departmentId) && $user->can('contract-col-chat:site')) ? '1' : '0');
+		$rules .= ','.((!$searched && !$selectionEdited && !isset($departmentId) && !$isArchive && $user->can('contract-col-to-archive:site')) ? '1' : '0');
+		$rules .= ','.((!$searched && !$selectionEdited && !isset($departmentId) && !$isArchive && $user->can('contract-col-sending-all:site')) ? '1' : '0');
+		$rules .= ','.((!$searched && !$selectionEdited && !isset($departmentId) && !$isArchive && $user->can('contract-col-chat:site')) ? '1' : '0');
+		$rules .= ','.((!$searched && !$selectionEdited && !isset($departmentId) && $isArchive && $user->can('contract-col-return-to-work:site')) ? '1' : '0');
+		
+		
 		return $this->renderWithHeaders(
 			'list',
 			compact(
@@ -134,6 +147,7 @@ class Contracts extends Controller {
 				'alldeps',
 				'contractdata',
 				'edited',
+				'rules',
 				'departmentId',
 				'isArchive',
 				'sortField',

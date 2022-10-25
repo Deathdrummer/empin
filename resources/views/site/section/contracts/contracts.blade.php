@@ -1551,7 +1551,7 @@
 	
 	
 	//-------------------------------------------------  Отправить договор в другой отдел
-	$.sendContractAction = (rowBtn, contractId) => {
+	$.sendContractAction = (row, contractId) => {
 		ddrPopup({
 			title: 'Отправить договор в отдел',
 			width: 500, // ширина окна
@@ -1566,7 +1566,7 @@
 				axiosQuery('post', 'site/contracts/send', {contractId, departmentId}, 'json').then(({data, error, status, headers}) => {
 					if (data) {
 						$.notify('Договор успешно отправлен в '+departmentName+'!');
-						if (rowsCount == 1) $(rowBtn).ddrInputs('disable');
+						if (rowsCount == 1) row.changeAttrData(6, '0');
 					} else {
 						$.notify('Ошибка! Договор не был отправлен!', 'error');
 					}
@@ -1582,25 +1582,65 @@
 	
 	
 	
-	
-	
-	
-	
-	
-	
 	//-------------------------------------------------  Контекстное меню
-	$.testContextMenu = (contractId, objectNumber, title, enableToArchive) => {
+	$.contractContextMenu = (
+		{close, setCallback},
+		contractId,
+		departmentId,
+		selection,
+		objectNumber,
+		title,
+		hasDepsToSend,
+		removeFromSelection,
+		addToSelection,
+		hide,
+		sendToDepts,
+		chatDept,
+		toArchive,
+		sendToDeptsAll,
+		chat,
+		returnToWork
+		) => {
+		
+		$('#contractsList').one('scroll', function() {
+			close();
+		});
+		
 		const navData = [];
 		
-		if (enableToArchive == 1) {
+		
+		
+		
+		// removeFromSelection -> removeContractFromSelection:contractId,selection (Удалить из подборки)
+		// addToSelection -> addContractToSelection:contractId (добавьть договор в подборку)
+		// hide -> hideContractAction:contractId,departmentId (Скрыть)
+		// sendToDepts -> sendContractAction:contractId (Отправить в другой отдел)(в отделе)
+		// chatDept -> contractChatAction:contractId,title (Чат договора)
+		// toArchive -> toarchivedata:objectNumber,title (Отправить в архив)
+		// sendToDeptsAll -> sendContractAction:contractId (Отправить в другой отдел) (все договоры)
+		// chat -> contractChatAction:contractId,title (Чат договора)
+		// returnToWork -> returnContractToWorkAction:contractId (Вернуть договор в работу)
+		
+		
+		//if (toArchive) {
 			navData.push({
 				name: 'Отправить в архив',
 				faIcon: 'fa-solid fa-box-archive',
-				callback: 'toArchiveContractAction'
+				enable: toArchive,
+				callback: setCallback('toArchiveContractAction', contractId, objectNumber, title)
 			});
-		}
+		//}
 		
+		//if (sendToDepts || sendToDeptsAll) {
+			navData.push({
+				name: 'Отправить в другой отдел',
+				faIcon: 'fa-solid fa-angles-right',
+				enable: (sendToDepts || sendToDeptsAll) && !!hasDepsToSend,
+				callback: setCallback('sendContractAction', contractId)
+			});
+		//}
 		
+		// пример
 		/*{
 			name: 'Отправить в архив',
 			faIcon: 'fa-solid fa-box-archive',

@@ -6,6 +6,7 @@
 				ondblclick="$.openContractInfo(this, '{{$contract['id']}}');"
 				isnew="{{$contract['is_new'] ? 1 : 0}}"
 				contractid="{{$contract['id']}}"
+				contextmenu="contractContextMenu:{{$contract['id'] ?? ''}},{{$departmentId ?: '0'}},{{$selection ?: '0'}},{{$contract['object_number'] ?? ''}},{{$contract['title'] ?? ''}},{{$contract['has_deps_to_send'] ?? '0'}},{{$rules}}"
 				>
 				@include('site.section/contracts.render.row_common', $contract)
 				@include('site.section/contracts.render.row_departments', compact('contract', 'alldeps'))
@@ -281,6 +282,10 @@
 					</x-table.head>
 					
 					
+					
+					
+					
+					
 					<x-table.body style="max-height: calc(100vh - 364px);" id="contractsList">
 						@foreach ($list as $contract)
 							<x-table.tr
@@ -288,7 +293,7 @@
 								ondblclick="$.openContractInfo(this, '{{$contract['id']}}');"
 								isnew="{{$contract['is_new'] ? 1 : 0}}"
 								contractid="{{$contract['id']}}"
-								contextmenu="testContextMenu:{{$contract['id']}},{{$contract['object_number'] ?? '-'}},{{$contract['title'] ?? '-'}},{{(!isset($departmentId) && !$isArchive && auth('site')->user()->can('contract-col-to-archive:site')) ? '1' : '0'}}"
+								contextmenu="contractContextMenu:{{$contract['id'] ?? ''}},{{$departmentId ?: '0'}},{{$selection ?: '0'}},{{$contract['object_number'] ?? ''}},{{$contract['title'] ?? ''}},{{$contract['has_deps_to_send'] ?? '0'}},{{$rules}}"
 								>
 								@include('site.section/contracts.render.row_common', $contract)
 								@include('site.section/contracts.render.row_departments', compact('contract', 'alldeps'))

@@ -6394,6 +6394,41 @@ $.fn.hasAttr = function (a) {
   return _typeof(attr) !== ( true ? "undefined" : 0) && attr !== false;
 };
 /*
+	Добавить аттрибуты к тегу
+		- название атрибута
+		- условия {[название значения]: условия} (если в названии переменная - обернуть в [])
+*/
+
+
+window.setTagAttribute = function () {
+  var attrName = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+  var rules = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+  var joinSign = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : ' ';
+  if (_.isNull(attrName)) throw new Error('Ошибка! setTagAttribute -> не указан атрибут');
+  if (!_.isObject(attrName) && _.isNull(rules)) return '';
+  if (_.isObject(attrName)) joinSign = rules;
+
+  if (_.isObject(attrName)) {
+    var allAttrsValues = '';
+    $.each(attrName, function (attrNameItem, rulesItem) {
+      var attrValueItem = [];
+      $.each(rulesItem, function (val, rule) {
+        if (Boolean(rule)) attrValueItem.push(val);
+      });
+      if (attrValueItem.length == 0) return;
+      allAttrsValues += ' ' + attrNameItem + '="' + attrValueItem.join(joinSign) + '"';
+    });
+    return allAttrsValues;
+  }
+
+  var attrValue = [];
+  $.each(rules, function (val, rule) {
+    if (Boolean(rule)) attrValue.push(val);
+  });
+  if (attrValue.length == 0) return '';
+  return ' ' + attrName + '="' + attrValue.join(joinSign) + '"';
+};
+/*
 	Запретить скролл
 */
 

@@ -685,6 +685,48 @@ $.fn.hasAttr = function(a) {
 
 
 
+/*
+	Добавить аттрибуты к тегу
+		- название атрибута
+		- условия {[название значения]: условия} (если в названии переменная - обернуть в [])
+*/
+window.setTagAttribute = function(attrName = null, rules = null, joinSign = ' ') {
+	if (_.isNull(attrName)) throw new Error('Ошибка! setTagAttribute -> не указан атрибут');
+	if (!_.isObject(attrName) && _.isNull(rules)) return '';
+	if (_.isObject(attrName)) joinSign = rules;
+	
+	
+	
+	if (_.isObject(attrName)) {
+		let allAttrsValues = '';
+		$.each(attrName, function(attrNameItem, rulesItem) {
+			let attrValueItem = [];
+			$.each(rulesItem, function(val, rule) {
+				if (Boolean(rule)) attrValueItem.push(val);
+			});
+			
+			if (attrValueItem.length == 0) return;
+			
+			
+			allAttrsValues += ' '+attrNameItem+'="'+attrValueItem.join(joinSign)+'"';
+		});
+		
+		return allAttrsValues;
+	}
+	
+	
+	let attrValue = [];
+	$.each(rules, function(val, rule) {
+		if (Boolean(rule)) attrValue.push(val);
+	});
+	
+	if (attrValue.length == 0) return '';
+	
+	return ' '+attrName+'="'+attrValue.join(joinSign)+'"';
+}
+
+
+
 
 /*
 	Запретить скролл

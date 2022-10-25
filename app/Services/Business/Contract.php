@@ -247,7 +247,7 @@ class Contract {
 				'has_deps_to_send'	=> !!$item['has_deps_to_send'] ?? null,
 				'ready_to_archive'	=> $item['hide_count'] != 0 && $item['hide_count'] == $item->departments->count(),
 				'messages_count'	=> $item['messages_count'] ?? 0,
-				//'selected'			=> in_array($item['id'], $selectedContracts),
+				//'selected'		=> in_array($item['id'], $selectedContracts),
 				'selections'		=> $item->selections->pluck('id')->toArray() ?? [],
 				'departments' 		=> $departments
 			]];

@@ -6252,6 +6252,41 @@ $.fn.hasAttr = function (a) {
   return _typeof(attr) !== ( true ? "undefined" : 0) && attr !== false;
 };
 /*
+	Добавить аттрибуты к тегу
+		- название атрибута
+		- условия {[название значения]: условия} (если в названии переменная - обернуть в [])
+*/
+
+
+window.setTagAttribute = function () {
+  var attrName = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+  var rules = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+  var joinSign = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : ' ';
+  if (_.isNull(attrName)) throw new Error('Ошибка! setTagAttribute -> не указан атрибут');
+  if (!_.isObject(attrName) && _.isNull(rules)) return '';
+  if (_.isObject(attrName)) joinSign = rules;
+
+  if (_.isObject(attrName)) {
+    var allAttrsValues = '';
+    $.each(attrName, function (attrNameItem, rulesItem) {
+      var attrValueItem = [];
+      $.each(rulesItem, function (val, rule) {
+        if (Boolean(rule)) attrValueItem.push(val);
+      });
+      if (attrValueItem.length == 0) return;
+      allAttrsValues += ' ' + attrNameItem + '="' + attrValueItem.join(joinSign) + '"';
+    });
+    return allAttrsValues;
+  }
+
+  var attrValue = [];
+  $.each(rules, function (val, rule) {
+    if (Boolean(rule)) attrValue.push(val);
+  });
+  if (attrValue.length == 0) return '';
+  return ' ' + attrName + '="' + attrValue.join(joinSign) + '"';
+};
+/*
 	Запретить скролл
 */
 
@@ -7886,6 +7921,8 @@ $.ddrCRUD = function () {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _index_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./index.css */ "./resources/js/plugins/ddrContextMenu/index.css");
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -7899,29 +7936,71 @@ function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToAr
 function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
 
 
+/*
+	как работает функция:
+		- в области, где нужно вызвать меню - прописывается атрибут contextmenu в значение которого заносятся
+			1. функция коллбэк, которая должна вернуть объект пунктов меню
+			2. любые необходимые данные для формирования этогосамого объекта пунктов меню
+		- создается функция коллбэк, которая была указана в атрибуте
+			- функция передает объект методов (close, setCallback... см. const methods) и далее, все аргументы, переданные через атрибут
+			- для каждого пункта указаывается коллбэк функция (можно через метод setCallback), которая вызывается при клике на соответствующй пункт меню
+*/
+// Функция вызова контекстного меню возвращает объект методов и все переданные аргументы
+
 $(document).on('contextmenu', '[contextmenu]', function (e) {
-  var _d$, _$;
+  var _$$attr, _$$attr$replace, _d$, _$, _window;
 
   var context = this,
-      d = $(context).attr('contextmenu').split(':'),
+      d = (_$$attr = $(context).attr('contextmenu')) === null || _$$attr === void 0 ? void 0 : (_$$attr$replace = _$$attr.replace(/\n+/gm, '')) === null || _$$attr$replace === void 0 ? void 0 : _$$attr$replace.split(':'),
       func = d[0],
       args = (_d$ = d[1]) === null || _d$ === void 0 ? void 0 : _d$.split(',');
 
-  if (!$[func]) {
+  if (!$[func] && !window[func]) {
     e.preventDefault();
     throw new Error('Ошибка! contextmenu -> Указанная функция не создана!');
   }
 
-  var navData = (_$ = $)[func].apply(_$, _toConsumableArray(args));
+  args = args.map(function (item) {
+    item = item.trim();
+    return isInt(item) ? parseInt(item) : item;
+  });
+  var methods = {
+    close: function close() {
+      // закрыть контекстное меню
+      $context.removeClass("is-visible");
+      setTimeout(function () {
+        $context.remove();
+      }, 100);
+    },
+    setCallback: function setCallback(cbFnc, args) {
+      for (var _len = arguments.length, addArgs = new Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
+        addArgs[_key - 2] = arguments[_key];
+      }
 
-  if (!navData.length) {
+      // при перечислении пунктов меню применять данную функцию как построитель для передачи функции с аргументами
+      var argsData = _.isArray(args) ? args : _.concat(args, [].concat(addArgs));
+      return cbFnc + ':' + argsData.join(',');
+    }
+  };
+  var navData = $[func] && typeof $[func] == 'function' ? (_$ = $)[func].apply(_$, [methods].concat(_toConsumableArray(args))) : window[func] && typeof window[func] == 'function' ? (_window = window)[func].apply(_window, [methods].concat(_toConsumableArray(args))) : false;
+
+  if (!navData || !navData.length) {
     console.warn('contextmenu -> Указанная функция не возвращает данные!');
     return; //throw new Error('Ошибка! contextmenu -> Указанная функция не возвращает данные!');
   }
 
   var menuHtml = '<ul class="context noselect">';
   $.each(navData, function (k, item) {
-    menuHtml += '<li' + (item.children ? ' class="parent"' : item.callback ? ' onclick="$.contextMenuCallFunc(\'' + item.callback + '\');"' : '') + '>';
+    //let itemAttrs = setTagAttribute('class', {'parent': item.children, 'nope': !item.enable || item.disable});
+    //	itemAttrs += setTagAttribute('onclick', {['$.contextMenuCallFunc(\''+item.callback+'\');']: item.callback && !item.children});
+    var itemAttrs = setTagAttribute({
+      'class': {
+        'parent': item.children,
+        'nope': item.enable != undefined && !item.enable || item.disable
+      },
+      'onclick': _defineProperty({}, '$.contextMenuCallFunc(\'' + item.callback + '\');', item.callback && !item.children)
+    });
+    menuHtml += '<li' + itemAttrs + '>';
 
     if (item.faIcon) {
       menuHtml += '<i class="icon fa-fw ' + item.faIcon + '"></i>';
@@ -7933,7 +8012,11 @@ $(document).on('contextmenu', '[contextmenu]', function (e) {
       menuHtml += '<i class="f fa-solid fa-chevron-right"></i>';
       menuHtml += '<ul class="context sub">';
       $.each(item.children, function (k, childItem) {
-        menuHtml += '<li' + (childItem.callback ? ' onclick="$.contextMenuCallFunc(\'' + childItem.callback + '\');"' : '') + '>';
+        var childItemAttrs = setTagAttribute('class', {
+          'nope': !childItem.enable || childItem.disable
+        });
+        childItemAttrs += setTagAttribute('onclick', _defineProperty({}, '$.contextMenuCallFunc(\'' + childItem.callback + '\');', childItem.callback));
+        menuHtml += '<li' + childItemAttrs + '>';
         menuHtml += '<i class="icon fa-fw ' + childItem.faIcon + '"></i>';
         menuHtml += '<p>' + childItem.name + '</p>';
         menuHtml += '</li>';
@@ -7944,7 +8027,6 @@ $(document).on('contextmenu', '[contextmenu]', function (e) {
     menuHtml += '</li>';
   });
   menuHtml += '</ul>';
-  console.log(menuHtml);
 
   if ($('body').find('.context').length) {
     $('body').find('.context').remove();
@@ -8026,20 +8108,46 @@ $(document).on('contextmenu', '[contextmenu]', function (e) {
       $(this).removeClass("active");
     }
   });
-  /*const cbObj = {
-  	close() {
-  		$context.removeClass("is-visible");
-  		setTimeout(function() {
-  			$context.remove();
-  		}, 100);
-  	}
-  };*/
 
   $.contextMenuCallFunc = function () {
-    var _$2;
+    var _cbData$replace, _d$2, _window2, _$2;
 
-    var cbFunc = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
-    if ($[cbFunc] && typeof $[cbFunc] == 'function') (_$2 = $)[cbFunc].apply(_$2, [context].concat(_toConsumableArray(args)));
+    var cbData = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+    if (!cbData) throw new Error('Ошибка! contextmenu contextMenuCallFunc -> Не переданы данные!');
+    var d = cbData === null || cbData === void 0 ? void 0 : (_cbData$replace = cbData.replace(/\n+/gm, '')) === null || _cbData$replace === void 0 ? void 0 : _cbData$replace.split(':'),
+        cbFunc = d[0],
+        cbArgs = (_d$2 = d[1]) === null || _d$2 === void 0 ? void 0 : _d$2.split(',');
+
+    if (!$[cbFunc] && !window[cbFunc]) {
+      e.preventDefault();
+      throw new Error('Ошибка! contextmenu contextMenuCallFunc -> Указанная функция коллбэка не создана!');
+    }
+
+    cbArgs = cbArgs.map(function (item) {
+      item = item.trim();
+      return isInt(item) ? parseInt(item) : item;
+    }); // методы, которые привязаны к селектору.
+    // То есть, можно использовать селектор по прямому назначению и можно вызывать через него методы.
+
+    $.extend(context, {
+      changeAttrData: function changeAttrData() {
+        var _$$attr2, _$$attr2$replace, _d$3;
+
+        var argIndex = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+        var newData = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+        if (_.isNull(argIndex) || _.isNull(newData)) throw new Error('Ошибка! contextmenu changeAttrData -> неверно переданы аргументы!');
+        var d = (_$$attr2 = $(context).attr('contextmenu')) === null || _$$attr2 === void 0 ? void 0 : (_$$attr2$replace = _$$attr2.replace(/\n+/gm, '')) === null || _$$attr2$replace === void 0 ? void 0 : _$$attr2$replace.split(':'),
+            func = d[0],
+            args = (_d$3 = d[1]) === null || _d$3 === void 0 ? void 0 : _d$3.split(','),
+            buildAttrString = func + ':',
+            i = argIndex - 1;
+        if (!args[i]) throw new Error('Ошибка! contextmenu changeAttrData -> аргумента с таким порядковым номером не существует!');
+        args[i] = newData;
+        buildAttrString += args.join(',');
+        $(context).setAttrib('contextmenu', buildAttrString);
+      }
+    });
+    if (window[cbFunc] && typeof window[cbFunc] == 'function') (_window2 = window)[cbFunc].apply(_window2, [context].concat(_toConsumableArray(cbArgs)));else if ($[cbFunc] && typeof $[cbFunc] == 'function') (_$2 = $)[cbFunc].apply(_$2, [context].concat(_toConsumableArray(cbArgs)));
   };
 });
 
@@ -13685,7 +13793,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, ":root {\r\n\t--bg: #24262d;\r\n\t--text: #dfe3ff;\r\n\t--color1: #624e7e;\r\n\t--color2: #3c2b45;\r\n\t--color1n: #ecf0f4;\r\n\t--color2n: #fff;\r\n\t--colorSub: #5d4d66;\r\n\t--divider: rgba(255,255,255,0.16);\r\n}\r\n\r\n.context {\r\n\tpadding: 0.05em 0.25em;\r\n\tborder: 1px solid transparent;\r\n\tborder-right-color: rgba(255, 255, 255, 0.15);\r\n\tborder-bottom-color: rgba(255, 255, 255, 0.15);\r\n\tborder-left-color: rgba(0, 0, 0, 0.15);\r\n\tborder-top-color: rgba(0, 0, 0, 0.15);\r\n\tborder-radius: 3px;\r\n\tposition: absolute;\r\n\tmin-width: 16em;\r\n\tz-index: 10;\r\n\tbackground: linear-gradient(145deg, var(--color1), var(--color2));\r\n\tbox-shadow: 0px 5px 5px -2px #1413213b;\r\n\twill-change: transform, opacity, filter;\r\n\ttransition: transform, opacity, visibility, filter;\r\n\ttransition-duration: 0.3s, 0.2s, 0.4s, 0.3s;\r\n\ttransition-delay: 0.1s, 0s, 0.4s, 0.2s;\r\n\ttransition-timing-function: ease;\r\n\ttransform: rotate3d(-1, -1, 0, 10deg) scale(1);\r\n\ttransform-origin: 0 0;\r\n\topacity: 0;\r\n\tvisibility: hidden;\r\n\tfilter: blur(1px);\r\n}\r\n\r\n.context p,\r\n.context span,\r\n.context small,\r\n.context strong,\r\n.context a {\r\n\tcolor: var(--text);\r\n}\r\n\r\n\r\n.context.is-visible {\r\n\topacity: 1;\r\n\ttransform: none;\r\n\ttransition-delay: 0s, 0s, 0s, 0s;\r\n\tvisibility: visible;\r\n\tfilter: none;\r\n}\r\n.context.sub {\r\n\tbackground: var(--colorSub);\r\n\twidth: max-content;\r\n\tmin-width: 10em;\r\n\tleft: 100%;\r\n\ttop: -0.35em;\r\n\ttransform: translateX(-0.7em);\r\n\ttransition: transform, opacity, width, min-width, visibility;\r\n\ttransition-timing-function: ease;\r\n\ttransition-duration: 0.4s, 0.25s, 0.15s, 0.15s, 0.01s;\r\n\ttransition-delay: 0.4s, 0.25s, 0.3s, 0.3s, 0.35s;\r\n\toverflow: hidden;\r\n\tfilter: none;\r\n}\r\n.context.sub .f {\r\n\ttransform: translateX(-2.25em);\r\n}\r\n.context.sub.oppositeX {\r\n\tright: 100%;\r\n\tleft: auto;\r\n\ttransform: translateX(0.7em);\r\n}\r\n.context.sub.oppositeY {\r\n\ttop: auto;\r\n\tbottom: -0.35em;\r\n}\r\n.context > li {\r\n\tpadding: 0.6em 2em 0.6em 0.5em;\r\n\tborder-radius: 3px;\r\n\tposition: relative;\r\n\tfont-size: 14px;\r\n\tline-height: 1em;\r\n\tdisplay: flex;\r\n\talign-items: center;\r\n}\r\n.context > li:before {\r\n\tcontent: \"\";\r\n\tposition: absolute;\r\n\tleft: 0;\r\n\ttop: 0;\r\n\tbottom: 0;\r\n\tright: 0;\r\n\tborder-radius: 3px;\r\n\tz-index: -1;\r\n\tbackground-color: rgba(97, 97, 97, 0.37);\r\n\tmix-blend-mode: color-dodge;\r\n\ttransition: opacity 0.15s cubic-bezier(0.55, 0.06, 0.68, 0.19);\r\n\topacity: 0;\r\n}\r\n.context > li.hilight {\r\n\tfont-weight: 500;\r\n\tcolor: white;\r\n}\r\n.context > li:not(.context > li.nope):hover {\r\n\tcolor: white;\r\n}\r\n.context > li:not(.context > li.nope):hover:before {\r\n\topacity: 1;\r\n\ttransition: opacity 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94);\r\n}\r\n.context > li:not(.context > li.nope):hover .sub {\r\n\topacity: 1;\r\n\ttransform: translateX(0);\r\n\ttransition-delay: 0.2s, 0.25s, 0.2s, 0.2s, 0s;\r\n\tborder-radius: 0 3px 3px 3px;\r\n\tvisibility: visible;\r\n}\r\n.context > li:not(.context > li.nope):hover > .f, .context > li.hilight > .f, .context > li:not(.context > li.nope):hover > .icon, .context > li.hilight > .icon {\r\n\topacity: 1;\r\n}\r\n.context > li:last-child {\r\n\t margin-bottom: 0.25em;\r\n}\r\n.context > li:first-child {\r\n\tmargin-top: 0.25em;\r\n}\r\n.context > li.nope {\r\n  color: rgba(255, 255, 255, 0.3);\r\n}\r\n.context > li.active {\r\n\t/*-webkit-animation: flash 0.5s ease 1;\r\n\t\t  animation: flash 0.5s ease 1;*/\r\n\tbackground: rgba(255, 255, 255, 0.2);\r\n}\r\n\r\n.context > li .f {\r\n\tfont-size: 10px;\r\n\tcolor: var(--text);\r\n\topacity: 0.5;\r\n\ttransition: all 0.2s ease;\r\n}\r\n.context > li .icon {\r\n\tfont-size: inherit;\r\n\tcolor: var(--text);\r\n\tmargin-right: 8px;\r\n\topacity: 0.5;\r\n\ttransition: all 0.2s ease;\r\n}\r\n.context .divline {\r\n\tborder-bottom: 1px solid var(--divider);\r\n\tpadding: 0;\r\n\tmargin-top: 0.3em;\r\n\tmargin-bottom: 0.35em;\r\n}\r\n.context .f {\r\n\tfont-style: normal;\r\n\tposition: absolute;\r\n\ttransform: translateX(-2.4em);\r\n}\r\n.context .f[class*=chevron-right] {\r\n\tright: 5px;\r\n\ttop: calc(50% - 6px);\r\n\ttransform: none;\r\n}\r\n\r\n\r\n/*\r\n@-webkit-keyframes flash {\r\n\t0% {\r\n\t\tbackground: rgba(255, 255, 255, 0);\r\n\t}\r\n\t7% {\r\n\t\tbackground: rgba(255, 255, 255, 0.2);\r\n\t}\r\n\t14% {\r\n\t\tbackground: rgba(255, 255, 255, 0);\r\n\t}\r\n\t21% {\r\n\t\tbackground: rgba(255, 255, 255, 0.3);\r\n\t}\r\n}\r\n\r\n@keyframes flash {\r\n\t0% {\r\n\t\tbackground: rgba(255, 255, 255, 0);\r\n\t}\r\n\t7% {\r\n\t\tbackground: rgba(255, 255, 255, 0.2);\r\n\t}\r\n\t14% {\r\n\t\tbackground: rgba(255, 255, 255, 0);\r\n\t}\r\n\t21% {\r\n\t\tbackground: rgba(255, 255, 255, 0.3);\r\n\t}\r\n}*/\r\n*,\r\n*:after,\r\n*:before {\r\n\tbox-sizing: border-box;\r\n}\r\n\r\n\r\n\r\n.hide {\r\n\tdisplay: none;\r\n}", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, ":root {\r\n\t--bg: #24262d;\r\n\t--text: #dfe3ff;\r\n\t--color1: #624e7e;\r\n\t--color2: #3c2b45;\r\n\t--color1n: #ecf0f4;\r\n\t--color2n: #fff;\r\n\t--colorSub: #5d4d66;\r\n\t--divider: rgba(255,255,255,0.16);\r\n}\r\n\r\n.context {\r\n\tpadding: 0.05em 0.25em;\r\n\tborder: 1px solid transparent;\r\n\tborder-right-color: rgba(255, 255, 255, 0.15);\r\n\tborder-bottom-color: rgba(255, 255, 255, 0.15);\r\n\tborder-left-color: rgba(0, 0, 0, 0.15);\r\n\tborder-top-color: rgba(0, 0, 0, 0.15);\r\n\tborder-radius: 3px;\r\n\tposition: absolute;\r\n\tmin-width: 16em;\r\n\tz-index: 10;\r\n\tbackground: linear-gradient(145deg, var(--color1), var(--color2));\r\n\tbox-shadow: 0px 5px 5px -2px #1413213b;\r\n\twill-change: transform, opacity, filter;\r\n\ttransition: transform, opacity, visibility, filter;\r\n\ttransition-duration: 0.3s, 0.2s, 0.4s, 0.3s;\r\n\ttransition-delay: 0.1s, 0s, 0.4s, 0.2s;\r\n\ttransition-timing-function: ease;\r\n\ttransform: rotate3d(-1, -1, 0, 10deg) scale(1);\r\n\ttransform-origin: 0 0;\r\n\topacity: 0;\r\n\tvisibility: hidden;\r\n\tfilter: blur(1px);\r\n}\r\n\r\n.context p,\r\n.context span,\r\n.context small,\r\n.context strong,\r\n.context a {\r\n\tcolor: var(--text);\r\n}\r\n\r\n\r\n.context.is-visible {\r\n\topacity: 1;\r\n\ttransform: none;\r\n\ttransition-delay: 0s, 0s, 0s, 0s;\r\n\tvisibility: visible;\r\n\tfilter: none;\r\n}\r\n.context.sub {\r\n\tbackground: var(--colorSub);\r\n\twidth: max-content;\r\n\tmin-width: 10em;\r\n\tleft: 100%;\r\n\ttop: -0.35em;\r\n\ttransform: translateX(-0.7em);\r\n\ttransition: transform, opacity, width, min-width, visibility;\r\n\ttransition-timing-function: ease;\r\n\ttransition-duration: 0.4s, 0.25s, 0.15s, 0.15s, 0.01s;\r\n\ttransition-delay: 0.4s, 0.25s, 0.3s, 0.3s, 0.35s;\r\n\toverflow: hidden;\r\n\tfilter: none;\r\n}\r\n.context.sub .f {\r\n\ttransform: translateX(-2.25em);\r\n}\r\n.context.sub.oppositeX {\r\n\tright: 100%;\r\n\tleft: auto;\r\n\ttransform: translateX(0.7em);\r\n}\r\n.context.sub.oppositeY {\r\n\ttop: auto;\r\n\tbottom: -0.35em;\r\n}\r\n.context > li {\r\n\tpadding: 0.6em 2em 0.6em 0.5em;\r\n\tborder-radius: 3px;\r\n\tposition: relative;\r\n\tfont-size: 14px;\r\n\tline-height: 1em;\r\n\tdisplay: flex;\r\n\talign-items: center;\r\n}\r\n.context > li:before {\r\n\tcontent: \"\";\r\n\tposition: absolute;\r\n\tleft: 0;\r\n\ttop: 0;\r\n\tbottom: 0;\r\n\tright: 0;\r\n\tborder-radius: 3px;\r\n\tz-index: -1;\r\n\tbackground-color: rgba(97, 97, 97, 0.37);\r\n\tmix-blend-mode: color-dodge;\r\n\ttransition: opacity 0.15s cubic-bezier(0.55, 0.06, 0.68, 0.19);\r\n\topacity: 0;\r\n}\r\n.context > li.hilight {\r\n\tfont-weight: 500;\r\n\tcolor: white;\r\n}\r\n.context > li:not(.context > li.nope):hover {\r\n\tcolor: white;\r\n}\r\n.context > li:not(.context > li.nope):hover:before {\r\n\topacity: 1;\r\n\ttransition: opacity 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94);\r\n}\r\n.context > li:not(.context > li.nope):hover .sub {\r\n\topacity: 1;\r\n\ttransform: translateX(0);\r\n\ttransition-delay: 0.2s, 0.25s, 0.2s, 0.2s, 0s;\r\n\tborder-radius: 0 3px 3px 3px;\r\n\tvisibility: visible;\r\n}\r\n.context > li:not(.context > li.nope):hover > .f, .context > li.hilight > .f, .context > li:not(.context > li.nope):hover > .icon, .context > li.hilight > .icon {\r\n\topacity: 1;\r\n}\r\n.context > li:last-child {\r\n\t margin-bottom: 0.25em;\r\n}\r\n.context > li:first-child {\r\n\tmargin-top: 0.25em;\r\n}\r\n\r\n.context > li.nope {\r\n\tpointer-events: none;\r\n\topacity: 0.4;\r\n}\r\n.context > li.active {\r\n\t/*-webkit-animation: flash 0.5s ease 1;\r\n\t\t  animation: flash 0.5s ease 1;*/\r\n\tbackground: rgba(255, 255, 255, 0.2);\r\n}\r\n\r\n.context > li .f {\r\n\tfont-size: 10px;\r\n\tcolor: var(--text);\r\n\topacity: 0.5;\r\n\ttransition: all 0.2s ease;\r\n}\r\n.context > li .icon {\r\n\tfont-size: inherit;\r\n\tcolor: var(--text);\r\n\tmargin-right: 8px;\r\n\topacity: 0.5;\r\n\ttransition: all 0.2s ease;\r\n}\r\n.context .divline {\r\n\tborder-bottom: 1px solid var(--divider);\r\n\tpadding: 0;\r\n\tmargin-top: 0.3em;\r\n\tmargin-bottom: 0.35em;\r\n}\r\n.context .f {\r\n\tfont-style: normal;\r\n\tposition: absolute;\r\n\ttransform: translateX(-2.4em);\r\n}\r\n.context .f[class*=chevron-right] {\r\n\tright: 5px;\r\n\ttop: calc(50% - 6px);\r\n\ttransform: none;\r\n}\r\n\r\n\r\n/*\r\n@-webkit-keyframes flash {\r\n\t0% {\r\n\t\tbackground: rgba(255, 255, 255, 0);\r\n\t}\r\n\t7% {\r\n\t\tbackground: rgba(255, 255, 255, 0.2);\r\n\t}\r\n\t14% {\r\n\t\tbackground: rgba(255, 255, 255, 0);\r\n\t}\r\n\t21% {\r\n\t\tbackground: rgba(255, 255, 255, 0.3);\r\n\t}\r\n}\r\n\r\n@keyframes flash {\r\n\t0% {\r\n\t\tbackground: rgba(255, 255, 255, 0);\r\n\t}\r\n\t7% {\r\n\t\tbackground: rgba(255, 255, 255, 0.2);\r\n\t}\r\n\t14% {\r\n\t\tbackground: rgba(255, 255, 255, 0);\r\n\t}\r\n\t21% {\r\n\t\tbackground: rgba(255, 255, 255, 0.3);\r\n\t}\r\n}*/\r\n*,\r\n*:after,\r\n*:before {\r\n\tbox-sizing: border-box;\r\n}\r\n\r\n\r\n\r\n.hide {\r\n\tdisplay: none;\r\n}", ""]);
 // Exports
 /* harmony default export */ __webpack_exports__["default"] = (___CSS_LOADER_EXPORT___);
 
