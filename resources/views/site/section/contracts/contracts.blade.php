@@ -1579,6 +1579,21 @@
 	
 	
 	
+	$.testFoo = ({setItems}, contractId, foo, bar) => {
+		axiosQuery('get', 'site/contracts/departments?contract_id='+contractId, {}, 'json', abortCtrl)
+		.then(({data, error, status, headers}) => {
+			let subData = data.map(function(item) {
+				return {
+					name: item.name,
+					faIcon: 'fa-solid fa-angles-right'
+				};
+			});
+			setItems(subData);
+		}).catch((e) => {
+			
+		});
+	}
+	
 	
 	
 	
@@ -1639,6 +1654,38 @@
 				callback: setCallback('sendContractAction', contractId)
 			});
 		//}
+		
+		
+		
+		navData.push({
+			name: 'Чат договора',
+			faIcon: 'fa-solid fa-comments',
+			enable: (chatDept || chat),
+			callback: setCallback('contractChatAction', contractId, title)
+		});
+		
+		
+		navData.push({
+			name: 'Список отделов (тест)',
+			faIcon: 'fa-solid fa-angles-right',
+			load: setCallback('testFoo', contractId),
+			/*children: [
+				{
+					name: 'Тест 1',
+					faIcon: 'fa-solid fa-bars',
+				},
+				{
+					name: 'Тест 2',
+					faIcon: 'fa-solid fa-bars',
+				},
+				{
+					name: 'Тест 3',
+					faIcon: 'fa-solid fa-bars',
+				}
+			]*/
+		});
+		
+		
 		
 		// пример
 		/*{

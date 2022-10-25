@@ -58,7 +58,7 @@
 	min-width: 10em;
 	left: 100%;
 	top: -0.35em;
-	transform: translateX(-0.7em);
+	transform: translateX(0);
 	transition: transform, opacity, width, min-width, visibility;
 	transition-timing-function: ease;
 	transition-duration: 0.4s, 0.25s, 0.15s, 0.15s, 0.01s;
@@ -112,13 +112,24 @@
 	opacity: 1;
 	transition: opacity 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
-.context > li:not(.context > li.nope):hover .sub {
+.context > li:not(.context > li.nope).parent:not(.loadingable):hover .sub {
 	opacity: 1;
 	transform: translateX(0);
 	transition-delay: 0.2s, 0.25s, 0.2s, 0.2s, 0s;
 	border-radius: 0 3px 3px 3px;
 	visibility: visible;
 }
+
+
+.context__sub-hover {
+	opacity: 1;
+	transform: translateX(0);
+	transition-delay: 0.2s, 0s, 0.2s, 0.2s, 0s;
+	border-radius: 3px;
+	visibility: visible;
+}
+
+
 .context > li:not(.context > li.nope):hover > .f, .context > li.hilight > .f, .context > li:not(.context > li.nope):hover > .icon, .context > li.hilight > .icon {
 	opacity: 1;
 }

@@ -10,6 +10,8 @@ export default function axiosQuery(method = null, url = false, data = {}, respon
 		method = 'post';
 	}
 	
+	data['_responsetype'] = responseType;
+	
 	if (url.substr(0, 1) != '/') url = '/'+url;
 	
 	let params = {

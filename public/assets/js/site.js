@@ -6264,27 +6264,49 @@ window.setTagAttribute = function () {
   var joinSign = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : ' ';
   if (_.isNull(attrName)) throw new Error('Ошибка! setTagAttribute -> не указан атрибут');
   if (!_.isObject(attrName) && _.isNull(rules)) return '';
-  if (_.isObject(attrName)) joinSign = rules;
+  if (_.isObject(attrName)) joinSign = rules || ' ';
 
   if (_.isObject(attrName)) {
     var allAttrsValues = '';
     $.each(attrName, function (attrNameItem, rulesItem) {
       var attrValueItem = [];
-      $.each(rulesItem, function (val, rule) {
-        if (Boolean(rule)) attrValueItem.push(val);
-      });
-      if (attrValueItem.length == 0) return;
-      allAttrsValues += ' ' + attrNameItem + '="' + attrValueItem.join(joinSign) + '"';
+
+      if (_.isPlainObject(rulesItem)) {
+        $.each(rulesItem, function (val, rule) {
+          if (Boolean(rule)) attrValueItem.push(val);
+        });
+        if (attrValueItem.length == 0) return '';
+        allAttrsValues += ' ' + attrNameItem + '="' + attrValueItem.join(joinSign) + '"';
+      } else if (_.isArray(rulesItem)) {
+        $.each(rulesItem, function (k, val) {
+          attrValueItem.push(val);
+        });
+        if (attrValueItem.length == 0) return '';
+        allAttrsValues += ' ' + attrNameItem + '="' + attrValueItem.join(joinSign) + '"';
+      } else {
+        allAttrsValues += Boolean(rulesItem) ? ' ' + attrNameItem : '';
+      }
     });
     return allAttrsValues;
   }
 
-  var attrValue = [];
-  $.each(rules, function (val, rule) {
-    if (Boolean(rule)) attrValue.push(val);
-  });
-  if (attrValue.length == 0) return '';
-  return ' ' + attrName + '="' + attrValue.join(joinSign) + '"';
+  if (_.isPlainObject(rules)) {
+    var attrValues = [];
+    $.each(rules, function (val, rule) {
+      if (Boolean(rule)) attrValues.push(val);
+    });
+    if (attrValues.length == 0) return '';
+    return ' ' + attrName + '="' + attrValues.join(joinSign) + '"';
+  } else if (_.isArray(rules)) {
+    var _attrValues = [];
+    $.each(rules, function (k, val) {
+      _attrValues.push(val);
+    });
+    if (_attrValues.length == 0) return '';
+    return ' ' + attrName + '="' + _attrValues.join(joinSign) + '"';
+  }
+
+  return Boolean(rules) ? ' ' + attrName : '';
 };
 /*
 	Запретить скролл
@@ -7162,6 +7184,7 @@ function axiosQuery() {
     method = 'post';
   }
 
+  data['_responsetype'] = responseType;
   if (url.substr(0, 1) != '/') url = '/' + url;
   var params = {
     method: method,
@@ -7953,7 +7976,7 @@ $(document).on('contextmenu', '[contextmenu]', function (e) {
   var context = this,
       d = (_$$attr = $(context).attr('contextmenu')) === null || _$$attr === void 0 ? void 0 : (_$$attr$replace = _$$attr.replace(/\n+/gm, '')) === null || _$$attr$replace === void 0 ? void 0 : _$$attr$replace.split(':'),
       func = d[0],
-      args = (_d$ = d[1]) === null || _d$ === void 0 ? void 0 : _d$.split(',');
+      args = ((_d$ = d[1]) === null || _d$ === void 0 ? void 0 : _d$.split(',')) || [];
 
   if (!$[func] && !window[func]) {
     e.preventDefault();
@@ -7991,14 +8014,14 @@ $(document).on('contextmenu', '[contextmenu]', function (e) {
 
   var menuHtml = '<ul class="context noselect">';
   $.each(navData, function (k, item) {
-    //let itemAttrs = setTagAttribute('class', {'parent': item.children, 'nope': !item.enable || item.disable});
-    //	itemAttrs += setTagAttribute('onclick', {['$.contextMenuCallFunc(\''+item.callback+'\');']: item.callback && !item.children});
     var itemAttrs = setTagAttribute({
       'class': {
-        'parent': item.children,
-        'nope': item.enable != undefined && !item.enable || item.disable
+        'parent': item.children || item.load,
+        'nope': item.enable != undefined && !item.enable || item.disable,
+        'loadingable': item.load && !item.children
       },
-      'onclick': _defineProperty({}, '$.contextMenuCallFunc(\'' + item.callback + '\');', item.callback && !item.children)
+      'onclick': _defineProperty({}, '$.contextMenuCallFunc(\'' + item.callback + '\');', item.callback && !item.children),
+      'load': [item.load || null]
     });
     menuHtml += '<li' + itemAttrs + '>';
 
@@ -8008,14 +8031,21 @@ $(document).on('contextmenu', '[contextmenu]', function (e) {
 
     menuHtml += '<p>' + item.name + '</p>';
 
-    if (item.children) {
+    if (item.children || item.load) {
       menuHtml += '<i class="f fa-solid fa-chevron-right"></i>';
+    }
+
+    if (item.load) {
+      menuHtml += '<ul class="context sub"></ul>';
+    } else if (item.children) {
       menuHtml += '<ul class="context sub">';
       $.each(item.children, function (k, childItem) {
-        var childItemAttrs = setTagAttribute('class', {
-          'nope': !childItem.enable || childItem.disable
+        var childItemAttrs = setTagAttribute({
+          'class': {
+            'nope': childItem.enable != undefined && !childItem.enable || childItem.disable
+          },
+          'onclick': _defineProperty({}, '$.contextMenuCallFunc(\'' + childItem.callback + '\');', childItem.callback)
         });
-        childItemAttrs += setTagAttribute('onclick', _defineProperty({}, '$.contextMenuCallFunc(\'' + childItem.callback + '\');', childItem.callback));
         menuHtml += '<li' + childItemAttrs + '>';
         menuHtml += '<i class="icon fa-fw ' + childItem.faIcon + '"></i>';
         menuHtml += '<p>' + childItem.name + '</p>';
@@ -8108,15 +8138,88 @@ $(document).on('contextmenu', '[contextmenu]', function (e) {
       $(this).removeClass("active");
     }
   });
+  var waiting;
+  $context.on("mouseenter mouseleave touchstart touchend", "li:not(.nope).parent", function (e) {
+    var subContext = $(this).find('.context.sub'),
+        loadData = $(this).attr('load');
+
+    if (hasIn(['mouseenter', 'touchstart'], e.type) !== false) {
+      var _loadData$replace, _d$2, _window2, _$2;
+
+      if (!loadData || $(subContext).hasClass('loaded')) {
+        $(subContext).addClass('context__sub-hover');
+        return;
+      }
+
+      var _d = loadData === null || loadData === void 0 ? void 0 : (_loadData$replace = loadData.replace(/\n+/gm, '')) === null || _loadData$replace === void 0 ? void 0 : _loadData$replace.split(':'),
+          loadFunc = _d[0],
+          loadArgs = ((_d$2 = _d[1]) === null || _d$2 === void 0 ? void 0 : _d$2.split(',')) || [];
+
+      if (!$[loadFunc] && !window[loadFunc]) {
+        throw new Error('Ошибка! contextmenu load -> Указанная функция загрузки дочерних элементов не создана!');
+      }
+
+      $(subContext).addClass('context__sub-hover minh4rem-5px');
+      waiting = $(subContext).ddrWait({
+        bgColor: 'transparent',
+        iconHeight: '25px'
+      });
+      var loadMethods = {
+        setItems: function setItems() {
+          var itemsData = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+
+          if (_.isNull(itemsData) || itemsData.length == 0) {
+            $(subContext).html('<li class="nope w100 color-gray-500">Пусто</li>');
+            return;
+          } // throw new Error('Ошибка! contextmenu setItems -> не переданы пункты дочернего меню!');
+
+
+          var menuHtml = '';
+          $.each(itemsData, function (k, childItem) {
+            var childItemAttrs = setTagAttribute({
+              'class': {
+                'nope': childItem.enable != undefined && !childItem.enable || childItem.disable
+              },
+              'onclick': _defineProperty({}, '$.contextMenuCallFunc(\'' + childItem.callback + '\');', childItem.callback)
+            });
+            menuHtml += '<li' + childItemAttrs + '>';
+            menuHtml += '<i class="icon fa-fw ' + childItem.faIcon + '"></i>';
+            menuHtml += '<p>' + childItem.name + '</p>';
+            menuHtml += '</li>';
+          });
+          $(subContext).addClass('loaded');
+          $(subContext).html(menuHtml);
+          var sw = subContext.width(),
+              sh = subContext.height(),
+              sx = subContext.offset().left,
+              sy = subContext.offset().top,
+              subHitsRight = sx + sw - padx >= ww - padx,
+              subHitsBottom = sy + sh - pady >= wh - pady;
+
+          if (subHitsRight) {
+            $sub.addClass("oppositeX");
+          }
+
+          if (subHitsBottom) {
+            $sub.addClass("oppositeY");
+          }
+        }
+      };
+      if (window[loadFunc] && typeof window[loadFunc] == 'function') (_window2 = window)[loadFunc].apply(_window2, [loadMethods].concat(_toConsumableArray(loadArgs)));else if ($[loadFunc] && typeof $[loadFunc] == 'function') (_$2 = $)[loadFunc].apply(_$2, [loadMethods].concat(_toConsumableArray(loadArgs)));
+    } else if (hasIn(['mouseleave', 'touchend'], e.type) !== false) {
+      $(subContext).removeClass('context__sub-hover');
+      if (_.isObject(waiting)) waiting.destroy();
+    }
+  });
 
   $.contextMenuCallFunc = function () {
-    var _cbData$replace, _d$2, _window2, _$2;
+    var _cbData$replace, _d$3, _window3, _$3;
 
     var cbData = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
     if (!cbData) throw new Error('Ошибка! contextmenu contextMenuCallFunc -> Не переданы данные!');
     var d = cbData === null || cbData === void 0 ? void 0 : (_cbData$replace = cbData.replace(/\n+/gm, '')) === null || _cbData$replace === void 0 ? void 0 : _cbData$replace.split(':'),
         cbFunc = d[0],
-        cbArgs = (_d$2 = d[1]) === null || _d$2 === void 0 ? void 0 : _d$2.split(',');
+        cbArgs = ((_d$3 = d[1]) === null || _d$3 === void 0 ? void 0 : _d$3.split(',')) || [];
 
     if (!$[cbFunc] && !window[cbFunc]) {
       e.preventDefault();
@@ -8131,14 +8234,14 @@ $(document).on('contextmenu', '[contextmenu]', function (e) {
 
     $.extend(context, {
       changeAttrData: function changeAttrData() {
-        var _$$attr2, _$$attr2$replace, _d$3;
+        var _$$attr2, _$$attr2$replace, _d$4;
 
         var argIndex = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
         var newData = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
         if (_.isNull(argIndex) || _.isNull(newData)) throw new Error('Ошибка! contextmenu changeAttrData -> неверно переданы аргументы!');
         var d = (_$$attr2 = $(context).attr('contextmenu')) === null || _$$attr2 === void 0 ? void 0 : (_$$attr2$replace = _$$attr2.replace(/\n+/gm, '')) === null || _$$attr2$replace === void 0 ? void 0 : _$$attr2$replace.split(':'),
             func = d[0],
-            args = (_d$3 = d[1]) === null || _d$3 === void 0 ? void 0 : _d$3.split(','),
+            args = ((_d$4 = d[1]) === null || _d$4 === void 0 ? void 0 : _d$4.split(',')) || [],
             buildAttrString = func + ':',
             i = argIndex - 1;
         if (!args[i]) throw new Error('Ошибка! contextmenu changeAttrData -> аргумента с таким порядковым номером не существует!');
@@ -8147,7 +8250,7 @@ $(document).on('contextmenu', '[contextmenu]', function (e) {
         $(context).setAttrib('contextmenu', buildAttrString);
       }
     });
-    if (window[cbFunc] && typeof window[cbFunc] == 'function') (_window2 = window)[cbFunc].apply(_window2, [context].concat(_toConsumableArray(cbArgs)));else if ($[cbFunc] && typeof $[cbFunc] == 'function') (_$2 = $)[cbFunc].apply(_$2, [context].concat(_toConsumableArray(cbArgs)));
+    if (window[cbFunc] && typeof window[cbFunc] == 'function') (_window3 = window)[cbFunc].apply(_window3, [context].concat(_toConsumableArray(cbArgs)));else if ($[cbFunc] && typeof $[cbFunc] == 'function') (_$3 = $)[cbFunc].apply(_$3, [context].concat(_toConsumableArray(cbArgs)));
   };
 });
 
@@ -13793,7 +13896,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, ":root {\r\n\t--bg: #24262d;\r\n\t--text: #dfe3ff;\r\n\t--color1: #624e7e;\r\n\t--color2: #3c2b45;\r\n\t--color1n: #ecf0f4;\r\n\t--color2n: #fff;\r\n\t--colorSub: #5d4d66;\r\n\t--divider: rgba(255,255,255,0.16);\r\n}\r\n\r\n.context {\r\n\tpadding: 0.05em 0.25em;\r\n\tborder: 1px solid transparent;\r\n\tborder-right-color: rgba(255, 255, 255, 0.15);\r\n\tborder-bottom-color: rgba(255, 255, 255, 0.15);\r\n\tborder-left-color: rgba(0, 0, 0, 0.15);\r\n\tborder-top-color: rgba(0, 0, 0, 0.15);\r\n\tborder-radius: 3px;\r\n\tposition: absolute;\r\n\tmin-width: 16em;\r\n\tz-index: 10;\r\n\tbackground: linear-gradient(145deg, var(--color1), var(--color2));\r\n\tbox-shadow: 0px 5px 5px -2px #1413213b;\r\n\twill-change: transform, opacity, filter;\r\n\ttransition: transform, opacity, visibility, filter;\r\n\ttransition-duration: 0.3s, 0.2s, 0.4s, 0.3s;\r\n\ttransition-delay: 0.1s, 0s, 0.4s, 0.2s;\r\n\ttransition-timing-function: ease;\r\n\ttransform: rotate3d(-1, -1, 0, 10deg) scale(1);\r\n\ttransform-origin: 0 0;\r\n\topacity: 0;\r\n\tvisibility: hidden;\r\n\tfilter: blur(1px);\r\n}\r\n\r\n.context p,\r\n.context span,\r\n.context small,\r\n.context strong,\r\n.context a {\r\n\tcolor: var(--text);\r\n}\r\n\r\n\r\n.context.is-visible {\r\n\topacity: 1;\r\n\ttransform: none;\r\n\ttransition-delay: 0s, 0s, 0s, 0s;\r\n\tvisibility: visible;\r\n\tfilter: none;\r\n}\r\n.context.sub {\r\n\tbackground: var(--colorSub);\r\n\twidth: max-content;\r\n\tmin-width: 10em;\r\n\tleft: 100%;\r\n\ttop: -0.35em;\r\n\ttransform: translateX(-0.7em);\r\n\ttransition: transform, opacity, width, min-width, visibility;\r\n\ttransition-timing-function: ease;\r\n\ttransition-duration: 0.4s, 0.25s, 0.15s, 0.15s, 0.01s;\r\n\ttransition-delay: 0.4s, 0.25s, 0.3s, 0.3s, 0.35s;\r\n\toverflow: hidden;\r\n\tfilter: none;\r\n}\r\n.context.sub .f {\r\n\ttransform: translateX(-2.25em);\r\n}\r\n.context.sub.oppositeX {\r\n\tright: 100%;\r\n\tleft: auto;\r\n\ttransform: translateX(0.7em);\r\n}\r\n.context.sub.oppositeY {\r\n\ttop: auto;\r\n\tbottom: -0.35em;\r\n}\r\n.context > li {\r\n\tpadding: 0.6em 2em 0.6em 0.5em;\r\n\tborder-radius: 3px;\r\n\tposition: relative;\r\n\tfont-size: 14px;\r\n\tline-height: 1em;\r\n\tdisplay: flex;\r\n\talign-items: center;\r\n}\r\n.context > li:before {\r\n\tcontent: \"\";\r\n\tposition: absolute;\r\n\tleft: 0;\r\n\ttop: 0;\r\n\tbottom: 0;\r\n\tright: 0;\r\n\tborder-radius: 3px;\r\n\tz-index: -1;\r\n\tbackground-color: rgba(97, 97, 97, 0.37);\r\n\tmix-blend-mode: color-dodge;\r\n\ttransition: opacity 0.15s cubic-bezier(0.55, 0.06, 0.68, 0.19);\r\n\topacity: 0;\r\n}\r\n.context > li.hilight {\r\n\tfont-weight: 500;\r\n\tcolor: white;\r\n}\r\n.context > li:not(.context > li.nope):hover {\r\n\tcolor: white;\r\n}\r\n.context > li:not(.context > li.nope):hover:before {\r\n\topacity: 1;\r\n\ttransition: opacity 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94);\r\n}\r\n.context > li:not(.context > li.nope):hover .sub {\r\n\topacity: 1;\r\n\ttransform: translateX(0);\r\n\ttransition-delay: 0.2s, 0.25s, 0.2s, 0.2s, 0s;\r\n\tborder-radius: 0 3px 3px 3px;\r\n\tvisibility: visible;\r\n}\r\n.context > li:not(.context > li.nope):hover > .f, .context > li.hilight > .f, .context > li:not(.context > li.nope):hover > .icon, .context > li.hilight > .icon {\r\n\topacity: 1;\r\n}\r\n.context > li:last-child {\r\n\t margin-bottom: 0.25em;\r\n}\r\n.context > li:first-child {\r\n\tmargin-top: 0.25em;\r\n}\r\n\r\n.context > li.nope {\r\n\tpointer-events: none;\r\n\topacity: 0.4;\r\n}\r\n.context > li.active {\r\n\t/*-webkit-animation: flash 0.5s ease 1;\r\n\t\t  animation: flash 0.5s ease 1;*/\r\n\tbackground: rgba(255, 255, 255, 0.2);\r\n}\r\n\r\n.context > li .f {\r\n\tfont-size: 10px;\r\n\tcolor: var(--text);\r\n\topacity: 0.5;\r\n\ttransition: all 0.2s ease;\r\n}\r\n.context > li .icon {\r\n\tfont-size: inherit;\r\n\tcolor: var(--text);\r\n\tmargin-right: 8px;\r\n\topacity: 0.5;\r\n\ttransition: all 0.2s ease;\r\n}\r\n.context .divline {\r\n\tborder-bottom: 1px solid var(--divider);\r\n\tpadding: 0;\r\n\tmargin-top: 0.3em;\r\n\tmargin-bottom: 0.35em;\r\n}\r\n.context .f {\r\n\tfont-style: normal;\r\n\tposition: absolute;\r\n\ttransform: translateX(-2.4em);\r\n}\r\n.context .f[class*=chevron-right] {\r\n\tright: 5px;\r\n\ttop: calc(50% - 6px);\r\n\ttransform: none;\r\n}\r\n\r\n\r\n/*\r\n@-webkit-keyframes flash {\r\n\t0% {\r\n\t\tbackground: rgba(255, 255, 255, 0);\r\n\t}\r\n\t7% {\r\n\t\tbackground: rgba(255, 255, 255, 0.2);\r\n\t}\r\n\t14% {\r\n\t\tbackground: rgba(255, 255, 255, 0);\r\n\t}\r\n\t21% {\r\n\t\tbackground: rgba(255, 255, 255, 0.3);\r\n\t}\r\n}\r\n\r\n@keyframes flash {\r\n\t0% {\r\n\t\tbackground: rgba(255, 255, 255, 0);\r\n\t}\r\n\t7% {\r\n\t\tbackground: rgba(255, 255, 255, 0.2);\r\n\t}\r\n\t14% {\r\n\t\tbackground: rgba(255, 255, 255, 0);\r\n\t}\r\n\t21% {\r\n\t\tbackground: rgba(255, 255, 255, 0.3);\r\n\t}\r\n}*/\r\n*,\r\n*:after,\r\n*:before {\r\n\tbox-sizing: border-box;\r\n}\r\n\r\n\r\n\r\n.hide {\r\n\tdisplay: none;\r\n}", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, ":root {\r\n\t--bg: #24262d;\r\n\t--text: #dfe3ff;\r\n\t--color1: #624e7e;\r\n\t--color2: #3c2b45;\r\n\t--color1n: #ecf0f4;\r\n\t--color2n: #fff;\r\n\t--colorSub: #5d4d66;\r\n\t--divider: rgba(255,255,255,0.16);\r\n}\r\n\r\n.context {\r\n\tpadding: 0.05em 0.25em;\r\n\tborder: 1px solid transparent;\r\n\tborder-right-color: rgba(255, 255, 255, 0.15);\r\n\tborder-bottom-color: rgba(255, 255, 255, 0.15);\r\n\tborder-left-color: rgba(0, 0, 0, 0.15);\r\n\tborder-top-color: rgba(0, 0, 0, 0.15);\r\n\tborder-radius: 3px;\r\n\tposition: absolute;\r\n\tmin-width: 16em;\r\n\tz-index: 10;\r\n\tbackground: linear-gradient(145deg, var(--color1), var(--color2));\r\n\tbox-shadow: 0px 5px 5px -2px #1413213b;\r\n\twill-change: transform, opacity, filter;\r\n\ttransition: transform, opacity, visibility, filter;\r\n\ttransition-duration: 0.3s, 0.2s, 0.4s, 0.3s;\r\n\ttransition-delay: 0.1s, 0s, 0.4s, 0.2s;\r\n\ttransition-timing-function: ease;\r\n\ttransform: rotate3d(-1, -1, 0, 10deg) scale(1);\r\n\ttransform-origin: 0 0;\r\n\topacity: 0;\r\n\tvisibility: hidden;\r\n\tfilter: blur(1px);\r\n}\r\n\r\n.context p,\r\n.context span,\r\n.context small,\r\n.context strong,\r\n.context a {\r\n\tcolor: var(--text);\r\n}\r\n\r\n\r\n.context.is-visible {\r\n\topacity: 1;\r\n\ttransform: none;\r\n\ttransition-delay: 0s, 0s, 0s, 0s;\r\n\tvisibility: visible;\r\n\tfilter: none;\r\n}\r\n.context.sub {\r\n\tbackground: var(--colorSub);\r\n\twidth: max-content;\r\n\tmin-width: 10em;\r\n\tleft: 100%;\r\n\ttop: -0.35em;\r\n\ttransform: translateX(0);\r\n\ttransition: transform, opacity, width, min-width, visibility;\r\n\ttransition-timing-function: ease;\r\n\ttransition-duration: 0.4s, 0.25s, 0.15s, 0.15s, 0.01s;\r\n\ttransition-delay: 0.4s, 0.25s, 0.3s, 0.3s, 0.35s;\r\n\toverflow: hidden;\r\n\tfilter: none;\r\n}\r\n.context.sub .f {\r\n\ttransform: translateX(-2.25em);\r\n}\r\n.context.sub.oppositeX {\r\n\tright: 100%;\r\n\tleft: auto;\r\n\ttransform: translateX(0.7em);\r\n}\r\n.context.sub.oppositeY {\r\n\ttop: auto;\r\n\tbottom: -0.35em;\r\n}\r\n.context > li {\r\n\tpadding: 0.6em 2em 0.6em 0.5em;\r\n\tborder-radius: 3px;\r\n\tposition: relative;\r\n\tfont-size: 14px;\r\n\tline-height: 1em;\r\n\tdisplay: flex;\r\n\talign-items: center;\r\n}\r\n.context > li:before {\r\n\tcontent: \"\";\r\n\tposition: absolute;\r\n\tleft: 0;\r\n\ttop: 0;\r\n\tbottom: 0;\r\n\tright: 0;\r\n\tborder-radius: 3px;\r\n\tz-index: -1;\r\n\tbackground-color: rgba(97, 97, 97, 0.37);\r\n\tmix-blend-mode: color-dodge;\r\n\ttransition: opacity 0.15s cubic-bezier(0.55, 0.06, 0.68, 0.19);\r\n\topacity: 0;\r\n}\r\n.context > li.hilight {\r\n\tfont-weight: 500;\r\n\tcolor: white;\r\n}\r\n.context > li:not(.context > li.nope):hover {\r\n\tcolor: white;\r\n}\r\n.context > li:not(.context > li.nope):hover:before {\r\n\topacity: 1;\r\n\ttransition: opacity 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94);\r\n}\r\n.context > li:not(.context > li.nope).parent:not(.loadingable):hover .sub {\r\n\topacity: 1;\r\n\ttransform: translateX(0);\r\n\ttransition-delay: 0.2s, 0.25s, 0.2s, 0.2s, 0s;\r\n\tborder-radius: 0 3px 3px 3px;\r\n\tvisibility: visible;\r\n}\r\n\r\n\r\n.context__sub-hover {\r\n\topacity: 1;\r\n\ttransform: translateX(0);\r\n\ttransition-delay: 0.2s, 0s, 0.2s, 0.2s, 0s;\r\n\tborder-radius: 3px;\r\n\tvisibility: visible;\r\n}\r\n\r\n\r\n.context > li:not(.context > li.nope):hover > .f, .context > li.hilight > .f, .context > li:not(.context > li.nope):hover > .icon, .context > li.hilight > .icon {\r\n\topacity: 1;\r\n}\r\n.context > li:last-child {\r\n\t margin-bottom: 0.25em;\r\n}\r\n.context > li:first-child {\r\n\tmargin-top: 0.25em;\r\n}\r\n\r\n.context > li.nope {\r\n\tpointer-events: none;\r\n\topacity: 0.4;\r\n}\r\n.context > li.active {\r\n\t/*-webkit-animation: flash 0.5s ease 1;\r\n\t\t  animation: flash 0.5s ease 1;*/\r\n\tbackground: rgba(255, 255, 255, 0.2);\r\n}\r\n\r\n.context > li .f {\r\n\tfont-size: 10px;\r\n\tcolor: var(--text);\r\n\topacity: 0.5;\r\n\ttransition: all 0.2s ease;\r\n}\r\n.context > li .icon {\r\n\tfont-size: inherit;\r\n\tcolor: var(--text);\r\n\tmargin-right: 8px;\r\n\topacity: 0.5;\r\n\ttransition: all 0.2s ease;\r\n}\r\n.context .divline {\r\n\tborder-bottom: 1px solid var(--divider);\r\n\tpadding: 0;\r\n\tmargin-top: 0.3em;\r\n\tmargin-bottom: 0.35em;\r\n}\r\n.context .f {\r\n\tfont-style: normal;\r\n\tposition: absolute;\r\n\ttransform: translateX(-2.4em);\r\n}\r\n.context .f[class*=chevron-right] {\r\n\tright: 5px;\r\n\ttop: calc(50% - 6px);\r\n\ttransform: none;\r\n}\r\n\r\n\r\n/*\r\n@-webkit-keyframes flash {\r\n\t0% {\r\n\t\tbackground: rgba(255, 255, 255, 0);\r\n\t}\r\n\t7% {\r\n\t\tbackground: rgba(255, 255, 255, 0.2);\r\n\t}\r\n\t14% {\r\n\t\tbackground: rgba(255, 255, 255, 0);\r\n\t}\r\n\t21% {\r\n\t\tbackground: rgba(255, 255, 255, 0.3);\r\n\t}\r\n}\r\n\r\n@keyframes flash {\r\n\t0% {\r\n\t\tbackground: rgba(255, 255, 255, 0);\r\n\t}\r\n\t7% {\r\n\t\tbackground: rgba(255, 255, 255, 0.2);\r\n\t}\r\n\t14% {\r\n\t\tbackground: rgba(255, 255, 255, 0);\r\n\t}\r\n\t21% {\r\n\t\tbackground: rgba(255, 255, 255, 0.3);\r\n\t}\r\n}*/\r\n*,\r\n*:after,\r\n*:before {\r\n\tbox-sizing: border-box;\r\n}\r\n\r\n\r\n\r\n.hide {\r\n\tdisplay: none;\r\n}", ""]);
 // Exports
 /* harmony default export */ __webpack_exports__["default"] = (___CSS_LOADER_EXPORT___);
 

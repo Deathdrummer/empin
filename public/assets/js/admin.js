@@ -6406,27 +6406,49 @@ window.setTagAttribute = function () {
   var joinSign = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : ' ';
   if (_.isNull(attrName)) throw new Error('Ошибка! setTagAttribute -> не указан атрибут');
   if (!_.isObject(attrName) && _.isNull(rules)) return '';
-  if (_.isObject(attrName)) joinSign = rules;
+  if (_.isObject(attrName)) joinSign = rules || ' ';
 
   if (_.isObject(attrName)) {
     var allAttrsValues = '';
     $.each(attrName, function (attrNameItem, rulesItem) {
       var attrValueItem = [];
-      $.each(rulesItem, function (val, rule) {
-        if (Boolean(rule)) attrValueItem.push(val);
-      });
-      if (attrValueItem.length == 0) return;
-      allAttrsValues += ' ' + attrNameItem + '="' + attrValueItem.join(joinSign) + '"';
+
+      if (_.isPlainObject(rulesItem)) {
+        $.each(rulesItem, function (val, rule) {
+          if (Boolean(rule)) attrValueItem.push(val);
+        });
+        if (attrValueItem.length == 0) return '';
+        allAttrsValues += ' ' + attrNameItem + '="' + attrValueItem.join(joinSign) + '"';
+      } else if (_.isArray(rulesItem)) {
+        $.each(rulesItem, function (k, val) {
+          attrValueItem.push(val);
+        });
+        if (attrValueItem.length == 0) return '';
+        allAttrsValues += ' ' + attrNameItem + '="' + attrValueItem.join(joinSign) + '"';
+      } else {
+        allAttrsValues += Boolean(rulesItem) ? ' ' + attrNameItem : '';
+      }
     });
     return allAttrsValues;
   }
 
-  var attrValue = [];
-  $.each(rules, function (val, rule) {
-    if (Boolean(rule)) attrValue.push(val);
-  });
-  if (attrValue.length == 0) return '';
-  return ' ' + attrName + '="' + attrValue.join(joinSign) + '"';
+  if (_.isPlainObject(rules)) {
+    var attrValues = [];
+    $.each(rules, function (val, rule) {
+      if (Boolean(rule)) attrValues.push(val);
+    });
+    if (attrValues.length == 0) return '';
+    return ' ' + attrName + '="' + attrValues.join(joinSign) + '"';
+  } else if (_.isArray(rules)) {
+    var _attrValues = [];
+    $.each(rules, function (k, val) {
+      _attrValues.push(val);
+    });
+    if (_attrValues.length == 0) return '';
+    return ' ' + attrName + '="' + _attrValues.join(joinSign) + '"';
+  }
+
+  return Boolean(rules) ? ' ' + attrName : '';
 };
 /*
 	Запретить скролл
@@ -7304,6 +7326,7 @@ function axiosQuery() {
     method = 'post';
   }
 
+  data['_responsetype'] = responseType;
   if (url.substr(0, 1) != '/') url = '/' + url;
   var params = {
     method: method,

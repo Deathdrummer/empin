@@ -177,6 +177,11 @@ class Contracts extends Controller {
 	 */
 	public function departments(Request $request) {
 		$departments = $this->department->getToSend($request);
+		
+		logger($departments);
+		
+		
+		if (request('_responsetype') == 'json') return response()->json($departments);
 		return $this->render('departments', compact('departments'));
 	}
 	
