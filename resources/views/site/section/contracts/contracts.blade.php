@@ -230,9 +230,7 @@
 	
 	
 	
-	//---------------------------------------------------- Фильтры
-	
-	
+	//--------------------------------------------------------------------------------- Фильтры
 	
 	let searchContractsTOut;
 	$.contractsSearch = (field) => {
@@ -281,11 +279,6 @@
 	}
 	
 	
-	
-	
-	
-	
-	
 	function _clearCounts() {
 		$('#chooserAll').find('[selectionscounts]').empty();
 		$('[chooserdepartment]').find('[selectionscounts]').empty();
@@ -300,8 +293,17 @@
 	
 	
 	
-	//------------------------------------------------- Подборки
 	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	//--------------------------------------------------------------------------------- Подборки
 	
 	$.openSelectionsWin = (openSelectionBtn) => {
 		ddrPopup({
@@ -710,7 +712,20 @@
 	
 	
 	
-	//------------------------------------------------- Добавить договор в подборку
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	//--------------------------------------------------------------------------------- Добавить договор в подборку
 	$.addContractToSelection = (select, contractId) => {
 		let selectionId = parseInt($(select).val());
 		
@@ -733,7 +748,13 @@
 	
 	
 	
-	//------------------------------------------------- Удалить договор из подборки
+	
+	
+	
+	
+	
+	
+	//--------------------------------------------------------------------------------- Удалить договор из подборки
 	$.removeContractFromSelection = (btn, contractId, selectionId) => {
 		$(btn).ddrInputs('disable');
 		$('[selectionsbtn]').ddrInputs('disable');
@@ -758,7 +779,12 @@
 	
 	
 	
-	//------------------------------------------------- отменить текущую подборку
+	
+	
+	
+	
+	
+	//--------------------------------------------------------------------------------- отменить текущую подборку
 	$.clearSelection = (btn) => {
 		$('[selectionsbtn]').ddrInputs('disable');
 		selection = null;
@@ -800,7 +826,7 @@
 	
 	
 	
-	//-------------------------------------------------  сортировка
+	//---------------------------------------------------------------------------------  сортировка
 	
 	$.sorting = (cell, sfield) => {
 		$('#contractsTable').find('.sort-asc, .sort-desc').removeClass('sort-asc sort-desc');
@@ -839,7 +865,7 @@
 	
 	
 	
-	//------------------------------------------------- Отображение столбцов
+	//--------------------------------------------------------------------------------- Отображение столбцов
 	$.openSetColumsWin = (btn) => {
 		ddrPopup({
 			title: 'Отображение столбцов',
@@ -898,7 +924,10 @@
 	
 	
 	
-	//------------------------------------------------- Убрать отметку нового договора и открыть окно с общей информацией
+	
+	
+	
+	//--------------------------------------------------------------------------------- Убрать отметку нового договора и открыть окно с общей информацией
 	$.openContractInfo = (tr, contractId) => {
 		let isNew = $(tr).attr('isnew');
 		
@@ -996,7 +1025,13 @@
 	
 	
 	
-	//------------------------------------------------- Закрепить/открепить договор
+	
+	
+	
+	
+	
+	
+	//--------------------------------------------------------------------------------- Закрепить/открепить договор
 	$.pinContract = (btn, contractId) => {
 		let pinned = parseInt($(btn).attr('pinned'));
 		
@@ -1031,58 +1066,15 @@
 	
 	
 	
-	//-------------------------------------------------  Чат договора
-	let sendMessStat;
-	$.contractChatAction = (btn, contractId, title) => {
-		ddrPopup({
-			title: '<small class="fz12px color-gray">Чат договора:</small> «'+title+'»',
-			width: 800,
-			buttons: ['Закрыть'],
-			winClass: 'ddrpopup_chat'
-		}).then(({state/* isClosed */, wait, setTitle, setButtons, loadData, setHtml, setLHtml, dialog, close, onScroll, disableButtons, enableButtons, setWidth}) => {
-			wait();
-			
-			axiosQuery('get', 'site/contracts/chat', {contract_id: contractId}).then(({data, error, status, headers}) => {
-				
-				if (error) {
-					$.notify('Не удалось загрузить чат!', 'error');
-					console.log(error?.message, error?.errors);
-					return;
-				}
-				
-				setHtml(data, () => {
-					sendMessStat = false;
-					wait(false);
-					
-					let chatVisibleHeight = $('#chatMessageList').outerHeight(),
-						chatScrollHeight = $('#chatMessageList')[0].scrollHeight;
-					$('#chatMessageList').scrollTop(chatScrollHeight - chatVisibleHeight);
-					
-					$('#chatMessageBlock').focus();
-					
-					$('#chatMessageBlock').ddrInputs('change', () => {
-						let mess = getContenteditable('#chatMessageBlock');
-						
-						if (mess && !sendMessStat) {
-							sendMessStat = true;
-							$('#chatSendMesageBtn').ddrInputs('enable');
-						} else if (!mess && sendMessStat) {
-							sendMessStat = false;
-							$('#chatSendMesageBtn').ddrInputs('disable');
-						}
-					});
-				});
-				
-			}).catch((e) => {
-				console.log(e);
-			});
-			
-		});
-	}
+	
+
 	
 	
 	
 	
+	
+	
+	//--------------------------------------------------------------------------------- Чат договора отпроавить сообщение
 	$.chatSendMesage = (btn, contractId) => {
 		let message = getContenteditable('#chatMessageBlock');
 		if (!message) return;
@@ -1128,7 +1120,14 @@
 	
 	
 	
-	//-------------------------------------------------  Указание цвета статуса
+	
+	
+	
+	
+	
+	
+	
+	//---------------------------------------------------------------------------------  Указание цвета статуса
 	let statusesTooltip, contractId;
 	$.openColorsStatuses = (btn, cId) => {
 		contractId = cId;
@@ -1215,7 +1214,14 @@
 	
 	
 	
-	//-------------------------------------------------  Заполнение данных договоров
+	
+	
+	
+	
+	
+	
+	
+	//---------------------------------------------------------------------------------  Заполнение данных договоров
 	let contractSetDataTOut, oldInputId = null;
 	$.contractSetData = (input, contractId, departmentId, stepId, type) => {
 		let cell = $(input).closest('td');
@@ -1483,7 +1489,7 @@
 	
 	
 	//-------------------------------------------------  Отправить договор в архив
-	$.toArchiveContractAction = (row, contractId, objectNumber, title) => {
+	$.toArchiveContractAction = ({context}, contractId, objectNumber, title) => {
 
 		let html = '';
 		html += '<div>';
@@ -1551,7 +1557,7 @@
 	
 	
 	//-------------------------------------------------  Отправить договор в другой отдел
-	$.sendContractAction = (row, contractId) => {
+	/*$.sendContractAction = (row, contractId) => {
 		ddrPopup({
 			title: 'Отправить договор в отдел',
 			width: 500, // ширина окна
@@ -1574,18 +1580,34 @@
 				});
 			}
 		});
-	}
+	}*/
 	
 	
 	
 	
-	$.testFoo = ({setItems}, contractId, foo, bar) => {
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	$.loadDepsToSub = ({setItems, setCallback}, context, contractId, foo, bar) => {
+		//console.log('context', context);
 		axiosQuery('get', 'site/contracts/departments?contract_id='+contractId, {}, 'json', abortCtrl)
 		.then(({data, error, status, headers}) => {
+			//console.log(data);
 			let subData = data.map(function(item) {
 				return {
 					name: item.name,
-					faIcon: 'fa-solid fa-angles-right'
+					faIcon: 'fa-solid fa-angles-right',
+					callback: setCallback('clickToSub', contractId, item.id)
 				};
 			});
 			setItems(subData);
@@ -1597,9 +1619,37 @@
 	
 	
 	
+	$.clickToSub = ({setItems}, context, contractId, departmentId) => {
+		
+		//console.log('context', context);
+		
+		/*axiosQuery('post', 'site/contracts/send', {contractId, departmentId}, 'json').then(({data, error, status, headers}) => {
+			if (data) {
+				$.notify('Договор успешно отправлен в '+departmentName+'!');
+				if (rowsCount == 1) row.changeAttrData(6, '0');
+			} else {
+				$.notify('Ошибка! Договор не был отправлен!', 'error');
+			}
+			close();
+		});*/
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	//-------------------------------------------------  Контекстное меню
+	let sendMessStat;
 	$.contractContextMenu = (
-		{close, setCallback},
+		{target, closeOnScroll},
 		contractId,
 		departmentId,
 		selection,
@@ -1617,11 +1667,138 @@
 		returnToWork
 		) => {
 		
-		$('#contractsList').one('scroll', function() {
-			close();
-		});
+		closeOnScroll('#contractsList');
 		
-		const navData = [];
+		
+		return [
+			{
+				name: 'Отправить в архив',
+				faIcon: 'fa-solid fa-box-archive',
+				visible: toArchive,
+				onClick: () => {
+					
+					let html = '';
+					html += '<div>';
+					html += '<p class="fz14px color-darkgray text-start">Номер объекта: <span class="color-black">'+objectNumber+'</span></p>';
+					html += '<p class="fz14px color-darkgray text-start">Название/заявитель: <span class="color-black">'+title+'</span></p>';
+					html += '<p class="fz18px color-red mt15px">Вы действительно хотите отправить договор в архив?</p>';
+					html += '</div>';
+					
+					ddrPopup({
+						width: 400, // ширина окна
+						html, // контент
+						buttons: ['ui.cancel', {title: 'Отправить', variant: 'red', action: 'contractToArchiveAction'}],
+						centerMode: true,
+						winClass: 'ddrpopup_dialog'
+					}).then(({close, wait}) => {
+						$.contractToArchiveAction = (_) => {
+							wait();
+							axiosQuery('post', 'site/contracts/to_archive', {contractId}, 'json')
+							.then(({data, error, status, headers}) => {
+								if (data) {
+									getList();
+									$.notify('Договор успешно отправлен в архив!');
+								} else {
+									$.notify('Ошибка! Договор не был отправлен в архив!', 'error');
+								}
+								close();
+							});
+						}
+					});
+				},
+			},
+			{
+				name: 'Отправить в другой отдел',
+				faIcon: 'fa-solid fa-angles-right',
+				enable: (sendToDepts || sendToDeptsAll) && !!hasDepsToSend,
+				hidden: (!sendToDepts && !sendToDeptsAll),
+				load: {
+					url: 'site/contracts/departments?contract_id='+contractId,
+					method: 'get',
+					map: (item) => {
+						return {
+							name: item.name,
+							faIcon: 'fa-solid fa-angles-right',
+							onClick(selector) {
+								let departmentName = selector.text(),
+									itemsCount = selector.items().length;
+								
+								let procNotif = processNotify('Отправка договора в другой отдел...');
+								
+								axiosQuery('post', 'site/contracts/send', {contractId, departmentId: item.id}, 'json')
+								.then(({data, error, status, headers}) => {
+									if (data) {
+										//$.notify('Договор успешно отправлен в '+departmentName+'!');
+										procNotif.done({message: 'Договор успешно отправлен в '+departmentName+'!'});
+										if (itemsCount == 0) target.changeAttrData(6, '0');
+									} else {
+										//$.notify('Ошибка! Договор не был отправлен!', 'error');
+										procNotif.error({message: 'Ошибка! Договор не был отправлен!'});
+									}
+								});
+							}
+						};
+					}
+				},
+			},
+			{
+				name: 'Чат договора',
+				faIcon: 'fa-solid fa-comments',
+				enable: (chatDept || chat),
+				hidden: (!chatDept && !chat),
+				onClick() {
+					ddrPopup({
+						title: '<small class="fz12px color-gray">Чат договора:</small> «'+title+'»',
+						width: 800,
+						buttons: ['Закрыть'],
+						winClass: 'ddrpopup_chat'
+					}).then(({state/* isClosed */, wait, setTitle, setButtons, loadData, setHtml, setLHtml, dialog, close, onScroll, disableButtons, enableButtons, setWidth}) => {
+						wait();
+						
+						axiosQuery('get', 'site/contracts/chat', {contract_id: contractId}).then(({data, error, status, headers}) => {
+							
+							if (error) {
+								$.notify('Не удалось загрузить чат!', 'error');
+								console.log(error?.message, error?.errors);
+								return;
+							}
+							
+							setHtml(data, () => {
+								sendMessStat = false;
+								wait(false);
+								
+								let chatVisibleHeight = $('#chatMessageList').outerHeight(),
+									chatScrollHeight = $('#chatMessageList')[0].scrollHeight;
+								$('#chatMessageList').scrollTop(chatScrollHeight - chatVisibleHeight);
+								
+								$('#chatMessageBlock').focus();
+								
+								$('#chatMessageBlock').ddrInputs('change', () => {
+									let mess = getContenteditable('#chatMessageBlock');
+									
+									if (mess && !sendMessStat) {
+										sendMessStat = true;
+										$('#chatSendMesageBtn').ddrInputs('enable');
+									} else if (!mess && sendMessStat) {
+										sendMessStat = false;
+										$('#chatSendMesageBtn').ddrInputs('disable');
+									}
+								});
+							});
+							
+						}).catch((e) => {
+							console.log(e);
+						});
+						
+					});
+				}
+			}
+		];
+		
+		
+		
+		
+		
 		
 		
 		
@@ -1638,37 +1815,32 @@
 		
 		
 		//if (toArchive) {
-			navData.push({
-				name: 'Отправить в архив',
-				faIcon: 'fa-solid fa-box-archive',
-				enable: toArchive,
-				callback: setCallback('toArchiveContractAction', contractId, objectNumber, title)
-			});
+			//navData.push({
+			//	name: 'Отправить в архив',
+			//	faIcon: 'fa-solid fa-box-archive',
+			//	enable: toArchive,
+			//	callback: setCallback('toArchiveContractAction', contractId, objectNumber, title)
+			//});
 		//}
 		
 		//if (sendToDepts || sendToDeptsAll) {
-			navData.push({
-				name: 'Отправить в другой отдел',
-				faIcon: 'fa-solid fa-angles-right',
-				enable: (sendToDepts || sendToDeptsAll) && !!hasDepsToSend,
-				callback: setCallback('sendContractAction', contractId)
-			});
+			//navData.push({
+			//	name: 'Отправить в другой отдел',
+			//	faIcon: 'fa-solid fa-angles-right',
+			//	enable: (sendToDepts || sendToDeptsAll) && !!hasDepsToSend,
+			//	callback: setCallback('sendContractAction', contractId)
+			//});
 		//}
 		
 		
 		
-		navData.push({
-			name: 'Чат договора',
-			faIcon: 'fa-solid fa-comments',
-			enable: (chatDept || chat),
-			callback: setCallback('contractChatAction', contractId, title)
-		});
+		navData.push();
 		
 		
-		navData.push({
-			name: 'Список отделов (тест)',
-			faIcon: 'fa-solid fa-angles-right',
-			load: setCallback('testFoo', contractId),
+		//navData.push({
+		//	name: 'Список отделов (тест)',
+		//	faIcon: 'fa-solid fa-angles-right',
+		//	load: setCallback('loadDepsToSub', contractId),
 			/*children: [
 				{
 					name: 'Тест 1',
@@ -1683,7 +1855,7 @@
 					faIcon: 'fa-solid fa-bars',
 				}
 			]*/
-		});
+		//});
 		
 		
 		
@@ -1701,8 +1873,44 @@
 		}*/
 		
 		
-		return navData;
+		//return navData;
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	

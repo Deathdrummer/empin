@@ -5923,8 +5923,57 @@ window.isHover = function () {
 
 window.pregSplit = function () {
   var str = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
-  if (!str || typeof str !== 'string') return false;
+  var separator = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
   return str.split(/\s*[,|]\s*|\s*[;]\s*|\s+/);
+};
+
+window.ddrSplit = function () {
+  var string = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+  if (_.isNull(string)) throw new Error('ddrSplit ошибка! Не передана строка!');
+  if (!_.isString(string)) throw new Error('ddrSplit ошибка! Первый аргумент не является строкой!');
+
+  for (var _len = arguments.length, separators = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+    separators[_key - 1] = arguments[_key];
+  }
+
+  var seps = [].concat(separators);
+  if (seps.length == 0) throw new Error('ddrSplit ошибка! Не переданы разделители!');
+
+  function splitRecursive(str) {
+    var iter = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+
+    if (iter + 1 > seps.length) {
+      return _clearData(str);
+    }
+
+    var res = _runRegSplit(str, seps[iter++]);
+
+    if (res.length == 1) {
+      return _clearData(res[0]);
+    }
+
+    return res.map(function (s, k) {
+      return splitRecursive(s, iter);
+    });
+  }
+
+  return splitRecursive(string);
+
+  function _runRegSplit(str) {
+    var separator = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+    separator = _.isArray(separator) ? separator.join('|') : separator;
+    var regex = new RegExp("\\s*[".concat(separator, "]\\s*"));
+    return str.split(regex);
+  }
+
+  function _clearData() {
+    var _strItem;
+
+    var strItem = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+    if (_.isNull(strItem)) return strItem;
+    strItem = (_strItem = strItem) === null || _strItem === void 0 ? void 0 : _strItem.trim();
+    return isInt(strItem) ? parseInt(strItem) : isFloat(strItem) ? parseFloat(strItem) : strItem;
+  }
 };
 /*
 	события активной или неактивной вкладки сайта в брайзере
@@ -7294,6 +7343,65 @@ window.translit = function (str, params) {
   if (slug) strtrData = strtrData.replaceAll(/[_\s]/g, '-');
   if (lower) strtrData = strtrData.toLowerCase();
   return strtrData;
+};
+
+window.processNotify = function () {
+  var message = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+  if (_.isNull(message)) return;
+  var waitNotifyWrapper = $('body').find('[waitnotify]');
+  var waitNotifyHtml = '<div class="waitnotify__item" waitnotifyitem>' + '<div class="waitnotify__iconcontainer">' + '<div class="waitnotify__icon" waitnotifyitemwait><img src="/assets/images/loading.gif" ddrwaiticon></div>' + '</div>' + '<div class="waitnotify__message" waitnotifymessage><p>' + message + '</p></div>' + '</div>';
+  var waitNotifyDOM = $(waitNotifyHtml);
+
+  if ($(waitNotifyWrapper).length == 0) {
+    $('body').append('<div class="waitnotify noselect" waitnotify></div>');
+    $('[waitnotify]').html(waitNotifyDOM);
+  } else {
+    $(waitNotifyWrapper).append(waitNotifyDOM); // prepend
+  }
+
+  $.extend(waitNotifyDOM, {
+    done: function done(params) {
+      var item = this,
+          _$assign2 = _.assign({
+        message: null,
+        iconFa: '<i class="fa-regular fa-circle-check"></i>',
+        icon: null,
+        remove: 5
+      }, params),
+          message = _$assign2.message,
+          remove = _$assign2.remove,
+          iconFa = _$assign2.iconFa,
+          icon = _$assign2.icon;
+
+      $(item).addClass('waitnotify__item_done');
+      if (message) $(item).find('[waitnotifymessage] p').html(message);
+      $(item).find('[waitnotifyitemwait]').html(icon || iconFa);
+      setTimeout(function () {
+        $(item).remove();
+      }, remove * 1000);
+    },
+    error: function error(params) {
+      var item = this,
+          _$assign3 = _.assign({
+        message: null,
+        iconFa: '<i class="fa-solid fa-triangle-exclamation"></i>',
+        icon: null,
+        remove: 5
+      }, params),
+          message = _$assign3.message,
+          remove = _$assign3.remove,
+          iconFa = _$assign3.iconFa,
+          icon = _$assign3.icon;
+
+      $(item).addClass('waitnotify__item_error');
+      if (message) $(item).find('[waitnotifymessage] p').html(message);
+      $(item).find('[waitnotifyitemwait]').html(icon || iconFa);
+      setTimeout(function () {
+        $(item).remove();
+      }, remove * 1000);
+    }
+  });
+  return waitNotifyDOM;
 };
 
 /***/ }),

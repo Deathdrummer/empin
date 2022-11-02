@@ -5781,8 +5781,57 @@ window.isHover = function () {
 
 window.pregSplit = function () {
   var str = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
-  if (!str || typeof str !== 'string') return false;
+  var separator = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
   return str.split(/\s*[,|]\s*|\s*[;]\s*|\s+/);
+};
+
+window.ddrSplit = function () {
+  var string = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+  if (_.isNull(string)) throw new Error('ddrSplit ошибка! Не передана строка!');
+  if (!_.isString(string)) throw new Error('ddrSplit ошибка! Первый аргумент не является строкой!');
+
+  for (var _len = arguments.length, separators = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+    separators[_key - 1] = arguments[_key];
+  }
+
+  var seps = [].concat(separators);
+  if (seps.length == 0) throw new Error('ddrSplit ошибка! Не переданы разделители!');
+
+  function splitRecursive(str) {
+    var iter = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+
+    if (iter + 1 > seps.length) {
+      return _clearData(str);
+    }
+
+    var res = _runRegSplit(str, seps[iter++]);
+
+    if (res.length == 1) {
+      return _clearData(res[0]);
+    }
+
+    return res.map(function (s, k) {
+      return splitRecursive(s, iter);
+    });
+  }
+
+  return splitRecursive(string);
+
+  function _runRegSplit(str) {
+    var separator = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+    separator = _.isArray(separator) ? separator.join('|') : separator;
+    var regex = new RegExp("\\s*[".concat(separator, "]\\s*"));
+    return str.split(regex);
+  }
+
+  function _clearData() {
+    var _strItem;
+
+    var strItem = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+    if (_.isNull(strItem)) return strItem;
+    strItem = (_strItem = strItem) === null || _strItem === void 0 ? void 0 : _strItem.trim();
+    return isInt(strItem) ? parseInt(strItem) : isFloat(strItem) ? parseFloat(strItem) : strItem;
+  }
 };
 /*
 	события активной или неактивной вкладки сайта в брайзере
@@ -7154,6 +7203,65 @@ window.translit = function (str, params) {
   return strtrData;
 };
 
+window.processNotify = function () {
+  var message = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+  if (_.isNull(message)) return;
+  var waitNotifyWrapper = $('body').find('[waitnotify]');
+  var waitNotifyHtml = '<div class="waitnotify__item" waitnotifyitem>' + '<div class="waitnotify__iconcontainer">' + '<div class="waitnotify__icon" waitnotifyitemwait><img src="/assets/images/loading.gif" ddrwaiticon></div>' + '</div>' + '<div class="waitnotify__message" waitnotifymessage><p>' + message + '</p></div>' + '</div>';
+  var waitNotifyDOM = $(waitNotifyHtml);
+
+  if ($(waitNotifyWrapper).length == 0) {
+    $('body').append('<div class="waitnotify noselect" waitnotify></div>');
+    $('[waitnotify]').html(waitNotifyDOM);
+  } else {
+    $(waitNotifyWrapper).append(waitNotifyDOM); // prepend
+  }
+
+  $.extend(waitNotifyDOM, {
+    done: function done(params) {
+      var item = this,
+          _$assign2 = _.assign({
+        message: null,
+        iconFa: '<i class="fa-regular fa-circle-check"></i>',
+        icon: null,
+        remove: 5
+      }, params),
+          message = _$assign2.message,
+          remove = _$assign2.remove,
+          iconFa = _$assign2.iconFa,
+          icon = _$assign2.icon;
+
+      $(item).addClass('waitnotify__item_done');
+      if (message) $(item).find('[waitnotifymessage] p').html(message);
+      $(item).find('[waitnotifyitemwait]').html(icon || iconFa);
+      setTimeout(function () {
+        $(item).remove();
+      }, remove * 1000);
+    },
+    error: function error(params) {
+      var item = this,
+          _$assign3 = _.assign({
+        message: null,
+        iconFa: '<i class="fa-solid fa-triangle-exclamation"></i>',
+        icon: null,
+        remove: 5
+      }, params),
+          message = _$assign3.message,
+          remove = _$assign3.remove,
+          iconFa = _$assign3.iconFa,
+          icon = _$assign3.icon;
+
+      $(item).addClass('waitnotify__item_error');
+      if (message) $(item).find('[waitnotifymessage] p').html(message);
+      $(item).find('[waitnotifyitemwait]').html(icon || iconFa);
+      setTimeout(function () {
+        $(item).remove();
+      }, remove * 1000);
+    }
+  });
+  return waitNotifyDOM;
+};
+
 /***/ }),
 
 /***/ "./resources/js/plugins/axiosQuery.js":
@@ -7950,80 +8058,268 @@ function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableTo
 
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
-
 function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
 
 function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
 
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
 function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
 
+function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"]; if (_i == null) return; var _arr = []; var _n = true; var _d = false; var _s, _e; try { for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
 
-/*
-	как работает функция:
-		- в области, где нужно вызвать меню - прописывается атрибут contextmenu в значение которого заносятся
-			1. функция коллбэк, которая должна вернуть объект пунктов меню
-			2. любые необходимые данные для формирования этогосамого объекта пунктов меню
-		- создается функция коллбэк, которая была указана в атрибуте
-			- функция передает объект методов (close, setCallback... см. const methods) и далее, все аргументы, переданные через атрибут
-			- для каждого пункта указаывается коллбэк функция (можно через метод setCallback), которая вызывается при клике на соответствующй пункт меню
-*/
-// Функция вызова контекстного меню возвращает объект методов и все переданные аргументы
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
 
 $(document).on('contextmenu', '[contextmenu]', function (e) {
-  var _$$attr, _$$attr$replace, _d$, _$, _window;
+  e.preventDefault();
+  var target = {};
+  target.selector = this;
+  var menuSelector; // методы, которые привязаны к селектору.
+  // То есть, можно использовать селектор target.selector и можно вызывать через target.методы.
 
-  var context = this,
-      d = (_$$attr = $(context).attr('contextmenu')) === null || _$$attr === void 0 ? void 0 : (_$$attr$replace = _$$attr.replace(/\n+/gm, '')) === null || _$$attr$replace === void 0 ? void 0 : _$$attr$replace.split(':'),
-      func = d[0],
-      args = ((_d$ = d[1]) === null || _d$ === void 0 ? void 0 : _d$.split(',')) || [];
+  $.extend(target, {
+    changeAttrData: function changeAttrData() {
+      var argIndex = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+      var newData = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+      if (_.isNull(argIndex) || _.isNull(newData)) throw new Error('Ошибка! contextmenu changeAttrData -> неверно переданы аргументы!');
 
-  if (!$[func] && !window[func]) {
-    e.preventDefault();
-    throw new Error('Ошибка! contextmenu -> Указанная функция не создана!');
-  }
+      var _parseStringToFuncArg = _parseStringToFuncArgs($(this.selector).attr('contextmenu')),
+          _parseStringToFuncArg2 = _slicedToArray(_parseStringToFuncArg, 2),
+          chFn = _parseStringToFuncArg2[0],
+          chArgs = _parseStringToFuncArg2[1];
 
-  args = args.map(function (item) {
-    item = item.trim();
-    return isInt(item) ? parseInt(item) : item;
+      var buildAttrString = chFn + ':',
+          i = argIndex - 1;
+      if (!chArgs[i]) throw new Error('Ошибка! contextmenu changeAttrData -> аргумента с таким порядковым номером не существует!');
+      chArgs[i] = newData;
+      buildAttrString += chArgs.join(',');
+      $(this.selector).setAttrib('contextmenu', buildAttrString);
+    }
   });
+
+  var _parseStringToFuncArg3 = _parseStringToFuncArgs($(target.selector).attr('contextmenu')),
+      _parseStringToFuncArg4 = _slicedToArray(_parseStringToFuncArg3, 2),
+      func = _parseStringToFuncArg4[0],
+      args = _parseStringToFuncArg4[1]; // Метода для основной функции
+
+
   var methods = {
+    target: target,
     close: function close() {
       // закрыть контекстное меню
-      $context.removeClass("is-visible");
+      menuSelector.removeClass("is-visible");
       setTimeout(function () {
-        $context.remove();
+        menuSelector.remove();
       }, 100);
     },
-    setCallback: function setCallback(cbFnc, args) {
+    setCallback: function setCallback(cbFnc, cbArgs) {
       for (var _len = arguments.length, addArgs = new Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
         addArgs[_key - 2] = arguments[_key];
       }
 
       // при перечислении пунктов меню применять данную функцию как построитель для передачи функции с аргументами
-      var argsData = _.isArray(args) ? args : _.concat(args, [].concat(addArgs));
+      var argsData = _.isArray(cbArgs) ? cbArgs : _.concat(cbArgs, [].concat(addArgs));
       return cbFnc + ':' + argsData.join(',');
+    },
+    closeOnScroll: function closeOnScroll() {
+      for (var _len2 = arguments.length, selectors = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+        selectors[_key2] = arguments[_key2];
+      }
+
+      var s = [].concat(selectors);
+      selectors.push('html, body');
+      var allSelectorsStr = selectors.join(', ');
+      $(allSelectorsStr).one('scroll', function () {
+        methods.close();
+      });
     }
   };
-  var navData = $[func] && typeof $[func] == 'function' ? (_$ = $)[func].apply(_$, [methods].concat(_toConsumableArray(args))) : window[func] && typeof window[func] == 'function' ? (_window = window)[func].apply(_window, [methods].concat(_toConsumableArray(args))) : false;
 
-  if (!navData || !navData.length) {
-    console.warn('contextmenu -> Указанная функция не возвращает данные!');
-    return; //throw new Error('Ошибка! contextmenu -> Указанная функция не возвращает данные!');
+  var menuData = _callGlobalFunc.apply(void 0, [func, methods].concat(_toConsumableArray(args)));
+
+  var _buildMenuHtml2 = _buildMenuHtml(menuData),
+      _buildMenuHtml3 = _slicedToArray(_buildMenuHtml2, 2),
+      menuHtml = _buildMenuHtml3[0],
+      funcMap = _buildMenuHtml3[1];
+
+  if (!menuHtml || !funcMap) return;
+  menuSelector = _render(e, menuHtml); // Скрытие меню при клике на пункт меню
+
+  menuHtml.one("mousedown mouseup touchstart touchend", "li:not(.nope):not(.parent)", function (e) {
+    e.stopPropagation();
+    if (e.which !== 1) return;
+
+    if (hasIn(['mousedown', 'touchstart'], e.type) !== false) {
+      $(this).addClass("active");
+    } else if (hasIn(['mouseup', 'touchend'], e.type) !== false) {
+      menuHtml.removeClass("is-visible");
+      setTimeout(function () {
+        menuHtml.remove();
+      }, 100);
+      $(this).removeClass("active");
+    }
+  }); // клик на пункт меню без дочерних
+
+  menuHtml.on(tapEvent, '[contextmenuitem]', function (e) {
+    var funcCode = $(this).attr('contextmenuitem');
+    if (!funcMap[funcCode] || typeof funcMap[funcCode] != 'function') throw new Error('Ошибка! contextmenu contextmenuitem parent -> передана не функция!');
+    var obj = {};
+    obj.target = this;
+    $.extend(obj, {
+      text: function text() {
+        return $(this.target).text().trim();
+      },
+      items: function items() {
+        return $(this.target).siblings();
+      }
+    });
+    funcMap[funcCode](obj);
+  }); // наведение на пункт меню с дочерними
+
+  var waiting, abortCtrl;
+  menuHtml.on('mouseenter mouseleave touchstart touchend', '[contextmenuitemload]:not(.nope).parent', function (e) {
+    var menuItem = this,
+        subContext = $(menuItem).find('.context.sub');
+
+    if (hasIn(['mouseenter', 'touchstart'], e.type) !== false) {
+      var funcCode = $(menuItem).attr('contextmenuitemload');
+      if (!_.isPlainObject(funcMap[funcCode])) throw new Error('Ошибка! contextmenu [contextmenuitemload] -> не передан объект с данными!');
+
+      if ($(menuItem).hasClass('loaded')) {
+        $(subContext).addClass('context__sub-hover');
+        return;
+      }
+
+      $(subContext).addClass('context__sub-hover minh4rem-5px');
+      waiting = $(subContext).ddrWait({
+        bgColor: 'transparent',
+        iconHeight: '25px'
+      });
+      $(menuItem).addClass('loaded');
+
+      var _$assign = _.assign({
+        url: null,
+        method: 'get',
+        params: {},
+        map: function map(item) {
+          return item;
+        },
+        empty: '<li class="nope w100 color-gray-500">Пусто</li>'
+      }, funcMap[funcCode]),
+          url = _$assign.url,
+          method = _$assign.method,
+          params = _$assign.params,
+          map = _$assign.map,
+          empty = _$assign.empty;
+
+      abortCtrl = new AbortController();
+      axiosQuery(method, url, params, 'json', abortCtrl).then(function (_ref) {
+        var data = _ref.data,
+            error = _ref.error,
+            status = _ref.status,
+            headers = _ref.headers;
+
+        if (error) {
+          console.log(error.message);
+          return;
+        }
+
+        if (_.isEmpty(data)) {
+          $(subContext).html(empty);
+          return;
+        }
+
+        _buildSubMenu(subContext, data, map, empty);
+      })["catch"](function (e) {
+        console.error(e);
+        $(menuItem).removeClass('loaded'); //throw new Error('Ошибка! contextmenu _buildSubMenu -> axiosQuery вернула ошибку!');
+      });
+    } else if (hasIn(['mouseleave', 'touchend'], e.type) !== false) {
+      $(subContext).removeClass('context__sub-hover');
+    }
+  }); // Скрытие меню при клике на любое место документа
+
+  $(document).on("mousedown", function (e) {
+    var $tar = $(e.target);
+    if (abortCtrl instanceof AbortController) abortCtrl.abort();
+
+    if (!$tar.is(menuHtml) && !$tar.closest(".context").length) {
+      menuHtml.removeClass("is-visible");
+      setTimeout(function () {
+        menuHtml.remove();
+      }, 100);
+      $(document).off(e);
+    }
+  });
+}); //const itemMethods = {};
+// Спарсить данные, переданные через атрибут contextmenu в теге.
+
+function _parseStringToFuncArgs() {
+  var stringToParse = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+  if (_.isNull(stringToParse)) throw new Error('Ошибка! contextmenu _parseStringToFuncArgs -> не передан аргумент!');
+  if (!_.isString(stringToParse)) throw new Error('Ошибка! contextmenu _parseStringToFuncArgs -> передаваемый аргумент должен быть строкой!');
+
+  var _ddrSplit = ddrSplit(stringToParse === null || stringToParse === void 0 ? void 0 : stringToParse.replace(/\n+/gm, ''), ':', ','),
+      _ddrSplit2 = _slicedToArray(_ddrSplit, 2),
+      func = _ddrSplit2[0],
+      args = _ddrSplit2[1];
+
+  if (!_.isArray(args)) args = [args];
+  return [func, args];
+} // Вызвать инициирующую функцию коллбкэа
+
+
+function _callGlobalFunc() {
+  var _$, _window;
+
+  var func = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+  var methods = arguments.length > 1 ? arguments[1] : undefined;
+  if (_.isNull(func)) throw new Error('Ошибка! contextmenu _callGlobalFunc -> неверно переданы аргументы!');
+  if (!$[func] && !window[func]) throw new Error('Ошибка! contextmenu _callGlobalFunc -> указанная функция не создана!');
+
+  for (var _len3 = arguments.length, args = new Array(_len3 > 2 ? _len3 - 2 : 0), _key3 = 2; _key3 < _len3; _key3++) {
+    args[_key3 - 2] = arguments[_key3];
   }
 
+  if ($[func] && typeof $[func] == 'function') return (_$ = $)[func].apply(_$, [methods].concat(args));else if (window[func] && typeof window[func] == 'function') return (_window = window)[func].apply(_window, [methods].concat(args));else throw new Error('Ошибка! contextmenu _callGlobalFunc -> указанная функция не является функцией!');
+}
+
+function _buildMenuHtml() {
+  var menuData = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+  if (!menuData || _.isEmpty(menuData)) return [];
+  menuData = menuData.filter(function (item) {
+    return Boolean((item.hidden == undefined || !item.hidden) && (item.visible == undefined || item.visible));
+  });
+  if (_.isEmpty(menuData)) return [];
+  var funcMap = {};
   var menuHtml = '<ul class="context noselect">';
-  $.each(navData, function (k, item) {
+  $.each(menuData, function (k, item) {
+    var funcCode = !item.children && (item.load || item.onClick) ? generateCode('nlLlLLnnlnnLnnn') : null;
+
+    if (item.onClick && !item.children && !item.load) {
+      funcMap[funcCode] = item.onClick;
+    } else if (item.load && !item.children && !item.onClick) {
+      funcMap[funcCode] = item.load;
+    }
+
     var itemAttrs = setTagAttribute({
       'class': {
         'parent': item.children || item.load,
         'nope': item.enable != undefined && !item.enable || item.disable,
         'loadingable': item.load && !item.children
       },
-      'onclick': _defineProperty({}, '$.contextMenuCallFunc(\'' + item.callback + '\');', item.callback && !item.children),
-      'load': [item.load || null]
+      'hidden': item.visible != undefined && !item.visible || item.hidden,
+      'contextmenuitem': _defineProperty({}, funcCode, item.onClick && !item.children && !item.load),
+      // коллбэк при клике на пункт меню (без дочерних)
+      'contextmenuitemload': _defineProperty({}, funcCode, item.load && !item.children && !item.onClick) // загрука подменю при наведении
+
     });
-    menuHtml += '<li' + itemAttrs + '>';
+    menuHtml += '<li' + itemAttrs + '>'; //------- parent li
 
     if (item.faIcon) {
       menuHtml += '<i class="icon fa-fw ' + item.faIcon + '"></i>';
@@ -8033,42 +8329,118 @@ $(document).on('contextmenu', '[contextmenu]', function (e) {
 
     if (item.children || item.load) {
       menuHtml += '<i class="f fa-solid fa-chevron-right"></i>';
+      menuHtml += '<ul class="context sub">';
     }
 
-    if (item.load) {
-      menuHtml += '<ul class="context sub"></ul>';
-    } else if (item.children) {
-      menuHtml += '<ul class="context sub">';
+    if (item.children) {
+      console.log('children');
       $.each(item.children, function (k, childItem) {
         var childItemAttrs = setTagAttribute({
           'class': {
             'nope': childItem.enable != undefined && !childItem.enable || childItem.disable
           },
-          'onclick': _defineProperty({}, '$.contextMenuCallFunc(\'' + childItem.callback + '\');', childItem.callback)
+          'hidden': childItem.visible != undefined && !childItem.visible || childItem.hidden,
+          'contextmenuitem': _defineProperty({}, funcCode, childItem.onClick && !childItem.children && !childItem.load) // коллбэк при клике на пункт меню (без дочерних)
+
         });
         menuHtml += '<li' + childItemAttrs + '>';
         menuHtml += '<i class="icon fa-fw ' + childItem.faIcon + '"></i>';
         menuHtml += '<p>' + childItem.name + '</p>';
         menuHtml += '</li>';
       });
+    }
+
+    if (item.load || item.children) {
       menuHtml += '</ul>';
     }
 
-    menuHtml += '</li>';
+    menuHtml += '</li>'; //------- parent li
   });
   menuHtml += '</ul>';
+  return [$(menuHtml), funcMap];
+}
 
+function _buildSubMenu() {
+  var subContext = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+  var itemsData = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+  var map = arguments.length > 2 ? arguments[2] : undefined;
+  var empty = arguments.length > 3 ? arguments[3] : undefined;
+  if (_.isNull(subContext)) throw new Error('Ошибка! contextmenu _buildSubMenu -> неверный селектор!');
+  if (_.isNull(itemsData) || !itemsData.length) return;
+  var subData = itemsData.map(map);
+  var menuHtml = '',
+      funcMap = {};
+  $.each(subData, function (k, childItem) {
+    var funcCode = childItem.onClick ? generateCode('nlLlLLnnlnnLnnn') : null;
+
+    if (childItem.onClick) {
+      funcMap[funcCode] = childItem.onClick;
+    }
+
+    var childItemAttrs = setTagAttribute({
+      'class': {
+        'nope': childItem.enable != undefined && !childItem.enable || childItem.disable
+      },
+      'hidden': childItem.visible != undefined && !childItem.visible || childItem.hidden,
+      'contextmenuitemloaded': _defineProperty({}, funcCode, childItem.onClick) // коллбэк при клике на пункт меню (без дочерних)
+
+    });
+    menuHtml += '<li' + childItemAttrs + '>';
+    menuHtml += '<i class="icon fa-fw ' + childItem.faIcon + '"></i>';
+    menuHtml += '<p>' + childItem.name + '</p>';
+    menuHtml += '</li>';
+  });
+  $(subContext).addClass('loaded');
+  $(subContext).html(menuHtml || empty); //-----------------------------------------------------------------
+
+  var $window = $(window),
+      sw = subContext.width(),
+      sh = subContext.height(),
+      sx = subContext.offset().left,
+      sy = subContext.offset().top,
+      padx = 30,
+      pady = 20,
+      ww = $window.width(),
+      wh = $window.height(),
+      subHitsRight = sx + sw - padx >= ww - padx,
+      subHitsBottom = sy + sh - pady >= wh - pady;
+
+  if (subHitsRight) {
+    $(subContext).addClass("oppositeX");
+  }
+
+  if (subHitsBottom) {
+    $(subContext).addClass("oppositeY");
+  } // клик на пункт меню без дочерних
+
+
+  subContext.on(tapEvent, '[contextmenuitemloaded]', function (e) {
+    var funcCode = $(this).attr('contextmenuitemloaded');
+    if (!funcMap[funcCode] || typeof funcMap[funcCode] != 'function') throw new Error('Ошибка! contextmenu contextmenuitemloaded -> передана не функция!');
+    var obj = {};
+    obj.target = this;
+    $.extend(obj, {
+      text: function text() {
+        return $(this.target).text().trim();
+      },
+      items: function items() {
+        return $(this.target).siblings();
+      }
+    });
+    funcMap[funcCode](obj);
+  });
+}
+
+function _render(e, context) {
   if ($('body').find('.context').length) {
     $('body').find('.context').remove();
   }
 
-  $('body').append(menuHtml);
+  $('body').append(context);
   var $doc = $(document),
-      $context = $(".context:not(.sub)"),
+      $context = $(context).not('.sub'),
       $window = $(window),
-      $sub = $context.find(".sub");
-  $sub.removeClass("oppositeX oppositeY");
-  e.preventDefault();
+      $sub = $context.find('.sub');
   var w = $context.width(),
       h = $context.height(),
       x = e.clientX,
@@ -8113,146 +8485,8 @@ $(document).on('contextmenu', '[contextmenu]', function (e) {
   }
 
   $context.addClass("is-visible");
-  $doc.on("mousedown", function (e) {
-    var $tar = $(e.target);
-
-    if (!$tar.is($context) && !$tar.closest(".context").length) {
-      $context.removeClass("is-visible");
-      setTimeout(function () {
-        $context.remove();
-      }, 100);
-      $doc.off(e);
-    }
-  });
-  $context.one("mousedown mouseup touchstart touchend", "li:not(.nope):not(.parent)", function (e) {
-    e.stopPropagation();
-    if (e.which !== 1) return;
-
-    if (hasIn(['mousedown', 'touchstart'], e.type) !== false) {
-      $(this).addClass("active");
-    } else if (hasIn(['mouseup', 'touchend'], e.type) !== false) {
-      $context.removeClass("is-visible");
-      setTimeout(function () {
-        $context.remove();
-      }, 100);
-      $(this).removeClass("active");
-    }
-  });
-  var waiting;
-  $context.on("mouseenter mouseleave touchstart touchend", "li:not(.nope).parent", function (e) {
-    var subContext = $(this).find('.context.sub'),
-        loadData = $(this).attr('load');
-
-    if (hasIn(['mouseenter', 'touchstart'], e.type) !== false) {
-      var _loadData$replace, _d$2, _window2, _$2;
-
-      if (!loadData || $(subContext).hasClass('loaded')) {
-        $(subContext).addClass('context__sub-hover');
-        return;
-      }
-
-      var _d = loadData === null || loadData === void 0 ? void 0 : (_loadData$replace = loadData.replace(/\n+/gm, '')) === null || _loadData$replace === void 0 ? void 0 : _loadData$replace.split(':'),
-          loadFunc = _d[0],
-          loadArgs = ((_d$2 = _d[1]) === null || _d$2 === void 0 ? void 0 : _d$2.split(',')) || [];
-
-      if (!$[loadFunc] && !window[loadFunc]) {
-        throw new Error('Ошибка! contextmenu load -> Указанная функция загрузки дочерних элементов не создана!');
-      }
-
-      $(subContext).addClass('context__sub-hover minh4rem-5px');
-      waiting = $(subContext).ddrWait({
-        bgColor: 'transparent',
-        iconHeight: '25px'
-      });
-      var loadMethods = {
-        setItems: function setItems() {
-          var itemsData = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
-
-          if (_.isNull(itemsData) || itemsData.length == 0) {
-            $(subContext).html('<li class="nope w100 color-gray-500">Пусто</li>');
-            return;
-          } // throw new Error('Ошибка! contextmenu setItems -> не переданы пункты дочернего меню!');
-
-
-          var menuHtml = '';
-          $.each(itemsData, function (k, childItem) {
-            var childItemAttrs = setTagAttribute({
-              'class': {
-                'nope': childItem.enable != undefined && !childItem.enable || childItem.disable
-              },
-              'onclick': _defineProperty({}, '$.contextMenuCallFunc(\'' + childItem.callback + '\');', childItem.callback)
-            });
-            menuHtml += '<li' + childItemAttrs + '>';
-            menuHtml += '<i class="icon fa-fw ' + childItem.faIcon + '"></i>';
-            menuHtml += '<p>' + childItem.name + '</p>';
-            menuHtml += '</li>';
-          });
-          $(subContext).addClass('loaded');
-          $(subContext).html(menuHtml);
-          var sw = subContext.width(),
-              sh = subContext.height(),
-              sx = subContext.offset().left,
-              sy = subContext.offset().top,
-              subHitsRight = sx + sw - padx >= ww - padx,
-              subHitsBottom = sy + sh - pady >= wh - pady;
-
-          if (subHitsRight) {
-            $sub.addClass("oppositeX");
-          }
-
-          if (subHitsBottom) {
-            $sub.addClass("oppositeY");
-          }
-        }
-      };
-      if (window[loadFunc] && typeof window[loadFunc] == 'function') (_window2 = window)[loadFunc].apply(_window2, [loadMethods].concat(_toConsumableArray(loadArgs)));else if ($[loadFunc] && typeof $[loadFunc] == 'function') (_$2 = $)[loadFunc].apply(_$2, [loadMethods].concat(_toConsumableArray(loadArgs)));
-    } else if (hasIn(['mouseleave', 'touchend'], e.type) !== false) {
-      $(subContext).removeClass('context__sub-hover');
-      if (_.isObject(waiting)) waiting.destroy();
-    }
-  });
-
-  $.contextMenuCallFunc = function () {
-    var _cbData$replace, _d$3, _window3, _$3;
-
-    var cbData = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
-    if (!cbData) throw new Error('Ошибка! contextmenu contextMenuCallFunc -> Не переданы данные!');
-    var d = cbData === null || cbData === void 0 ? void 0 : (_cbData$replace = cbData.replace(/\n+/gm, '')) === null || _cbData$replace === void 0 ? void 0 : _cbData$replace.split(':'),
-        cbFunc = d[0],
-        cbArgs = ((_d$3 = d[1]) === null || _d$3 === void 0 ? void 0 : _d$3.split(',')) || [];
-
-    if (!$[cbFunc] && !window[cbFunc]) {
-      e.preventDefault();
-      throw new Error('Ошибка! contextmenu contextMenuCallFunc -> Указанная функция коллбэка не создана!');
-    }
-
-    cbArgs = cbArgs.map(function (item) {
-      item = item.trim();
-      return isInt(item) ? parseInt(item) : item;
-    }); // методы, которые привязаны к селектору.
-    // То есть, можно использовать селектор по прямому назначению и можно вызывать через него методы.
-
-    $.extend(context, {
-      changeAttrData: function changeAttrData() {
-        var _$$attr2, _$$attr2$replace, _d$4;
-
-        var argIndex = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
-        var newData = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-        if (_.isNull(argIndex) || _.isNull(newData)) throw new Error('Ошибка! contextmenu changeAttrData -> неверно переданы аргументы!');
-        var d = (_$$attr2 = $(context).attr('contextmenu')) === null || _$$attr2 === void 0 ? void 0 : (_$$attr2$replace = _$$attr2.replace(/\n+/gm, '')) === null || _$$attr2$replace === void 0 ? void 0 : _$$attr2$replace.split(':'),
-            func = d[0],
-            args = ((_d$4 = d[1]) === null || _d$4 === void 0 ? void 0 : _d$4.split(',')) || [],
-            buildAttrString = func + ':',
-            i = argIndex - 1;
-        if (!args[i]) throw new Error('Ошибка! contextmenu changeAttrData -> аргумента с таким порядковым номером не существует!');
-        args[i] = newData;
-        buildAttrString += args.join(',');
-        $(context).setAttrib('contextmenu', buildAttrString);
-      }
-    });
-    if (window[cbFunc] && typeof window[cbFunc] == 'function') (_window3 = window)[cbFunc].apply(_window3, [context].concat(_toConsumableArray(cbArgs)));else if ($[cbFunc] && typeof $[cbFunc] == 'function') (_$3 = $)[cbFunc].apply(_$3, [context].concat(_toConsumableArray(cbArgs)));
-  };
-});
+  return $context;
+}
 
 /***/ }),
 

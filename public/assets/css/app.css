@@ -45557,7 +45557,7 @@ template {
   white-space: break-spaces;
 }
 
-.nowrap {
+.nowrap, .nobreak {
   white-space: nowrap;
 }
 

@@ -720,3 +720,97 @@ section
 	&__date
 		display: block
 		text-align: right
+
+
+
+
+
+
+
+
+
+.waitnotify
+	position: fixed
+	display: flex
+	flex-direction: column
+	align-items: flex-end
+	bottom: 20px
+	right: 20px
+	z-index: 120
+	
+	
+	&__item
+		display: flex
+		align-items: center
+		box-shadow: 0px 4px 8px -2px rgb(0 0 0 / 47%)
+		border-radius: 5px
+		padding: 10px 15px
+		max-width: 500px
+		
+		
+		&:not(:last-of-type)
+			margin-bottom: 15px
+		
+		
+		&:not(.waitnotify__item_done):not(.waitnotify__item_error)
+			background-color: #d9d9d9
+			border: 1px solid darken(#d9d9d9, 5%)
+			
+			p
+				color: #727272
+		
+		
+		
+		&_done
+			background-color: #89d16f
+			border: 1px solid darken(#89d16f, 5%)
+			
+			i
+				color: #4f0
+			
+			p
+				color: #1b6600
+		
+		&_error
+			background-color: #df7a7a
+			border: 1px solid darken(#df7a7a, 5%)
+			
+			i
+				color: #a90000
+			
+			p
+				color: #500000
+			
+	
+	&__iconcontainer
+		margin-right: 20px
+		flex: 0 1 auto
+	
+	
+	&__icon
+		width: 30px
+		height: 30px
+		display: flex
+		align-items: center
+		justify-content: center
+		
+		img
+			width: 100%
+			height: auto
+			filter: hue-rotate(30deg) brightness(0.8)
+			
+		i
+			font-size: 30px
+			
+		
+	&__message
+		word-break: break-word
+		line-height: 18px
+		text-align: left
+		flex: 0 1 auto
+		display: inline
+		
+		p
+			font-size: 16px
+		
+		

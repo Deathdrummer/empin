@@ -19,8 +19,8 @@
 			'border-light',
 		])
 		>
-		<strong class="chat__author">{{$name ?? null}}</strong>
-		<p class="chat__message">{{$message}}</p>
+		<strong class="chat__author breakword">{{$name ?? null}}</strong>
+		<p class="chat__message breakword">{{$message}}</p>
 		<small class="fz10px color-gray-500 chat__date mt5px">@date($created_at) г. в @time($created_at)</small>
 	</div>
 	

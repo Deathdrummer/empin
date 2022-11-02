@@ -103,7 +103,7 @@
 @if(auth('site')->user()->can('contract-col-price:site') && (empty($userColums) || in_array('price', $userColums)))
 	<x-table.td class="text-end">
 		@isset($price)
-			<p class="fz12px lh90">@number($price, 2) @symbal(money)</p>
+			<p class="fz12px lh90 nobreak">@number($price, 2) <strong>@symbal(money)</strong></p>
 		@else
 			<p class="color-gray">-</p>
 		@endisset

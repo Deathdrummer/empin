@@ -10,15 +10,9 @@
 			<div class="mt2rem">
 				<div class="row align-items-end">
 					<div class="col">
-						{{-- <x-textarea
-							rows="5"
-							group="normal"
-							class="w100"
-							/> --}}
-						
 						<div
 							id="chatMessageBlock"
-							class="color-gray-600 border-all border-gray-300 border-radius-5px minh4rem maxh15rem scrollblock p1rem"
+							class="color-gray-600 border-all border-gray-300 border-radius-5px minh4rem maxh15rem scrollblock p1rem breakword"
 							contenteditable
 							>
 							

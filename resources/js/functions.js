@@ -4,9 +4,9 @@ window.tapEvent = (('ontouchstart' in window) && !isIos) ? 'tap' : 'click';
 $.fn.tripleTap = function(callback) {
 	$(this).on(tapEvent, function (e) {
 		e.preventDefault();
-	    if (e.detail >= 3) {
-	        if (callback && typeof callback == 'function') callback(this);
-	    }
+		if (e.detail >= 3) {
+			if (callback && typeof callback == 'function') callback(this);
+		}
 	});
 }
 	
@@ -146,9 +146,52 @@ window.isHover = (selector = null) => {
 
 
 
-window.pregSplit = function(str = null) {
-	if (!str || typeof str !== 'string') return false;
+window.pregSplit = function(str = null, separator = null) {
 	return str.split(/\s*[,|]\s*|\s*[;]\s*|\s+/);
+}
+
+
+
+
+
+
+window.ddrSplit = function(string = null, ...separators) {
+	if (_.isNull(string)) throw new Error('ddrSplit ошибка! Не передана строка!');
+	if (!_.isString(string)) throw new Error('ddrSplit ошибка! Первый аргумент не является строкой!');
+	let seps = [...separators];
+	if (seps.length == 0) throw new Error('ddrSplit ошибка! Не переданы разделители!');
+	
+	function splitRecursive(str, iter = 0) {
+		if (iter + 1 > seps.length) {
+			return _clearData(str);
+		}
+		
+		let res = _runRegSplit(str, seps[iter++]);
+		
+		if (res.length == 1) {
+			return _clearData(res[0]);
+		} 
+		
+		return res.map(function(s, k) {
+			return splitRecursive(s, iter);
+		});
+	}
+	
+	return splitRecursive(string);
+	
+	
+	
+	function _runRegSplit(str, separator = null) {
+		separator = _.isArray(separator) ? separator.join('|') : separator;
+		let regex = new RegExp(`\\s*[${separator}]\\s*`);
+		return str.split(regex);
+	}
+	
+	function _clearData(strItem = null) {
+		if (_.isNull(strItem)) return strItem;
+		strItem = strItem?.trim();
+		return isInt(strItem) ? parseInt(strItem) : (isFloat(strItem) ? parseFloat(strItem) : strItem);
+	}
 }
 
 
@@ -289,15 +332,15 @@ window.attribData = function(e, d) {
 
 // Хэш сторка
 window.ddrHash = function(str, seed = 0) {
-    let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
-    for (let i = 0, ch; i < str.length; i++) {
-        ch = str.charCodeAt(i);
-        h1 = Math.imul(h1 ^ ch, 2654435761);
-        h2 = Math.imul(h2 ^ ch, 1597334677);
-    }
-    h1 = Math.imul(h1 ^ (h1>>>16), 2246822507) ^ Math.imul(h2 ^ (h2>>>13), 3266489909);
-    h2 = Math.imul(h2 ^ (h2>>>16), 2246822507) ^ Math.imul(h1 ^ (h1>>>13), 3266489909);
-    return 4294967296 * (2097151 & h2) + (h1>>>0);
+	let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
+	for (let i = 0, ch; i < str.length; i++) {
+		ch = str.charCodeAt(i);
+		h1 = Math.imul(h1 ^ ch, 2654435761);
+		h2 = Math.imul(h2 ^ ch, 1597334677);
+	}
+	h1 = Math.imul(h1 ^ (h1>>>16), 2246822507) ^ Math.imul(h2 ^ (h2>>>13), 3266489909);
+	h2 = Math.imul(h2 ^ (h2>>>16), 2246822507) ^ Math.imul(h1 ^ (h1>>>13), 3266489909);
+	return 4294967296 * (2097151 & h2) + (h1>>>0);
 };
 
 
@@ -337,7 +380,7 @@ window.setCookie = function(cname, cvalue, exdays, encode) {
 	if (encode) {
 		cvalueStr = (cvalue * 567)+'346045267804235468667352353ddr';
 		let bta = encodeURIComponent(btoa(cvalueStr.replace(/%([0-9A-F]{2})/g, function toSolidBytes(match, p1) {
-		      return String.fromCharCode('0x' + p1);
+			  return String.fromCharCode('0x' + p1);
 		})));
 		cvalue = bta;			
 	}
@@ -441,11 +484,11 @@ $.fn.imgLoaded = function(func) {
 		- шаг
 */
 window.Counter = function(start, order, step) {
-    var count = start || 0;
-    return function(num) {
-        count = num != undefined ? num : count;
-        return order == undefined || order == '+' ? (order == '-' ? count-=step : count+=step) : count-=step;
-    }
+	var count = start || 0;
+	return function(num) {
+		count = num != undefined ? num : count;
+		return order == undefined || order == '+' ? (order == '-' ? count-=step : count+=step) : count-=step;
+	}
 }
 
 
@@ -486,12 +529,12 @@ window.isNull = function(str) {
 */
 window.isJson = function(str) {
 	if (str == undefined || typeof str == 'undefined') return false;
-    try {
-        JSON.parse(str);
-    } catch (e) {
-        return false;
-    }
-    return true;
+	try {
+		JSON.parse(str);
+	} catch (e) {
+		return false;
+	}
+	return true;
 }
 
 
@@ -848,12 +891,12 @@ $.fn.scrollFix = function(settings) {
 		- максимальное число
 */
 export function random(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
+	return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 
 window.random = function(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
+	return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 
@@ -939,10 +982,10 @@ window.getArgs = function(arg) {
 		- путь до файла
 */
 window.urlExists = function(url) {
-    var http = new XMLHttpRequest();
-    http.open('HEAD', url, false);
-    http.send();
-    return http.status != 404;
+	var http = new XMLHttpRequest();
+	http.open('HEAD', url, false);
+	http.send();
+	return http.status != 404;
 }
 
 
@@ -1231,10 +1274,10 @@ window.initEditors = function() {
 		lineHeights: lineHeights,
 		fontSizes: fontSizes,
 		codeviewFilter: false,
-  		codeviewIframeFilter: true,
-  		disableGrammar: true,
-  		codemirror: {
-		    theme: 'monokai'
+		codeviewIframeFilter: true,
+		disableGrammar: true,
+		codemirror: {
+			theme: 'monokai'
 		},
 		toolbar: [
 			['font', ['bold', 'italic', 'underline', 'clear']],
@@ -1253,11 +1296,11 @@ window.initEditors = function() {
 				if ($(this).closest('tr').find('[save], [update]').length) {
 					$(this).closest('tr').find('[save], [update]').removeAttrib('disabled');
 				}
-		    }
-		    /*onChange: function (contents) {
-		    	$summernote.summernote('code', '');
-		    },
-		    onBlurCodeview: function() {
+			}
+			/*onChange: function (contents) {
+				$summernote.summernote('code', '');
+			},
+			onBlurCodeview: function() {
 			}*/
 		},
 		buttons: {
@@ -1396,8 +1439,8 @@ window.ddrInitTabs = function() {
 			- onChooseFile: событие при выборе файла. Передается селектор файла
 */
 window.clientFileManager = function(callback) {
-    var html = '',
-    	isLoadedData = false,
+	var html = '',
+		isLoadedData = false,
 		fileTypes = false,
 		activeSelector,
 		currentDir,
@@ -1680,4 +1723,73 @@ window.translit = function(str, params) {
 	if (slug) strtrData = strtrData.replaceAll(/[_\s]/g, '-');
 	if (lower) strtrData = strtrData.toLowerCase();
 	return strtrData;
+}
+
+
+
+
+
+
+
+
+
+
+window.processNotify = function(message = null) {
+	if (_.isNull(message)) return;
+	const waitNotifyWrapper = $('body').find('[waitnotify]');
+	
+	let waitNotifyHtml = '<div class="waitnotify__item" waitnotifyitem>' +
+						 	'<div class="waitnotify__iconcontainer">' +
+						 		'<div class="waitnotify__icon" waitnotifyitemwait><img src="/assets/images/loading.gif" ddrwaiticon></div>' +
+						 	'</div>' +
+						 	'<div class="waitnotify__message" waitnotifymessage><p>'+message+'</p></div>' +
+						 '</div>';
+	
+	const waitNotifyDOM = $(waitNotifyHtml);
+	
+	if ($(waitNotifyWrapper).length == 0) {
+		$('body').append('<div class="waitnotify noselect" waitnotify></div>');
+		$('[waitnotify]').html(waitNotifyDOM);
+	} else {
+		$(waitNotifyWrapper).append(waitNotifyDOM); // prepend
+	}
+	
+	$.extend(waitNotifyDOM, {
+		done(params) {
+			const item = this,
+				{message, remove, iconFa, icon} = _.assign({
+					message: null,
+					iconFa: '<i class="fa-regular fa-circle-check"></i>',
+					icon: null,
+					remove: 5
+				}, params);
+			
+			$(item).addClass('waitnotify__item_done');
+			if (message) $(item).find('[waitnotifymessage] p').html(message);
+			$(item).find('[waitnotifyitemwait]').html(icon || iconFa);
+			
+			setTimeout(() => {
+				$(item).remove();
+			}, remove * 1000);
+		},
+		error(params) {
+			const item = this,
+				{message, remove, iconFa, icon} = _.assign({
+					message: null,
+					iconFa: '<i class="fa-solid fa-triangle-exclamation"></i>',
+					icon: null,
+					remove: 5
+				}, params);
+			
+			$(item).addClass('waitnotify__item_error');
+			if (message) $(item).find('[waitnotifymessage] p').html(message);
+			$(item).find('[waitnotifyitemwait]').html(icon || iconFa);
+			
+			setTimeout(() => {
+				$(item).remove();
+			}, remove * 1000);
+		}
+	});
+	
+	return waitNotifyDOM;
 }
