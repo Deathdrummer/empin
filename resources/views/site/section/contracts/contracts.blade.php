@@ -1800,6 +1800,7 @@
 			{
 				name: 'Добавить в подборку',
 				faIcon: 'fa-solid fa-clipboard-check',
+				hidden: !toArchive,
 				//visible: addToSelection,
 				load: {
 					url: 'site/contracts/choosed_selections?contract_id='+contractId,
