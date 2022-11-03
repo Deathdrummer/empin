@@ -1459,30 +1459,7 @@
 	
 	
 	
-	//-------------------------------------------------  Скрыть договор
-	$.hideContractAction = (btn, contractId, departmentId) => {
-		let row = $(btn).closest('tr');
-		ddrPopup({
-			width: 400, // ширина окна
-			html: '<p class="fz18px color-red">Вы действительно хотите скрыть договор?</p>', // контент
-			buttons: ['ui.cancel', {title: 'Скрыть', variant: 'red', action: 'contractHide'}],
-			centerMode: true,
-			winClass: 'ddrpopup_dialog'
-		}).then(({close, wait}) => {
-			$.contractHide = (_) => {
-				wait();
-				axiosQuery('post', 'site/contracts/hide', {contractId, departmentId}, 'json').then(({data, error, status, headers}) => {
-					if (data) {
-						getList();
-						$.notify('Договор успешно скрыт!');
-					} else {
-						$.notify('Ошибка! Договор не был скрыт!', 'error');
-					}
-					close();
-				});
-			}
-		});	
-	}
+	
 	
 	
 	
@@ -1793,6 +1770,35 @@
 						
 					});
 				}
+			},
+			{
+				
+				name: 'Скрыть договор',
+				faIcon: 'fa-solid fa-eye-slash',
+				visible: hide,
+				onClick() {	
+					ddrPopup({
+						width: 400, // ширина окна
+						html: '<p class="fz18px color-red">Вы действительно хотите скрыть договор?</p>', // контент
+						buttons: ['ui.cancel', {title: 'Скрыть', variant: 'red', action: 'contractHide'}],
+						centerMode: true,
+						winClass: 'ddrpopup_dialog'
+					}).then(({close, wait}) => {
+						$.contractHide = (_) => {
+							wait();
+							axiosQuery('post', 'site/contracts/hide', {contractId, departmentId}, 'json').then(({data, error, status, headers}) => {
+								if (data) {
+									getList();
+									$.notify('Договор успешно скрыт!');
+									target.changeAttrData(9, '0');
+								} else {
+									$.notify('Ошибка! Договор не был скрыт!', 'error');
+								}
+								close();
+							});
+						}
+					});
+				}
 			}
 		];
 		
@@ -1814,67 +1820,6 @@
 		// chat -> contractChatAction:contractId,title (Чат договора)
 		// returnToWork -> returnContractToWorkAction:contractId (Вернуть договор в работу)
 		
-		
-		//if (toArchive) {
-			//navData.push({
-			//	name: 'Отправить в архив',
-			//	faIcon: 'fa-solid fa-box-archive',
-			//	enable: toArchive,
-			//	callback: setCallback('toArchiveContractAction', contractId, objectNumber, title)
-			//});
-		//}
-		
-		//if (sendToDepts || sendToDeptsAll) {
-			//navData.push({
-			//	name: 'Отправить в другой отдел',
-			//	faIcon: 'fa-solid fa-angles-right',
-			//	enable: (sendToDepts || sendToDeptsAll) && !!hasDepsToSend,
-			//	callback: setCallback('sendContractAction', contractId)
-			//});
-		//}
-		
-		
-		
-		navData.push();
-		
-		
-		//navData.push({
-		//	name: 'Список отделов (тест)',
-		//	faIcon: 'fa-solid fa-angles-right',
-		//	load: setCallback('loadDepsToSub', contractId),
-			/*children: [
-				{
-					name: 'Тест 1',
-					faIcon: 'fa-solid fa-bars',
-				},
-				{
-					name: 'Тест 2',
-					faIcon: 'fa-solid fa-bars',
-				},
-				{
-					name: 'Тест 3',
-					faIcon: 'fa-solid fa-bars',
-				}
-			]*/
-		//});
-		
-		
-		
-		// пример
-		/*{
-			name: 'Отправить в архив',
-			faIcon: 'fa-solid fa-box-archive',
-			children: [
-				{
-					name: 'name 1 1',
-					faIcon: 'fa-solid fa-triangle-exclamation',
-					callback: 'toArchiveContractAction'
-				}
-			]
-		}*/
-		
-		
-		//return navData;
 	}
 	
 	
