@@ -1719,6 +1719,7 @@
 						return {
 							name: item.name,
 							faIcon: 'fa-solid fa-angles-right',
+							visible: true,
 							onClick(selector) {
 								let departmentName = selector.text(),
 									itemsCount = selector.items().length;

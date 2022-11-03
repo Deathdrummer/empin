@@ -7207,7 +7207,7 @@ window.processNotify = function () {
   var message = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
   if (_.isNull(message)) return;
   var waitNotifyWrapper = $('body').find('[waitnotify]');
-  var waitNotifyHtml = '<div class="waitnotify__item" waitnotifyitem>' + '<div class="waitnotify__iconcontainer">' + '<div class="waitnotify__icon" waitnotifyitemwait><img src="/assets/images/loading.gif" ddrwaiticon></div>' + '</div>' + '<div class="waitnotify__message" waitnotifymessage><p>' + message + '</p></div>' + '</div>';
+  var waitNotifyHtml = '<div class="waitnotify__item" waitnotifyitem>' + '<div class="waitnotify__iconcontainer">' + '<div class="waitnotify__icon" waitnotifyitemwait><img src="/assets/images/loading.gif" ddrwaiticon></div>' + '</div>' + '<div class="waitnotify__message" waitnotifymessage>' + message + '</div>' + '</div>';
   var waitNotifyDOM = $(waitNotifyHtml);
 
   if ($(waitNotifyWrapper).length == 0) {
@@ -7222,41 +7222,61 @@ window.processNotify = function () {
       var item = this,
           _$assign2 = _.assign({
         message: null,
-        iconFa: '<i class="fa-regular fa-circle-check"></i>',
+        iconFa: '<i class="fa-regular fa-fw fa-circle-check"></i>',
         icon: null,
-        remove: 5
+        close: 5
       }, params),
           message = _$assign2.message,
-          remove = _$assign2.remove,
+          close = _$assign2.close,
           iconFa = _$assign2.iconFa,
           icon = _$assign2.icon;
 
       $(item).addClass('waitnotify__item_done');
-      if (message) $(item).find('[waitnotifymessage] p').html(message);
+      if (message) $(item).find('[waitnotifymessage]').html(message);
       $(item).find('[waitnotifyitemwait]').html(icon || iconFa);
       setTimeout(function () {
         $(item).remove();
-      }, remove * 1000);
+      }, close * 1000);
     },
-    error: function error(params) {
+    cancelled: function cancelled(params) {
       var item = this,
           _$assign3 = _.assign({
         message: null,
-        iconFa: '<i class="fa-solid fa-triangle-exclamation"></i>',
+        iconFa: '<i class="fa-solid fa-fw fa-ban"></i>',
         icon: null,
-        remove: 5
+        close: 5
       }, params),
           message = _$assign3.message,
-          remove = _$assign3.remove,
+          close = _$assign3.close,
           iconFa = _$assign3.iconFa,
           icon = _$assign3.icon;
 
-      $(item).addClass('waitnotify__item_error');
-      if (message) $(item).find('[waitnotifymessage] p').html(message);
+      $(item).addClass('waitnotify__item_cancelled');
+      if (message) $(item).find('[waitnotifymessage]').html(message);
       $(item).find('[waitnotifyitemwait]').html(icon || iconFa);
       setTimeout(function () {
         $(item).remove();
-      }, remove * 1000);
+      }, close * 1000);
+    },
+    error: function error(params) {
+      var item = this,
+          _$assign4 = _.assign({
+        message: null,
+        iconFa: '<i class="fa-solid fa-fw fa-triangle-exclamation"></i>',
+        icon: null,
+        close: 5
+      }, params),
+          message = _$assign4.message,
+          close = _$assign4.close,
+          iconFa = _$assign4.iconFa,
+          icon = _$assign4.icon;
+
+      $(item).addClass('waitnotify__item_error');
+      if (message) $(item).find('[waitnotifymessage]').html(message);
+      $(item).find('[waitnotifyitemwait]').html(icon || iconFa);
+      setTimeout(function () {
+        $(item).remove();
+      }, close * 1000);
     }
   });
   return waitNotifyDOM;
@@ -8368,28 +8388,35 @@ function _buildSubMenu() {
   if (_.isNull(subContext)) throw new Error('Ошибка! contextmenu _buildSubMenu -> неверный селектор!');
   if (_.isNull(itemsData) || !itemsData.length) return;
   var subData = itemsData.map(map);
+  subData = subData.filter(function (item) {
+    return Boolean((item.hidden == undefined || !item.hidden) && (item.visible == undefined || item.visible));
+  });
   var menuHtml = '',
       funcMap = {};
-  $.each(subData, function (k, childItem) {
-    var funcCode = childItem.onClick ? generateCode('nlLlLLnnlnnLnnn') : null;
 
-    if (childItem.onClick) {
-      funcMap[funcCode] = childItem.onClick;
-    }
+  if (subData) {
+    $.each(subData, function (k, childItem) {
+      var funcCode = childItem.onClick ? generateCode('nlLlLLnnlnnLnnn') : null;
 
-    var childItemAttrs = setTagAttribute({
-      'class': {
-        'nope': childItem.enable != undefined && !childItem.enable || childItem.disable
-      },
-      'hidden': childItem.visible != undefined && !childItem.visible || childItem.hidden,
-      'contextmenuitemloaded': _defineProperty({}, funcCode, childItem.onClick) // коллбэк при клике на пункт меню (без дочерних)
+      if (childItem.onClick) {
+        funcMap[funcCode] = childItem.onClick;
+      }
 
+      var childItemAttrs = setTagAttribute({
+        'class': {
+          'nope': childItem.enable != undefined && !childItem.enable || childItem.disable
+        },
+        'hidden': childItem.visible != undefined && !childItem.visible || childItem.hidden,
+        'contextmenuitemloaded': _defineProperty({}, funcCode, childItem.onClick) // коллбэк при клике на пункт меню (без дочерних)
+
+      });
+      menuHtml += '<li' + childItemAttrs + '>';
+      menuHtml += '<i class="icon fa-fw ' + childItem.faIcon + '"></i>';
+      menuHtml += '<p>' + childItem.name + '</p>';
+      menuHtml += '</li>';
     });
-    menuHtml += '<li' + childItemAttrs + '>';
-    menuHtml += '<i class="icon fa-fw ' + childItem.faIcon + '"></i>';
-    menuHtml += '<p>' + childItem.name + '</p>';
-    menuHtml += '</li>';
-  });
+  }
+
   $(subContext).addClass('loaded');
   $(subContext).html(menuHtml || empty); //-----------------------------------------------------------------
 

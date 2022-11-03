@@ -334,31 +334,35 @@ function _buildSubMenu(subContext = null, itemsData = null, map, empty) {
 	
 	let subData = itemsData.map(map);
 	
+	subData = subData.filter(item => Boolean((item.hidden == undefined || !item.hidden) && (item.visible == undefined || item.visible)));
+	
 	let menuHtml = '',
 		funcMap = {};
-	$.each(subData, function(k, childItem) {
-		
-		let funcCode = childItem.onClick ? generateCode('nlLlLLnnlnnLnnn') : null;
-		
-		if (childItem.onClick) {
-			funcMap[funcCode] = childItem.onClick;
-		}
-		
-		let childItemAttrs = setTagAttribute({
-			'class': {'nope': (childItem.enable != undefined && !childItem.enable) || childItem.disable},
-			'hidden': (childItem.visible != undefined && !childItem.visible) || childItem.hidden,
-			'contextmenuitemloaded': {[funcCode]: childItem.onClick}, // коллбэк при клике на пункт меню (без дочерних)
+	if (subData) {
+		$.each(subData, function(k, childItem) {
+			
+			let funcCode = childItem.onClick ? generateCode('nlLlLLnnlnnLnnn') : null;
+			
+			if (childItem.onClick) {
+				funcMap[funcCode] = childItem.onClick;
+			}
+			
+			let childItemAttrs = setTagAttribute({
+				'class': {'nope': (childItem.enable != undefined && !childItem.enable) || childItem.disable},
+				'hidden': (childItem.visible != undefined && !childItem.visible) || childItem.hidden,
+				'contextmenuitemloaded': {[funcCode]: childItem.onClick}, // коллбэк при клике на пункт меню (без дочерних)
+			});
+			
+			menuHtml += '<li'+childItemAttrs+'>';
+			menuHtml += 	'<i class="icon fa-fw '+childItem.faIcon+'"></i>';
+			menuHtml += 	'<p>'+childItem.name+'</p>';
+			menuHtml += '</li>';
 		});
-		
-		menuHtml += '<li'+childItemAttrs+'>';
-		menuHtml += 	'<i class="icon fa-fw '+childItem.faIcon+'"></i>';
-		menuHtml += 	'<p>'+childItem.name+'</p>';
-		menuHtml += '</li>';
-	});
+	}
 	
 	$(subContext).addClass('loaded');
 	
-	$(subContext).html(menuHtml || empty)
+	$(subContext).html(menuHtml || empty);
 
 	
 	//-----------------------------------------------------------------

@@ -1742,7 +1742,7 @@ window.processNotify = function(message = null) {
 						 	'<div class="waitnotify__iconcontainer">' +
 						 		'<div class="waitnotify__icon" waitnotifyitemwait><img src="/assets/images/loading.gif" ddrwaiticon></div>' +
 						 	'</div>' +
-						 	'<div class="waitnotify__message" waitnotifymessage><p>'+message+'</p></div>' +
+						 	'<div class="waitnotify__message" waitnotifymessage>'+message+'</div>' +
 						 '</div>';
 	
 	const waitNotifyDOM = $(waitNotifyHtml);
@@ -1757,37 +1757,54 @@ window.processNotify = function(message = null) {
 	$.extend(waitNotifyDOM, {
 		done(params) {
 			const item = this,
-				{message, remove, iconFa, icon} = _.assign({
+				{message, close, iconFa, icon} = _.assign({
 					message: null,
-					iconFa: '<i class="fa-regular fa-circle-check"></i>',
+					iconFa: '<i class="fa-regular fa-fw fa-circle-check"></i>',
 					icon: null,
-					remove: 5
+					close: 5
 				}, params);
 			
 			$(item).addClass('waitnotify__item_done');
-			if (message) $(item).find('[waitnotifymessage] p').html(message);
+			if (message) $(item).find('[waitnotifymessage]').html(message);
 			$(item).find('[waitnotifyitemwait]').html(icon || iconFa);
 			
 			setTimeout(() => {
 				$(item).remove();
-			}, remove * 1000);
+			}, close * 1000);
+		},
+		cancelled(params) {
+			const item = this,
+				{message, close, iconFa, icon} = _.assign({
+					message: null,
+					iconFa: '<i class="fa-solid fa-fw fa-ban"></i>',
+					icon: null,
+					close: 5
+				}, params);
+			
+			$(item).addClass('waitnotify__item_cancelled');
+			if (message) $(item).find('[waitnotifymessage]').html(message);
+			$(item).find('[waitnotifyitemwait]').html(icon || iconFa);
+			
+			setTimeout(() => {
+				$(item).remove();
+			}, close * 1000);
 		},
 		error(params) {
 			const item = this,
-				{message, remove, iconFa, icon} = _.assign({
+				{message, close, iconFa, icon} = _.assign({
 					message: null,
-					iconFa: '<i class="fa-solid fa-triangle-exclamation"></i>',
+					iconFa: '<i class="fa-solid fa-fw fa-triangle-exclamation"></i>',
 					icon: null,
-					remove: 5
+					close: 5
 				}, params);
 			
 			$(item).addClass('waitnotify__item_error');
-			if (message) $(item).find('[waitnotifymessage] p').html(message);
+			if (message) $(item).find('[waitnotifymessage]').html(message);
 			$(item).find('[waitnotifyitemwait]').html(icon || iconFa);
 			
 			setTimeout(() => {
 				$(item).remove();
-			}, remove * 1000);
+			}, close * 1000);
 		}
 	});
 	
