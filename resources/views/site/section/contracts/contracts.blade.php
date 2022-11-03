@@ -1500,30 +1500,6 @@
 	
 	
 	
-	//-------------------------------------------------  Вернуть договор из архива
-	$.returnContractToWorkAction = (btn, contractId) => {
-		let row = $(btn).closest('tr');
-		ddrPopup({
-			width: 400, // ширина окна
-			html: '<p class="fz18px color-green">Вы действительно хотите вернуть договор в работу?</p>', // контент
-			buttons: ['ui.cancel', {title: 'Вернуть', variant: 'green', action: 'returnContractToWorkBtn'}],
-			centerMode: true,
-			winClass: 'ddrpopup_dialog'
-		}).then(({close, wait}) => {
-			$.returnContractToWorkBtn = (_) => {
-				wait();
-				axiosQuery('post', 'site/contracts/to_work', {contractId}, 'json').then(({data, error, status, headers}) => {
-					if (data) {
-						getList();
-						$.notify('Договор успешно возвращен в работу!');
-					} else {
-						$.notify('Ошибка! Договор не был возвращен в работу!', 'error');
-					}
-					close();
-				});
-			}
-		});
-	}
 	
 	
 	
@@ -1772,7 +1748,6 @@
 				}
 			},
 			{
-				
 				name: 'Скрыть договор',
 				faIcon: 'fa-solid fa-eye-slash',
 				visible: hide,
@@ -1793,6 +1768,34 @@
 									target.changeAttrData(9, '0');
 								} else {
 									$.notify('Ошибка! Договор не был скрыт!', 'error');
+								}
+								close();
+							});
+						}
+					});
+				}
+			},
+			{
+				name: 'Вернуть договор в работу',
+				faIcon: 'fa-solid fa-arrow-rotate-left',
+				visible: returnToWork,
+				onClick() {
+					ddrPopup({
+						width: 400, // ширина окна
+						html: '<p class="fz18px color-green">Вы действительно хотите вернуть договор в работу?</p>', // контент
+						buttons: ['ui.cancel', {title: 'Вернуть', variant: 'green', action: 'returnContractToWorkBtn'}],
+						centerMode: true,
+						winClass: 'ddrpopup_dialog'
+					}).then(({close, wait}) => {
+						$.returnContractToWorkBtn = (_) => {
+							wait();
+							axiosQuery('post', 'site/contracts/to_work', {contractId}, 'json').then(({data, error, status, headers}) => {
+								if (data) {
+									getList();
+									$.notify('Договор успешно возвращен в работу!');
+									target.changeAttrData(15, '0');
+								} else {
+									$.notify('Ошибка! Договор не был возвращен в работу!', 'error');
 								}
 								close();
 							});
