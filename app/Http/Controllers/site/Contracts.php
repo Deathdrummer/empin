@@ -187,6 +187,18 @@ class Contracts extends Controller {
 	
 	
 	
+	/** Вернуть уже заданные подборки
+	 * @param 
+	 * @return 
+	 */
+	public function choosed_selections() {
+		$selectionsToChoose = $this->contract->getSelectionsToChoose();
+		return response()->json($selectionsToChoose);
+		//if (request('_responsetype') == 'json') 
+	}
+	
+	
+	
 	
 	
 	

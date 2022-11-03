@@ -8353,7 +8353,6 @@ function _buildMenuHtml() {
     }
 
     if (item.children) {
-      console.log('children');
       $.each(item.children, function (k, childItem) {
         var childItemAttrs = setTagAttribute({
           'class': {
@@ -8386,7 +8385,7 @@ function _buildSubMenu() {
   var map = arguments.length > 2 ? arguments[2] : undefined;
   var empty = arguments.length > 3 ? arguments[3] : undefined;
   if (_.isNull(subContext)) throw new Error('Ошибка! contextmenu _buildSubMenu -> неверный селектор!');
-  if (_.isNull(itemsData) || !itemsData.length) return;
+  if (_.isNull(itemsData) || !_.isArray(itemsData)) return;
   var subData = itemsData.map(map);
   subData = subData.filter(function (item) {
     return Boolean((item.hidden == undefined || !item.hidden) && (item.visible == undefined || item.visible));

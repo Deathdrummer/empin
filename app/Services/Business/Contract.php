@@ -493,5 +493,36 @@ class Contract {
 	
 	
 	
+	/**
+	 * @param 
+	 * @return 
+	 */
+	public function getSelectionsToChoose() {
+		$userId = auth('site')->user()->id;
+		$contract = ContractModel::where('id', request('contract_id'))
+			->with(['selections' => function ($query) use($userId) {
+				$query->where('account_id', $userId)
+					->orWhereJsonContains('subscribed', $userId);
+			}])
+			->first();
+		
+		$choosedSelections = $contract->selections->pluck('id')->toArray() ?? [];
+		
+		$filtredSelections = Selection::toChoose()->get()->filter(function($item) use($choosedSelections) {
+				return !in_array($item['id'], $choosedSelections);
+			});
+		
+		
+		return $filtredSelections->map(function($item) {
+				return [
+					'id' 	=> $item['id'],
+					'title' => $item['title'],
+				];
+			})->values()->toArray();
+	}
+	
+	
+	
+	
 	
 }

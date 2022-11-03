@@ -296,7 +296,6 @@ function _buildMenuHtml(menuData = null) {
 		
 		
 		if (item.children) {
-			console.log('children');
 			$.each(item.children, function(k, childItem) {
 				let childItemAttrs = setTagAttribute({
 					'class': {'nope': (childItem.enable != undefined && !childItem.enable) || childItem.disable},
@@ -330,7 +329,8 @@ function _buildMenuHtml(menuData = null) {
 
 function _buildSubMenu(subContext = null, itemsData = null, map, empty) {
 	if (_.isNull(subContext)) throw new Error('Ошибка! contextmenu _buildSubMenu -> неверный селектор!');
-	if (_.isNull(itemsData) || !itemsData.length) return;
+	
+	if (_.isNull(itemsData) || !_.isArray(itemsData)) return;
 	
 	let subData = itemsData.map(map);
 	

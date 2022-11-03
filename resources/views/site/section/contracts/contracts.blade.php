@@ -725,23 +725,7 @@
 	
 	
 	
-	//--------------------------------------------------------------------------------- Добавить договор в подборку
-	$.addContractToSelection = (select, contractId) => {
-		let selectionId = parseInt($(select).val());
-		
-		$(select).ddrInputs('disable');
-		axiosQuery('put', 'site/selections/add_contract', {contractId, selectionId}).then(({data, error, status, headers}) => {
-			if (error) {
-				$.notify('Ошибка добавления в подборку!', 'error');
-				console.log(error?.message, error.errors);
-				$(select).ddrInputs('error');
-			} else {
-				$(select).find('option[value="'+selectionId+'"]').setAttrib('disabled');
-				$(select).ddrInputs('enable');
-				$.notify('Договор успешно добавлен в подборку!');
-			}
-		});
-	}
+	
 	
 	
 	
@@ -1812,13 +1796,47 @@
 					});
 					
 				}
+			},
+			{
+				name: 'Добавить в подборку',
+				faIcon: 'fa-solid fa-clipboard-check',
+				//visible: addToSelection,
+				load: {
+					url: 'site/contracts/choosed_selections?contract_id='+contractId,
+					method: 'get',
+					map: (item) => {
+						return {
+							name: item.title,
+							//faIcon: 'fa-solid fa-clipboard-check',
+							onClick(selector) {
+								let selectionId = item.id;
+								
+								let procNotif = processNotify('Добавление договора в подборку...');
+								
+								//$().ddrInputs('disable');
+								axiosQuery('put', 'site/selections/add_contract', {contractId, selectionId})
+								.then(({data, error, status, headers}) => {
+									if (error) {
+										//$.notify('Ошибка добавления в подборку!', 'error');
+										procNotif.error({message: 'Ошибка добавления в подборку!'});
+										console.log(error?.message, error.errors);
+										//$(select).ddrInputs('error');
+									} else {
+										//$(select).find('option[value="'+selectionId+'"]').setAttrib('disabled');
+										//$(select).ddrInputs('enable');
+										//$.notify('Договор успешно добавлен в подборку!');
+										procNotif.done({message: 'Договор успешно добавлен в подборку!'});
+									}
+								});
+							}
+						};
+					}
+				},
 			}
 		];
 		
 		
-		
-		
-		
+
 		
 		
 		
