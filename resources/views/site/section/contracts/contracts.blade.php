@@ -754,26 +754,7 @@
 	
 	
 	
-	//--------------------------------------------------------------------------------- Удалить договор из подборки
-	$.removeContractFromSelection = (btn, contractId, selectionId) => {
-		$(btn).ddrInputs('disable');
-		$('[selectionsbtn]').ddrInputs('disable');
-		
-		axiosQuery('put', 'site/selections/remove_contract', {contractId, selectionId}).then(({data, error, status, headers}) => {
-			if (error) {
-				$.notify('Ошибка удаления из подборки!', 'error');
-				console.log(error?.message, error.errors);
-			} else {
-				$.notify('Договор успешно удален из подборки!');
-				getList({
-					withCounts: true,
-					callback: function() {
-						$('[selectionsbtn]').ddrInputs('enable');
-					}
-				});
-			}
-		});
-	}
+	
 	
 	
 	
@@ -1605,7 +1586,7 @@
 		{target, closeOnScroll},
 		contractId,
 		departmentId,
-		selection,
+		selectionId,
 		objectNumber,
 		title,
 		hasDepsToSend,
@@ -1802,6 +1783,35 @@
 						}
 					});
 				}
+			},
+			{
+				name: 'Удалить из подборки',
+				faIcon: 'fa-solid fa-trash-can',
+				visible: removeFromSelection,
+				onClick() {
+					$('[selectionsbtn]').ddrInputs('disable');
+					let procNotif = processNotify('Удаление договора из подборки...');
+					
+					axiosQuery('put', 'site/selections/remove_contract', {contractId, selectionId})
+					.then(({data, error, status, headers}) => {
+						if (error) {
+							//$.notify('Ошибка удаления из подборки!', 'error');
+							procNotif.error({message: 'Ошибка удаления договора из подборки!'});
+							console.log(error?.message, error.errors);
+						} else {
+							//$.notify('Договор успешно удален из подборки!');
+							procNotif.done({message: 'Договор успешно удален из подборки!'});
+							target.changeAttrData(7, '0');
+							getList({
+								withCounts: true,
+								callback: function() {
+									$('[selectionsbtn]').ddrInputs('enable');
+								}
+							});
+						}
+					});
+					
+				}
 			}
 		];
 		
@@ -1813,7 +1823,7 @@
 		
 		
 		
-		// removeFromSelection -> removeContractFromSelection:contractId,selection (Удалить из подборки)
+		// removeFromSelection -> removeContractFromSelection:contractId,selectionId (Удалить из подборки)
 		// addToSelection -> addContractToSelection:contractId (добавьть договор в подборку)
 		// hide -> hideContractAction:contractId,departmentId (Скрыть)
 		// sendToDepts -> sendContractAction:contractId (Отправить в другой отдел)(в отделе)
