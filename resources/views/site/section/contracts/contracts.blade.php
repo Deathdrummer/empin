@@ -1596,6 +1596,7 @@
 				name: 'Отправить в архив',
 				faIcon: 'fa-solid fa-box-archive',
 				visible: canToArchive && !isArchive,
+				sort: 5,
 				onClick: () => {
 					
 					let html = '';
@@ -1617,7 +1618,9 @@
 							axiosQuery('post', 'site/contracts/to_archive', {contractId}, 'json')
 							.then(({data, error, status, headers}) => {
 								if (data) {
-									getList();
+									let params = {};
+									if (selectionId || searched) params['withCounts'] = true;
+									getList(params);
 									$.notify('Договор успешно отправлен в архив!');
 								} else {
 									$.notify('Ошибка! Договор не был отправлен в архив!', 'error');
@@ -1632,6 +1635,7 @@
 				faIcon: 'fa-solid fa-angles-right',
 				enable: !!hasDepsToSend && ((canSending && departmentId) || (canSendingAll && !departmentId)),
 				hidden: isArchive,
+				sort: 4,
 				load: {
 					url: 'site/contracts/departments?contract_id='+contractId,
 					method: 'get',
@@ -1650,6 +1654,11 @@
 								.then(({data, error, status, headers}) => {
 									if (data) {
 										//$.notify('Договор успешно отправлен в '+departmentName+'!');
+										if (selectionId || searched) {
+											let params = {};
+											getList({withCounts: true});
+										}
+										
 										procNotif.done({message: 'Договор успешно отправлен в '+departmentName+'!'});
 										if (itemsCount == 0) target.changeAttrData(6, '0');
 									} else {
@@ -1665,6 +1674,7 @@
 				name: 'Чат договора ['+messagesCount+']',
 				faIcon: 'fa-solid fa-comments',
 				visible: canChat,
+				sort: 1,
 				onClick() {
 					ddrPopup({
 						title: '<small class="fz12px color-gray">Чат договора:</small> «'+title+'»',
@@ -1727,9 +1737,11 @@
 							wait();
 							axiosQuery('post', 'site/contracts/hide', {contractId, departmentId}, 'json').then(({data, error, status, headers}) => {
 								if (data) {
-									getList();
+									let params = {};
+									if (selectionId || searched) params['withCounts'] = true;
+									getList(params);
 									$.notify('Договор успешно скрыт!');
-									target.changeAttrData(9, '0');
+									//target.changeAttrData(9, '0');
 								} else {
 									$.notify('Ошибка! Договор не был скрыт!', 'error');
 								}
@@ -1754,9 +1766,11 @@
 							wait();
 							axiosQuery('post', 'site/contracts/to_work', {contractId}, 'json').then(({data, error, status, headers}) => {
 								if (data) {
-									getList();
+									let params = {};
+									if (selectionId || searched) params['withCounts'] = true;
+									getList(params);
 									$.notify('Договор успешно возвращен в работу!');
-									target.changeAttrData(15, '0');
+									//target.changeAttrData(15, '0');
 								} else {
 									$.notify('Ошибка! Договор не был возвращен в работу!', 'error');
 								}
@@ -1768,7 +1782,7 @@
 			}, {
 				name: 'Удалить из подборки',
 				faIcon: 'fa-solid fa-trash-can',
-				visible: selectionEdited,
+				visible: selectionId,
 				onClick() {
 					$('[selectionsbtn]').ddrInputs('disable');
 					let procNotif = processNotify('Удаление договора из подборки...');
@@ -1782,7 +1796,7 @@
 						} else {
 							//$.notify('Договор успешно удален из подборки!');
 							procNotif.done({message: 'Договор успешно удален из подборки!'});
-							target.changeAttrData(7, '0');
+							//target.changeAttrData(7, '0');
 							getList({
 								withCounts: true,
 								callback: function() {
@@ -1796,6 +1810,7 @@
 			}, {
 				name: 'Добавить в подборку',
 				faIcon: 'fa-solid fa-clipboard-check',
+				sort: 2,
 				load: {
 					url: 'site/contracts/selections_to_choose?contract_id='+contractId,
 					method: 'get',
@@ -1828,6 +1843,37 @@
 						};
 					}
 				},
+			}, {
+				name: 'Создать новую подборку',
+				faIcon: 'fa-solid fa-clipboard-check',
+				sort: 3,
+				onClick() {
+					
+					console.log('rool');
+					
+					//$('[selectionsbtn]').ddrInputs('disable');
+					//let procNotif = processNotify('Удаление договора из подборки...');
+					//
+					//axiosQuery('put', 'site/selections/remove_contract', {contractId, selectionId})
+					//.then(({data, error, status, headers}) => {
+					//	if (error) {
+					//		//$.notify('Ошибка удаления из подборки!', 'error');
+					//		procNotif.error({message: 'Ошибка удаления договора из подборки!'});
+					//		console.log(error?.message, error.errors);
+					//	} else {
+					//		//$.notify('Договор успешно удален из подборки!');
+					//		procNotif.done({message: 'Договор успешно удален из подборки!'});
+					//		target.changeAttrData(7, '0');
+					//		getList({
+					//			withCounts: true,
+					//			callback: function() {
+					//				$('[selectionsbtn]').ddrInputs('enable');
+					//			}
+					//		});
+					//	}
+					//});
+					
+				}
 			}
 			
 		];
@@ -2010,18 +2056,25 @@
 			
 			if (currentCount) $('[stepprice]').number(true, 2, '.', ' ');
 			
+			
+			console.log(withCounts, headers);
+			
 			if (withCounts && headers) {
+				$('#chooserAll').find('[selectionscounts]').empty();
+				$('#chooserArchive').find('[selectionscounts]').empty();
+				$('[chooserdepartment]').find('[selectionscounts]').empty();
+				
 				
 				if (headers['x-count-contracts-all']) {
 					$('#chooserAll').find('[selectionscounts]').text(headers['x-count-contracts-all'] > 0 ? headers['x-count-contracts-all'] : '');
 				} else {
-					$('#chooserAll').find('[selectionscounts]').empty();
+					//$('#chooserAll').find('[selectionscounts]').empty();
 				}
 				
 				if (headers['x-count-contracts-archive']) {
 					$('#chooserArchive').find('[selectionscounts]').text(headers['x-count-contracts-archive'] > 0 ? headers['x-count-contracts-archive'] : '');
 				} else {
-					$('#chooserArchive').find('[selectionscounts]').empty();
+					//$('#chooserArchive').find('[selectionscounts]').empty();
 				}
 				
 				
@@ -2031,7 +2084,7 @@
 						$('[chooserdepartment="'+depId+'"]').find('[selectionscounts]').text(count > 0 ? count : '');
 					});
 				} else {
-					$('[chooserdepartment]').find('[selectionscounts]').empty();
+					//$('[chooserdepartment]').find('[selectionscounts]').empty();
 				}	
 			}
 			

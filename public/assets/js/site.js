@@ -8316,6 +8316,13 @@ function _buildMenuHtml() {
     return Boolean((item.hidden == undefined || !item.hidden) && (item.visible == undefined || item.visible));
   });
   if (_.isEmpty(menuData)) return [];
+  menuData = menuData.sort(function (a, b) {
+    var aSort = a.sort || 0,
+        bSort = b.sort || 0;
+    return aSort - bSort; //if (a.sort > b.sort) return 1;
+    //if (a.sort < b.sort) return -1;
+    //return 0;
+  });
   var funcMap = {};
   var menuHtml = '<ul class="context noselect">';
   $.each(menuData, function (k, item) {
@@ -8333,7 +8340,6 @@ function _buildMenuHtml() {
         'nope': item.enable != undefined && !item.enable || item.disable,
         'loadingable': item.load && !item.children
       },
-      'hidden': item.visible != undefined && !item.visible || item.hidden,
       'contextmenuitem': _defineProperty({}, funcCode, item.onClick && !item.children && !item.load),
       // коллбэк при клике на пункт меню (без дочерних)
       'contextmenuitemload': _defineProperty({}, funcCode, item.load && !item.children && !item.onClick) // загрука подменю при наведении
@@ -8353,13 +8359,21 @@ function _buildMenuHtml() {
     }
 
     if (item.children) {
+      item.children = item.children.filter(function (child) {
+        return Boolean((child.hidden == undefined || !child.hidden) && (child.visible == undefined || child.visible));
+      });
+      if (_.isEmpty(item.children)) return [];
+      item.children = item.children.sort(function (a, b) {
+        var aSort = a.sort || 0,
+            bSort = b.sort || 0;
+        return aSort - bSort;
+      });
       $.each(item.children, function (k, childItem) {
         var childItemAttrs = setTagAttribute({
           'class': {
             'nope': childItem.enable != undefined && !childItem.enable || childItem.disable
           },
-          'hidden': childItem.visible != undefined && !childItem.visible || childItem.hidden,
-          'contextmenuitem': _defineProperty({}, funcCode, childItem.onClick && !childItem.children && !childItem.load) // коллбэк при клике на пункт меню (без дочерних)
+          'contextmenuitem': _defineProperty({}, funcCode, childItem.onClick && !childItem.load) // коллбэк при клике на пункт меню (без дочерних)
 
         });
         menuHtml += '<li' + childItemAttrs + '>';
@@ -8390,6 +8404,12 @@ function _buildSubMenu() {
   subData = subData.filter(function (item) {
     return Boolean((item.hidden == undefined || !item.hidden) && (item.visible == undefined || item.visible));
   });
+  if (_.isEmpty(subData)) return;
+  subData = subData.sort(function (a, b) {
+    var aSort = a.sort || 0,
+        bSort = b.sort || 0;
+    return aSort - bSort;
+  });
   var menuHtml = '',
       funcMap = {};
 
@@ -8405,7 +8425,6 @@ function _buildSubMenu() {
         'class': {
           'nope': childItem.enable != undefined && !childItem.enable || childItem.disable
         },
-        'hidden': childItem.visible != undefined && !childItem.visible || childItem.hidden,
         'contextmenuitemloaded': _defineProperty({}, funcCode, childItem.onClick) // коллбэк при клике на пункт меню (без дочерних)
 
       });

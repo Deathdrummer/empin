@@ -167,7 +167,7 @@
 @endif
 
 
-@if($selectionEdited || ($selectionEdited && $searched))
+{{-- @if($selectionEdited || ($selectionEdited && $searched))
 	<x-table.td class="h-center">
 		<x-button
 			variant="red"
@@ -189,11 +189,6 @@
 			empty-has-value
 			action="addContractToSelection:{{$id}}"
 			/>
-		{{-- <x-checkbox
-			group="large"
-			:checked="$selected"
-			action="addContractToSelection:{{$id}}"
-			/> --}}
 	</x-table.td>
 @else
 	@if(isset($departmentId))
@@ -234,7 +229,7 @@
 					@cando('contract-col-to-archive:site')
 						<x-button
 							variant="{{$ready_to_archive ? 'green' : 'neutral'}}"
-							{{-- :animation="$ready_to_archive ? 'fa-shake' : false" --}}
+							:animation="$ready_to_archive ? 'fa-shake' : false"
 							animationDuration="2s"
 							action="toArchiveContractAction:{{$id}}"
 							title="Отправить в архив"
@@ -273,4 +268,4 @@
 			</x-table.td>
 		@endcando
 	@endif
-@endif
+@endif --}}

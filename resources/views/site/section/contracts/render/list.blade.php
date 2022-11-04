@@ -186,7 +186,7 @@
 								</x-table.td>
 							@endif
 							
-							@if($selectionEdited || ($selectionEdited && $searched))
+							{{-- @if($selectionEdited || ($selectionEdited && $searched))
 								<x-table.td class="w7rem h-center" ddrtabletdmain>
 									<strong class="fz10px lh90 d-block text-center wodrbreak">Удалить из подборки</strong>
 								</x-table.td>
@@ -214,7 +214,7 @@
 										</x-table.td>
 									@endcando
 								@endif
-							@endif
+							@endif --}}
 							
 							
 							
