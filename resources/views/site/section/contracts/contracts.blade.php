@@ -1575,6 +1575,7 @@
 		title,
 		
 		hasDepsToSend,
+		messagesCount,
 		searched,
 		selectionEdited,
 		isArchive,
@@ -1661,7 +1662,7 @@
 					}
 				},
 			}, {
-				name: 'Чат договора',
+				name: 'Чат договора ['+messagesCount+']',
 				faIcon: 'fa-solid fa-comments',
 				visible: canChat,
 				onClick() {
