@@ -2010,7 +2010,7 @@
 			
 			if (currentCount) $('[stepprice]').number(true, 2, '.', ' ');
 			
-			if (withCounts && headers && currentCount) {
+			if (withCounts && headers) {
 				
 				if (headers['x-count-contracts-all']) {
 					$('#chooserAll').find('[selectionscounts]').text(headers['x-count-contracts-all'] > 0 ? headers['x-count-contracts-all'] : '');

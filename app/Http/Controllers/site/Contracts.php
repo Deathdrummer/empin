@@ -139,6 +139,7 @@ class Contracts extends Controller {
 		$rules .= ','.($user->can('contract-col-chat-can-sending:site') ? '1' : '0'); // возможность отправлять сообщения в чате
 		$rules .= ','.($user->can('contract-col-return-to-work:site') ? '1' : '0'); // вернуть договор в работу из архива
 		
+		
 		return $this->renderWithHeaders(
 			'list',
 			compact(
