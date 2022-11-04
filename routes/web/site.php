@@ -291,7 +291,7 @@ Route::prefix('site')->middleware(['lang', 'isajax:site'])->group(function() {
 	Route::get('/contracts/statuses', [Contracts::class, 'statuses']);
 	Route::put('/contracts/set_status', [Contracts::class, 'set_status']);
 	
-	Route::get('/contracts/choosed_selections', [Contracts::class, 'choosed_selections']);
+	
 	
 	Route::get('/contracts/colums', [Contracts::class, 'colums']);
 	Route::put('/contracts/colums', [Contracts::class, 'set_colums']);
@@ -323,7 +323,7 @@ Route::prefix('site')->middleware(['lang', 'isajax:site'])->group(function() {
 	
 	Route::resource('selections', Selections::class);
 	
-	
+	Route::get('/contracts/selections_to_choose', [Contracts::class, 'selections_to_choose']);
 	
 });
 

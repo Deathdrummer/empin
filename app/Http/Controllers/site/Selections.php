@@ -86,9 +86,12 @@ class Selections extends Controller {
 		
 		$userId = auth('site')->user()->id;
 		
-		$list = Selection::where(['account_id' 	=> $userId])
+		$list = Selection::where(['account_id' => $userId])
 			->orWhereJsonContains('subscribed', ['read' => $userId])
 			->orWhereJsonContains('subscribed', ['write' => $userId])
+			/* ->withCount(['contracts' => function($query) {
+				$query->where('archive', 0);
+			}]) */
 			->withCount('contracts')
 			->orderBy('_sort', 'ASC')
 			->get()

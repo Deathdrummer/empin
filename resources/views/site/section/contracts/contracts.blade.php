@@ -1573,26 +1573,28 @@
 		selectionId,
 		objectNumber,
 		title,
+		
 		hasDepsToSend,
-		removeFromSelection,
-		addToSelection,
-		hide,
-		sendToDepts,
-		chatDept,
-		toArchive,
-		sendToDeptsAll,
-		chat,
-		returnToWork
+		searched,
+		selectionEdited,
+		isArchive,
+		
+		canToArchive, // отправка договора в архив
+		canSending, // отправка договора в другой отдел из отдела
+		canSendingAll, // отправка договора в другой отдел из общего списка
+		canHiding, // скрыть договор
+		canChat, // просмотр чата
+		canChatSending, // возможность отправлять сообщения в чате
+		canReturnToWork // вернуть договор в работу из архива
 		) => {
 		
 		closeOnScroll('#contractsList');
-		
 		
 		return [
 			{
 				name: 'Отправить в архив',
 				faIcon: 'fa-solid fa-box-archive',
-				visible: toArchive,
+				visible: canToArchive && !isArchive,
 				onClick: () => {
 					
 					let html = '';
@@ -1624,12 +1626,11 @@
 						}
 					});
 				},
-			},
-			{
+			}, {
 				name: 'Отправить в другой отдел',
 				faIcon: 'fa-solid fa-angles-right',
-				enable: (sendToDepts || sendToDeptsAll) && !!hasDepsToSend,
-				hidden: (!sendToDepts && !sendToDeptsAll),
+				enable: !!hasDepsToSend && ((canSending && departmentId) || (canSendingAll && !departmentId)),
+				hidden: isArchive,
 				load: {
 					url: 'site/contracts/departments?contract_id='+contractId,
 					method: 'get',
@@ -1659,12 +1660,10 @@
 						};
 					}
 				},
-			},
-			{
+			}, {
 				name: 'Чат договора',
 				faIcon: 'fa-solid fa-comments',
-				enable: (chatDept || chat),
-				hidden: (!chatDept && !chat),
+				visible: canChat,
 				onClick() {
 					ddrPopup({
 						title: '<small class="fz12px color-gray">Чат договора:</small> «'+title+'»',
@@ -1711,11 +1710,10 @@
 						
 					});
 				}
-			},
-			{
+			}, {
 				name: 'Скрыть договор',
 				faIcon: 'fa-solid fa-eye-slash',
-				visible: hide,
+				visible: canHiding && departmentId && !isArchive,
 				onClick() {	
 					ddrPopup({
 						width: 400, // ширина окна
@@ -1739,11 +1737,10 @@
 						}
 					});
 				}
-			},
-			{
+			}, {
 				name: 'Вернуть договор в работу',
 				faIcon: 'fa-solid fa-arrow-rotate-left',
-				visible: returnToWork,
+				visible: canReturnToWork && isArchive,
 				onClick() {
 					ddrPopup({
 						width: 400, // ширина окна
@@ -1767,11 +1764,10 @@
 						}
 					});
 				}
-			},
-			{
+			}, {
 				name: 'Удалить из подборки',
 				faIcon: 'fa-solid fa-trash-can',
-				visible: removeFromSelection,
+				visible: selectionEdited,
 				onClick() {
 					$('[selectionsbtn]').ddrInputs('disable');
 					let procNotif = processNotify('Удаление договора из подборки...');
@@ -1796,19 +1792,17 @@
 					});
 					
 				}
-			},
-			{
+			}, {
 				name: 'Добавить в подборку',
 				faIcon: 'fa-solid fa-clipboard-check',
-				hidden: returnToWork,
-				//visible: addToSelection,
 				load: {
-					url: 'site/contracts/choosed_selections?contract_id='+contractId,
+					url: 'site/contracts/selections_to_choose?contract_id='+contractId,
 					method: 'get',
 					map: (item) => {
 						return {
 							name: item.title,
 							//faIcon: 'fa-solid fa-clipboard-check',
+							disable: !!item.choosed,
 							onClick(selector) {
 								let selectionId = item.id;
 								
@@ -1834,11 +1828,8 @@
 					}
 				},
 			}
+			
 		];
-		
-		
-
-		
 		
 		
 		

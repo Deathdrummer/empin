@@ -172,7 +172,7 @@
 		<x-button
 			variant="red"
 			group="small"
-			action="removeContractFromSelection:{{$id}},{{$selection}}"
+			action="removeContractFromSelection:{{$id}},{{$selectionId}}"
 			title="Удалить из подборки"
 			><i class="fa-solid fa-trash-can"></i></x-button>
 	</x-table.td>

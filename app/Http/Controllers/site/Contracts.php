@@ -50,11 +50,11 @@ class Contracts extends Controller {
 		$list = $this->contract->getWithDepartments($request);
 		
 		$headers = [];
-		$selection = null;
+		$selectionId = null;
 		
 		if ($request->has('selection')) {
 			$selectioned = $request->has('selection');
-			$selection = $request->get('selection', null);
+			$selectionId = $request->get('selection', null);
 		}
 		
 		//  Если поиск или подборка - то сформировать количество результатов
@@ -128,17 +128,16 @@ class Contracts extends Controller {
 			})->toArray() : null;
 		
 		$user = auth('site')->user();
-		$rules = '';
-		$rules .= ($selectionEdited || ($selectionEdited && $searched) ? '1' : '0');
-		$rules .= ','.($searched && !($selectionEdited ?? false) ? '1' : '0');
-		$rules .= ','.((!$searched && !$selectionEdited && isset($departmentId) && $user->can('contract-col-hiding:site')) ? '1' : '0');
-		$rules .= ','.((!$searched && !$selectionEdited && isset($departmentId) && $user->can('contract-col-sending:site')) ? '1' : '0');
-		$rules .= ','.((!$searched && !$selectionEdited && isset($departmentId) && $user->can('contract-col-chat:site')) ? '1' : '0');
-		$rules .= ','.((!$searched && !$selectionEdited && !isset($departmentId) && !$isArchive && $user->can('contract-col-to-archive:site')) ? '1' : '0');
-		$rules .= ','.((!$searched && !$selectionEdited && !isset($departmentId) && !$isArchive && $user->can('contract-col-sending-all:site')) ? '1' : '0');
-		$rules .= ','.((!$searched && !$selectionEdited && !isset($departmentId) && !$isArchive && $user->can('contract-col-chat:site')) ? '1' : '0');
-		$rules .= ','.((!$searched && !$selectionEdited && !isset($departmentId) && $isArchive && $user->can('contract-col-return-to-work:site')) ? '1' : '0');
-		
+		$rules = ($searched ? '1' : '0');
+		$rules .= ','.($selectionEdited ? '1' : '0');
+		$rules .= ','.($isArchive ? '1' : '0');
+		$rules .= ','.($user->can('contract-col-to-archive:site') ? '1' : '0'); // отправка договора в архив
+		$rules .= ','.($user->can('contract-col-sending:site') ? '1' : '0'); // отправка договора в другой отдел из отдела
+		$rules .= ','.($user->can('contract-col-sending-all:site') ? '1' : '0'); // отправка договора в другой отдел из общего списка
+		$rules .= ','.($user->can('contract-col-hiding:site') ? '1' : '0'); // скрыть договор
+		$rules .= ','.($user->can('contract-col-chat:site') ? '1' : '0'); // просмотр чата
+		$rules .= ','.($user->can('contract-col-chat-can-sending:site') ? '1' : '0'); // возможность отправлять сообщения в чате
+		$rules .= ','.($user->can('contract-col-return-to-work:site') ? '1' : '0'); // вернуть договор в работу из архива
 		
 		return $this->renderWithHeaders(
 			'list',
@@ -155,7 +154,7 @@ class Contracts extends Controller {
 				'searched',
 				'allSelections',
 				'selectionEdited',
-				'selection',
+				'selectionId',
 				'userColums',
 				'append'
 			),
@@ -191,7 +190,7 @@ class Contracts extends Controller {
 	 * @param 
 	 * @return 
 	 */
-	public function choosed_selections() {
+	public function selections_to_choose() {
 		$selectionsToChoose = $this->contract->getSelectionsToChoose();
 		return response()->json($selectionsToChoose);
 		//if (request('_responsetype') == 'json') 

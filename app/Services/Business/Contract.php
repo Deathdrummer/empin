@@ -244,7 +244,7 @@ class Contract {
 				'is_new' 			=> isset($viewed[$item['id']]) ? $viewed[$item['id']] == 0 : true,
 				'pinned'			=> in_array($item['id'], $pinned) ? -$item['id'] : null,
 				
-				'has_deps_to_send'	=> !!$item['has_deps_to_send'] ?? null,
+				'has_deps_to_send'	=> $item['has_deps_to_send'] ?? null,
 				'ready_to_archive'	=> $item['hide_count'] != 0 && $item['hide_count'] == $item->departments->count(),
 				'messages_count'	=> $item['messages_count'] ?? 0,
 				//'selected'		=> in_array($item['id'], $selectedContracts),
@@ -508,15 +508,13 @@ class Contract {
 		
 		$choosedSelections = $contract->selections->pluck('id')->toArray() ?? [];
 		
-		$filtredSelections = Selection::toChoose()->get()->filter(function($item) use($choosedSelections) {
-				return !in_array($item['id'], $choosedSelections);
-			});
+		$allSelections = Selection::toChoose()->get();
 		
-		
-		return $filtredSelections->map(function($item) {
+		return $allSelections->map(function($item) use($choosedSelections) {
 				return [
-					'id' 	=> $item['id'],
-					'title' => $item['title'],
+					'id' 		=> $item['id'],
+					'title' 	=> $item['title'],
+					'choosed'	=> in_array($item['id'], $choosedSelections)
 				];
 			})->values()->toArray();
 	}
