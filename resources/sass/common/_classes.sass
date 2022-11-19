@@ -974,11 +974,14 @@ $tableColor: #efefef
 			//padding-right: 6px
 		
 		.ddrtable__tr
-			&:nth-child(odd):not(.clear)
+			&:nth-child(odd):not(.clear):not(.ddrtable__tr-selected)
 				background-color: #fff
 			
-			&:nth-child(even):not(.clear)
+			&:nth-child(even):not(.clear):not(.ddrtable__tr-selected)
 				background-color: #fdfdfd
+		
+			&-selected
+				background-color: #e5ddf3
 	
 	&__tr
 		display: flex
@@ -999,6 +1002,8 @@ $tableColor: #efefef
 				width: 100%
 				height: 100%
 				background-color: #ffffffcf
+		
+		
 		
 		
 		

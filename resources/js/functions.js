@@ -198,6 +198,33 @@ window.ddrSplit = function(string = null, ...separators) {
 
 
 
+
+window.strPad = function(str) {
+	return str;
+}
+
+
+
+
+
+
+window.wordCase = function(count = null, variants = null) {
+	if (_.isNull(count) || _.isNull(variants)) return;
+	if (!_.isArray(variants)) variants = pregSplit(variants);
+	count = ''+count;
+
+	if (['11', '12', '13', '14'].indexOf(count) != -1 || ['5', '6', '7', '8', '9', '0'].indexOf(count.substr(-1)) != -1) return variants[2];
+	else if (['2', '3', '4'].indexOf(count.substr(-1)) != -1 ) return variants[1];
+	else if (count.substr(-1) == '1') return variants[0];
+}
+
+
+
+
+
+
+
+
 /*
 	события активной или неактивной вкладки сайта в брайзере
 		- коллбэк активной вкладки
@@ -744,7 +771,6 @@ window.setTagAttribute = function(attrName = null, rules = null, joinSign = ' ')
 			
 			let attrValueItem = [];
 			
-			
 			if (_.isPlainObject(rulesItem)) {
 				$.each(rulesItem, function(val, rule) {
 					if (Boolean(rule)) attrValueItem.push(val);
@@ -755,12 +781,18 @@ window.setTagAttribute = function(attrName = null, rules = null, joinSign = ' ')
 			
 			} else if (_.isArray(rulesItem)) {
 				$.each(rulesItem, function(k, val) {
-					attrValueItem.push(val);
+					if (_.isPlainObject(val)) {
+						$.each(val, function(v, r) {
+							if (Boolean(r)) attrValueItem.push(v);
+						});
+					} else {
+						attrValueItem.push(val);
+					}
 				});
 				
 				if (attrValueItem.length == 0) return '';
 				allAttrsValues += ' '+attrNameItem+'="'+attrValueItem.join(joinSign)+'"';
-			
+				
 			} else {
 				allAttrsValues += Boolean(rulesItem) ? ' '+attrNameItem : '';
 			}	

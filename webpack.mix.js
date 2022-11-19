@@ -44,9 +44,9 @@ mix
 			}
 		}
 	})
-	.copy('resources/js/plugins', 'public/assets/js/plugins')
-	.copy('resources/images', 'public/assets/images')
-	.copy('resources/fonts', 'public/assets/fonts')
+	//.copy('resources/js/plugins', 'public/assets/js/plugins')
+	//.copy('resources/images', 'public/assets/images')
+	//.copy('resources/fonts', 'public/assets/fonts')
 	.js('resources/js/admin.js', 'public/assets/js')
 	.js('resources/js/site.js', 'public/assets/js')
 	.disableNotifications()

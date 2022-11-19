@@ -5833,6 +5833,19 @@ window.ddrSplit = function () {
     return isInt(strItem) ? parseInt(strItem) : isFloat(strItem) ? parseFloat(strItem) : strItem;
   }
 };
+
+window.strPad = function (str) {
+  return str;
+};
+
+window.wordCase = function () {
+  var count = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+  var variants = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+  if (_.isNull(count) || _.isNull(variants)) return;
+  if (!_.isArray(variants)) variants = pregSplit(variants);
+  count = '' + count;
+  if (['11', '12', '13', '14'].indexOf(count) != -1 || ['5', '6', '7', '8', '9', '0'].indexOf(count.substr(-1)) != -1) return variants[2];else if (['2', '3', '4'].indexOf(count.substr(-1)) != -1) return variants[1];else if (count.substr(-1) == '1') return variants[0];
+};
 /*
 	события активной или неактивной вкладки сайта в брайзере
 		- коллбэк активной вкладки
@@ -6328,7 +6341,13 @@ window.setTagAttribute = function () {
         allAttrsValues += ' ' + attrNameItem + '="' + attrValueItem.join(joinSign) + '"';
       } else if (_.isArray(rulesItem)) {
         $.each(rulesItem, function (k, val) {
-          attrValueItem.push(val);
+          if (_.isPlainObject(val)) {
+            $.each(val, function (v, r) {
+              if (Boolean(r)) attrValueItem.push(v);
+            });
+          } else {
+            attrValueItem.push(val);
+          }
         });
         if (attrValueItem.length == 0) return '';
         allAttrsValues += ' ' + attrNameItem + '="' + attrValueItem.join(joinSign) + '"';
@@ -8095,47 +8114,24 @@ function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Sy
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 
+var functionsMap, loadedFuntionsMap, menuSelector, abortCtrl;
 $(document).on('contextmenu', '[contextmenu]', function (e) {
   e.preventDefault();
   var target = {};
   target.selector = this;
-  var menuSelector; // методы, которые привязаны к селектору.
-  // То есть, можно использовать селектор target.selector и можно вызывать через target.методы.
+  var uniqueBlockId = 'ddrContextMenu'; // Получить название функции-построителя меню и ее аргументы
 
-  $.extend(target, {
-    changeAttrData: function changeAttrData() {
-      var argIndex = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
-      var newData = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-      if (_.isNull(argIndex) || _.isNull(newData)) throw new Error('Ошибка! contextmenu changeAttrData -> неверно переданы аргументы!');
-
-      var _parseStringToFuncArg = _parseStringToFuncArgs($(this.selector).attr('contextmenu')),
-          _parseStringToFuncArg2 = _slicedToArray(_parseStringToFuncArg, 2),
-          chFn = _parseStringToFuncArg2[0],
-          chArgs = _parseStringToFuncArg2[1];
-
-      var buildAttrString = chFn + ':',
-          i = argIndex - 1;
-      if (!chArgs[i]) throw new Error('Ошибка! contextmenu changeAttrData -> аргумента с таким порядковым номером не существует!');
-      chArgs[i] = newData;
-      buildAttrString += chArgs.join(',');
-      $(this.selector).setAttrib('contextmenu', buildAttrString);
-    }
-  });
-
-  var _parseStringToFuncArg3 = _parseStringToFuncArgs($(target.selector).attr('contextmenu')),
-      _parseStringToFuncArg4 = _slicedToArray(_parseStringToFuncArg3, 2),
-      func = _parseStringToFuncArg4[0],
-      args = _parseStringToFuncArg4[1]; // Метода для основной функции
+  var _parseAttribString2 = _parseAttribString($(target.selector).attr('contextmenu')),
+      _parseAttribString3 = _slicedToArray(_parseAttribString2, 2),
+      func = _parseAttribString3[0],
+      args = _parseAttribString3[1]; // Методы для основной функции
 
 
   var methods = {
     target: target,
     close: function close() {
       // закрыть контекстное меню
-      menuSelector.removeClass("is-visible");
-      setTimeout(function () {
-        menuSelector.remove();
-      }, 100);
+      _close();
     },
     setCallback: function setCallback(cbFnc, cbArgs) {
       for (var _len = arguments.length, addArgs = new Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
@@ -8157,129 +8153,61 @@ $(document).on('contextmenu', '[contextmenu]', function (e) {
       $(allSelectorsStr).one('scroll', function () {
         methods.close();
       });
+    },
+    onContextMenu: function onContextMenu() {
+      var callback = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+      if (!_.isNull(callback) && _.isFunction(callback)) callback();
     }
-  };
+  }; // Вызвать функцию построения меню
 
-  var menuData = _callGlobalFunc.apply(void 0, [func, methods].concat(_toConsumableArray(args)));
+  var menuData = _callBuildMenuFunc.apply(void 0, [func, methods].concat(_toConsumableArray(args))); // Сформировать из данных HTML меню, карту функций и связать клик на пукнт меню с вызовом сооответствующей функции
+
 
   var _buildMenuHtml2 = _buildMenuHtml(menuData),
       _buildMenuHtml3 = _slicedToArray(_buildMenuHtml2, 2),
       menuHtml = _buildMenuHtml3[0],
       funcMap = _buildMenuHtml3[1];
 
-  if (!menuHtml || !funcMap) return;
-  menuSelector = _render(e, menuHtml); // Скрытие меню при клике на пункт меню
+  menuSelector = menuHtml;
+  functionsMap = funcMap; // Отрисовать меню
 
-  menuHtml.one("mousedown mouseup touchstart touchend", "li:not(.nope):not(.parent)", function (e) {
-    e.stopPropagation();
-    if (e.which !== 1) return;
+  _renderDomElement(menuHtml, uniqueBlockId); // Установить положение меню
 
-    if (hasIn(['mousedown', 'touchstart'], e.type) !== false) {
-      $(this).addClass("active");
-    } else if (hasIn(['mouseup', 'touchend'], e.type) !== false) {
-      menuHtml.removeClass("is-visible");
-      setTimeout(function () {
-        menuHtml.remove();
-      }, 100);
-      $(this).removeClass("active");
-    }
-  }); // клик на пункт меню без дочерних
 
-  menuHtml.on(tapEvent, '[contextmenuitem]', function (e) {
-    var funcCode = $(this).attr('contextmenuitem');
-    if (!funcMap[funcCode] || typeof funcMap[funcCode] != 'function') throw new Error('Ошибка! contextmenu contextmenuitem parent -> передана не функция!');
-    var obj = {};
-    obj.target = this;
-    $.extend(obj, {
-      text: function text() {
-        return $(this.target).text().trim();
-      },
-      items: function items() {
-        return $(this.target).siblings();
-      }
-    });
-    funcMap[funcCode](obj);
-  }); // наведение на пункт меню с дочерними
+  _setPositionByCursor(e, menuHtml, {
+    strictX: false,
+    strictY: true
+  }); // Установить положение всех списков подменю
 
-  var waiting, abortCtrl;
-  menuHtml.on('mouseenter mouseleave touchstart touchend', '[contextmenuitemload]:not(.nope).parent', function (e) {
-    var menuItem = this,
-        subContext = $(menuItem).find('.context.sub');
 
-    if (hasIn(['mouseenter', 'touchstart'], e.type) !== false) {
-      var funcCode = $(menuItem).attr('contextmenuitemload');
-      if (!_.isPlainObject(funcMap[funcCode])) throw new Error('Ошибка! contextmenu [contextmenuitemload] -> не передан объект с данными!');
+  _initSubmenuPositions(menuHtml); // Показать меню
 
-      if ($(menuItem).hasClass('loaded')) {
-        $(subContext).addClass('context__sub-hover');
-        return;
-      }
 
-      $(subContext).addClass('context__sub-hover minh4rem-5px');
-      waiting = $(subContext).ddrWait({
-        bgColor: 'transparent',
-        iconHeight: '25px'
-      });
-      $(menuItem).addClass('loaded');
+  _show(); // клик на пункт меню
 
-      var _$assign = _.assign({
-        url: null,
-        method: 'get',
-        params: {},
-        map: function map(item) {
-          return item;
-        },
-        empty: '<li class="nope w100 color-gray-500">Пусто</li>'
-      }, funcMap[funcCode]),
-          url = _$assign.url,
-          method = _$assign.method,
-          params = _$assign.params,
-          map = _$assign.map,
-          empty = _$assign.empty;
 
-      abortCtrl = new AbortController();
-      axiosQuery(method, url, params, 'json', abortCtrl).then(function (_ref) {
-        var data = _ref.data,
-            error = _ref.error,
-            status = _ref.status,
-            headers = _ref.headers;
+  _clickToAction(menuHtml); // Скрытие меню при клике на любое место документа
 
-        if (error) {
-          console.log(error.message);
-          return;
-        }
 
-        if (_.isEmpty(data)) {
-          $(subContext).html(empty);
-          return;
-        }
+  _clickToHideEvent(menuHtml, uniqueBlockId);
+}); //--------------------------------------------------------------------------------------------------------------------------
 
-        _buildSubMenu(subContext, data, map, empty);
-      })["catch"](function (e) {
-        console.error(e);
-        $(menuItem).removeClass('loaded'); //throw new Error('Ошибка! contextmenu _buildSubMenu -> axiosQuery вернула ошибку!');
-      });
-    } else if (hasIn(['mouseleave', 'touchend'], e.type) !== false) {
-      $(subContext).removeClass('context__sub-hover');
-    }
-  }); // Скрытие меню при клике на любое место документа
+$(document).on('mouseenter', '.ddrcontextmenu .ddrcontextmenu__item_main', function () {
+  $(this).addClass('ddrcontextmenu__item-hovered');
+});
+$(document).on('mouseleave', '.ddrcontextmenu > li', function () {
+  $(this).find('.ddrcontextmenu__item_main').removeClass('ddrcontextmenu__item-hovered');
+}); // наведение на пункт меню с подгрузкой
 
-  $(document).on("mousedown", function (e) {
-    var $tar = $(e.target);
-    if (abortCtrl instanceof AbortController) abortCtrl.abort();
+$(document).on('mouseenter touchstart', '.ddrcontextmenu [ddrcontextmenuitemload]:not([ddrcmloaded])', function (e) {
+  _loadSubmenu(this);
 
-    if (!$tar.is(menuHtml) && !$tar.closest(".context").length) {
-      menuHtml.removeClass("is-visible");
-      setTimeout(function () {
-        menuHtml.remove();
-      }, 100);
-      $(document).off(e);
-    }
-  });
-}); //const itemMethods = {};
+  $(this).setAttrib('ddrcmloaded');
+}); //--------------------------------------------------------------------------------------------------------------------------
 // Спарсить данные, переданные через атрибут contextmenu в теге.
+// Получить название функции-построителя меню и ее аргументы
 
-function _parseStringToFuncArgs() {
+function _parseAttribString() {
   var stringToParse = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
   if (_.isNull(stringToParse)) throw new Error('Ошибка! contextmenu _parseStringToFuncArgs -> не передан аргумент!');
   if (!_.isString(stringToParse)) throw new Error('Ошибка! contextmenu _parseStringToFuncArgs -> передаваемый аргумент должен быть строкой!');
@@ -8291,10 +8219,10 @@ function _parseStringToFuncArgs() {
 
   if (!_.isArray(args)) args = [args];
   return [func, args];
-} // Вызвать инициирующую функцию коллбкэа
+} // Вызвать функцию построения меню
 
 
-function _callGlobalFunc() {
+function _callBuildMenuFunc() {
   var _$, _window;
 
   var func = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
@@ -8307,7 +8235,8 @@ function _callGlobalFunc() {
   }
 
   if ($[func] && typeof $[func] == 'function') return (_$ = $)[func].apply(_$, [methods].concat(args));else if (window[func] && typeof window[func] == 'function') return (_window = window)[func].apply(_window, [methods].concat(args));else throw new Error('Ошибка! contextmenu _callGlobalFunc -> указанная функция не является функцией!');
-}
+} // Сформировать из данных HTML меню, карту функций и связать клик на пукнт меню с вызовом сооответствующей функции
+
 
 function _buildMenuHtml() {
   var menuData = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
@@ -8317,15 +8246,19 @@ function _buildMenuHtml() {
   });
   if (_.isEmpty(menuData)) return [];
   menuData = menuData.sort(function (a, b) {
+    if (a == 'divline' || b == 'divline') return 0;
     var aSort = a.sort || 0,
         bSort = b.sort || 0;
-    return aSort - bSort; //if (a.sort > b.sort) return 1;
-    //if (a.sort < b.sort) return -1;
-    //return 0;
+    return aSort - bSort;
   });
   var funcMap = {};
-  var menuHtml = '<ul class="context noselect">';
+  var menuHtml = '<ul class="ddrcontextmenu ddrcontextmenu_main noselect">';
   $.each(menuData, function (k, item) {
+    if (item == 'divline') {
+      menuHtml += '<li><div class="ddrcontextmenu__divline"></div></li>';
+      return;
+    }
+
     var funcCode = !item.children && (item.load || item.onClick) ? generateCode('nlLlLLnnlnnLnnn') : null;
 
     if (item.onClick && !item.children && !item.load) {
@@ -8335,27 +8268,34 @@ function _buildMenuHtml() {
     }
 
     var itemAttrs = setTagAttribute({
-      'class': {
-        'parent': item.children || item.load,
-        'nope': item.enable != undefined && !item.enable || item.disable,
-        'loadingable': item.load && !item.children
-      },
-      'contextmenuitem': _defineProperty({}, funcCode, item.onClick && !item.children && !item.load),
+      'class': ['ddrcontextmenu__item', 'ddrcontextmenu__item_main', {
+        'ddrcontextmenu__item_parent': item.children || item.load
+      }, {
+        'ddrcontextmenu__item_single': !item.children && !item.load
+      }, {
+        'ddrcontextmenu__item-disabled': item.enabled != undefined && !item.enabled || item.disabled != undefined && item.disabled
+      }
+      /*{'ddrcontextmenu__item-loadingable': item.load && !item.children}*/
+      ],
+      'ddrcontextmenuitem': _defineProperty({}, funcCode, item.onClick && !item.children && !item.load && (item.enabled == undefined || item.enabled) && (item.disabled == undefined || !item.disabled)),
       // коллбэк при клике на пункт меню (без дочерних)
-      'contextmenuitemload': _defineProperty({}, funcCode, item.load && !item.children && !item.onClick) // загрука подменю при наведении
+      'ddrcontextmenuitemload': _defineProperty({}, funcCode, item.load && !item.children && !item.onClick) // загрука подменю при наведении
 
     });
-    menuHtml += '<li' + itemAttrs + '>'; //------- parent li
+    menuHtml += '<li>'; //------- parent li
+
+    menuHtml += '<div' + itemAttrs + '>'; //------- parent li
 
     if (item.faIcon) {
-      menuHtml += '<i class="icon fa-fw ' + item.faIcon + '"></i>';
+      menuHtml += '<div class="icon"><i class="fa-fw ' + item.faIcon + '"></i></div>';
     }
 
-    menuHtml += '<p>' + item.name + '</p>';
+    menuHtml += '<p class="text">' + strPad(item.name, 110, '...') + '</p>';
 
     if (item.children || item.load) {
-      menuHtml += '<i class="f fa-solid fa-chevron-right"></i>';
-      menuHtml += '<ul class="context sub">';
+      menuHtml += '<div class="arrow"><i class="fa-solid fa-chevron-right"></i></div>';
+      menuHtml += '</div>';
+      menuHtml += '<ul class="ddrcontextmenu ddrcontextmenu_sub">';
     }
 
     if (item.children) {
@@ -8369,99 +8309,249 @@ function _buildMenuHtml() {
         return aSort - bSort;
       });
       $.each(item.children, function (k, childItem) {
+        var childFuncCode = childItem.onClick ? generateCode('nlLlLLnnlnnLnnn') : null;
+
+        if (childItem.onClick) {
+          funcMap[childFuncCode] = childItem.onClick;
+        }
+
         var childItemAttrs = setTagAttribute({
-          'class': {
-            'nope': childItem.enable != undefined && !childItem.enable || childItem.disable
-          },
-          'contextmenuitem': _defineProperty({}, funcCode, childItem.onClick && !childItem.load) // коллбэк при клике на пункт меню (без дочерних)
+          'class': ['ddrcontextmenu__item', 'ddrcontextmenu__item_sub', {
+            'ddrcontextmenu__item-disabled': childItem.enabled != undefined && !childItem.enabled || childItem.disabled != undefined && childItem.disabled
+          }],
+          'ddrcontextmenuitem': _defineProperty({}, childFuncCode, childItem.onClick && !childItem.load && (childItem.enabled == undefined || childItem.enabled) && (childItem.disabled == undefined || !childItem.disabled)) // коллбэк при клике на пункт меню
 
         });
-        menuHtml += '<li' + childItemAttrs + '>';
-        menuHtml += '<i class="icon fa-fw ' + childItem.faIcon + '"></i>';
-        menuHtml += '<p>' + childItem.name + '</p>';
+        menuHtml += '<li>';
+        menuHtml += '<div' + childItemAttrs + '>';
+        if (childItem.faIcon) menuHtml += '<div class="icon"><i class="fa-fw ' + childItem.faIcon + '"></i></div>';
+        menuHtml += '<p class="text">' + strPad(childItem.name, 110, '...') + '</p>';
+        menuHtml += '</div>';
         menuHtml += '</li>';
       });
     }
 
+    if (item.load && !item.children) {
+      menuHtml += '<li class="ddrcontextmenu__item ddrcontextmenu__item_sub ddrcontextmenu__item-loadingable">';
+      menuHtml += '<img class="ddrcontextloadingicon" src="/assets/images/loading.gif">';
+      menuHtml += '</li>';
+    }
+
     if (item.load || item.children) {
-      menuHtml += '</ul>';
+      menuHtml += '</ul>'; //------- child ul
     }
 
     menuHtml += '</li>'; //------- parent li
   });
-  menuHtml += '</ul>';
+  menuHtml += '</ul>'; //------- parent ul
+
   return [$(menuHtml), funcMap];
-}
+} // Сформировать подгруженное подменю
 
-function _buildSubMenu() {
-  var subContext = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
-  var itemsData = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-  var map = arguments.length > 2 ? arguments[2] : undefined;
-  var empty = arguments.length > 3 ? arguments[3] : undefined;
-  if (_.isNull(subContext)) throw new Error('Ошибка! contextmenu _buildSubMenu -> неверный селектор!');
-  if (_.isNull(itemsData) || !_.isArray(itemsData)) return;
-  var subData = itemsData.map(map);
-  subData = subData.filter(function (item) {
-    return Boolean((item.hidden == undefined || !item.hidden) && (item.visible == undefined || item.visible));
-  });
-  if (_.isEmpty(subData)) return;
-  subData = subData.sort(function (a, b) {
-    var aSort = a.sort || 0,
-        bSort = b.sort || 0;
-    return aSort - bSort;
-  });
-  var menuHtml = '',
-      funcMap = {};
 
-  if (subData) {
+function _loadSubmenu() {
+  var menuItem = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+  if (_.isNull(menuItem)) return;
+  var subMenu = $(menuItem).siblings('.ddrcontextmenu_sub'),
+      funcCode = $(menuItem).attr('ddrcontextmenuitemload'),
+      funcData = functionsMap[funcCode];
+  if (!_.isPlainObject(funcData)) return;
+
+  var _$assign = _.assign({
+    url: null,
+    method: 'get',
+    params: {},
+    map: function map(item) {
+      return item;
+    },
+    sortBy: 'sort',
+    empty: '<li class="ddrcontextmenu__item ddrcontextmenu__item_sub ddrcontextmenu__item-loadingable"> <p class="text">Пусто</p></li>'
+  }, funcData),
+      url = _$assign.url,
+      method = _$assign.method,
+      params = _$assign.params,
+      map = _$assign.map,
+      sortBy = _$assign.sortBy,
+      empty = _$assign.empty;
+
+  abortCtrl = new AbortController();
+  axiosQuery(method, url, params, 'json', abortCtrl).then(function (_ref) {
+    var data = _ref.data,
+        error = _ref.error,
+        status = _ref.status,
+        headers = _ref.headers;
+
+    if (error || _.isEmpty(data)) {
+      if (error) console.log(error.message);
+      $(subMenu).html(empty);
+      return;
+    }
+
+    var subData = data.map(map);
+    subData = subData.filter(function (item) {
+      return Boolean((item.hidden == undefined || !item.hidden) && (item.visible == undefined || item.visible));
+    });
+    if (_.isEmpty(subData)) return;
+
+    if (sortBy) {
+      subData = subData.sort(function (a, b) {
+        var aSort = a[sortBy] || 0,
+            bSort = b[sortBy] || 0;
+        return aSort - bSort;
+      });
+    }
+
+    var subMenuHtml = '',
+        funcMap = {};
     $.each(subData, function (k, childItem) {
-      var funcCode = childItem.onClick ? generateCode('nlLlLLnnlnnLnnn') : null;
+      var childFuncCode = childItem.onClick ? generateCode('nlLlLLnnlnnLnnn') : null;
 
-      if (childItem.onClick) {
-        funcMap[funcCode] = childItem.onClick;
+      if (childFuncCode) {
+        funcMap[childFuncCode] = childItem.onClick;
       }
 
       var childItemAttrs = setTagAttribute({
-        'class': {
-          'nope': childItem.enable != undefined && !childItem.enable || childItem.disable
-        },
-        'contextmenuitemloaded': _defineProperty({}, funcCode, childItem.onClick) // коллбэк при клике на пункт меню (без дочерних)
+        'class': ['ddrcontextmenu__item', 'ddrcontextmenu__item_sub', {
+          'ddrcontextmenu__item-disabled': childItem.enabled != undefined && !childItem.enabled || childItem.disabled != undefined && childItem.disabled
+        }],
+        'ddrcontextmenuitem': _defineProperty({}, childFuncCode, childItem.onClick && !childItem.load && (childItem.enabled == undefined || childItem.enabled) && (childItem.disabled == undefined || !childItem.disabled)) // коллбэк при клике на пункт меню
 
       });
-      menuHtml += '<li' + childItemAttrs + '>';
-      menuHtml += '<i class="icon fa-fw ' + childItem.faIcon + '"></i>';
-      menuHtml += '<p>' + childItem.name + '</p>';
-      menuHtml += '</li>';
+      subMenuHtml += '<li>';
+      subMenuHtml += '<div' + childItemAttrs + '>';
+      if (childItem.faIcon) subMenuHtml += '<div class="icon"><i class="fa-fw ' + childItem.faIcon + '"></i></div>';
+      subMenuHtml += '<p class="text">' + strPad(childItem.name, 110, '...') + '</p>';
+      subMenuHtml += '</div>';
+      subMenuHtml += '</li>';
     });
+    $(subMenu).html(subMenuHtml || empty);
+
+    _setSubmenuPosition(subMenu);
+
+    loadedFuntionsMap = funcMap; // клик на пункт меню
+
+    _clickToAction(subMenu, true);
+  })["catch"](function (e) {
+    console.error(e);
+    throw new Error('Ошибка! contextmenu _loadSubmenu -> axiosQuery вернула ошибку!');
+  });
+} // Вывется HTML DOM элемент
+
+
+function _renderDomElement() {
+  var html = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+  var bdeid = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+  var append = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+  var htmlSelector = $(html);
+  htmlSelector.setAttrib('bdeid', bdeid);
+
+  if (append == false && $('body').find('[bdeid="' + bdeid + '"]').length > 0) {
+    $('body').find('[bdeid="' + bdeid + '"]').replaceWith(htmlSelector);
+  } else {
+    $('body').append(htmlSelector);
   }
 
-  $(subContext).addClass('loaded');
-  $(subContext).html(menuHtml || empty); //-----------------------------------------------------------------
+  return htmlSelector;
+}
 
-  var $window = $(window),
-      sw = subContext.width(),
-      sh = subContext.height(),
-      sx = subContext.offset().left,
-      sy = subContext.offset().top,
-      padx = 30,
-      pady = 20,
-      ww = $window.width(),
-      wh = $window.height(),
-      subHitsRight = sx + sw - padx >= ww - padx,
-      subHitsBottom = sy + sh - pady >= wh - pady;
+function _setPositionByCursor(e, blockSelector, options) {
+  if (!e || !blockSelector) throw new Error('ddrSetPosition ошибка в аргументах!');
 
-  if (subHitsRight) {
-    $(subContext).addClass("oppositeX");
+  var _$assign2 = _.assign({
+    target: window,
+    strictX: false,
+    strictY: false
+  }, options),
+      strictX = _$assign2.strictX,
+      strictY = _$assign2.strictY,
+      target = _$assign2.target,
+      cursorX = e.clientX,
+      cursorY = e.clientY,
+      winW = $(target).width(),
+      winH = $(target).height(),
+      blockW = blockSelector.outerWidth(),
+      blockH = blockSelector.outerHeight(),
+      leftPos,
+      topPos;
+
+  if (cursorX + blockW > winW) {
+    leftPos = strictX ? cursorX - blockW < 0 ? 0 : cursorX - blockW : cursorX - (cursorX + blockW - winW);
+  } else {
+    leftPos = cursorX;
   }
 
-  if (subHitsBottom) {
-    $(subContext).addClass("oppositeY");
-  } // клик на пункт меню без дочерних
+  if (cursorY + blockH > winH) {
+    topPos = strictY ? cursorY - blockH < 0 ? 0 : cursorY - blockH : cursorY - (cursorY + blockH - winH);
+  } else {
+    topPos = cursorY;
+  }
+
+  blockSelector.css({
+    'top': topPos + 'px',
+    'left': leftPos + 'px'
+  });
+} // Установить положение всех списков подменю
 
 
-  subContext.on(tapEvent, '[contextmenuitemloaded]', function (e) {
-    var funcCode = $(this).attr('contextmenuitemloaded');
-    if (!funcMap[funcCode] || typeof funcMap[funcCode] != 'function') throw new Error('Ошибка! contextmenu contextmenuitemloaded -> передана не функция!');
+function _initSubmenuPositions() {
+  var menuHtml = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+  if (_.isNull(menuHtml)) return;
+  $(menuHtml).children('li:not(.ddrcontextmenu__divline)').each(function (k, item) {
+    if ($(item).find('.ddrcontextmenu_sub').length == 0) return;
+
+    _setSubmenuPosition($(item).find('.ddrcontextmenu_sub'));
+  });
+}
+
+function _setSubmenuPosition() {
+  var subMenu = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+  if (_.isNull(subMenu)) return;
+  var posX = subMenu.offset().left,
+      posY = subMenu.offset().top,
+      winW = $(window).width(),
+      winH = $(window).height(),
+      itemW = subMenu.outerWidth(),
+      itemH = subMenu.outerHeight();
+
+  if (posX + itemW > winW) {
+    $(subMenu).addClass('oppositeX');
+  }
+
+  if (posY + itemH > winH) {
+    $(subMenu).addClass('oppositeY');
+  }
+} // Показать меню
+
+
+function _show() {
+  $('.ddrcontextmenu_main').addClass('ddrcontextmenu_main-visible');
+} // Скрытие меню при клике на любое место документа
+
+
+function _clickToHideEvent() {
+  var menuSelector = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+  var uniqueBlockId = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+  if (_.isNull(menuSelector) || _.isNull(uniqueBlockId)) return;
+  $(document).on("mousedown", function (e) {
+    var target = $(e.target);
+    if (abortCtrl instanceof AbortController) abortCtrl.abort();
+
+    if (!target.is(menuSelector) && !target.closest('[bdeid="' + uniqueBlockId + '"]').length) {
+      _close();
+
+      $(document).off(e);
+    }
+  });
+} // Клик на пункт меню
+
+
+function _clickToAction() {
+  var menuSelector = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+  var useLoadedFuncs = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+  if (_.isNull(menuSelector)) return;
+  menuSelector.on(tapEvent, '[ddrcontextmenuitem]', function (e) {
+    var funcCode = $(this).attr('ddrcontextmenuitem');
+    if ((!functionsMap[funcCode] || !_.isFunction(functionsMap[funcCode])) && (!loadedFuntionsMap[funcCode] || !_.isFunction(loadedFuntionsMap[funcCode]))) throw new Error('Ошибка! contextmenu _clickToAction -> передана не функция!');
     var obj = {};
     obj.target = this;
     $.extend(obj, {
@@ -8469,68 +8559,21 @@ function _buildSubMenu() {
         return $(this.target).text().trim();
       },
       items: function items() {
-        return $(this.target).siblings();
+        return $(this.target).parent('li').siblings(':not(.ddrcontextmenu__divline)');
       }
     });
-    funcMap[funcCode](obj);
+    if (useLoadedFuncs && loadedFuntionsMap[funcCode] != undefined && _.isFunction(loadedFuntionsMap[funcCode])) loadedFuntionsMap[funcCode](obj);else if (!useLoadedFuncs && functionsMap[funcCode] != undefined && _.isFunction(functionsMap[funcCode])) functionsMap[funcCode](obj);
+
+    _close();
   });
-}
+} // Закрыть меню
 
-function _render(e, context) {
-  if ($('body').find('.context').length) {
-    $('body').find('.context').remove();
-  }
 
-  $('body').append(context);
-  var $doc = $(document),
-      $context = $(context).not('.sub'),
-      $window = $(window),
-      $sub = $context.find('.sub');
-  var w = $context.width(),
-      h = $context.height(),
-      x = e.clientX,
-      y = e.clientY,
-      ww = $window.width(),
-      wh = $window.height(),
-      padx = 30,
-      pady = 20,
-      fx = x,
-      fy = y,
-      hitsRight = x + w >= ww - padx,
-      hitsBottom = y + h >= wh - pady;
+function _close() {
+  if (_.isNull(menuSelector)) return;
+  menuSelector.removeClass("ddrcontextmenu-visible"); //setTimeout(function() {
 
-  if (hitsRight) {
-    fx = ww - w - padx;
-  }
-
-  if (hitsBottom) {
-    fy = wh - h - pady;
-  }
-
-  $context.css({
-    left: fx - 1,
-    top: fy - 1
-  });
-
-  if ($sub.length) {
-    var sw = $sub.width(),
-        sh = $sub.height(),
-        sx = $sub.offset().left,
-        sy = $sub.offset().top,
-        subHitsRight = sx + sw - padx >= ww - padx,
-        subHitsBottom = sy + sh - pady >= wh - pady;
-
-    if (subHitsRight) {
-      $sub.addClass("oppositeX");
-    }
-
-    if (subHitsBottom) {
-      $sub.addClass("oppositeY");
-    }
-  }
-
-  $context.addClass("is-visible");
-  return $context;
+  menuSelector.remove(); //}, 100);
 }
 
 /***/ }),
@@ -8661,7 +8704,7 @@ function createInstance(selectorOrElement, opts) {
     This will get assigned the <custom-element> containing the shadow DOM.
     This can potentially eventually become `positionedEl` (stored on the instance object).
     It is used for positioning purposes. See the explanation below where `positionedEl` is defined.
-     PLEASE NOTE - custom elements have a default display of `inline` which, for whatever reason,
+      PLEASE NOTE - custom elements have a default display of `inline` which, for whatever reason,
     can have negative effects on the calendar. This is only an issue if the calendar is attached
     directly to the shadow DOM and not nested within some other element in the shadow DOM.
     If this is your case and you notice weirdness (such as the calendar disappearing immediately after showing),
@@ -8717,14 +8760,14 @@ function createInstance(selectorOrElement, opts) {
     Otherwise, it will conditionally add `position: relative` styling to the parent.
     For instance, if datepicker's selector was 'body', there is no parent element to do any
     styling to. And there's nothing to position datepicker relative to. It will just be appended to the body.
-     This property also prevents `calculatePosition()` from doing anything.
+      This property also prevents `calculatePosition()` from doing anything.
     `noPosition` will false when using a shadow DOM.
   */
 
   var noPosition = el === document.body;
   /*
     `parent` is the element that datepicker will be attached to in the DOM.
-     In the case of `noPosition`, it will be the <body>. If datepicker was passed a top-level element
+      In the case of `noPosition`, it will be the <body>. If datepicker was passed a top-level element
     in the shadow DOM (meaning the element's direct parent IS the shadow DOM), the parent will be the
     shadow DOM. Otherwise, `parent` is assigned the parent of the element that was passed to datepicker
     in the first place (usually an <input>).
@@ -8737,9 +8780,9 @@ function createInstance(selectorOrElement, opts) {
     explicit positioning below via inline styles if it doesn't already have it. That positioning, if applied,
     will be removed (cleaned up) down the line. `calculatePosition` will use the coordinates for `positionedEl`
     and `el` to correctly position the calendar.
-     If `noPosition` is true, this value will be ignored further down the chain.
+      If `noPosition` is true, this value will be ignored further down the chain.
     If `parent` is a shadow DOM, this could be the custom element associated with that shadow DOM.
-     If the next element up the chain (el.parentElement) IS the shadow DOM, el.parentElement will be null
+      If the next element up the chain (el.parentElement) IS the shadow DOM, el.parentElement will be null
     since a shadow DOM isn't an element. Hence why we go even further up the chain and assign customElement.
   */
 
@@ -9172,7 +9215,7 @@ function renderCalendar(instance, date) {
     html is recreated here. To make the overlay fade out the same way it faded in,
     we need to create it with the appropriate classes (triggered by `overlayOpen`),
     then wait for the next repaint, triggering a fade out.
-     Good for IE >= 10.
+      Good for IE >= 10.
   */
 
   if (overlayOpen) window.requestAnimationFrame(function () {
@@ -14175,7 +14218,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, ":root {\r\n\t--bg: #24262d;\r\n\t--text: #dfe3ff;\r\n\t--color1: #624e7e;\r\n\t--color2: #3c2b45;\r\n\t--color1n: #ecf0f4;\r\n\t--color2n: #fff;\r\n\t--colorSub: #5d4d66;\r\n\t--divider: rgba(255,255,255,0.16);\r\n}\r\n\r\n.context {\r\n\tpadding: 0.05em 0.25em;\r\n\tborder: 1px solid transparent;\r\n\tborder-right-color: rgba(255, 255, 255, 0.15);\r\n\tborder-bottom-color: rgba(255, 255, 255, 0.15);\r\n\tborder-left-color: rgba(0, 0, 0, 0.15);\r\n\tborder-top-color: rgba(0, 0, 0, 0.15);\r\n\tborder-radius: 3px;\r\n\tposition: absolute;\r\n\tmin-width: 16em;\r\n\tz-index: 10;\r\n\tbackground: linear-gradient(145deg, var(--color1), var(--color2));\r\n\tbox-shadow: 0px 5px 5px -2px #1413213b;\r\n\twill-change: transform, opacity, filter;\r\n\ttransition: transform, opacity, visibility, filter;\r\n\ttransition-duration: 0.3s, 0.2s, 0.4s, 0.3s;\r\n\ttransition-delay: 0.1s, 0s, 0.4s, 0.2s;\r\n\ttransition-timing-function: ease;\r\n\ttransform: rotate3d(-1, -1, 0, 10deg) scale(1);\r\n\ttransform-origin: 0 0;\r\n\topacity: 0;\r\n\tvisibility: hidden;\r\n\tfilter: blur(1px);\r\n}\r\n\r\n.context p,\r\n.context span,\r\n.context small,\r\n.context strong,\r\n.context a {\r\n\tcolor: var(--text);\r\n}\r\n\r\n\r\n.context.is-visible {\r\n\topacity: 1;\r\n\ttransform: none;\r\n\ttransition-delay: 0s, 0s, 0s, 0s;\r\n\tvisibility: visible;\r\n\tfilter: none;\r\n}\r\n.context.sub {\r\n\tbackground: var(--colorSub);\r\n\twidth: max-content;\r\n\tmin-width: 10em;\r\n\tleft: 100%;\r\n\ttop: -0.35em;\r\n\ttransform: translateX(0);\r\n\ttransition: transform, opacity, width, min-width, visibility;\r\n\ttransition-timing-function: ease;\r\n\ttransition-duration: 0.4s, 0.25s, 0.15s, 0.15s, 0.01s;\r\n\ttransition-delay: 0.4s, 0.25s, 0.3s, 0.3s, 0.35s;\r\n\toverflow: hidden;\r\n\tfilter: none;\r\n}\r\n.context.sub .f {\r\n\ttransform: translateX(-2.25em);\r\n}\r\n.context.sub.oppositeX {\r\n\tright: 100%;\r\n\tleft: auto;\r\n\ttransform: translateX(0.7em);\r\n}\r\n.context.sub.oppositeY {\r\n\ttop: auto;\r\n\tbottom: -0.35em;\r\n}\r\n.context > li {\r\n\tpadding: 0.6em 2em 0.6em 0.5em;\r\n\tborder-radius: 3px;\r\n\tposition: relative;\r\n\tfont-size: 14px;\r\n\tline-height: 1em;\r\n\tdisplay: flex;\r\n\talign-items: center;\r\n}\r\n.context > li:before {\r\n\tcontent: \"\";\r\n\tposition: absolute;\r\n\tleft: 0;\r\n\ttop: 0;\r\n\tbottom: 0;\r\n\tright: 0;\r\n\tborder-radius: 3px;\r\n\tz-index: -1;\r\n\tbackground-color: rgba(97, 97, 97, 0.37);\r\n\tmix-blend-mode: color-dodge;\r\n\ttransition: opacity 0.15s cubic-bezier(0.55, 0.06, 0.68, 0.19);\r\n\topacity: 0;\r\n}\r\n.context > li.hilight {\r\n\tfont-weight: 500;\r\n\tcolor: white;\r\n}\r\n.context > li:not(.context > li.nope):hover {\r\n\tcolor: white;\r\n}\r\n.context > li:not(.context > li.nope):hover:before {\r\n\topacity: 1;\r\n\ttransition: opacity 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94);\r\n}\r\n.context > li:not(.context > li.nope).parent:not(.loadingable):hover .sub {\r\n\topacity: 1;\r\n\ttransform: translateX(0);\r\n\ttransition-delay: 0.2s, 0.25s, 0.2s, 0.2s, 0s;\r\n\tborder-radius: 0 3px 3px 3px;\r\n\tvisibility: visible;\r\n}\r\n\r\n\r\n.context__sub-hover {\r\n\topacity: 1;\r\n\ttransform: translateX(0);\r\n\ttransition-delay: 0.2s, 0s, 0.2s, 0.2s, 0s;\r\n\tborder-radius: 3px;\r\n\tvisibility: visible;\r\n}\r\n\r\n\r\n.context > li:not(.context > li.nope):hover > .f, .context > li.hilight > .f, .context > li:not(.context > li.nope):hover > .icon, .context > li.hilight > .icon {\r\n\topacity: 1;\r\n}\r\n.context > li:last-child {\r\n\t margin-bottom: 0.25em;\r\n}\r\n.context > li:first-child {\r\n\tmargin-top: 0.25em;\r\n}\r\n\r\n.context > li.nope {\r\n\tpointer-events: none;\r\n\topacity: 0.4;\r\n}\r\n.context > li.active {\r\n\t/*-webkit-animation: flash 0.5s ease 1;\r\n\t\t  animation: flash 0.5s ease 1;*/\r\n\tbackground: rgba(255, 255, 255, 0.2);\r\n}\r\n\r\n.context > li .f {\r\n\tfont-size: 10px;\r\n\tcolor: var(--text);\r\n\topacity: 0.5;\r\n\ttransition: all 0.2s ease;\r\n}\r\n.context > li .icon {\r\n\tfont-size: inherit;\r\n\tcolor: var(--text);\r\n\tmargin-right: 8px;\r\n\topacity: 0.5;\r\n\ttransition: all 0.2s ease;\r\n}\r\n.context .divline {\r\n\tborder-bottom: 1px solid var(--divider);\r\n\tpadding: 0;\r\n\tmargin-top: 0.3em;\r\n\tmargin-bottom: 0.35em;\r\n}\r\n.context .f {\r\n\tfont-style: normal;\r\n\tposition: absolute;\r\n\ttransform: translateX(-2.4em);\r\n}\r\n.context .f[class*=chevron-right] {\r\n\tright: 5px;\r\n\ttop: calc(50% - 6px);\r\n\ttransform: none;\r\n}\r\n\r\n\r\n/*\r\n@-webkit-keyframes flash {\r\n\t0% {\r\n\t\tbackground: rgba(255, 255, 255, 0);\r\n\t}\r\n\t7% {\r\n\t\tbackground: rgba(255, 255, 255, 0.2);\r\n\t}\r\n\t14% {\r\n\t\tbackground: rgba(255, 255, 255, 0);\r\n\t}\r\n\t21% {\r\n\t\tbackground: rgba(255, 255, 255, 0.3);\r\n\t}\r\n}\r\n\r\n@keyframes flash {\r\n\t0% {\r\n\t\tbackground: rgba(255, 255, 255, 0);\r\n\t}\r\n\t7% {\r\n\t\tbackground: rgba(255, 255, 255, 0.2);\r\n\t}\r\n\t14% {\r\n\t\tbackground: rgba(255, 255, 255, 0);\r\n\t}\r\n\t21% {\r\n\t\tbackground: rgba(255, 255, 255, 0.3);\r\n\t}\r\n}*/\r\n*,\r\n*:after,\r\n*:before {\r\n\tbox-sizing: border-box;\r\n}\r\n\r\n\r\n\r\n.hide {\r\n\tdisplay: none;\r\n}", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, ":root {\r\n\t--cm-fontFamily: 'Roboto';\r\n\t\r\n\t--cm-mainBg: #fff;\r\n\t--cm-subBg: #fff;\r\n\t\r\n\t--cm-mainBoxShadow: 0 0 20px -1px #0000004a;\r\n\t--cm-subBoxShadow: 0 0 20px -1px #0000004a;\r\n\t\r\n\t--cm-mainBorderWidth: 2px;\r\n\t--cm-subBorderWidth: 2px;\r\n\t\r\n\t--cm-mainBorderColor: rgb(204, 204, 204);\r\n\t--cm-subBorderColor: rgb(204, 204, 204);\r\n\t\r\n\t--cm-mainItemHoverBg: rgb(222, 223, 229);\r\n\t--cm-subItemHoverBg: rgb(222, 223, 229);\r\n\t\r\n\t--cm-mainItemActiveBg: #c2c4cf;\r\n\t--cm-subItemActiveBg: #c2c4cf;\r\n\t\r\n\t--cm-mainIconColor: rgb(77, 77, 77);\r\n\t--cm-subIconColor: rgb(77, 77, 77);\r\n\t\r\n\t--cm-mainFontColor: rgb(77, 77, 77);\r\n\t--cm-subFontColor: rgb(77, 77, 77);\r\n\t\r\n\t--cm-hoverTransition: 0.1s;\r\n\t\r\n\t--cm-mainMenuPadding: 6px;\r\n\t--cm-subMenuPadding: 6px;\r\n\t\r\n\t--cm-mainMenuRadius: 12px;\r\n\t--cm-subMenuRadius: 12px;\r\n\t\r\n\t--cm-mainItemRadius: 8px;\r\n\t--cm-subItemRadius: 8px;\r\n\t\r\n\t--cm-mainItemPadding: 15px;\r\n\t--cm-subItemPadding: 15px;\r\n\t\r\n\t--cm-mainFontSize: 16px;\r\n\t--cm-subFontSize: 16px;\r\n\t\r\n\t--cm-mainMinHeight: 38px;\r\n\t--cm-subMinHeight: 38px;\r\n\t\r\n\t--cm-mainArrowSpace: 25px;\r\n\t\r\n\t--cm-showSubMenu: 0.2s;\r\n\t--cm-hideSubMenu: 0.1s;\r\n\t\r\n\t--cm-divSpace: 20px;\r\n}\r\n\t\r\n\t\r\n\t\r\n\t\r\n\r\n.ddrcontextmenu {\r\n  position: absolute;\r\n  opacity: 0;\r\n  pointer-events: none;\r\n  will-change: opacity, pointer-events; }\r\n  .ddrcontextmenu li {\r\n\tposition: relative; }\r\n  .ddrcontextmenu_main {\r\n\tbackground-color: var(--cm-mainBg);\r\n\tpadding-top: var(--cm-mainMenuPadding);\r\n\tpadding-bottom: var(--cm-mainMenuPadding);\r\n\tborder: var(--cm-mainBorderWidth) solid var(--cm-mainBorderColor);\r\n\tborder-radius: var(--cm-mainMenuRadius);\r\n\tbox-shadow: var(--cm-mainBoxShadow);\r\n\tz-index: 130; }\r\n\t.ddrcontextmenu_main-visible {\r\n\t  opacity: 1;\r\n\t  pointer-events: auto; }\r\n  .ddrcontextmenu_sub {\r\n\tleft: 100%;\r\n\ttop: calc(-1 * (var(--cm-subMenuPadding) + var(--cm-subBorderWidth)));\r\n\twidth: max-content;\r\n\tbackground-color: var(--cm-subBg);\r\n\tpadding-top: var(--cm-subMenuPadding);\r\n\tpadding-bottom: var(--cm-subMenuPadding);\r\n\tborder: var(--cm-subBorderWidth) solid var(--cm-subBorderColor);\r\n\tborder-radius: var(--cm-subMenuRadius);\r\n\tbox-shadow: var(--cm-subBoxShadow);\r\n\topacity: 0;\r\n\tpointer-events: none;\r\n\ttransition: opacity var(--cm-hideSubMenu);\r\n\tz-index: 131; }\r\n\t.ddrcontextmenu_sub.oppositeX {\r\n\t  right: 100%;\r\n\t  left: auto; }\r\n\t.ddrcontextmenu_sub.oppositeY {\r\n\t  top: auto;\r\n\t  bottom: calc(-1 * var(--cm-mainMenuPadding) - var(--cm-mainBorderWidth)); }\r\n  .ddrcontextmenu__item {\r\n\tposition: relative;\r\n\tdisplay: flex;\r\n\talign-items: center;\r\n\tjustify-content: space-between;\r\n\tfont-size: var(--cm-mainFontSize);\r\n\tpadding-left: var(--cm-mainItemPadding);\r\n\tpadding-right: var(--cm-mainItemPadding);\r\n\tmargin-left: var(--cm-mainMenuPadding);\r\n\tmargin-right: var(--cm-mainMenuPadding);\r\n\tmax-width: 500px;\r\n\tmin-height: var(--cm-mainMinHeight);\r\n\tborder-radius: var(--cm-mainItemRadius);\r\n\twill-change: background-color;\r\n\twidth: 100%; }\r\n\t.ddrcontextmenu__item .icon {\r\n\t  flex: 1 0 auto;\r\n\t  margin-right: 8px;\r\n\t  font-size: inherit; }\r\n\t  .ddrcontextmenu__item .icon i {\r\n\t\tfont-size: inherit;\r\n\t\tcolor: var(--cm-mainIconColor); }\r\n\t.ddrcontextmenu__item .text {\r\n\t  font-family: 'Roboto', sans-serif;\r\n\t  word-break: break-word;\r\n\t  font-size: inherit;\r\n\t  line-height: 0.9em;\r\n\t  display: block;\r\n\t  width: 100%; }\r\n\t.ddrcontextmenu__item .arrow {\r\n\t  flex: 1 0 var(--cm-mainArrowSpace);\r\n\t  text-align: right; }\r\n\t  .ddrcontextmenu__item .arrow i {\r\n\t\tfont-size: 0.8em;\r\n\t\tcolor: var(--cm-mainIconColor); }\r\n\t.ddrcontextmenu__item-hovered:not(.ddrcontextmenu__item-disabled) {\r\n\t  background-color: var(--cm-mainItemHoverBg);\r\n\t  transition: background-color var(--cm-hoverTransition); }\r\n\t  .ddrcontextmenu__item-hovered:not(.ddrcontextmenu__item-disabled) ~ .ddrcontextmenu_sub {\r\n\t\topacity: 1;\r\n\t\tpointer-events: auto;\r\n\t\ttransition: opacity var(--cm-showSubMenu); }\r\n\t.ddrcontextmenu__item:active:not(.ddrcontextmenu__item-disabled):not(.ddrcontextmenu__item_parent):not(.ddrcontextmenu__item-loadingable) {\r\n\t  background-color: var(--cm-mainItemActiveBg);\r\n\t  transition: background-color 0s; }\r\n\t.ddrcontextmenu__item-disabled .icon i {\r\n\t  color: #e3e8ed; }\r\n\t.ddrcontextmenu__item-disabled .text {\r\n\t  color: #cfd3d7; }\r\n\t.ddrcontextmenu__item-disabled .arrow i {\r\n\t  color: #cfd3d7; }\r\n\t.ddrcontextmenu__item-loadingable {\r\n\t  min-width: calc(4 * var(--cm-subMinHeight));\r\n\t  justify-content: center; }\r\n\t  .ddrcontextmenu__item-loadingable .ddrcontextloadingicon {\r\n\t\tmin-width: 20px;\r\n\t\tmin-height: 20px;\r\n\t\twidth: calc(var(--cm-subMinHeight) - var(--cm-subMenuPadding));\r\n\t\theight: calc(var(--cm-subMinHeight) - var(--cm-subMenuPadding)); }\r\n\t.ddrcontextmenu__item_single .text {\r\n\t  padding-right: var(--cm-mainArrowSpace); }\r\n\t.ddrcontextmenu__item_sub {\r\n\t  font-size: var(--cm-subFontSize);\r\n\t  min-height: var(--cm-subMinHeight);\r\n\t  border-radius: var(--cm-subItemRadius);\r\n\t  padding-left: var(--cm-subItemPadding);\r\n\t  padding-right: var(--cm-subItemPadding);\r\n\t  margin-left: var(--cm-subMenuPadding);\r\n\t  margin-right: var(--cm-subMenuPadding);\r\n\t  will-change: background-color; }\r\n\t  .ddrcontextmenu__item_sub:not(.ddrcontextmenu__item-disabled) .icon i {\r\n\t\tcolor: var(--cm-subIconColor); }\r\n\t  .ddrcontextmenu__item_sub:hover:not(.ddrcontextmenu__item-disabled):not(.ddrcontextmenu__item-loadingable) {\r\n\t\tbackground-color: var(--cm-subItemHoverBg);\r\n\t\ttransition: background-color var(--cm-hoverTransition); }\r\n  .ddrcontextmenu__divline {\r\n\theight: 1px;\r\n\tbackground-color: var(--cm-mainBg);\r\n\tfilter: brightness(80%) contrast(140%);\r\n\tmargin-top: calc(var(--cm-divSpace) / 2);\r\n\tmargin-bottom: calc(var(--cm-divSpace) / 2);\r\n\tmargin-left: calc(var(--cm-subMenuPadding) + (var(--cm-mainItemRadius)));\r\n\tmargin-right: calc(var(--cm-subMenuPadding) + (var(--cm-mainItemRadius))); }\r\n", ""]);
 // Exports
 /* harmony default export */ __webpack_exports__["default"] = (___CSS_LOADER_EXPORT___);
 
@@ -14196,7 +14239,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, ".qs-datepicker-container {\n\tfont-size: 1.3rem;\n\tcolor: var(--ddr-fontColor);\n\tposition: absolute;\n\twidth: 15.625em;\n\tdisplay: flex;\n\tflex-direction: column;\n\tz-index: 9001;\n\t-webkit-user-select: none;\n\t-ms-user-select: none;\n\tuser-select: none;\n\tborder: 1px solid #ebf1f1;\n\tborder-radius: .263921875em;\n\toverflow: hidden;\n\tbackground: #fff;\n\tbox-shadow: 0 1.25em 1.25em -.9375em rgba(0,0,0,.3);\n}\n\n.qs-datepicker-container * {\n\tbox-sizing: border-box;\n}\n\n.qs-centered {\n\tposition: fixed;\n\ttop: 50%;\n\tleft: 50%;\n\ttransform: translate(-50%,-50%);\n}\n\n.qs-hidden {\n\tdisplay: none;\n}\n\n.qs-overlay {\n\tposition: absolute;\n\ttop: 0;\n\tleft: 0;\n\tbackground: rgba(0,0,0,.75);\n\tcolor: #fff;\n\twidth: 100%;\n\theight: 100%;\n\tpadding: .5em;\n\tz-index: 1;\n\topacity: 1;\n\ttransition: opacity .3s;\n\tdisplay: flex;\n\tflex-direction: column;\n}\n\n.qs-overlay.qs-hidden {\n\topacity: 0;\n\tz-index: -1;\n}\n\n.qs-overlay .qs-overlay-year {\n\tbackground: rgba(0,0,0,0);\n\tborder: none;\n\tborder-bottom: 1px solid #fff;\n\tborder-radius: 0;\n\tcolor: #fff;\n\tfont-size: .875em;\n\tpadding: .25em 0;\n\twidth: 80%;\n\ttext-align: center;\n\tmargin: 0 auto;\n\tdisplay: block;\n}\n\n.qs-overlay .qs-overlay-year::-webkit-inner-spin-button {\n\t-webkit-appearance: none;\n}\n\n.qs-overlay .qs-close {\n\tpadding: .5em;\n\tcursor: pointer;\n\tposition: absolute;\n\ttop: 0;\n\tright: 0;\n}\n\n.qs-overlay .qs-submit {\n\tborder: 1px solid #fff;\n\tborder-radius: .263921875em;\n\tpadding: .5em;\n\tmargin: 0 auto auto;\n\tcursor: pointer;\n\tbackground: hsla(0,0%,50.2%,.4);\n\tdisplay: none;\n}\n\n.qs-overlay .qs-submit.qs-disabled {\n\tcolor: grey;\n\tborder-color: grey;\n\tcursor: not-allowed;\n}\n\n.qs-overlay .qs-overlay-month-container {\n\tdisplay: flex;\n\tflex-wrap: wrap;\n\tflex-grow: 1;\n}\n\n.qs-overlay .qs-overlay-month {\n\tdisplay: flex;\n\tjustify-content: center;\n\talign-items: center;\n\twidth: calc(100% / 3);\n\tcursor: pointer;\n\topacity: .5;\n\ttransition: opacity .15s;\n}\n\n.qs-overlay .qs-overlay-month.active,.qs-overlay .qs-overlay-month:hover {\n\topacity: 1;\n}\n\n.qs-controls {\n\twidth: 100%;\n\tdisplay: flex;\n\tjustify-content: space-between;\n\talign-items: center;\n\tflex-grow: 1;\n\tflex-shrink: 0;\n\tbackground: #1bdbe0;\n\tfilter: blur(0);\n\ttransition: filter .3s;\n}\n\n.qs-controls.qs-blur {\n\tfilter: blur(5px);\n}\n\n.qs-arrow {\n\theight: 1.5625em;\n\twidth: 1.5625em;\n\tposition: relative;\n\tcursor: pointer;\n\tborder-radius: .263921875em;\n\ttransition: background .15s;\n}\n\n.qs-arrow:hover {\n\tbackground: rgba(0,0,0,.1);\n}\n\n.qs-arrow:hover.qs-left:after {\n\tborder-right-color: #000;\n}\n\n.qs-arrow:hover.qs-right:after {\n\tborder-left-color: #000;\n}\n\n.qs-arrow:after {\n\tcontent: \"\";\n\tborder: .390625em solid rgba(0,0,0,0);\n\tposition: absolute;\n\ttop: 50%;\n\ttransition: border .2s;\n}\n\n.qs-arrow.qs-left:after {\n\tborder-right-color: grey;\n\tright: 50%;\n\ttransform: translate(25%,-50%);\n}\n\n.qs-arrow.qs-right:after {\n\tborder-left-color: grey;\n\tleft: 50%;\n\ttransform: translate(-25%,-50%);\n}\n\n.qs-month-year {\n\tfont-weight: 700;\n\ttransition: border .2s;\n\tborder-bottom: 1px solid rgba(0,0,0,0);\n\tcursor: pointer;\n}\n\n.qs-month-year:hover {\n\tborder-bottom: 1px solid grey;\n}\n\n.qs-month-year:active:focus,.qs-month-year:focus {\n\toutline: none;\n}\n\n.qs-month {\n\tpadding-right: .5ex;\n}\n\n.qs-year {\n\tpadding-left: .5ex;\n}\n\n.qs-squares {\n\tdisplay: flex;\n\tflex-wrap: wrap;\n\tpadding: .3125em;\n\tfilter: blur(0);\n\ttransition: filter .3s;\n}\n\n.qs-squares.qs-blur {\n\tfilter: blur(5px);\n}\n\n.qs-square {\n\twidth: calc(100% / 7);\n\theight: 1.5625em;\n\tdisplay: flex;\n\talign-items: center;\n\tjustify-content: center;\n\tcursor: pointer;\n\ttransition: background .1s;\n\tborder-radius: .263921875em;\n}\n\n.qs-square:not(.qs-empty):not(.qs-disabled):not(.qs-day):not(.qs-active):hover {\n\tbackground: orange;\n}\n\n.qs-current {\n\tfont-weight: 700;\n\ttext-decoration: underline;\n}\n\n.qs-active,.qs-range-end,.qs-range-start {\n\tbackground: #add8e6;\n}\n\n.qs-range-start:not(.qs-range-6) {\n\tborder-top-right-radius: 0;\n\tborder-bottom-right-radius: 0;\n}\n\n.qs-range-middle {\n\tbackground: #d4ebf2;\n}\n\n.qs-range-middle:not(.qs-range-0):not(.qs-range-6) {\n\tborder-radius: 0;\n}\n\n.qs-range-middle.qs-range-0 {\n\tborder-top-right-radius: 0;\n\tborder-bottom-right-radius: 0;\n}\n\n.qs-range-end:not(.qs-range-0),.qs-range-middle.qs-range-6 {\n\tborder-top-left-radius: 0;\n\tborder-bottom-left-radius: 0;\n}\n\n.qs-disabled,.qs-outside-current-month {\n\topacity: .2;\n}\n\n.qs-disabled {\n\tcursor: not-allowed;\n}\n\n.qs-day,.qs-empty {\n\tcursor: default;\n}\n\n.qs-day {\n\tfont-weight: 700;\n\tcolor: grey;\n}\n\t\n.qs-num {\n\tcolor: grey;\n}\n\t\n.qs-event {\n\tposition: relative;\n}\n\n.qs-event:after {\n\tcontent: \"\";\n\tposition: absolute;\n\twidth: .46875em;\n\theight: .46875em;\n\tborder-radius: 50%;\n\tbackground: #07f;\n\tbottom: 0;\n\tright: 0;\n}", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, ".qs-datepicker-container {\r\n\tfont-size: 1.3rem;\r\n\tcolor: var(--ddr-fontColor);\r\n\tposition: absolute;\r\n\twidth: 15.625em;\r\n\tdisplay: flex;\r\n\tflex-direction: column;\r\n\tz-index: 9001;\r\n\t-webkit-user-select: none;\r\n\t-ms-user-select: none;\r\n\tuser-select: none;\r\n\tborder: 1px solid #ebf1f1;\r\n\tborder-radius: .263921875em;\r\n\toverflow: hidden;\r\n\tbackground: #fff;\r\n\tbox-shadow: 0 1.25em 1.25em -.9375em rgba(0,0,0,.3);\r\n}\r\n\r\n.qs-datepicker-container * {\r\n\tbox-sizing: border-box;\r\n}\r\n\r\n.qs-centered {\r\n\tposition: fixed;\r\n\ttop: 50%;\r\n\tleft: 50%;\r\n\ttransform: translate(-50%,-50%);\r\n}\r\n\r\n.qs-hidden {\r\n\tdisplay: none;\r\n}\r\n\r\n.qs-overlay {\r\n\tposition: absolute;\r\n\ttop: 0;\r\n\tleft: 0;\r\n\tbackground: rgba(0,0,0,.75);\r\n\tcolor: #fff;\r\n\twidth: 100%;\r\n\theight: 100%;\r\n\tpadding: .5em;\r\n\tz-index: 1;\r\n\topacity: 1;\r\n\ttransition: opacity .3s;\r\n\tdisplay: flex;\r\n\tflex-direction: column;\r\n}\r\n\r\n.qs-overlay.qs-hidden {\r\n\topacity: 0;\r\n\tz-index: -1;\r\n}\r\n\r\n.qs-overlay .qs-overlay-year {\r\n\tbackground: rgba(0,0,0,0);\r\n\tborder: none;\r\n\tborder-bottom: 1px solid #fff;\r\n\tborder-radius: 0;\r\n\tcolor: #fff;\r\n\tfont-size: .875em;\r\n\tpadding: .25em 0;\r\n\twidth: 80%;\r\n\ttext-align: center;\r\n\tmargin: 0 auto;\r\n\tdisplay: block;\r\n}\r\n\r\n.qs-overlay .qs-overlay-year::-webkit-inner-spin-button {\r\n\t-webkit-appearance: none;\r\n}\r\n\r\n.qs-overlay .qs-close {\r\n\tpadding: .5em;\r\n\tcursor: pointer;\r\n\tposition: absolute;\r\n\ttop: 0;\r\n\tright: 0;\r\n}\r\n\r\n.qs-overlay .qs-submit {\r\n\tborder: 1px solid #fff;\r\n\tborder-radius: .263921875em;\r\n\tpadding: .5em;\r\n\tmargin: 0 auto auto;\r\n\tcursor: pointer;\r\n\tbackground: hsla(0,0%,50.2%,.4);\r\n\tdisplay: none;\r\n}\r\n\r\n.qs-overlay .qs-submit.qs-disabled {\r\n\tcolor: grey;\r\n\tborder-color: grey;\r\n\tcursor: not-allowed;\r\n}\r\n\r\n.qs-overlay .qs-overlay-month-container {\r\n\tdisplay: flex;\r\n\tflex-wrap: wrap;\r\n\tflex-grow: 1;\r\n}\r\n\r\n.qs-overlay .qs-overlay-month {\r\n\tdisplay: flex;\r\n\tjustify-content: center;\r\n\talign-items: center;\r\n\twidth: calc(100% / 3);\r\n\tcursor: pointer;\r\n\topacity: .5;\r\n\ttransition: opacity .15s;\r\n}\r\n\r\n.qs-overlay .qs-overlay-month.active,.qs-overlay .qs-overlay-month:hover {\r\n\topacity: 1;\r\n}\r\n\r\n.qs-controls {\r\n\twidth: 100%;\r\n\tdisplay: flex;\r\n\tjustify-content: space-between;\r\n\talign-items: center;\r\n\tflex-grow: 1;\r\n\tflex-shrink: 0;\r\n\tbackground: #1bdbe0;\r\n\tfilter: blur(0);\r\n\ttransition: filter .3s;\r\n}\r\n\r\n.qs-controls.qs-blur {\r\n\tfilter: blur(5px);\r\n}\r\n\r\n.qs-arrow {\r\n\theight: 1.5625em;\r\n\twidth: 1.5625em;\r\n\tposition: relative;\r\n\tcursor: pointer;\r\n\tborder-radius: .263921875em;\r\n\ttransition: background .15s;\r\n}\r\n\r\n.qs-arrow:hover {\r\n\tbackground: rgba(0,0,0,.1);\r\n}\r\n\r\n.qs-arrow:hover.qs-left:after {\r\n\tborder-right-color: #000;\r\n}\r\n\r\n.qs-arrow:hover.qs-right:after {\r\n\tborder-left-color: #000;\r\n}\r\n\r\n.qs-arrow:after {\r\n\tcontent: \"\";\r\n\tborder: .390625em solid rgba(0,0,0,0);\r\n\tposition: absolute;\r\n\ttop: 50%;\r\n\ttransition: border .2s;\r\n}\r\n\r\n.qs-arrow.qs-left:after {\r\n\tborder-right-color: grey;\r\n\tright: 50%;\r\n\ttransform: translate(25%,-50%);\r\n}\r\n\r\n.qs-arrow.qs-right:after {\r\n\tborder-left-color: grey;\r\n\tleft: 50%;\r\n\ttransform: translate(-25%,-50%);\r\n}\r\n\r\n.qs-month-year {\r\n\tfont-weight: 700;\r\n\ttransition: border .2s;\r\n\tborder-bottom: 1px solid rgba(0,0,0,0);\r\n\tcursor: pointer;\r\n}\r\n\r\n.qs-month-year:hover {\r\n\tborder-bottom: 1px solid grey;\r\n}\r\n\r\n.qs-month-year:active:focus,.qs-month-year:focus {\r\n\toutline: none;\r\n}\r\n\r\n.qs-month {\r\n\tpadding-right: .5ex;\r\n}\r\n\r\n.qs-year {\r\n\tpadding-left: .5ex;\r\n}\r\n\r\n.qs-squares {\r\n\tdisplay: flex;\r\n\tflex-wrap: wrap;\r\n\tpadding: .3125em;\r\n\tfilter: blur(0);\r\n\ttransition: filter .3s;\r\n}\r\n\r\n.qs-squares.qs-blur {\r\n\tfilter: blur(5px);\r\n}\r\n\r\n.qs-square {\r\n\twidth: calc(100% / 7);\r\n\theight: 1.5625em;\r\n\tdisplay: flex;\r\n\talign-items: center;\r\n\tjustify-content: center;\r\n\tcursor: pointer;\r\n\ttransition: background .1s;\r\n\tborder-radius: .263921875em;\r\n}\r\n\r\n.qs-square:not(.qs-empty):not(.qs-disabled):not(.qs-day):not(.qs-active):hover {\r\n\tbackground: orange;\r\n}\r\n\r\n.qs-current {\r\n\tfont-weight: 700;\r\n\ttext-decoration: underline;\r\n}\r\n\r\n.qs-active,.qs-range-end,.qs-range-start {\r\n\tbackground: #add8e6;\r\n}\r\n\r\n.qs-range-start:not(.qs-range-6) {\r\n\tborder-top-right-radius: 0;\r\n\tborder-bottom-right-radius: 0;\r\n}\r\n\r\n.qs-range-middle {\r\n\tbackground: #d4ebf2;\r\n}\r\n\r\n.qs-range-middle:not(.qs-range-0):not(.qs-range-6) {\r\n\tborder-radius: 0;\r\n}\r\n\r\n.qs-range-middle.qs-range-0 {\r\n\tborder-top-right-radius: 0;\r\n\tborder-bottom-right-radius: 0;\r\n}\r\n\r\n.qs-range-end:not(.qs-range-0),.qs-range-middle.qs-range-6 {\r\n\tborder-top-left-radius: 0;\r\n\tborder-bottom-left-radius: 0;\r\n}\r\n\r\n.qs-disabled,.qs-outside-current-month {\r\n\topacity: .2;\r\n}\r\n\r\n.qs-disabled {\r\n\tcursor: not-allowed;\r\n}\r\n\r\n.qs-day,.qs-empty {\r\n\tcursor: default;\r\n}\r\n\r\n.qs-day {\r\n\tfont-weight: 700;\r\n\tcolor: grey;\r\n}\r\n\t\r\n.qs-num {\r\n\tcolor: grey;\r\n}\r\n\t\r\n.qs-event {\r\n\tposition: relative;\r\n}\r\n\r\n.qs-event:after {\r\n\tcontent: \"\";\r\n\tposition: absolute;\r\n\twidth: .46875em;\r\n\theight: .46875em;\r\n\tborder-radius: 50%;\r\n\tbackground: #07f;\r\n\tbottom: 0;\r\n\tright: 0;\r\n}", ""]);
 // Exports
 /* harmony default export */ __webpack_exports__["default"] = (___CSS_LOADER_EXPORT___);
 

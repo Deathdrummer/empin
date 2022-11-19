@@ -209,27 +209,97 @@
 		search = null,
 		selection = null,
 		editSelection = null,
-		searchWithArchive = false;
+		searchWithArchive = false,
+		selectedContracts = {},
+		loadedContractsIds = {},
+		lastChoosedRow = null;
 		
+	
+	
+	
+	
+	
+	
+	
+	
+	//--------------------------------------------------------------------------------- Расширения
+	
+	// виртуальный список подгружаемых ID договоров
+	$.extend(loadedContractsIds, {
+		parts: {},
+		add(contractIds) {
+			if (loadedContractsIds.parts[offset] === undefined) {
+				loadedContractsIds.parts[offset] = JSON.parse(contractIds);
+			}
+		},
+		get(fromId = null, toId = null) {
+			const allItems = _.union(...Object.values(loadedContractsIds.parts)) || false;
+			if (!fromId && !toId) return allItems;
+			if (!fromId || !toId) return false;
+					
+			let fromIndex = allItems.indexOf(parseInt(fromId)),
+				toIndex = allItems.indexOf(parseInt(toId));
+			
+			if (fromIndex == -1 || toIndex == -1) return false;
+			
+			let startIndex = Math.min(fromIndex, toIndex),
+				endIndex = Math.max(fromIndex, toIndex);
+			
+			return allItems.slice(startIndex, endIndex + 1);
+		}
+	});
+	
+	
+	
+	// Список ID выделенных договоров
+	$.extend(selectedContracts, {
+		items: [],
+		add(items = null) {
+			if (_.isNull(items)) return;
+			items = !_.isArray(items) ? [parseInt(items)] : items;
+			selectedContracts.items = items;
+		},
+		remove(item = null) {
+			if (_.isNull(item)) return;
+			let removeIndex = selectedContracts.items.indexOf(parseInt(item));
+			if (removeIndex == -1) return;
+			selectedContracts.items.splice(removeIndex, 1);
+		},
+		append(item = null) {
+			if (_.isNull(item)) return;
+			selectedContracts.items.push(parseInt(item));
+		},
+		clear() {
+			selectedContracts.items = [];
+		}
+	});
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	getList({init: true});
 	
-	// 1
-	// 2 with tag
-	// 3 with tag
-	// 4 with --UPLOAD
-	// 5 with --UPLOAD
-	// 6 with --UPLOAD
-	// 7 with --UPLOAD
-	// 8 with --UPLOAD
 	
-	// 9 dfgdfgdf
-	// 10 dfgdfgdf
 	
 	$.getListAction = (btn, isActive, list) => {
 		if (isActive) return false;
 		currentList = list;
 		getList();
 	}
+	
+	
+	
+	
 	
 	
 	
@@ -305,12 +375,7 @@
 	
 	
 	
-	
-	
-	
-	
-	
-	
+		
 	
 	
 	
@@ -584,11 +649,6 @@
 					
 					
 					
-					
-					
-					
-					
-					
 					//--------------------------------- Поделиться подборкой с другими сотрудниками
 					let statusesTooltip, destroyTooltip, sharePopper;
 					$.selectionShare = (btn, selection_id, subscribed = false) => {
@@ -658,24 +718,9 @@
 					
 					
 					
-						
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
 					
 					
 					//--------------------------------- Действия со списками
-					
 					
 					$.selectionBuildList = (btn, id) => {
 						$('[selectionsbtn]').ddrInputs('disable');
@@ -694,9 +739,6 @@
 					
 					
 					
-					
-					
-					
 					$.selectionBuildToEdit = (btn, id) => {
 						$('[selectionsbtn]').ddrInputs('disable');
 						close();
@@ -711,38 +753,10 @@
 							}
 						});
 					}
-					
-					
 				});
 			});
 		});
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	
 	
 	
@@ -774,18 +788,6 @@
 			}
 		});
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	
 	
 	
@@ -1441,127 +1443,62 @@
 	
 	
 	
-	//-------------------------------------------------  Отправить договор в архив
-	$.toArchiveContractAction = ({context}, contractId, objectNumber, title) => {
-
-		let html = '';
-		html += '<div>';
-		html += '<p class="fz14px color-darkgray text-start">Номер объекта: <span class="color-black">'+objectNumber+'</span></p>';
-		html += '<p class="fz14px color-darkgray text-start">Название/заявитель: <span class="color-black">'+title+'</span></p>';
-		html += '<p class="fz18px color-red mt15px">Вы действительно хотите отправить договор в архив?</p>';
-		html += '</div>';
+	
+	
+	//----------------------------------------------------------------------------------- Выделение договоров
+	$('#contractsTable').on(tapEvent, '[contractid]', function({type, target, currentTarget, ctrlKey, shiftKey, detail, which}) {
+		let row = currentTarget,
+			contractId = $(row).attr('contractid');
 		
-		ddrPopup({
-			width: 400, // ширина окна
-			html, // контент
-			buttons: ['ui.cancel', {title: 'Отправить', variant: 'red', action: 'contractToArchiveAction'}],
-			centerMode: true,
-			winClass: 'ddrpopup_dialog'
-		}).then(({close, wait}) => {
-			$.contractToArchiveAction = (_) => {
-				wait();
-				axiosQuery('post', 'site/contracts/to_archive', {contractId}, 'json').then(({data, error, status, headers}) => {
-					if (data) {
-						getList();
-						$.notify('Договор успешно отправлен в архив!');
-					} else {
-						$.notify('Ошибка! Договор не был отправлен в архив!', 'error');
-					}
-					close();
-				});
-			}
-		});
-	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	//-------------------------------------------------  Отправить договор в другой отдел
-	/*$.sendContractAction = (row, contractId) => {
-		ddrPopup({
-			title: 'Отправить договор в отдел',
-			width: 500, // ширина окна
-			url: 'site/contracts/departments?contract_id='+contractId,
-			method: 'get',
-			buttons: ['ui.cancel']
-		}).then(({close, wait}) => {
-			$.sendToDepartment = (btn, departmentId) => {
-				let rowsCount = $(btn).closest('[departmentslist]').find('[departmentitem]').length,
-					departmentName = $(btn).text().trim();
-				wait();
-				axiosQuery('post', 'site/contracts/send', {contractId, departmentId}, 'json').then(({data, error, status, headers}) => {
-					if (data) {
-						$.notify('Договор успешно отправлен в '+departmentName+'!');
-						if (rowsCount == 1) row.changeAttrData(6, '0');
-					} else {
-						$.notify('Ошибка! Договор не был отправлен!', 'error');
-					}
-					close();
-				});
-			}
-		});
-	}*/
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	$.loadDepsToSub = ({setItems, setCallback}, context, contractId, foo, bar) => {
-		//console.log('context', context);
-		axiosQuery('get', 'site/contracts/departments?contract_id='+contractId, {}, 'json', abortCtrl)
-		.then(({data, error, status, headers}) => {
-			//console.log(data);
-			let subData = data.map(function(item) {
-				return {
-					name: item.name,
-					faIcon: 'fa-solid fa-angles-right',
-					callback: setCallback('clickToSub', contractId, item.id)
-				};
-			});
-			setItems(subData);
-		}).catch((e) => {
-			
-		});
-	}
-	
-	
-	
-	
-	$.clickToSub = ({setItems}, context, contractId, departmentId) => {
 		
-		//console.log('context', context);
-		
-		/*axiosQuery('post', 'site/contracts/send', {contractId, departmentId}, 'json').then(({data, error, status, headers}) => {
-			if (data) {
-				$.notify('Договор успешно отправлен в '+departmentName+'!');
-				if (rowsCount == 1) row.changeAttrData(6, '0');
+		if (ctrlKey) {
+			if ($(row).hasAttr('contractselected')) {
+				$(row).removeClass('ddrtable__tr-selected').removeAttrib('contractselected');
+				let lastSelected = selectedContracts.remove($(row).attr('contractid'));
+				lastChoosedRow = row;
 			} else {
-				$.notify('Ошибка! Договор не был отправлен!', 'error');
+				$(row).addClass('ddrtable__tr-selected').setAttrib('contractselected');
+				lastChoosedRow = row;
+				selectedContracts.append($(row).attr('contractid'));
 			}
-			close();
-		});*/
-	}
+		} 
+		
+		
+		
+		if (shiftKey) {
+			if (lastChoosedRow) {
+				let lastChoosedContractId = $(lastChoosedRow).attr('contractid');
+				if (contractId == lastChoosedContractId) {
+					$(row).not('[contractselected]').addClass('ddrtable__tr-selected').setAttrib('contractselected');
+					selectedContracts.add(contractId);
+				} else {
+					let choosedItems = loadedContractsIds.get(lastChoosedContractId, contractId);
+					if (choosedItems.length) {
+						$('#contractsTable').find('[contractselected]').removeClass('ddrtable__tr-selected').removeAttrib('contractselected');
+						choosedItems.forEach(function(contractId) {
+							$('#contractsTable').find('[contractid="'+contractId+'"]').addClass('ddrtable__tr-selected').setAttrib('contractselected');
+						});
+						selectedContracts.add(choosedItems);
+					}
+				}
+				
+			} else {
+				$(row).not('[contractselected]').addClass('ddrtable__tr-selected').setAttrib('contractselected');
+				lastChoosedRow = row;
+				selectedContracts.add($(lastChoosedRow).attr('contractid'));
+			}
+		}
+		
+		
+		
+		if (!ctrlKey && !shiftKey) {
+			$('#contractsTable').find('[contractselected]').removeClass('ddrtable__tr-selected').removeAttrib('contractselected');
+			lastChoosedRow = null;
+			selectedContracts.clear();
+		}
+		
+		//console.log(type, target, currentTarget, ctrlKey, shiftKey, detail, which);
+	});
 	
 	
 	
@@ -1573,12 +1510,21 @@
 	
 	
 	
+	/*
+	1. сделать работу с несколькими записями
+	2. создание подборки через контекстное меню
+	
+	*/
 	
 	
-	//-------------------------------------------------  Контекстное меню
+	
+	
+	
+	//----------------------------------------------------------------------------------- Контекстное меню
+	
 	let sendMessStat;
 	$.contractContextMenu = (
-		{target, closeOnScroll},
+		{target, closeOnScroll, onContextMenu},
 		contractId,
 		departmentId,
 		selectionId,
@@ -1602,10 +1548,23 @@
 		
 		closeOnScroll('#contractsList');
 		
+		onContextMenu(() => {
+			// если кликнуть на НЕвыделенном договоре - то все выделенния отменятся и выделится текущий кликнутый договор
+			if ($(target.selector).hasAttr('contractselected') == false) {
+				$('#contractsTable').find('[contractselected]').removeClass('ddrtable__tr-selected').removeAttrib('contractselected');
+				lastChoosedRow = target.selector;
+				$(target.selector).addClass('ddrtable__tr-selected').setAttrib('contractselected');
+				selectedContracts.add($(target.selector).attr('contractid'));
+			}
+			
+			console.log(selectedContracts.items);
+		});
+		
+		
 		return [
 			{
-				name: 'Отправить в архив',
-				faIcon: 'fa-solid fa-box-archive',
+				name: selectedContracts.items.length > 1 ? 'Отправить '+selectedContracts.items.length+' '+wordCase(selectedContracts.items.length, ['договор', 'договора', 'договоров'])+' в архив' : 'Отправить договор в архив',
+				//faIcon: 'fa-solid fa-box-archive',
 				visible: canToArchive && !isArchive,
 				sort: 5,
 				onClick: () => {
@@ -1629,9 +1588,7 @@
 							axiosQuery('post', 'site/contracts/to_archive', {contractId}, 'json')
 							.then(({data, error, status, headers}) => {
 								if (data) {
-									let params = {};
-									if (selectionId || searched) params['withCounts'] = true;
-									getList(params);
+									getList({withCounts: Boolean(selectionId || searched)});
 									$.notify('Договор успешно отправлен в архив!');
 								} else {
 									$.notify('Ошибка! Договор не был отправлен в архив!', 'error');
@@ -1643,8 +1600,8 @@
 				},
 			}, {
 				name: 'Отправить в другой отдел',
-				faIcon: 'fa-solid fa-angles-right',
-				enable: !!hasDepsToSend && ((canSending && departmentId) || (canSendingAll && !departmentId)),
+				//faIcon: 'fa-solid fa-angles-right',
+				enabled: !!hasDepsToSend && ((canSending && departmentId) || (canSendingAll && !departmentId)),
 				hidden: isArchive,
 				sort: 4,
 				load: {
@@ -1653,7 +1610,7 @@
 					map: (item) => {
 						return {
 							name: item.name,
-							faIcon: 'fa-solid fa-angles-right',
+							//faIcon: 'fa-solid fa-angles-right',
 							visible: true,
 							onClick(selector) {
 								let departmentName = selector.text(),
@@ -1683,7 +1640,7 @@
 				},
 			}, {
 				name: 'Чат договора ['+messagesCount+']',
-				faIcon: 'fa-solid fa-comments',
+				//faIcon: 'fa-solid fa-comments',
 				visible: canChat,
 				sort: 1,
 				onClick() {
@@ -1734,7 +1691,7 @@
 				}
 			}, {
 				name: 'Скрыть договор',
-				faIcon: 'fa-solid fa-eye-slash',
+				//faIcon: 'fa-solid fa-eye-slash',
 				visible: canHiding && departmentId && !isArchive,
 				onClick() {	
 					ddrPopup({
@@ -1748,9 +1705,7 @@
 							wait();
 							axiosQuery('post', 'site/contracts/hide', {contractId, departmentId}, 'json').then(({data, error, status, headers}) => {
 								if (data) {
-									let params = {};
-									if (selectionId || searched) params['withCounts'] = true;
-									getList(params);
+									getList({withCounts: Boolean(selectionId || searched)});
 									$.notify('Договор успешно скрыт!');
 									//target.changeAttrData(9, '0');
 								} else {
@@ -1763,7 +1718,7 @@
 				}
 			}, {
 				name: 'Вернуть договор в работу',
-				faIcon: 'fa-solid fa-arrow-rotate-left',
+				//faIcon: 'fa-solid fa-arrow-rotate-left',
 				visible: canReturnToWork && isArchive,
 				onClick() {
 					ddrPopup({
@@ -1777,9 +1732,7 @@
 							wait();
 							axiosQuery('post', 'site/contracts/to_work', {contractId}, 'json').then(({data, error, status, headers}) => {
 								if (data) {
-									let params = {};
-									if (selectionId || searched) params['withCounts'] = true;
-									getList(params);
+									getList({withCounts: Boolean(selectionId || searched)});
 									$.notify('Договор успешно возвращен в работу!');
 									//target.changeAttrData(15, '0');
 								} else {
@@ -1792,7 +1745,7 @@
 				}
 			}, {
 				name: 'Удалить из подборки',
-				faIcon: 'fa-solid fa-trash-can',
+				//faIcon: 'fa-solid fa-trash-can',
 				visible: selectionId,
 				onClick() {
 					$('[selectionsbtn]').ddrInputs('disable');
@@ -1820,7 +1773,7 @@
 				}
 			}, {
 				name: 'Добавить в подборку',
-				faIcon: 'fa-solid fa-clipboard-check',
+				//faIcon: 'fa-solid fa-clipboard-check',
 				sort: 2,
 				load: {
 					url: 'site/contracts/selections_to_choose?contract_id='+contractId,
@@ -1829,7 +1782,7 @@
 						return {
 							name: item.title,
 							//faIcon: 'fa-solid fa-clipboard-check',
-							disable: !!item.choosed,
+							disabled: !!item.choosed,
 							onClick(selector) {
 								let selectionId = item.id;
 								
@@ -1856,50 +1809,13 @@
 				},
 			}, {
 				name: 'Создать новую подборку',
-				faIcon: 'fa-solid fa-clipboard-check',
+				//faIcon: 'fa-solid fa-clipboard-check',
 				sort: 3,
 				onClick() {
 					
-					console.log('rool');
-					
-					//$('[selectionsbtn]').ddrInputs('disable');
-					//let procNotif = processNotify('Удаление договора из подборки...');
-					//
-					//axiosQuery('put', 'site/selections/remove_contract', {contractId, selectionId})
-					//.then(({data, error, status, headers}) => {
-					//	if (error) {
-					//		//$.notify('Ошибка удаления из подборки!', 'error');
-					//		procNotif.error({message: 'Ошибка удаления договора из подборки!'});
-					//		console.log(error?.message, error.errors);
-					//	} else {
-					//		//$.notify('Договор успешно удален из подборки!');
-					//		procNotif.done({message: 'Договор успешно удален из подборки!'});
-					//		target.changeAttrData(7, '0');
-					//		getList({
-					//			withCounts: true,
-					//			callback: function() {
-					//				$('[selectionsbtn]').ddrInputs('enable');
-					//			}
-					//		});
-					//	}
-					//});
-					
 				}
 			}
-			
 		];
-		
-		
-		
-		// removeFromSelection -> removeContractFromSelection:contractId,selectionId (Удалить из подборки)
-		// addToSelection -> addContractToSelection:contractId (добавьть договор в подборку)
-		// hide -> hideContractAction:contractId,departmentId (Скрыть)
-		// sendToDepts -> sendContractAction:contractId (Отправить в другой отдел)(в отделе)
-		// chatDept -> contractChatAction:contractId,title (Чат договора)
-		// toArchive -> toarchivedata:objectNumber,title (Отправить в архив)
-		// sendToDeptsAll -> sendContractAction:contractId (Отправить в другой отдел) (все договоры)
-		// chat -> contractChatAction:contractId,title (Чат договора)
-		// returnToWork -> returnContractToWorkAction:contractId (Вернуть договор в работу)
 		
 	}
 	
@@ -1949,7 +1865,7 @@
 	
 	
 	
-	//-----------------------------------------------------------------------------------------------------
+	//----------------------------------------------------------------------------------------------------- Получение записей
 	
 	
 	function getList(settings) {
@@ -1984,6 +1900,8 @@
 		if (!append) {
 			offset = 0;
 			$(document).scrollTop(0);
+			lastChoosedRow = null;
+			selectedContracts.clear();
 		} else {
 			
 		}
@@ -2011,6 +1929,7 @@
 		params['search'] = search;
 		params['selection'] = selection;
 		params['edit_selection'] = editSelection;
+		params['selected_contracts'] = selectedContracts.items;
 		
 		
 		//-----------------------------------
@@ -2030,12 +1949,18 @@
 		abortCtrl = new AbortController();
 		axiosQuery('get', 'site/contracts', params, 'text', abortCtrl).then(({data, error, status, headers, abort}) => {
 			
+			console.log(headers);
+			
+			
 			if (error) {
 				$.notify(error.message, 'error');
 				return;
 			}
 			
 			const currentCount = headers ? headers['x-count-contracts-current'] : null;
+			const contractIds = headers ? headers['x-contracts-ids'] : null;
+			
+			loadedContractsIds.add(contractIds);
 			
 			if (append) {
 				if (currentCount) {
@@ -2067,8 +1992,6 @@
 			
 			if (currentCount) $('[stepprice]').number(true, 2, '.', ' ');
 			
-			
-			console.log(withCounts, headers);
 			
 			if (withCounts && headers) {
 				$('#chooserAll').find('[selectionscounts]').empty();
@@ -2110,7 +2033,15 @@
 	
 	
 	
-	//-------------------------------------------------------------------------------------------
+	
+	
+	
+	
+	
+	
+	
+	
+	//------------------------------------------------------------------------------------------- Вспомогательные функции
 	
 	
 	
@@ -2154,16 +2085,9 @@
 		});
 	}
 	
-	// $.doScrollPart = (target) => {
-	// 	
-	// 	
-	// 	
-	// 	//console.log(target);
-	// 	//offset += limit;
-	// 	//console.log(offset);
-	// 	//getList({append: true});
-	// }
 	
+	
+
 	
 	
 </script>

@@ -95,7 +95,7 @@ class Contract {
 		$offset = $request->get('offset', 0);
 		$selection = $request->get('selection', null);
 		$sortStep = strpos($sortField, ':') !== false ? (substr($sortField, strpos($sortField, ':') - strlen($sortField) + 1)) : null;
-		
+		$selectedContracts = request('selected_contracts', []);
 		
 		if (!$userId = auth('site')->user()->id) return false;
 		
@@ -167,7 +167,7 @@ class Contract {
 		$deadlinesContracts = $this->getSettings('contracts-deadlines');
 		$deadlinesSteps = $this->getSettings('steps-deadlines');
 		
-		$buildedData = $data->mapWithKeysMany(function($item) use($deadlinesContracts, $deadlinesSteps, $viewed, $pinned) {
+		$buildedData = $data->mapWithKeysMany(function($item) use($deadlinesContracts, $deadlinesSteps, $viewed, $pinned, $selectedContracts) {
 			if (!is_null($item['deadline_color_key'] )) {
 				$forcedColor = $deadlinesContracts[$item['deadline_color_key']]['color']?? null;
 				$forcedName = $deadlinesContracts[$item['deadline_color_key']]['name'] ?? '';
@@ -247,7 +247,7 @@ class Contract {
 				'has_deps_to_send'	=> $item['has_deps_to_send'] ?? null,
 				'ready_to_archive'	=> $item['hide_count'] != 0 && $item['hide_count'] == $item->departments->count(),
 				'messages_count'	=> $item['messages_count'] ?? 0,
-				//'selected'		=> in_array($item['id'], $selectedContracts),
+				'selected'			=> in_array($item['id'], $selectedContracts),
 				'selections'		=> $item->selections->pluck('id')->toArray() ?? [],
 				'departments' 		=> $departments
 			]];

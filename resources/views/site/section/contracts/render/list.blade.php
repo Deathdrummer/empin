@@ -2,11 +2,12 @@
 	@if(isset($append) && $append)
 		@foreach($list as $contract)
 			<x-table.tr
-				class="h5rem-4px"
+				class="h5rem-4px{{$contract['selected'] ? ' ddrtable__tr-selected' : ''}}"
 				ondblclick="$.openContractInfo(this, '{{$contract['id']}}');"
 				isnew="{{$contract['is_new'] ? 1 : 0}}"
 				contractid="{{$contract['id']}}"
 				contextmenu="contractContextMenu:{{$contract['id'] ?? ''}},{{$departmentId ?: '0'}},{{$selectionId ?: '0'}},{{$contract['object_number'] ?? ''}},{{$contract['title'] ?? ''}},{{$contract['has_deps_to_send'] ? '1' : '0'}},{{$contract['messages_count'] ?? '0'}},{{$rules}}"
+				:contractselected="$contract['selected']"
 				>
 				@include('site.section/contracts.render.row_common', $contract)
 				@include('site.section/contracts.render.row_departments', compact('contract', 'alldeps'))

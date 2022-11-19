@@ -5975,6 +5975,19 @@ window.ddrSplit = function () {
     return isInt(strItem) ? parseInt(strItem) : isFloat(strItem) ? parseFloat(strItem) : strItem;
   }
 };
+
+window.strPad = function (str) {
+  return str;
+};
+
+window.wordCase = function () {
+  var count = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+  var variants = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+  if (_.isNull(count) || _.isNull(variants)) return;
+  if (!_.isArray(variants)) variants = pregSplit(variants);
+  count = '' + count;
+  if (['11', '12', '13', '14'].indexOf(count) != -1 || ['5', '6', '7', '8', '9', '0'].indexOf(count.substr(-1)) != -1) return variants[2];else if (['2', '3', '4'].indexOf(count.substr(-1)) != -1) return variants[1];else if (count.substr(-1) == '1') return variants[0];
+};
 /*
 	события активной или неактивной вкладки сайта в брайзере
 		- коллбэк активной вкладки
@@ -6470,7 +6483,13 @@ window.setTagAttribute = function () {
         allAttrsValues += ' ' + attrNameItem + '="' + attrValueItem.join(joinSign) + '"';
       } else if (_.isArray(rulesItem)) {
         $.each(rulesItem, function (k, val) {
-          attrValueItem.push(val);
+          if (_.isPlainObject(val)) {
+            $.each(val, function (v, r) {
+              if (Boolean(r)) attrValueItem.push(v);
+            });
+          } else {
+            attrValueItem.push(val);
+          }
         });
         if (attrValueItem.length == 0) return '';
         allAttrsValues += ' ' + attrNameItem + '="' + attrValueItem.join(joinSign) + '"';
@@ -8162,7 +8181,7 @@ function createInstance(selectorOrElement, opts) {
     This will get assigned the <custom-element> containing the shadow DOM.
     This can potentially eventually become `positionedEl` (stored on the instance object).
     It is used for positioning purposes. See the explanation below where `positionedEl` is defined.
-     PLEASE NOTE - custom elements have a default display of `inline` which, for whatever reason,
+      PLEASE NOTE - custom elements have a default display of `inline` which, for whatever reason,
     can have negative effects on the calendar. This is only an issue if the calendar is attached
     directly to the shadow DOM and not nested within some other element in the shadow DOM.
     If this is your case and you notice weirdness (such as the calendar disappearing immediately after showing),
@@ -8218,14 +8237,14 @@ function createInstance(selectorOrElement, opts) {
     Otherwise, it will conditionally add `position: relative` styling to the parent.
     For instance, if datepicker's selector was 'body', there is no parent element to do any
     styling to. And there's nothing to position datepicker relative to. It will just be appended to the body.
-     This property also prevents `calculatePosition()` from doing anything.
+      This property also prevents `calculatePosition()` from doing anything.
     `noPosition` will false when using a shadow DOM.
   */
 
   var noPosition = el === document.body;
   /*
     `parent` is the element that datepicker will be attached to in the DOM.
-     In the case of `noPosition`, it will be the <body>. If datepicker was passed a top-level element
+      In the case of `noPosition`, it will be the <body>. If datepicker was passed a top-level element
     in the shadow DOM (meaning the element's direct parent IS the shadow DOM), the parent will be the
     shadow DOM. Otherwise, `parent` is assigned the parent of the element that was passed to datepicker
     in the first place (usually an <input>).
@@ -8238,9 +8257,9 @@ function createInstance(selectorOrElement, opts) {
     explicit positioning below via inline styles if it doesn't already have it. That positioning, if applied,
     will be removed (cleaned up) down the line. `calculatePosition` will use the coordinates for `positionedEl`
     and `el` to correctly position the calendar.
-     If `noPosition` is true, this value will be ignored further down the chain.
+      If `noPosition` is true, this value will be ignored further down the chain.
     If `parent` is a shadow DOM, this could be the custom element associated with that shadow DOM.
-     If the next element up the chain (el.parentElement) IS the shadow DOM, el.parentElement will be null
+      If the next element up the chain (el.parentElement) IS the shadow DOM, el.parentElement will be null
     since a shadow DOM isn't an element. Hence why we go even further up the chain and assign customElement.
   */
 
@@ -8673,7 +8692,7 @@ function renderCalendar(instance, date) {
     html is recreated here. To make the overlay fade out the same way it faded in,
     we need to create it with the appropriate classes (triggered by `overlayOpen`),
     then wait for the next repaint, triggering a fade out.
-     Good for IE >= 10.
+      Good for IE >= 10.
   */
 
   if (overlayOpen) window.requestAnimationFrame(function () {
@@ -13576,7 +13595,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, ".qs-datepicker-container {\n\tfont-size: 1.3rem;\n\tcolor: var(--ddr-fontColor);\n\tposition: absolute;\n\twidth: 15.625em;\n\tdisplay: flex;\n\tflex-direction: column;\n\tz-index: 9001;\n\t-webkit-user-select: none;\n\t-ms-user-select: none;\n\tuser-select: none;\n\tborder: 1px solid #ebf1f1;\n\tborder-radius: .263921875em;\n\toverflow: hidden;\n\tbackground: #fff;\n\tbox-shadow: 0 1.25em 1.25em -.9375em rgba(0,0,0,.3);\n}\n\n.qs-datepicker-container * {\n\tbox-sizing: border-box;\n}\n\n.qs-centered {\n\tposition: fixed;\n\ttop: 50%;\n\tleft: 50%;\n\ttransform: translate(-50%,-50%);\n}\n\n.qs-hidden {\n\tdisplay: none;\n}\n\n.qs-overlay {\n\tposition: absolute;\n\ttop: 0;\n\tleft: 0;\n\tbackground: rgba(0,0,0,.75);\n\tcolor: #fff;\n\twidth: 100%;\n\theight: 100%;\n\tpadding: .5em;\n\tz-index: 1;\n\topacity: 1;\n\ttransition: opacity .3s;\n\tdisplay: flex;\n\tflex-direction: column;\n}\n\n.qs-overlay.qs-hidden {\n\topacity: 0;\n\tz-index: -1;\n}\n\n.qs-overlay .qs-overlay-year {\n\tbackground: rgba(0,0,0,0);\n\tborder: none;\n\tborder-bottom: 1px solid #fff;\n\tborder-radius: 0;\n\tcolor: #fff;\n\tfont-size: .875em;\n\tpadding: .25em 0;\n\twidth: 80%;\n\ttext-align: center;\n\tmargin: 0 auto;\n\tdisplay: block;\n}\n\n.qs-overlay .qs-overlay-year::-webkit-inner-spin-button {\n\t-webkit-appearance: none;\n}\n\n.qs-overlay .qs-close {\n\tpadding: .5em;\n\tcursor: pointer;\n\tposition: absolute;\n\ttop: 0;\n\tright: 0;\n}\n\n.qs-overlay .qs-submit {\n\tborder: 1px solid #fff;\n\tborder-radius: .263921875em;\n\tpadding: .5em;\n\tmargin: 0 auto auto;\n\tcursor: pointer;\n\tbackground: hsla(0,0%,50.2%,.4);\n\tdisplay: none;\n}\n\n.qs-overlay .qs-submit.qs-disabled {\n\tcolor: grey;\n\tborder-color: grey;\n\tcursor: not-allowed;\n}\n\n.qs-overlay .qs-overlay-month-container {\n\tdisplay: flex;\n\tflex-wrap: wrap;\n\tflex-grow: 1;\n}\n\n.qs-overlay .qs-overlay-month {\n\tdisplay: flex;\n\tjustify-content: center;\n\talign-items: center;\n\twidth: calc(100% / 3);\n\tcursor: pointer;\n\topacity: .5;\n\ttransition: opacity .15s;\n}\n\n.qs-overlay .qs-overlay-month.active,.qs-overlay .qs-overlay-month:hover {\n\topacity: 1;\n}\n\n.qs-controls {\n\twidth: 100%;\n\tdisplay: flex;\n\tjustify-content: space-between;\n\talign-items: center;\n\tflex-grow: 1;\n\tflex-shrink: 0;\n\tbackground: #1bdbe0;\n\tfilter: blur(0);\n\ttransition: filter .3s;\n}\n\n.qs-controls.qs-blur {\n\tfilter: blur(5px);\n}\n\n.qs-arrow {\n\theight: 1.5625em;\n\twidth: 1.5625em;\n\tposition: relative;\n\tcursor: pointer;\n\tborder-radius: .263921875em;\n\ttransition: background .15s;\n}\n\n.qs-arrow:hover {\n\tbackground: rgba(0,0,0,.1);\n}\n\n.qs-arrow:hover.qs-left:after {\n\tborder-right-color: #000;\n}\n\n.qs-arrow:hover.qs-right:after {\n\tborder-left-color: #000;\n}\n\n.qs-arrow:after {\n\tcontent: \"\";\n\tborder: .390625em solid rgba(0,0,0,0);\n\tposition: absolute;\n\ttop: 50%;\n\ttransition: border .2s;\n}\n\n.qs-arrow.qs-left:after {\n\tborder-right-color: grey;\n\tright: 50%;\n\ttransform: translate(25%,-50%);\n}\n\n.qs-arrow.qs-right:after {\n\tborder-left-color: grey;\n\tleft: 50%;\n\ttransform: translate(-25%,-50%);\n}\n\n.qs-month-year {\n\tfont-weight: 700;\n\ttransition: border .2s;\n\tborder-bottom: 1px solid rgba(0,0,0,0);\n\tcursor: pointer;\n}\n\n.qs-month-year:hover {\n\tborder-bottom: 1px solid grey;\n}\n\n.qs-month-year:active:focus,.qs-month-year:focus {\n\toutline: none;\n}\n\n.qs-month {\n\tpadding-right: .5ex;\n}\n\n.qs-year {\n\tpadding-left: .5ex;\n}\n\n.qs-squares {\n\tdisplay: flex;\n\tflex-wrap: wrap;\n\tpadding: .3125em;\n\tfilter: blur(0);\n\ttransition: filter .3s;\n}\n\n.qs-squares.qs-blur {\n\tfilter: blur(5px);\n}\n\n.qs-square {\n\twidth: calc(100% / 7);\n\theight: 1.5625em;\n\tdisplay: flex;\n\talign-items: center;\n\tjustify-content: center;\n\tcursor: pointer;\n\ttransition: background .1s;\n\tborder-radius: .263921875em;\n}\n\n.qs-square:not(.qs-empty):not(.qs-disabled):not(.qs-day):not(.qs-active):hover {\n\tbackground: orange;\n}\n\n.qs-current {\n\tfont-weight: 700;\n\ttext-decoration: underline;\n}\n\n.qs-active,.qs-range-end,.qs-range-start {\n\tbackground: #add8e6;\n}\n\n.qs-range-start:not(.qs-range-6) {\n\tborder-top-right-radius: 0;\n\tborder-bottom-right-radius: 0;\n}\n\n.qs-range-middle {\n\tbackground: #d4ebf2;\n}\n\n.qs-range-middle:not(.qs-range-0):not(.qs-range-6) {\n\tborder-radius: 0;\n}\n\n.qs-range-middle.qs-range-0 {\n\tborder-top-right-radius: 0;\n\tborder-bottom-right-radius: 0;\n}\n\n.qs-range-end:not(.qs-range-0),.qs-range-middle.qs-range-6 {\n\tborder-top-left-radius: 0;\n\tborder-bottom-left-radius: 0;\n}\n\n.qs-disabled,.qs-outside-current-month {\n\topacity: .2;\n}\n\n.qs-disabled {\n\tcursor: not-allowed;\n}\n\n.qs-day,.qs-empty {\n\tcursor: default;\n}\n\n.qs-day {\n\tfont-weight: 700;\n\tcolor: grey;\n}\n\t\n.qs-num {\n\tcolor: grey;\n}\n\t\n.qs-event {\n\tposition: relative;\n}\n\n.qs-event:after {\n\tcontent: \"\";\n\tposition: absolute;\n\twidth: .46875em;\n\theight: .46875em;\n\tborder-radius: 50%;\n\tbackground: #07f;\n\tbottom: 0;\n\tright: 0;\n}", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, ".qs-datepicker-container {\r\n\tfont-size: 1.3rem;\r\n\tcolor: var(--ddr-fontColor);\r\n\tposition: absolute;\r\n\twidth: 15.625em;\r\n\tdisplay: flex;\r\n\tflex-direction: column;\r\n\tz-index: 9001;\r\n\t-webkit-user-select: none;\r\n\t-ms-user-select: none;\r\n\tuser-select: none;\r\n\tborder: 1px solid #ebf1f1;\r\n\tborder-radius: .263921875em;\r\n\toverflow: hidden;\r\n\tbackground: #fff;\r\n\tbox-shadow: 0 1.25em 1.25em -.9375em rgba(0,0,0,.3);\r\n}\r\n\r\n.qs-datepicker-container * {\r\n\tbox-sizing: border-box;\r\n}\r\n\r\n.qs-centered {\r\n\tposition: fixed;\r\n\ttop: 50%;\r\n\tleft: 50%;\r\n\ttransform: translate(-50%,-50%);\r\n}\r\n\r\n.qs-hidden {\r\n\tdisplay: none;\r\n}\r\n\r\n.qs-overlay {\r\n\tposition: absolute;\r\n\ttop: 0;\r\n\tleft: 0;\r\n\tbackground: rgba(0,0,0,.75);\r\n\tcolor: #fff;\r\n\twidth: 100%;\r\n\theight: 100%;\r\n\tpadding: .5em;\r\n\tz-index: 1;\r\n\topacity: 1;\r\n\ttransition: opacity .3s;\r\n\tdisplay: flex;\r\n\tflex-direction: column;\r\n}\r\n\r\n.qs-overlay.qs-hidden {\r\n\topacity: 0;\r\n\tz-index: -1;\r\n}\r\n\r\n.qs-overlay .qs-overlay-year {\r\n\tbackground: rgba(0,0,0,0);\r\n\tborder: none;\r\n\tborder-bottom: 1px solid #fff;\r\n\tborder-radius: 0;\r\n\tcolor: #fff;\r\n\tfont-size: .875em;\r\n\tpadding: .25em 0;\r\n\twidth: 80%;\r\n\ttext-align: center;\r\n\tmargin: 0 auto;\r\n\tdisplay: block;\r\n}\r\n\r\n.qs-overlay .qs-overlay-year::-webkit-inner-spin-button {\r\n\t-webkit-appearance: none;\r\n}\r\n\r\n.qs-overlay .qs-close {\r\n\tpadding: .5em;\r\n\tcursor: pointer;\r\n\tposition: absolute;\r\n\ttop: 0;\r\n\tright: 0;\r\n}\r\n\r\n.qs-overlay .qs-submit {\r\n\tborder: 1px solid #fff;\r\n\tborder-radius: .263921875em;\r\n\tpadding: .5em;\r\n\tmargin: 0 auto auto;\r\n\tcursor: pointer;\r\n\tbackground: hsla(0,0%,50.2%,.4);\r\n\tdisplay: none;\r\n}\r\n\r\n.qs-overlay .qs-submit.qs-disabled {\r\n\tcolor: grey;\r\n\tborder-color: grey;\r\n\tcursor: not-allowed;\r\n}\r\n\r\n.qs-overlay .qs-overlay-month-container {\r\n\tdisplay: flex;\r\n\tflex-wrap: wrap;\r\n\tflex-grow: 1;\r\n}\r\n\r\n.qs-overlay .qs-overlay-month {\r\n\tdisplay: flex;\r\n\tjustify-content: center;\r\n\talign-items: center;\r\n\twidth: calc(100% / 3);\r\n\tcursor: pointer;\r\n\topacity: .5;\r\n\ttransition: opacity .15s;\r\n}\r\n\r\n.qs-overlay .qs-overlay-month.active,.qs-overlay .qs-overlay-month:hover {\r\n\topacity: 1;\r\n}\r\n\r\n.qs-controls {\r\n\twidth: 100%;\r\n\tdisplay: flex;\r\n\tjustify-content: space-between;\r\n\talign-items: center;\r\n\tflex-grow: 1;\r\n\tflex-shrink: 0;\r\n\tbackground: #1bdbe0;\r\n\tfilter: blur(0);\r\n\ttransition: filter .3s;\r\n}\r\n\r\n.qs-controls.qs-blur {\r\n\tfilter: blur(5px);\r\n}\r\n\r\n.qs-arrow {\r\n\theight: 1.5625em;\r\n\twidth: 1.5625em;\r\n\tposition: relative;\r\n\tcursor: pointer;\r\n\tborder-radius: .263921875em;\r\n\ttransition: background .15s;\r\n}\r\n\r\n.qs-arrow:hover {\r\n\tbackground: rgba(0,0,0,.1);\r\n}\r\n\r\n.qs-arrow:hover.qs-left:after {\r\n\tborder-right-color: #000;\r\n}\r\n\r\n.qs-arrow:hover.qs-right:after {\r\n\tborder-left-color: #000;\r\n}\r\n\r\n.qs-arrow:after {\r\n\tcontent: \"\";\r\n\tborder: .390625em solid rgba(0,0,0,0);\r\n\tposition: absolute;\r\n\ttop: 50%;\r\n\ttransition: border .2s;\r\n}\r\n\r\n.qs-arrow.qs-left:after {\r\n\tborder-right-color: grey;\r\n\tright: 50%;\r\n\ttransform: translate(25%,-50%);\r\n}\r\n\r\n.qs-arrow.qs-right:after {\r\n\tborder-left-color: grey;\r\n\tleft: 50%;\r\n\ttransform: translate(-25%,-50%);\r\n}\r\n\r\n.qs-month-year {\r\n\tfont-weight: 700;\r\n\ttransition: border .2s;\r\n\tborder-bottom: 1px solid rgba(0,0,0,0);\r\n\tcursor: pointer;\r\n}\r\n\r\n.qs-month-year:hover {\r\n\tborder-bottom: 1px solid grey;\r\n}\r\n\r\n.qs-month-year:active:focus,.qs-month-year:focus {\r\n\toutline: none;\r\n}\r\n\r\n.qs-month {\r\n\tpadding-right: .5ex;\r\n}\r\n\r\n.qs-year {\r\n\tpadding-left: .5ex;\r\n}\r\n\r\n.qs-squares {\r\n\tdisplay: flex;\r\n\tflex-wrap: wrap;\r\n\tpadding: .3125em;\r\n\tfilter: blur(0);\r\n\ttransition: filter .3s;\r\n}\r\n\r\n.qs-squares.qs-blur {\r\n\tfilter: blur(5px);\r\n}\r\n\r\n.qs-square {\r\n\twidth: calc(100% / 7);\r\n\theight: 1.5625em;\r\n\tdisplay: flex;\r\n\talign-items: center;\r\n\tjustify-content: center;\r\n\tcursor: pointer;\r\n\ttransition: background .1s;\r\n\tborder-radius: .263921875em;\r\n}\r\n\r\n.qs-square:not(.qs-empty):not(.qs-disabled):not(.qs-day):not(.qs-active):hover {\r\n\tbackground: orange;\r\n}\r\n\r\n.qs-current {\r\n\tfont-weight: 700;\r\n\ttext-decoration: underline;\r\n}\r\n\r\n.qs-active,.qs-range-end,.qs-range-start {\r\n\tbackground: #add8e6;\r\n}\r\n\r\n.qs-range-start:not(.qs-range-6) {\r\n\tborder-top-right-radius: 0;\r\n\tborder-bottom-right-radius: 0;\r\n}\r\n\r\n.qs-range-middle {\r\n\tbackground: #d4ebf2;\r\n}\r\n\r\n.qs-range-middle:not(.qs-range-0):not(.qs-range-6) {\r\n\tborder-radius: 0;\r\n}\r\n\r\n.qs-range-middle.qs-range-0 {\r\n\tborder-top-right-radius: 0;\r\n\tborder-bottom-right-radius: 0;\r\n}\r\n\r\n.qs-range-end:not(.qs-range-0),.qs-range-middle.qs-range-6 {\r\n\tborder-top-left-radius: 0;\r\n\tborder-bottom-left-radius: 0;\r\n}\r\n\r\n.qs-disabled,.qs-outside-current-month {\r\n\topacity: .2;\r\n}\r\n\r\n.qs-disabled {\r\n\tcursor: not-allowed;\r\n}\r\n\r\n.qs-day,.qs-empty {\r\n\tcursor: default;\r\n}\r\n\r\n.qs-day {\r\n\tfont-weight: 700;\r\n\tcolor: grey;\r\n}\r\n\t\r\n.qs-num {\r\n\tcolor: grey;\r\n}\r\n\t\r\n.qs-event {\r\n\tposition: relative;\r\n}\r\n\r\n.qs-event:after {\r\n\tcontent: \"\";\r\n\tposition: absolute;\r\n\twidth: .46875em;\r\n\theight: .46875em;\r\n\tborder-radius: 50%;\r\n\tbackground: #07f;\r\n\tbottom: 0;\r\n\tright: 0;\r\n}", ""]);
 // Exports
 /* harmony default export */ __webpack_exports__["default"] = (___CSS_LOADER_EXPORT___);
 

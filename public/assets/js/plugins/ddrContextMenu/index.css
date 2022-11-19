@@ -1,224 +1,180 @@
 :root {
-	--bg: #24262d;
-	--text: #dfe3ff;
-	--color1: #624e7e;
-	--color2: #3c2b45;
-	--color1n: #ecf0f4;
-	--color2n: #fff;
-	--colorSub: #5d4d66;
-	--divider: rgba(255,255,255,0.16);
+	--cm-fontFamily: 'Roboto';
+	
+	--cm-mainBg: #fff;
+	--cm-subBg: #fff;
+	
+	--cm-mainBoxShadow: 0 0 20px -1px #0000004a;
+	--cm-subBoxShadow: 0 0 20px -1px #0000004a;
+	
+	--cm-mainBorderWidth: 2px;
+	--cm-subBorderWidth: 2px;
+	
+	--cm-mainBorderColor: rgb(204, 204, 204);
+	--cm-subBorderColor: rgb(204, 204, 204);
+	
+	--cm-mainItemHoverBg: rgb(222, 223, 229);
+	--cm-subItemHoverBg: rgb(222, 223, 229);
+	
+	--cm-mainItemActiveBg: #c2c4cf;
+	--cm-subItemActiveBg: #c2c4cf;
+	
+	--cm-mainIconColor: rgb(77, 77, 77);
+	--cm-subIconColor: rgb(77, 77, 77);
+	
+	--cm-mainFontColor: rgb(77, 77, 77);
+	--cm-subFontColor: rgb(77, 77, 77);
+	
+	--cm-hoverTransition: 0.1s;
+	
+	--cm-mainMenuPadding: 6px;
+	--cm-subMenuPadding: 6px;
+	
+	--cm-mainMenuRadius: 12px;
+	--cm-subMenuRadius: 12px;
+	
+	--cm-mainItemRadius: 8px;
+	--cm-subItemRadius: 8px;
+	
+	--cm-mainItemPadding: 15px;
+	--cm-subItemPadding: 15px;
+	
+	--cm-mainFontSize: 16px;
+	--cm-subFontSize: 16px;
+	
+	--cm-mainMinHeight: 38px;
+	--cm-subMinHeight: 38px;
+	
+	--cm-mainArrowSpace: 25px;
+	
+	--cm-showSubMenu: 0.2s;
+	--cm-hideSubMenu: 0.1s;
+	
+	--cm-divSpace: 20px;
 }
+	
+	
+	
+	
 
-.context {
-	padding: 0.05em 0.25em;
-	border: 1px solid transparent;
-	border-right-color: rgba(255, 255, 255, 0.15);
-	border-bottom-color: rgba(255, 255, 255, 0.15);
-	border-left-color: rgba(0, 0, 0, 0.15);
-	border-top-color: rgba(0, 0, 0, 0.15);
-	border-radius: 3px;
-	position: absolute;
-	min-width: 16em;
-	z-index: 10;
-	background: linear-gradient(145deg, var(--color1), var(--color2));
-	box-shadow: 0px 5px 5px -2px #1413213b;
-	will-change: transform, opacity, filter;
-	transition: transform, opacity, visibility, filter;
-	transition-duration: 0.3s, 0.2s, 0.4s, 0.3s;
-	transition-delay: 0.1s, 0s, 0.4s, 0.2s;
-	transition-timing-function: ease;
-	transform: rotate3d(-1, -1, 0, 10deg) scale(1);
-	transform-origin: 0 0;
-	opacity: 0;
-	visibility: hidden;
-	filter: blur(1px);
-}
-
-.context p,
-.context span,
-.context small,
-.context strong,
-.context a {
-	color: var(--text);
-}
-
-
-.context.is-visible {
-	opacity: 1;
-	transform: none;
-	transition-delay: 0s, 0s, 0s, 0s;
-	visibility: visible;
-	filter: none;
-}
-.context.sub {
-	background: var(--colorSub);
-	width: -webkit-max-content;
-	width: -moz-max-content;
-	width: max-content;
-	min-width: 10em;
+.ddrcontextmenu {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  will-change: opacity, pointer-events; }
+  .ddrcontextmenu li {
+	position: relative; }
+  .ddrcontextmenu_main {
+	background-color: var(--cm-mainBg);
+	padding-top: var(--cm-mainMenuPadding);
+	padding-bottom: var(--cm-mainMenuPadding);
+	border: var(--cm-mainBorderWidth) solid var(--cm-mainBorderColor);
+	border-radius: var(--cm-mainMenuRadius);
+	box-shadow: var(--cm-mainBoxShadow);
+	z-index: 130; }
+	.ddrcontextmenu_main-visible {
+	  opacity: 1;
+	  pointer-events: auto; }
+  .ddrcontextmenu_sub {
 	left: 100%;
-	top: -0.35em;
-	transform: translateX(0);
-	transition: transform, opacity, width, min-width, visibility;
-	transition-timing-function: ease;
-	transition-duration: 0.4s, 0.25s, 0.15s, 0.15s, 0.01s;
-	transition-delay: 0.4s, 0.25s, 0.3s, 0.3s, 0.35s;
-	overflow: hidden;
-	filter: none;
-}
-.context.sub .f {
-	transform: translateX(-2.25em);
-}
-.context.sub.oppositeX {
-	right: 100%;
-	left: auto;
-	transform: translateX(0.7em);
-}
-.context.sub.oppositeY {
-	top: auto;
-	bottom: -0.35em;
-}
-.context > li {
-	padding: 0.6em 2em 0.6em 0.5em;
-	border-radius: 3px;
+	top: calc(-1 * (var(--cm-subMenuPadding) + var(--cm-subBorderWidth)));
+	width: max-content;
+	background-color: var(--cm-subBg);
+	padding-top: var(--cm-subMenuPadding);
+	padding-bottom: var(--cm-subMenuPadding);
+	border: var(--cm-subBorderWidth) solid var(--cm-subBorderColor);
+	border-radius: var(--cm-subMenuRadius);
+	box-shadow: var(--cm-subBoxShadow);
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity var(--cm-hideSubMenu);
+	z-index: 131; }
+	.ddrcontextmenu_sub.oppositeX {
+	  right: 100%;
+	  left: auto; }
+	.ddrcontextmenu_sub.oppositeY {
+	  top: auto;
+	  bottom: calc(-1 * var(--cm-mainMenuPadding) - var(--cm-mainBorderWidth)); }
+  .ddrcontextmenu__item {
 	position: relative;
-	font-size: 14px;
-	line-height: 1em;
 	display: flex;
 	align-items: center;
-}
-.context > li:before {
-	content: "";
-	position: absolute;
-	left: 0;
-	top: 0;
-	bottom: 0;
-	right: 0;
-	border-radius: 3px;
-	z-index: -1;
-	background-color: rgba(97, 97, 97, 0.37);
-	mix-blend-mode: color-dodge;
-	transition: opacity 0.15s cubic-bezier(0.55, 0.06, 0.68, 0.19);
-	opacity: 0;
-}
-.context > li.hilight {
-	font-weight: 500;
-	color: white;
-}
-.context > li:not(.context > li.nope):hover {
-	color: white;
-}
-.context > li:not(.context > li.nope):hover:before {
-	opacity: 1;
-	transition: opacity 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-.context > li:not(.context > li.nope).parent:not(.loadingable):hover .sub {
-	opacity: 1;
-	transform: translateX(0);
-	transition-delay: 0.2s, 0.25s, 0.2s, 0.2s, 0s;
-	border-radius: 0 3px 3px 3px;
-	visibility: visible;
-}
-
-
-.context__sub-hover {
-	opacity: 1;
-	transform: translateX(0);
-	transition-delay: 0.2s, 0s, 0.2s, 0.2s, 0s;
-	border-radius: 3px;
-	visibility: visible;
-}
-
-
-.context > li:not(.context > li.nope):hover > .f, .context > li.hilight > .f, .context > li:not(.context > li.nope):hover > .icon, .context > li.hilight > .icon {
-	opacity: 1;
-}
-.context > li:last-child {
-	 margin-bottom: 0.25em;
-}
-.context > li:first-child {
-	margin-top: 0.25em;
-}
-
-.context > li.nope {
-	pointer-events: none;
-	opacity: 0.4;
-}
-.context > li.active {
-	/*-webkit-animation: flash 0.5s ease 1;
-		  animation: flash 0.5s ease 1;*/
-	background: rgba(255, 255, 255, 0.2);
-}
-
-.context > li .f {
-	font-size: 10px;
-	color: var(--text);
-	opacity: 0.5;
-	transition: all 0.2s ease;
-}
-.context > li .icon {
-	font-size: inherit;
-	color: var(--text);
-	margin-right: 8px;
-	opacity: 0.5;
-	transition: all 0.2s ease;
-}
-.context .divline {
-	border-bottom: 1px solid var(--divider);
-	padding: 0;
-	margin-top: 0.3em;
-	margin-bottom: 0.35em;
-}
-.context .f {
-	font-style: normal;
-	position: absolute;
-	transform: translateX(-2.4em);
-}
-.context .f[class*=chevron-right] {
-	right: 5px;
-	top: calc(50% - 6px);
-	transform: none;
-}
-
-
-/*
-@-webkit-keyframes flash {
-	0% {
-		background: rgba(255, 255, 255, 0);
-	}
-	7% {
-		background: rgba(255, 255, 255, 0.2);
-	}
-	14% {
-		background: rgba(255, 255, 255, 0);
-	}
-	21% {
-		background: rgba(255, 255, 255, 0.3);
-	}
-}
-
-@keyframes flash {
-	0% {
-		background: rgba(255, 255, 255, 0);
-	}
-	7% {
-		background: rgba(255, 255, 255, 0.2);
-	}
-	14% {
-		background: rgba(255, 255, 255, 0);
-	}
-	21% {
-		background: rgba(255, 255, 255, 0.3);
-	}
-}*/
-*,
-*:after,
-*:before {
-	box-sizing: border-box;
-}
-
-
-
-.hide {
-	display: none;
-}
+	justify-content: space-between;
+	font-size: var(--cm-mainFontSize);
+	padding-left: var(--cm-mainItemPadding);
+	padding-right: var(--cm-mainItemPadding);
+	margin-left: var(--cm-mainMenuPadding);
+	margin-right: var(--cm-mainMenuPadding);
+	max-width: 500px;
+	min-height: var(--cm-mainMinHeight);
+	border-radius: var(--cm-mainItemRadius);
+	will-change: background-color;
+	width: 100%; }
+	.ddrcontextmenu__item .icon {
+	  flex: 1 0 auto;
+	  margin-right: 8px;
+	  font-size: inherit; }
+	  .ddrcontextmenu__item .icon i {
+		font-size: inherit;
+		color: var(--cm-mainIconColor); }
+	.ddrcontextmenu__item .text {
+	  font-family: 'Roboto', sans-serif;
+	  word-break: break-word;
+	  font-size: inherit;
+	  line-height: 0.9em;
+	  display: block;
+	  width: 100%; }
+	.ddrcontextmenu__item .arrow {
+	  flex: 1 0 var(--cm-mainArrowSpace);
+	  text-align: right; }
+	  .ddrcontextmenu__item .arrow i {
+		font-size: 0.8em;
+		color: var(--cm-mainIconColor); }
+	.ddrcontextmenu__item-hovered:not(.ddrcontextmenu__item-disabled) {
+	  background-color: var(--cm-mainItemHoverBg);
+	  transition: background-color var(--cm-hoverTransition); }
+	  .ddrcontextmenu__item-hovered:not(.ddrcontextmenu__item-disabled) ~ .ddrcontextmenu_sub {
+		opacity: 1;
+		pointer-events: auto;
+		transition: opacity var(--cm-showSubMenu); }
+	.ddrcontextmenu__item:active:not(.ddrcontextmenu__item-disabled):not(.ddrcontextmenu__item_parent):not(.ddrcontextmenu__item-loadingable) {
+	  background-color: var(--cm-mainItemActiveBg);
+	  transition: background-color 0s; }
+	.ddrcontextmenu__item-disabled .icon i {
+	  color: #e3e8ed; }
+	.ddrcontextmenu__item-disabled .text {
+	  color: #cfd3d7; }
+	.ddrcontextmenu__item-disabled .arrow {
+	  color: #cfd3d7; }
+	.ddrcontextmenu__item-loadingable {
+	  min-width: calc(4 * var(--cm-subMinHeight));
+	  justify-content: center; }
+	  .ddrcontextmenu__item-loadingable .ddrcontextloadingicon {
+		min-width: 20px;
+		min-height: 20px;
+		width: calc(var(--cm-subMinHeight) - var(--cm-subMenuPadding));
+		height: calc(var(--cm-subMinHeight) - var(--cm-subMenuPadding)); }
+	.ddrcontextmenu__item_single .text {
+	  padding-right: var(--cm-mainArrowSpace); }
+	.ddrcontextmenu__item_sub {
+	  font-size: var(--cm-subFontSize);
+	  min-height: var(--cm-subMinHeight);
+	  border-radius: var(--cm-subItemRadius);
+	  padding-left: var(--cm-subItemPadding);
+	  padding-right: var(--cm-subItemPadding);
+	  margin-left: var(--cm-subMenuPadding);
+	  margin-right: var(--cm-subMenuPadding);
+	  will-change: background-color; }
+	  .ddrcontextmenu__item_sub:not(.ddrcontextmenu__item-disabled) .icon i {
+		color: var(--cm-subIconColor); }
+	  .ddrcontextmenu__item_sub:hover:not(.ddrcontextmenu__item-disabled):not(.ddrcontextmenu__item-loadingable) {
+		background-color: var(--cm-subItemHoverBg);
+		transition: background-color var(--cm-hoverTransition); }
+  .ddrcontextmenu__divline {
+	height: 1px;
+	background-color: var(--cm-mainBg);
+	filter: brightness(80%) contrast(140%);
+	margin-top: calc(var(--cm-divSpace) / 2);
+	margin-bottom: calc(var(--cm-divSpace) / 2);
+	margin-left: calc(var(--cm-subMenuPadding) + (var(--cm-mainItemRadius)));
+	margin-right: calc(var(--cm-subMenuPadding) + (var(--cm-mainItemRadius))); }
