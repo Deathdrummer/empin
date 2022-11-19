@@ -213,6 +213,7 @@
 		
 	getList({init: true});
 	
+	// 1
 	
 	$.getListAction = (btn, isActive, list) => {
 		if (isActive) return false;
