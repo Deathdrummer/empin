@@ -214,6 +214,7 @@
 	getList({init: true});
 	
 	// 1
+	// 2 with tag
 	
 	$.getListAction = (btn, isActive, list) => {
 		if (isActive) return false;
