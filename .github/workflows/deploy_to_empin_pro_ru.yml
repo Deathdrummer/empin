@@ -1,7 +1,7 @@
 on:
   push:
     tags:
-      - 'to_site'
+      - to_site
 name: Публикация на empin-pro.ru
 jobs:
   FTP-Deploy-Action:
