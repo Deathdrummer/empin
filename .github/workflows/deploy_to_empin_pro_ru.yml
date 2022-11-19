@@ -1,11 +1,11 @@
 on: push
-if: "contains(github.event.head_commit.message, '--UPLOAD')" 
-  
+
 name: Публикация на empin-pro.ru
 jobs:
   FTP-Deploy-Action:
     name: SSH-Deploy
     runs-on: ubuntu-latest
+    if: "contains(github.event.head_commit.message, '--UPLOAD')"
     steps:
     - uses: actions/checkout@v2.1.0
       with:
