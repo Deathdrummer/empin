@@ -215,8 +215,10 @@
 	
 	// 1
 	// 2 with tag
-	
 	// 3 with tag
+	// 4 with --UPLOAD
+	
+	
 	$.getListAction = (btn, isActive, list) => {
 		if (isActive) return false;
 		currentList = list;
