@@ -1,4 +1,7 @@
-on: push
+on:
+  push:
+    branches:
+      - main
 name: Публикация на empin-pro.ru
 jobs:
   FTP-Deploy-Action:
