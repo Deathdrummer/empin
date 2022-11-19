@@ -220,6 +220,7 @@
 	// 5 with --UPLOAD
 	// 6 with --UPLOAD
 	// 7 with --UPLOAD
+	// 8 with --UPLOAD
 	
 	$.getListAction = (btn, isActive, list) => {
 		if (isActive) return false;
