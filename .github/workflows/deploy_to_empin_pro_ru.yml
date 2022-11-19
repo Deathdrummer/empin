@@ -1,5 +1,4 @@
 on: push
-
 name: Публикация на empin-pro.ru
 jobs:
   FTP-Deploy-Action:
