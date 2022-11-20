@@ -108,8 +108,7 @@
 	max-width: 500px;
 	min-height: var(--cm-mainMinHeight);
 	border-radius: var(--cm-mainItemRadius);
-	will-change: background-color;
-	width: 100%; }
+	will-change: background-color; }
 	.ddrcontextmenu__item .icon {
 	  flex: 1 0 auto;
 	  margin-right: 8px;
