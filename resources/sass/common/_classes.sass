@@ -947,6 +947,15 @@ $tableColor: #efefef
 			
 			&_visible
 				visibility: visible
+			
+			&:nth-child(odd):not(.clear):not(.ddrtable__tr-selected)
+				background-color: #fff
+			
+			&:nth-child(even):not(.clear):not(.ddrtable__tr-selected)
+				background-color: #fdfdfd
+		
+			&-selected
+				background-color: #e5ddf3
 		
 		&:empty
 			height: 60px
@@ -973,16 +982,6 @@ $tableColor: #efefef
 			overflow-y: scroll
 			//padding-right: 6px
 		
-		.ddrtable__tr
-			&:nth-child(odd):not(.clear):not(.ddrtable__tr-selected)
-				background-color: #fff
-			
-			&:nth-child(even):not(.clear):not(.ddrtable__tr-selected)
-				background-color: #fdfdfd
-		
-			&-selected
-				background-color: #e5ddf3
-	
 	&__tr
 		display: flex
 		flex-wrap: nowrap

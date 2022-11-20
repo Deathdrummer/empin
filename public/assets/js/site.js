@@ -8157,6 +8157,29 @@ $(document).on('contextmenu', '[contextmenu]', function (e) {
     onContextMenu: function onContextMenu() {
       var callback = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
       if (!_.isNull(callback) && _.isFunction(callback)) callback();
+    },
+    buildTitle: function buildTitle() {
+      var count = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+      var one = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+      var many = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+      var wordVariants = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
+      // сформировать заголовок исходя из кол-ва выбранных элементов
+      if (_.isNull(count) || _.isNull(one)) return;
+      var oneWithoutNum = false;
+
+      if (_.isNull(wordVariants)) {
+        wordVariants = many;
+        many = one;
+        oneWithoutNum = true;
+      }
+
+      var word = wordCase(count, wordVariants);
+
+      if (count > 1) {
+        return many.replaceAll(/%/ig, word).replaceAll(/#/ig, count);
+      }
+
+      return one.replaceAll(/%/ig, word).replaceAll(/\s*#\s*/ig, oneWithoutNum ? ' ' : count);
     }
   }; // Вызвать функцию построения меню
 
@@ -8251,6 +8274,9 @@ function _buildMenuHtml() {
         bSort = b.sort || 0;
     return aSort - bSort;
   });
+  var hasChilds = menuData.some(function (item) {
+    return item.children || item.load;
+  });
   var funcMap = {};
   var menuHtml = '<ul class="ddrcontextmenu ddrcontextmenu_main noselect">';
   $.each(menuData, function (k, item) {
@@ -8273,6 +8299,8 @@ function _buildMenuHtml() {
       }, {
         'ddrcontextmenu__item_single': !item.children && !item.load
       }, {
+        'ddrcontextmenu__item_rowed': hasChilds
+      }, {
         'ddrcontextmenu__item-disabled': item.enabled != undefined && !item.enabled || item.disabled != undefined && item.disabled
       }
       /*{'ddrcontextmenu__item-loadingable': item.load && !item.children}*/
@@ -8290,7 +8318,7 @@ function _buildMenuHtml() {
       menuHtml += '<div class="icon"><i class="fa-fw ' + item.faIcon + '"></i></div>';
     }
 
-    menuHtml += '<p class="text">' + strPad(item.name, 110, '...') + '</p>';
+    menuHtml += '<div class="text"><p>' + strPad(item.name, 110, '...') + '</p></div>';
 
     if (item.children || item.load) {
       menuHtml += '<div class="arrow"><i class="fa-solid fa-chevron-right"></i></div>';
@@ -8325,7 +8353,7 @@ function _buildMenuHtml() {
         menuHtml += '<li>';
         menuHtml += '<div' + childItemAttrs + '>';
         if (childItem.faIcon) menuHtml += '<div class="icon"><i class="fa-fw ' + childItem.faIcon + '"></i></div>';
-        menuHtml += '<p class="text">' + strPad(childItem.name, 110, '...') + '</p>';
+        menuHtml += '<div class="text"><p>' + strPad(childItem.name, 110, '...') + '</p></div>';
         menuHtml += '</div>';
         menuHtml += '</li>';
       });
@@ -8365,7 +8393,7 @@ function _loadSubmenu() {
       return item;
     },
     sortBy: 'sort',
-    empty: '<li class="ddrcontextmenu__item ddrcontextmenu__item_sub ddrcontextmenu__item-loadingable"> <p class="text">Пусто</p></li>'
+    empty: '<li class="ddrcontextmenu__item ddrcontextmenu__item_sub ddrcontextmenu__item-loadingable"><div class="text"><p>Пусто</p></div></li>'
   }, funcData),
       url = _$assign.url,
       method = _$assign.method,
@@ -8420,7 +8448,7 @@ function _loadSubmenu() {
       subMenuHtml += '<li>';
       subMenuHtml += '<div' + childItemAttrs + '>';
       if (childItem.faIcon) subMenuHtml += '<div class="icon"><i class="fa-fw ' + childItem.faIcon + '"></i></div>';
-      subMenuHtml += '<p class="text">' + strPad(childItem.name, 110, '...') + '</p>';
+      subMenuHtml += '<div class="text"><p>' + strPad(childItem.name, 110, '...') + '</p></div>';
       subMenuHtml += '</div>';
       subMenuHtml += '</li>';
     });
@@ -14218,7 +14246,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, ":root {\r\n\t--cm-fontFamily: 'Roboto';\r\n\t\r\n\t--cm-mainBg: #fff;\r\n\t--cm-subBg: #fff;\r\n\t\r\n\t--cm-mainBoxShadow: 0 0 20px -1px #0000004a;\r\n\t--cm-subBoxShadow: 0 0 20px -1px #0000004a;\r\n\t\r\n\t--cm-mainBorderWidth: 2px;\r\n\t--cm-subBorderWidth: 2px;\r\n\t\r\n\t--cm-mainBorderColor: rgb(204, 204, 204);\r\n\t--cm-subBorderColor: rgb(204, 204, 204);\r\n\t\r\n\t--cm-mainItemHoverBg: rgb(222, 223, 229);\r\n\t--cm-subItemHoverBg: rgb(222, 223, 229);\r\n\t\r\n\t--cm-mainItemActiveBg: #c2c4cf;\r\n\t--cm-subItemActiveBg: #c2c4cf;\r\n\t\r\n\t--cm-mainIconColor: rgb(77, 77, 77);\r\n\t--cm-subIconColor: rgb(77, 77, 77);\r\n\t\r\n\t--cm-mainFontColor: rgb(77, 77, 77);\r\n\t--cm-subFontColor: rgb(77, 77, 77);\r\n\t\r\n\t--cm-hoverTransition: 0.1s;\r\n\t\r\n\t--cm-mainMenuPadding: 6px;\r\n\t--cm-subMenuPadding: 6px;\r\n\t\r\n\t--cm-mainMenuRadius: 12px;\r\n\t--cm-subMenuRadius: 12px;\r\n\t\r\n\t--cm-mainItemRadius: 8px;\r\n\t--cm-subItemRadius: 8px;\r\n\t\r\n\t--cm-mainItemPadding: 15px;\r\n\t--cm-subItemPadding: 15px;\r\n\t\r\n\t--cm-mainFontSize: 16px;\r\n\t--cm-subFontSize: 16px;\r\n\t\r\n\t--cm-mainMinHeight: 38px;\r\n\t--cm-subMinHeight: 38px;\r\n\t\r\n\t--cm-mainArrowSpace: 25px;\r\n\t\r\n\t--cm-showSubMenu: 0.2s;\r\n\t--cm-hideSubMenu: 0.1s;\r\n\t\r\n\t--cm-divSpace: 20px;\r\n}\r\n\t\r\n\t\r\n\t\r\n\t\r\n\r\n.ddrcontextmenu {\r\n  position: absolute;\r\n  opacity: 0;\r\n  pointer-events: none;\r\n  will-change: opacity, pointer-events; }\r\n  .ddrcontextmenu li {\r\n\tposition: relative; }\r\n  .ddrcontextmenu_main {\r\n\tbackground-color: var(--cm-mainBg);\r\n\tpadding-top: var(--cm-mainMenuPadding);\r\n\tpadding-bottom: var(--cm-mainMenuPadding);\r\n\tborder: var(--cm-mainBorderWidth) solid var(--cm-mainBorderColor);\r\n\tborder-radius: var(--cm-mainMenuRadius);\r\n\tbox-shadow: var(--cm-mainBoxShadow);\r\n\tz-index: 130; }\r\n\t.ddrcontextmenu_main-visible {\r\n\t  opacity: 1;\r\n\t  pointer-events: auto; }\r\n  .ddrcontextmenu_sub {\r\n\tleft: 100%;\r\n\ttop: calc(-1 * (var(--cm-subMenuPadding) + var(--cm-subBorderWidth)));\r\n\twidth: max-content;\r\n\tbackground-color: var(--cm-subBg);\r\n\tpadding-top: var(--cm-subMenuPadding);\r\n\tpadding-bottom: var(--cm-subMenuPadding);\r\n\tborder: var(--cm-subBorderWidth) solid var(--cm-subBorderColor);\r\n\tborder-radius: var(--cm-subMenuRadius);\r\n\tbox-shadow: var(--cm-subBoxShadow);\r\n\topacity: 0;\r\n\tpointer-events: none;\r\n\ttransition: opacity var(--cm-hideSubMenu);\r\n\tz-index: 131; }\r\n\t.ddrcontextmenu_sub.oppositeX {\r\n\t  right: 100%;\r\n\t  left: auto; }\r\n\t.ddrcontextmenu_sub.oppositeY {\r\n\t  top: auto;\r\n\t  bottom: calc(-1 * var(--cm-mainMenuPadding) - var(--cm-mainBorderWidth)); }\r\n  .ddrcontextmenu__item {\r\n\tposition: relative;\r\n\tdisplay: flex;\r\n\talign-items: center;\r\n\tjustify-content: space-between;\r\n\tfont-size: var(--cm-mainFontSize);\r\n\tpadding-left: var(--cm-mainItemPadding);\r\n\tpadding-right: var(--cm-mainItemPadding);\r\n\tmargin-left: var(--cm-mainMenuPadding);\r\n\tmargin-right: var(--cm-mainMenuPadding);\r\n\tmax-width: 500px;\r\n\tmin-height: var(--cm-mainMinHeight);\r\n\tborder-radius: var(--cm-mainItemRadius);\r\n\twill-change: background-color; }\r\n\t.ddrcontextmenu__item .icon {\r\n\t  flex: 1 0 auto;\r\n\t  margin-right: 8px;\r\n\t  font-size: inherit; }\r\n\t  .ddrcontextmenu__item .icon i {\r\n\t\tfont-size: inherit;\r\n\t\tcolor: var(--cm-mainIconColor); }\r\n\t.ddrcontextmenu__item .text {\r\n\t  font-family: 'Roboto', sans-serif;\r\n\t  word-break: break-word;\r\n\t  font-size: inherit;\r\n\t  line-height: 0.9em;\r\n\t  display: block;\r\n\t  width: 100%; }\r\n\t.ddrcontextmenu__item .arrow {\r\n\t  flex: 1 0 var(--cm-mainArrowSpace);\r\n\t  text-align: right; }\r\n\t  .ddrcontextmenu__item .arrow i {\r\n\t\tfont-size: 0.8em;\r\n\t\tcolor: var(--cm-mainIconColor); }\r\n\t.ddrcontextmenu__item-hovered:not(.ddrcontextmenu__item-disabled) {\r\n\t  background-color: var(--cm-mainItemHoverBg);\r\n\t  transition: background-color var(--cm-hoverTransition); }\r\n\t  .ddrcontextmenu__item-hovered:not(.ddrcontextmenu__item-disabled) ~ .ddrcontextmenu_sub {\r\n\t\topacity: 1;\r\n\t\tpointer-events: auto;\r\n\t\ttransition: opacity var(--cm-showSubMenu); }\r\n\t.ddrcontextmenu__item:active:not(.ddrcontextmenu__item-disabled):not(.ddrcontextmenu__item_parent):not(.ddrcontextmenu__item-loadingable) {\r\n\t  background-color: var(--cm-mainItemActiveBg);\r\n\t  transition: background-color 0s; }\r\n\t.ddrcontextmenu__item-disabled .icon i {\r\n\t  color: #e3e8ed; }\r\n\t.ddrcontextmenu__item-disabled .text {\r\n\t  color: #cfd3d7; }\r\n\t.ddrcontextmenu__item-disabled .arrow i {\r\n\t  color: #cfd3d7; }\r\n\t.ddrcontextmenu__item-loadingable {\r\n\t  min-width: calc(4 * var(--cm-subMinHeight));\r\n\t  justify-content: center; }\r\n\t  .ddrcontextmenu__item-loadingable .ddrcontextloadingicon {\r\n\t\tmin-width: 20px;\r\n\t\tmin-height: 20px;\r\n\t\twidth: calc(var(--cm-subMinHeight) - var(--cm-subMenuPadding));\r\n\t\theight: calc(var(--cm-subMinHeight) - var(--cm-subMenuPadding)); }\r\n\t.ddrcontextmenu__item_single .text {\r\n\t  padding-right: var(--cm-mainArrowSpace); }\r\n\t.ddrcontextmenu__item_sub {\r\n\t  font-size: var(--cm-subFontSize);\r\n\t  min-height: var(--cm-subMinHeight);\r\n\t  border-radius: var(--cm-subItemRadius);\r\n\t  padding-left: var(--cm-subItemPadding);\r\n\t  padding-right: var(--cm-subItemPadding);\r\n\t  margin-left: var(--cm-subMenuPadding);\r\n\t  margin-right: var(--cm-subMenuPadding);\r\n\t  will-change: background-color; }\r\n\t  .ddrcontextmenu__item_sub:not(.ddrcontextmenu__item-disabled) .icon i {\r\n\t\tcolor: var(--cm-subIconColor); }\r\n\t  .ddrcontextmenu__item_sub:hover:not(.ddrcontextmenu__item-disabled):not(.ddrcontextmenu__item-loadingable) {\r\n\t\tbackground-color: var(--cm-subItemHoverBg);\r\n\t\ttransition: background-color var(--cm-hoverTransition); }\r\n  .ddrcontextmenu__divline {\r\n\theight: 1px;\r\n\tbackground-color: var(--cm-mainBg);\r\n\tfilter: brightness(80%) contrast(140%);\r\n\tmargin-top: calc(var(--cm-divSpace) / 2);\r\n\tmargin-bottom: calc(var(--cm-divSpace) / 2);\r\n\tmargin-left: calc(var(--cm-subMenuPadding) + (var(--cm-mainItemRadius)));\r\n\tmargin-right: calc(var(--cm-subMenuPadding) + (var(--cm-mainItemRadius))); }\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, ":root {\r\n\t--cm-fontFamily: 'Roboto';\r\n\t\r\n\t--cm-mainBg: #fff;\r\n\t--cm-subBg: #fff;\r\n\t\r\n\t--cm-mainBoxShadow: 0 0 20px -1px #0000004a;\r\n\t--cm-subBoxShadow: 0 0 20px -1px #0000004a;\r\n\t\r\n\t--cm-mainBorderWidth: 2px;\r\n\t--cm-subBorderWidth: 2px;\r\n\t\r\n\t--cm-mainBorderColor: rgb(204, 204, 204);\r\n\t--cm-subBorderColor: rgb(204, 204, 204);\r\n\t\r\n\t--cm-mainItemHoverBg: rgb(222, 223, 229);\r\n\t--cm-subItemHoverBg: rgb(222, 223, 229);\r\n\t\r\n\t--cm-mainItemActiveBg: #c2c4cf;\r\n\t--cm-subItemActiveBg: #c2c4cf;\r\n\t\r\n\t--cm-mainIconColor: rgb(77, 77, 77);\r\n\t--cm-subIconColor: rgb(77, 77, 77);\r\n\t\r\n\t--cm-mainFontColor: rgb(77, 77, 77);\r\n\t--cm-subFontColor: rgb(77, 77, 77);\r\n\t\r\n\t--cm-hoverTransition: 0.1s;\r\n\t\r\n\t--cm-mainMenuPadding: 6px;\r\n\t--cm-subMenuPadding: 6px;\r\n\t\r\n\t--cm-mainMenuRadius: 12px;\r\n\t--cm-subMenuRadius: 12px;\r\n\t\r\n\t--cm-mainItemRadius: 8px;\r\n\t--cm-subItemRadius: 8px;\r\n\t\r\n\t--cm-mainItemPadding: 15px;\r\n\t--cm-subItemPadding: 15px;\r\n\t\r\n\t--cm-mainFontSize: 16px;\r\n\t--cm-subFontSize: 16px;\r\n\t\r\n\t--cm-mainMinHeight: 38px;\r\n\t--cm-subMinHeight: 38px;\r\n\t\r\n\t--cm-mainArrowSpace: 25px;\r\n\t\r\n\t--cm-showSubMenu: 0.2s;\r\n\t--cm-hideSubMenu: 0.1s;\r\n\t\r\n\t--cm-divSpace: 20px;\r\n}\r\n\t\r\n\t\r\n\t\r\n\t\r\n\r\n.ddrcontextmenu {\r\n\tposition: absolute;\r\n\topacity: 0;\r\n\tpointer-events: none;\r\n\twill-change: opacity, pointer-events;\r\n}\r\n\r\n\t.ddrcontextmenu li {\r\n\t\tposition: relative;\r\n\t}\r\n\r\n\t.ddrcontextmenu_main {\r\n\t\tbackground-color: var(--cm-mainBg);\r\n\t\tpadding-top: var(--cm-mainMenuPadding);\r\n\t\tpadding-bottom: var(--cm-mainMenuPadding);\r\n\t\tborder: var(--cm-mainBorderWidth) solid var(--cm-mainBorderColor);\r\n\t\tborder-radius: var(--cm-mainMenuRadius);\r\n\t\tbox-shadow: var(--cm-mainBoxShadow);\r\n\t\tz-index: 130;\r\n\t}\r\n\r\n\t\t.ddrcontextmenu_main-visible {\r\n\t\t\topacity: 1;\r\n\t\t\tpointer-events: auto;\r\n\t\t}\r\n\r\n\t.ddrcontextmenu_sub {\r\n\t\tleft: 100%;\r\n\t\ttop: calc(-1 * (var(--cm-subMenuPadding) + var(--cm-subBorderWidth)));\r\n\t\twidth: max-content;\r\n\t\tbackground-color: var(--cm-subBg);\r\n\t\tpadding-top: var(--cm-subMenuPadding);\r\n\t\tpadding-bottom: var(--cm-subMenuPadding);\r\n\t\tborder: var(--cm-subBorderWidth) solid var(--cm-subBorderColor);\r\n\t\tborder-radius: var(--cm-subMenuRadius);\r\n\t\tbox-shadow: var(--cm-subBoxShadow);\r\n\t\topacity: 0;\r\n\t\tpointer-events: none;\r\n\t\ttransition: opacity var(--cm-hideSubMenu);\r\n\t\tz-index: 131;\r\n\t}\r\n\r\n\t\t.ddrcontextmenu_sub.oppositeX {\r\n\t\t\tright: 100%;\r\n\t\t\tleft: auto;\r\n\t\t}\r\n\r\n\t\t.ddrcontextmenu_sub.oppositeY {\r\n\t\t\ttop: auto;\r\n\t\t\tbottom: calc(-1 * var(--cm-mainMenuPadding) - var(--cm-mainBorderWidth));\r\n\t\t}\r\n\r\n\t.ddrcontextmenu__item {\r\n\t\tposition: relative;\r\n\t\tdisplay: flex;\r\n\t\talign-items: center;\r\n\t\tjustify-content: space-between;\r\n\t\tfont-size: var(--cm-mainFontSize);\r\n\t\tpadding-left: var(--cm-mainItemPadding);\r\n\t\tpadding-right: var(--cm-mainItemPadding);\r\n\t\tmargin-left: var(--cm-mainMenuPadding);\r\n\t\tmargin-right: var(--cm-mainMenuPadding);\r\n\t\tmax-width: 500px;\r\n\t\tmin-height: var(--cm-mainMinHeight);\r\n\t\tborder-radius: var(--cm-mainItemRadius);\r\n\t\twill-change: background-color;\r\n\t}\r\n\r\n\t\t.ddrcontextmenu__item .icon {\r\n\t\t\tflex: 0 0 20px;\r\n\t\t\tmargin-right: 8px;\r\n\t\t\tfont-size: inherit;\r\n\t\t}\r\n\r\n\t\t\t.ddrcontextmenu__item .icon i {\r\n\t\t\t\tfont-size: inherit;\r\n\t\t\t\tcolor: var(--cm-mainIconColor);\r\n\t\t\t}\r\n\r\n\t\t.ddrcontextmenu__item .text {\r\n\t\t\tword-break: break-word;\r\n\t\t\tfont-size: inherit;\r\n\t\t\tdisplay: block;\r\n\t\t\tmax-width: 100%;\r\n\t\t\tflex: 1 1 auto;\r\n\t\t}\r\n\t\t\t.ddrcontextmenu__item .text p {\r\n\t\t\t\tfont-family: 'Roboto', sans-serif;\r\n\t\t\t\tfont-size: inherit;\r\n\t\t\t\tline-height: 0.9em;\r\n\t\t\t\tcolor: var(--cm-mainFontColor);\r\n\t\t\t}\r\n\r\n\t\t.ddrcontextmenu__item .arrow {\r\n\t\t\t/*flex: 1 0 var(--cm-mainArrowSpace);*/\r\n\t\t\twidth: var(--cm-mainArrowSpace);\r\n\t\t\ttext-align: right;\r\n\t\t\tposition: absolute;\r\n\t\t\tright: var(--cm-mainItemPadding);\r\n\t\t}\r\n\r\n\t\t\t.ddrcontextmenu__item .arrow i {\r\n\t\t\t\tfont-size: 0.8em;\r\n\t\t\t\tcolor: var(--cm-mainIconColor);\r\n\t\t\t}\r\n\r\n\t\t.ddrcontextmenu__item-hovered:not(.ddrcontextmenu__item-disabled) {\r\n\t\t\tbackground-color: var(--cm-mainItemHoverBg);\r\n\t\t\ttransition: background-color var(--cm-hoverTransition);\r\n\t\t}\r\n\r\n\t\t.ddrcontextmenu__item-hovered:not(.ddrcontextmenu__item-disabled)~.ddrcontextmenu_sub {\r\n\t\t\topacity: 1;\r\n\t\t\tpointer-events: auto;\r\n\t\t\ttransition: opacity var(--cm-showSubMenu);\r\n\t\t}\r\n\r\n\t\t.ddrcontextmenu__item:active:not(.ddrcontextmenu__item-disabled):not(.ddrcontextmenu__item_parent):not(.ddrcontextmenu__item-loadingable) {\r\n\t\t\tbackground-color: var(--cm-mainItemActiveBg);\r\n\t\t\ttransition: background-color 0s;\r\n\t\t}\r\n\r\n\t\t.ddrcontextmenu__item-disabled .icon i {\r\n\t\t\tcolor: #e3e8ed;\r\n\t\t}\r\n\r\n\t\t.ddrcontextmenu__item-disabled .text p {\r\n\t\t\tcolor: #cfd3d7;\r\n\t\t}\r\n\r\n\t\t.ddrcontextmenu__item-disabled .arrow i {\r\n\t\t\tcolor: #cfd3d7;\r\n\t\t}\r\n\r\n\t\t.ddrcontextmenu__item-loadingable {\r\n\t\t\tmin-width: calc(4 * var(--cm-subMinHeight));\r\n\t\t\tjustify-content: center;\r\n\t\t}\r\n\r\n\t\t\t.ddrcontextmenu__item-loadingable .ddrcontextloadingicon {\r\n\t\t\t\tmin-width: 20px;\r\n\t\t\t\tmin-height: 20px;\r\n\t\t\t\twidth: calc(var(--cm-subMinHeight) - var(--cm-subMenuPadding));\r\n\t\t\t\theight: calc(var(--cm-subMinHeight) - var(--cm-subMenuPadding));\r\n\t\t\t}\r\n\r\n\t\t.ddrcontextmenu__item_single .text {\r\n\t\t\t/*padding-right: var(--cm-mainArrowSpace);*/\r\n\t\t}\r\n\t\t\r\n\t\t.ddrcontextmenu__item_rowed .text {\r\n\t\t\tmargin-right: var(--cm-mainArrowSpace);\r\n\t\t}\r\n\r\n\t\t.ddrcontextmenu__item_sub {\r\n\t\t\tfont-size: var(--cm-subFontSize);\r\n\t\t\tmin-height: var(--cm-subMinHeight);\r\n\t\t\tborder-radius: var(--cm-subItemRadius);\r\n\t\t\tpadding-left: var(--cm-subItemPadding);\r\n\t\t\tpadding-right: var(--cm-subItemPadding);\r\n\t\t\tmargin-left: var(--cm-subMenuPadding);\r\n\t\t\tmargin-right: var(--cm-subMenuPadding);\r\n\t\t\twill-change: background-color;\r\n\t\t}\r\n\t\t\r\n\t\t\t.ddrcontextmenu__item_sub .text p {\r\n\t\t\t\tcolor: var(--cm-subFontColor);\r\n\t\t\t}\r\n\r\n\t\t\t.ddrcontextmenu__item_sub:not(.ddrcontextmenu__item-disabled) .icon i {\r\n\t\t\t\tcolor: var(--cm-subIconColor);\r\n\t\t\t}\r\n\r\n\t\t\t.ddrcontextmenu__item_sub:hover:not(.ddrcontextmenu__item-disabled):not(.ddrcontextmenu__item-loadingable) {\r\n\t\t\t\tbackground-color: var(--cm-subItemHoverBg);\r\n\t\t\t\ttransition: background-color var(--cm-hoverTransition);\r\n\t\t\t}\r\n\r\n\t.ddrcontextmenu__divline {\r\n\t\theight: 1px;\r\n\t\tbackground-color: var(--cm-mainBg);\r\n\t\tfilter: brightness(80%) contrast(140%);\r\n\t\tmargin-top: calc(var(--cm-divSpace) / 2);\r\n\t\tmargin-bottom: calc(var(--cm-divSpace) / 2);\r\n\t\tmargin-left: calc(var(--cm-subMenuPadding) + (var(--cm-mainItemRadius)));\r\n\t\tmargin-right: calc(var(--cm-subMenuPadding) + (var(--cm-mainItemRadius)));\r\n\t}", ""]);
 // Exports
 /* harmony default export */ __webpack_exports__["default"] = (___CSS_LOADER_EXPORT___);
 

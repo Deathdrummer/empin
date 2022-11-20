@@ -1,7 +1,6 @@
 import "./index.css";
 
 
-
 let functionsMap, loadedFuntionsMap, menuSelector, abortCtrl;
 
 $(document).on('contextmenu', '[contextmenu]', function(e) {
@@ -36,6 +35,24 @@ $(document).on('contextmenu', '[contextmenu]', function(e) {
 		},
 		onContextMenu(callback = null) {
 			if (!_.isNull(callback) && _.isFunction(callback)) callback();
+		},
+		buildTitle(count = null, one = null, many = null, wordVariants = null) { // сформировать заголовок исходя из кол-ва выбранных элементов
+			if (_.isNull(count) || _.isNull(one)) return;
+			
+			let oneWithoutNum = false;
+			if (_.isNull(wordVariants)) {
+				wordVariants = many;
+				many = one;
+				oneWithoutNum = true;
+			}
+			
+			const word = wordCase(count, wordVariants);
+			
+			if (count > 1) {
+				return many.replaceAll(/%/ig, word).replaceAll(/#/ig, count);
+			}
+			
+			return one.replaceAll(/%/ig, word).replaceAll(/\s*#\s*/ig, oneWithoutNum ? ' ' : count);
 		}
 	};
 	
@@ -82,16 +99,6 @@ $(document).on('contextmenu', '[contextmenu]', function(e) {
 
 
 
-
-
-
-
-
-
-
-
-
-
 //--------------------------------------------------------------------------------------------------------------------------
 
 $(document).on('mouseenter', '.ddrcontextmenu .ddrcontextmenu__item_main', function() {
@@ -122,16 +129,7 @@ $(document).on('mouseenter touchstart', '.ddrcontextmenu [ddrcontextmenuitemload
 
 
 
-
-
-
-
-
-
-
 //--------------------------------------------------------------------------------------------------------------------------
-
-
 
 
 // Спарсить данные, переданные через атрибут contextmenu в теге.
@@ -161,9 +159,6 @@ function _callBuildMenuFunc(func = null, methods, ...args) {
 
 
 
-
-
-
 // Сформировать из данных HTML меню, карту функций и связать клик на пукнт меню с вызовом сооответствующей функции
 function _buildMenuHtml(menuData = null) {
 	if (!menuData || _.isEmpty(menuData)) return [];
@@ -177,7 +172,10 @@ function _buildMenuHtml(menuData = null) {
 			bSort = b.sort || 0;
 		return aSort - bSort;
 	});
-
+	
+	
+	const hasChilds = menuData.some((item) => item.children || item.load);
+	
 	const funcMap = {};
 	
 	let menuHtml = '<ul class="ddrcontextmenu ddrcontextmenu_main noselect">';
@@ -202,6 +200,7 @@ function _buildMenuHtml(menuData = null) {
 				'ddrcontextmenu__item_main',
 				{'ddrcontextmenu__item_parent': item.children || item.load},
 				{'ddrcontextmenu__item_single': !item.children && !item.load},
+				{'ddrcontextmenu__item_rowed': hasChilds},
 				{'ddrcontextmenu__item-disabled': (item.enabled != undefined && !item.enabled) || (item.disabled != undefined && item.disabled)},
 				/*{'ddrcontextmenu__item-loadingable': item.load && !item.children}*/
 			],
@@ -215,7 +214,7 @@ function _buildMenuHtml(menuData = null) {
 		if (item.faIcon) {
 			menuHtml += '<div class="icon"><i class="fa-fw '+item.faIcon+'"></i></div>';
 		}
-		menuHtml += '<p class="text">'+strPad(item.name, 110, '...')+'</p>';
+		menuHtml += '<div class="text"><p>'+strPad(item.name, 110, '...')+'</p></div>';
 		
 		
 		if (item.children || item.load) {
@@ -236,7 +235,6 @@ function _buildMenuHtml(menuData = null) {
 			});
 			
 			$.each(item.children, function(k, childItem) {
-				
 				let childFuncCode = childItem.onClick ? generateCode('nlLlLLnnlnnLnnn') : null;
 				
 				if (childItem.onClick) {
@@ -255,7 +253,7 @@ function _buildMenuHtml(menuData = null) {
 				menuHtml += '<li>';
 				menuHtml += 	'<div'+childItemAttrs+'>';
 				if (childItem.faIcon) menuHtml += 	'<div class="icon"><i class="fa-fw '+childItem.faIcon+'"></i></div>';
-				menuHtml += 	'<p class="text">'+strPad(childItem.name, 110, '...')+'</p>';
+				menuHtml += 	'<div class="text"><p>'+strPad(childItem.name, 110, '...')+'</p></div>';
 				menuHtml += 	'</div>';
 				menuHtml += '</li>';
 			});
@@ -268,7 +266,6 @@ function _buildMenuHtml(menuData = null) {
 			menuHtml += '</li>';
 		}
 		
-		
 		if (item.load || item.children) {
 			menuHtml += '</ul>'; //------- child ul
 		}
@@ -280,13 +277,6 @@ function _buildMenuHtml(menuData = null) {
 	
 	return [$(menuHtml), funcMap];
 }
-
-
-
-
-
-
-
 
 
 
@@ -307,7 +297,7 @@ function _loadSubmenu(menuItem = null) {
 		params: {},
 		map(item) {return item;},
 		sortBy: 'sort',
-		empty: '<li class="ddrcontextmenu__item ddrcontextmenu__item_sub ddrcontextmenu__item-loadingable"> <p class="text">Пусто</p></li>'
+		empty: '<li class="ddrcontextmenu__item ddrcontextmenu__item_sub ddrcontextmenu__item-loadingable"><div class="text"><p>Пусто</p></div></li>'
 	}, funcData);
 	
 	abortCtrl = new AbortController();
@@ -336,8 +326,6 @@ function _loadSubmenu(menuItem = null) {
 			let subMenuHtml = '',
 				funcMap = {};
 			$.each(subData, function(k, childItem) {
-				
-				
 				let childFuncCode = childItem.onClick ? generateCode('nlLlLLnnlnnLnnn') : null;
 		
 				if (childFuncCode) {
@@ -357,13 +345,11 @@ function _loadSubmenu(menuItem = null) {
 				subMenuHtml += '<li>';
 				subMenuHtml += 	'<div'+childItemAttrs+'>';
 				if (childItem.faIcon) subMenuHtml += 	'<div class="icon"><i class="fa-fw '+childItem.faIcon+'"></i></div>';
-				subMenuHtml += 	'<p class="text">'+strPad(childItem.name, 110, '...')+'</p>';
+				subMenuHtml += 	'<div class="text"><p>'+strPad(childItem.name, 110, '...')+'</p></div>';
 				subMenuHtml += 	'</div>';
 				subMenuHtml += '</li>';
 			});
-		
-		
-
+			
 			$(subMenu).html(subMenuHtml || empty);
 		
 			_setSubmenuPosition(subMenu);
@@ -382,17 +368,6 @@ function _loadSubmenu(menuItem = null) {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
 // Вывется HTML DOM элемент
 function _renderDomElement(html = null, bdeid = null, append = false) {
 	const htmlSelector = $(html);	
@@ -406,7 +381,6 @@ function _renderDomElement(html = null, bdeid = null, append = false) {
 	
 	return htmlSelector;
 }
-
 
 
 
@@ -482,12 +456,11 @@ function _setSubmenuPosition(subMenu = null) {
 
 
 
-
-
 // Показать меню
 function _show() {
 	$('.ddrcontextmenu_main').addClass('ddrcontextmenu_main-visible');
 }
+
 
 
 
@@ -504,8 +477,8 @@ function _clickToHideEvent(menuSelector = null, uniqueBlockId = null) {
 		}
 	});
 }
-	
-	
+
+
 
 
 // Клик на пункт меню
@@ -532,6 +505,7 @@ function _clickToAction(menuSelector = null, useLoadedFuncs = false) {
 		_close();
 	});
 }
+
 
 
 

@@ -143249,6 +143249,15 @@ template {
 .ddrtable__body .ddrtable__tr_visible {
   visibility: visible;
 }
+.ddrtable__body .ddrtable__tr:nth-child(odd):not(.clear):not(.ddrtable__tr-selected) {
+  background-color: #fff;
+}
+.ddrtable__body .ddrtable__tr:nth-child(even):not(.clear):not(.ddrtable__tr-selected) {
+  background-color: #fdfdfd;
+}
+.ddrtable__body .ddrtable__tr-selected {
+  background-color: #e5ddf3;
+}
 .ddrtable__body:empty {
   height: 60px;
 }
@@ -143291,15 +143300,6 @@ template {
   height: 0px;
   background: transparent;
   border-radius: 0;
-}
-.ddrtable__body .ddrtable__tr:nth-child(odd):not(.clear):not(.ddrtable__tr-selected) {
-  background-color: #fff;
-}
-.ddrtable__body .ddrtable__tr:nth-child(even):not(.clear):not(.ddrtable__tr-selected) {
-  background-color: #fdfdfd;
-}
-.ddrtable__body .ddrtable__tr-selected {
-  background-color: #e5ddf3;
 }
 .ddrtable__tr {
   display: flex;

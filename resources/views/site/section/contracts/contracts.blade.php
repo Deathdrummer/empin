@@ -1524,7 +1524,7 @@
 	
 	let sendMessStat;
 	$.contractContextMenu = (
-		{target, closeOnScroll, onContextMenu},
+		{target, closeOnScroll, onContextMenu, buildTitle},
 		contractId,
 		departmentId,
 		selectionId,
@@ -1560,10 +1560,11 @@
 			console.log(selectedContracts.items);
 		});
 		
+		const countSelected = selectedContracts.items.length;
 		
 		return [
 			{
-				name: selectedContracts.items.length > 1 ? 'Отправить '+selectedContracts.items.length+' '+wordCase(selectedContracts.items.length, ['договор', 'договора', 'договоров'])+' в архив' : 'Отправить договор в архив',
+				name: buildTitle(countSelected, 'Отправить # % в архив', ['договор', 'договора', 'договоров']),
 				//faIcon: 'fa-solid fa-box-archive',
 				visible: canToArchive && !isArchive,
 				sort: 5,
@@ -1599,7 +1600,7 @@
 					});
 				},
 			}, {
-				name: 'Отправить в другой отдел',
+				name: buildTitle(countSelected, 'Отправить в другой отдел', 'Отправить # % в другой отдел', ['договор', 'договора', 'договоров']),
 				//faIcon: 'fa-solid fa-angles-right',
 				enabled: !!hasDepsToSend && ((canSending && departmentId) || (canSendingAll && !departmentId)),
 				hidden: isArchive,
@@ -1639,7 +1640,7 @@
 					}
 				},
 			}, {
-				name: 'Чат договора ['+messagesCount+']',
+				name: /*'Отправить сообщение в чаты ' */'Чат договора ['+messagesCount+']',
 				//faIcon: 'fa-solid fa-comments',
 				visible: canChat,
 				sort: 1,
@@ -1948,10 +1949,6 @@
 		
 		abortCtrl = new AbortController();
 		axiosQuery('get', 'site/contracts', params, 'text', abortCtrl).then(({data, error, status, headers, abort}) => {
-			
-			console.log(headers);
-			
-			
 			if (error) {
 				$.notify(error.message, 'error');
 				return;
@@ -1992,7 +1989,6 @@
 			
 			if (currentCount) $('[stepprice]').number(true, 2, '.', ' ');
 			
-			
 			if (withCounts && headers) {
 				$('#chooserAll').find('[selectionscounts]').empty();
 				$('#chooserArchive').find('[selectionscounts]').empty();
@@ -2011,7 +2007,6 @@
 					//$('#chooserArchive').find('[selectionscounts]').empty();
 				}
 				
-				
 				if (headers['x-count-contracts-departments']) {
 					let depsCounts = JSON.parse(headers['x-count-contracts-departments']);
 					$.each(depsCounts, function(depId, count) {
@@ -2022,10 +2017,8 @@
 				}	
 			}
 			
-			
 			if (callback && typeof callback == 'function') callback(currentCount);
 		});
-		
 	}
 	
 	
