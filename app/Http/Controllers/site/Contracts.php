@@ -272,11 +272,9 @@ class Contracts extends Controller {
 	 * @return 
 	 */
 	public function to_archive(Request $request) {
-		['contractId' => $contractId] = $request->validate(['contractId' => 'required|numeric']);
-		$contract = Contract::find($contractId);
-		$contract->archive = 1;
-		$stat = $contract->save();
-		return response()->json($stat);
+		['contractIds' => $contractIds] = $request->validate(['contractIds' => 'required|array']);
+		$stat = Contract::whereIn('id', $contractIds)->update(['archive' => 1]);
+		return response()->json($stat > 0);
 	}
 	
 	
@@ -289,11 +287,9 @@ class Contracts extends Controller {
 	 * @return 
 	 */
 	public function to_work(Request $request) {
-		['contractId' => $contractId] = $request->validate(['contractId' => 'required|numeric']);
-		$contract = Contract::find($contractId);
-		$contract->archive = 0;
-		$stat = $contract->save();
-		return response()->json($stat);
+		['contractIds' => $contractIds] = $request->validate(['contractIds' => 'required|array']);
+		$stat = Contract::whereIn('id', $contractIds)->update(['archive' => 0]);
+		return response()->json($stat > 0);
 	}
 	
 	

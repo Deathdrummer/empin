@@ -228,7 +228,7 @@
 	$.extend(loadedContractsIds, {
 		parts: {},
 		add(contractIds) {
-			if (loadedContractsIds.parts[offset] === undefined) {
+			if (loadedContractsIds.parts[offset] === undefined && !_.isEmpty(contractIds)) {
 				loadedContractsIds.parts[offset] = JSON.parse(contractIds);
 			}
 		},
@@ -246,6 +246,9 @@
 				endIndex = Math.max(fromIndex, toIndex);
 			
 			return allItems.slice(startIndex, endIndex + 1);
+		},
+		clear() {
+			loadedContractsIds.parts = {};
 		}
 	});
 	
@@ -1450,7 +1453,6 @@
 		let row = currentTarget,
 			contractId = $(row).attr('contractid');
 		
-		
 		if (ctrlKey) {
 			if ($(row).hasAttr('contractselected')) {
 				$(row).removeClass('ddrtable__tr-selected').removeAttrib('contractselected');
@@ -1560,7 +1562,7 @@
 			console.log(selectedContracts.items);
 		});
 		
-		const countSelected = selectedContracts.items.length;
+		const countSelected = selectedContracts.items?.length || null;
 		
 		return [
 			{
@@ -1570,11 +1572,17 @@
 				sort: 5,
 				onClick: () => {
 					
+					// selectedContracts.items
+					
 					let html = '';
 					html += '<div>';
-					html += '<p class="fz14px color-darkgray text-start">Номер объекта: <span class="color-black">'+objectNumber+'</span></p>';
-					html += '<p class="fz14px color-darkgray text-start">Название/заявитель: <span class="color-black">'+title+'</span></p>';
-					html += '<p class="fz18px color-red mt15px">Вы действительно хотите отправить договор в архив?</p>';
+					if (countSelected == 1) {
+						html += '<p class="fz14px color-darkgray text-start">Номер объекта: <span class="color-black">'+objectNumber+'</span></p>';
+						html += '<p class="fz14px color-darkgray text-start">Название/заявитель: <span class="color-black">'+title+'</span></p>';
+						html += '<p class="fz18px color-red mt15px">Вы действительно хотите отправить договор в архив?</p>';
+					} else if (countSelected > 1) {
+						html += '<p class="fz18px color-red mt15px">'+buildTitle(countSelected, 'Вы действительно хотите отправить # % в архив?', ['договор', 'договора', 'договоров'])+'</p>';
+					}
 					html += '</div>';
 					
 					ddrPopup({
@@ -1586,13 +1594,13 @@
 					}).then(({close, wait}) => {
 						$.contractToArchiveAction = (_) => {
 							wait();
-							axiosQuery('post', 'site/contracts/to_archive', {contractId}, 'json')
+							axiosQuery('post', 'site/contracts/to_archive', {contractIds: selectedContracts.items}, 'json')
 							.then(({data, error, status, headers}) => {
 								if (data) {
 									getList({withCounts: Boolean(selectionId || searched)});
-									$.notify('Договор успешно отправлен в архив!');
+									$.notify(buildTitle(countSelected, '% успешно отправлен в архив!', '# % успешно отправлены в архив!', ['Договор', 'договора', 'договоров']));
 								} else {
-									$.notify('Ошибка! Договор не был отправлен в архив!', 'error');
+									$.notify(buildTitle(countSelected, 'Ошибка! % не был отправлен в архив!', 'Ошибка! % не были отправлены в архив!', ['договор', 'договора', 'договоров']), 'error');
 								}
 								close();
 							});
@@ -1600,7 +1608,7 @@
 					});
 				},
 			}, {
-				name: buildTitle(countSelected, 'Отправить в другой отдел', 'Отправить # % в другой отдел', ['договор', 'договора', 'договоров']),
+				name: buildTitle(countSelected, 'Отправить # % в другой отдел', ['договор', 'договора', 'договоров']),
 				//faIcon: 'fa-solid fa-angles-right',
 				enabled: !!hasDepsToSend && ((canSending && departmentId) || (canSendingAll && !departmentId)),
 				hidden: isArchive,
@@ -1640,7 +1648,7 @@
 					}
 				},
 			}, {
-				name: /*'Отправить сообщение в чаты ' */'Чат договора ['+messagesCount+']',
+				name: buildTitle(countSelected, 'Чат договора <sup>'+messagesCount+' сообщ.</sup>', 'Отправить сообщение в чаты # %', ['договора', 'договоров', 'договоров']),
 				//faIcon: 'fa-solid fa-comments',
 				visible: canChat,
 				sort: 1,
@@ -1691,7 +1699,7 @@
 					});
 				}
 			}, {
-				name: 'Скрыть договор',
+				name: buildTitle(countSelected, 'Скрыть # %', ['договор', 'договора', 'договоров']),
 				//faIcon: 'fa-solid fa-eye-slash',
 				visible: canHiding && departmentId && !isArchive,
 				onClick() {	
@@ -1718,26 +1726,28 @@
 					});
 				}
 			}, {
-				name: 'Вернуть договор в работу',
+				name: buildTitle(countSelected, 'Вернуть # % в работу', ['договор', 'договора', 'договоров']),
 				//faIcon: 'fa-solid fa-arrow-rotate-left',
 				visible: canReturnToWork && isArchive,
+				sort: 5,
 				onClick() {
 					ddrPopup({
 						width: 400, // ширина окна
-						html: '<p class="fz18px color-green">Вы действительно хотите вернуть договор в работу?</p>', // контент
+						html: '<p class="fz18px color-green">'+buildTitle(countSelected, 'Вы действительно хотите вернуть # % в работу?', ['договор', 'договора', 'договоров'])+'</p>', // контент
 						buttons: ['ui.cancel', {title: 'Вернуть', variant: 'green', action: 'returnContractToWorkBtn'}],
 						centerMode: true,
 						winClass: 'ddrpopup_dialog'
 					}).then(({close, wait}) => {
 						$.returnContractToWorkBtn = (_) => {
 							wait();
-							axiosQuery('post', 'site/contracts/to_work', {contractId}, 'json').then(({data, error, status, headers}) => {
+							axiosQuery('post', 'site/contracts/to_work', {contractIds: selectedContracts.items}, 'json')
+							.then(({data, error, status, headers}) => {
 								if (data) {
 									getList({withCounts: Boolean(selectionId || searched)});
-									$.notify('Договор успешно возвращен в работу!');
+									$.notify(buildTitle(countSelected, '% успешно возвращен в работу!', '# % успешно возвращены в работу!', ['Договор', 'договора', 'договоров']));
 									//target.changeAttrData(15, '0');
 								} else {
-									$.notify('Ошибка! Договор не был возвращен в работу!', 'error');
+									$.notify(buildTitle(countSelected, 'Ошибка! % не был возвращен в работу!', 'Ошибка! # % не были возвращены в работу!', ['Договор', 'договора', 'договоров']), 'error');
 								}
 								close();
 							});
@@ -1745,9 +1755,10 @@
 					});
 				}
 			}, {
-				name: 'Удалить из подборки',
+				name: buildTitle(countSelected, 'Удалить # % из подборки', ['договор', 'договора', 'договоров']),
 				//faIcon: 'fa-solid fa-trash-can',
 				visible: selectionId,
+				sort: 4,
 				onClick() {
 					$('[selectionsbtn]').ddrInputs('disable');
 					let procNotif = processNotify('Удаление договора из подборки...');
@@ -1773,7 +1784,7 @@
 					
 				}
 			}, {
-				name: 'Добавить в подборку',
+				name: buildTitle(countSelected, 'Добавить # % в подборку', ['договор', 'договора', 'договоров']),
 				//faIcon: 'fa-solid fa-clipboard-check',
 				sort: 2,
 				load: {
@@ -1809,7 +1820,7 @@
 					}
 				},
 			}, {
-				name: 'Создать новую подборку',
+				name: buildTitle(countSelected, 'Создать новую подборку', 'Создать новую подборку из # %', ['договора', 'договоров', 'договоров']),
 				//faIcon: 'fa-solid fa-clipboard-check',
 				sort: 3,
 				onClick() {
@@ -1903,9 +1914,8 @@
 			$(document).scrollTop(0);
 			lastChoosedRow = null;
 			selectedContracts.clear();
-		} else {
-			
-		}
+			loadedContractsIds.clear();
+		} else {}
 		
 		
 		//-----------------------------------
@@ -1943,8 +1953,7 @@
 				bgColor: '#ffffffbb',
 				//position: 'adaptive'
 			});
-		} else {
-		}
+		} else {}
 		
 		
 		abortCtrl = new AbortController();
