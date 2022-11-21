@@ -1786,6 +1786,10 @@ window.processNotify = function(message = null) {
 		$(waitNotifyWrapper).append(waitNotifyDOM); // prepend
 	}
 	
+	$(waitNotifyDOM).on(tapEvent, function() {
+		$(this).remove();
+	});
+	
 	$.extend(waitNotifyDOM, {
 		done(params) {
 			const item = this,

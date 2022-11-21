@@ -304,7 +304,8 @@ function _loadSubmenu(menuItem = null) {
 	axiosQuery(method, url, params, 'json', abortCtrl)
 		.then(({data, error, status, headers}) => {
 			if (error || _.isEmpty(data)) {
-				if (error) console.log(error.message);
+				console.log(error);	
+				if (error) console.log('Ошибка! contextmenu _loadSubmenu -> axiosQuery:', error.status, error.message);
 				$(subMenu).html(empty);
 				return;
 			}

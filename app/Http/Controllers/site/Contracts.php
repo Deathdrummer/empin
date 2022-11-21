@@ -192,9 +192,13 @@ class Contracts extends Controller {
 	 * @return 
 	 */
 	public function selections_to_choose() {
-		$selectionsToChoose = $this->contract->getSelectionsToChoose();
+		$contractIds = request('contractIds');
+		if (!$contractIds) return response()->json(false);
+		
+		$contractId = count($contractIds) == 1 ? reset($contractIds) : null;
+		$selectionsToChoose = $this->contract->getSelectionsToChoose($contractId);
+		
 		return response()->json($selectionsToChoose);
-		//if (request('_responsetype') == 'json') 
 	}
 	
 	
@@ -588,10 +592,15 @@ class Contracts extends Controller {
 	 */
 	public function chat_send_many(Request $request) {
 		$selectionId = $request->input('selectionId');
+		$contractIds = $request->input('contractIds');
 		$message = $request->input('message');
 		
-		$selection = Selection::find($selectionId);
-		$contracts = $selection->contracts->pluck('id');
+		if ($selectionId) {
+			$selection = Selection::find($selectionId);
+			$contracts = $selection->contracts->pluck('id');
+		} elseif ($contractIds) {
+			$contracts = collect($contractIds);
+		}
 		
 		if ($contracts->isEmpty()) return response()->json(-1);
 		

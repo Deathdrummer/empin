@@ -1653,50 +1653,118 @@
 				visible: canChat,
 				sort: 1,
 				onClick() {
-					ddrPopup({
-						title: '<small class="fz12px color-gray">Чат договора:</small> «'+title+'»',
-						width: 800,
-						buttons: ['Закрыть'],
-						winClass: 'ddrpopup_chat'
-					}).then(({state/* isClosed */, wait, setTitle, setButtons, loadData, setHtml, setLHtml, dialog, close, onScroll, disableButtons, enableButtons, setWidth}) => {
-						wait();
-						
-						axiosQuery('get', 'site/contracts/chat', {contract_id: contractId}).then(({data, error, status, headers}) => {
+					if (countSelected == 1) { // Если выделен 1 договор
+						ddrPopup({
+							title: '<small class="fz12px color-gray">Чат договора:</small> «'+title+'»',
+							width: 800,
+							buttons: ['Закрыть'],
+							winClass: 'ddrpopup_chat'
+						}).then(({state/* isClosed */, wait, setTitle, setButtons, loadData, setHtml, setLHtml, dialog, close, onScroll, disableButtons, enableButtons, setWidth}) => {
+							wait();
 							
-							if (error) {
-								$.notify('Не удалось загрузить чат!', 'error');
-								console.log(error?.message, error?.errors);
-								return;
-							}
-							
-							setHtml(data, () => {
-								sendMessStat = false;
-								wait(false);
+							axiosQuery('get', 'site/contracts/chat', {contract_id: contractId}).then(({data, error, status, headers}) => {
 								
-								let chatVisibleHeight = $('#chatMessageList').outerHeight(),
-									chatScrollHeight = $('#chatMessageList')[0].scrollHeight;
-								$('#chatMessageList').scrollTop(chatScrollHeight - chatVisibleHeight);
+								if (error) {
+									$.notify('Не удалось загрузить чат!', 'error');
+									console.log(error?.message, error?.errors);
+									return;
+								}
 								
-								$('#chatMessageBlock').focus();
-								
-								$('#chatMessageBlock').ddrInputs('change', () => {
-									let mess = getContenteditable('#chatMessageBlock');
+								setHtml(data, () => {
+									sendMessStat = false;
+									wait(false);
 									
-									if (mess && !sendMessStat) {
-										sendMessStat = true;
-										$('#chatSendMesageBtn').ddrInputs('enable');
-									} else if (!mess && sendMessStat) {
-										sendMessStat = false;
-										$('#chatSendMesageBtn').ddrInputs('disable');
-									}
+									let chatVisibleHeight = $('#chatMessageList').outerHeight(),
+										chatScrollHeight = $('#chatMessageList')[0].scrollHeight;
+									$('#chatMessageList').scrollTop(chatScrollHeight - chatVisibleHeight);
+									
+									$('#chatMessageBlock').focus();
+									
+									$('#chatMessageBlock').ddrInputs('change', () => {
+										let mess = getContenteditable('#chatMessageBlock');
+										
+										if (mess && !sendMessStat) {
+											sendMessStat = true;
+											$('#chatSendMesageBtn').ddrInputs('enable');
+										} else if (!mess && sendMessStat) {
+											sendMessStat = false;
+											$('#chatSendMesageBtn').ddrInputs('disable');
+										}
+									});
 								});
+								
+							}).catch((e) => {
+								console.log(e);
 							});
 							
-						}).catch((e) => {
-							console.log(e);
 						});
+					
+					} else { // Если выделено более 1 договора - отправить сообщение в чаты с выделеными договорами
 						
-					});
+						
+						let html = '<p class="d-block mb5px fz14px color-darkgray">Сообщение:</p>' +
+									'<div class="textarea normal-textarea w100" id="sendMessagesToManyContractsField">' +
+										'<textarea name="" rows="10" class="w100"></textarea>' +
+									'</div>';
+						
+						ddrPopup({
+							title: 'Отправить сообщение в выбранные договоры',
+							width: 500,
+							html,
+							buttons: ['Закрыть', {title: 'Отправить', variant: 'green', action: 'sendMessagesToManyContracts', disabled: 1, id: 'sendMessagesToManyContractsBtn'}],
+							winClass: 'ddrpopup_chat'
+						}).then(({state/* isClosed */, wait, setTitle, setButtons, loadData, setHtml, setLHtml, dialog, close, onClose, onScroll, disableButtons, enableButtons, setWidth}) => {							
+							let isEmpty = true;	
+							$('#sendMessagesToManyContractsField').ddrInputs('change', (textarea) => {
+								if ($(textarea).val() && isEmpty) {
+									$('#sendMessagesToManyContractsBtn').ddrInputs('enable');
+									isEmpty = false;
+								} else if (!$(textarea).val() && !isEmpty) {
+									$('#sendMessagesToManyContractsBtn').ddrInputs('disable');
+									isEmpty = true;
+								}
+							});
+							
+							
+							$.sendMessagesToManyContracts = () => {
+								wait();
+								$('#sendMessagesToManyContractsBtn').ddrInputs('disable');
+								
+								let message = $('#sendMessagesToManyContractsField').find('textarea').val();
+								let sendMessAbortCtrl = new AbortController();
+								
+								axiosQuery('put', 'site/contracts/chats', {contractIds: selectedContracts.items, message}, 'json', sendMessAbortCtrl)
+								.then(({data, error, status, headers}) => {
+									if (error) {
+										$.notify('Ошибка отправки сообщения!', 'error');
+										return;
+									}
+									
+									if (data) {
+										if (data == -1) {
+											$.notify('Сообщение не было разослано!', 'info');
+										} else {
+											$.notify('Сообщение успешно отправлено во все чаты выбранных договоров!');
+											close();
+										}
+										
+									} else {
+										$.notify('Не удалось отправить сообщение в чаты выбранных договоров!', 'error');
+										wait(false);
+									}
+									
+								}).catch((e) => {
+									console.log(e);
+								});
+								
+								
+								onClose(() => {
+									sendMessAbortCtrl.abort();
+								});
+							}
+							
+						});
+					}
 				}
 			}, {
 				name: buildTitle(countSelected, 'Скрыть # %', ['договор', 'договора', 'договоров']),
@@ -1755,23 +1823,77 @@
 					});
 				}
 			}, {
+				name: buildTitle(countSelected, 'Добавить # % в подборку', ['договор', 'договора', 'договоров']),
+				//faIcon: 'fa-solid fa-clipboard-check',
+				hidden: selectionId,
+				sort: 2,
+				load: {
+					url: 'site/contracts/selections_to_choose',
+					params: {contractIds: selectedContracts.items},
+					method: 'get',
+					map: (item) => {
+						return {
+							name: item.title,
+							//faIcon: 'fa-solid fa-clipboard-check',
+							disabled: !!item.choosed,
+							onClick(selector) {
+								let selectionId = item.id;
+								
+								let procNotif = processNotify(buildTitle(countSelected, 'Добавление # % в подборку...', ['договора', 'договоров', 'договоров']));
+								
+								let contractIds = selectedContracts.items;
+								
+								let params, method;
+								
+								if (contractIds.length == 1) {
+									params = {contractId: contractIds[0], selectionId};
+									method = 'add_contract';
+								} else {
+									params = {contractIds, selectionId};
+									method = 'add_contracts';
+								}
+								
+								axiosQuery('put', 'site/selections/'+method, params)
+								.then(({data, error, status, headers}) => {
+									if (error) {
+										procNotif.error({message: 'Ошибка добавления в подборку!'});
+										console.log(error?.message, error.errors);
+									} else {
+										procNotif.done({message: buildTitle(countSelected, '% успешно добавлен в подборку!', '# % успешно добавлены в подборку!', ['Договор', 'договора', 'договоров'])});
+									}
+								});	
+							}
+						};
+					}
+				},
+			}, {
 				name: buildTitle(countSelected, 'Удалить # % из подборки', ['договор', 'договора', 'договоров']),
 				//faIcon: 'fa-solid fa-trash-can',
 				visible: selectionId,
 				sort: 4,
-				onClick() {
-					$('[selectionsbtn]').ddrInputs('disable');
-					let procNotif = processNotify('Удаление договора из подборки...');
+				onClick() {		
+					let procNotif = processNotify(buildTitle(countSelected, 'Удаление # % из подборки...', ['договора', 'договоров', 'договоров']));
 					
-					axiosQuery('put', 'site/selections/remove_contract', {contractId, selectionId})
+					let contractIds = selectedContracts.items;
+					
+					let params, method;
+					
+					if (contractIds.length == 1) {
+						params = {contractId: contractIds[0], selectionId};
+						method = 'remove_contract';
+					} else {
+						params = {contractIds, selectionId};
+						method = 'remove_contracts';
+					}
+					
+					axiosQuery('put', 'site/selections/'+method, params)
 					.then(({data, error, status, headers}) => {
 						if (error) {
 							//$.notify('Ошибка удаления из подборки!', 'error');
 							procNotif.error({message: 'Ошибка удаления договора из подборки!'});
 							console.log(error?.message, error.errors);
 						} else {
-							//$.notify('Договор успешно удален из подборки!');
-							procNotif.done({message: 'Договор успешно удален из подборки!'});
+							procNotif.done({message: buildTitle(countSelected, '% успешно удален из подборки!', '# % успешно удалены из подборки!', ['Договор', 'договора', 'договоров'])});
 							//target.changeAttrData(7, '0');
 							getList({
 								withCounts: true,
@@ -1783,42 +1905,6 @@
 					});
 					
 				}
-			}, {
-				name: buildTitle(countSelected, 'Добавить # % в подборку', ['договор', 'договора', 'договоров']),
-				//faIcon: 'fa-solid fa-clipboard-check',
-				sort: 2,
-				load: {
-					url: 'site/contracts/selections_to_choose?contract_id='+contractId,
-					method: 'get',
-					map: (item) => {
-						return {
-							name: item.title,
-							//faIcon: 'fa-solid fa-clipboard-check',
-							disabled: !!item.choosed,
-							onClick(selector) {
-								let selectionId = item.id;
-								
-								let procNotif = processNotify('Добавление договора в подборку...');
-								
-								//$().ddrInputs('disable');
-								axiosQuery('put', 'site/selections/add_contract', {contractId, selectionId})
-								.then(({data, error, status, headers}) => {
-									if (error) {
-										//$.notify('Ошибка добавления в подборку!', 'error');
-										procNotif.error({message: 'Ошибка добавления в подборку!'});
-										console.log(error?.message, error.errors);
-										//$(select).ddrInputs('error');
-									} else {
-										//$(select).find('option[value="'+selectionId+'"]').setAttrib('disabled');
-										//$(select).ddrInputs('enable');
-										//$.notify('Договор успешно добавлен в подборку!');
-										procNotif.done({message: 'Договор успешно добавлен в подборку!'});
-									}
-								});
-							}
-						};
-					}
-				},
 			}, {
 				name: buildTitle(countSelected, 'Создать новую подборку', 'Создать новую подборку из # %', ['договора', 'договоров', 'договоров']),
 				//faIcon: 'fa-solid fa-clipboard-check',

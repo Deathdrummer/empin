@@ -494,19 +494,25 @@ class Contract {
 	
 	
 	/**
+	 * Получить список подборок. Если не передан ID договора - вернуть с учетом уже выбранных подборок
 	 * @param 
 	 * @return 
 	 */
-	public function getSelectionsToChoose() {
+	public function getSelectionsToChoose($contractId = null) {
 		$userId = auth('site')->user()->id;
-		$contract = ContractModel::where('id', request('contract_id'))
-			->with(['selections' => function ($query) use($userId) {
-				$query->where('account_id', $userId)
-					->orWhereJsonContains('subscribed', $userId);
-			}])
-			->first();
+
+		$choosedSelections = [];
 		
-		$choosedSelections = $contract->selections->pluck('id')->toArray() ?? [];
+		if ($contractId) {
+				$contract = ContractModel::where('id', $contractId)
+				->with(['selections' => function ($query) use($userId) {
+					$query->where('account_id', $userId)
+						->orWhereJsonContains('subscribed', $userId);
+				}])
+				->first();
+			
+			$choosedSelections = $contract->selections->pluck('id')->toArray() ?? [];
+		}
 		
 		$allSelections = Selection::toChoose()->get();
 		

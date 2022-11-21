@@ -238,7 +238,7 @@ class Selections extends Controller {
         		'required',
 				Rule::unique('contracts_selections')->ignore(Selection::where('id', $id)->first()),
 			],
-			'_sort'					=> 'numeric'
+			'_sort' => 'numeric'
 		]);
 		
 		Selection::where('id', $id)->update($validFields);
@@ -302,6 +302,29 @@ class Selections extends Controller {
 	 * @param 
 	 * @return 
 	 */
+	public function add_contracts(Request $request) {
+		[
+			'contractIds' 	=> $contractIds,
+			'selectionId' 	=> $selectionId
+		] = $request->validate([
+			'contractIds' 	=> 'required|array',
+			'selectionId' 	=> 'required|numeric'
+		]);
+		
+		$selection = Selection::find($selectionId);
+		$statData = $selection->contracts()->syncWithoutDetaching($contractIds);
+		return response()->json($statData);
+	}
+	
+	
+	
+	
+	
+	
+	/**
+	 * @param 
+	 * @return 
+	 */
 	public function remove_contract(Request $request) {
 		[
 			'contractId' 	=> $contractId,
@@ -314,7 +337,26 @@ class Selections extends Controller {
 		$selection = Selection::find($selectionId);
 		$statData = $selection->contracts()->detach($contractId);
 		return response()->json($statData);
+	}
+	
+	
+	
+	/**
+	 * @param 
+	 * @return 
+	 */
+	public function remove_contracts(Request $request) {
+		[
+			'contractIds' 	=> $contractIds,
+			'selectionId' 	=> $selectionId
+		] = $request->validate([
+			'contractIds' 	=> 'required|array',
+			'selectionId' 	=> 'required|numeric'
+		]);
 		
+		$selection = Selection::find($selectionId);
+		$statData = $selection->contracts()->detach($contractIds);
+		return response()->json($statData);
 	}
 	
 	

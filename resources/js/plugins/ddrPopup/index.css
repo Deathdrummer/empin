@@ -183,7 +183,10 @@
 		}
 			
 		
-		.ddrpopup__title_1 {}
+		.ddrpopup__title_1 {
+			font-size: 18px;
+			line-height: 16px;
+		}
 		.ddrpopup__title_2 {}
 		.ddrpopup__title_3 {}
 		.ddrpopup__title_4 {}

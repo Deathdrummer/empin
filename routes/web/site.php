@@ -314,7 +314,9 @@ Route::prefix('site')->middleware(['lang', 'isajax:site'])->group(function() {
 	// Подборки
 	Route::get('/selections/init', [Selections::class, 'init']);
 	Route::put('/selections/add_contract', [Selections::class, 'add_contract']);
+	Route::put('/selections/add_contracts', [Selections::class, 'add_contracts']);
 	Route::put('/selections/remove_contract', [Selections::class, 'remove_contract']);
+	Route::put('/selections/remove_contracts', [Selections::class, 'remove_contracts']);
 	Route::post('/selections/store_show', [Selections::class, 'store_show']);
 	
 	Route::get('/selections/users_to_share', [Selections::class, 'users_to_share']);
