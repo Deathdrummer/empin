@@ -1453,6 +1453,9 @@
 		let row = currentTarget,
 			contractId = $(row).attr('contractid');
 		
+		
+		console.log(ctrlKey, shiftKey);
+		
 		if (ctrlKey) {
 			if ($(row).hasAttr('contractselected')) {
 				$(row).removeClass('ddrtable__tr-selected').removeAttrib('contractselected');
