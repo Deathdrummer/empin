@@ -8161,13 +8161,35 @@ $(document).on('contextmenu', '[contextmenu]', function (e) {
       var callback = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
       if (!_.isNull(callback) && _.isFunction(callback)) callback();
     },
+    changeAttrData: function changeAttrData() {
+      var argIndex = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+      var newData = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+      if (_.isNull(argIndex) || _.isNull(newData)) throw new Error('Ошибка! contextmenu changeAttrData -> неверно переданы аргументы!');
+
+      var _parseAttribString4 = _parseAttribString($(target.selector).attr('contextmenu')),
+          _parseAttribString5 = _slicedToArray(_parseAttribString4, 2),
+          chFn = _parseAttribString5[0],
+          chArgs = _parseAttribString5[1];
+
+      var buildAttrString = chFn + ':',
+          i = argIndex - 1;
+      if (!chArgs[i]) throw new Error('Ошибка! contextmenu changeAttrData -> аргумента с таким порядковым номером не существует!');
+      chArgs[i] = newData;
+      buildAttrString += chArgs.join(',');
+      $(target.selector).setAttrib('contextmenu', buildAttrString);
+    },
     buildTitle: function buildTitle() {
       var count = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
       var one = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
       var many = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
       var wordVariants = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
       // сформировать заголовок исходя из кол-ва выбранных элементов
-      if (_.isNull(count) || _.isNull(one)) return;
+      if (_.isNull(count) || _.isNull(one) || _.isNull(many) && _.isNull(wordVariants)) return;
+
+      if (_.isNull(wordVariants) && !_.isArray(many)) {
+        if (count > 1) return many.replaceAll(/#/ig, count);else return one.replaceAll(/\s*#\s*/ig, count);
+      }
+
       var oneWithoutNum = false;
 
       if (_.isNull(wordVariants)) {
@@ -8218,7 +8240,7 @@ $(document).on('contextmenu', '[contextmenu]', function (e) {
   _clickToHideEvent(menuHtml, uniqueBlockId);
 }); //--------------------------------------------------------------------------------------------------------------------------
 
-$(document).on('mouseenter', '.ddrcontextmenu .ddrcontextmenu__item_main', function () {
+$(document).on('mouseenter', '.ddrcontextmenu .ddrcontextmenu__item_main:not(.ddrcontextmenu__item-disabled)', function () {
   $(this).addClass('ddrcontextmenu__item-hovered');
 });
 $(document).on('mouseleave', '.ddrcontextmenu > li', function () {
@@ -8280,6 +8302,12 @@ function _buildMenuHtml() {
   var hasChilds = menuData.some(function (item) {
     return item.children || item.load;
   });
+  var hasCountsLeft = menuData.some(function (item) {
+    return item.countLeft;
+  });
+  var hasCountsRight = menuData.some(function (item) {
+    return item.countRight && !item.countOnArrow;
+  });
   var funcMap = {};
   var menuHtml = '<ul class="ddrcontextmenu ddrcontextmenu_main noselect">';
   $.each(menuData, function (k, item) {
@@ -8302,7 +8330,7 @@ function _buildMenuHtml() {
       }, {
         'ddrcontextmenu__item_single': !item.children && !item.load
       }, {
-        'ddrcontextmenu__item_rowed': hasChilds
+        'ddrcontextmenu__item_full': hasChilds && hasCountsRight && (_.isUndefined(item.countOnArrow) || item.countOnArrow == false)
       }, {
         'ddrcontextmenu__item-disabled': item.enabled != undefined && !item.enabled || item.disabled != undefined && item.disabled
       }
@@ -8310,7 +8338,7 @@ function _buildMenuHtml() {
       ],
       'ddrcontextmenuitem': _defineProperty({}, funcCode, item.onClick && !item.children && !item.load && (item.enabled == undefined || item.enabled) && (item.disabled == undefined || !item.disabled)),
       // коллбэк при клике на пункт меню (без дочерних)
-      'ddrcontextmenuitemload': _defineProperty({}, funcCode, item.load && !item.children && !item.onClick) // загрука подменю при наведении
+      'ddrcontextmenuitemload': _defineProperty({}, funcCode, item.load && !item.children && !item.onClick && (item.enabled == undefined || item.enabled) && (item.disabled == undefined || !item.disabled)) // загрука подменю при наведении
 
     });
     menuHtml += '<li>'; //------- parent li
@@ -8321,11 +8349,26 @@ function _buildMenuHtml() {
       menuHtml += '<div class="icon"><i class="fa-fw ' + item.faIcon + '"></i></div>';
     }
 
+    if (hasCountsLeft) {
+      menuHtml += '<div class="metablock metablock_left">'; // metablock
+
+      if (!_.isUndefined(item.countLeft) && !_.isNull(item.countLeft)) menuHtml += '<div class="count"><span>' + item.countLeft + '</span></div>';
+      menuHtml += '</div>'; // metablock
+    }
+
     menuHtml += '<div class="text"><p>' + strPad(item.name, 110, '...') + '</p></div>';
 
+    if (hasChilds || hasCountsRight) {
+      menuHtml += '<div class="metablock metablock_right">'; // metablock
+
+      if (!_.isUndefined(item.countRight) && !_.isNull(item.countRight)) menuHtml += '<div class="count"><span>' + item.countRight + '</span></div>';
+      if (item.children || item.load) menuHtml += '<div class="arrow"><i class="fa-solid fa-angle-right"></i></div>';
+      menuHtml += '</div>'; // metablock
+    }
+
     if (item.children || item.load) {
-      menuHtml += '<div class="arrow"><i class="fa-solid fa-chevron-right"></i></div>';
-      menuHtml += '</div>';
+      menuHtml += '</div>'; // ddrcontextmenu__item
+
       menuHtml += '<ul class="ddrcontextmenu ddrcontextmenu_sub">';
     }
 
@@ -8338,6 +8381,12 @@ function _buildMenuHtml() {
         var aSort = a.sort || 0,
             bSort = b.sort || 0;
         return aSort - bSort;
+      });
+      var hasCountsChildLeft = item.children.some(function (child) {
+        return child.countLeft;
+      });
+      var hasCountsChildRight = item.children.some(function (child) {
+        return child.countRight;
       });
       $.each(item.children, function (k, childItem) {
         var childFuncCode = childItem.onClick ? generateCode('nlLlLLnnlnnLnnn') : null;
@@ -8356,7 +8405,23 @@ function _buildMenuHtml() {
         menuHtml += '<li>';
         menuHtml += '<div' + childItemAttrs + '>';
         if (childItem.faIcon) menuHtml += '<div class="icon"><i class="fa-fw ' + childItem.faIcon + '"></i></div>';
+
+        if (hasCountsChildLeft) {
+          menuHtml += '<div class="metablock metablock_left">'; // metablock
+
+          if (!_.isUndefined(childItem.countLeft) && !_.isNull(childItem.countLeft)) menuHtml += '<div class="count"><span>' + childItem.countLeft + '</span></div>';
+          menuHtml += '</div>'; // metablock
+        }
+
         menuHtml += '<div class="text"><p>' + strPad(childItem.name, 110, '...') + '</p></div>';
+
+        if (hasCountsChildRight) {
+          menuHtml += '<div class="metablock metablock_right">'; // metablock
+
+          if (!_.isUndefined(childItem.countRight) && !_.isNull(childItem.countRight)) menuHtml += '<div class="count"><span>' + childItem.countRight + '</span></div>';
+          menuHtml += '</div>'; // metablock
+        }
+
         menuHtml += '</div>';
         menuHtml += '</li>';
       });
@@ -8413,7 +8478,6 @@ function _loadSubmenu() {
         headers = _ref.headers;
 
     if (error || _.isEmpty(data)) {
-      console.log(error);
       if (error) console.log('Ошибка! contextmenu _loadSubmenu -> axiosQuery:', error.status, error.message);
       $(subMenu).html(empty);
       return;
@@ -8433,6 +8497,12 @@ function _loadSubmenu() {
       });
     }
 
+    var hasCountsSubLeft = subData.some(function (sub) {
+      return sub.countLeft;
+    });
+    var hasCountsSubRight = subData.some(function (sub) {
+      return sub.countRight;
+    });
     var subMenuHtml = '',
         funcMap = {};
     $.each(subData, function (k, childItem) {
@@ -8452,7 +8522,23 @@ function _loadSubmenu() {
       subMenuHtml += '<li>';
       subMenuHtml += '<div' + childItemAttrs + '>';
       if (childItem.faIcon) subMenuHtml += '<div class="icon"><i class="fa-fw ' + childItem.faIcon + '"></i></div>';
+
+      if (hasCountsSubLeft) {
+        menuHtml += '<div class="metablock metablock_left">'; // metablock
+
+        if (!_.isUndefined(childItem.countLeft) && !_.isNull(childItem.countLeft)) menuHtml += '<div class="count"><span>' + childItem.countLeft + '</span></div>';
+        menuHtml += '</div>'; // metablock
+      }
+
       subMenuHtml += '<div class="text"><p>' + strPad(childItem.name, 110, '...') + '</p></div>';
+
+      if (hasCountsSubRight) {
+        menuHtml += '<div class="metablock metablock_right">'; // metablock
+
+        if (!_.isUndefined(childItem.countRight) && !_.isNull(childItem.countRight)) menuHtml += '<div class="count"><span>' + childItem.countRight + '</span></div>';
+        menuHtml += '</div>'; // metablock
+      }
+
       subMenuHtml += '</div>';
       subMenuHtml += '</li>';
     });
@@ -14250,7 +14336,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, ":root {\r\n\t--cm-fontFamily: 'Roboto';\r\n\t\r\n\t--cm-mainBg: #fff;\r\n\t--cm-subBg: #fff;\r\n\t\r\n\t--cm-mainBoxShadow: 0 0 20px -1px #0000004a;\r\n\t--cm-subBoxShadow: 0 0 20px -1px #0000004a;\r\n\t\r\n\t--cm-mainBorderWidth: 2px;\r\n\t--cm-subBorderWidth: 2px;\r\n\t\r\n\t--cm-mainBorderColor: rgb(204, 204, 204);\r\n\t--cm-subBorderColor: rgb(204, 204, 204);\r\n\t\r\n\t--cm-mainItemHoverBg: rgb(222, 223, 229);\r\n\t--cm-subItemHoverBg: rgb(222, 223, 229);\r\n\t\r\n\t--cm-mainItemActiveBg: #c2c4cf;\r\n\t--cm-subItemActiveBg: #c2c4cf;\r\n\t\r\n\t--cm-mainIconColor: rgb(77, 77, 77);\r\n\t--cm-subIconColor: rgb(77, 77, 77);\r\n\t\r\n\t--cm-mainFontColor: rgb(77, 77, 77);\r\n\t--cm-subFontColor: rgb(77, 77, 77);\r\n\t\r\n\t--cm-hoverTransition: 0.1s;\r\n\t\r\n\t--cm-mainMenuPadding: 6px;\r\n\t--cm-subMenuPadding: 6px;\r\n\t\r\n\t--cm-mainMenuRadius: 12px;\r\n\t--cm-subMenuRadius: 12px;\r\n\t\r\n\t--cm-mainItemRadius: 8px;\r\n\t--cm-subItemRadius: 8px;\r\n\t\r\n\t--cm-mainItemPadding: 15px;\r\n\t--cm-subItemPadding: 15px;\r\n\t\r\n\t--cm-mainFontSize: 16px;\r\n\t--cm-subFontSize: 16px;\r\n\t\r\n\t--cm-mainMinHeight: 38px;\r\n\t--cm-subMinHeight: 38px;\r\n\t\r\n\t--cm-mainArrowSpace: 25px;\r\n\t\r\n\t--cm-showSubMenu: 0.2s;\r\n\t--cm-hideSubMenu: 0.1s;\r\n\t\r\n\t--cm-divSpace: 20px;\r\n}\r\n\t\r\n\t\r\n\t\r\n\t\r\n\r\n.ddrcontextmenu {\r\n\tposition: absolute;\r\n\topacity: 0;\r\n\tpointer-events: none;\r\n\twill-change: opacity, pointer-events;\r\n}\r\n\r\n\t.ddrcontextmenu li {\r\n\t\tposition: relative;\r\n\t}\r\n\r\n\t.ddrcontextmenu_main {\r\n\t\tbackground-color: var(--cm-mainBg);\r\n\t\tpadding-top: var(--cm-mainMenuPadding);\r\n\t\tpadding-bottom: var(--cm-mainMenuPadding);\r\n\t\tborder: var(--cm-mainBorderWidth) solid var(--cm-mainBorderColor);\r\n\t\tborder-radius: var(--cm-mainMenuRadius);\r\n\t\tbox-shadow: var(--cm-mainBoxShadow);\r\n\t\tz-index: 130;\r\n\t}\r\n\r\n\t\t.ddrcontextmenu_main-visible {\r\n\t\t\topacity: 1;\r\n\t\t\tpointer-events: auto;\r\n\t\t}\r\n\r\n\t.ddrcontextmenu_sub {\r\n\t\tleft: 100%;\r\n\t\ttop: calc(-1 * (var(--cm-subMenuPadding) + var(--cm-subBorderWidth)));\r\n\t\twidth: max-content;\r\n\t\tbackground-color: var(--cm-subBg);\r\n\t\tpadding-top: var(--cm-subMenuPadding);\r\n\t\tpadding-bottom: var(--cm-subMenuPadding);\r\n\t\tborder: var(--cm-subBorderWidth) solid var(--cm-subBorderColor);\r\n\t\tborder-radius: var(--cm-subMenuRadius);\r\n\t\tbox-shadow: var(--cm-subBoxShadow);\r\n\t\topacity: 0;\r\n\t\tpointer-events: none;\r\n\t\ttransition: opacity var(--cm-hideSubMenu);\r\n\t\tz-index: 131;\r\n\t}\r\n\r\n\t\t.ddrcontextmenu_sub.oppositeX {\r\n\t\t\tright: 100%;\r\n\t\t\tleft: auto;\r\n\t\t}\r\n\r\n\t\t.ddrcontextmenu_sub.oppositeY {\r\n\t\t\ttop: auto;\r\n\t\t\tbottom: calc(-1 * var(--cm-mainMenuPadding) - var(--cm-mainBorderWidth));\r\n\t\t}\r\n\r\n\t.ddrcontextmenu__item {\r\n\t\tposition: relative;\r\n\t\tdisplay: flex;\r\n\t\talign-items: center;\r\n\t\tjustify-content: space-between;\r\n\t\tfont-size: var(--cm-mainFontSize);\r\n\t\tpadding-left: var(--cm-mainItemPadding);\r\n\t\tpadding-right: var(--cm-mainItemPadding);\r\n\t\tmargin-left: var(--cm-mainMenuPadding);\r\n\t\tmargin-right: var(--cm-mainMenuPadding);\r\n\t\tmax-width: 500px;\r\n\t\tmin-height: var(--cm-mainMinHeight);\r\n\t\tborder-radius: var(--cm-mainItemRadius);\r\n\t\twill-change: background-color;\r\n\t}\r\n\r\n\t\t.ddrcontextmenu__item .icon {\r\n\t\t\tflex: 0 0 20px;\r\n\t\t\tmargin-right: 8px;\r\n\t\t\tfont-size: inherit;\r\n\t\t}\r\n\r\n\t\t\t.ddrcontextmenu__item .icon i {\r\n\t\t\t\tfont-size: inherit;\r\n\t\t\t\tcolor: var(--cm-mainIconColor);\r\n\t\t\t}\r\n\r\n\t\t.ddrcontextmenu__item .text {\r\n\t\t\tword-break: break-word;\r\n\t\t\tfont-size: inherit;\r\n\t\t\tdisplay: block;\r\n\t\t\tmax-width: 100%;\r\n\t\t\tflex: 1 1 auto;\r\n\t\t}\r\n\t\t\t.ddrcontextmenu__item .text p {\r\n\t\t\t\tfont-family: 'Roboto', sans-serif;\r\n\t\t\t\tfont-size: inherit;\r\n\t\t\t\tline-height: 0.9em;\r\n\t\t\t\tcolor: var(--cm-mainFontColor);\r\n\t\t\t}\r\n\r\n\t\t.ddrcontextmenu__item .arrow {\r\n\t\t\t/*flex: 1 0 var(--cm-mainArrowSpace);*/\r\n\t\t\twidth: var(--cm-mainArrowSpace);\r\n\t\t\ttext-align: right;\r\n\t\t\tposition: absolute;\r\n\t\t\tright: var(--cm-mainItemPadding);\r\n\t\t}\r\n\r\n\t\t\t.ddrcontextmenu__item .arrow i {\r\n\t\t\t\tfont-size: 0.8em;\r\n\t\t\t\tcolor: var(--cm-mainIconColor);\r\n\t\t\t}\r\n\t\t\r\n\t\t\r\n\t\t.ddrcontextmenu__item_sub {\r\n\t\t\tfont-size: var(--cm-subFontSize);\r\n\t\t\tmin-height: var(--cm-subMinHeight);\r\n\t\t\tborder-radius: var(--cm-subItemRadius);\r\n\t\t\tpadding-left: var(--cm-subItemPadding);\r\n\t\t\tpadding-right: var(--cm-subItemPadding);\r\n\t\t\tmargin-left: var(--cm-subMenuPadding);\r\n\t\t\tmargin-right: var(--cm-subMenuPadding);\r\n\t\t\twill-change: background-color;\r\n\t\t}\r\n\t\t\r\n\t\t\t.ddrcontextmenu__item_sub .text p {\r\n\t\t\t\tcolor: var(--cm-subFontColor);\r\n\t\t\t}\r\n\r\n\t\t\t.ddrcontextmenu__item_sub:not(.ddrcontextmenu__item-disabled) .icon i {\r\n\t\t\t\tcolor: var(--cm-subIconColor);\r\n\t\t\t}\r\n\r\n\t\t\t.ddrcontextmenu__item_sub:hover:not(.ddrcontextmenu__item-disabled):not(.ddrcontextmenu__item-loadingable) {\r\n\t\t\t\tbackground-color: var(--cm-subItemHoverBg);\r\n\t\t\t\ttransition: background-color var(--cm-hoverTransition);\r\n\t\t\t}\r\n\r\n\t\t.ddrcontextmenu__item-hovered:not(.ddrcontextmenu__item-disabled) {\r\n\t\t\tbackground-color: var(--cm-mainItemHoverBg);\r\n\t\t\ttransition: background-color var(--cm-hoverTransition);\r\n\t\t}\r\n\r\n\t\t.ddrcontextmenu__item-hovered:not(.ddrcontextmenu__item-disabled)~.ddrcontextmenu_sub {\r\n\t\t\topacity: 1;\r\n\t\t\tpointer-events: auto;\r\n\t\t\ttransition: opacity var(--cm-showSubMenu);\r\n\t\t}\r\n\r\n\t\t.ddrcontextmenu__item:active:not(.ddrcontextmenu__item-disabled):not(.ddrcontextmenu__item_parent):not(.ddrcontextmenu__item-loadingable) {\r\n\t\t\tbackground-color: var(--cm-mainItemActiveBg);\r\n\t\t\ttransition: background-color 0s;\r\n\t\t}\r\n\r\n\t\t.ddrcontextmenu__item-disabled .icon i {\r\n\t\t\tcolor: #e3e8ed;\r\n\t\t}\r\n\r\n\t\t.ddrcontextmenu__item-disabled .text p {\r\n\t\t\tcolor: #cfd3d7;\r\n\t\t}\r\n\r\n\t\t.ddrcontextmenu__item-disabled .arrow i {\r\n\t\t\tcolor: #cfd3d7;\r\n\t\t}\r\n\r\n\t\t.ddrcontextmenu__item-loadingable {\r\n\t\t\tmin-width: calc(4 * var(--cm-subMinHeight));\r\n\t\t\tjustify-content: center;\r\n\t\t}\r\n\r\n\t\t\t.ddrcontextmenu__item-loadingable .ddrcontextloadingicon {\r\n\t\t\t\tmin-width: 20px;\r\n\t\t\t\tmin-height: 20px;\r\n\t\t\t\twidth: calc(var(--cm-subMinHeight) - var(--cm-subMenuPadding));\r\n\t\t\t\theight: calc(var(--cm-subMinHeight) - var(--cm-subMenuPadding));\r\n\t\t\t}\r\n\r\n\t\t.ddrcontextmenu__item_single .text {\r\n\t\t\t/*padding-right: var(--cm-mainArrowSpace);*/\r\n\t\t}\r\n\t\t\r\n\t\t.ddrcontextmenu__item_rowed .text {\r\n\t\t\tmargin-right: var(--cm-mainArrowSpace);\r\n\t\t}\r\n\r\n\t.ddrcontextmenu__divline {\r\n\t\theight: 1px;\r\n\t\tbackground-color: var(--cm-mainBg);\r\n\t\tfilter: brightness(80%) contrast(140%);\r\n\t\tmargin-top: calc(var(--cm-divSpace) / 2);\r\n\t\tmargin-bottom: calc(var(--cm-divSpace) / 2);\r\n\t\tmargin-left: calc(var(--cm-subMenuPadding) + (var(--cm-mainItemRadius)));\r\n\t\tmargin-right: calc(var(--cm-subMenuPadding) + (var(--cm-mainItemRadius)));\r\n\t}", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, ":root {\r\n\t--cm-fontFamily: 'Roboto';\r\n\t--cm-fontFamily: 'Roboto';\r\n\t\r\n\t--cm-mainFontSize: 16px;\r\n\t--cm-subFontSize: 16px;\r\n\t\r\n\t--cm-mainFontWeight: 700;\r\n\t--cm-subFontWeight: 700;\r\n\t\r\n\t--cm-mainFontColor: #787878;\r\n\t--cm-subFontColor: #787878;\r\n\t\r\n\t--cm-mainFontHoverColor: #fff;\r\n\t--cm-subFontHoverColor: #fff;\r\n\t\r\n\t\r\n\t--cm-mainBg: #fff;\r\n\t--cm-subBg: #fff;\r\n\t\r\n\t--cm-mainBoxShadow: 0 0 20px -1px #00000080;\r\n\t--cm-subBoxShadow: 0 0 20px -1px #00000080;\r\n\t\r\n\t--cm-mainBorderWidth: 0.5px;\r\n\t--cm-subBorderWidth: 0.5px;\r\n\t\r\n\t--cm-mainBorderColor: rgb(204, 204, 204);\r\n\t--cm-subBorderColor: rgb(204, 204, 204);\r\n\t\r\n\t--cm-mainItemHoverBg: rgb(222, 223, 229);\r\n\t--cm-subItemHoverBg: rgb(222, 223, 229);\r\n\t\r\n\t--cm-mainItemActiveBg: #c2c4cf;\r\n\t--cm-subItemActiveBg: #c2c4cf;\r\n\t\r\n\t--cm-mainIconColor: #787878;\r\n\t--cm-subIconColor: #787878;\r\n\t\r\n\t\r\n\t--cm-mainMetaBlockItemSize: 21px;\r\n\t--cm-subMetaBlockItemSize: 21px;\r\n\t\r\n\t--cm-mainCountRadius: 8px;\r\n\t--cm-subCountRadius: 8px;\r\n\t\r\n\t--cm-mainCountBg: rgb(222, 223, 229);\r\n\t--cm-subCountBg: rgb(222, 223, 229);\r\n\t\r\n\t--cm-mainCountColor: #fff;\r\n\t--cm-subCountColor: #fff;\r\n\t\r\n\t\r\n\t--cm-hoverTransition: 0.1s;\r\n\t\r\n\t--cm-mainMenuPaddingX: 11px;\r\n\t--cm-mainMenuPaddingY: 7px;\r\n\t--cm-subMenuPaddingX: 11px;\r\n\t--cm-subMenuPaddingY: 7px;\r\n\t\r\n\t--cm-mainMenuRadius: 17px;\r\n\t--cm-subMenuRadius: 17px;\r\n\t\r\n\t--cm-mainItemRadius: 10px;\r\n\t--cm-subItemRadius: 10px;\r\n\t\r\n\t--cm-mainItemPadding: 7px;\r\n\t--cm-subItemPadding: 7px;\r\n\t\r\n\t\r\n\t--cm-mainMinHeight: 48px;\r\n\t--cm-subMinHeight: 48px;\r\n\t\r\n\t--cm-metaBlockLeftSpace: 9px;\r\n\t--cm-metaBlockRightSpace: 15px;\r\n\t--cm-metaBlockWidth: 60px;\r\n\t\r\n\t--cm-showSubMenu: 0.2s;\r\n\t--cm-hideSubMenu: 0.1s;\r\n\t\r\n\t--cm-divSpace: 20px;\r\n}\r\n\t\r\n\t\r\n\t\r\n\t\r\n\r\n.ddrcontextmenu {\r\n\tposition: absolute;\r\n\topacity: 0;\r\n\tpointer-events: none;\r\n\twill-change: opacity, pointer-events;\r\n}\r\n\r\n\t.ddrcontextmenu li {\r\n\t\tposition: relative;\r\n\t}\r\n\r\n\t.ddrcontextmenu_main {\r\n\t\tbackground-color: var(--cm-mainBg);\r\n\t\tpadding-top: var(--cm-mainMenuPaddingY);\r\n\t\tpadding-bottom: var(--cm-mainMenuPaddingY);\r\n\t\tborder: var(--cm-mainBorderWidth) solid var(--cm-mainBorderColor);\r\n\t\tborder-radius: var(--cm-mainMenuRadius);\r\n\t\tbox-shadow: var(--cm-mainBoxShadow);\r\n\t\tz-index: 130;\r\n\t}\r\n\r\n\t\t.ddrcontextmenu_main-visible {\r\n\t\t\topacity: 1;\r\n\t\t\tpointer-events: auto;\r\n\t\t}\r\n\r\n\t.ddrcontextmenu_sub {\r\n\t\tleft: 100%;\r\n\t\ttop: calc(-1 * (var(--cm-subMenuPaddingY) + var(--cm-subBorderWidth)));\r\n\t\twidth: max-content;\r\n\t\tbackground-color: var(--cm-subBg);\r\n\t\tpadding-top: var(--cm-subMenuPaddingY);\r\n\t\tpadding-bottom: var(--cm-subMenuPaddingY);\r\n\t\tborder: var(--cm-subBorderWidth) solid var(--cm-subBorderColor);\r\n\t\tborder-radius: var(--cm-subMenuRadius);\r\n\t\tbox-shadow: var(--cm-subBoxShadow);\r\n\t\topacity: 0;\r\n\t\tpointer-events: none;\r\n\t\ttransition: opacity var(--cm-hideSubMenu);\r\n\t\tz-index: 131;\r\n\t}\r\n\r\n\t\t.ddrcontextmenu_sub.oppositeX {\r\n\t\t\tright: 100%;\r\n\t\t\tleft: auto;\r\n\t\t}\r\n\r\n\t\t.ddrcontextmenu_sub.oppositeY {\r\n\t\t\ttop: auto;\r\n\t\t\tbottom: calc(-1 * var(--cm-mainMenuPaddingY) - var(--cm-mainBorderWidth));\r\n\t\t}\r\n\r\n\t.ddrcontextmenu__item {\r\n\t\tposition: relative;\r\n\t\tdisplay: flex;\r\n\t\talign-items: center;\r\n\t\tjustify-content: space-between;\r\n\t\tfont-size: var(--cm-mainFontSize);\r\n\t\tpadding-left: var(--cm-mainItemPadding);\r\n\t\tpadding-right: var(--cm-mainItemPadding);\r\n\t\tmargin-left: var(--cm-mainMenuPaddingX);\r\n\t\tmargin-right: var(--cm-mainMenuPaddingX);\r\n\t\tmax-width: 500px;\r\n\t\tmin-height: var(--cm-mainMinHeight);\r\n\t\tborder-radius: var(--cm-mainItemRadius);\r\n\t\twill-change: background-color;\r\n\t}\r\n\t\t\r\n\t\t.ddrcontextmenu__item .metablock {\r\n\t\t\tdisplay: flex;\r\n\t\t\tjustify-content: flex-end;\r\n\t\t\talign-items: center;\r\n\t\t}\r\n\t\t\t.ddrcontextmenu__item .metablock.metablock_right {\r\n\t\t\t\tmargin-left: var(--cm-metaBlockRightSpace);\r\n\t\t\t}\r\n\t\t\t\r\n\t\t\t.ddrcontextmenu__item.ddrcontextmenu__item_full .metablock.metablock_right {\r\n\t\t\t\twidth: var(--cm-metaBlockWidth);\r\n\t\t\t}\r\n\t\t\t.ddrcontextmenu__item:not(.ddrcontextmenu__item_full) .metablock {\r\n\t\t\t\twidth: var(--cm-mainMetaBlockItemSize);\r\n\t\t\t}\r\n\t\t\r\n\t\t\r\n\t\t.ddrcontextmenu__item .icon {\r\n\t\t\tflex: 0 0 20px;\r\n\t\t\tmargin-right: 8px;\r\n\t\t\tfont-size: inherit;\r\n\t\t}\r\n\r\n\t\t\t.ddrcontextmenu__item .icon i {\r\n\t\t\t\tfont-size: inherit;\r\n\t\t\t\tcolor: var(--cm-mainIconColor);\r\n\t\t\t}\r\n\r\n\t\t.ddrcontextmenu__item .text {\r\n\t\t\tword-break: break-word;\r\n\t\t\tfont-size: inherit;\r\n\t\t\tdisplay: block;\r\n\t\t\tmax-width: 100%;\r\n\t\t\tflex: 1 1 auto;\r\n\t\t}\r\n\t\t\t.ddrcontextmenu__item .text p {\r\n\t\t\t\tfont-family: 'Roboto', sans-serif;\r\n\t\t\t\tfont-weight: var(--cm-mainFontWeight);\r\n\t\t\t\tfont-size: inherit;\r\n\t\t\t\tline-height: 0.9em;\r\n\t\t\t\tcolor: var(--cm-mainFontColor);\r\n\t\t\t}\r\n\t\t\r\n\t\t\r\n\t\t.ddrcontextmenu__item .metablock .count {\r\n\t\t\twidth: var(--cm-mainMetaBlockItemSize);\r\n\t\t\theight: var(--cm-mainMetaBlockItemSize);\r\n\t\t\tfont-size: inherit;\r\n\t\t\t\r\n\t\t\t/*display: flex;*/\r\n\t\t\t/*align-items: center;\r\n\t\t\tjustify-content: center;*/\r\n\t\t\t/*position: absolute;*/\r\n\t\t}\r\n\r\n\t\t\t.ddrcontextmenu__item .metablock .count span {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\talign-items: center;\r\n\t\t\t\tjustify-content: center;\r\n\t\t\t\theight: 100%;\r\n\t\t\t\twidth: max-content;\r\n\t\t\t\ttransform: translateX(calc(-50% + (var(--cm-mainMetaBlockItemSize) / 2)));\r\n\t\t\t\tbackground-color: var(--cm-mainCountBg);\r\n\t\t\t\tborder-radius: var(--cm-mainCountRadius);\r\n\t\t\t\tmin-width: var(--cm-mainMetaBlockItemSize);\r\n\t\t\t\tfont-size: 0.8em;\r\n\t\t\t\tfont-weight: 900;\r\n\t\t\t\tcolor: var(--cm-mainCountColor);\r\n\t\t\t\tpadding-left: calc(var(--cm-mainMetaBlockItemSize) / 6);\r\n\t\t\t\tpadding-right: calc(var(--cm-mainMetaBlockItemSize) / 6);\r\n\t\t\t}\r\n\t\t\t\r\n\t\t\t.ddrcontextmenu__item .metablock_left {\r\n\t\t\t\tmargin-right: var(--cm-metaBlockLeftSpace);\r\n\t\t\t\twidth: var(--cm-mainMetaBlockItemSize);\r\n\t\t\t}\r\n\t\t\t\r\n\t\t\t/*var(--cm-mainCountColor)\r\n\t\t\tvar(--cm-mainCountSize)*/\r\n\r\n\r\n\r\n\t\t.ddrcontextmenu__item .arrow {\r\n\t\t\tmax-width: var(--cm-mainMetaBlockItemSize);\r\n\t\t\tflex: 1 0 var(--cm-mainMetaBlockItemSize);\r\n\t\t\t/*width: var(--cm-mainArrowSpace);*/\r\n\t\t\t/*text-align: right;*/\r\n\t\t\t/*position: absolute;*/\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: center;\r\n\t\t\tmargin-left: auto;\r\n\t\t}\r\n\r\n\t\t\t.ddrcontextmenu__item .arrow i {\r\n\t\t\t\tfont-size: 1.1em;\r\n\t\t\t\tcolor: var(--cm-mainIconColor);\r\n\t\t\t}\r\n\t\t\r\n\t\t\r\n\t\t.ddrcontextmenu__item_sub {\r\n\t\t\tfont-size: var(--cm-subFontSize);\r\n\t\t\tmin-height: var(--cm-subMinHeight);\r\n\t\t\tborder-radius: var(--cm-subItemRadius);\r\n\t\t\tpadding-left: var(--cm-subItemPadding);\r\n\t\t\tpadding-right: var(--cm-subItemPadding);\r\n\t\t\tmargin-left: var(--cm-subMenuPaddingX);\r\n\t\t\tmargin-right: var(--cm-subMenuPaddingX);\r\n\t\t\twill-change: background-color;\r\n\t\t}\r\n\t\t\r\n\t\t\t.ddrcontextmenu__item_sub .text * {\r\n\t\t\t\tcolor: var(--cm-subFontColor);\r\n\t\t\t\tfont-weight: var(--cm-subFontWeight);\r\n\t\t\t}\r\n\t\t\t\r\n\t\t\t\r\n\t\t\t.ddrcontextmenu__item_sub .count {\r\n\t\t\t\twidth: var(--cm-subMetaBlockItemSize);\r\n\t\t\t\theight: var(--cm-subMetaBlockItemSize);\r\n\t\t\t\tfont-size: inherit;\r\n\t\t\t}\r\n\r\n\t\t\t\t.ddrcontextmenu__item_sub .count span {\r\n\t\t\t\t\ttransform: translateX(calc(-50% + (var(--cm-subMetaBlockItemSize) / 2)));\r\n\t\t\t\t\tbackground-color: var(--cm-subCountBg);\r\n\t\t\t\t\tborder-radius: var(--cm-subCountRadius);\r\n\t\t\t\t\tmin-width: var(--cm-subMetaBlockItemSize);\r\n\t\t\t\t\tcolor: var(--cm-subCountColor);\r\n\t\t\t\t\tpadding-left: calc(var(--cm-subMetaBlockItemSize) / 6);\r\n\t\t\t\t\tpadding-right: calc(var(--cm-subMetaBlockItemSize) / 6);\r\n\t\t\t\t}\r\n\t\t\t\r\n\t\t\t\r\n\t\t\t\r\n\t\t\t.ddrcontextmenu__item_sub:not(.ddrcontextmenu__item-disabled) .icon i {\r\n\t\t\t\tcolor: var(--cm-subIconColor);\r\n\t\t\t}\r\n\r\n\t\t\t.ddrcontextmenu__item_sub:hover:not(.ddrcontextmenu__item-disabled) {\r\n\t\t\t\tbackground-color: var(--cm-subItemHoverBg);\r\n\t\t\t\ttransition: background-color var(--cm-hoverTransition);\r\n\t\t\t}\r\n\t\t\t\t.ddrcontextmenu__item_sub:hover:not(.ddrcontextmenu__item-disabled) .text * {\r\n\t\t\t\t\tcolor: var(--cm-subFontHoverColor);\r\n\t\t\t\t}\r\n\t\t\t\t\r\n\t\t\t\t.ddrcontextmenu__item_sub:hover:not(.ddrcontextmenu__item-disabled) .count span {\r\n\t\t\t\t\tcolor: var(--cm-subFontColor);\r\n\t\t\t\t\tbackground-color: var(--cm-subBg);\r\n\t\t\t\t}\r\n\r\n\t\t.ddrcontextmenu__item-hovered:not(.ddrcontextmenu__item-disabled) {\r\n\t\t\tbackground-color: var(--cm-mainItemHoverBg);\r\n\t\t\ttransition: background-color var(--cm-hoverTransition);\r\n\t\t}\r\n\t\t\t.ddrcontextmenu__item-hovered:not(.ddrcontextmenu__item-disabled) .text * {\r\n\t\t\t\tcolor: var(--cm-mainFontHoverColor);\r\n\t\t\t\tfont-weight: var(--cm-mainFontWeight);\r\n\t\t\t}\r\n\t\t\t\r\n\t\t\t.ddrcontextmenu__item-hovered:not(.ddrcontextmenu__item-disabled) .count span {\r\n\t\t\t\tcolor: var(--cm-mainFontColor);\r\n\t\t\t\tbackground-color: var(--cm-mainBg);\r\n\t\t\t}\r\n\t\t\r\n\r\n\t\t.ddrcontextmenu__item-hovered:not(.ddrcontextmenu__item-disabled)~.ddrcontextmenu_sub {\r\n\t\t\topacity: 1;\r\n\t\t\tpointer-events: auto;\r\n\t\t\ttransition: opacity var(--cm-showSubMenu);\r\n\t\t}\r\n\r\n\t\t.ddrcontextmenu__item:active:not(.ddrcontextmenu__item-disabled):not(.ddrcontextmenu__item_parent):not(.ddrcontextmenu__item-loadingable) {\r\n\t\t\tbackground-color: var(--cm-mainItemActiveBg);\r\n\t\t\ttransition: background-color 0s;\r\n\t\t}\r\n\r\n\t\t.ddrcontextmenu__item-disabled .icon i {\r\n\t\t\tcolor: #e3e8ed;\r\n\t\t}\r\n\r\n\t\t.ddrcontextmenu__item-disabled .text p {\r\n\t\t\tcolor: #cfd3d7;\r\n\t\t}\r\n\r\n\t\t.ddrcontextmenu__item-disabled .arrow i {\r\n\t\t\tcolor: #cfd3d7;\r\n\t\t}\r\n\r\n\t\t.ddrcontextmenu__item-loadingable {\r\n\t\t\tmin-width: calc(4 * var(--cm-subMinHeight));\r\n\t\t\tjustify-content: center;\r\n\t\t}\r\n\r\n\t\t\t.ddrcontextmenu__item-loadingable .ddrcontextloadingicon {\r\n\t\t\t\tmin-width: 20px;\r\n\t\t\t\tmin-height: 20px;\r\n\t\t\t\twidth: calc(var(--cm-subMinHeight) - var(--cm-subMenuPaddingX));\r\n\t\t\t\theight: calc(var(--cm-subMinHeight) - var(--cm-subMenuPaddingY));\r\n\t\t\t}\r\n\r\n\t\t.ddrcontextmenu__item_single .text {\r\n\t\t\t/*padding-right: var(--cm-mainArrowSpace);*/\r\n\t\t}\r\n\t\t\r\n\t\t\r\n\t\t.ddrcontextmenu__item_full .count {\r\n\t\t\tmargin-right: auto;\r\n\t\t}\r\n\t\t\r\n\t\t\r\n\t\t\r\n\t\t/*.ddrcontextmenu__item_full .text {\r\n\t\t\tmargin-right: calc(var(--cm-metaBlockLeftSpace) + var(--cm-metaBlockRightSpace));\r\n\t\t}*/\r\n\r\n\t.ddrcontextmenu__divline {\r\n\t\theight: 1px;\r\n\t\tbackground-color: var(--cm-mainBg);\r\n\t\tfilter: brightness(80%) contrast(140%);\r\n\t\tmargin-top: calc(var(--cm-divSpace) / 2);\r\n\t\tmargin-bottom: calc(var(--cm-divSpace) / 2);\r\n\t\tmargin-left: calc(var(--cm-mainMenuPaddingX) + (var(--cm-mainItemRadius)));\r\n\t\tmargin-right: calc(var(--cm-mainMenuPaddingX) + (var(--cm-mainItemRadius)));\r\n\t}", ""]);
 // Exports
 /* harmony default export */ __webpack_exports__["default"] = (___CSS_LOADER_EXPORT___);
 

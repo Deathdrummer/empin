@@ -29,8 +29,10 @@ class Department {
 	 * @return 
 	 */
 	public function getToSend(Request $request, $sort = 'ASC') {
-		if (!$contractId = $request->get('contract_id')) return false;
+		$contractId = $request->get('contractId');
 		
+		if (!$contractId) return DepartmentModel::all();
+
 		return DepartmentModel::whereHas('contracts', function (Builder $query) use($contractId) {
 			$query->where('contract_id', $contractId);
 			$query->where('show', 0);

@@ -510,5 +510,35 @@ class Selections extends Controller {
 	
 	
 	
+	
+	
+	
+	
+	
+	
+	
+	public function add_selection_from_contextmenu(Request $request) {
+		if (!$request) return false;
+		
+		$userId = auth('site')->user()->id;
+		
+		[
+			'title' => $title,
+			'contractIds' => $contractIds,
+		] = $request->validate([
+			'title'	=> 'required|string',
+			'contractIds' 	=> 'required|array',
+		]);
+		
+		$validFields['_sort'] = Selection::where('account_id', $userId)->max('_sort') + 1;
+		
+		if (!$created = Selection::create(compact('title'))) return -1;
+		
+		$statData = $created->contracts()->syncWithoutDetaching($contractIds);
+		return response()->json($statData);
+	}
+	
+	
+	
 
 }

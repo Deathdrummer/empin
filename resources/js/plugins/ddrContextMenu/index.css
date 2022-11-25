@@ -1,14 +1,28 @@
 :root {
 	--cm-fontFamily: 'Roboto';
+	--cm-fontFamily: 'Roboto';
+	
+	--cm-mainFontSize: 16px;
+	--cm-subFontSize: 16px;
+	
+	--cm-mainFontWeight: 700;
+	--cm-subFontWeight: 700;
+	
+	--cm-mainFontColor: #787878;
+	--cm-subFontColor: #787878;
+	
+	--cm-mainFontHoverColor: #fff;
+	--cm-subFontHoverColor: #fff;
+	
 	
 	--cm-mainBg: #fff;
 	--cm-subBg: #fff;
 	
-	--cm-mainBoxShadow: 0 0 20px -1px #0000004a;
-	--cm-subBoxShadow: 0 0 20px -1px #0000004a;
+	--cm-mainBoxShadow: 0 0 20px -1px #00000080;
+	--cm-subBoxShadow: 0 0 20px -1px #00000080;
 	
-	--cm-mainBorderWidth: 2px;
-	--cm-subBorderWidth: 2px;
+	--cm-mainBorderWidth: 0.5px;
+	--cm-subBorderWidth: 0.5px;
 	
 	--cm-mainBorderColor: rgb(204, 204, 204);
 	--cm-subBorderColor: rgb(204, 204, 204);
@@ -19,33 +33,46 @@
 	--cm-mainItemActiveBg: #c2c4cf;
 	--cm-subItemActiveBg: #c2c4cf;
 	
-	--cm-mainIconColor: rgb(77, 77, 77);
-	--cm-subIconColor: rgb(77, 77, 77);
+	--cm-mainIconColor: #787878;
+	--cm-subIconColor: #787878;
 	
-	--cm-mainFontColor: rgb(77, 77, 77);
-	--cm-subFontColor: rgb(77, 77, 77);
+	
+	--cm-mainMetaBlockItemSize: 21px;
+	--cm-subMetaBlockItemSize: 21px;
+	
+	--cm-mainCountRadius: 8px;
+	--cm-subCountRadius: 8px;
+	
+	--cm-mainCountBg: rgb(222, 223, 229);
+	--cm-subCountBg: rgb(222, 223, 229);
+	
+	--cm-mainCountColor: #fff;
+	--cm-subCountColor: #fff;
+	
 	
 	--cm-hoverTransition: 0.1s;
 	
-	--cm-mainMenuPadding: 6px;
-	--cm-subMenuPadding: 6px;
+	--cm-mainMenuPaddingX: 11px;
+	--cm-mainMenuPaddingY: 7px;
+	--cm-subMenuPaddingX: 11px;
+	--cm-subMenuPaddingY: 7px;
 	
-	--cm-mainMenuRadius: 12px;
-	--cm-subMenuRadius: 12px;
+	--cm-mainMenuRadius: 17px;
+	--cm-subMenuRadius: 17px;
 	
-	--cm-mainItemRadius: 8px;
-	--cm-subItemRadius: 8px;
+	--cm-mainItemRadius: 10px;
+	--cm-subItemRadius: 10px;
 	
-	--cm-mainItemPadding: 15px;
-	--cm-subItemPadding: 15px;
+	--cm-mainItemPadding: 7px;
+	--cm-subItemPadding: 7px;
 	
-	--cm-mainFontSize: 16px;
-	--cm-subFontSize: 16px;
 	
-	--cm-mainMinHeight: 38px;
-	--cm-subMinHeight: 38px;
+	--cm-mainMinHeight: 48px;
+	--cm-subMinHeight: 48px;
 	
-	--cm-mainArrowSpace: 25px;
+	--cm-metaBlockLeftSpace: 9px;
+	--cm-metaBlockRightSpace: 15px;
+	--cm-metaBlockWidth: 60px;
 	
 	--cm-showSubMenu: 0.2s;
 	--cm-hideSubMenu: 0.1s;
@@ -70,8 +97,8 @@
 
 	.ddrcontextmenu_main {
 		background-color: var(--cm-mainBg);
-		padding-top: var(--cm-mainMenuPadding);
-		padding-bottom: var(--cm-mainMenuPadding);
+		padding-top: var(--cm-mainMenuPaddingY);
+		padding-bottom: var(--cm-mainMenuPaddingY);
 		border: var(--cm-mainBorderWidth) solid var(--cm-mainBorderColor);
 		border-radius: var(--cm-mainMenuRadius);
 		box-shadow: var(--cm-mainBoxShadow);
@@ -85,11 +112,11 @@
 
 	.ddrcontextmenu_sub {
 		left: 100%;
-		top: calc(-1 * (var(--cm-subMenuPadding) + var(--cm-subBorderWidth)));
+		top: calc(-1 * (var(--cm-subMenuPaddingY) + var(--cm-subBorderWidth)));
 		width: max-content;
 		background-color: var(--cm-subBg);
-		padding-top: var(--cm-subMenuPadding);
-		padding-bottom: var(--cm-subMenuPadding);
+		padding-top: var(--cm-subMenuPaddingY);
+		padding-bottom: var(--cm-subMenuPaddingY);
 		border: var(--cm-subBorderWidth) solid var(--cm-subBorderColor);
 		border-radius: var(--cm-subMenuRadius);
 		box-shadow: var(--cm-subBoxShadow);
@@ -106,7 +133,7 @@
 
 		.ddrcontextmenu_sub.oppositeY {
 			top: auto;
-			bottom: calc(-1 * var(--cm-mainMenuPadding) - var(--cm-mainBorderWidth));
+			bottom: calc(-1 * var(--cm-mainMenuPaddingY) - var(--cm-mainBorderWidth));
 		}
 
 	.ddrcontextmenu__item {
@@ -117,14 +144,31 @@
 		font-size: var(--cm-mainFontSize);
 		padding-left: var(--cm-mainItemPadding);
 		padding-right: var(--cm-mainItemPadding);
-		margin-left: var(--cm-mainMenuPadding);
-		margin-right: var(--cm-mainMenuPadding);
+		margin-left: var(--cm-mainMenuPaddingX);
+		margin-right: var(--cm-mainMenuPaddingX);
 		max-width: 500px;
 		min-height: var(--cm-mainMinHeight);
 		border-radius: var(--cm-mainItemRadius);
 		will-change: background-color;
 	}
-
+		
+		.ddrcontextmenu__item .metablock {
+			display: flex;
+			justify-content: flex-end;
+			align-items: center;
+		}
+			.ddrcontextmenu__item .metablock.metablock_right {
+				margin-left: var(--cm-metaBlockRightSpace);
+			}
+			
+			.ddrcontextmenu__item.ddrcontextmenu__item_full .metablock.metablock_right {
+				width: var(--cm-metaBlockWidth);
+			}
+			.ddrcontextmenu__item:not(.ddrcontextmenu__item_full) .metablock {
+				width: var(--cm-mainMetaBlockItemSize);
+			}
+		
+		
 		.ddrcontextmenu__item .icon {
 			flex: 0 0 20px;
 			margin-right: 8px;
@@ -145,21 +189,65 @@
 		}
 			.ddrcontextmenu__item .text p {
 				font-family: 'Roboto', sans-serif;
+				font-weight: var(--cm-mainFontWeight);
 				font-size: inherit;
 				line-height: 0.9em;
 				color: var(--cm-mainFontColor);
 			}
+		
+		
+		.ddrcontextmenu__item .metablock .count {
+			width: var(--cm-mainMetaBlockItemSize);
+			height: var(--cm-mainMetaBlockItemSize);
+			font-size: inherit;
+			
+			/*display: flex;*/
+			/*align-items: center;
+			justify-content: center;*/
+			/*position: absolute;*/
+		}
+
+			.ddrcontextmenu__item .metablock .count span {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				height: 100%;
+				width: max-content;
+				transform: translateX(calc(-50% + (var(--cm-mainMetaBlockItemSize) / 2)));
+				background-color: var(--cm-mainCountBg);
+				border-radius: var(--cm-mainCountRadius);
+				min-width: var(--cm-mainMetaBlockItemSize);
+				font-size: 0.8em;
+				font-weight: 900;
+				color: var(--cm-mainCountColor);
+				padding-left: calc(var(--cm-mainMetaBlockItemSize) / 6);
+				padding-right: calc(var(--cm-mainMetaBlockItemSize) / 6);
+			}
+			
+			.ddrcontextmenu__item .metablock_left {
+				margin-right: var(--cm-metaBlockLeftSpace);
+				width: var(--cm-mainMetaBlockItemSize);
+			}
+			
+			/*var(--cm-mainCountColor)
+			var(--cm-mainCountSize)*/
+
+
 
 		.ddrcontextmenu__item .arrow {
-			/*flex: 1 0 var(--cm-mainArrowSpace);*/
-			width: var(--cm-mainArrowSpace);
-			text-align: right;
-			position: absolute;
-			right: var(--cm-mainItemPadding);
+			max-width: var(--cm-mainMetaBlockItemSize);
+			flex: 1 0 var(--cm-mainMetaBlockItemSize);
+			/*width: var(--cm-mainArrowSpace);*/
+			/*text-align: right;*/
+			/*position: absolute;*/
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			margin-left: auto;
 		}
 
 			.ddrcontextmenu__item .arrow i {
-				font-size: 0.8em;
+				font-size: 1.1em;
 				color: var(--cm-mainIconColor);
 			}
 		
@@ -170,28 +258,66 @@
 			border-radius: var(--cm-subItemRadius);
 			padding-left: var(--cm-subItemPadding);
 			padding-right: var(--cm-subItemPadding);
-			margin-left: var(--cm-subMenuPadding);
-			margin-right: var(--cm-subMenuPadding);
+			margin-left: var(--cm-subMenuPaddingX);
+			margin-right: var(--cm-subMenuPaddingX);
 			will-change: background-color;
 		}
 		
-			.ddrcontextmenu__item_sub .text p {
+			.ddrcontextmenu__item_sub .text * {
 				color: var(--cm-subFontColor);
+				font-weight: var(--cm-subFontWeight);
+			}
+			
+			
+			.ddrcontextmenu__item_sub .count {
+				width: var(--cm-subMetaBlockItemSize);
+				height: var(--cm-subMetaBlockItemSize);
+				font-size: inherit;
 			}
 
+				.ddrcontextmenu__item_sub .count span {
+					transform: translateX(calc(-50% + (var(--cm-subMetaBlockItemSize) / 2)));
+					background-color: var(--cm-subCountBg);
+					border-radius: var(--cm-subCountRadius);
+					min-width: var(--cm-subMetaBlockItemSize);
+					color: var(--cm-subCountColor);
+					padding-left: calc(var(--cm-subMetaBlockItemSize) / 6);
+					padding-right: calc(var(--cm-subMetaBlockItemSize) / 6);
+				}
+			
+			
+			
 			.ddrcontextmenu__item_sub:not(.ddrcontextmenu__item-disabled) .icon i {
 				color: var(--cm-subIconColor);
 			}
 
-			.ddrcontextmenu__item_sub:hover:not(.ddrcontextmenu__item-disabled):not(.ddrcontextmenu__item-loadingable) {
+			.ddrcontextmenu__item_sub:hover:not(.ddrcontextmenu__item-disabled) {
 				background-color: var(--cm-subItemHoverBg);
 				transition: background-color var(--cm-hoverTransition);
 			}
+				.ddrcontextmenu__item_sub:hover:not(.ddrcontextmenu__item-disabled) .text * {
+					color: var(--cm-subFontHoverColor);
+				}
+				
+				.ddrcontextmenu__item_sub:hover:not(.ddrcontextmenu__item-disabled) .count span {
+					color: var(--cm-subFontColor);
+					background-color: var(--cm-subBg);
+				}
 
 		.ddrcontextmenu__item-hovered:not(.ddrcontextmenu__item-disabled) {
 			background-color: var(--cm-mainItemHoverBg);
 			transition: background-color var(--cm-hoverTransition);
 		}
+			.ddrcontextmenu__item-hovered:not(.ddrcontextmenu__item-disabled) .text * {
+				color: var(--cm-mainFontHoverColor);
+				font-weight: var(--cm-mainFontWeight);
+			}
+			
+			.ddrcontextmenu__item-hovered:not(.ddrcontextmenu__item-disabled) .count span {
+				color: var(--cm-mainFontColor);
+				background-color: var(--cm-mainBg);
+			}
+		
 
 		.ddrcontextmenu__item-hovered:not(.ddrcontextmenu__item-disabled)~.ddrcontextmenu_sub {
 			opacity: 1;
@@ -224,17 +350,24 @@
 			.ddrcontextmenu__item-loadingable .ddrcontextloadingicon {
 				min-width: 20px;
 				min-height: 20px;
-				width: calc(var(--cm-subMinHeight) - var(--cm-subMenuPadding));
-				height: calc(var(--cm-subMinHeight) - var(--cm-subMenuPadding));
+				width: calc(var(--cm-subMinHeight) - var(--cm-subMenuPaddingX));
+				height: calc(var(--cm-subMinHeight) - var(--cm-subMenuPaddingY));
 			}
 
 		.ddrcontextmenu__item_single .text {
 			/*padding-right: var(--cm-mainArrowSpace);*/
 		}
 		
-		.ddrcontextmenu__item_rowed .text {
-			margin-right: var(--cm-mainArrowSpace);
+		
+		.ddrcontextmenu__item_full .count {
+			margin-right: auto;
 		}
+		
+		
+		
+		/*.ddrcontextmenu__item_full .text {
+			margin-right: calc(var(--cm-metaBlockLeftSpace) + var(--cm-metaBlockRightSpace));
+		}*/
 
 	.ddrcontextmenu__divline {
 		height: 1px;
@@ -242,6 +375,6 @@
 		filter: brightness(80%) contrast(140%);
 		margin-top: calc(var(--cm-divSpace) / 2);
 		margin-bottom: calc(var(--cm-divSpace) / 2);
-		margin-left: calc(var(--cm-subMenuPadding) + (var(--cm-mainItemRadius)));
-		margin-right: calc(var(--cm-subMenuPadding) + (var(--cm-mainItemRadius)));
+		margin-left: calc(var(--cm-mainMenuPaddingX) + (var(--cm-mainItemRadius)));
+		margin-right: calc(var(--cm-mainMenuPaddingX) + (var(--cm-mainItemRadius)));
 	}

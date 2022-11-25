@@ -5,6 +5,7 @@ use App\Models\Contract;
 use App\Models\ContractChat;
 use App\Models\ContractData;
 use App\Models\ContractInfo;
+use App\Models\Department;
 use App\Models\Selection;
 use App\Services\Business\Department as DepartmentService;
 use App\Services\Business\Contract as ContractService;
@@ -251,17 +252,34 @@ class Contracts extends Controller {
 	 */
 	public function hide(Request $request) {
 		[
-			'contractId' 	=> $contractId,
+			'contractIds' 	=> $contractIds,
 			'departmentId' 	=> $departmentId
 		] = $request->validate([
-			'contractId' 	=> 'required|numeric',
+			'contractIds' 	=> 'required|array',
 			'departmentId' 	=> 'required|numeric'
 		]);
 		
-		$contract = Contract::find($contractId);
-		$statData = $contract->departments()->syncWithoutDetaching([$departmentId => ['hide' => 1]]);
-
+		
+		$dept = Department::find($departmentId);
+		
+		$dataToUpdate = [];
+		foreach ($contractIds as $countractId) {
+			$dataToUpdate[$countractId] = ['hide' => 1];
+		}
+		
+		
+		$statData = $dept->contracts()->syncWithoutDetaching($dataToUpdate);
+		
 		return response()->json($statData['updated']);
+		
+		
+		//$stat = Contract::whereIn('id', $contractIds)->update(['archive' => 1]);
+		//return response()->json($stat > 0);
+		
+		//$contract = Contract::find(reset($contractIds));
+		//$statData = $contract->departments()->syncWithoutDetaching([$departmentId => ['hide' => 1]]);
+
+		//return response()->json($statData['updated']);
 	}
 	
 	
@@ -308,17 +326,61 @@ class Contracts extends Controller {
 	 */
 	public function send(Request $request) {
 		[
-			'contractId' 	=> $contractId,
+			'contractIds' 	=> $contractIds,
 			'departmentId' 	=> $departmentId
 		] = $request->validate([
-			'contractId' 	=> 'required|numeric',
+			'contractIds' 	=> 'required|array',
 			'departmentId' 	=> 'required|numeric'
 		]);
 		
-		$contract = Contract::find($contractId);
-		$statData = $contract->departments()->syncWithoutDetaching([$departmentId => ['show' => 1, 'updated_show' => now()->setTime(0, 0, 0)]]);
 		
+		$dept = Department::find($departmentId);
+		$hasDepsContractIds = $dept->contracts()->wherePivotNotNull('steps')->wherePivot('show', 0)->get()->pluck('id');
+		
+		$dataToUpdate = [];
+		foreach ($contractIds as $countractId) {
+			if (!$hasDepsContractIds->contains($countractId)) continue;
+			$dataToUpdate[$countractId] = ['show' => 1, 'updated_show' => now()->setTime(0, 0, 0)];
+		}
+		
+		$statData = $dept->contracts()->syncWithoutDetaching($dataToUpdate);
 		return response()->json($statData['updated']);
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		// ---- пример
+		/* $dept = Department::find($departmentId);
+		
+		$dataToUpdate = [];
+		foreach ($contractIds as $countractId) {
+			$dataToUpdate[$countractId] = ['hide' => 1];
+		}
+		
+		
+		$statData = $dept->contracts()->syncWithoutDetaching($dataToUpdate);
+		
+		return response()->json($statData['updated']); */
+		// ---- пример
+		
+		
+		
+		
+		
+		
+		
+		
+		//$contract = Contract::find($contractIds);
+		//$statData = $contract->departments()->syncWithoutDetaching([$departmentId => ['show' => 1, 'updated_show' => now()->setTime(0, 0, 0)]]);
+		
+		//return response()->json($statData['updated']);
 	}
 	
 	

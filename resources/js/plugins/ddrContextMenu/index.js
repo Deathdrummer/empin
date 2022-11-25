@@ -36,8 +36,29 @@ $(document).on('contextmenu', '[contextmenu]', function(e) {
 		onContextMenu(callback = null) {
 			if (!_.isNull(callback) && _.isFunction(callback)) callback();
 		},
+		changeAttrData(argIndex = null, newData = null) {
+			if (_.isNull(argIndex) || _.isNull(newData)) throw new Error('Ошибка! contextmenu changeAttrData -> неверно переданы аргументы!');
+			
+			const [chFn, chArgs] = _parseAttribString($(target.selector).attr('contextmenu'));
+			
+			let buildAttrString = chFn+':',
+				i = argIndex - 1;
+			
+			if (!chArgs[i]) throw new Error('Ошибка! contextmenu changeAttrData -> аргумента с таким порядковым номером не существует!');
+			
+			chArgs[i] = newData;
+			
+			buildAttrString += chArgs.join(',');
+			
+			$(target.selector).setAttrib('contextmenu', buildAttrString);
+		},
 		buildTitle(count = null, one = null, many = null, wordVariants = null) { // сформировать заголовок исходя из кол-ва выбранных элементов
-			if (_.isNull(count) || _.isNull(one)) return;
+			if (_.isNull(count) || _.isNull(one) || (_.isNull(many) && _.isNull(wordVariants))) return;
+			
+			if (_.isNull(wordVariants) && !_.isArray(many)) {
+				if (count > 1) return many.replaceAll(/#/ig, count);
+				else return one.replaceAll(/\s*#\s*/ig, count);
+			}
 			
 			let oneWithoutNum = false;
 			if (_.isNull(wordVariants)) {
@@ -101,7 +122,7 @@ $(document).on('contextmenu', '[contextmenu]', function(e) {
 
 //--------------------------------------------------------------------------------------------------------------------------
 
-$(document).on('mouseenter', '.ddrcontextmenu .ddrcontextmenu__item_main', function() {
+$(document).on('mouseenter', '.ddrcontextmenu .ddrcontextmenu__item_main:not(.ddrcontextmenu__item-disabled)', function() {
 	$(this).addClass('ddrcontextmenu__item-hovered');
 });
 
@@ -175,6 +196,8 @@ function _buildMenuHtml(menuData = null) {
 	
 	
 	const hasChilds = menuData.some((item) => item.children || item.load);
+	const hasCountsLeft = menuData.some((item) => item.countLeft);
+	const hasCountsRight = menuData.some((item) => item.countRight && !item.countOnArrow);
 	
 	const funcMap = {};
 	
@@ -200,12 +223,12 @@ function _buildMenuHtml(menuData = null) {
 				'ddrcontextmenu__item_main',
 				{'ddrcontextmenu__item_parent': item.children || item.load},
 				{'ddrcontextmenu__item_single': !item.children && !item.load},
-				{'ddrcontextmenu__item_rowed': hasChilds},
+				{'ddrcontextmenu__item_full': hasChilds && hasCountsRight && (_.isUndefined(item.countOnArrow) || item.countOnArrow == false)},
 				{'ddrcontextmenu__item-disabled': (item.enabled != undefined && !item.enabled) || (item.disabled != undefined && item.disabled)},
 				/*{'ddrcontextmenu__item-loadingable': item.load && !item.children}*/
 			],
 			'ddrcontextmenuitem': {[funcCode]: item.onClick && !item.children && !item.load && ((item.enabled == undefined || item.enabled) && (item.disabled == undefined || !item.disabled))}, // коллбэк при клике на пункт меню (без дочерних)
-			'ddrcontextmenuitemload': {[funcCode]: item.load && !item.children && !item.onClick} // загрука подменю при наведении
+			'ddrcontextmenuitemload': {[funcCode]: item.load && !item.children && !item.onClick && ((item.enabled == undefined || item.enabled) && (item.disabled == undefined || !item.disabled))} // загрука подменю при наведении
 		});
 		
 		
@@ -214,12 +237,24 @@ function _buildMenuHtml(menuData = null) {
 		if (item.faIcon) {
 			menuHtml += '<div class="icon"><i class="fa-fw '+item.faIcon+'"></i></div>';
 		}
+		
+		if (hasCountsLeft) {
+			menuHtml += '<div class="metablock metablock_left">'; // metablock
+			if (!_.isUndefined(item.countLeft) && !_.isNull(item.countLeft)) menuHtml += '<div class="count"><span>'+item.countLeft+'</span></div>';
+			menuHtml += '</div>'; // metablock
+		}
+		
 		menuHtml += '<div class="text"><p>'+strPad(item.name, 110, '...')+'</p></div>';
 		
+		if (hasChilds || hasCountsRight) {
+			menuHtml += '<div class="metablock metablock_right">'; // metablock
+			if (!_.isUndefined(item.countRight) && !_.isNull(item.countRight)) menuHtml += '<div class="count"><span>'+item.countRight+'</span></div>';
+			if (item.children || item.load) menuHtml += '<div class="arrow"><i class="fa-solid fa-angle-right"></i></div>';
+			menuHtml += '</div>'; // metablock
+		}
 		
 		if (item.children || item.load) {
-			menuHtml += '<div class="arrow"><i class="fa-solid fa-chevron-right"></i></div>';
-			menuHtml += '</div>';
+			menuHtml += '</div>'; // ddrcontextmenu__item
 			menuHtml += '<ul class="ddrcontextmenu ddrcontextmenu_sub">';
 		}
 		
@@ -233,6 +268,9 @@ function _buildMenuHtml(menuData = null) {
 					bSort = b.sort || 0;
 				return aSort - bSort;
 			});
+			
+			const hasCountsChildLeft = item.children.some((child) => child.countLeft);
+			const hasCountsChildRight = item.children.some((child) => child.countRight);
 			
 			$.each(item.children, function(k, childItem) {
 				let childFuncCode = childItem.onClick ? generateCode('nlLlLLnnlnnLnnn') : null;
@@ -253,7 +291,21 @@ function _buildMenuHtml(menuData = null) {
 				menuHtml += '<li>';
 				menuHtml += 	'<div'+childItemAttrs+'>';
 				if (childItem.faIcon) menuHtml += 	'<div class="icon"><i class="fa-fw '+childItem.faIcon+'"></i></div>';
+				
+				if (hasCountsChildLeft) {
+					menuHtml += '<div class="metablock metablock_left">'; // metablock
+					if (!_.isUndefined(childItem.countLeft) && !_.isNull(childItem.countLeft)) menuHtml += '<div class="count"><span>'+childItem.countLeft+'</span></div>';
+					menuHtml += '</div>'; // metablock
+				}
+				
 				menuHtml += 	'<div class="text"><p>'+strPad(childItem.name, 110, '...')+'</p></div>';
+				
+				if (hasCountsChildRight) {
+					menuHtml += '<div class="metablock metablock_right">'; // metablock
+					if (!_.isUndefined(childItem.countRight) && !_.isNull(childItem.countRight)) menuHtml += '<div class="count"><span>'+childItem.countRight+'</span></div>';
+					menuHtml += '</div>'; // metablock
+				}
+				
 				menuHtml += 	'</div>';
 				menuHtml += '</li>';
 			});
@@ -304,7 +356,6 @@ function _loadSubmenu(menuItem = null) {
 	axiosQuery(method, url, params, 'json', abortCtrl)
 		.then(({data, error, status, headers}) => {
 			if (error || _.isEmpty(data)) {
-				console.log(error);	
 				if (error) console.log('Ошибка! contextmenu _loadSubmenu -> axiosQuery:', error.status, error.message);
 				$(subMenu).html(empty);
 				return;
@@ -322,6 +373,9 @@ function _loadSubmenu(menuItem = null) {
 					return aSort - bSort;
 				});
 			}
+			
+			const hasCountsSubLeft = subData.some((sub) => sub.countLeft);
+			const hasCountsSubRight = subData.some((sub) => sub.countRight);
 			
 			
 			let subMenuHtml = '',
@@ -346,7 +400,21 @@ function _loadSubmenu(menuItem = null) {
 				subMenuHtml += '<li>';
 				subMenuHtml += 	'<div'+childItemAttrs+'>';
 				if (childItem.faIcon) subMenuHtml += 	'<div class="icon"><i class="fa-fw '+childItem.faIcon+'"></i></div>';
-				subMenuHtml += 	'<div class="text"><p>'+strPad(childItem.name, 110, '...')+'</p></div>';
+				
+				if (hasCountsSubLeft) {
+					menuHtml += '<div class="metablock metablock_left">'; // metablock
+					if (!_.isUndefined(childItem.countLeft) && !_.isNull(childItem.countLeft)) menuHtml += '<div class="count"><span>'+childItem.countLeft+'</span></div>';
+					menuHtml += '</div>'; // metablock
+				}
+				
+				subMenuHtml += 		'<div class="text"><p>'+strPad(childItem.name, 110, '...')+'</p></div>';
+				
+				if (hasCountsSubRight) {
+					menuHtml += '<div class="metablock metablock_right">'; // metablock
+					if (!_.isUndefined(childItem.countRight) && !_.isNull(childItem.countRight)) menuHtml += '<div class="count"><span>'+childItem.countRight+'</span></div>';
+					menuHtml += '</div>'; // metablock
+				}
+				
 				subMenuHtml += 	'</div>';
 				subMenuHtml += '</li>';
 			});

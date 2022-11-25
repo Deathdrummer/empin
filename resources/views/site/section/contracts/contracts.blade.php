@@ -1526,7 +1526,7 @@
 	
 	let sendMessStat;
 	$.contractContextMenu = (
-		{target, closeOnScroll, onContextMenu, buildTitle},
+		{target, closeOnScroll, onContextMenu, changeAttrData, buildTitle},
 		contractId,
 		departmentId,
 		selectionId,
@@ -1566,90 +1566,10 @@
 		
 		return [
 			{
-				name: buildTitle(countSelected, 'Отправить # % в архив', ['договор', 'договора', 'договоров']),
-				//faIcon: 'fa-solid fa-box-archive',
-				visible: canToArchive && !isArchive,
-				sort: 5,
-				onClick: () => {
-					
-					// selectedContracts.items
-					
-					let html = '';
-					html += '<div>';
-					if (countSelected == 1) {
-						html += '<p class="fz14px color-darkgray text-start">Номер объекта: <span class="color-black">'+objectNumber+'</span></p>';
-						html += '<p class="fz14px color-darkgray text-start">Название/заявитель: <span class="color-black">'+title+'</span></p>';
-						html += '<p class="fz18px color-red mt15px">Вы действительно хотите отправить договор в архив?</p>';
-					} else if (countSelected > 1) {
-						html += '<p class="fz18px color-red mt15px">'+buildTitle(countSelected, 'Вы действительно хотите отправить # % в архив?', ['договор', 'договора', 'договоров'])+'</p>';
-					}
-					html += '</div>';
-					
-					ddrPopup({
-						width: 400, // ширина окна
-						html, // контент
-						buttons: ['ui.cancel', {title: 'Отправить', variant: 'red', action: 'contractToArchiveAction'}],
-						centerMode: true,
-						winClass: 'ddrpopup_dialog'
-					}).then(({close, wait}) => {
-						$.contractToArchiveAction = (_) => {
-							wait();
-							axiosQuery('post', 'site/contracts/to_archive', {contractIds: selectedContracts.items}, 'json')
-							.then(({data, error, status, headers}) => {
-								if (data) {
-									getList({withCounts: Boolean(selectionId || searched)});
-									$.notify(buildTitle(countSelected, '% успешно отправлен в архив!', '# % успешно отправлены в архив!', ['Договор', 'договора', 'договоров']));
-								} else {
-									$.notify(buildTitle(countSelected, 'Ошибка! % не был отправлен в архив!', 'Ошибка! % не были отправлены в архив!', ['договор', 'договора', 'договоров']), 'error');
-								}
-								close();
-							});
-						}
-					});
-				},
-			}, {
-				name: buildTitle(countSelected, 'Отправить # % в другой отдел', ['договор', 'договора', 'договоров']),
-				//faIcon: 'fa-solid fa-angles-right',
-				enabled: !!hasDepsToSend && ((canSending && departmentId) || (canSendingAll && !departmentId)),
-				hidden: isArchive,
-				sort: 4,
-				load: {
-					url: 'site/contracts/departments?contract_id='+contractId,
-					method: 'get',
-					map: (item) => {
-						return {
-							name: item.name,
-							//faIcon: 'fa-solid fa-angles-right',
-							visible: true,
-							onClick(selector) {
-								let departmentName = selector.text(),
-									itemsCount = selector.items().length;
-								
-								let procNotif = processNotify('Отправка договора в другой отдел...');
-								
-								axiosQuery('post', 'site/contracts/send', {contractId, departmentId: item.id}, 'json')
-								.then(({data, error, status, headers}) => {
-									if (data) {
-										//$.notify('Договор успешно отправлен в '+departmentName+'!');
-										if (selectionId || searched) {
-											let params = {};
-											getList({withCounts: true});
-										}
-										
-										procNotif.done({message: 'Договор успешно отправлен в '+departmentName+'!'});
-										if (itemsCount == 0) target.changeAttrData(6, '0');
-									} else {
-										//$.notify('Ошибка! Договор не был отправлен!', 'error');
-										procNotif.error({message: 'Ошибка! Договор не был отправлен!'});
-									}
-								});
-							}
-						};
-					}
-				},
-			}, {
-				name: buildTitle(countSelected, 'Чат договора <sup>'+messagesCount+' сообщ.</sup>', 'Отправить сообщение в чаты # %', ['договора', 'договоров', 'договоров']),
-				//faIcon: 'fa-solid fa-comments',
+				name: buildTitle(countSelected, 'Чат договора', 'Cообщение в чаты'),
+				countLeft: countSelected > 1 ? countSelected : null,
+				countRight: countSelected == 1 ? messagesCount : null,
+				countOnArrow: true,
 				visible: canChat,
 				sort: 1,
 				onClick() {
@@ -1701,7 +1621,6 @@
 					
 					} else { // Если выделено более 1 договора - отправить сообщение в чаты с выделеными договорами
 						
-						
 						let html = '<p class="d-block mb5px fz14px color-darkgray">Сообщение:</p>' +
 									'<div class="textarea normal-textarea w100" id="sendMessagesToManyContractsField">' +
 										'<textarea name="" rows="10" class="w100"></textarea>' +
@@ -1711,7 +1630,7 @@
 							title: 'Отправить сообщение в выбранные договоры',
 							width: 500,
 							html,
-							buttons: ['Закрыть', {title: 'Отправить', variant: 'green', action: 'sendMessagesToManyContracts', disabled: 1, id: 'sendMessagesToManyContractsBtn'}],
+							buttons: ['Закрыть', {title: 'Отправить', variant: 'blue', action: 'sendMessagesToManyContracts', disabled: 1, id: 'sendMessagesToManyContractsBtn'}],
 							winClass: 'ddrpopup_chat'
 						}).then(({state/* isClosed */, wait, setTitle, setButtons, loadData, setHtml, setLHtml, dialog, close, onClose, onScroll, disableButtons, enableButtons, setWidth}) => {							
 							let isEmpty = true;	
@@ -1762,47 +1681,58 @@
 									sendMessAbortCtrl.abort();
 								});
 							}
-							
 						});
 					}
 				}
 			}, {
-				name: buildTitle(countSelected, 'Скрыть # %', ['договор', 'договора', 'договоров']),
-				//faIcon: 'fa-solid fa-eye-slash',
-				visible: canHiding && departmentId && !isArchive,
-				onClick() {	
+				name: 'Отправить в архив',
+				visible: canToArchive && !isArchive,
+				countLeft: countSelected > 1 ? countSelected : null,
+				sort: 5,
+				onClick: () => {
+					let html = '';
+					html += '<div>';
+					if (countSelected == 1) {
+						html += '<p class="fz14px color-darkgray text-start">Номер объекта: <span class="color-black">'+objectNumber+'</span></p>';
+						html += '<p class="fz14px color-darkgray text-start">Название/заявитель: <span class="color-black">'+title+'</span></p>';
+						html += '<p class="fz18px color-red mt15px">Вы действительно хотите отправить договор в архив?</p>';
+					} else if (countSelected > 1) {
+						html += '<p class="fz18px color-red mt15px">'+buildTitle(countSelected, 'Вы действительно хотите отправить # % в архив?', ['договор', 'договора', 'договоров'])+'</p>';
+					}
+					html += '</div>';
+					
 					ddrPopup({
 						width: 400, // ширина окна
-						html: '<p class="fz18px color-red">Вы действительно хотите скрыть договор?</p>', // контент
-						buttons: ['ui.cancel', {title: 'Скрыть', variant: 'red', action: 'contractHide'}],
+						html, // контент
+						buttons: ['ui.cancel', {title: 'Отправить', variant: 'red', action: 'contractToArchiveAction'}],
 						centerMode: true,
 						winClass: 'ddrpopup_dialog'
 					}).then(({close, wait}) => {
-						$.contractHide = (_) => {
+						$.contractToArchiveAction = (_) => {
 							wait();
-							axiosQuery('post', 'site/contracts/hide', {contractId, departmentId}, 'json').then(({data, error, status, headers}) => {
+							axiosQuery('post', 'site/contracts/to_archive', {contractIds: selectedContracts.items}, 'json')
+							.then(({data, error, status, headers}) => {
 								if (data) {
 									getList({withCounts: Boolean(selectionId || searched)});
-									$.notify('Договор успешно скрыт!');
-									//target.changeAttrData(9, '0');
+									$.notify(buildTitle(countSelected, '% успешно отправлен в архив!', '# % успешно отправлены в архив!', ['Договор', 'договора', 'договоров']));
 								} else {
-									$.notify('Ошибка! Договор не был скрыт!', 'error');
+									$.notify(buildTitle(countSelected, 'Ошибка! % не был отправлен в архив!', 'Ошибка! % не были отправлены в архив!', ['договор', 'договора', 'договоров']), 'error');
 								}
 								close();
 							});
 						}
 					});
-				}
+				},
 			}, {
-				name: buildTitle(countSelected, 'Вернуть # % в работу', ['договор', 'договора', 'договоров']),
-				//faIcon: 'fa-solid fa-arrow-rotate-left',
+				name: 'Вернуть в работу',
 				visible: canReturnToWork && isArchive,
+				countLeft: countSelected > 1 ? countSelected : null,
 				sort: 5,
 				onClick() {
 					ddrPopup({
 						width: 400, // ширина окна
 						html: '<p class="fz18px color-green">'+buildTitle(countSelected, 'Вы действительно хотите вернуть # % в работу?', ['договор', 'договора', 'договоров'])+'</p>', // контент
-						buttons: ['ui.cancel', {title: 'Вернуть', variant: 'green', action: 'returnContractToWorkBtn'}],
+						buttons: ['ui.cancel', {title: 'Вернуть', variant: 'blue', action: 'returnContractToWorkBtn'}],
 						centerMode: true,
 						winClass: 'ddrpopup_dialog'
 					}).then(({close, wait}) => {
@@ -1823,9 +1753,9 @@
 					});
 				}
 			}, {
-				name: buildTitle(countSelected, 'Добавить # % в подборку', ['договор', 'договора', 'договоров']),
-				//faIcon: 'fa-solid fa-clipboard-check',
+				name: 'Добавить в подборку',
 				hidden: selectionId,
+				countLeft: countSelected > 1 ? countSelected : null,
 				sort: 2,
 				load: {
 					url: 'site/contracts/selections_to_choose',
@@ -1861,15 +1791,15 @@
 									} else {
 										procNotif.done({message: buildTitle(countSelected, '% успешно добавлен в подборку!', '# % успешно добавлены в подборку!', ['Договор', 'договора', 'договоров'])});
 									}
-								});	
+								});
 							}
 						};
 					}
 				},
 			}, {
-				name: buildTitle(countSelected, 'Удалить # % из подборки', ['договор', 'договора', 'договоров']),
-				//faIcon: 'fa-solid fa-trash-can',
+				name: 'Удалить из подборки',
 				visible: selectionId,
+				countLeft: countSelected > 1 ? countSelected : null,
 				sort: 4,
 				onClick() {		
 					let procNotif = processNotify(buildTitle(countSelected, 'Удаление # % из подборки...', ['договора', 'договоров', 'договоров']));
@@ -1903,14 +1833,152 @@
 							});
 						}
 					});
-					
 				}
 			}, {
-				name: buildTitle(countSelected, 'Создать новую подборку', 'Создать новую подборку из # %', ['договора', 'договоров', 'договоров']),
-				//faIcon: 'fa-solid fa-clipboard-check',
+				name: 'Создать новую подборку',
 				sort: 3,
+				countLeft: countSelected > 1 ? countSelected : null,
 				onClick() {
+					let html = 	'<p class="d-block mb5px fz14px color-darkgray">Название подборки:</p>' +
+								'<div class="input normal-input normal-input-text w100">' +
+									'<input type="text" value="" id="selectionNameInput" placeholder="Введите текст" autocomplete="off" inpgroup="normal">' +
+									'<div class="normal-input__errorlabel noselect" errorlabel=""></div>' +
+								'</div>';
 					
+					
+					ddrPopup({
+						title: 'Создать подборку из выбранных договоров',
+						width: 500,
+						html,
+						buttons: ['Закрыть', {title: 'Создать', variant: 'blue', action: 'createNewSelection', disabled: 1, id: 'createNewSelectionBtn'}],
+						winClass: 'ddrpopup_chat'
+					}).then(({state/* isClosed */, wait, setTitle, setButtons, loadData, setHtml, setLHtml, dialog, close, onClose, onScroll, disableButtons, enableButtons, setWidth}) => {							
+						
+						let isEmpty = true;	
+						$('#selectionNameInput').ddrInputs('change', (input) => {
+							if ($(input).val() && isEmpty) {
+								$('#createNewSelectionBtn').ddrInputs('enable');
+								isEmpty = false;
+							} else if (!$(input).val() && !isEmpty) {
+								$('#createNewSelectionBtn').ddrInputs('disable');
+								isEmpty = true;
+							}
+						});
+						
+						
+						$.createNewSelection = () => {
+							wait();
+							
+							let title = $('#selectionNameInput').val();
+							let newSelectionAbortCtrl = new AbortController();
+							
+							axiosQuery('post', 'site/selections/add_selection_from_contextmenu', {title, contractIds: selectedContracts.items}, 'json', newSelectionAbortCtrl)
+							.then(({data, error, status, headers}) => {
+								if (error) {
+									$.notify('Ошибка создания подборки!', 'error');
+									return;
+								}
+								
+								if (data) {
+									if (data == -1) {
+										$.notify('Подборка не была создана!', 'info');
+										wait(false);
+									} else {
+										$.notify(buildTitle(countSelected, 'Поодборка с # % была успешна создана!', ['договором', 'договорами', 'договорами']));
+										close();
+									}
+									
+								} else {
+									$.notify('Не удалось создать подборку!', 'error');
+									wait(false);
+								}
+								
+							}).catch((e) => {
+								console.log(e);
+							});
+							
+							onClose(() => {
+								newSelectionAbortCtrl.abort();
+							});
+						}
+						
+					});
+				}
+			}, {
+				name: 'Отправить в другой отдел',
+				enabled: selectedContracts.items.length > 1 || (!!hasDepsToSend && ((canSending && departmentId) || (canSendingAll && !departmentId))),
+				hidden: isArchive,
+				countLeft: countSelected > 1 ? countSelected : null,
+				sort: 4,
+				load: {
+					url: 'site/contracts/departments',
+					params: {contractId: selectedContracts.items.length == 1 ? selectedContracts.items[0] : null},
+					method: 'get',
+					map: (item) => {
+						return {
+							name: item.name,
+							//faIcon: 'fa-solid fa-angles-right',
+							visible: true,
+							onClick(selector) {
+								let departmentName = selector.text(),
+									itemsCount = selector.items().length;
+								
+								let procNotif = processNotify('Отправка договора в другой отдел...');
+								
+								axiosQuery('post', 'site/contracts/send', {contractIds: selectedContracts.items, departmentId: item.id}, 'json')
+								.then(({data, error, status, headers}) => {
+									if (data) {
+										//$.notify('Договор успешно отправлен в '+departmentName+'!');
+										if (selectionId || searched) {
+											let params = {};
+											getList({withCounts: true});
+										}
+										
+										if (data.length) {
+											let mess = buildTitle(data.length, '# % успешно отправлен в '+departmentName+'!', '# % успешно отправлены в '+departmentName+'!', ['договор', 'договора', 'договоров']);
+											procNotif.done({message: mess});
+										} else {
+											procNotif.error({message: 'Ни один договор не был отправлен!'});
+										} 
+										
+										if (countSelected == 1 && itemsCount == 0) changeAttrData(6, '0');
+									} else {
+										//$.notify('Ошибка! Договор не был отправлен!', 'error');
+										procNotif.error({message: 'Ошибка! Договор не был отправлен!'});
+									}
+								});
+							}
+						};
+					}
+				},
+			}, {
+				name: 'Скрыть',
+				visible: canHiding && departmentId && !isArchive,
+				countLeft: countSelected > 1 ? countSelected : null,
+				sort: 6,
+				onClick() {	
+					ddrPopup({
+						width: 400, // ширина окна
+						html: buildTitle(countSelected, '<p class="fz18px color-red">Вы действительно хотите скрыть # %?</p>', ['договор', 'договора', 'договоров']), // контент
+						buttons: ['ui.cancel', {title: 'Скрыть', variant: 'red', action: 'contractHide'}],
+						centerMode: true,
+						winClass: 'ddrpopup_dialog'
+					}).then(({close, wait}) => {
+						$.contractHide = (_) => {
+							wait();
+							axiosQuery('post', 'site/contracts/hide', {contractIds: selectedContracts.items, departmentId}, 'json')
+							.then(({data, error, status, headers}) => {
+								if (data) {
+									getList({withCounts: Boolean(selectionId || searched)});
+									$.notify(buildTitle(countSelected, '% успешно скрыт!', '# % успешно скрыты!', ['Договор', 'договора', 'договоров']));
+									//target.changeAttrData(9, '0');
+								} else {
+									$.notify(buildTitle(countSelected, 'Ошибка! договор не был скрыт!', 'Ошибка! договоры не были скрыты!'), 'error');
+								}
+								close();
+							});
+						}
+					});
 				}
 			}
 		];

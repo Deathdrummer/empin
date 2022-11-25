@@ -40,16 +40,29 @@ class Handler extends ExceptionHandler {
 	
 	
 	
-	
+	/**
+     * Логирование ошибок
+     * Throwable $e
+     */
 	public function report(Throwable $e) {
-		Log::error('['.$e->getCode().'] "'.$e->getMessage().'" on line '.$e->getLine().' of file '.$e->getFile());
+		$code = $e->getCode();
+		$message = $e->getMessage();
+		$line = $e->getLine();
+		$file = $e->getFile();
+		
+		Log::error("[{$code}] \"{$message}\" of file: {$file}:{$line} on line: {$line}");
 		return;
 	}
 	
 	
-	public function render($request, Throwable $exception) {
-		$details = parent::render($request, $exception);
-		if ($this->isHttpException($exception) && !$request->expectsJson()) {
+	/**
+     * Отрисовка ошибок в соответствии с типом запроса
+	 * $request
+     * Throwable $e
+     */
+	public function render($request, Throwable $e) {
+		$details = parent::render($request, $e);
+		if ($this->isHttpException($e) && !$request->expectsJson()) {
 			return $details;
 		} elseif($request->expectsJson()) {
 			$locale = new Locale('admin');

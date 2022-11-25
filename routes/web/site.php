@@ -323,6 +323,11 @@ Route::prefix('site')->middleware(['lang', 'isajax:site'])->group(function() {
 	Route::post('/selections/share', [Selections::class, 'share']);
 	Route::post('/selections/unsubscribe', [Selections::class, 'unsubscribe']);
 	
+	
+	Route::post('/selections/add_selection_from_contextmenu', [Selections::class, 'add_selection_from_contextmenu']);
+	
+	
+	
 	Route::resource('selections', Selections::class);
 	
 	Route::get('/contracts/selections_to_choose', [Contracts::class, 'selections_to_choose']);
