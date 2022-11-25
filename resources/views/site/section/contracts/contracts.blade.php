@@ -1454,7 +1454,7 @@
 			contractId = $(row).attr('contractid');
 		
 		
-		console.log(ctrlKey, shiftKey);
+		console.log(ctrlKey, shiftKey, detail, which);
 		
 		if (ctrlKey) {
 			if ($(row).hasAttr('contractselected')) {
