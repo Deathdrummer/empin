@@ -1459,7 +1459,7 @@
 
 		console.log(metaKey);
 		
-		if (ctrlKey) {
+		if (ctrlKey || metaKey) {
 			if ($(row).hasAttr('contractselected')) {
 				$(row).removeClass('ddrtable__tr-selected').removeAttrib('contractselected');
 				let lastSelected = selectedContracts.remove($(row).attr('contractid'));
@@ -1499,7 +1499,7 @@
 		
 		
 		
-		if (!ctrlKey && !shiftKey) {
+		if (!ctrlKey && !metaKey && !shiftKey) {
 			$('#contractsTable').find('[contractselected]').removeClass('ddrtable__tr-selected').removeAttrib('contractselected');
 			lastChoosedRow = null;
 			selectedContracts.clear();
