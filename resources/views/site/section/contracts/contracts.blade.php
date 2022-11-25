@@ -1448,13 +1448,16 @@
 	
 	
 	
+	
+	
 	//----------------------------------------------------------------------------------- Выделение договоров
-	$('#contractsTable').on(tapEvent, '[contractid]', function({type, target, currentTarget, ctrlKey, shiftKey, detail, which}) {
+	$('#contractsTable').on(tapEvent, '[contractid]', function({type, target, currentTarget, ctrlKey, shiftKey, detail, which, metaKey}) {
 		let row = currentTarget,
 			contractId = $(row).attr('contractid');
 		
-		
-		console.log(ctrlKey, shiftKey, detail, which);
+
+
+		console.log(metaKey);
 		
 		if (ctrlKey) {
 			if ($(row).hasAttr('contractselected')) {
