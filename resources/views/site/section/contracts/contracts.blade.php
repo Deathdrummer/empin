@@ -1457,7 +1457,7 @@
 		
 
 
-		console.log(metaKey);
+		 console.log(metaKey);
 		
 		if (ctrlKey || metaKey) {
 			if ($(row).hasAttr('contractselected')) {
