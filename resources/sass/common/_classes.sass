@@ -886,8 +886,10 @@ $bPoints: map-remove($grid-breakpoints, xs)
 $tableColor: #efefef
 
 .ddrtable
-	border: 1px solid $tableColor
 	display: inline-block
+	
+	&:not(.noborder)
+		border: 1px solid $tableColor
 	
 	.ddrtable__head ~ .ddrtable__body, .ddrtable__body ~ .ddrtable__foot
 		border-top: 1px solid $tableColor
@@ -987,7 +989,7 @@ $tableColor: #efefef
 		flex-wrap: nowrap
 		width: 100%
 		
-		+ .ddrtable__tr
+		+ .ddrtable__tr:not(.noborder)
 			border-top: 1px solid $tableColor
 		
 		&.waiting
@@ -1023,7 +1025,7 @@ $tableColor: #efefef
 			padding-top: 4px
 			padding-bottom: 4px
 		
-		+ .ddrtable__td
+		+ .ddrtable__td:not(.noborder)
 			border-left: 1px solid $tableColor
 		
 		&:not([style])

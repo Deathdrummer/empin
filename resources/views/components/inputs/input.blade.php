@@ -5,6 +5,7 @@
 
 @props([
 	'id' 			=> 'input'.rand(0,9999999),
+	'inpclass'		=> null,
 	'autocomplete'	=> 'off',
 	'disabled'		=> false,
 	'enabled'		=> true,
@@ -47,6 +48,7 @@
 	@endif
 	
 	<input
+		@if($inpclass)class="{{$inpclass}}" @endif
 		type="{{$type}}"
 		@if($name)name="{{$name}}" @endif
 		value="{{$setValue($value, $settings, $setting)}}"

@@ -10,7 +10,7 @@
 					>
 					<x-simplelist
 						setting="contracts-common-info"
-						fieldset="ID:w7rem|number|id|1,Название поля:w30rem|text|name,Тип поля:w20rem|select|type,Количество строк:w10rem|number|rows_count,Описание:w30rem|textarea|desc"
+						fieldset="ID:w7rem|number|id|1,Название поля:w30rem|textarea|name,Тип поля:w20rem|select|type,Количество строк:w10rem|number|rows_count,Количество символов:w10rem|number|limit,Описание:w30rem|textarea|desc"
 						options="type;input:Однострочное поле,textarea:Многострочное поле"
 						group="small"
 						onRemove="clearCommonInfo"

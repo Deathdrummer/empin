@@ -204,6 +204,7 @@
 		sortField = ddrStore('site-contracts-sortfield') || 'id',
 		sortOrder = ddrStore('site-contracts-sortorder') || 'desc',
 		limit = {{$setting['contracts-per-page'] ?? 10}},
+		priceNds = {{$setting['price-nds'] ?? 1}},
 		countShownLoadings = {{$setting['count-shown-loadings'] ?? 2}},
 		offset = 0,
 		search = null,
@@ -214,9 +215,6 @@
 		loadedContractsIds = {},
 		lastChoosedRow = null;
 		
-	
-	
-	
 	
 	
 	
@@ -908,14 +906,15 @@
 	
 	
 	
-	//--------------------------------------------------------------------------------- Убрать отметку нового договора и открыть окно с общей информацией
+	//--------------------------------------------------------------------------------- Открыть окно с общей информацией (убрать отметку нового договора)
 	$.openContractInfo = (tr, contractId) => {
 		let isNew = $(tr).attr('isnew');
 		
 		ddrPopup({
-			title: false, 
-			width: 800,
+			width: 1100,
 			buttons: ['Закрыть'],
+			topClose: false,
+			winClass: 'commoninfo'
 		}).then(({state, wait, setTitle, setButtons, loadData, setHtml, setLHtml, dialog, close, onScroll, disableButtons, enableButtons, setWidth}) => { //isClosed
 			wait();
 			
@@ -1283,6 +1282,19 @@
 					if (data) setHtml(data, () => {
 						enableButtons('close');
 						$('input[name="price"]').number(true, 2, '.', ' ');
+						$('input[name="price"]').number(true, 2, '.', ' ');
+						
+						// Работа с НДС
+						$('input[name="price"]').on('input', function() {
+							$('input[name="price_nds"]').val($.number(($(this).val() * (1 + priceNds / 100)), 2, '.', ' '));
+						});
+						
+						// Работа с НДС
+						$('input[name="price_nds"]').on('input', function() {
+							$('input[name="price"]').val($.number(($(this).val() / (1 + priceNds / 100)), 2, '.', ' '));
+						});
+						
+						
 						$('#contractForm').ddrInputs('change', function(item) {
 							enableButtons(false);
 						});
@@ -1454,11 +1466,7 @@
 	$('#contractsTable').on(tapEvent, '[contractid]', function({type, target, currentTarget, ctrlKey, shiftKey, detail, which, metaKey}) {
 		let row = currentTarget,
 			contractId = $(row).attr('contractid');
-		
-
-
-		 console.log(metaKey);
-		
+			
 		if (ctrlKey || metaKey) {
 			if ($(row).hasAttr('contractselected')) {
 				$(row).removeClass('ddrtable__tr-selected').removeAttrib('contractselected');
@@ -1565,7 +1573,7 @@
 				selectedContracts.add($(target.selector).attr('contractid'));
 			}
 			
-			console.log(selectedContracts.items);
+			// console.log(selectedContracts.items);
 		});
 		
 		const countSelected = selectedContracts.items?.length || null;

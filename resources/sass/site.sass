@@ -35,10 +35,6 @@ body
 	
 
 
-.ddrpopup
-	+scrollbar($sbBg, $sbSliderBg, $sbWidth, $sbBorderRadius, $sbSliderBorderRadius)
-	
-
 
 input, textarea, [contenteditable]
 	+placeholder(#ccc)
@@ -436,6 +432,104 @@ section
 			color: #008f93
 			border-color: #008f93
 	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.ddrpopup
+	+scrollbar($sbBg, $sbSliderBg, $sbWidth, $sbBorderRadius, $sbSliderBorderRadius)
+	
+	&__win
+		&.commoninfo
+			background-color: #fff
+			
+			.ddrpopup__footer
+				display: none
+	
+.commoninfo // окно с общей информацией
+	border-radius: 25px
+	padding: 40px 60px 0px
+	
+	
+	h3, p, span, small, strong
+		+font(Roboto, sans-serif)
+	
+	&__scrollblock
+		+scrollbar(#e6eaed, #bfcfdb, 6px, 3px, 3px)
+		overflow-y: scroll 
+		height: calc(100vh - 180px)
+		min-height: 400px
+		padding-right: 1rem
+	
+	&__line
+		height: 1px
+		background-color: #ddd
+	
+	&__tableblock
+		position: relative
+		
+	&__label
+		position: absolute
+		top: 30px
+		left: 10px
+		
+		p
+			font-size: 18px
+			width: min-content
+			
+	
+	&__table
+		border-spacing: 0 30px
+		border-collapse: separate
+		
+		tr
+			td
+				&:first-of-type
+					width: 40%
+					text-align: right
+					padding-right: 40px
+					
+				&:last-of-type
+					width: 60%
+				
+				p
+					font-size: 18px
+					white-space: pre-line
+				
+				input, textarea
+					font-size: 18px
+				
+				
+				
+				
+				
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

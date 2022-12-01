@@ -143200,8 +143200,10 @@ template {
 }
 
 .ddrtable {
-  border: 1px solid #efefef;
   display: inline-block;
+}
+.ddrtable:not(.noborder) {
+  border: 1px solid #efefef;
 }
 .ddrtable .ddrtable__head ~ .ddrtable__body, .ddrtable .ddrtable__body ~ .ddrtable__foot {
   border-top: 1px solid #efefef;
@@ -143306,7 +143308,7 @@ template {
   flex-wrap: nowrap;
   width: 100%;
 }
-.ddrtable__tr + .ddrtable__tr {
+.ddrtable__tr + .ddrtable__tr:not(.noborder) {
   border-top: 1px solid #efefef;
 }
 .ddrtable__tr.waiting {
@@ -143337,7 +143339,7 @@ template {
   padding-top: 4px;
   padding-bottom: 4px;
 }
-.ddrtable__td + .ddrtable__td {
+.ddrtable__td + .ddrtable__td:not(.noborder) {
   border-left: 1px solid #efefef;
 }
 .ddrtable__td:not([style]) {

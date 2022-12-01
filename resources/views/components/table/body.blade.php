@@ -8,7 +8,8 @@
 <div
 	{{$attributes->class([
 		'ddrtable__body',
-	])->merge(['class' => 'ddrtable__body_scrolled'])}}
+		'ddrtable__body_scrolled' => $scrollstart || $scrollend
+	])}}
 	ddrtablebody
 	{{$scrollsync}}
 	>

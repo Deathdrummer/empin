@@ -174,19 +174,24 @@ class Contracts extends Controller {
 		
 		$validFields = $request->validate([
 			'object_number'		=> 'required|string|unique:contracts,object_number',
+			'buy_number'		=> 'nullable|string',
 			'title' 			=> 'required|string',
 			'applicant' 		=> 'nullable|string',
 			'titul' 			=> 'nullable|string',
 			'contract' 			=> 'nullable|string',
 			'price' 			=> 'nullable|numeric',
+			'price_nds' 		=> 'nullable|numeric',
 			'date_start' 		=> 'nullable|date_format:d-m-Y',
 			'date_end' 			=> 'nullable|date_format:d-m-Y',
+			'date_close' 		=> 'nullable|date_format:d-m-Y',
+			'date_buy' 			=> 'nullable|date_format:d-m-Y',
 			'customer' 			=> 'nullable|numeric',
 			'locality' 			=> 'nullable|string',
 			'contractor' 		=> 'nullable|numeric',
 			'type' 				=> 'nullable|numeric',
 			'subcontracting'	=> 'boolean|nullable',
 			'hoz_method' 		=> 'boolean|nullable',
+			'archive_dir' 		=> 'nullable|string',
 			'departments' 		=> 'array|exclude',
 			'_sort'				=> 'exclude|regex:/[0-9]+/'
 		]);
@@ -322,19 +327,24 @@ class Contracts extends Controller {
         		'required',
 				Rule::unique('contracts')->ignore(Contract::where('id', $id)->first()),
 			],
+			'buy_number' 		=> 'nullable|string',
 			'title' 			=> 'required|string',
 			'applicant' 		=> 'nullable|string',
 			'titul' 			=> 'nullable|string',
 			'contract' 			=> 'nullable|string',
 			'price' 			=> 'nullable|numeric',
+			'price_nds' 		=> 'nullable|numeric',
 			'date_start' 		=> 'nullable|date_format:d-m-Y',
 			'date_end' 			=> 'nullable|date_format:d-m-Y',
+			'date_close' 		=> 'nullable|date_format:d-m-Y',
+			'date_buy' 			=> 'nullable|date_format:d-m-Y',
 			'customer' 			=> 'nullable|numeric',
 			'locality' 			=> 'nullable|string',
 			'contractor' 		=> 'nullable|numeric',
 			'type' 				=> 'nullable|numeric',
 			'subcontracting'	=> 'boolean|nullable',
 			'hoz_method' 		=> 'boolean|nullable',
+			'archive_dir' 		=> 'nullable|string',
 			'departments' 		=> 'array|exclude',
 			'views'				=> 'string|required|exclude'
 		]);
@@ -513,6 +523,8 @@ class Contracts extends Controller {
 			'value'		=> 'title'
 		], [
 			'setting'	=> 'contract-contractors:contractors'
+		], [
+			'setting'	=> 'price-nds'
 		]]);
 		
 		

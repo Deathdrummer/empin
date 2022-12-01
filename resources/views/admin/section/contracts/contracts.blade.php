@@ -28,7 +28,7 @@
 						<td><strong>Номер договора</strong></td>
 						<td class="w20rem"><strong>Заказчик</strong></td>
 						<td class="w20rem"><strong>Населенный пункт</strong></td>
-						<td class="w14rem"><strong class="lh90 d-block">Стоимость договора</strong></td>
+						<td class="w14rem"><strong class="lh90 d-block">Стоимость договора с НДС</strong></td>
 						<td class="w14rem"><strong>Дата создания</strong></td>
 						<td class="w7rem"><strong>Архив</strong></td>
 						<td class="w13rem center"><strong>Действия</strong></td>
@@ -126,6 +126,18 @@
 					if (data) setHtml(data, () => {
 						enableButtons('close');
 						$('input[name="price"]').number(true, 2, '.', ' ');
+						$('input[name="price_nds"]').number(true, 2, '.', ' ');
+						
+						// Работа с НДС
+						let priceNds = $('input[name="nds"]').val();
+						
+						$('input[name="price"]').on('input', function() {
+							$('input[name="price_nds"]').val($.number(($(this).val() * (1 + priceNds / 100)), 2, '.', ' '));
+						});
+						
+						$('input[name="price_nds"]').on('input', function() {
+							$('input[name="price"]').val($.number(($(this).val() / (1 + priceNds / 100)), 2, '.', ' '));
+						});
 						
 						$('#objectNumber').ddrInputs('change', function(item) {
 							let value = $(item).val(),
@@ -245,6 +257,18 @@
 						setHtml(data, () => {
 							enableButtons('close');
 							$('input[name="price"]').number(true, 2, '.', ' ');
+							$('input[name="price_nds"]').number(true, 2, '.', ' ');
+							
+							// Работа с НДС
+							let priceNds = $('input[name="nds"]').val();
+							
+							$('input[name="price"]').on('input', function() {
+								$('input[name="price_nds"]').val($.number(($(this).val() * (1 + priceNds / 100)), 2, '.', ' '));
+							});
+							
+							$('input[name="price_nds"]').on('input', function() {
+								$('input[name="price"]').val($.number(($(this).val() / (1 + priceNds / 100)), 2, '.', ' '));
+							});
 							
 							$('#objectNumber').ddrInputs('change', function(item) {
 								let value = $(item).val(),

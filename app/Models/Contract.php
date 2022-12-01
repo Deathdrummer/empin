@@ -56,13 +56,17 @@ class Contract extends Model {
      */
 	protected $fillable = [
 		'object_number',
+		'buy_number',
 		'title',
 		'applicant',
 		'titul',
 		'contract',
 		'price',
+		'price_nds',
 		'date_start',
 		'date_end',
+		'date_close',
+		'date_buy',
 		'customer',
 		'locality',
 		'contractor',
@@ -71,6 +75,7 @@ class Contract extends Model {
 		'hoz_method',
 		'departments',
 		'archive',
+		'archive_dir',
 		'_sort'
 	];
 	
@@ -190,6 +195,29 @@ class Contract extends Model {
 	public function setDateEndAttribute($value) {
 		if (!$value) return false;
 		$this->attributes['date_end'] = Carbon::parse($value);
+	}
+	
+	
+	
+	
+	/**
+	 * @param 
+	 * @return 
+	 */
+	public function setDateCloseAttribute($value) {
+		if (!$value) return false;
+		$this->attributes['date_close'] = Carbon::parse($value);
+	}
+	
+	
+	
+	/**
+	 * @param 
+	 * @return 
+	 */
+	public function setDateBuyAttribute($value) {
+		if (!$value) return false;
+		$this->attributes['date_buy'] = Carbon::parse($value);
 	}
 	
 	

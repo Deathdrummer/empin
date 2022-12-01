@@ -8,7 +8,9 @@
 
 
 <div
-	class="ddrtable"
+	{{$attributes->class([
+		'ddrtable',
+	])}}
 	id="{{$id}}"
 	ddrtable
 	scrollsync="{{$scrollsync}}"

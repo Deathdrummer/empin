@@ -19,8 +19,8 @@
 			</div>
 		<td><p class="fz12px">{{$locality ?? '-'}}</p></td>
 		<td class="text-end">
-			@isset($price)
-				<p>@number($price, 2) @symbal(money)</p></td>
+			@isset($price_nds)
+				<p>@number($price_nds, 2) @symbal(money)</p></td>
 			@else
 				<p class="color-gray">-</p>
 			@endisset

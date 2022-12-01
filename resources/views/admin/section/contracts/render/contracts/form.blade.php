@@ -1,27 +1,34 @@
 <x-input-group group="normal">
-	
 	<form id="contractForm">
 		<div class="row g-30">
 			<div class="col-5">
 				<div class="form">
 					<div class="form__item">
-						<label class="form__label color-dark">Номер объекта</label>
-						@if($guard == 'site')
-							<strong class="fz14px d-block mt4px">{{$new_object_number ?? $object_number ?? null}}</strong>
-							@isset($new_object_number)
-								<input type="hidden" name="object_number" value="{{$new_object_number}}">
-							@endisset
-						@elseif($guard == 'admin')
-							<x-input
-								id="objectNumber"
-								name="object_number"
-								type="number"
-								value="{{$new_object_number ?? $object_number ?? null}}"
-								class="w10rem"
-								placeholder="00000"
-								showrows
-								/>
-						@endif
+						<div class="row g-10">
+							<div class="col-auto">
+								<label class="form__label color-dark">Номер объекта</label>
+								@if($guard == 'site')
+									<strong class="fz14px d-block mt4px">{{$new_object_number ?? $object_number ?? null}}</strong>
+									@isset($new_object_number)
+										<input type="hidden" name="object_number" value="{{$new_object_number}}">
+									@endisset
+								@elseif($guard == 'admin')
+									<x-input
+										id="objectNumber"
+										name="object_number"
+										type="number"
+										value="{{$new_object_number ?? $object_number ?? null}}"
+										class="w10rem"
+										placeholder="00000"
+										showrows
+										/>
+								@endif
+							</div>
+							<div class="col">
+								<label class="form__label color-dark">Номер договора</label>
+								<x-input name="contract" value="{{$contract ?? null}}" class="w100" />
+							</div>
+						</div>
 					</div>
 					
 					<div class="form__item">
@@ -40,10 +47,14 @@
 					</div>
 					
 					<div class="form__item">
-						<label class="form__label color-dark">Номер договора</label>
-						<x-input name="contract" value="{{$contract ?? null}}" class="w100" />
+						<label class="form__label color-dark">Номер закупки</label>
+						<x-input name="buy_number" value="{{$buy_number ?? null}}" class="w100" />
 					</div>
 					
+					<div class="form__item">
+						<label class="form__label color-dark">Архивная папка</label>
+						<x-input name="archive_dir" value="{{$archive_dir ?? null}}" class="w100" />
+					</div>
 				</div>
 			</div>
 			
@@ -53,12 +64,25 @@
 					<div class="form__item">
 						<div class="row row-cols-2 g-10">
 							<div class="col">
-								<label class="form__label color-dark">Дата начала договора</label>
-								<x-datepicker name="date_start" date="{{$date_start ?? null}}" calendarid="cntractForm{{$data['rand_id']}}" class="w100" />
+								<label class="form__label color-dark">Дата подписания договора</label>
+								<x-datepicker name="date_start" date="{{$date_start ?? null}}" calendarid="contractForm{{$data['rand_id']}}" class="w100" />
 							</div>
 							<div class="col">
-								<label class="form__label color-dark">Дата окончания договора</label>
-								<x-datepicker name="date_end" date="{{$date_end ?? null}}" calendarid="cntractForm{{$data['rand_id']}}" class="w100" />
+								<label class="form__label color-dark">Дата окончания работ по договору</label>
+								<x-datepicker name="date_end" date="{{$date_end ?? null}}" calendarid="contractForm{{$data['rand_id']}}" class="w100" />
+							</div>
+						</div>	
+					</div>
+					
+					<div class="form__item">
+						<div class="row row-cols-2 g-10">
+							<div class="col">
+								<label class="form__label color-dark">Дата закрытия договора</label>
+								<x-datepicker name="date_close" date="{{$date_close ?? null}}" calendarid="contractForm2{{$data['rand_id']}}" class="w100" />
+							</div>
+							<div class="col">
+								<label class="form__label color-dark">Дата закупки</label>
+								<x-datepicker name="date_buy" date="{{$date_end ?? null}}" calendarid="contractForm2{{$data['rand_id']}}" class="w100" />
 							</div>
 						</div>	
 					</div>
@@ -87,9 +111,19 @@
 						<x-select :options="$data['types']" name="type" value="{{$type ?? null}}" class="w100" />
 					</div>
 					
+					
+					<input type="hidden" name="nds" value="{{$data['price-nds'][0] ?? 1}}">
 					<div class="form__item">
-						<label class="form__label color-dark">Стоимость договора</label>
-						<x-input name="price" value="{{$price ?? 0}}" icon="ruble-sign" iconbg="yellow" class="w100" />
+						<div class="row row-cols-2 g-10">
+							<div class="col">
+								<label class="form__label color-dark">Стоимость договора без НДС</label>
+								<x-input name="price" value="{{$price ?? 0}}" icon="ruble-sign" iconbg="yellow" class="w100" />
+							</div>
+							<div class="col">
+								<label class="form__label color-dark">Стоимость договора с НДС</label>
+								<x-input name="price_nds" value="{{$price_nds ?? 0}}" icon="ruble-sign" iconbg="yellow" class="w100" />
+							</div>
+						</div>	
 					</div>
 				</div>
 			</div>

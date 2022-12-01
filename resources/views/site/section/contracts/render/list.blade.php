@@ -114,6 +114,17 @@
 								</x-table.td>
 							@endif
 							
+							@if(auth('site')->user()->can('contract-col-price_nds:site') && (empty($userColums) || in_array('price_nds', $userColums)))
+								<x-table.td
+									style="width:{{isset($listWidth['price_nds']) ? $listWidth['price_nds'] : '110'}}px;"
+									class="sort{{$sortField == 'price_nds' ? ' sort-'.$sortOrder : ''}}"
+									onclick="$.sorting(this, 'price_nds')"
+									noscroll
+									ddrtabletdmain
+									><strong class="fz10px lh90 d-block text-center wodrbreak">Стоимость договора с НДС</strong>
+								</x-table.td>
+							@endif
+							
 							@if(auth('site')->user()->can('contract-col-price:site') && (empty($userColums) || in_array('price', $userColums)))
 								<x-table.td
 									style="width:{{isset($listWidth['price']) ? $listWidth['price'] : '110'}}px;"
@@ -121,7 +132,7 @@
 									onclick="$.sorting(this, 'price')"
 									noscroll
 									ddrtabletdmain
-									><strong class="fz10px lh90 d-block text-center wodrbreak">Стоимость договора</strong>
+									><strong class="fz10px lh90 d-block text-center wodrbreak">Стоимость договора без НДС</strong>
 								</x-table.td>
 							@endif
 							
@@ -131,7 +142,7 @@
 									onclick="$.sorting(this, 'date_start')"
 									noscroll
 									ddrtabletdmain
-									><strong class="fz10px lh90 d-block text-center wodrbreak">Дата начала договора</strong>
+									><strong class="fz10px lh90 d-block text-center wodrbreak">Дата подписания договора</strong>
 								</x-table.td>
 							@endif
 							
@@ -141,7 +152,27 @@
 									onclick="$.sorting(this, 'date_end')"
 									noscroll
 									ddrtabletdmain
-									><strong class="fz10px lh90 d-block text-center wodrbreak">Дата окончания договора</strong>
+									><strong class="fz10px lh90 d-block text-center wodrbreak">Дата окончания работ по договору</strong>
+								</x-table.td>
+							@endif
+							
+							@if(auth('site')->user()->can('contract-col-date_close:site') && (empty($userColums) || in_array('date_close', $userColums)))
+								<x-table.td
+									class="w6rem sort{{$sortField == 'date_close' ? ' sort-'.$sortOrder : ''}}"
+									onclick="$.sorting(this, 'date_close')"
+									noscroll
+									ddrtabletdmain
+									><strong class="fz10px lh90 d-block text-center wodrbreak">Дата закрытия договора</strong>
+								</x-table.td>
+							@endif
+							
+							@if(auth('site')->user()->can('contract-col-date_buy:site') && (empty($userColums) || in_array('date_buy', $userColums)))
+								<x-table.td
+									class="w6rem sort{{$sortField == 'date_buy' ? ' sort-'.$sortOrder : ''}}"
+									onclick="$.sorting(this, 'date_buy')"
+									noscroll
+									ddrtabletdmain
+									><strong class="fz10px lh90 d-block text-center wodrbreak">Дата закупки</strong>
 								</x-table.td>
 							@endif
 							
@@ -186,6 +217,28 @@
 									><strong class="fz10px lh90 d-block text-center wodrbreak">Исполнитель</strong>
 								</x-table.td>
 							@endif
+							
+							@if(auth('site')->user()->can('contract-col-buy_number:site') && (empty($userColums) || in_array('buy_number', $userColums)))
+								<x-table.td
+									class="w7rem sort{{$sortField == 'buy_number' ? ' sort-'.$sortOrder : ''}}"
+									onclick="$.sorting(this, 'buy_number')"
+									noscroll
+									ddrtabletdmain
+									><strong class="fz10px lh90 d-block text-center wodrbreak">Номер закупки</strong>
+								</x-table.td>
+							@endif
+							
+							@if(auth('site')->user()->can('contract-col-archive_dir:site') && (empty($userColums) || in_array('archive_dir', $userColums)))
+								<x-table.td
+									style="width:{{isset($listWidth['archive_dir']) ? $listWidth['archive_dir'] : '100'}}px;"
+									class="sort{{$sortField == 'archive_dir' ? ' sort-'.$sortOrder : ''}}"
+									onclick="$.sorting(this, 'archive_dir')"
+									noscroll
+									ddrtabletdmain
+									><strong class="fz10px lh90 d-block text-center wodrbreak">Архивная папка</strong>
+								</x-table.td>
+							@endif
+							
 							
 							{{-- @if($selectionEdited || ($selectionEdited && $searched))
 								<x-table.td class="w7rem h-center" ddrtabletdmain>

@@ -52,6 +52,7 @@ class Contract {
 			return [$item['id'] => [
 				'id'				=> $item['id'] ?? null,
 				'object_number'		=> $item['object_number'] ?? null,
+				'buy_number'		=> $item['buy_number'] ?? null,
 				'title'				=> $item['title'] ?? null,
 				'applicant'			=> $item['applicant'] ?? null,
 				'titul' 			=> $item['titul'] ?? null,
@@ -60,12 +61,16 @@ class Contract {
 				'customer' 			=> $item['customer'] ?? null,
 				'locality' 			=> $item['locality'] ?? null,
 				'price' 			=> $item['price'] ?? null,
+				'price_nds' 		=> $item['price_nds'] ?? null,
 				'date_start' 		=> $item['date_start'] ?? null,
 				'date_end' 			=> $item['date_end'] ?? null,
+				'date_close' 		=> $item['date_close'] ?? null,
+				'date_buy' 			=> $item['date_buy'] ?? null,
 				'hoz_method' 		=> $item['hoz_method'] ?? null,
 				'type' 				=> $item['type'] ?? null,
 				'contractor' 		=> $item['contractor'] ?? null,
 				'archive' 			=> $item['archive'] ?? null,
+				'archive_dir' 		=> $item['archive_dir'] ?? null,
 				'created_at' 		=> $item['created_at'] ?? null,
 				'updated_at' 		=> $item['updated_at'] ?? null
 			]];
@@ -74,6 +79,7 @@ class Contract {
 		if ($one) return $result[$contractId];
 		return $result;
 	}
+	
 	
 	
 	
@@ -221,6 +227,7 @@ class Contract {
 			return [$item['id'] => [
 				'id'				=> $item['id'] ?? null,
 				'object_number'		=> $item['object_number'] ?? null,
+				'buy_number'		=> $item['buy_number'] ?? null,
 				'title'				=> $item['title'] ?? null,
 				'applicant'			=> $item['applicant'] ?? null,
 				'titul' 			=> $item['titul'] ?? null,
@@ -229,12 +236,16 @@ class Contract {
 				'customer' 			=> $item['customer'] ?? null,
 				'locality' 			=> $item['locality'] ?? null,
 				'price' 			=> $item['price'] ?? null,
+				'price_nds' 		=> $item['price_nds'] ?? null,
 				'date_start' 		=> $item['date_start'] ?? null,
 				'date_end' 			=> $item['date_end'] ?? null,
+				'date_close' 		=> $item['date_close'] ?? null,
+				'date_buy' 			=> $item['date_buy'] ?? null,
 				'hoz_method' 		=> $item['hoz_method'] ?? null,
 				'type' 				=> $item['type'] ?? null,
 				'contractor' 		=> $item['contractor'] ?? null,
 				'archive' 			=> $item['archive'] ?? null,
+				'archive_dir' 		=> $item['archive_dir'] ?? null,
 				'created_at' 		=> $item['created_at'] ?? null,
 				'updated_at' 		=> $item['updated_at'] ?? null,
 				'color' 			=> $color ?? null,
@@ -431,6 +442,7 @@ class Contract {
 		$allColums = collect([
 			'period' 			=> 'Срок исполнения договора',
 			'object_number' 	=> 'Номер объекта',
+			'buy_number' 		=> 'Номер закупки',
 			'title' 			=> 'Название/заявитель',
 			'applicant' 		=> 'Заявитель',
 			'titul' 			=> 'Титул',
@@ -438,13 +450,17 @@ class Contract {
 			'subcontracting' 	=> 'Субподряд',
 			'customer' 			=> 'Заказчик',
 			'locality' 			=> 'Населенный пункт',
-			'price' 			=> 'Стоимость договора',
-			'date_start' 		=> 'Дата начала договора',
-			'date_end' 			=> 'Дата окончания договора',
+			'price' 			=> 'Стоимость договора без НДС',
+			'price_nds' 		=> 'Стоимость договора с НДС',
+			'date_start' 		=> 'Дата подписания договора',
+			'date_end' 			=> 'Дата окончания работ по договору',
+			'date_close' 	 	=> 'Дата закрытия договора',
+			'date_buy' 	 		=> 'Дата закупки',
 			'hoz_method' 		=> 'Хоз способ',
 			'type' 				=> 'Тип договора',
 			'contractor' 		=> 'Исполнтель',
 			'archive' 			=> 'В архиве',
+			'archive_dir' 		=> 'Архивная папка',
 		]);
 		
 		$contractColums = $this->getUserColums();

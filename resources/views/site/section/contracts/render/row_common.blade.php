@@ -100,6 +100,16 @@
 	</x-table.td>
 @endif
 
+@if(auth('site')->user()->can('contract-col-price_nds:site') && (empty($userColums) || in_array('price_nds', $userColums)))
+	<x-table.td class="text-end">
+		@isset($price_nds)
+			<p class="fz12px lh90 nobreak">@number($price_nds, 2) <strong>@symbal(money)</strong></p>
+		@else
+			<p class="color-gray">-</p>
+		@endisset
+	</x-table.td>
+@endif
+
 @if(auth('site')->user()->can('contract-col-price:site') && (empty($userColums) || in_array('price', $userColums)))
 	<x-table.td class="text-end">
 		@isset($price)
@@ -124,6 +134,26 @@
 	<x-table.td>
 		@if(isset($date_end) && $date_end)
 			<p class="fz12px lh90">{{dateFormatter($date_end, 'd.m.y')}}</p>
+		@else
+			<p class="color-gray">-</p>
+		@endif
+	</x-table.td>
+@endif
+
+@if(auth('site')->user()->can('contract-col-date_close:site') && (empty($userColums) || in_array('date_close', $userColums)))
+	<x-table.td>
+		@if(isset($date_close) && $date_close)
+			<p class="fz12px lh90">{{dateFormatter($date_close, 'd.m.y')}}</p>
+		@else
+			<p class="color-gray">-</p>
+		@endif
+	</x-table.td>
+@endif
+
+@if(auth('site')->user()->can('contract-col-date_buy:site') && (empty($userColums) || in_array('date_buy', $userColums)))
+	<x-table.td>
+		@if(isset($date_buy) && $date_buy)
+			<p class="fz12px lh90">{{dateFormatter($date_buy, 'd.m.y')}}</p>
 		@else
 			<p class="color-gray">-</p>
 		@endif
@@ -163,6 +193,18 @@
 		@else
 			<p class="color-gray">-</p>
 		@endif
+	</x-table.td>
+@endif
+
+@if(auth('site')->user()->can('contract-col-buy_number:site') && (empty($userColums) || in_array('buy_number', $userColums)))
+	<x-table.td class="h-center"><strong class="fz16px">{{$buy_number ?? '-'}}</strong></x-table.td>
+@endif
+
+@if(auth('site')->user()->can('contract-col-archive_dir:site') && (empty($userColums) || in_array('archive_dir', $userColums)))
+	<x-table.td class="breakword h-center">
+		<div class="scrollblock-hidden maxh4rem-6px pr3px">
+			<p class="fz12px lh100 mt2px mb2px">{{$archive_dir ?? '-'}}</p>
+		</div>
 	</x-table.td>
 @endif
 

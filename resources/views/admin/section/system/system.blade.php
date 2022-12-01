@@ -129,6 +129,16 @@
 									/>
 							</div>
 							<div class="col-auto w14rem">
+								<p class="fz10px mb4px">Номер закупки</p>
+								<x-input
+									class="w100"
+									type="number"
+									showrows
+									group="small"
+									setting="contract-list-widths.buy_number"
+									/>
+							</div>
+							<div class="col-auto w14rem">
 								<p class="fz10px mb4px">Заказчик</p>
 								<x-input
 									class="w100"
@@ -149,7 +159,17 @@
 									/>
 							</div>
 							<div class="col-auto w14rem">
-								<p class="fz10px mb4px">Стоимость договора</p>
+								<p class="fz10px mb4px">Стоим. дог. С НДС</p>
+								<x-input
+									class="w100"
+									type="number"
+									showrows
+									group="small"
+									setting="contract-list-widths.price_nds"
+									/>
+							</div>
+							<div class="col-auto w14rem">
+								<p class="fz10px mb4px">Стоим. дог. без НДС</p>
 								<x-input
 									class="w100"
 									type="number"
@@ -176,6 +196,16 @@
 									showrows
 									group="small"
 									setting="contract-list-widths.contractor"
+									/>
+							</div>
+							<div class="col-auto w14rem">
+								<p class="fz10px mb4px">Архивная папка</p>
+								<x-input
+									class="w100"
+									type="number"
+									showrows
+									group="small"
+									setting="contract-list-widths.archive_dir"
 									/>
 							</div>
 						</div>
@@ -205,6 +235,25 @@
 									/>
 							</div>
 						</div>
+						
+						
+						
+						<div class="h3rem"></div>
+						
+						
+						<p class="color-gray mb1rem">НДС</p>
+						<x-input
+							class="w12rem"
+							type="number"
+							min="0"
+							max="1000"
+							showrows
+							group="large"
+							icon="percent"
+							iconbg="yellow"
+							inpclass="pr48px"
+							setting="price-nds"
+							/>
 					</div>
 				</div>
 			</div>
