@@ -7571,7 +7571,6 @@ section {
 }
 .commoninfo__table tr td p {
   font-size: 18px;
-  white-space: pre-line;
 }
 .commoninfo__table tr td input, .commoninfo__table tr td textarea {
   font-size: 18px;
