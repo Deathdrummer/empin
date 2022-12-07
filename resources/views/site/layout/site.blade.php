@@ -283,7 +283,7 @@
 	
 	
 	function loadSection(section = null) {
-		console.log('loadSection');
+		console.log(1);
 		$('#sectionPlace.main__content_visible').removeClass('main__content_visible');
 		//$('#sectionTitle.header__pagetitle_visible').removeClass('header__pagetitle_visible');
 		
@@ -308,9 +308,9 @@
 		
 		closeNav();
 		removeTeleports();
-		
+		console.log(2);
 		getSection.then(function ({data, error, status, headers}) {
-			
+			console.log(3);
 			if (error || status != 200) {
 				if (error.message) $.notify(error.message, 'error');
 				else $.notify('Ошибка загрузки раздела!', 'error');
@@ -330,7 +330,7 @@
 			
 		}).catch(err => {
 			closeNav();
-			
+			console.log(4);
 			if (axios.isCancel(err)) {
 				console.log('Request canceled');
 			} else {
@@ -341,7 +341,7 @@
 		});
 		
 		
-		
+		console.log(5);
 		
 		/*window.onpopstate = function(event) {
 		  console.log(event.state);
