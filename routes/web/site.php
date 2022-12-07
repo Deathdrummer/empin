@@ -338,7 +338,7 @@ Route::prefix('site')->middleware(['lang', 'isajax:site'])->group(function() {
 
 
 Route::fallback(function () {
-    logger('fallback');
+    return;
 });
 
 
