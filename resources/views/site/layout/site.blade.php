@@ -367,17 +367,20 @@
 		
 		
 		$.each(teleports, function(k, teleport) {
-			console.log(teleport);
+			console.log(1);
 			let to = $(teleport).attr('teleport');
-			
+			console.log(2);
 			teleportEements.push({
 				placement: $(to)[0].outerHTML,
 				data: teleport
 			});
-			
+			console.log(3);
 			$(teleport).removeAttrib('teleport');
+			console.log(4);
 			$(to).replaceWith(teleport);
+			console.log(5);
 		});
+		
 		return dataDom;
 	}
 	
