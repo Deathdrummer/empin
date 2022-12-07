@@ -309,13 +309,7 @@
 		removeTeleports();
 		
 		getSection.then(function ({data, error, status, headers}) {
-			
-			
-			const dataDom = buildTeleports(data);
-			console.log(dataDom);
-			$('#sectionPlace').html(dataDom);
-			
-			/*if (error || status != 200) {
+			if (error || status != 200) {
 				if (error.message) $.notify(error.message, 'error');
 				else $.notify('Ошибка загрузки раздела!', 'error');
 				$('#sectionPlace').html('');
@@ -326,7 +320,7 @@
 				$('#sectionPlace').html(dataDom);
 				//$('#sectionTitle').html(setPageTitle(headers['x-page-title']));
 			}
-			*/
+			
 			//$('#sectionTitle:not(.header__pagetitle_visible)').addClass('header__pagetitle_visible');
 			$('#sectionPlace:not(.main__content_visible)').addClass('main__content_visible');
 			loadSectionWait.destroy();
@@ -362,24 +356,22 @@
 		let dataDom = $(data);
 		let teleports = $(dataDom).find('[teleport]');
 		if (teleports.length == 0) return data;
+		
 		$(dataDom).find('[teleport]').remove();
 		
-		
-		
 		$.each(teleports, function(k, teleport) {
-			console.log(1);
 			let to = $(teleport).attr('teleport');
-			console.log(2);
-			console.log(teleportEements, typeof teleportEements);
+			
+			console.log($(to)[0].outerHTML, teleport);
+			
+			
 			teleportEements.push({
-				//placement: $(to)[0].outerHTML,
-				//data: teleport
+				placement: $(to)[0].outerHTML,
+				data: teleport
 			});
-			console.log(3);
+			
 			$(teleport).removeAttrib('teleport');
-			console.log(4);
 			$(to).replaceWith(teleport);
-			console.log(5);
 		});
 		
 		return dataDom;
