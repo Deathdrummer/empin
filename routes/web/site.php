@@ -276,11 +276,11 @@ Route::post('/lang', function (Request $request) {
 
 
 
-
+Route::get('/', [Contracts::class, 'list']);
 
 Route::prefix('site')->middleware(['lang', 'isajax:site'])->group(function() {
 	// Договоры
-	Route::get('/', [Contracts::class, 'list']);
+	
 	Route::get('/contracts', [Contracts::class, 'list']);
 	Route::put('/contracts', [Contracts::class, 'set_data']);
 	Route::post('/contracts/hide', [Contracts::class, 'hide']);
