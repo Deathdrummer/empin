@@ -283,6 +283,7 @@
 	
 	
 	function loadSection(section = null) {
+		console.log('loadSection');
 		$('#sectionPlace.main__content_visible').removeClass('main__content_visible');
 		//$('#sectionTitle.header__pagetitle_visible').removeClass('header__pagetitle_visible');
 		
