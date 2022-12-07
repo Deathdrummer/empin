@@ -283,7 +283,6 @@
 	
 	
 	function loadSection(section = null) {
-		console.log(1);
 		$('#sectionPlace.main__content_visible').removeClass('main__content_visible');
 		//$('#sectionTitle.header__pagetitle_visible').removeClass('header__pagetitle_visible');
 		
@@ -308,10 +307,12 @@
 		
 		closeNav();
 		removeTeleports();
-		console.log(2);
+		
 		getSection.then(function ({data, error, status, headers}) {
-			console.log(3);
-			if (error || status != 200) {
+			
+			$('#sectionPlace').html(data);
+			
+			/*if (error || status != 200) {
 				if (error.message) $.notify(error.message, 'error');
 				else $.notify('Ошибка загрузки раздела!', 'error');
 				$('#sectionPlace').html('');
@@ -321,7 +322,7 @@
 				const dataDom = buildTeleports(data);
 				$('#sectionPlace').html(dataDom);
 				//$('#sectionTitle').html(setPageTitle(headers['x-page-title']));
-			}
+			}*/
 			
 			//$('#sectionTitle:not(.header__pagetitle_visible)').addClass('header__pagetitle_visible');
 			$('#sectionPlace:not(.main__content_visible)').addClass('main__content_visible');
@@ -330,7 +331,7 @@
 			
 		}).catch(err => {
 			closeNav();
-			console.log(4);
+			
 			if (axios.isCancel(err)) {
 				console.log('Request canceled');
 			} else {
@@ -341,7 +342,7 @@
 		});
 		
 		
-		console.log(5);
+		
 		
 		/*window.onpopstate = function(event) {
 		  console.log(event.state);
