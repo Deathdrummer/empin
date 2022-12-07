@@ -358,13 +358,14 @@
 	
 	// Извлечь из HTML блоки для телепортации, вставить телепорты и вернуть HTML без телепортов
 	function buildTeleports(data = null) {
+		console.log(1);
 		if (_.isNull(data)) return;
 		let dataDom = $(data);
 		let teleports = $(dataDom).find('[teleport]');
 		if (teleports.length == 0) return data;
-		
+		console.log(2);
 		$(dataDom).find('[teleport]').remove();
-		
+		console.log(3);
 		$.each(teleports, function(k, teleport) {
 			let to = $(teleport).attr('teleport');
 			
@@ -376,7 +377,7 @@
 			$(teleport).removeAttrib('teleport');
 			$(to).replaceWith(teleport);
 		});
-		
+		console.log(4);
 		return dataDom;
 	}
 	
