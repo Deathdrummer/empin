@@ -364,9 +364,10 @@
 		if (teleports.length == 0) return data;
 		$(dataDom).find('[teleport]').remove();
 		
-		console.log(teleports);
+		
 		
 		$.each(teleports, function(k, teleport) {
+			console.log(teleport);
 			let to = $(teleport).attr('teleport');
 			
 			teleportEements.push({
