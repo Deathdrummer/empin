@@ -362,13 +362,12 @@
 		$.each(teleports, function(k, teleport) {
 			let to = $(teleport).attr('teleport');
 			
-			console.log($(to)[0].outerHTML, teleport);
-			
-			
-			teleportEements.push({
-				placement: $(to)[0].outerHTML,
-				data: teleport
-			});
+			if ($(to)[0].outerHTML && teleport) {
+				teleportEements.push({
+					placement: $(to)[0].outerHTML,
+					data: teleport
+				});
+			}
 			
 			$(teleport).removeAttrib('teleport');
 			$(to).replaceWith(teleport);
