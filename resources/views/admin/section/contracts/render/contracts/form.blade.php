@@ -82,7 +82,7 @@
 							</div>
 							<div class="col">
 								<label class="form__label color-dark">Дата закупки</label>
-								<x-datepicker name="date_buy" date="{{$date_end ?? null}}" calendarid="contractForm2{{$data['rand_id']}}" class="w100" />
+								<x-datepicker name="date_buy" date="{{$date_buy ?? null}}" calendarid="contractForm2{{$data['rand_id']}}" class="w100" />
 							</div>
 						</div>	
 					</div>

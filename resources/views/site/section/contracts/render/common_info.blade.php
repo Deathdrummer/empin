@@ -72,7 +72,13 @@
 						<p class="color-gray-500 noselect format">Дата подписания договора:</p>
 					</td>
 					<td>
-						<p class="breakword select-text" tripleselect>@date($contract['date_start']) г.</p>
+						<p class="breakword select-text" tripleselect>
+							@if($contract['date_start'])
+								@date($contract['date_start']) г.
+							@else
+								-
+							@endif
+						</p>
 					</td>
 				</tr>
 			@endcando
@@ -83,7 +89,13 @@
 						<p class="color-gray-500 noselect format">Дата окончания работ по договору:</p>
 					</td>
 					<td>
-						<p class="breakword select-text" tripleselect>@date($contract['date_end']) г.</p>
+						<p class="breakword select-text" tripleselect>
+							@if($contract['date_end'])
+								@date($contract['date_end']) г.
+							@else
+								-
+							@endif
+						</p>
 					</td>
 				</tr>
 			@endcando
@@ -94,7 +106,13 @@
 						<p class="color-gray-500 noselect format">Дата закрытия договора:</p>
 					</td>
 					<td>
-						<p class="breakword select-text" tripleselect>@date($contract['date_close']) г.</p>
+						<p class="breakword select-text" tripleselect>
+							@if($contract['date_close'])
+								@date($contract['date_close']) г.
+							@else
+								-
+							@endif
+						</p>
 					</td>
 				</tr>
 			@endcando
@@ -195,6 +213,45 @@
 						@else
 							<p>Нет</p>
 						@endif
+					</td>
+				</tr>
+			@endcando
+			
+			@cando('contract-col-date_buy:site')
+				<tr>
+					<td>
+						<p class="color-gray-500 noselect format">Дата закупки:</p>
+					</td>
+					<td>
+						<p class="breakword select-text" tripleselect>
+							@if($contract['date_buy'])
+								@date($contract['date_buy']) г.
+							@else
+								-
+							@endif
+						</p>
+					</td>
+				</tr>
+			@endcando
+			
+			@cando('contract-col-buy_number:site')
+				<tr>
+					<td>
+						<p class="color-gray-500 noselect format">Номер закупки:</p>
+					</td>
+					<td>
+						<p class="breakword select-text" tripleselect>{{$contract['buy_number'] ?? '-'}}</p>
+					</td>
+				</tr>
+			@endcando
+			
+			@cando('contract-col-archive_dir:site')
+				<tr>
+					<td>
+						<p class="color-gray-500 noselect format">Архивная папка:</p>
+					</td>
+					<td>
+						<p class="breakword select-text" tripleselect>{{$contract['archive_dir'] ?? '-'}}</p>
 					</td>
 				</tr>
 			@endcando

@@ -8,7 +8,6 @@
 							<div>
 								<img
 									src="{{asset('assets/images/ampin.png')}}"
-									class="w15rem"
 									alt="{{$company_name ?? 'ЭМПИН'}}"
 									title="{{$company_name ?? 'ЭМПИН'}}"
 									>
@@ -17,65 +16,18 @@
 						</div>
 					</div>
 				</div>
-				@if(isset($show_nav) && $show_nav)
-					<div class="col-auto">
-						<div class="header__block">
-							
-							<div class="header__nav" headernav>
-								<div class="headernav__handler" touch="header__nav_opened">
-									<i class="fa-solid fa-grip fz40px"></i>
-									{{-- <p>Меню</p> --}}
-								</div>
-								
-								
-								<nav class="headernav noselect">
-									<div class="headernav__item">
-										@isset($nav)
-											{{-- <p>sectionTitle</p> --}}
-											<ul>
-												@foreach($nav as $item)
-													@if (!isset($item['section']))
-														@continue
-													@endif
-													
-													<li @class([
-															'active' => $activeNav == $item['section'],
-															'opened' => isset($item['active'])
-														])
-														loadsection="{{$item['section']}}"
-														><span>{{$item['title']}}</span></li>
-														
-												@endforeach
-											</ul>
-										@endif
-									</div>
-									
-									{{-- 
-									{% for sectionTitle, sectionsList in sections %}
-										<div class="main_nav_item">
-											<p>{{sectionTitle}}</p>
-											<ul>
-												{% for url, title in sectionsList %}
-													<li data-block="{{url}}">{% if title is iterable %}{{title.title}}{% else %}{{title}}{% endif %}</li>
-												{% endfor %}
-											</ul>
-										</div>
-									{% endfor %} --}}
-								</nav>
-							</div>
-							
-							
-							
-								
-						</div>
-					</div>
-				@endif
-				<div class="col-auto">
+				
+				{{-- <div class="col-auto">
 					<div class="header__line"></div>
-				</div>
-				<div class="col-auto">
+				</div> --}}
+				{{-- <div class="col-auto">
 					<div class="header__block">
 						<p class="header__pagetitle" id="sectionTitle"></p>
+					</div>
+				</div> --}}
+				<div class="col-auto">
+					<div class="header__block">
+						<teleport id="headerTeleport"></teleport>
 					</div>
 				</div>
 				{{-- <div class="col-auto ms-auto">
@@ -98,11 +50,62 @@
 						<p class="fz16px "><strong>{{$user->pseudoname ?? $user->name}}</strong></p>
 					</div>
 				</div>
+				
+				
 				<div class="col-auto">
 					<div class="header__block">
-						<div class="header__logout noselect" logout>
-							<i class="fa-solid fa-arrow-right-from-bracket"></i>
-							<span>{{__('auth.logout')}}</span>
+						@if(isset($show_nav) && $show_nav)
+						<div class="header__nav" headernav>
+							<div class="headernav__handler" touch="header__nav_opened">
+								<i class="fa-solid fa-fw fa-bars"></i>
+								{{-- <p>Меню</p> --}}
+							</div>
+							
+							
+							<nav class="headernav noselect">
+								<div class="headernav__item">
+									@isset($nav)
+										{{-- <p>sectionTitle</p> --}}
+										<ul>
+											@foreach($nav as $item)
+												@if (!isset($item['section']))
+													@continue
+												@endif
+												
+												<li @class([
+														'active' => $activeNav == $item['section'],
+														'opened' => isset($item['active'])
+													])
+													loadsection="{{$item['section']}}"
+													><span>{{$item['title']}}</span></li>	
+													
+											@endforeach
+											
+											<li class="line"></li>
+											
+											<teleport id="menuTeleport"></teleport>
+										</ul>
+									@endif
+								</div>
+								
+								{{-- 
+								{% for sectionTitle, sectionsList in sections %}
+									<div class="main_nav_item">
+										<p>{{sectionTitle}}</p>
+										<ul>
+											{% for url, title in sectionsList %}
+												<li data-block="{{url}}">{% if title is iterable %}{{title.title}}{% else %}{{title}}{% endif %}</li>
+											{% endfor %}
+										</ul>
+									</div>
+								{% endfor %} --}}
+							</nav>
+						</div>
+						@endif
+						
+						<div class="header__logout ml4px noselect" logout>
+							<i class="fa-solid fa-fw fa-arrow-right-from-bracket"></i>
+							{{-- <span>{{__('auth.logout')}}</span> --}}
 						</div>
 					</div>
 				</div>
@@ -138,7 +141,8 @@
 <script type="module">
 	let loadSectionController,
 		uriSegment = getUrlSegment(0),
-		startPage = '{{$site_start_page ?? 'common'}}';
+		startPage = '{{$site_start_page ?? 'common'}}',
+		teleportEements = [];
 	
 	loadSection(uriSegment);
 	
@@ -280,7 +284,7 @@
 	
 	function loadSection(section = null) {
 		$('#sectionPlace.main__content_visible').removeClass('main__content_visible');
-		$('#sectionTitle.header__pagetitle_visible').removeClass('header__pagetitle_visible');
+		//$('#sectionTitle.header__pagetitle_visible').removeClass('header__pagetitle_visible');
 		
 		let loadSectionWait = $('#sectionPlace').ddrWait({
 				iconHeight: '80px',
@@ -302,21 +306,23 @@
 		let getSection = axiosQuery('post', '/get_section', {section});
 		
 		closeNav();
+		removeTeleports();
 		
 		getSection.then(function ({data, error, status, headers}) {
 			
-			if (status != 200) {
+			if (error || status != 200) {
 				if (error.message) $.notify(error.message, 'error');
 				else $.notify('Ошибка загрузки раздела!', 'error');
 				$('#sectionPlace').html('');
-				$('#sectionTitle').text('');
+				//$('#sectionTitle').text('');
 				throw new Error('loadSection -> ошибка загрузки раздела!');
 			} else {
-				$('#sectionPlace').html(data);
-				$('#sectionTitle').html(setPageTitle(headers['x-page-title']));
+				const dataDom = buildTeleports(data);
+				$('#sectionPlace').html(dataDom);
+				//$('#sectionTitle').html(setPageTitle(headers['x-page-title']));
 			}
 			
-			$('#sectionTitle:not(.header__pagetitle_visible)').addClass('header__pagetitle_visible');
+			//$('#sectionTitle:not(.header__pagetitle_visible)').addClass('header__pagetitle_visible');
 			$('#sectionPlace:not(.main__content_visible)').addClass('main__content_visible');
 			loadSectionWait.destroy();
 			
@@ -342,6 +348,43 @@
 	}
 	
 	
+	
+	
+	
+	// Извлечь из HTML блоки для телепортации, вставить телепорты и вернуть HTML без телепортов
+	function buildTeleports(data = null) {
+		if (_.isNull(data)) return;
+		let dataDom = $(data);
+		let teleports = $(dataDom).find('[teleport]');
+		if (teleports.length == 0) return data;
+		
+		$(dataDom).find('[teleport]').remove();
+		
+		$.each(teleports, function(k, teleport) {
+			let to = $(teleport).attr('teleport');
+			
+			teleportEements.push({
+				placement: $(to)[0].outerHTML,
+				data: teleport
+			});
+			
+			$(teleport).removeAttrib('teleport');
+			$(to).replaceWith(teleport);
+		});
+		
+		return dataDom;
+	}
+	
+	
+	function removeTeleports() {
+		$.each(teleportEements, function(k, {placement, data}) {
+			$(data).replaceWith(placement);
+		});
+		//$(teleportEements).remove();
+		teleportEements = [];
+		//
+		//$(document).find('[teleport]').remove();
+	}
 	
 	
 	function getUrlSegment(index = 0) {

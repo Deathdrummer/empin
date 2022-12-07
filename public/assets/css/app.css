@@ -143330,8 +143330,6 @@ template {
   align-items: center;
   min-height: 20px;
   font-size: 14px;
-  font-family: Fira Sans, sans-serif;
-  font-weight: 400;
 }
 .ddrtable__td:not(.nopadding) {
   padding-left: 5px;

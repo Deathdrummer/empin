@@ -340,7 +340,7 @@
 					
 					
 					
-					<x-table.body style="max-height: calc(100vh - 364px);" id="contractsList">
+					<x-table.body style="max-height: calc(100vh - 332px);" id="contractsList">
 						@foreach ($list as $contract)
 							<x-table.tr
 								class="h5rem-4px"

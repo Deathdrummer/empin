@@ -6,55 +6,75 @@
 		>
 		
 		
-		<div class="row mb2rem gx-30 align-items-center">
+		
+		<li
+			onclick="$.openSetColumsWin()"
+			teleport="#menuTeleport"
+			><span>Настроить отображение столбцов</span>
+		</li>
+		
+		
+		{{-- <x-button
+					group="normal"
+					variant="purple"
+					action="openSetColumsWin"
+					title="Отображение столбцов"
+					teleport="#headerTeleport"
+					><i class="fa-solid fa-table-columns"></i></x-button> --}}
+		
+		
+		<div class="row gx-30 align-items-center" teleport="#headerTeleport">
 			<div class="col-auto">
 				<x-input
+					style="box-shadow: 0 0 8px 0 #0000000a;"
 					id="contractsSearchField"
-					group="normal"
+					group="large"
 					type="search"
 					class="w40rem"
 					action="contractsSearch"
 					icon="magnifying-glass"
-					{{-- iconaction="contractsSearch:1" --}}
-					iconbg="light"
+					{{-- iconaction="contractsSearch" --}}
+					{{-- iconbg="light" --}}
 					placeholder="Поиск..."
 					cleared
 					tag="tool:56"
 					/>
 				
-				<x-button
+				{{-- <x-button
 					id="clearSearch"
-					group="normal"
+					group="large"
 					variant="red"
 					disabled
 					action="clearContractsSearch"
 					w="3rem"
 					title="Очестить поиск"
-					><i class="fa-solid fa-xmark"></i></x-button>
+					><i class="fa-solid fa-xmark"></i></x-button> --}}
 			</div>
 			
-			<div class="col-auto">
+			{{-- <div class="col-auto">
 				<x-checkbox
 					class="mt3px"
 					id="searchWithArchive"
-					group="normal"
+					group="large"
 					label="Включить в поиск архив"
 					action="searchWithArchive"
 					/>
-			</div>
+			</div> --}}
 			
 			<div class="col-auto">
 				<x-button
-					group="normal"
-					variant="neutral"
+					style="border-radius: 10px; border-color:transparent;"
+					group="large"
+					variant="light"
 					action="openSelectionsWin"
 					title="Список подборок"
+					px="20"
 					tag="selectionsbtn"
 					>Подборки</x-button>
 				
 				<x-button
 					id="selectionsClearBtn"
-					group="normal"
+					group="large"
 					w="3rem"
 					variant="red"
 					action="clearSelection"
@@ -63,24 +83,25 @@
 					disabled
 					hidden
 					><i class="fa-solid fa-xmark"></i></x-button>
-			</div>
 			
-			<div class="col-auto ms-auto">
+			{{-- <div class="col-auto ms-auto">
 				<x-button
 					group="normal"
 					variant="purple"
 					action="openSetColumsWin"
 					title="Отображение столбцов"
 					><i class="fa-solid fa-table-columns"></i></x-button>
-			</div>
+			</div> --}}
 			
-			<div class="col-auto">
+
 				@cando('sozdanie-dogovora:site')
 					<x-button
-						group="normal"
-						variant="green"
+						style="border-radius: 10px; border-color:transparent;"
+						group="large"
+						variant="light"
 						action="contractNew"
-						>Новый договор</x-button>
+						px="20"
+						>Новый договор <i class="fa-solid fa-plus"></i></x-button>
 				@endcando
 			</div>
 		</div>
@@ -334,8 +355,15 @@
 					}
 				});
 			} else {
+				$('#contractsSearchField').parent('.input').ddrInputs('disable');
+				
 				getList({
-					withCounts: true
+					withCounts: true,
+					callback: function() {
+						let replaceIconHtml = '<div class="postfix_icon bg-light bg-light-hovered pointer" onclick="$.clearContractsSearch(this)"><i class="fa-solid fa-xmark"></i></div>';
+						$('#contractsSearchField').parent('.input').find('.postfix_icon').replaceWith(replaceIconHtml);
+						$('#contractsSearchField').parent('.input').ddrInputs('enable');
+					}
 				});
 			}
 		}, 300);
@@ -344,14 +372,20 @@
 	
 	$.clearContractsSearch = (btn) => {
 		$('#contractsSearchField').val('');
+		$('#contractsSearchField').parent('.input').ddrInputs('disable');
+		
+		let replaceIconHtml = '<div class="postfix_icon bg-light"><i class="fa-solid fa-magnifying-glass"></i></div>';	
+		$('#contractsSearchField').parent('.input').find('.postfix_icon').replaceWith(replaceIconHtml);
+		
 		search = null;
 		_clearCounts();
 		getList({
 			withCounts: search || selection,
 			callback: function() {
+				$('#contractsSearchField').parent('.input').ddrInputs('enable');
 			}
 		});
-		$(btn).ddrInputs('disable');
+		//$(btn).ddrInputs('disable');
 	}
 	
 	

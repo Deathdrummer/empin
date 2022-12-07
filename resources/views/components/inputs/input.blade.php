@@ -85,7 +85,7 @@
 		<div
 			@class([
 				'postfix_icon',
-				'postfix_icon-hovered postfix_icon-colored' => $iconActionFunc && !$iconbg,
+				'postfix_icon-hovered' => $iconActionFunc && !$iconbg,
 				'bg-'.$iconbg => $iconbg,
 				'bg-'.$iconbg.'-hovered' => $iconbg && $iconActionFunc,
 				'pointer' => $iconActionFunc

@@ -35,6 +35,9 @@ body
 	
 
 
+teleport
+	display: contents
+
 
 input, textarea, [contenteditable]
 	+placeholder(#ccc)
@@ -84,13 +87,15 @@ input, textarea, [contenteditable]
 	&__logo
 		display: flex
 		align-items: center
-		margin-right: 30px
+		justify-content: center
+		margin-right: 5px
 		
 		> div
-			padding-right: 10px
+			margin-right: 10px
+			margin-left: 10px
 			
 			img
-				height: 30px
+				+resp(height, (xs: 42px, sm: 48px, md: 50px, lg: 52px, xl: 54px, xxl: 56px))
 				width: auto
 				object-fit: contain
 				
@@ -104,18 +109,20 @@ input, textarea, [contenteditable]
 	
 	//---------------------------------------------------------------- Меню
 	&__nav
-		margin-right: 20px
+		//margin-right: 20px
 			
 		.headernav
 			display: flex
 			opacity: 0
 			pointer-events: none
 			position: absolute
-			background-color: #181824
-			box-shadow: 0 11px 15px -7px rgb(30 36 41 / 34%)
+			background-color: #fff
+			box-shadow: 0 0 20px -1px #00000080
 			+resp(top, $headerHeight)
+			margin-top: -6px
+			right: 20px
 			z-index: 200
-			border-radius: 5px
+			border-radius: 17px
 			transition: opacity 0.16s
 			
 			
@@ -123,10 +130,16 @@ input, textarea, [contenteditable]
 				display: flex
 				align-items: center
 				cursor: pointer
+				height: 36px
+				padding-left: 6px
+				padding-right: 6px
+				border: 1px solid transparent
+				border-radius: $borderRadius
+				transition: background-color 0.1s
 				
 				i
-					font-size: 28px
-					color: #767689
+					font-size: 20px
+					color: #babac5
 					transition: color 0.16s
 					
 				
@@ -137,12 +150,21 @@ input, textarea, [contenteditable]
 					transition: color 0.16s
 					
 				&:hover
+					background-color: #e8e8e6
+					
 					i, p
-						color: #658cad
+						color: #9595a9
+				
+				&:active
+					//box-shadow: 0 0 0 0.2rem rgb(28 192 197 / 50%)
+					background-color: #dbdbda
+					
+					i, p
+						color: #9595a9
 			
 			&__item
-				width: 240px
-				padding: 15px
+				min-width: 240px
+				padding: 10px
 				
 				p
 					font-size: 14px
@@ -156,40 +178,58 @@ input, textarea, [contenteditable]
 					//margin: $grid-gutter-width / 2
 					
 					li
-						display: flex
-						align-items: center
-						cursor: pointer
-						padding: 2px 4px 0px
-						height: 42px
-						font-size: 14px
-						line-height: 16px
-						list-style: none
-						color: #d8d8e5
-						border: 1px solid transparent
-						border-top: 1px solid #2f2f44
-						// background-color: lighten(#c7ccd0, 2%)
-						transition: background-color 0.16s
+						&:not(.line)
+							display: flex
+							align-items: center
+							cursor: pointer
+							padding-left: 10px
+							padding-right: 10px
+							height: 48px
+							font-size: 14px
+							line-height: 16px
+							list-style: none
+							color: #d8d8e5
+							border-radius: 10px
+							// background-color: lighten(#c7ccd0, 2%)
+							transition: background-color 0.16s
+							
+							+ li:not(.line)
+								margin-top: 4px
+						
+						&.line
+							height: 1px
+							background-color: #efefef
+							margin-top: 15px
+							margin-bottom: 15px
+							margin-left: 5px
+							margin-right: 5px
 						
 						span
-							color: #d8d8e5
-						
-						&:last-of-type
-							border-bottom: 1px solid #2f2f44
+							color: #555
+							font-weight: 700
+							font-size: 16px
 							
 							
 						&:hover
-							background-color: #2f2f44
-							color: #d8d8e5
+							background-color: #f7f7fb
+							
+							span
+								color: #555
 						
 						&:active
-							background-color: #51516a
-							color: #d8d8e5
+							background-color: #e5e5ed
 							transition: background-color 0s
 							
+							span
+								color: #555
+							
+							
 						&.active
-							background-color: #51516a
-							color: #d8d8e5
+							background-color: #e5e5ed
 							cursor: default
+							
+							span
+								color: #fff
 		
 		
 		&_opened
@@ -198,8 +238,10 @@ input, textarea, [contenteditable]
 				pointer-events: auto
 			
 			.headernav__handler
+				background-color: #dbdbda !important
+				
 				i, p
-					color: #2badf9 !important
+					color: #555 !important
 		
 		
 
@@ -223,12 +265,13 @@ input, textarea, [contenteditable]
 	&__logout
 		display: flex
 		align-items: center
-		background-color: #fff
 		border: 1px solid transparent
 		border-radius: $borderRadius
 		cursor: pointer
-		+resp(height, $inputHeight)
-		+resp(padding-left, $inputPaddingX, (padding-right: 0))
+		height: 36px
+		padding-left: 6px
+		padding-right: 6px
+		//+resp(padding-left, $inputPaddingX, (padding-right: 0))
 		transition: background-color 0.16s, border-color 0.16s, box-shadow 0.16s
 		
 		span
@@ -239,25 +282,30 @@ input, textarea, [contenteditable]
 			color: $colorBlack
 		
 		i
-			margin-right: 5px
-			font-size: 16px
-			color: #9f9fa9
+			font-size: 20px
+			color: #babac5
 		
 		
 		&:hover
-			border-color: #d6eeef
+			background-color: #e8e8e6
 			
 			i
-				color: #181824
+				color: #9595a9
 		
 		&:active
-			box-shadow: 0 0 0 0.2rem rgb(28 192 197 / 50%)
-			//background-color: #16afb2
-			border-color: #93e3e5
+			//box-shadow: 0 0 0 0.2rem rgb(28 192 197 / 50%)
+			background-color: #dbdbda
+			//border-color: #93e3e5
+			
+			i
+				color: #9595a9
 		
 		
 	
 	
+	
+	
+
 	
 	
 
@@ -458,15 +506,15 @@ section
 				display: none
 	
 .commoninfo // окно с общей информацией
-	border-radius: 25px
-	padding: 40px 60px 0px
+	border-radius: 34px
+	padding: 40px 26px 0px
 	
 	
 	h3, p, span, small, strong
 		+font(Roboto, sans-serif)
 	
 	&__scrollblock
-		+scrollbar(#e6eaed, #bfcfdb, 6px, 3px, 3px)
+		+scrollbar(transparent, transparent, 1px)
 		overflow-y: scroll 
 		height: calc(100vh - 180px)
 		min-height: 400px
@@ -481,11 +529,11 @@ section
 		
 	&__label
 		position: absolute
-		top: 30px
+		top: 27px
 		left: 10px
 		
 		p
-			font-size: 18px
+			font-size: 22px
 			width: min-content
 			
 	
@@ -499,6 +547,7 @@ section
 					width: 40%
 					text-align: right
 					padding-right: 40px
+					vertical-align: top
 					
 				&:last-of-type
 					width: 60%

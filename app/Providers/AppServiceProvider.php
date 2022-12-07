@@ -237,11 +237,11 @@ class AppServiceProvider extends ServiceProvider
 		
 		
 		Blade::directive('date', function ($expression) {
-            return "<?php echo Carbon\Carbon::parse($expression)->locale('ru')->isoFormat('DD MMMM YYYY', 'Do MMMM'); ?>";
+            return "<?php echo $expression ? Carbon\Carbon::parse($expression)->locale('ru')->isoFormat('DD MMMM YYYY', 'Do MMMM') : ''; ?>";
         });
 		
 		Blade::directive('time', function ($expression) {
-            return "<?php echo Carbon\Carbon::parse($expression)->format('H:i'); ?>";
+            return "<?php echo $expression ? Carbon\Carbon::parse($expression)->format('H:i') : ''; ?>";
         });
 		
 		Blade::directive('number', function ($expression) {

@@ -197,7 +197,7 @@
 @endif
 
 @if(auth('site')->user()->can('contract-col-buy_number:site') && (empty($userColums) || in_array('buy_number', $userColums)))
-	<x-table.td class="h-center"><strong class="fz16px">{{$buy_number ?? '-'}}</strong></x-table.td>
+	<x-table.td class="breakword h-center"><p class="fz12px">{{$buy_number ?? '-'}}</p></x-table.td>
 @endif
 
 @if(auth('site')->user()->can('contract-col-archive_dir:site') && (empty($userColums) || in_array('archive_dir', $userColums)))
