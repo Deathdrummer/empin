@@ -362,7 +362,7 @@
 		$.each(teleports, function(k, teleport) {
 			let to = $(teleport).attr('teleport');
 			
-			if ($(to)[0].outerHTML && teleport) {
+			if ($(to)[0] && teleport) {
 				teleportEements.push({
 					placement: $(to)[0].outerHTML,
 					data: teleport
