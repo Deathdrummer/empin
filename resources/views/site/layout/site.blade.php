@@ -372,7 +372,7 @@
 			console.log(2);
 			console.log(teleportEements, typeof teleportEements);
 			teleportEements.push({
-				placement: $(to)[0].outerHTML,
+				//placement: $(to)[0].outerHTML,
 				//data: teleport
 			});
 			console.log(3);
