@@ -370,9 +370,10 @@
 			console.log(1);
 			let to = $(teleport).attr('teleport');
 			console.log(2);
+			console.log(teleportEements, typeof teleportEements);
 			teleportEements.push({
 				placement: $(to)[0].outerHTML,
-				data: teleport
+				//data: teleport
 			});
 			console.log(3);
 			$(teleport).removeAttrib('teleport');
