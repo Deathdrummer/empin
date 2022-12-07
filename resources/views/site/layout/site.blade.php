@@ -312,6 +312,7 @@
 			
 			
 			const dataDom = buildTeleports(data);
+			console.log(dataDom);
 			$('#sectionPlace').html(dataDom);
 			
 			/*if (error || status != 200) {
