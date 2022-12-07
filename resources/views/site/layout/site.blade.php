@@ -310,7 +310,9 @@
 		
 		getSection.then(function ({data, error, status, headers}) {
 			
-			$('#sectionPlace').html(data);
+			
+			const dataDom = buildTeleports(data);
+			$('#sectionPlace').html(dataDom);
 			
 			/*if (error || status != 200) {
 				if (error.message) $.notify(error.message, 'error');
@@ -322,8 +324,8 @@
 				const dataDom = buildTeleports(data);
 				$('#sectionPlace').html(dataDom);
 				//$('#sectionTitle').html(setPageTitle(headers['x-page-title']));
-			}*/
-			
+			}
+			*/
 			//$('#sectionTitle:not(.header__pagetitle_visible)').addClass('header__pagetitle_visible');
 			$('#sectionPlace:not(.main__content_visible)').addClass('main__content_visible');
 			loadSectionWait.destroy();
