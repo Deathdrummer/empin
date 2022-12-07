@@ -52,8 +52,7 @@ class Handler extends ExceptionHandler {
 		
 		Log::error("[{$code}] \"{$message}\" of file: {$file}:{$line} on line: {$line}");
 		
-		return false;
-		//parent::report($e);
+		parent::report($e);
 		//return;
 	}
 	
