@@ -5,7 +5,7 @@
 				<div class="header__block">
 					<div class="header__logo">
 						<img
-							src="{{asset('assets/images/ampin_light.png')}}"
+							src="{{asset('assets/images/ampin.png')}}"
 							class="w15rem"
 							alt="{{$company_name ?? 'ЭМПИН'}}"
 							title="{{$company_name ?? 'ЭМПИН'}}"
