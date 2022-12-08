@@ -238,6 +238,7 @@
 		
 	
 	
+	console.log(priceNds);
 	
 	
 	
