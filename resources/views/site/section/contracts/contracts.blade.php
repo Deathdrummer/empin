@@ -337,17 +337,19 @@
 		
 		searchWithArchive = $('#searchWithArchive').is(':checked');
 		
-		$('#clearSearch').ddrInputs('enable');
+		//$('#clearSearch').ddrInputs('enable');
 		
 		searchContractsTOut = setTimeout(() => {
 			search = $(field).val();
 			_clearCounts();
 			if (search == '') {
 				search = null;
+				let replaceIconHtml = '<div class="postfix_icon bg-light"><i class="fa-solid fa-magnifying-glass"></i></div>';	
+				$('#contractsSearchField').parent('.input').find('.postfix_icon').replaceWith(replaceIconHtml);
 				getList({
 					withCounts: search || selection,
 					callback: function() {
-						$('#clearSearch').ddrInputs('disable');
+						//$('#clearSearch').ddrInputs('disable');
 					}
 				});
 			} else {
