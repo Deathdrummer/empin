@@ -351,14 +351,14 @@
 					}
 				});
 			} else {
-				$('#contractsSearchField').parent('.input').ddrInputs('disable');
+				//$('#contractsSearchField').parent('.input').ddrInputs('disable');
 				
 				getList({
 					withCounts: true,
 					callback: function() {
 						let replaceIconHtml = '<div class="postfix_icon bg-light bg-light-hovered pointer" onclick="$.clearContractsSearch(this)"><i class="fa-solid fa-xmark"></i></div>';
 						$('#contractsSearchField').parent('.input').find('.postfix_icon').replaceWith(replaceIconHtml);
-						$('#contractsSearchField').parent('.input').ddrInputs('enable');
+						//$('#contractsSearchField').parent('.input').ddrInputs('enable');
 					}
 				});
 			}
@@ -368,7 +368,7 @@
 	
 	$.clearContractsSearch = (btn) => {
 		$('#contractsSearchField').val('');
-		$('#contractsSearchField').parent('.input').ddrInputs('disable');
+		//$('#contractsSearchField').parent('.input').ddrInputs('disable');
 		
 		let replaceIconHtml = '<div class="postfix_icon bg-light"><i class="fa-solid fa-magnifying-glass"></i></div>';	
 		$('#contractsSearchField').parent('.input').find('.postfix_icon').replaceWith(replaceIconHtml);
@@ -378,7 +378,7 @@
 		getList({
 			withCounts: search || selection,
 			callback: function() {
-				$('#contractsSearchField').parent('.input').ddrInputs('enable');
+				//$('#contractsSearchField').parent('.input').ddrInputs('enable');
 			}
 		});
 		//$(btn).ddrInputs('disable');
