@@ -186,10 +186,6 @@
 				</tr>
 			@endcando
 			
-			
-			
-			
-			
 			@cando('contract-col-price_nds:site')
 			@if($contract['subcontracting'])
 				<tr>
@@ -228,14 +224,6 @@
 			@endif
 			@endcando
 			
-			
-			
-			
-			
-			
-			
-			
-			
 			@cando('contract-col-hoz_method:site')
 				<tr>
 					<td>
@@ -266,6 +254,17 @@
 				</tr>
 			@endcando
 			
+			@cando('contract-col-buy_number:site')
+				<tr>
+					<td>
+						<p class="color-gray-500 noselect format">Номер закупки:</p>
+					</td>
+					<td>
+						<p class="breakword select-text" tripleselect>{{$contract['buy_number'] ?? '-'}}</p>
+					</td>
+				</tr>
+			@endcando
+			
 			@cando('contract-col-date_buy:site')
 				<tr>
 					<td>
@@ -283,16 +282,6 @@
 				</tr>
 			@endcando
 			
-			@cando('contract-col-buy_number:site')
-				<tr>
-					<td>
-						<p class="color-gray-500 noselect format">Номер закупки:</p>
-					</td>
-					<td>
-						<p class="breakword select-text" tripleselect>{{$contract['buy_number'] ?? '-'}}</p>
-					</td>
-				</tr>
-			@endcando
 			
 			@cando('contract-col-archive_dir:site')
 				<tr>

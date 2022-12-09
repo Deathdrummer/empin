@@ -442,27 +442,28 @@ class Contract {
 	 */
 	public function getContractColums() {
 		$allColums = collect([
-			'period' 			=> 'Срок исполнения договора',
 			'object_number' 	=> 'Номер объекта',
-			'buy_number' 		=> 'Номер закупки',
 			'title' 			=> 'Название/заявитель',
-			'applicant' 		=> 'Заявитель',
-			'titul' 			=> 'Титул',
-			'contract' 			=> 'Номер договора',
-			'subcontracting' 	=> 'Субподряд',
 			'customer' 			=> 'Заказчик',
-			'locality' 			=> 'Населенный пункт',
-			'price' 			=> 'Стоимость договора без НДС',
-			'price_nds' 		=> 'Стоимость договора с НДС',
+			'contractor' 		=> 'Исполнтель',
+			'type' 				=> 'Тип договора',
 			'date_start' 		=> 'Дата подписания договора',
 			'date_end' 			=> 'Дата окончания работ по договору',
 			'date_close' 	 	=> 'Дата закрытия договора',
-			'date_buy' 	 		=> 'Дата закупки',
+			'contract' 			=> 'Номер договора',
+			'applicant' 		=> 'Заявитель',
+			'locality' 			=> 'Населенный пункт',
+			'price' 			=> 'Стоимость договора без НДС',
+			'price_nds' 		=> 'Стоимость договора с НДС',
 			'hoz_method' 		=> 'Хоз способ',
-			'type' 				=> 'Тип договора',
-			'contractor' 		=> 'Исполнтель',
-			'archive' 			=> 'В архиве',
+			'subcontracting' 	=> 'Субподряд',
+			'buy_number' 		=> 'Номер закупки',
+			'date_buy' 	 		=> 'Дата закупки',
 			'archive_dir' 		=> 'Архивная папка',
+			'titul' 			=> 'Титул',
+			'period' 			=> 'Срок исполнения договора',
+			'archive' 			=> 'В архиве',
+			
 		]);
 		
 		$contractColums = $this->getUserColums();
