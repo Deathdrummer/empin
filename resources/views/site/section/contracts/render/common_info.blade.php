@@ -191,6 +191,7 @@
 			
 			
 			@cando('contract-col-price_nds:site')
+			@if($contract['subcontracting'])
 				<tr>
 					<td>
 						<p class="color-gray-500 noselect format">Стоимость генподрядного договора с НДС:</p>
@@ -205,9 +206,11 @@
 						</p>
 					</td>
 				</tr>
+			@endif
 			@endcando
 			
 			@cando('contract-col-price:site')
+			@if($contract['subcontracting'])
 				<tr>
 					<td>
 						<p class="color-gray-500 noselect format">Стоимость генподрядного договора без НДС:</p>
@@ -222,6 +225,7 @@
 						</p>
 					</td>
 				</tr>
+			@endif
 			@endcando
 			
 			
