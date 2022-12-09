@@ -63,6 +63,7 @@ class Contract extends Model {
 		'contract',
 		'price',
 		'price_nds',
+		'gen_percent',
 		'date_start',
 		'date_end',
 		'date_close',

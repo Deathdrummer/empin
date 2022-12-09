@@ -48,7 +48,7 @@ class Textarea extends Component {
      * @return 
      */
     public function setValue($value = null, $settings = null, $setting = null) {
-        if ($value) return $value;
+        if ($value || $value === '0' || $value === 0) return $value;
         if (!$setting || !$settings) return false;
         return data_get($settings, $setting);
     }

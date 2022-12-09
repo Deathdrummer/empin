@@ -187,6 +187,51 @@
 			@endcando
 			
 			
+			
+			
+			
+			@cando('contract-col-price_nds:site')
+				<tr>
+					<td>
+						<p class="color-gray-500 noselect format">Стоимость генподрядного договора с НДС:</p>
+					</td>
+					<td>
+						<p class="breakword select-text" tripleselect>
+							@if(isset($contract['price_nds']) && $contract['price_nds'])
+								@number($contract['price_nds'] / ((100 - $contract['gen_percent']) / 100)) @symbal(money)
+							@else
+								-
+							@endif
+						</p>
+					</td>
+				</tr>
+			@endcando
+			
+			@cando('contract-col-price:site')
+				<tr>
+					<td>
+						<p class="color-gray-500 noselect format">Стоимость генподрядного договора без НДС:</p>
+					</td>
+					<td>
+						<p class="breakword select-text" tripleselect>
+							@if(isset($contract['price']) && $contract['price'])
+								@number($contract['price'] / ((100 - $contract['gen_percent']) / 100)) @symbal(money)
+							@else
+								-
+							@endif
+						</p>
+					</td>
+				</tr>
+			@endcando
+			
+			
+			
+			
+			
+			
+			
+			
+			
 			@cando('contract-col-hoz_method:site')
 				<tr>
 					<td>

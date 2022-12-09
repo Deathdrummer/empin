@@ -27,7 +27,7 @@ class Input extends Component {
     public function __construct(
 		string $type = 'text',
 		string $name = '',
-		?string $value = null,
+		mixed $value = null,
 		?string $placeholder = null,
 		/*, ?string $group = null*/
 		?string $action = null,
@@ -73,7 +73,7 @@ class Input extends Component {
 	 * @return 
 	 */
 	public function setValue($value = false, $settings = false, $setting = false) {
-		if ($value) return $value;
+		if ($value || $value === '0' || $value === 0) return $value;
 		if (!$setting || !$settings) return false;
 		return data_get($settings, $setting);
 	}

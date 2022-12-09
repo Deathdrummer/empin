@@ -127,17 +127,82 @@
 						enableButtons('close');
 						$('input[name="price"]').number(true, 2, '.', ' ');
 						$('input[name="price_nds"]').number(true, 2, '.', ' ');
+						$('#genPrice').number(true, 2, '.', ' ');
+						$('#genPriceNds').number(true, 2, '.', ' ');
+						
+						
 						
 						// Работа с НДС
 						let priceNds = $('input[name="nds"]').val();
+						let genPercent = parseFloat($('#genPercent').val());
 						
-						$('input[name="price"]').on('input', function() {
-							$('input[name="price_nds"]').val($.number(($(this).val() * (1 + priceNds / 100)), 2, '.', ' '));
+						$('#genPercent').on('input', function() {
+							genPercent = parseFloat($(this).val());
+							
+							// меняется стоимость своего договора
+							$('input[name="price"]').val(parseFloat($('#genPrice').val()) * ((100 - genPercent) / 100));
+							$('input[name="price_nds"]').val(parseFloat($('#genPriceNds').val()) * ((100 - genPercent) / 100));
+							
+							// меняется стоимость не нашего договора
+							//$('#genPrice').val(parseFloat($('input[name="price"]').val()) + ($('input[name="price"]').val() / 100) * genPercent);
+							//$('#genPriceNds').val(parseFloat($('input[name="price_nds"]').val()) + ($('input[name="price_nds"]').val() / 100) * genPercent);
 						});
+						
+						
+						// Работа с НДС
+						$('input[name="price"]').on('input', function() {
+							let thisVal = parseFloat($(this).val());
+							$('input[name="price_nds"]').val($.number((thisVal * (1 + priceNds / 100)), 2, '.', ' '));
+							$('#genPrice').val($.number(thisVal / ((100 - genPercent) / 100), 2, '.', ' '));
+							$('#genPriceNds').val($.number(thisVal / ((100 - genPercent) / 100) * (1 + priceNds / 100), 2, '.', ' '));
+						});
+						
 						
 						$('input[name="price_nds"]').on('input', function() {
-							$('input[name="price"]').val($.number(($(this).val() / (1 + priceNds / 100)), 2, '.', ' '));
+							let thisVal = parseFloat($(this).val());
+							$('input[name="price"]').val($.number((thisVal / (1 + priceNds / 100)), 2, '.', ' '));
+							$('#genPrice').val($.number(thisVal / ((100 - genPercent) / 100) / (1 + priceNds / 100), 2, '.', ' '));
+							$('#genPriceNds').val($.number(thisVal / ((100 - genPercent) / 100), 2, '.', ' '));
 						});
+						
+						
+						$('#genPrice').on('input', function() {
+							let thisVal = parseFloat($(this).val());
+							$('#genPriceNds').val($.number((thisVal * (1 + priceNds / 100)), 2, '.', ' '));
+							$('input[name="price"]').val($.number(thisVal * ((100 - genPercent) / 100), 2, '.', ' '));
+							$('input[name="price_nds"]').val($.number(thisVal * ((100 - genPercent) / 100) * (1 + priceNds / 100), 2, '.', ' '));
+						});
+						
+						$('#genPriceNds').on('input', function() {
+							let thisVal = parseFloat($(this).val());
+							$('#genPrice').val($.number((thisVal / (1 + priceNds / 100)), 2, '.', ' '));
+							$('input[name="price"]').val($.number(thisVal * ((100 - genPercent) / 100) / (1 + priceNds / 100), 2, '.', ' '));
+							$('input[name="price_nds"]').val($.number(thisVal * ((100 - genPercent) / 100), 2, '.', ' '));
+						});
+						
+						
+						
+						
+						
+						$('#subcontracting').on('change', function() {
+							let isChecked = $(this).is(':checked');
+							if (isChecked) $('#genFields').removeAttrib('hidden');
+							else {
+								$('#genFields').setAttrib('hidden');
+								$('#genPercent').val('');
+								$('#genPrice').val('');
+								$('#genPriceNds').val('');
+							}
+						});
+						
+						
+						
+						
+						
+						
+						
+						
+						
 						
 						$('#objectNumber').ddrInputs('change', function(item) {
 							let value = $(item).val(),
@@ -258,17 +323,85 @@
 							enableButtons('close');
 							$('input[name="price"]').number(true, 2, '.', ' ');
 							$('input[name="price_nds"]').number(true, 2, '.', ' ');
+							$('#genPrice').number(true, 2, '.', ' ');
+							$('#genPriceNds').number(true, 2, '.', ' ');
 							
 							// Работа с НДС
+							// Работа с НДС
 							let priceNds = $('input[name="nds"]').val();
+							let genPercent = parseFloat($('#genPercent').val());
 							
-							$('input[name="price"]').on('input', function() {
-								$('input[name="price_nds"]').val($.number(($(this).val() * (1 + priceNds / 100)), 2, '.', ' '));
+							$('#genPercent').on('input', function() {
+								genPercent = parseFloat($(this).val());
+								
+								// меняется стоимость своего договора
+								$('input[name="price"]').val(parseFloat($('#genPrice').val()) * ((100 - genPercent) / 100));
+								$('input[name="price_nds"]').val(parseFloat($('#genPriceNds').val()) * ((100 - genPercent) / 100));
+								
+								// меняется стоимость не нашего договора
+								//$('#genPrice').val(parseFloat($('input[name="price"]').val()) + ($('input[name="price"]').val() / 100) * genPercent);
+								//$('#genPriceNds').val(parseFloat($('input[name="price_nds"]').val()) + ($('input[name="price_nds"]').val() / 100) * genPercent);
 							});
+							
+							
+							// Работа с НДС
+							$('input[name="price"]').on('input', function() {
+								let thisVal = parseFloat($(this).val());
+								$('input[name="price_nds"]').val($.number((thisVal * (1 + priceNds / 100)), 2, '.', ' '));
+								$('#genPrice').val($.number(thisVal / ((100 - genPercent) / 100), 2, '.', ' '));
+								$('#genPriceNds').val($.number(thisVal / ((100 - genPercent) / 100) * (1 + priceNds / 100), 2, '.', ' '));
+							});
+							
 							
 							$('input[name="price_nds"]').on('input', function() {
-								$('input[name="price"]').val($.number(($(this).val() / (1 + priceNds / 100)), 2, '.', ' '));
+								let thisVal = parseFloat($(this).val());
+								$('input[name="price"]').val($.number((thisVal / (1 + priceNds / 100)), 2, '.', ' '));
+								$('#genPrice').val($.number(thisVal / ((100 - genPercent) / 100) / (1 + priceNds / 100), 2, '.', ' '));
+								$('#genPriceNds').val($.number(thisVal / ((100 - genPercent) / 100), 2, '.', ' '));
 							});
+							
+							
+							$('#genPrice').on('input', function() {
+								let thisVal = parseFloat($(this).val());
+								$('#genPriceNds').val($.number((thisVal * (1 + priceNds / 100)), 2, '.', ' '));
+								$('input[name="price"]').val($.number(thisVal * ((100 - genPercent) / 100), 2, '.', ' '));
+								$('input[name="price_nds"]').val($.number(thisVal * ((100 - genPercent) / 100) * (1 + priceNds / 100), 2, '.', ' '));
+							});
+							
+							$('#genPriceNds').on('input', function() {
+								let thisVal = parseFloat($(this).val());
+								$('#genPrice').val($.number((thisVal / (1 + priceNds / 100)), 2, '.', ' '));
+								$('input[name="price"]').val($.number(thisVal * ((100 - genPercent) / 100) / (1 + priceNds / 100), 2, '.', ' '));
+								$('input[name="price_nds"]').val($.number(thisVal * ((100 - genPercent) / 100), 2, '.', ' '));
+							});
+							
+							
+							
+							
+							
+							$('#subcontracting').on('change', function() {
+								let isChecked = $(this).is(':checked');
+								if (isChecked) $('#genFields').removeAttrib('hidden');
+								else {
+									$('#genFields').setAttrib('hidden');
+									$('#genPercent').val('');
+									$('#genPrice').val('');
+									$('#genPriceNds').val('');
+								}
+							});
+							
+							
+							
+							
+							
+							
+							
+							
+							
+							
+							
+							
+							
 							
 							$('#objectNumber').ddrInputs('change', function(item) {
 								let value = $(item).val(),

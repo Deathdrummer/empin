@@ -125,6 +125,33 @@
 							</div>
 						</div>	
 					</div>
+					
+					<div class="form__item" id="genFields" {{!isset($subcontracting) || !$subcontracting ? 'hidden' : ''}}>
+						<div class="row row-cols-3 g-10 align-items-end">
+							<div class="col-5">
+								<label class="form__label color-dark">Стоимость генподрядного {{$guard == 'admin' ? '(не нашего)' : ''}} договора без НДС</label>
+								<x-input id="genPrice" :value="($price ?? 0) / ((100 - ($gen_percent ?? 0)) / 100)" icon="ruble-sign" iconbg="yellow" class="w100" />
+							</div>
+							<div class="col-5">
+								<label class="form__label color-dark">Стоимость генподрядного {{$guard == 'admin' ? '(не нашего)' : ''}} договора с НДС</label>
+								<x-input id="genPriceNds" :value="($price_nds ?? 0) / ((100 - ($gen_percent ?? 0)) / 100)" icon="ruble-sign" iconbg="yellow" class="w100" />
+							</div>
+							<div class="col-2">
+								<label class="form__label color-dark breakword">Генподрядный процент</label>
+								<x-input
+									id="genPercent"
+									type="number"
+									name="gen_percent"
+									showrows
+									value="{{$gen_percent ?? 0}}"
+									icon="percent"
+									iconbg="yellow"
+									class="w100"
+									inpclass="pr32px"
+									placeholder="%" />
+							</div>
+						</div>	
+					</div>
 				</div>
 			</div>
 			
@@ -132,7 +159,7 @@
 			<div class="col-2">
 				<div class="form">
 					<div class="form__item">
-						<x-checkbox name="subcontracting" :checked="$subcontracting ?? null" label="Субподряд" />
+						<x-checkbox name="subcontracting" id="subcontracting" :checked="$subcontracting ?? false" label="Субподряд" />
 					</div>
 					
 					<div class="form__item">
