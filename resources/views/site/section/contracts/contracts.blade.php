@@ -73,6 +73,7 @@
 					>Подборки</x-button>
 				
 				<x-button
+					style="border-radius: 10px; border-color:transparent;"
 					id="selectionsClearBtn"
 					group="large"
 					w="3rem"
@@ -96,7 +97,7 @@
 
 				@cando('sozdanie-dogovora:site')
 					<x-button
-						style="border-radius: 10px; border-color:transparent;"
+						style="border-radius: 10px; border-color:transparent; margin-left: 20px;"
 						group="large"
 						variant="light"
 						action="contractNew"
@@ -1614,13 +1615,6 @@
 	
 	
 	
-	/*
-	1. сделать работу с несколькими записями
-	2. создание подборки через контекстное меню
-	
-	*/
-	
-	
 	
 	
 	
@@ -1856,7 +1850,7 @@
 				}
 			}, {
 				name: 'Добавить в подборку',
-				hidden: selectionId,
+				//hidden: selectionId,
 				countLeft: countSelected > 1 ? countSelected : null,
 				sort: 2,
 				load: {
