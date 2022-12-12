@@ -156,26 +156,6 @@
 								</x-table.td>
 							@endif
 							
-							@if(auth('site')->user()->can('contract-col-date_close:site') && (empty($userColums) || in_array('date_close', $userColums)))
-								<x-table.td
-									class="w6rem sort{{$sortField == 'date_close' ? ' sort-'.$sortOrder : ''}}"
-									onclick="$.sorting(this, 'date_close')"
-									noscroll
-									ddrtabletdmain
-									><strong class="fz10px lh90 d-block text-center wodrbreak">Дата закрытия договора</strong>
-								</x-table.td>
-							@endif
-							
-							@if(auth('site')->user()->can('contract-col-date_buy:site') && (empty($userColums) || in_array('date_buy', $userColums)))
-								<x-table.td
-									class="w6rem sort{{$sortField == 'date_buy' ? ' sort-'.$sortOrder : ''}}"
-									onclick="$.sorting(this, 'date_buy')"
-									noscroll
-									ddrtabletdmain
-									><strong class="fz10px lh90 d-block text-center wodrbreak">Дата закупки</strong>
-								</x-table.td>
-							@endif
-							
 							@if(auth('site')->user()->can('contract-col-hoz_method:site') && (empty($userColums) || in_array('hoz_method', $userColums)))
 								<x-table.td
 									class="w3rem sort{{$sortField == 'hoz_method' ? ' sort-'.$sortOrder : ''}}"
@@ -225,6 +205,26 @@
 									noscroll
 									ddrtabletdmain
 									><strong class="fz10px lh90 d-block text-center wodrbreak">Номер закупки</strong>
+								</x-table.td>
+							@endif
+							
+							@if(auth('site')->user()->can('contract-col-date_buy:site') && (empty($userColums) || in_array('date_buy', $userColums)))
+								<x-table.td
+									class="w6rem sort{{$sortField == 'date_buy' ? ' sort-'.$sortOrder : ''}}"
+									onclick="$.sorting(this, 'date_buy')"
+									noscroll
+									ddrtabletdmain
+									><strong class="fz10px lh90 d-block text-center wodrbreak">Дата закупки</strong>
+								</x-table.td>
+							@endif
+							
+							@if(auth('site')->user()->can('contract-col-date_close:site') && (empty($userColums) || in_array('date_close', $userColums)))
+								<x-table.td
+									class="w6rem sort{{$sortField == 'date_close' ? ' sort-'.$sortOrder : ''}}"
+									onclick="$.sorting(this, 'date_close')"
+									noscroll
+									ddrtabletdmain
+									><strong class="fz10px lh90 d-block text-center wodrbreak">Дата закрытия договора</strong>
 								</x-table.td>
 							@endif
 							

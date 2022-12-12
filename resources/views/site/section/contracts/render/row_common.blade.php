@@ -140,26 +140,6 @@
 	</x-table.td>
 @endif
 
-@if(auth('site')->user()->can('contract-col-date_close:site') && (empty($userColums) || in_array('date_close', $userColums)))
-	<x-table.td>
-		@if(isset($date_close) && $date_close)
-			<p class="fz12px lh90">{{dateFormatter($date_close, 'd.m.y')}}</p>
-		@else
-			<p class="color-gray">-</p>
-		@endif
-	</x-table.td>
-@endif
-
-@if(auth('site')->user()->can('contract-col-date_buy:site') && (empty($userColums) || in_array('date_buy', $userColums)))
-	<x-table.td>
-		@if(isset($date_buy) && $date_buy)
-			<p class="fz12px lh90">{{dateFormatter($date_buy, 'd.m.y')}}</p>
-		@else
-			<p class="color-gray">-</p>
-		@endif
-	</x-table.td>
-@endif
-
 @if(auth('site')->user()->can('contract-col-hoz_method:site') && (empty($userColums) || in_array('hoz_method', $userColums)))
 	<x-table.td class="h-center">
 		@if($hoz_method)
@@ -198,6 +178,26 @@
 
 @if(auth('site')->user()->can('contract-col-buy_number:site') && (empty($userColums) || in_array('buy_number', $userColums)))
 	<x-table.td class="breakword h-center"><p class="fz12px">{{$buy_number ?? '-'}}</p></x-table.td>
+@endif
+
+@if(auth('site')->user()->can('contract-col-date_buy:site') && (empty($userColums) || in_array('date_buy', $userColums)))
+	<x-table.td>
+		@if(isset($date_buy) && $date_buy)
+			<p class="fz12px lh90">{{dateFormatter($date_buy, 'd.m.y')}}</p>
+		@else
+			<p class="color-gray">-</p>
+		@endif
+	</x-table.td>
+@endif
+
+@if(auth('site')->user()->can('contract-col-date_close:site') && (empty($userColums) || in_array('date_close', $userColums)))
+	<x-table.td>
+		@if(isset($date_close) && $date_close)
+			<p class="fz12px lh90">{{dateFormatter($date_close, 'd.m.y')}}</p>
+		@else
+			<p class="color-gray">-</p>
+		@endif
+	</x-table.td>
 @endif
 
 @if(auth('site')->user()->can('contract-col-archive_dir:site') && (empty($userColums) || in_array('archive_dir', $userColums)))

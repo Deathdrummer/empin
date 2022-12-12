@@ -97,7 +97,7 @@
 
 				@cando('sozdanie-dogovora:site')
 					<x-button
-						style="border-radius: 10px; border-color:transparent; margin-left: 20px;"
+						style="border-radius: 10px; border-color:transparent; margin-left:20px;"
 						group="large"
 						variant="light"
 						action="contractNew"

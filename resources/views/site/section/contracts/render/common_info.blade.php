@@ -100,24 +100,6 @@
 				</tr>
 			@endcando
 			
-			@cando('contract-col-date_close:site')
-				<tr>
-					<td>
-						<p class="color-gray-500 noselect format">Дата закрытия договора:</p>
-					</td>
-					<td>
-						<p class="breakword select-text" tripleselect>
-							@if($contract['date_close'])
-								@date($contract['date_close']) г.
-							@else
-								-
-							@endif
-						</p>
-					</td>
-				</tr>
-			@endcando
-
-		
 			@cando('contract-col-contract:site')
 				<tr>
 					<td>
@@ -282,6 +264,22 @@
 				</tr>
 			@endcando
 			
+			@cando('contract-col-date_close:site')
+				<tr>
+					<td>
+						<p class="color-gray-500 noselect format">Дата закрытия договора:</p>
+					</td>
+					<td>
+						<p class="breakword select-text" tripleselect>
+							@if($contract['date_close'])
+								@date($contract['date_close']) г.
+							@else
+								-
+							@endif
+						</p>
+					</td>
+				</tr>
+			@endcando
 			
 			@cando('contract-col-archive_dir:site')
 				<tr>
