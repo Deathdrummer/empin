@@ -157,11 +157,11 @@ class Contract {
 			}, function($query) use($sortField, $sortOrder) {
 				return $query->orderBy($sortField, $sortOrder);
 			})
-			//->limit($limit)
-			//->offset($offset)
+			->limit($limit)
+			->offset($offset)
 			->get();
 		
-		logger($data->count()); 
+		logger($offset);
 		
 		if ($data->isEmpty()) return false;
 		
