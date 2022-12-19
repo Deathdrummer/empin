@@ -142,7 +142,7 @@ class Contract {
 				return $query->whereIn('id', $selectionContracts->contracts->pluck('id'));
 			})
 			
-			->when($sortStep, function ($query) use($sortStep, $sortOrder) {
+			/* ->when($sortStep, function ($query) use($sortStep, $sortOrder) {
 				$query->orderBy(
 					ContractData::select('data')
 					->whereColumn('contract_data.contract_id', 'contracts.id')
@@ -158,9 +158,8 @@ class Contract {
 				);
 				
 			}, function($query) use($sortField, $sortOrder) {
-				logger($sortField.' '.$sortOrder);
 				$query->orderBy($sortField, $sortOrder);
-			})
+			}) */
 			
 			->limit($limit)
 			->offset($offset)
