@@ -135,7 +135,7 @@ class Contract {
 					->orderBy('_sort', 'ASC');
 			}]) */
 			/* ->with('selections') */
-			/* ->when($onlyAssignedContractsIds, function ($query) use($onlyAssignedContractsIds) {
+			->when($onlyAssignedContractsIds, function ($query) use($onlyAssignedContractsIds) {
 				return $query->whereIn('id', $onlyAssignedContractsIds);
 			})
 			->when($selectionContracts, function ($query) use($selectionContracts) {
@@ -156,7 +156,7 @@ class Contract {
 				
 			}, function($query) use($sortField, $sortOrder) {
 				return $query->orderBy($sortField, $sortOrder);
-			}) */
+			})
 			->limit($limit)
 			->offset($offset)
 			->get();
