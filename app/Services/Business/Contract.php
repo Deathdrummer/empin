@@ -161,10 +161,10 @@ class Contract {
 			->offset($offset)
 			->get();
 		
-		logger($offset);
-		
 		if ($data->isEmpty()) return false;
 		
+		
+		logger($data->pluck('object_number'));
 		
 		
 		
