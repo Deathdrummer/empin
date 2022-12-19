@@ -94,6 +94,9 @@ class Contract {
 	 * @return mixed
 	 */
 	public function getWithDepartments(Request $request) {
+		
+		logger($request->all());
+		
 		$filter = app()->make(ContractFilter::class, ['queryParams' => $request->except(['sort_field', 'sort_order'])]);
 		
 		$sortField = $request->get('sort_field', 'id');
@@ -162,6 +165,8 @@ class Contract {
 			->get();
 		
 		if ($data->isEmpty()) return false;
+		
+		
 		
 		
 		// Список подборок для каждого договора, в которых он уже добавлен
