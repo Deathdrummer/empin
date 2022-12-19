@@ -158,7 +158,8 @@ class Contract {
 				);
 				
 			}, function($query) use($sortField, $sortOrder) {
-				//return $query->orderBy($sortField, $sortOrder);
+				logger($sortField.' '.$sortOrder);
+				$query->orderBy($sortField, $sortOrder);
 			})
 			
 			->limit($limit)
