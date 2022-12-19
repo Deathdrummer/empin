@@ -95,7 +95,7 @@ class Contract {
 	 */
 	public function getWithDepartments(Request $request) {
 		
-		logger($request->all());
+		logger($request->all()); 
 		
 		$filter = app()->make(ContractFilter::class, ['queryParams' => $request->except(['sort_field', 'sort_order'])]);
 		
