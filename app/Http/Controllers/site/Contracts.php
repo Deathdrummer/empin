@@ -48,6 +48,10 @@ class Contracts extends Controller {
 	 * @return 
 	 */
 	public function list(Request $request) {
+		
+		logger(date('Y-m-d H:i'));
+		
+		
 		$list = $this->contract->getWithDepartments($request);
 		
 		$headers = [];
