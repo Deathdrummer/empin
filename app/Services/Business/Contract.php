@@ -122,7 +122,7 @@ class Contract {
 		
 		
 		$data = ContractModel::filter($filter)
-			->withCount(['departments as has_deps_to_send' => function (Builder $query) {
+			/* ->withCount(['departments as has_deps_to_send' => function (Builder $query) {
 				$query->where(['show' => 0, 'hide' => 0]);
 			}, 'departments as hide_count' => function (Builder $query) {
 				$query->where('hide', 1);
@@ -133,9 +133,9 @@ class Contract {
 				$query->where('account_id', $userId)
 					->orWhereJsonContains('subscribed', $userId)
 					->orderBy('_sort', 'ASC');
-			}])
+			}]) */
 			/* ->with('selections') */
-			->when($onlyAssignedContractsIds, function ($query) use($onlyAssignedContractsIds) {
+			/* ->when($onlyAssignedContractsIds, function ($query) use($onlyAssignedContractsIds) {
 				return $query->whereIn('id', $onlyAssignedContractsIds);
 			})
 			->when($selectionContracts, function ($query) use($selectionContracts) {
@@ -156,7 +156,7 @@ class Contract {
 				
 			}, function($query) use($sortField, $sortOrder) {
 				return $query->orderBy($sortField, $sortOrder);
-			})
+			}) */
 			->limit($limit)
 			->offset($offset)
 			->get();
