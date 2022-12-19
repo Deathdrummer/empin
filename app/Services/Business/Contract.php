@@ -141,14 +141,18 @@ class Contract {
 			->when($selectionContracts, function ($query) use($selectionContracts) {
 				return $query->whereIn('id', $selectionContracts->contracts->pluck('id'));
 			})
-			/* ->when($sortStep, function ($query) use($sortStep, $sortOrder) {
-				$query->orderBy(ContractData::select('data')
+			
+			->when($sortStep, function ($query) use($sortStep, $sortOrder) {
+				logger(222);
+				$query->orderBy(
+					ContractData::select('data')
 					->whereColumn('contract_data.contract_id', 'contracts.id')
 					->where('contract_data.step_id', $sortStep),
 					$sortOrder 
 				);
 				
-				$query->orderBy(ContractDepartment::select('show')
+				$query->orderBy(
+					ContractDepartment::select('show')
 					->whereColumn('contract_department.contract_id', 'contracts.id')
 					->whereJsonContains('steps', ['step_id' => (int)$sortStep]),
 					$sortOrder 
@@ -156,7 +160,8 @@ class Contract {
 				
 			}, function($query) use($sortField, $sortOrder) {
 				return $query->orderBy($sortField, $sortOrder);
-			}) */
+			})
+			
 			->limit($limit)
 			->offset($offset)
 			->get();
