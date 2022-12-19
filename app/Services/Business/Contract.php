@@ -143,7 +143,6 @@ class Contract {
 			})
 			
 			->when($sortStep, function ($query) use($sortStep, $sortOrder) {
-				logger(222);
 				$query->orderBy(
 					ContractData::select('data')
 					->whereColumn('contract_data.contract_id', 'contracts.id')
@@ -159,7 +158,7 @@ class Contract {
 				);
 				
 			}, function($query) use($sortField, $sortOrder) {
-				return $query->orderBy($sortField, $sortOrder);
+				//return $query->orderBy($sortField, $sortOrder);
 			})
 			
 			->limit($limit)
