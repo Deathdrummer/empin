@@ -94,9 +94,6 @@ class Contract {
 	 * @return mixed
 	 */
 	public function getWithDepartments(Request $request) {
-		
-		logger($request->all()); 
-		
 		$filter = app()->make(ContractFilter::class, ['queryParams' => $request->except(['sort_field', 'sort_order'])]);
 		
 		$sortField = $request->get('sort_field', 'id');
@@ -160,9 +157,11 @@ class Contract {
 			}, function($query) use($sortField, $sortOrder) {
 				return $query->orderBy($sortField, $sortOrder);
 			})
-			->limit($limit)
-			->offset($offset)
+			//->limit($limit)
+			//->offset($offset)
 			->get();
+		
+		logger($data->count()); 
 		
 		if ($data->isEmpty()) return false;
 		
