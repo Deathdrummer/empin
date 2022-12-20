@@ -141,8 +141,7 @@ class Contract {
 			->when($selectionContracts, function ($query) use($selectionContracts) {
 				return $query->whereIn('id', $selectionContracts->contracts->pluck('id'));
 			})
-			
-			/* ->when($sortStep, function ($query) use($sortStep, $sortOrder) {
+			->when($sortStep, function ($query) use($sortStep, $sortOrder) {
 				$query->orderBy(
 					ContractData::select('data')
 					->whereColumn('contract_data.contract_id', 'contracts.id')
@@ -158,20 +157,13 @@ class Contract {
 				);
 				
 			}, function($query) use($sortField, $sortOrder) {
-				$query->orderBy($sortField, $sortOrder);
-			}) */
-			->orderBy($sortField, $sortOrder)
+				return $query->orderBy($sortField, $sortOrder);
+			})
 			->limit($limit)
 			->offset($offset)
-			->toSql();
-		
-		logger($data);
+			->get();
 		
 		if ($data->isEmpty()) return false;
-		
-		
-		//logger($data->pluck('object_number'));
-		
 		
 		
 		// Список подборок для каждого договора, в которых он уже добавлен
