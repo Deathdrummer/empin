@@ -159,7 +159,7 @@ class Contract {
 			}, function($query) use($sortField, $sortOrder) {
 				$query->orderBy($sortField, $sortOrder);
 			})
-			->orderBy('object_number', $sortOrder)
+			->orderBy('id', $sortOrder)
 			->limit($limit)
 			->offset($offset)
 			->get();
