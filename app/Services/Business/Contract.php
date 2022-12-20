@@ -159,6 +159,7 @@ class Contract {
 			}, function($query) use($sortField, $sortOrder) {
 				return $query->orderBy($sortField, $sortOrder);
 			})
+			->groupBy('contracts.id')
 			->limit($limit)
 			->offset($offset)
 			->get();
