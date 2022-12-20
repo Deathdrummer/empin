@@ -160,7 +160,7 @@ class Contract {
 			}, function($query) use($sortField, $sortOrder) {
 				$query->orderBy($sortField, $sortOrder);
 			}) */
-			
+			->orderBy($sortField, $sortOrder)
 			->limit($limit)
 			->offset($offset)
 			->get();
