@@ -157,13 +157,14 @@ class Contract {
 				);
 				
 			}, function($query) use($sortField, $sortOrder) {
-				return $query->orderBy($sortField, $sortOrder);
+				$query->orderBy($sortField, $sortOrder);
+				$query->orderBy('object_number', $sortOrder);
 			})
 			->limit($limit)
 			->offset($offset)
 			->get();
 		
-		logger($data->pluck('customer'));
+		logger($data->pluck('customer', 'object_number'));
 		
 		if ($data->isEmpty()) return false;
 		
