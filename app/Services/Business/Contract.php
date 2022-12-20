@@ -163,12 +163,14 @@ class Contract {
 			->orderBy($sortField, $sortOrder)
 			->limit($limit)
 			->offset($offset)
-			->get();
+			->toSql();
+		
+		logger($data);
 		
 		if ($data->isEmpty()) return false;
 		
 		
-		logger($data->pluck('object_number'));
+		//logger($data->pluck('object_number'));
 		
 		
 		
