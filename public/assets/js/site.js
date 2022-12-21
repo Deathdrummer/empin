@@ -8122,6 +8122,7 @@ $(document).on('contextmenu', '[contextmenu]', function (e) {
   e.preventDefault();
   var target = {};
   target.selector = this;
+  target.pointer = e === null || e === void 0 ? void 0 : e.target;
   var uniqueBlockId = 'ddrContextMenu'; // Получить название функции-построителя меню и ее аргументы
 
   var _parseAttribString2 = _parseAttribString($(target.selector).attr('contextmenu')),
@@ -8573,7 +8574,8 @@ function _renderDomElement() {
 }
 
 function _setPositionByCursor(e, blockSelector, options) {
-  if (!e || !blockSelector) throw new Error('ddrSetPosition ошибка в аргументах!');
+  if (!e) throw new Error('_setPositionByCursor ошибка в аргументах!');
+  if (!blockSelector) return;
 
   var _$assign2 = _.assign({
     target: window,

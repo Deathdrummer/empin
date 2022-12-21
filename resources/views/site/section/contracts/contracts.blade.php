@@ -1554,7 +1554,15 @@
 	//----------------------------------------------------------------------------------- Выделение договоров
 	$('#contractsTable').on(tapEvent, '[contractid]', function({type, target, currentTarget, ctrlKey, shiftKey, detail, which, metaKey}) {
 		let row = currentTarget,
-			contractId = $(row).attr('contractid');
+			contractId = $(row).attr('contractid'),
+			isCommon = !!$(target).closest('[ddrtabletd]').hasAttr('commonlist') || false;
+		
+		if (!isCommon) {
+			$('#contractsTable').find('[contractselected]').removeClass('ddrtable__tr-selected').removeAttrib('contractselected');
+			lastChoosedRow = null;
+			selectedContracts.clear();
+			return;
+		} 
 			
 		if (ctrlKey || metaKey) {
 			if ($(row).hasAttr('contractselected')) {
@@ -1644,6 +1652,11 @@
 		canReturnToWork // вернуть договор в работу из архива
 		) => {
 		
+		
+		const countSelected = selectedContracts.items?.length || null;
+		const isCommon = !!$(target.pointer).closest('[ddrtabletd]').hasAttr('commonlist') || false;
+		
+		
 		closeOnScroll('#contractsList');
 		
 		onContextMenu(() => {
@@ -1655,10 +1668,16 @@
 				selectedContracts.add($(target.selector).attr('contractid'));
 			}
 			
+			if (!isCommon) {
+				$('#contractsTable').find('[contractselected]').removeClass('ddrtable__tr-selected').removeAttrib('contractselected');
+				lastChoosedRow = target.selector;
+				$(target.selector).addClass('ddrtable__tr-selected').setAttrib('contractselected');
+				selectedContracts.add($(target.selector).attr('contractid'));
+				
+			}
 			// console.log(selectedContracts.items);
 		});
 		
-		const countSelected = selectedContracts.items?.length || null;
 		
 		return [
 			{
@@ -1666,7 +1685,7 @@
 				countLeft: countSelected > 1 ? countSelected : null,
 				countRight: countSelected == 1 ? messagesCount : null,
 				countOnArrow: true,
-				visible: canChat,
+				visible: isCommon && canChat,
 				sort: 1,
 				onClick() {
 					if (countSelected == 1) { // Если выделен 1 договор
@@ -1782,7 +1801,7 @@
 				}
 			}, {
 				name: 'Отправить в архив',
-				visible: canToArchive && !isArchive,
+				visible: isCommon && (canToArchive && !isArchive),
 				countLeft: countSelected > 1 ? countSelected : null,
 				sort: 5,
 				onClick: () => {
@@ -1821,7 +1840,7 @@
 				},
 			}, {
 				name: 'Вернуть в работу',
-				visible: canReturnToWork && isArchive,
+				visible: isCommon && canReturnToWork && isArchive,
 				countLeft: countSelected > 1 ? countSelected : null,
 				sort: 5,
 				onClick() {
@@ -1851,6 +1870,7 @@
 			}, {
 				name: 'Добавить в подборку',
 				//hidden: selectionId,
+				visible: isCommon,
 				countLeft: countSelected > 1 ? countSelected : null,
 				sort: 2,
 				load: {
@@ -1894,7 +1914,7 @@
 				},
 			}, {
 				name: 'Удалить из подборки',
-				visible: selectionId,
+				visible: isCommon && selectionId,
 				countLeft: countSelected > 1 ? countSelected : null,
 				sort: 4,
 				onClick() {		
@@ -1933,6 +1953,7 @@
 			}, {
 				name: 'Создать новую подборку',
 				sort: 3,
+				visible: isCommon,
 				countLeft: countSelected > 1 ? countSelected : null,
 				onClick() {
 					let html = 	'<p class="d-block mb5px fz14px color-darkgray">Название подборки:</p>' +
@@ -2003,7 +2024,7 @@
 			}, {
 				name: 'Отправить в другой отдел',
 				enabled: selectedContracts.items.length > 1 || (!!hasDepsToSend && ((canSending && departmentId) || (canSendingAll && !departmentId))),
-				hidden: isArchive,
+				hidden: isArchive || !isCommon,
 				countLeft: countSelected > 1 ? countSelected : null,
 				sort: 4,
 				load: {
@@ -2049,7 +2070,7 @@
 				},
 			}, {
 				name: 'Скрыть',
-				visible: canHiding && departmentId && !isArchive,
+				visible: isCommon && canHiding && departmentId && !isArchive,
 				countLeft: countSelected > 1 ? countSelected : null,
 				sort: 6,
 				onClick() {	
@@ -2075,6 +2096,13 @@
 							});
 						}
 					});
+				}
+			}, {
+				name: 'Добавить чекбокс',
+				visible: !isCommon && !isArchive,
+				sort: 1,
+				onClick() {	
+					
 				}
 			}
 		];

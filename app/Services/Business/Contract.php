@@ -157,9 +157,31 @@ class Contract {
 				);
 				
 			}, function($query) use($sortField, $sortOrder) {
-				$query->orderBy($sortField, $sortOrder);
+				
+				// что тут происходит: производится сортировка по подставным данным. Перечисляются ID сортируемого поля в том порядке, в котором нужно нам.
+				
+				$settingData = match ($sortField) {
+					'type' 			=> array_column($this->getSettings('contract-types'), 'id', 'title'),
+					'contractor' 	=> array_column($this->getSettings('contract-contractors'), 'id', 'name'),
+					'customer' 		=> array_column($this->getSettings('contract-customers'), 'id', 'name'),
+				};
+				
+				if ($sortOrder == 'asc') ksort($settingData, SORT_NATURAL);
+				elseif ($sortOrder == 'desc') krsort($settingData, SORT_NATURAL);
+				
+				$ids = array_values($settingData); 
+				
+				// первый вариант
+				//$placeholders = implode(',', array_fill(0, count($ids), '?'));
+				//$query->orderByRaw("field({$sortField},{$placeholders})", $ids);
+				
+				// второй вариант
+				$implodeIds = implode(',', $ids);
+				$query->orderByRaw("FIND_IN_SET($sortField, '$implodeIds')");
+				
 			})
-			->orderBy('id', $sortOrder)
+			->orderBy('id', 'asc')
+			->groupBy('id')
 			->limit($limit)
 			->offset($offset)
 			->get();

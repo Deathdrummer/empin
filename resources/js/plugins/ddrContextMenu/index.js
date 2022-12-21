@@ -7,6 +7,7 @@ $(document).on('contextmenu', '[contextmenu]', function(e) {
 	e.preventDefault();
 	const target = {};
 	target.selector = this;
+	target.pointer = e?.target;
 	let uniqueBlockId = 'ddrContextMenu';
 	
 	
@@ -455,7 +456,8 @@ function _renderDomElement(html = null, bdeid = null, append = false) {
 
 
 function _setPositionByCursor(e, blockSelector, options) {
-	if (!e || !blockSelector) throw new Error('ddrSetPosition ошибка в аргументах!');
+	if (!e) throw new Error('_setPositionByCursor ошибка в аргументах!');
+	if (!blockSelector) return;
 	
 	let {strictX, strictY, target} = _.assign({
 			target: window, 
