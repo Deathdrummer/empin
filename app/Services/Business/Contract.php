@@ -164,20 +164,26 @@ class Contract {
 					'type' 			=> array_column($this->getSettings('contract-types'), 'id', 'title'),
 					'contractor' 	=> array_column($this->getSettings('contract-contractors'), 'id', 'name'),
 					'customer' 		=> array_column($this->getSettings('contract-customers'), 'id', 'name'),
+					default => false,
 				};
 				
-				if ($sortOrder == 'asc') ksort($settingData, SORT_NATURAL);
-				elseif ($sortOrder == 'desc') krsort($settingData, SORT_NATURAL);
+				if ($settingData) {
+					if ($sortOrder == 'asc') ksort($settingData, SORT_NATURAL);
+					elseif ($sortOrder == 'desc') krsort($settingData, SORT_NATURAL);
+					
+					$ids = array_values($settingData);
+					
+					// первый вариант
+					//$placeholders = implode(',', array_fill(0, count($ids), '?'));
+					//$query->orderByRaw("field({$sortField},{$placeholders})", $ids);
+					
+					// второй вариант
+					$implodeIds = implode(',', $ids);
+					$query->orderByRaw("FIND_IN_SET($sortField, '$implodeIds')");
 				
-				$ids = array_values($settingData); 
-				
-				// первый вариант
-				//$placeholders = implode(',', array_fill(0, count($ids), '?'));
-				//$query->orderByRaw("field({$sortField},{$placeholders})", $ids);
-				
-				// второй вариант
-				$implodeIds = implode(',', $ids);
-				$query->orderByRaw("FIND_IN_SET($sortField, '$implodeIds')");
+				} else {
+					$query->orderBy($sortField, $sortOrder);
+				}
 				
 			})
 			->orderBy('id', 'asc')
