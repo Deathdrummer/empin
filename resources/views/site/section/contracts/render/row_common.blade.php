@@ -50,7 +50,7 @@
 @endif
 
 @if(auth('site')->user()->can('contract-col-object_number:site') && (empty($userColums) || in_array('object_number', $userColums)))
-	<x-table.td class="h-center" commonlist><strong class="fz16px">{{$object_number ?? '-'}}</strong><sup>{{$id}}</sup></x-table.td>
+	<x-table.td class="h-center" commonlist><strong class="fz16px">{{$object_number ?? '-'}}</strong></x-table.td>
 @endif
 
 @if(auth('site')->user()->can('contract-col-title:site') && (empty($userColums) || in_array('title', $userColums)))
