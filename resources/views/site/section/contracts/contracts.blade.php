@@ -1716,6 +1716,10 @@
 									sendMessStat = false;
 									wait(false);
 									
+									$('.chat__message').tripleTap((elem) => {
+										selectText(elem);
+									});
+									
 									let chatVisibleHeight = $('#chatMessageList').outerHeight(),
 										chatScrollHeight = $('#chatMessageList')[0].scrollHeight;
 									$('#chatMessageList').scrollTop(chatScrollHeight - chatVisibleHeight);
