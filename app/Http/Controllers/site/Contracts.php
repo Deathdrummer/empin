@@ -4,9 +4,11 @@ use App\Http\Controllers\Controller;
 use App\Models\Contract;
 use App\Models\ContractChat;
 use App\Models\ContractData;
+use App\Models\ContractDepartment;
 use App\Models\ContractInfo;
 use App\Models\Department;
 use App\Models\Selection;
+use App\Models\Step;
 use App\Services\Business\Department as DepartmentService;
 use App\Services\Business\Contract as ContractService;
 use App\Services\Business\User as UserService;
@@ -681,6 +683,46 @@ class Contracts extends Controller {
 		$inserted = ContractChat::insert($insertData);
 		return response()->json($inserted);
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	public function step_checkbox(Request $request) {
+		[
+			'contractId' 	=> $contractId,
+			'departmentId' 	=> $departmentId,
+			'stepId' 		=> $stepId,
+			'value' 		=> $value,
+		] = $request->validate([
+			'contractId' 	=> 'required|numeric',
+			'departmentId' 	=> 'required|numeric',
+			'stepId' 		=> 'required|numeric',
+			'value' 		=> 'required|boolean',
+		]);
+		
+		$initStepsData = ContractDepartment::where(['contract_id' => $contractId, 'department_id' => $departmentId])->first();
+		$steps = $initStepsData->steps;
+		
+		if ($value) {
+			//$stepsArrKey = array_search($stepId, array_column($steps, 'step_id'));
+            Arr::forget($steps, $stepId);
+			ContractData::where(['contract_id' => $contractId, 'department_id' => $departmentId, 'step_id' => $stepId])->delete();
+        } else {
+			$stepData = Step::find($stepId);
+			$steps[] = ['step_id' => $stepId, 'deadline' => $stepData->deadline];
+        }
+		
+		$initStepsData->steps = array_values($steps);
+        $stat = $initStepsData->save();
+		return response()->json($stat);
+	}
+	
+	
+	
 	
 	
 	

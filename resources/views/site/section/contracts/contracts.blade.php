@@ -228,6 +228,8 @@
 		limit = {{$setting['contracts-per-page'] ?? 10}},
 		priceNds = {{$setting['price-nds'] ?? 1}},
 		countShownLoadings = {{$setting['count-shown-loadings'] ?? 2}},
+		canCreateCheckbox = '{{Auth::guard('site')->user()->can('contract-create-checkbox::site')}}',
+		canRemoveCheckbox = '{{Auth::guard('site')->user()->can('contract-remove-checkbox::site')}}',
 		offset = 0,
 		search = null,
 		selection = null,
@@ -1653,11 +1655,10 @@
 		) => {
 		
 		
-		const countSelected = selectedContracts.items?.length || null;
 		const isCommon = !!$(target.pointer).closest('[ddrtabletd]').hasAttr('commonlist') || false;
+		const isDeptCheckbox = !!$(target.pointer).closest('[ddrtabletd]').hasAttr('deptcheck') || false;
+		const hasCheckbox = !!$(target.pointer).closest('[ddrtabletd]').children().length
 		
-		
-		closeOnScroll('#contractsList');
 		
 		onContextMenu(() => {
 			// если кликнуть на НЕвыделенном договоре - то все выделенния отменятся и выделится текущий кликнутый договор
@@ -1677,6 +1678,12 @@
 			}
 			// console.log(selectedContracts.items);
 		});
+		
+		
+		const countSelected = selectedContracts.items?.length || null;
+		
+		
+		closeOnScroll('#contractsList');
 		
 		
 		return [
@@ -2098,11 +2105,59 @@
 					});
 				}
 			}, {
-				name: 'Добавить чекбокс',
-				visible: !isCommon && !isArchive,
+				name: hasCheckbox && canRemoveCheckbox ? 'Удалить чекбокс' : (!hasCheckbox && canCreateCheckbox ? 'Добавить чекбокс' : ''),
+				visible: isDeptCheckbox && !isArchive && ((!hasCheckbox && canCreateCheckbox) || (hasCheckbox && canRemoveCheckbox)),
 				sort: 1,
-				onClick() {	
+				async onClick(foo) {	
+					const cell = $(target.pointer).closest('[ddrtabletd]');
+					const edited = !!$(cell).attr('edited');
+					const attrData = $(cell).attr('deptcheck');
+					const [contractId = null, departmentId = null, stepId = null] = pregSplit(attrData);
 					
+					const waitCell = $(cell).ddrWait({
+						iconHeight: '30px',
+						bgColor: '#efe9f9',
+					});
+					
+					const {data, error, status, headers} = await axiosQuery('post', 'site/contracts/step_checkbox', {
+						contractId, 
+						departmentId,
+						stepId,
+						value: hasCheckbox
+					}, 'json');
+					
+					
+					if (error) {
+						console.log(error);
+						$.notify('Ошибка! Не удалось '+(hasCheckbox ? 'удалить' : 'добавить')+' чекбокс!', 'error');
+						waitCell.destroy();
+						return;
+					}
+					
+					// canCreateCheckbox canRemoveCheckbox
+					if (data) {
+						if (!hasCheckbox) {
+							if (edited) {
+								const randId = generateCode('nnnnnnn');
+								const editedCheckbox = '<div class="checkbox normal-checkbox">' +
+									'<input type="checkbox" name="assigned_primary" id="checkbox'+randId+'" inpgroup="normal" oninput="$.contractSetData(this, '+contractId+','+departmentId+','+stepId+',1)">' +
+									
+										'<label class="noselect" for="checkbox'+randId+'"></label>' +
+									
+										'<label for="checkbox'+randId+'" class="checkbox__label lh90 d-inline-block normal-checkbox__label noselect"></label>' +
+										'<div class="normal-checkbox__errorlabel" errorlabel=""></div>' +
+									'</div>';
+								$(cell).html(editedCheckbox);
+							} else {
+								$(cell).html('<div class="checkbox-empty checkbox-empty-normal border-gray-400"></div>');
+							}
+							$.notify('Чекбокс успешно добавлен!');
+						} else {
+							$(cell).empty();
+							$.notify('Чекбокс успешно удален!');
+						}
+						waitCell.destroy();
+					}
 				}
 			}
 		];

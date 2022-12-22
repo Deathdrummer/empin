@@ -306,6 +306,8 @@ Route::prefix('site')->middleware(['lang', 'isajax:site'])->group(function() {
 	Route::put('/contracts/chat', [Contracts::class, 'chat_send']);
 	Route::put('/contracts/chats', [Contracts::class, 'chat_send_many']);
 	
+	Route::post('/contracts/step_checkbox', [Contracts::class, 'step_checkbox']);
+	
 	
 	
 	// Подборки

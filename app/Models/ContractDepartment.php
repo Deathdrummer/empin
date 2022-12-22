@@ -5,6 +5,31 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 
 class ContractDepartment extends Pivot {
 	
+	/**
+     * Таблица
+	 *
+     * @var string
+     */
+	protected $table = 'contract_department';
+	
+	
+	/**
+	* Атрибуты, для которых НЕ разрешено массовое присвоение значений.
+	*
+	* @var array
+	*/
+	protected $guarded = [];
+	
+	
+	
+	/**
+     * Поля разрешенные для редактирования
+	 *
+     * @var array
+     */
+	protected $fillable = [
+		'steps',
+	];
 	
 	
 	/**
@@ -13,6 +38,25 @@ class ContractDepartment extends Pivot {
      * @var string
      */
 	public $timestamps = false;
+	
+	
+	
+	/**
+     * Атрибуты, которые должны быть типизированы. (Конвертация полей при добавлении и получении)
+	 *
+     * @var array
+     */
+	protected $casts = [
+        'steps' => 'array',
+    ];
+	
+	
+	
+
+	
+	
+	
+	
 	
 	
 	/**

@@ -54,7 +54,8 @@ $(document).on('contextmenu', '[contextmenu]', function(e) {
 			$(target.selector).setAttrib('contextmenu', buildAttrString);
 		},
 		buildTitle(count = null, one = null, many = null, wordVariants = null) { // сформировать заголовок исходя из кол-ва выбранных элементов
-			if (_.isNull(count) || _.isNull(one) || (_.isNull(many) && _.isNull(wordVariants))) return;
+			if (_.isNull(one) || (_.isNull(many) && _.isNull(wordVariants))) return;
+			if (_.isNull(count)) return one;
 			
 			if (_.isNull(wordVariants) && !_.isArray(many)) {
 				if (count > 1) return many.replaceAll(/#/ig, count);
@@ -78,8 +79,12 @@ $(document).on('contextmenu', '[contextmenu]', function(e) {
 		}
 	};
 	
+	
 	// Вызвать функцию построения меню
 	const menuData = _callBuildMenuFunc(func, methods, ...args);
+	
+	// Если есть атрибут nocontext то меню не сработает, но onContextMenu сработает
+	if ($(target.pointer).closest('[nocontext]').length) return;
 	
 	// Сформировать из данных HTML меню, карту функций и связать клик на пукнт меню с вызовом сооответствующей функции
 	const [menuHtml, funcMap] = _buildMenuHtml(menuData);

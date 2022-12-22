@@ -5782,7 +5782,19 @@ window.isHover = function () {
 window.pregSplit = function () {
   var str = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
   var separator = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-  return str.split(/\s*[,|]\s*|\s*[;]\s*|\s+/);
+  var splitData = str.split(/\s*[,|]\s*|\s*[;]\s*|\s+/);
+  return splitData.map(function (item) {
+    return _clearData(item);
+  });
+
+  function _clearData() {
+    var _strItem;
+
+    var strItem = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+    if (_.isNull(strItem)) return strItem;
+    strItem = (_strItem = strItem) === null || _strItem === void 0 ? void 0 : _strItem.trim();
+    return isInt(strItem) ? parseInt(strItem) : isFloat(strItem) ? parseFloat(strItem) : strItem;
+  }
 };
 
 window.ddrSplit = function () {
@@ -5825,11 +5837,11 @@ window.ddrSplit = function () {
   }
 
   function _clearData() {
-    var _strItem;
+    var _strItem2;
 
     var strItem = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
     if (_.isNull(strItem)) return strItem;
-    strItem = (_strItem = strItem) === null || _strItem === void 0 ? void 0 : _strItem.trim();
+    strItem = (_strItem2 = strItem) === null || _strItem2 === void 0 ? void 0 : _strItem2.trim();
     return isInt(strItem) ? parseInt(strItem) : isFloat(strItem) ? parseFloat(strItem) : strItem;
   }
 };
@@ -8185,7 +8197,8 @@ $(document).on('contextmenu', '[contextmenu]', function (e) {
       var many = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
       var wordVariants = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
       // сформировать заголовок исходя из кол-ва выбранных элементов
-      if (_.isNull(count) || _.isNull(one) || _.isNull(many) && _.isNull(wordVariants)) return;
+      if (_.isNull(one) || _.isNull(many) && _.isNull(wordVariants)) return;
+      if (_.isNull(count)) return one;
 
       if (_.isNull(wordVariants) && !_.isArray(many)) {
         if (count > 1) return many.replaceAll(/#/ig, count);else return one.replaceAll(/\s*#\s*/ig, count);
@@ -8209,8 +8222,10 @@ $(document).on('contextmenu', '[contextmenu]', function (e) {
     }
   }; // Вызвать функцию построения меню
 
-  var menuData = _callBuildMenuFunc.apply(void 0, [func, methods].concat(_toConsumableArray(args))); // Сформировать из данных HTML меню, карту функций и связать клик на пукнт меню с вызовом сооответствующей функции
+  var menuData = _callBuildMenuFunc.apply(void 0, [func, methods].concat(_toConsumableArray(args))); // Если есть атрибут nocontext то меню не сработает, но onContextMenu сработает
 
+
+  if ($(target.pointer).closest('[nocontext]').length) return; // Сформировать из данных HTML меню, карту функций и связать клик на пукнт меню с вызовом сооответствующей функции
 
   var _buildMenuHtml2 = _buildMenuHtml(menuData),
       _buildMenuHtml3 = _slicedToArray(_buildMenuHtml2, 2),

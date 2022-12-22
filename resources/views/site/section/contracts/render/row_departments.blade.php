@@ -3,7 +3,7 @@
 		@continue
 	@endif
 	
-	<x-table.td class="w2rem bg-white"></x-table.td>
+	<x-table.td class="w2rem bg-white" nocontext="1"></x-table.td>
 	
 	@foreach($dept['steps'] as $step)
 		@isset($contract['departments'][$dept['id']]['steps'][$step['id']])
@@ -12,6 +12,8 @@
 					class="h-center"
 					style="{{!($contractdata[$contract['id']][$dept['id']][$step['id']]['data'] ?? false) ? 'background-color: '.$contract['departments'][$dept['id']]['steps'][$step['id']]['color'] ?? null : 'tranparent'}};"
 					deadlinecolor="{{$contract['departments'][$dept['id']]['steps'][$step['id']]['color'] ?? null}}"
+					deptcheck="{{$contract['id']}},{{$dept['id']}},{{$step['id']}}"
+					edited="{{$edited}}"
 					>
 					@if($edited)
 						<x-checkbox
@@ -101,7 +103,15 @@
 				</x-table.td>
 			@endif
 		@else
-			<x-table.td class="center"></x-table.td>
+			@if($step['type'] == 1)
+				<x-table.td
+					class="h-center"
+					deptcheck="{{$contract['id']}},{{$dept['id']}},{{$step['id']}}"
+					edited="{{$edited}}"
+					></x-table.td>
+			@else
+				<x-table.td class="center"></x-table.td>
+			@endif
 		@endisset
 	@endforeach
 	

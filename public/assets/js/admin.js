@@ -5924,7 +5924,19 @@ window.isHover = function () {
 window.pregSplit = function () {
   var str = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
   var separator = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-  return str.split(/\s*[,|]\s*|\s*[;]\s*|\s+/);
+  var splitData = str.split(/\s*[,|]\s*|\s*[;]\s*|\s+/);
+  return splitData.map(function (item) {
+    return _clearData(item);
+  });
+
+  function _clearData() {
+    var _strItem;
+
+    var strItem = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+    if (_.isNull(strItem)) return strItem;
+    strItem = (_strItem = strItem) === null || _strItem === void 0 ? void 0 : _strItem.trim();
+    return isInt(strItem) ? parseInt(strItem) : isFloat(strItem) ? parseFloat(strItem) : strItem;
+  }
 };
 
 window.ddrSplit = function () {
@@ -5967,11 +5979,11 @@ window.ddrSplit = function () {
   }
 
   function _clearData() {
-    var _strItem;
+    var _strItem2;
 
     var strItem = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
     if (_.isNull(strItem)) return strItem;
-    strItem = (_strItem = strItem) === null || _strItem === void 0 ? void 0 : _strItem.trim();
+    strItem = (_strItem2 = strItem) === null || _strItem2 === void 0 ? void 0 : _strItem2.trim();
     return isInt(strItem) ? parseInt(strItem) : isFloat(strItem) ? parseFloat(strItem) : strItem;
   }
 };

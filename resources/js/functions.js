@@ -124,7 +124,7 @@ window.selectText = function(elem) {
 */
 window.thisDevice = 'desktop';
 if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|Opera Mini/i.test(navigator.userAgent)) {
-   window.thisDevice = 'mobile';
+	window.thisDevice = 'mobile';
 }
 
 
@@ -147,7 +147,17 @@ window.isHover = (selector = null) => {
 
 
 window.pregSplit = function(str = null, separator = null) {
-	return str.split(/\s*[,|]\s*|\s*[;]\s*|\s+/);
+	const splitData = str.split(/\s*[,|]\s*|\s*[;]\s*|\s+/);
+	
+	return splitData.map((item) => {
+		return _clearData(item);
+	});
+	
+	function _clearData(strItem = null) {
+		if (_.isNull(strItem)) return strItem;
+		strItem = strItem?.trim();
+		return isInt(strItem) ? parseInt(strItem) : (isFloat(strItem) ? parseFloat(strItem) : strItem);
+	}
 }
 
 
@@ -1771,10 +1781,10 @@ window.processNotify = function(message = null) {
 	const waitNotifyWrapper = $('body').find('[waitnotify]');
 	
 	let waitNotifyHtml = '<div class="waitnotify__item" waitnotifyitem>' +
-						 	'<div class="waitnotify__iconcontainer">' +
-						 		'<div class="waitnotify__icon" waitnotifyitemwait><img src="/assets/images/loading.gif" ddrwaiticon></div>' +
-						 	'</div>' +
-						 	'<div class="waitnotify__message" waitnotifymessage>'+message+'</div>' +
+							'<div class="waitnotify__iconcontainer">' +
+								'<div class="waitnotify__icon" waitnotifyitemwait><img src="/assets/images/loading.gif" ddrwaiticon></div>' +
+							'</div>' +
+							'<div class="waitnotify__message" waitnotifymessage>'+message+'</div>' +
 						 '</div>';
 	
 	const waitNotifyDOM = $(waitNotifyHtml);
