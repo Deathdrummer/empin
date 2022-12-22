@@ -86,6 +86,8 @@ class ContractFilter extends AbstractFilter {
 			$query->orWhere('titul', 'like', '%'.$value.'%');
 			$query->orWhere('contract', 'like', '%'.$value.'%');
 			$query->orWhere('locality', 'like', '%'.$value.'%');
+			$query->orWhere('buy_number', 'like', '%'.$value.'%');
+			$query->orWhere('archive_dir', 'like', '%'.$value.'%');
 			
 			if ($customersMatch) $query->orWhereIn('customer', $customersMatch);
 			if ($typesMatch) $query->orWhereIn('type', $typesMatch);
