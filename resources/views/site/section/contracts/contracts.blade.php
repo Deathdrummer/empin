@@ -1840,26 +1840,13 @@
 							axiosQuery('post', 'site/contracts/to_archive', {contractIds: selectedContracts.items}, 'json')
 							.then(({data, error, status, headers}) => {
 								if (data) {
-									
-									
-									
 									if (selectionId || searched) {
-										/*const counter = $('[chooseritem].chooser__item_active').find('[selectionscounts]'),
-											count = parseInt($(counter).text());
-										$(counter).text(count - 1);*/
-										
 										getCounts(() => {
 											$(target.selector).remove();
 										});
 									} else {
 										$(target.selector).remove();
 									}
-									
-									
-										
-									
-									
-									
 									
 									$.notify(buildTitle(countSelected, '% успешно отправлен в архив!', '# % успешно отправлены в архив!', ['Договор', 'договора', 'договоров']));
 								} else {
@@ -1888,7 +1875,14 @@
 							axiosQuery('post', 'site/contracts/to_work', {contractIds: selectedContracts.items}, 'json')
 							.then(({data, error, status, headers}) => {
 								if (data) {
-									getList({withCounts: Boolean(selectionId || searched)});
+									if (selectionId || searched) {
+										getCounts(() => {
+											$(target.selector).remove();
+										});
+									} else {
+										$(target.selector).remove();
+									}
+									
 									$.notify(buildTitle(countSelected, '% успешно возвращен в работу!', '# % успешно возвращены в работу!', ['Договор', 'договора', 'договоров']));
 									//target.changeAttrData(15, '0');
 								} else {
@@ -1973,11 +1967,10 @@
 						} else {
 							procNotif.done({message: buildTitle(countSelected, '% успешно удален из подборки!', '# % успешно удалены из подборки!', ['Договор', 'договора', 'договоров'])});
 							//target.changeAttrData(7, '0');
-							getList({
-								withCounts: true,
-								callback: function() {
-									$('[selectionsbtn]').ddrInputs('enable');
-								}
+							
+							getCounts(() => {
+								$(target.selector).remove();
+								$('[selectionsbtn]').ddrInputs('enable');
 							});
 						}
 					});
@@ -2078,9 +2071,14 @@
 								.then(({data, error, status, headers}) => {
 									if (data) {
 										//$.notify('Договор успешно отправлен в '+departmentName+'!');
+										
 										if (selectionId || searched) {
 											let params = {};
-											getList({withCounts: true});
+											getCounts(() => {
+												$(target.selector).remove();
+											});
+										} else {
+											$(target.selector).remove();
 										}
 										
 										if (data.length) {
@@ -2118,7 +2116,14 @@
 							axiosQuery('post', 'site/contracts/hide', {contractIds: selectedContracts.items, departmentId}, 'json')
 							.then(({data, error, status, headers}) => {
 								if (data) {
-									getList({withCounts: Boolean(selectionId || searched)});
+									if (selectionId || searched) {
+										getCounts(() => {
+											$(target.selector).remove();
+										});
+									} else {
+										$(target.selector).remove();
+									}
+									
 									$.notify(buildTitle(countSelected, '% успешно скрыт!', '# % успешно скрыты!', ['Договор', 'договора', 'договоров']));
 									//target.changeAttrData(9, '0');
 								} else {
