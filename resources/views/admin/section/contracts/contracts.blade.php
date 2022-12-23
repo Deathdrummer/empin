@@ -314,13 +314,18 @@
 			}).then(({state, wait, setTitle, setButtons, loadData, setHtml, setLHtml, dialog, close, onScroll, disableButtons, enableButtons, setWidth}) => { //isClosed
 				wait();
 				
-				
 				edit(id, (data, container, {error}) => {
-					wait(false);
+					if (error) {
+						console.log(error);
+						$.notify('Ошибка открытия договора!', 'error');
+						close();
+						return;
+					}
 					
 					if (data) {
 						setHtml(data, () => {
 							enableButtons('close');
+							wait(false);
 							$('input[name="price"]').number(true, 2, '.', ' ');
 							$('input[name="price_nds"]').number(true, 2, '.', ' ');
 							$('#genPrice').number(true, 2, '.', ' ');
@@ -467,8 +472,7 @@
 							});
 							
 						});
-					} 
-					if (error) $.notify(error.message, 'error');
+					}
 				});
 				
 				

@@ -23,16 +23,6 @@ class ContractDepartment extends Pivot {
 	
 	
 	/**
-     * Поля разрешенные для редактирования
-	 *
-     * @var array
-     */
-	protected $fillable = [
-		'steps',
-	];
-	
-	
-	/**
      * учитывать временные поля created_at и updated_at
 	 *
      * @var string

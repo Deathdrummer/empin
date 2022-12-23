@@ -173,6 +173,38 @@ class Contracts extends Controller {
 	
 	
 	
+	/**
+	 * Получить только количества договоров для всех разделов
+	 * 
+	 * @param 
+	 * @return 
+	 */
+	public function counts(Request $request) {
+		$counts = $this->contract->getCounts($request);
+		$counts = [
+			'x-count-contracts-all' 		=> $counts['all'] ?? null,
+			'x-count-contracts-departments' => json_encode($counts['departments']) ?? null,
+			'x-count-contracts-archive' 	=> $counts['archive'] ?? null,
+		];
+		return response()->json($counts);
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	/**
 	 * @param Request  $request
@@ -335,7 +367,6 @@ class Contracts extends Controller {
 			'departmentId' 	=> 'required|numeric'
 		]);
 		
-		
 		$dept = Department::find($departmentId);
 		$hasDepsContractIds = $dept->contracts()->wherePivotNotNull('steps')->wherePivot('show', 0)->get()->pluck('id');
 		
@@ -347,47 +378,7 @@ class Contracts extends Controller {
 		
 		$statData = $dept->contracts()->syncWithoutDetaching($dataToUpdate);
 		return response()->json($statData['updated']);
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		// ---- пример
-		/* $dept = Department::find($departmentId);
-		
-		$dataToUpdate = [];
-		foreach ($contractIds as $countractId) {
-			$dataToUpdate[$countractId] = ['hide' => 1];
-		}
-		
-		
-		$statData = $dept->contracts()->syncWithoutDetaching($dataToUpdate);
-		
-		return response()->json($statData['updated']); */
-		// ---- пример
-		
-		
-		
-		
-		
-		
-		
-		
-		//$contract = Contract::find($contractIds);
-		//$statData = $contract->departments()->syncWithoutDetaching([$departmentId => ['show' => 1, 'updated_show' => now()->setTime(0, 0, 0)]]);
-		
-		//return response()->json($statData['updated']);
 	}
-	
-	
-	
-	
 	
 	
 	

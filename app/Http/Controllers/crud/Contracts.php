@@ -270,13 +270,17 @@ class Contracts extends Controller {
 		
 		$contrDeps = [];
 		if ($contractDepartments = $contractData->departments->toArray()) {
-			foreach ($contractDepartments as $item) foreach ($item['pivot']['steps'] as $step) {
-				$contrDeps[$item['pivot']['department_id']]['show'] = $item['pivot']['show'];
-				//$contrDeps[$item['pivot']['department_id']]['assigned'] = $item['pivot']['assigned'];
-				$contrDeps[$item['pivot']['department_id']]['steps'][$step['step_id']] = [
-					'show' => true,
-					'deadline' => $step['deadline'] ?? null,
-				];
+			foreach ($contractDepartments as $item) {
+				if ($item['pivot']['steps'] && is_array($item['pivot']['steps'])) {
+					foreach ($item['pivot']['steps'] as $step) {
+						$contrDeps[$item['pivot']['department_id']]['show'] = $item['pivot']['show'];
+						//$contrDeps[$item['pivot']['department_id']]['assigned'] = $item['pivot']['assigned'];
+						$contrDeps[$item['pivot']['department_id']]['steps'][$step['step_id']] = [
+							'show' => true,
+							'deadline' => $step['deadline'] ?? null,
+						];
+					}
+				}
 			}
 		}
 		

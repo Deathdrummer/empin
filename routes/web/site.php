@@ -279,6 +279,7 @@ Route::prefix('site')->middleware(['lang', 'isajax:site'])->group(function() {
 	// Договоры
 	
 	Route::get('/contracts', [Contracts::class, 'list']);
+	Route::get('/contracts/counts', [Contracts::class, 'counts']);
 	Route::put('/contracts', [Contracts::class, 'set_data']);
 	Route::post('/contracts/hide', [Contracts::class, 'hide']);
 	Route::post('/contracts/to_archive', [Contracts::class, 'to_archive']);
@@ -324,7 +325,6 @@ Route::prefix('site')->middleware(['lang', 'isajax:site'])->group(function() {
 	
 	
 	Route::post('/selections/add_selection_from_contextmenu', [Selections::class, 'add_selection_from_contextmenu']);
-	
 	
 	
 	Route::resource('selections', Selections::class);

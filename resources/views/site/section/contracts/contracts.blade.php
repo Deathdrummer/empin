@@ -222,6 +222,7 @@
 <script type="module">
 	
 	let abortCtrl,
+		abortCtrlCounts,
 		currentList = 0,
 		sortField = ddrStore('site-contracts-sortfield') || 'id',
 		sortOrder = ddrStore('site-contracts-sortorder') || 'desc',
@@ -1839,7 +1840,27 @@
 							axiosQuery('post', 'site/contracts/to_archive', {contractIds: selectedContracts.items}, 'json')
 							.then(({data, error, status, headers}) => {
 								if (data) {
-									getList({withCounts: Boolean(selectionId || searched)});
+									
+									
+									
+									if (selectionId || searched) {
+										/*const counter = $('[chooseritem].chooser__item_active').find('[selectionscounts]'),
+											count = parseInt($(counter).text());
+										$(counter).text(count - 1);*/
+										
+										getCounts(() => {
+											$(target.selector).remove();
+										});
+									} else {
+										$(target.selector).remove();
+									}
+									
+									
+										
+									
+									
+									
+									
 									$.notify(buildTitle(countSelected, '% успешно отправлен в архив!', '# % успешно отправлены в архив!', ['Договор', 'договора', 'договоров']));
 								} else {
 									$.notify(buildTitle(countSelected, 'Ошибка! % не был отправлен в архив!', 'Ошибка! % не были отправлены в архив!', ['договор', 'договора', 'договоров']), 'error');
@@ -2366,6 +2387,78 @@
 			if (callback && typeof callback == 'function') callback(currentCount);
 		});
 	}
+	
+	
+	
+	
+	
+	
+	
+	//---------- Получение данных по количеству записей в разделах
+	async function getCounts(callback) {
+		if (abortCtrlCounts instanceof AbortController) abortCtrlCounts.abort();
+		
+		abortCtrlCounts = new AbortController();
+		const params = {};
+		
+		/*if (currentList > 0) {
+			params['archive'] = 0;
+			params['department_id'] = currentList;
+			params['pivot'] = {
+				department_id: currentList,
+				show: 1,
+				hide: 0
+			};
+		} else {
+			params['archive'] = currentList == -1 ? 1 : (searchWithArchive ? null : 0);
+		}*/
+		
+		params['search'] = search;
+		params['selection'] = selection;
+		
+		const {data, error, status, headers, abort} = await axiosQuery('get', 'site/contracts/counts', params, 'json', abortCtrlCounts);
+		
+		if (error) {
+			$.notify(error.message, 'error');
+			return;
+		}
+		
+		if (!data) return;
+		
+		
+		$('#chooserAll').find('[selectionscounts]').empty();
+		$('#chooserArchive').find('[selectionscounts]').empty();
+		$('[chooserdepartment]').find('[selectionscounts]').empty();
+		
+		
+		if (data['x-count-contracts-all']) {
+			$('#chooserAll').find('[selectionscounts]').text(data['x-count-contracts-all'] > 0 ? data['x-count-contracts-all'] : '');
+		} else {
+			//$('#chooserAll').find('[selectionscounts]').empty();
+		}
+		
+		if (data['x-count-contracts-archive']) {
+			$('#chooserArchive').find('[selectionscounts]').text(data['x-count-contracts-archive'] > 0 ? data['x-count-contracts-archive'] : '');
+		} else {
+			//$('#chooserArchive').find('[selectionscounts]').empty();
+		}
+		
+		if (data['x-count-contracts-departments']) {
+			let depsCounts = JSON.parse(data['x-count-contracts-departments']);
+			$.each(depsCounts, function(depId, count) {
+				$('[chooserdepartment="'+depId+'"]').find('[selectionscounts]').text(count > 0 ? count : '');
+			});
+		} else {
+			//$('[chooserdepartment]').find('[selectionscounts]').empty();
+		}	
+		
+			
+		if (callback && typeof callback == 'function') callback();
+	}
+	
+	
+	
+	
 	
 	
 	
