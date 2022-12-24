@@ -85,8 +85,6 @@ class Contracts extends Controller {
 		$contractdata = $this->contract->buildData($list->keys());
 		$userColums = $this->contract->getUserColums();
 		
-		logger($userColums);
-		
 		$this->addSettingToGlobalData([[
 				'setting'	=> 'contract-customers:customers',
 				'key'		=> 'id',
