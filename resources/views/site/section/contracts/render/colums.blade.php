@@ -2,6 +2,7 @@
 	<table>
 		<thead>
 			<tr>
+				<td class="w4rem"></td>
 				<td><strong class="fz12px">Название столбца</strong></td>
 				<td class="w4rem center"><i class="fa-solid fa-eye"></i></td>
 			</tr>
@@ -10,6 +11,7 @@
 			@forelse($colums as $field => $column)
 				@if(auth('site')->user()->can('contract-col-'.$field.':site'))
 					<tr class="h4rem">
+						<td class="handle"><i class="fa-solid fa-fw fa-arrows-up-down color-gray"></i></td>
 						<td>
 							<p>{{$column['title']}}</p>
 						</td>

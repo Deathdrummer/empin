@@ -1,5 +1,5 @@
-@if(!$isArchive)
-	@if(auth('site')->user()->can('contract-col-period:site') && (empty($userColums) || in_array('period', $userColums)))
+@forelse($userColums as $column)
+	@if($column == 'period' && !$isArchive && auth('site')->user()->can('contract-col-period:site'))
 		<x-table.td class="h-center" commonlist>
 				<i
 					onclick="$.pinContract(this, {{$id}});"
@@ -47,165 +47,170 @@
 				
 		</x-table.td>
 	@endif
-@endif
 
-@if(auth('site')->user()->can('contract-col-object_number:site') && (empty($userColums) || in_array('object_number', $userColums)))
-	<x-table.td class="h-center" commonlist><strong class="fz16px">{{$object_number ?? '-'}}</strong></x-table.td>
-@endif
+	@if($column == 'object_number' && auth('site')->user()->can('contract-col-object_number:site'))
+		<x-table.td class="h-center" commonlist><strong class="fz16px">{{$object_number ?? '-'}}</strong></x-table.td>
+	@endif
 
-@if(auth('site')->user()->can('contract-col-title:site') && (empty($userColums) || in_array('title', $userColums)))
-	<x-table.td class="breakword h-start" commonlist>
-		<div class="scrollblock-hidden maxh4rem-6px pr3px">
-			<p class="fz12px lh100 mt2px mb2px">{{Str::of($title ?? '-')->limit(60, '...')}}</p>
-		</div>
-	</x-table.td>
-@endif
+	@if($column == 'title' && auth('site')->user()->can('contract-col-title:site'))
+		<x-table.td class="breakword h-start" commonlist>
+			<div class="scrollblock-hidden maxh4rem-6px pr3px">
+				<p class="fz12px lh100 mt2px mb2px">{{Str::of($title ?? '-')->limit(60, '...')}}</p>
+			</div>
+		</x-table.td>
+	@endif
 
-@if(auth('site')->user()->can('contract-col-applicant:site') && (empty($userColums) || in_array('applicant', $userColums)))
-	<x-table.td class="breakword h-start" commonlist>
-		<div class="scrollblock-hidden maxh4rem-6px pr3px">
-			<p class="fz12px lh100 mt2px mb2px">{{$applicant ?? '-'}}</p>
-		</div>
-	</x-table.td>
-@endif
+	@if($column == 'applicant' && auth('site')->user()->can('contract-col-applicant:site'))
+		<x-table.td class="breakword h-start" commonlist>
+			<div class="scrollblock-hidden maxh4rem-6px pr3px">
+				<p class="fz12px lh100 mt2px mb2px">{{$applicant ?? '-'}}</p>
+			</div>
+		</x-table.td>
+	@endif
 
-@if(auth('site')->user()->can('contract-col-titul:site') && (empty($userColums) || in_array('titul', $userColums)))
-	<x-table.td class="pr2px breakword" commonlist>
-		<div class="scrollblock-hidden maxh4rem-6px pr3px">
-			<p class="format fz12px lh100 mt2px mb2px text-justify">{{$titul ?? '-'}}</p>
-		</div>
-	</x-table.td>
-@endif
+	@if($column == 'titul' && auth('site')->user()->can('contract-col-titul:site'))
+		<x-table.td class="pr2px breakword" commonlist>
+			<div class="scrollblock-hidden maxh4rem-6px pr3px">
+				<p class="format fz12px lh100 mt2px mb2px text-justify">{{$titul ?? '-'}}</p>
+			</div>
+		</x-table.td>
+	@endif
 
-@if(auth('site')->user()->can('contract-col-contract:site') && (empty($userColums) || in_array('contract', $userColums)))
-	<x-table.td class="breakword" commonlist><p class="fz12px lh110">{{$contract ?? '-'}}</p></x-table.td>
-@endif
+	@if($column == 'contract' && auth('site')->user()->can('contract-col-contract:site'))
+		<x-table.td class="breakword" commonlist><p class="fz12px lh110">{{$contract ?? '-'}}</p></x-table.td>
+	@endif
 
-@if(auth('site')->user()->can('contract-col-customer:site') && (empty($userColums) || in_array('customer', $userColums)))
-	<x-table.td class="breakword" commonlist>
-		@if(isset($customer) && isset($customers[$customer]))
-			<p class="fz12px lh90">{{Str::of($customers[$customer])->limit(60, '...')}}</p>
-		@else
-			<p class="color-gray">-</p>
-		@endif
-	</x-table.td>
-@endif
+	@if($column == 'customer' && auth('site')->user()->can('contract-col-customer:site'))
+		<x-table.td class="breakword" commonlist>
+			@if(isset($customer) && isset($customers[$customer]))
+				<p class="fz12px lh90">{{Str::of($customers[$customer])->limit(60, '...')}}</p>
+			@else
+				<p class="color-gray">-</p>
+			@endif
+		</x-table.td>
+	@endif
 
-@if(auth('site')->user()->can('contract-col-locality:site') && (empty($userColums) || in_array('locality', $userColums)))
-	<x-table.td class="breakword h-center" commonlist>
-		<div class="scrollblock-hidden maxh4rem-6px pr3px">
-			<p class="fz12px lh100 mt2px mb2px">{{$locality ?? '-'}}</p>
-		</div>
-	</x-table.td>
-@endif
+	@if($column == 'locality' && auth('site')->user()->can('contract-col-locality:site'))
+		<x-table.td class="breakword h-center" commonlist>
+			<div class="scrollblock-hidden maxh4rem-6px pr3px">
+				<p class="fz12px lh100 mt2px mb2px">{{$locality ?? '-'}}</p>
+			</div>
+		</x-table.td>
+	@endif
 
-@if(auth('site')->user()->can('contract-col-price_nds:site') && (empty($userColums) || in_array('price_nds', $userColums)))
-	<x-table.td class="text-end" commonlist>
-		@isset($price_nds)
-			<p class="fz12px lh90 nobreak">@number($price_nds, 2) <strong>@symbal(money)</strong></p>
-		@else
-			<p class="color-gray">-</p>
-		@endisset
-	</x-table.td>
-@endif
+	@if($column == 'price_nds' && auth('site')->user()->can('contract-col-price_nds:site'))
+		<x-table.td class="text-end" commonlist>
+			@isset($price_nds)
+				<p class="fz12px lh90 nobreak">@number($price_nds, 2) <strong>@symbal(money)</strong></p>
+			@else
+				<p class="color-gray">-</p>
+			@endisset
+		</x-table.td>
+	@endif
 
-@if(auth('site')->user()->can('contract-col-price:site') && (empty($userColums) || in_array('price', $userColums)))
-	<x-table.td class="text-end" commonlist>
-		@isset($price)
-			<p class="fz12px lh90 nobreak">@number($price, 2) <strong>@symbal(money)</strong></p>
-		@else
-			<p class="color-gray">-</p>
-		@endisset
-	</x-table.td>
-@endif
+	@if($column == 'price' && auth('site')->user()->can('contract-col-price:site'))
+		<x-table.td class="text-end" commonlist>
+			@isset($price)
+				<p class="fz12px lh90 nobreak">@number($price, 2) <strong>@symbal(money)</strong></p>
+			@else
+				<p class="color-gray">-</p>
+			@endisset
+		</x-table.td>
+	@endif
 
-@if(auth('site')->user()->can('contract-col-date_start:site') && (empty($userColums) || in_array('date_start', $userColums)))
-	<x-table.td commonlist>
-		@if(isset($date_start) && $date_start)
-			<p class="fz12px lh90">{{dateFormatter($date_start, 'd.m.y')}}</p>
-		@else
-			<p class="color-gray">-</p>
-		@endif
-	</x-table.td>
-@endif
+	@if($column == 'date_start' && auth('site')->user()->can('contract-col-date_start:site'))
+		<x-table.td commonlist>
+			@if(isset($date_start) && $date_start)
+				<p class="fz12px lh90">{{dateFormatter($date_start, 'd.m.y')}}</p>
+			@else
+				<p class="color-gray">-</p>
+			@endif
+		</x-table.td>
+	@endif
 
-@if(auth('site')->user()->can('contract-col-date_end:site') && (empty($userColums) || in_array('date_end', $userColums)))
-	<x-table.td commonlist>
-		@if(isset($date_end) && $date_end)
-			<p class="fz12px lh90">{{dateFormatter($date_end, 'd.m.y')}}</p>
-		@else
-			<p class="color-gray">-</p>
-		@endif
-	</x-table.td>
-@endif
+	@if($column == 'date_end' && auth('site')->user()->can('contract-col-date_end:site'))
+		<x-table.td commonlist>
+			@if(isset($date_end) && $date_end)
+				<p class="fz12px lh90">{{dateFormatter($date_end, 'd.m.y')}}</p>
+			@else
+				<p class="color-gray">-</p>
+			@endif
+		</x-table.td>
+	@endif
 
-@if(auth('site')->user()->can('contract-col-hoz_method:site') && (empty($userColums) || in_array('hoz_method', $userColums)))
-	<x-table.td class="h-center" commonlist>
-		@if($hoz_method)
-			<i class="fa-solid fa-circle-check color-green fz16px"></i>
-		@endif
-	</x-table.td>
-@endif
+	@if($column == 'hoz_method' && auth('site')->user()->can('contract-col-hoz_method:site'))
+		<x-table.td class="h-center" commonlist>
+			@if($hoz_method)
+				<i class="fa-solid fa-circle-check color-green fz16px"></i>
+			@endif
+		</x-table.td>
+	@endif
 
-@if(auth('site')->user()->can('contract-col-subcontracting:site') && (empty($userColums) || in_array('subcontracting', $userColums)))
-	<x-table.td class="h-center" commonlist>
-		@if(isset($subcontracting) && $subcontracting)
-			<i class="fa-solid fa-circle-check color-green fz16px"></i>
-		@endif
-	</x-table.td>
-@endif
+	@if($column == 'subcontracting' && auth('site')->user()->can('contract-col-subcontracting:site'))
+		<x-table.td class="h-center" commonlist>
+			@if(isset($subcontracting) && $subcontracting)
+				<i class="fa-solid fa-circle-check color-green fz16px"></i>
+			@endif
+		</x-table.td>
+	@endif
 
-@if(auth('site')->user()->can('contract-col-type:site') && (empty($userColums) || in_array('type', $userColums)))
-	<x-table.td class="h-center breakword" commonlist>
-		@if(isset($type) && isset($types[$type]))
-			<p class="fz12px lh110">{{$types[$type]}}</p>
-		@else
-			<p class="color-gray">-</p>
-		@endif
-	</x-table.td>
-@endif
+	@if($column == 'type' && auth('site')->user()->can('contract-col-type:site'))
+		<x-table.td class="h-center breakword" commonlist>
+			@if(isset($type) && isset($types[$type]))
+				<p class="fz12px lh110">{{$types[$type]}}</p>
+			@else
+				<p class="color-gray">-</p>
+			@endif
+		</x-table.td>
+	@endif
 
-@if(auth('site')->user()->can('contract-col-contractor:site') && (empty($userColums) || in_array('contractor', $userColums)))
-	<x-table.td class="h-center breakword" commonlist>
-		@if(isset($contractor) && isset($contractors[$contractor]))
-			<p class="fz12px lh90">{{$contractors[$contractor]}}</p>
-		@else
-			<p class="color-gray">-</p>
-		@endif
-	</x-table.td>
-@endif
+	@if($column == 'contractor' && auth('site')->user()->can('contract-col-contractor:site'))
+		<x-table.td class="h-center breakword" commonlist>
+			@if(isset($contractor) && isset($contractors[$contractor]))
+				<p class="fz12px lh90">{{$contractors[$contractor]}}</p>
+			@else
+				<p class="color-gray">-</p>
+			@endif
+		</x-table.td>
+	@endif
 
-@if(auth('site')->user()->can('contract-col-buy_number:site') && (empty($userColums) || in_array('buy_number', $userColums)))
-	<x-table.td class="breakword h-center" commonlist><p class="fz12px">{{$buy_number ?? '-'}}</p></x-table.td>
-@endif
+	@if($column == 'buy_number' && auth('site')->user()->can('contract-col-buy_number:site'))
+		<x-table.td class="breakword h-center" commonlist><p class="fz12px">{{$buy_number ?? '-'}}</p></x-table.td>
+	@endif
 
-@if(auth('site')->user()->can('contract-col-date_buy:site') && (empty($userColums) || in_array('date_buy', $userColums)))
-	<x-table.td commonlist>
-		@if(isset($date_buy) && $date_buy)
-			<p class="fz12px lh90">{{dateFormatter($date_buy, 'd.m.y')}}</p>
-		@else
-			<p class="color-gray">-</p>
-		@endif
-	</x-table.td>
-@endif
+	@if($column == 'date_buy' && auth('site')->user()->can('contract-col-date_buy:site'))
+		<x-table.td commonlist>
+			@if(isset($date_buy) && $date_buy)
+				<p class="fz12px lh90">{{dateFormatter($date_buy, 'd.m.y')}}</p>
+			@else
+				<p class="color-gray">-</p>
+			@endif
+		</x-table.td>
+	@endif
 
-@if(auth('site')->user()->can('contract-col-date_close:site') && (empty($userColums) || in_array('date_close', $userColums)))
-	<x-table.td commonlist>
-		@if(isset($date_close) && $date_close)
-			<p class="fz12px lh90">{{dateFormatter($date_close, 'd.m.y')}}</p>
-		@else
-			<p class="color-gray">-</p>
-		@endif
-	</x-table.td>
-@endif
+	@if($column == 'date_close' && auth('site')->user()->can('contract-col-date_close:site'))
+		<x-table.td commonlist>
+			@if(isset($date_close) && $date_close)
+				<p class="fz12px lh90">{{dateFormatter($date_close, 'd.m.y')}}</p>
+			@else
+				<p class="color-gray">-</p>
+			@endif
+		</x-table.td>
+	@endif
 
-@if(auth('site')->user()->can('contract-col-archive_dir:site') && (empty($userColums) || in_array('archive_dir', $userColums)))
-	<x-table.td class="breakword h-center" commonlist>
-		<div class="scrollblock-hidden maxh4rem-6px pr3px">
-			<p class="fz12px lh100 mt2px mb2px">{{$archive_dir ?? '-'}}</p>
-		</div>
-	</x-table.td>
-@endif
+	@if($column == 'archive_dir' && auth('site')->user()->can('contract-col-archive_dir:site'))
+		<x-table.td class="breakword h-center" commonlist>
+			<div class="scrollblock-hidden maxh4rem-6px pr3px">
+				<p class="fz12px lh100 mt2px mb2px">{{$archive_dir ?? '-'}}</p>
+			</div>
+		</x-table.td>
+	@endif
+@empty	
+@endforelse
+
+
+
+	
 
 
 {{-- @if($selectionEdited || ($selectionEdited && $searched))

@@ -472,7 +472,7 @@ class Contract {
 	 * @return 
 	 */
 	public function getContractColums() {
-		$allColums = collect([
+		$allColumsMap = [
 			'object_number' 	=> 'Номер объекта',
 			'title' 			=> 'Название/заявитель',
 			'customer' 			=> 'Заказчик',
@@ -494,18 +494,28 @@ class Contract {
 			'titul' 			=> 'Титул',
 			'period' 			=> 'Срок исполнения договора',
 			'archive' 			=> 'В архиве',
-		]);
+		];
 		
 		$contractColums = $this->getUserColums();
 		
-		$columsData = $allColums->mapWithKeys(function($title, $field) use($contractColums) {
-			return [$field => [
-				'title'		=> $title,
-				'checked'	=> in_array($field, $contractColums)
-			]];
-		});
+		$allColumsKeys = array_keys($allColumsMap);
 		
-		return $columsData;
+		
+		foreach ($contractColums as $k => $field) {
+			$indx = array_search($field, $allColumsKeys);
+			array_splice($allColumsKeys, $indx, 1);
+			array_splice($allColumsKeys, $k-1, 0, $field);
+		}
+		
+		$sortedColums = [];
+		foreach ($allColumsKeys as $field) {
+			$sortedColums[$field] = [
+				'title'		=> $allColumsMap[$field],
+				'checked'	=> in_array($field, $contractColums),
+			];
+		}
+		
+		return $sortedColums;
 	}
 	
 	
@@ -529,8 +539,8 @@ class Contract {
 	 * @param 
 	 * @return 
 	 */
-	public function setUserColums(Request $request) {
-		$colums = $request->get('checkedColums');
+	public function setUserColums($request) {
+		$colums = $request->get('sortableCheckedColums');
 		$user = User::find(auth('site')->user()->id);
 		$user->contract_colums = $colums;
 		return $user->save();

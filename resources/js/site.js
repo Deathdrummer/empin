@@ -17,6 +17,7 @@ require('@plugins/tooltip');
 require('@plugins/ddrTable');
 require('@plugins/blockTable');
 require('@plugins/ddrContextMenu');
+require('@plugins/jquery.ui');
 
 
 

@@ -896,33 +896,57 @@
 					console.log(error?.message, error?.errors);
 				} 
 				
-				setHtml(data);
+				setHtml(data, {}, () => {
+					$("#contractColumnList").sortable({
+						axis: 'y',
+						placeholder: 'sortable-placeholder h4rem',
+						async stop(event, ui) {
+							const sortedData = [];
+							$("#contractColumnList").find('[contractcolumn]:checked').each((k, item) => {
+								let field = $(item).attr('contractcolumn');
+								sortedData[k] = field;
+								
+							});
+						},
+						handle: ".handle"
+					});
+					
+					/*$('#contractColumnList').sortable({
+						animation: 150,
+						invertSwap: true,
+					});*/
+					//var sortable = new Sortable($('#contractColumnList')[0]);
+				});
+				
+				
 				wait(false);
 			});
 			
-			$.setContractsColums = (_) => {
+			
+			$.setContractsColums = async (_) => {
 				wait();
-				let checkedColums = [];
+				const sortableCheckedColums = {};
 				$('#contractColumnList').find('[contractcolumn]:checked').each(function(k, item) {
-					checkedColums.push($(item).attr('contractcolumn'));
+					let idx = parseInt($(item).closest('tr').index());
+					sortableCheckedColums[idx + 1] = $(item).attr('contractcolumn');
 				});
 				
-				axiosQuery('put', 'site/contracts/colums', {checkedColums}).then(({data, error, status, headers}) => {
-					if (error) {
-						$.notify('Ошибка установки столбцов!', 'error');
-						console.log(error?.message, error.errors);
-						wait(false);
-					} else {
-						$.notify('Столбцы успешно заданы!');
-						getList({
-							callback: function() {
-								//$('[selectionsbtn]').ddrInputs('enable');
-							}
-						});
-						close();
-					}
+				const {data, error, status, headers} = await axiosQuery('put', 'site/contracts/colums', {sortableCheckedColums});
+				
+				if (error) {
+					$.notify('Ошибка установки столбцов!', 'error');
+					console.log(error?.message, error.errors);
+					wait(false);
+				} else {
+					$.notify('Столбцы успешно заданы!');
 					
-				});
+					getList({
+						callback: function() {
+							//$('[selectionsbtn]').ddrInputs('enable');
+						}
+					});
+					close();
+				}
 			}
 			
 		});

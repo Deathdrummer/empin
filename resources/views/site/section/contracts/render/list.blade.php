@@ -26,8 +26,9 @@
 							class="{{-- showrows  --}}h{{$rowHeight ?? '7'}}rem"
 							sorts
 							>
-							@if(!$isArchive)
-								@if(auth('site')->user()->can('contract-col-period:site') && (empty($userColums) || in_array('period', $userColums)))
+							
+							@forelse($userColums as $column)
+								@if($column == 'period' && !$isArchive && auth('site')->user()->can('contract-col-period:site'))
 									<x-table.td
 										class="w6rem sort{{$sortField == 'deadline_color_key' ? ' sort-'.$sortOrder : ''}}"
 										onclick="$.sorting(this, 'deadline_color_key')"
@@ -36,209 +37,213 @@
 										><strong class="fz10px lh90 d-block text-center wodrbreak" title="Срок исполнения договора">Срок исполн. договора</strong>
 									</x-table.td>
 								@endif
-							@endif
+								
+								@if($column == 'object_number' && auth('site')->user()->can('contract-col-object_number:site'))
+									<x-table.td
+										class="w7rem sort{{$sortField == 'object_number' ? ' sort-'.$sortOrder : ''}}"
+										onclick="$.sorting(this, 'object_number')"
+										noscroll
+										ddrtabletdmain
+										><strong class="fz10px lh90 d-block text-center wodrbreak">Номер объекта</strong>
+									</x-table.td>
+								@endif
+								
+								@if($column == 'title' && auth('site')->user()->can('contract-col-title:site'))
+									<x-table.td
+										style="width:{{isset($listWidth['title']) ? $listWidth['title'] : '300'}}px;"
+										class="sort{{$sortField == 'title' ? ' sort-'.$sortOrder : ''}}"
+										onclick="$.sorting(this, 'title')"
+										noscroll
+										ddrtabletdmain
+										><strong class="fz10px lh90 d-block text-center wodrbreak">Название</strong>
+									</x-table.td>
+								@endif
+								
+								@if($column == 'applicant' && auth('site')->user()->can('contract-col-applicant:site'))
+									<x-table.td
+										style="width:{{isset($listWidth['applicant']) ? $listWidth['applicant'] : '100'}}px;"
+										class="sort{{$sortField == 'applicant' ? ' sort-'.$sortOrder : ''}}"
+										onclick="$.sorting(this, 'applicant')"
+										noscroll
+										ddrtabletdmain
+										><strong class="fz10px lh90 d-block text-center wodrbreak">Заявитель</strong>
+									</x-table.td>
+								@endif
+								
+								@if($column == 'titul' && auth('site')->user()->can('contract-col-titul:site'))
+									<x-table.td
+										style="width:{{isset($listWidth['titul']) ? $listWidth['titul'] : '200'}}px;"
+										class="sort{{$sortField == 'titul' ? ' sort-'.$sortOrder : ''}}"
+										onclick="$.sorting(this, 'titul')"
+										noscroll
+										ddrtabletdmain
+										><strong class="fz10px lh90 d-block text-center wodrbreak">Титул</strong>
+									</x-table.td>
+								@endif
+								
+								@if($column == 'contract' && auth('site')->user()->can('contract-col-contract:site'))
+									<x-table.td
+										style="width:{{isset($listWidth['contract']) ? $listWidth['contract'] : '100'}}px;"
+										class="sort{{$sortField == 'contract' ? ' sort-'.$sortOrder : ''}}"
+										onclick="$.sorting(this, 'contract')"
+										noscroll
+										ddrtabletdmain
+										><strong class="fz10px lh90 d-block text-center wodrbreak">Номер договора</strong>
+									</x-table.td>
+								@endif
+								
+								@if($column == 'customer' && auth('site')->user()->can('contract-col-customer:site'))
+									<x-table.td
+										style="width:{{isset($listWidth['customer']) ? $listWidth['customer'] : '150'}}px;"
+										class="sort{{$sortField == 'customer' ? ' sort-'.$sortOrder : ''}}"
+										onclick="$.sorting(this, 'customer')"
+										noscroll
+										ddrtabletdmain
+										><strong class="fz10px lh90 d-block text-center wodrbreak">Заказчик</strong>
+									</x-table.td>
+								@endif
+								
+								@if($column == 'locality' && auth('site')->user()->can('contract-col-locality:site'))
+									<x-table.td
+										style="width:{{isset($listWidth['locality']) ? $listWidth['locality'] : '150'}}px;"
+										class="sort{{$sortField == 'locality' ? ' sort-'.$sortOrder : ''}}"
+										onclick="$.sorting(this, 'locality')"
+										noscroll
+										ddrtabletdmain
+										><strong class="fz10px lh90 d-block text-center wodrbreak">Населенный пункт</strong>
+									</x-table.td>
+								@endif
+								
+								@if($column == 'price_nds' && auth('site')->user()->can('contract-col-price_nds:site'))
+									<x-table.td
+										style="width:{{isset($listWidth['price_nds']) ? $listWidth['price_nds'] : '110'}}px;"
+										class="sort{{$sortField == 'price_nds' ? ' sort-'.$sortOrder : ''}}"
+										onclick="$.sorting(this, 'price_nds')"
+										noscroll
+										ddrtabletdmain
+										><strong class="fz10px lh90 d-block text-center wodrbreak">Стоимость договора с НДС</strong>
+									</x-table.td>
+								@endif
+								
+								@if($column == 'price' && auth('site')->user()->can('contract-col-price:site'))
+									<x-table.td
+										style="width:{{isset($listWidth['price']) ? $listWidth['price'] : '110'}}px;"
+										class="sort{{$sortField == 'price' ? ' sort-'.$sortOrder : ''}}"
+										onclick="$.sorting(this, 'price')"
+										noscroll
+										ddrtabletdmain
+										><strong class="fz10px lh90 d-block text-center wodrbreak">Стоимость договора без НДС</strong>
+									</x-table.td>
+								@endif
+								
+								@if($column == 'date_start' && auth('site')->user()->can('contract-col-date_start:site'))
+									<x-table.td
+										class="w6rem sort{{$sortField == 'date_start' ? ' sort-'.$sortOrder : ''}}"
+										onclick="$.sorting(this, 'date_start')"
+										noscroll
+										ddrtabletdmain
+										><strong class="fz10px lh90 d-block text-center wodrbreak">Дата подписания договора</strong>
+									</x-table.td>
+								@endif
+								
+								@if($column == 'date_end' && auth('site')->user()->can('contract-col-date_end:site'))
+									<x-table.td
+										class="w6rem sort{{$sortField == 'date_end' ? ' sort-'.$sortOrder : ''}}"
+										onclick="$.sorting(this, 'date_end')"
+										noscroll
+										ddrtabletdmain
+										><strong class="fz10px lh90 d-block text-center wodrbreak">Дата окончания работ по договору</strong>
+									</x-table.td>
+								@endif
+								
+								@if($column == 'hoz_method' && auth('site')->user()->can('contract-col-hoz_method:site'))
+									<x-table.td
+										class="w3rem sort{{$sortField == 'hoz_method' ? ' sort-'.$sortOrder : ''}}"
+										onclick="$.sorting(this, 'hoz_method')"
+										noscroll
+										ddrtabletdmain
+										><strong class="fz10px lh90 d-block text-center wodrbreak">Хоз способ</strong>
+									</x-table.td>
+								@endif
+								
+								@if($column == 'subcontracting' && auth('site')->user()->can('contract-col-subcontracting:site'))
+									<x-table.td
+										class="w3rem sort{{$sortField == 'subcontracting' ? ' sort-'.$sortOrder : ''}}"
+										onclick="$.sorting(this, 'subcontracting')"
+										noscroll
+										ddrtabletdmain
+										><strong class="fz10px lh90 d-block text-center wodrbreak">Субподряд</strong>
+									</x-table.td>
+								@endif
+								
+								@if($column == 'type' && auth('site')->user()->can('contract-col-type:site'))
+									<x-table.td
+										style="width:{{isset($listWidth['type']) ? $listWidth['type'] : '80'}}px;"
+										class="sort{{$sortField == 'type' ? ' sort-'.$sortOrder : ''}}"
+										onclick="$.sorting(this, 'type')"
+										noscroll
+										ddrtabletdmain
+										><strong class="fz10px lh90 d-block text-center wodrbreak">Тип договора</strong>
+									</x-table.td>
+								@endif
+								
+								@if($column == 'contractor' && auth('site')->user()->can('contract-col-contractor:site'))
+									<x-table.td
+										style="width:{{isset($listWidth['contractor']) ? $listWidth['contractor'] : '100'}}px;"
+										class="sort{{$sortField == 'contractor' ? ' sort-'.$sortOrder : ''}}"
+										onclick="$.sorting(this, 'contractor')"
+										noscroll
+										ddrtabletdmain
+										><strong class="fz10px lh90 d-block text-center wodrbreak">Исполнитель</strong>
+									</x-table.td>
+								@endif
+								
+								@if($column == 'buy_number' && auth('site')->user()->can('contract-col-buy_number:site'))
+									<x-table.td
+										class="w7rem sort{{$sortField == 'buy_number' ? ' sort-'.$sortOrder : ''}}"
+										onclick="$.sorting(this, 'buy_number')"
+										noscroll
+										ddrtabletdmain
+										><strong class="fz10px lh90 d-block text-center wodrbreak">Номер закупки</strong>
+									</x-table.td>
+								@endif
+								
+								@if($column == 'date_buy' && auth('site')->user()->can('contract-col-date_buy:site'))
+									<x-table.td
+										class="w6rem sort{{$sortField == 'date_buy' ? ' sort-'.$sortOrder : ''}}"
+										onclick="$.sorting(this, 'date_buy')"
+										noscroll
+										ddrtabletdmain
+										><strong class="fz10px lh90 d-block text-center wodrbreak">Дата закупки</strong>
+									</x-table.td>
+								@endif
+								
+								@if($column == 'date_close' && auth('site')->user()->can('contract-col-date_close:site'))
+									<x-table.td
+										class="w6rem sort{{$sortField == 'date_close' ? ' sort-'.$sortOrder : ''}}"
+										onclick="$.sorting(this, 'date_close')"
+										noscroll
+										ddrtabletdmain
+										><strong class="fz10px lh90 d-block text-center wodrbreak">Дата закрытия договора</strong>
+									</x-table.td>
+								@endif
+								
+								@if($column == 'archive_dir' && auth('site')->user()->can('contract-col-archive_dir:site'))
+									<x-table.td
+										style="width:{{isset($listWidth['archive_dir']) ? $listWidth['archive_dir'] : '100'}}px;"
+										class="sort{{$sortField == 'archive_dir' ? ' sort-'.$sortOrder : ''}}"
+										onclick="$.sorting(this, 'archive_dir')"
+										noscroll
+										ddrtabletdmain
+										><strong class="fz10px lh90 d-block text-center wodrbreak">Архивная папка</strong>
+									</x-table.td>
+								@endif
+								
+							@empty	
+							@endforelse
+
 							
-							@if(auth('site')->user()->can('contract-col-object_number:site') && (empty($userColums) || in_array('object_number', $userColums)))
-								<x-table.td
-									class="w7rem sort{{$sortField == 'object_number' ? ' sort-'.$sortOrder : ''}}"
-									onclick="$.sorting(this, 'object_number')"
-									noscroll
-									ddrtabletdmain
-									><strong class="fz10px lh90 d-block text-center wodrbreak">Номер объекта</strong>
-								</x-table.td>
-							@endif
-							
-							@if(auth('site')->user()->can('contract-col-title:site') && (empty($userColums) || in_array('title', $userColums)))
-								<x-table.td
-									style="width:{{isset($listWidth['title']) ? $listWidth['title'] : '300'}}px;"
-									class="sort{{$sortField == 'title' ? ' sort-'.$sortOrder : ''}}"
-									onclick="$.sorting(this, 'title')"
-									noscroll
-									ddrtabletdmain
-									><strong class="fz10px lh90 d-block text-center wodrbreak">Название</strong>
-								</x-table.td>
-							@endif
-							
-							@if(auth('site')->user()->can('contract-col-applicant:site') && (empty($userColums) || in_array('applicant', $userColums)))
-								<x-table.td
-									style="width:{{isset($listWidth['applicant']) ? $listWidth['applicant'] : '100'}}px;"
-									class="sort{{$sortField == 'applicant' ? ' sort-'.$sortOrder : ''}}"
-									onclick="$.sorting(this, 'applicant')"
-									noscroll
-									ddrtabletdmain
-									><strong class="fz10px lh90 d-block text-center wodrbreak">Заявитель</strong>
-								</x-table.td>
-							@endif
-							
-							@if(auth('site')->user()->can('contract-col-titul:site') && (empty($userColums) || in_array('titul', $userColums)))
-								<x-table.td
-									style="width:{{isset($listWidth['titul']) ? $listWidth['titul'] : '200'}}px;"
-									class="sort{{$sortField == 'titul' ? ' sort-'.$sortOrder : ''}}"
-									onclick="$.sorting(this, 'titul')"
-									noscroll
-									ddrtabletdmain
-									><strong class="fz10px lh90 d-block text-center wodrbreak">Титул</strong>
-								</x-table.td>
-							@endif
-							
-							@if(auth('site')->user()->can('contract-col-contract:site') && (empty($userColums) || in_array('contract', $userColums)))
-								<x-table.td
-									style="width:{{isset($listWidth['contract']) ? $listWidth['contract'] : '100'}}px;"
-									class="sort{{$sortField == 'contract' ? ' sort-'.$sortOrder : ''}}"
-									onclick="$.sorting(this, 'contract')"
-									noscroll
-									ddrtabletdmain
-									><strong class="fz10px lh90 d-block text-center wodrbreak">Номер договора</strong>
-								</x-table.td>
-							@endif
-							
-							@if(auth('site')->user()->can('contract-col-customer:site') && (empty($userColums) || in_array('customer', $userColums)))
-								<x-table.td
-									style="width:{{isset($listWidth['customer']) ? $listWidth['customer'] : '150'}}px;"
-									class="sort{{$sortField == 'customer' ? ' sort-'.$sortOrder : ''}}"
-									onclick="$.sorting(this, 'customer')"
-									noscroll
-									ddrtabletdmain
-									><strong class="fz10px lh90 d-block text-center wodrbreak">Заказчик</strong>
-								</x-table.td>
-							@endif
-							
-							@if(auth('site')->user()->can('contract-col-locality:site') && (empty($userColums) || in_array('locality', $userColums)))
-								<x-table.td
-									style="width:{{isset($listWidth['locality']) ? $listWidth['locality'] : '150'}}px;"
-									class="sort{{$sortField == 'locality' ? ' sort-'.$sortOrder : ''}}"
-									onclick="$.sorting(this, 'locality')"
-									noscroll
-									ddrtabletdmain
-									><strong class="fz10px lh90 d-block text-center wodrbreak">Населенный пункт</strong>
-								</x-table.td>
-							@endif
-							
-							@if(auth('site')->user()->can('contract-col-price_nds:site') && (empty($userColums) || in_array('price_nds', $userColums)))
-								<x-table.td
-									style="width:{{isset($listWidth['price_nds']) ? $listWidth['price_nds'] : '110'}}px;"
-									class="sort{{$sortField == 'price_nds' ? ' sort-'.$sortOrder : ''}}"
-									onclick="$.sorting(this, 'price_nds')"
-									noscroll
-									ddrtabletdmain
-									><strong class="fz10px lh90 d-block text-center wodrbreak">Стоимость договора с НДС</strong>
-								</x-table.td>
-							@endif
-							
-							@if(auth('site')->user()->can('contract-col-price:site') && (empty($userColums) || in_array('price', $userColums)))
-								<x-table.td
-									style="width:{{isset($listWidth['price']) ? $listWidth['price'] : '110'}}px;"
-									class="sort{{$sortField == 'price' ? ' sort-'.$sortOrder : ''}}"
-									onclick="$.sorting(this, 'price')"
-									noscroll
-									ddrtabletdmain
-									><strong class="fz10px lh90 d-block text-center wodrbreak">Стоимость договора без НДС</strong>
-								</x-table.td>
-							@endif
-							
-							@if(auth('site')->user()->can('contract-col-date_start:site') && (empty($userColums) || in_array('date_start', $userColums)))
-								<x-table.td
-									class="w6rem sort{{$sortField == 'date_start' ? ' sort-'.$sortOrder : ''}}"
-									onclick="$.sorting(this, 'date_start')"
-									noscroll
-									ddrtabletdmain
-									><strong class="fz10px lh90 d-block text-center wodrbreak">Дата подписания договора</strong>
-								</x-table.td>
-							@endif
-							
-							@if(auth('site')->user()->can('contract-col-date_end:site') && (empty($userColums) || in_array('date_end', $userColums)))
-								<x-table.td
-									class="w6rem sort{{$sortField == 'date_end' ? ' sort-'.$sortOrder : ''}}"
-									onclick="$.sorting(this, 'date_end')"
-									noscroll
-									ddrtabletdmain
-									><strong class="fz10px lh90 d-block text-center wodrbreak">Дата окончания работ по договору</strong>
-								</x-table.td>
-							@endif
-							
-							@if(auth('site')->user()->can('contract-col-hoz_method:site') && (empty($userColums) || in_array('hoz_method', $userColums)))
-								<x-table.td
-									class="w3rem sort{{$sortField == 'hoz_method' ? ' sort-'.$sortOrder : ''}}"
-									onclick="$.sorting(this, 'hoz_method')"
-									noscroll
-									ddrtabletdmain
-									><strong class="fz10px lh90 d-block text-center wodrbreak">Хоз способ</strong>
-								</x-table.td>
-							@endif
-							
-							@if(auth('site')->user()->can('contract-col-subcontracting:site') && (empty($userColums) || in_array('subcontracting', $userColums)))
-								<x-table.td
-									class="w3rem sort{{$sortField == 'subcontracting' ? ' sort-'.$sortOrder : ''}}"
-									onclick="$.sorting(this, 'subcontracting')"
-									noscroll
-									ddrtabletdmain
-									><strong class="fz10px lh90 d-block text-center wodrbreak">Субподряд</strong>
-								</x-table.td>
-							@endif
-							
-							@if(auth('site')->user()->can('contract-col-type:site') && (empty($userColums) || in_array('type', $userColums)))
-								<x-table.td
-									style="width:{{isset($listWidth['type']) ? $listWidth['type'] : '80'}}px;"
-									class="sort{{$sortField == 'type' ? ' sort-'.$sortOrder : ''}}"
-									onclick="$.sorting(this, 'type')"
-									noscroll
-									ddrtabletdmain
-									><strong class="fz10px lh90 d-block text-center wodrbreak">Тип договора</strong>
-								</x-table.td>
-							@endif
-							
-							@if(auth('site')->user()->can('contract-col-contractor:site') && (empty($userColums) || in_array('contractor', $userColums)))
-								<x-table.td
-									style="width:{{isset($listWidth['contractor']) ? $listWidth['contractor'] : '100'}}px;"
-									class="sort{{$sortField == 'contractor' ? ' sort-'.$sortOrder : ''}}"
-									onclick="$.sorting(this, 'contractor')"
-									noscroll
-									ddrtabletdmain
-									><strong class="fz10px lh90 d-block text-center wodrbreak">Исполнитель</strong>
-								</x-table.td>
-							@endif
-							
-							@if(auth('site')->user()->can('contract-col-buy_number:site') && (empty($userColums) || in_array('buy_number', $userColums)))
-								<x-table.td
-									class="w7rem sort{{$sortField == 'buy_number' ? ' sort-'.$sortOrder : ''}}"
-									onclick="$.sorting(this, 'buy_number')"
-									noscroll
-									ddrtabletdmain
-									><strong class="fz10px lh90 d-block text-center wodrbreak">Номер закупки</strong>
-								</x-table.td>
-							@endif
-							
-							@if(auth('site')->user()->can('contract-col-date_buy:site') && (empty($userColums) || in_array('date_buy', $userColums)))
-								<x-table.td
-									class="w6rem sort{{$sortField == 'date_buy' ? ' sort-'.$sortOrder : ''}}"
-									onclick="$.sorting(this, 'date_buy')"
-									noscroll
-									ddrtabletdmain
-									><strong class="fz10px lh90 d-block text-center wodrbreak">Дата закупки</strong>
-								</x-table.td>
-							@endif
-							
-							@if(auth('site')->user()->can('contract-col-date_close:site') && (empty($userColums) || in_array('date_close', $userColums)))
-								<x-table.td
-									class="w6rem sort{{$sortField == 'date_close' ? ' sort-'.$sortOrder : ''}}"
-									onclick="$.sorting(this, 'date_close')"
-									noscroll
-									ddrtabletdmain
-									><strong class="fz10px lh90 d-block text-center wodrbreak">Дата закрытия договора</strong>
-								</x-table.td>
-							@endif
-							
-							@if(auth('site')->user()->can('contract-col-archive_dir:site') && (empty($userColums) || in_array('archive_dir', $userColums)))
-								<x-table.td
-									style="width:{{isset($listWidth['archive_dir']) ? $listWidth['archive_dir'] : '100'}}px;"
-									class="sort{{$sortField == 'archive_dir' ? ' sort-'.$sortOrder : ''}}"
-									onclick="$.sorting(this, 'archive_dir')"
-									noscroll
-									ddrtabletdmain
-									><strong class="fz10px lh90 d-block text-center wodrbreak">Архивная папка</strong>
-								</x-table.td>
-							@endif
-							
+								
 							
 							{{-- @if($selectionEdited || ($selectionEdited && $searched))
 								<x-table.td class="w7rem h-center" ddrtabletdmain>

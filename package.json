@@ -13,6 +13,7 @@
         "axios": "^0.25.0",
         "browser-sync": "^2.27.9",
         "browser-sync-webpack-plugin": "^2.3.0",
+        "jquery-sortablejs": "^1.0.1",
         "laravel-mix": "^6.0.49",
         "lodash": "^4.17.19",
         "postcss": "^8.1.14",

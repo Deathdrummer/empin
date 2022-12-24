@@ -31,15 +31,6 @@ class ContractDepartment extends Pivot {
 	
 	
 	
-	/**
-     * Атрибуты, которые должны быть типизированы. (Конвертация полей при добавлении и получении)
-	 *
-     * @var array
-     */
-	protected $casts = [
-        'steps' => 'array',
-    ];
-	
 	
 	
 
@@ -55,7 +46,7 @@ class ContractDepartment extends Pivot {
 	 */
 	public function getStepsAttribute($value) {
 		$data = json_decode($value, true);
-		if (!$data) return null;
+		if (!$data || !is_array($data) || empty($data)) return null;
 		
 		$result = [];
 		foreach ($data as $step) {

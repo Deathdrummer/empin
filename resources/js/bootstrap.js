@@ -1,6 +1,7 @@
 window.$ = window.jQuery = require('jquery');
 window._ = require('lodash');
 require('tapjs');
+
 window.strtr = require('locutus/php/strings/strtr');
  
 _.mixin({
