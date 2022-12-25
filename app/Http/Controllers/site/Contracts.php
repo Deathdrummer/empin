@@ -80,12 +80,11 @@ class Contracts extends Controller {
 		
 		$alldeps = $this->department->getWithSteps($request);
 		
+		
 		$this->_addDepsUsersToData($alldeps);
 		
 		$contractdata = $this->contract->buildData($list->keys());
 		$userColums = $this->contract->getUserColums();
-		
-		logger($userColums);
 		
 		$this->addSettingToGlobalData([[
 				'setting'	=> 'contract-customers:customers',
@@ -446,6 +445,45 @@ class Contracts extends Controller {
 	 */
 	public function set_colums(Request $request) {
 		$stat = $this->contract->setUserColums($request);
+		return response()->json($stat);
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	/**
+	 * @param 
+	 * @return 
+	 */
+	public function sortdeps(Request $request) {
+		$alldeps = $this->department->get($request)->pluck('name', 'id');
+		
+		
+		$sort = auth('site')->user()->contract_deps;
+		
+		$sortDeps = [];
+		foreach ($sort as $id) {
+			$sortDeps[$id] = $alldeps[$id];
+		}
+		
+		return $this->render('sortdeps', compact('sortDeps'));
+	}
+	
+	
+	
+	
+	/**
+	 * @param 
+	 * @return 
+	 */
+	public function set_sortdeps(Request $request) {
+		$stat = $this->contract->setUserDeps($request);
 		return response()->json($stat);
 	}
 	

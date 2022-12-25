@@ -550,6 +550,19 @@ class Contract {
 	
 	
 	
+	/**
+	 * @param 
+	 * @return 
+	 */
+	public function setUserDeps($request) {
+		$sortedDeps = $request->get('sortedDeps');
+		$user = User::find(auth('site')->user()->id);
+		$user->contract_deps = $sortedDeps;
+		return $user->save();
+	}
+	
+	
+	
 	
 	
 	

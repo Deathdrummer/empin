@@ -84,10 +84,19 @@ class Department {
 			'department_id'
 		]);
 		$filter = app()->make(DepartmentFilter::class, compact('queryParams'));
+		
+		
+		$contractDeps = auth('site')->user()->contract_deps;
+		$implodeDepsIds = $contractDeps ? implode(',', $contractDeps) : false;
+		
 		return DepartmentModel::filter($filter)->with(['steps' => function($query) {
 				$query->orderBy('_sort', 'ASC');
 			}])
-			->orderBy('_sort', 'ASC')
+			->when($implodeDepsIds, function ($query) use($implodeDepsIds) {
+				$query->orderByRaw("FIND_IN_SET(id, '$implodeDepsIds')");
+			}, function($query) {
+				$query->orderBy('sort', 'ASC');
+			})
 			->get();
 	}
 	

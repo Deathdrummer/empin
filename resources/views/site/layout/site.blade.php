@@ -359,6 +359,8 @@
 		
 		$(dataDom).find('[teleport]').remove();
 		
+		const hasPleces = {};
+		
 		$.each(teleports, function(k, teleport) {
 			let to = $(teleport).attr('teleport');
 			
@@ -370,7 +372,10 @@
 			}
 			
 			$(teleport).removeAttrib('teleport');
-			$(to).replaceWith(teleport);
+			
+			if (Object.keys(hasPleces).includes(to)) $(hasPleces[to]).after(teleport);
+			else $(to).replaceWith(teleport);
+			hasPleces[to] = teleport;
 		});
 		
 		return dataDom;

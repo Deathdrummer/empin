@@ -12,6 +12,11 @@
 			teleport="#menuTeleport"
 			><span>Настроить отображение столбцов</span>
 		</li>
+		<li
+			onclick="$.openSetDepsWin()"
+			teleport="#menuTeleport"
+			><span>Настроить отображение отделов</span>
+		</li>
 		
 		
 		{{-- <x-button
@@ -900,14 +905,14 @@
 					$("#contractColumnList").sortable({
 						axis: 'y',
 						placeholder: 'sortable-placeholder h4rem',
-						async stop(event, ui) {
-							const sortedData = [];
+						/*async stop(event, ui) {
+							const sortedData = {};
 							$("#contractColumnList").find('[contractcolumn]:checked').each((k, item) => {
 								let field = $(item).attr('contractcolumn');
 								sortedData[k] = field;
 								
 							});
-						},
+						},*/
 						cancel: "[nohandle]"
 						//handle: ".handle"
 					});
@@ -956,6 +961,94 @@
 	
 	
 			
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	//--------------------------------------------------------------------------------- Отображение отделов
+	$.openSetDepsWin = (btn) => {
+		ddrPopup({
+			title: 'Отображение отделов',
+			width: 500,
+			buttons: ['Закрыть', {action: 'setDepsColums', title: 'Применить'}],
+			winClass: 'ddrpopup_white'
+		}).then(({state, wait, setTitle, setButtons, loadData, setHtml, setLHtml, dialog, close, onScroll, disableButtons, enableButtons, setWidth}) => { //isClosed
+			wait();
+			axiosQuery('get', 'site/contracts/sortdeps').then(({data, error, status, headers}) => {
+				
+				if (error) {
+					$.notify('Ошибка удаления из подборки!', 'error');
+					console.log(error?.message, error?.errors);
+				} 
+				
+				setHtml(data, {}, () => {
+					$("#contractDepsList").sortable({
+						axis: 'y',
+						placeholder: 'sortable-placeholder h4rem',
+						/*async stop(event, ui) {
+							const sortedData = [];
+							$("#contractDepsList").find('[sortdept]').each((k, item) => {
+								let id = $(item).attr('sortdept');
+								sortedData.push(id);
+								
+							});
+						},*/
+						cancel: "[nohandle]"
+						//handle: ".handle"
+					});
+					
+					/*$('#contractDepsList').sortable({
+						animation: 150,
+						invertSwap: true,
+					});*/
+					//var sortable = new Sortable($('#contractDepsList')[0]);
+				});
+				
+				
+				wait(false);
+			});
+			
+			
+			$.setDepsColums = async (_) => {
+				wait();
+				const sortedDeps = [];
+				$("#contractDepsList").find('[sortdept]').each((k, item) => {
+					let id = $(item).attr('sortdept');
+					sortedDeps.push(id);
+					
+				});
+				
+				const {data, error, status, headers} = await axiosQuery('put', 'site/contracts/sortdeps', {sortedDeps});
+				
+				if (error) {
+					$.notify('Ошибка установки столбцов!', 'error');
+					console.log(error?.message, error.errors);
+					wait(false);
+				} else {
+					$.notify('Столбцы успешно заданы!');
+					
+					getList({
+						callback: function() {
+							//$('[selectionsbtn]').ddrInputs('enable');
+						}
+					});
+					close();
+				}
+			}
+			
+		});
+	}
+	
+	
+	
+	
+	
 	
 	
 	

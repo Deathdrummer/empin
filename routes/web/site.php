@@ -294,6 +294,10 @@ Route::prefix('site')->middleware(['lang', 'isajax:site'])->group(function() {
 	Route::get('/contracts/colums', [Contracts::class, 'colums']);
 	Route::put('/contracts/colums', [Contracts::class, 'set_colums']);
 	
+	Route::get('/contracts/sortdeps', [Contracts::class, 'sortdeps']);
+	Route::put('/contracts/sortdeps', [Contracts::class, 'set_sortdeps']);
+	
+	
 	Route::post('/contracts/send', [Contracts::class, 'send']);
 	
 	Route::put('/contracts/check_new', [Contracts::class, 'check_new']);

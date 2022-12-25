@@ -26,7 +26,7 @@
 				@endif
 			@empty
 				<tr>
-					<td colspan="2">
+					<td colspan="3">
 						<p class="color-gray-300">Нет данных</p>
 					</td>
 				</tr>
