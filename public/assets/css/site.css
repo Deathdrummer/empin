@@ -7226,7 +7226,7 @@ teleport {
   color: #fff;
 }
 .header__nav .headernav__item ul li.active {
-  background-color: #c2c4d0;
+  background-color: #dedfe4;
   cursor: default;
 }
 .header__nav .headernav__item ul li.active span {
