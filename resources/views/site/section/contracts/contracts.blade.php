@@ -908,7 +908,8 @@
 								
 							});
 						},
-						handle: ".handle"
+						cancel: "[nohandle]"
+						//handle: ".handle"
 					});
 					
 					/*$('#contractColumnList').sortable({

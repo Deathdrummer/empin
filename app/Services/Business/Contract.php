@@ -21,6 +21,32 @@ class Contract {
 	private $department;
 	private $user;
 	
+	private $allColumsMap = [
+		'object_number' 	=> 'Номер объекта',
+		'title' 			=> 'Название',
+		'titul' 			=> 'Титул',
+		'customer' 			=> 'Заказчик',
+		'contractor' 		=> 'Исполнтель',
+		'type' 				=> 'Тип договора',
+		'contract' 			=> 'Номер договора',
+		'applicant' 		=> 'Заявитель',
+		'locality' 			=> 'Населенный пункт',
+		'date_start' 		=> 'Дата подписания договора',
+		'date_end' 			=> 'Дата окончания работ по договору',
+		'price_nds' 		=> 'Стоимость договора с НДС',
+		'price' 			=> 'Стоимость договора без НДС',
+		'buy_number' 		=> 'Номер закупки',
+		'date_buy' 	 		=> 'Дата закупки',
+		'hoz_method' 		=> 'Хоз способ',
+		'subcontracting' 	=> 'Субподряд',
+		'date_close' 	 	=> 'Дата закрытия договора',
+		'archive_dir' 		=> 'Архивная папка',
+		'period' 			=> 'Срок исполнения договора',
+		'archive' 			=> 'В архиве',
+	];
+	
+	
+	
 	public function __construct(DateTime $datetime, DepartmentService $department, UserService $user) {
 		$this->datetime = $datetime;
 		$this->department = $department;
@@ -472,33 +498,9 @@ class Contract {
 	 * @return 
 	 */
 	public function getContractColums() {
-		$allColumsMap = [
-			'object_number' 	=> 'Номер объекта',
-			'title' 			=> 'Название/заявитель',
-			'customer' 			=> 'Заказчик',
-			'contractor' 		=> 'Исполнтель',
-			'type' 				=> 'Тип договора',
-			'date_start' 		=> 'Дата подписания договора',
-			'date_end' 			=> 'Дата окончания работ по договору',
-			'contract' 			=> 'Номер договора',
-			'applicant' 		=> 'Заявитель',
-			'locality' 			=> 'Населенный пункт',
-			'price_nds' 		=> 'Стоимость договора с НДС',
-			'price' 			=> 'Стоимость договора без НДС',
-			'hoz_method' 		=> 'Хоз способ',
-			'subcontracting' 	=> 'Субподряд',
-			'buy_number' 		=> 'Номер закупки',
-			'date_buy' 	 		=> 'Дата закупки',
-			'date_close' 	 	=> 'Дата закрытия договора',
-			'archive_dir' 		=> 'Архивная папка',
-			'titul' 			=> 'Титул',
-			'period' 			=> 'Срок исполнения договора',
-			'archive' 			=> 'В архиве',
-		];
+		$contractColums = auth('site')->user()->contract_colums ?: [];
 		
-		$contractColums = $this->getUserColums();
-		
-		$allColumsKeys = array_keys($allColumsMap);
+		$allColumsKeys = array_keys($this->allColumsMap);
 		
 		
 		foreach ($contractColums as $k => $field) {
@@ -510,7 +512,7 @@ class Contract {
 		$sortedColums = [];
 		foreach ($allColumsKeys as $field) {
 			$sortedColums[$field] = [
-				'title'		=> $allColumsMap[$field],
+				'title'		=> $this->allColumsMap[$field],
 				'checked'	=> in_array($field, $contractColums),
 			];
 		}
@@ -528,7 +530,7 @@ class Contract {
 	 * @return 
 	 */
 	public function getUserColums() {
-		return auth('site')->user()->contract_colums ?: [];
+		return auth('site')->user()->contract_colums ?: array_keys($this->allColumsMap);
 	}
 	
 	

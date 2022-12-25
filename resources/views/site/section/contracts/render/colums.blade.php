@@ -11,11 +11,11 @@
 			@forelse($colums as $field => $column)
 				@if(auth('site')->user()->can('contract-col-'.$field.':site'))
 					<tr class="h4rem">
-						<td class="handle"><i class="fa-solid fa-fw fa-arrows-up-down color-gray"></i></td>
+						<td class="center"><i class="fa-solid fa-fw fa-arrows-up-down color-gray fz12px"></i></td>
 						<td>
 							<p>{{$column['title']}}</p>
 						</td>
-						<td class="center">
+						<td class="center" nohandle>
 							<x-checkbox
 								group="normal"
 								:checked="$column['checked']"
