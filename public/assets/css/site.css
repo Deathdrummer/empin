@@ -7931,24 +7931,3 @@ section {
   font-size: 16px;
   color: #727272;
 }
-
-table .ui-sortable-helper {
-  display: table-row !important;
-  cursor: move;
-  height: 4rem;
-}
-table .ui-sortable-helper td:nth-child(1) {
-  width: 4rem !important;
-  vertical-align: middle;
-}
-table .ui-sortable-helper td:nth-child(2) {
-  width: 100% !important;
-  vertical-align: middle;
-}
-table .ui-sortable-helper td:nth-child(3) {
-  width: 4rem !important;
-  vertical-align: middle;
-}
-table .sortable-placeholder {
-  background-color: #f00;
-}

@@ -888,7 +888,7 @@ $tableColor: #efefef
 .ddrtable
 	display: inline-block
 	
-	&:not(.noborder)
+	&:not(.noborder):not([noborder])
 		border: 1px solid $tableColor
 	
 	.ddrtable__head ~ .ddrtable__body, .ddrtable__body ~ .ddrtable__foot
@@ -989,7 +989,7 @@ $tableColor: #efefef
 		flex-wrap: nowrap
 		width: 100%
 		
-		+ .ddrtable__tr:not(.noborder)
+		+ .ddrtable__tr:not(.noborder):not([noborder])
 			border-top: 1px solid $tableColor
 		
 		&.waiting
@@ -1025,7 +1025,7 @@ $tableColor: #efefef
 			padding-top: 4px
 			padding-bottom: 4px
 		
-		+ .ddrtable__td:not(.noborder)
+		+ .ddrtable__td:not(.noborder):not([noborder])
 			border-left: 1px solid $tableColor
 		
 		&:not([style])
@@ -1091,3 +1091,16 @@ $tableColor: #efefef
 		
 		
 	
+	
+	// настройки для sortable
+	.ui-sortable
+		&-helper
+			cursor: move
+			box-shadow: 0 1px 0 0 #efefef
+			//border-bottom: 1px solid #efefef
+		
+		&-placeholder
+			visibility: visible !important
+			
+			&.ddrtable__tr:not(:first-of-type)
+				border-top: 1px solid #efefef !important

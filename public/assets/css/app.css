@@ -143202,7 +143202,7 @@ template {
 .ddrtable {
   display: inline-block;
 }
-.ddrtable:not(.noborder) {
+.ddrtable:not(.noborder):not([noborder]) {
   border: 1px solid #efefef;
 }
 .ddrtable .ddrtable__head ~ .ddrtable__body, .ddrtable .ddrtable__body ~ .ddrtable__foot {
@@ -143308,7 +143308,7 @@ template {
   flex-wrap: nowrap;
   width: 100%;
 }
-.ddrtable__tr + .ddrtable__tr:not(.noborder) {
+.ddrtable__tr + .ddrtable__tr:not(.noborder):not([noborder]) {
   border-top: 1px solid #efefef;
 }
 .ddrtable__tr.waiting {
@@ -143337,7 +143337,7 @@ template {
   padding-top: 4px;
   padding-bottom: 4px;
 }
-.ddrtable__td + .ddrtable__td:not(.noborder) {
+.ddrtable__td + .ddrtable__td:not(.noborder):not([noborder]) {
   border-left: 1px solid #efefef;
 }
 .ddrtable__td:not([style]) {
@@ -143391,4 +143391,14 @@ template {
 .ddrtable__td .icon-hidden {
   opacity: 0;
   transition: opacity 0.16s;
+}
+.ddrtable .ui-sortable-helper {
+  cursor: move;
+  box-shadow: 0 1px 0 0 #efefef;
+}
+.ddrtable .ui-sortable-placeholder {
+  visibility: visible !important;
+}
+.ddrtable .ui-sortable-placeholder.ddrtable__tr:not(:first-of-type) {
+  border-top: 1px solid #efefef !important;
 }

@@ -905,6 +905,9 @@
 					$("#contractColumnList").sortable({
 						axis: 'y',
 						placeholder: 'sortable-placeholder h4rem',
+						classes: {
+							'ui-sortable-placeholder': 'ddrtable__tr',
+						},
 						/*async stop(event, ui) {
 							const sortedData = {};
 							$("#contractColumnList").find('[contractcolumn]:checked').each((k, item) => {
@@ -933,7 +936,7 @@
 				wait();
 				const sortableCheckedColums = {};
 				$('#contractColumnList').find('[contractcolumn]:checked').each(function(k, item) {
-					let idx = parseInt($(item).closest('tr').index());
+					let idx = parseInt($(item).closest('[ddrtabletr]').index());
 					sortableCheckedColums[idx + 1] = $(item).attr('contractcolumn');
 				});
 				
@@ -991,6 +994,9 @@
 					$("#contractDepsList").sortable({
 						axis: 'y',
 						placeholder: 'sortable-placeholder h4rem',
+						classes: {
+							'ui-sortable-placeholder': 'ddrtable__tr',
+						},
 						/*async stop(event, ui) {
 							const sortedData = [];
 							$("#contractDepsList").find('[sortdept]').each((k, item) => {
