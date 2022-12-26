@@ -71,7 +71,7 @@
 								<label class="form__label color-dark">Дата окончания работ по договору</label>
 								<x-datepicker name="date_end" date="{{$date_end ?? null}}" calendarid="contractForm{{$data['rand_id']}}" class="w100" />
 							</div>
-						</div>	
+						</div>
 					</div>
 					
 					<div class="form__item">

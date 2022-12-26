@@ -738,12 +738,19 @@ class Contracts extends Controller {
 			'value' 		=> 'required|boolean',
 		]);
 		
-		$initStepsData = ContractDepartment::where(['contract_id' => $contractId, 'department_id' => $departmentId])->first();
-		$steps = $initStepsData->steps;
+		$initStepsData = ContractDepartment::firstOrNew([
+			'contract_id' 	=> $contractId,
+			'department_id' => $departmentId,
+		], [
+			'show'			=> 1,
+			'updated_show'	=> now()->setTime(0, 0, 0),
+		]);
+		
+		$steps = $initStepsData->steps ?? [];
 		
 		if ($value) {
 			//$stepsArrKey = array_search($stepId, array_column($steps, 'step_id'));
-            Arr::forget($steps, $stepId);
+            if ($steps) Arr::forget($steps, $stepId);
 			ContractData::where(['contract_id' => $contractId, 'department_id' => $departmentId, 'step_id' => $stepId])->delete();
         } else {
 			$stepData = Step::find($stepId);
@@ -751,7 +758,8 @@ class Contracts extends Controller {
         }
 		
 		$initStepsData->steps = array_values($steps);
-        $stat = $initStepsData->save();
+       
+	    $stat = $initStepsData->save();
 		return response()->json($stat);
 	}
 	
@@ -777,6 +785,16 @@ class Contracts extends Controller {
 		return response()->json($values);
 	}
 	
+	
+	
+	
+	
+	
+	
+	
+	public function calendar(Request $request) {
+		return $this->render('calendar');
+	}
 	
 	
 	

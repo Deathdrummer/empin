@@ -228,7 +228,8 @@
 	
 	let abortCtrl,
 		abortCtrlCounts,
-		aAbortCtrlFilter,
+		abortCtrlFilter,
+		abortCtrlFilterDates,
 		currentList = 0,
 		sortField = ddrStore('site-contracts-sortfield') || 'id',
 		sortOrder = ddrStore('site-contracts-sortorder') || 'desc',
@@ -696,9 +697,6 @@
 					//--------------------------------- Поделиться подборкой с другими сотрудниками
 					let statusesTooltip, destroyTooltip, sharePopper;
 					$.selectionShare = (btn, selection_id, subscribed = false) => {
-						
-						console.log('rool');
-						
 						
 						statusesTooltip = $(btn).ddrTooltip({
 							cls: 'w30rem',
@@ -2345,15 +2343,15 @@
 	
 	//----------------------------------------------------------------------------------------------------- Фильтрация по полю
 	$.contractFilterBy = async ({target, preload, closeOnScroll, onContextMenu, onCloseContextMenu, changeAttrData, buildTitle}, column) => {
-		if (aAbortCtrlFilter instanceof AbortController) aAbortCtrlFilter.abort();
+		if (abortCtrlFilter instanceof AbortController) abortCtrlFilter.abort();
 		ddrCssVar('cm-mainFontSize', '12px');
 		ddrCssVar('cm-mainMinHeight', '30px');
 		
 		preload({iconSize: '3rem'});
 		
 		
-		aAbortCtrlFilter = new AbortController();
-		const {data, error, status, headers, abort} = await axiosQuery('get', 'site/contracts/column_values', {column, currentList}, 'json', aAbortCtrlFilter);
+		abortCtrlFilter = new AbortController();
+		const {data, error, status, headers, abort} = await axiosQuery('get', 'site/contracts/column_values', {column, currentList}, 'json', abortCtrlFilter);
 		
 		const navData = [];
 		$.each(data, (id, title) => {
@@ -2401,6 +2399,80 @@
 	
 	
 	
+	
+	
+	
+	
+	$.contractFilterByDate = () => {
+		if (abortCtrlFilterDates instanceof AbortController) abortCtrlFilterDates.abort();
+		statusesTooltip = $(event.currentTarget).ddrTooltip({
+			cls: 'w44rem',
+			placement: 'bottom',
+			tag: 'noscroll',
+			minWidth: '360px',
+			minHeight: '200px',
+			duration: [200, 200],
+			trigger: 'click',
+			wait: {
+				iconHeight: '40px'
+			},
+			onShow: async function({reference, popper, show, hide, destroy, waitDetroy, setContent, setData, setProps}) {
+				
+				//abortCtrlFilterDates = new AbortController();
+				//const {data, error, status, headers, abort} = await axiosQuery('get', 'site/contracts/calendar', {}, 'text', abortCtrlFilterDates);
+				
+				
+				const calendarHtml = '<div class="row row-cols-2 g-10">' +
+										'<div class="col">' +
+											'<label class="form__label color-dark fz12px lh90">Дата от:</label>' +
+											'<input type="hidden" />' +
+											'<div id="custom1"></div>' +
+										'</div>' +
+										'<div>' +
+											'<label class="form__label color-dark fz12px lh90">Дата до:</label>' +
+											'<input type="hidden" />' +
+											'<div id="custom2"></div>' +
+										'</div>' +
+									'</div>';
+				
+				await setData(calendarHtml);
+				
+				const datePicker1 = ddrDatepicker('#custom1', {
+					alwaysShow: true,
+					position: false,
+					onShow: ({calendar}) => {
+						$(calendar).parent('.qs-datepicker-container').css({'box-shadow': 'none', 'position': 'relative'});
+						
+					    // Do stuff when the calendar is shown.
+					    // You have access to the datepicker instance for convenience.
+					}
+				});
+				
+				const datePicker2 = ddrDatepicker('#custom2', {
+					alwaysShow: true,
+					position: false,
+					onShow: ({calendar}) => {
+						$(calendar).parent('.qs-datepicker-container').css({'box-shadow': 'none', 'position': 'relative'});
+						
+					    // Do stuff when the calendar is shown.
+					    // You have access to the datepicker instance for convenience.
+					}
+				});
+				
+				waitDetroy();
+				
+				/*
+				query({method: 'get', route: 'users_to_share', data: {views: viewsPath, selection_id, subscribed}, responseType: 'text'}, (data, container, {error, status, headers}) => {
+					if (error) {
+						$.notify(error?.message, 'error');
+						console.log(error?.errors);
+					}
+					setData(data);
+					waitDetroy();
+				});*/
+			}
+		});
+	}
 	
 	
 	

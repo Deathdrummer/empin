@@ -148,6 +148,7 @@
 									<x-table.td
 										class="w6rem sort{{$sortField == 'date_start' ? ' sort-'.$sortOrder : ''}}"
 										onclick="$.sorting(this, 'date_start')"
+										oncontextmenu="$.contractFilterByDate()"
 										noscroll
 										ddrtabletdmain
 										><strong class="fz10px lh90 d-block text-center wodrbreak">Дата подписания договора</strong>

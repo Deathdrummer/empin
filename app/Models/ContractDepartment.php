@@ -57,6 +57,16 @@ class ContractDepartment extends Pivot {
 	
 	
 	
+	/**
+	 * @param string  $value
+	 * @return 
+	 */
+	public function setStepsAttribute($value) {
+		$this->attributes['steps'] = is_array($value) ? json_encode($value, JSON_UNESCAPED_UNICODE) : $value;
+	}
+	
+	
+	
 	
 	/**
 	 * @param 
