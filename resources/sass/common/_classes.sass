@@ -1078,12 +1078,41 @@ $tableColor: #efefef
 				
 			&-right
 				right: 4px
+			
+			&-center
+				text-align: center
 				
 			&-top
 				top: 4px
 			
 			&-bottom
 				bottom: 4px
+		
+			&-hidden
+				opacity: 0
+				transition: opacity 0.16s
+		
+		
+		.placer
+			position: absolute
+			display: flex
+			width: 100%
+			left: 0
+			
+			&-center
+				justify-content: center
+			
+			&-right
+				justify-content: end
+			
+			
+			&-top
+				top: 0
+			
+			&-bottom
+				bottom: 0
+				> *
+					justify-content: center
 		
 			&-hidden
 				opacity: 0

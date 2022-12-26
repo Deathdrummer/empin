@@ -123,8 +123,10 @@ class Contracts extends Controller {
 		
 		$append = $request->has('append') && $request->get('append');
 		
-		
-		
+		$columnFilter = null;
+		if ($filterRequest = json_decode($request->get('filter', null), true)) {
+			$columnFilter = $filterRequest['column'] ?? null;
+		}
 		
 		$allSelections = $searched ? Selection::toChoose()->get()->mapWithKeys(function($item) {
 				return [$item['id'] => $item['title']];
@@ -160,6 +162,7 @@ class Contracts extends Controller {
 				'selectionEdited',
 				'selectionId',
 				'userColums',
+				'columnFilter',
 				'append'
 			),
 			$headers
@@ -750,6 +753,28 @@ class Contracts extends Controller {
 		$initStepsData->steps = array_values($steps);
         $stat = $initStepsData->save();
 		return response()->json($stat);
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	/** Получить все уникальные значения выбранной колонки
+	 * @param 
+	 * @return 
+	 */
+	public function column_values(Request $request) {
+		$columnName = $request->get('column');
+		$currentList = $request->get('currentList');
+		$values = $this->contract->getColumnValues($columnName, $currentList);
+		return response()->json($values);
 	}
 	
 	

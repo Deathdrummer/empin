@@ -634,7 +634,7 @@
 		
 		let statusesTooltip;
 		$.contractStatuses = (btn, id) => {
-			statusesTooltip = $(btn).tooltip({
+			statusesTooltip = $(btn).ddrTooltip({
 				cls: 'w30rem',
 				placement: 'auto',
 				tag: 'noscroll',

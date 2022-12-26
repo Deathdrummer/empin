@@ -97,9 +97,17 @@
 										style="width:{{isset($listWidth['customer']) ? $listWidth['customer'] : '150'}}px;"
 										class="sort{{$sortField == 'customer' ? ' sort-'.$sortOrder : ''}}"
 										onclick="$.sorting(this, 'customer')"
+										contextmenu="contractFilterBy:{{$column}}"
 										noscroll
 										ddrtabletdmain
-										><strong class="fz10px lh90 d-block text-center wodrbreak">Заказчик</strong>
+										>
+										<strong class="fz10px lh90 d-block text-center wodrbreak">Заказчик</strong>
+										
+										@if($columnFilter == $column)
+											<div class="placer placer-bottom placer-center">
+												<i onclick="$.cancelContractFilter(event)" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
+											</div>
+										@endif
 									</x-table.td>
 								@endif
 								
@@ -192,9 +200,16 @@
 										style="width:{{isset($listWidth['contractor']) ? $listWidth['contractor'] : '100'}}px;"
 										class="sort{{$sortField == 'contractor' ? ' sort-'.$sortOrder : ''}}"
 										onclick="$.sorting(this, 'contractor')"
+										contextmenu="contractFilterBy:{{$column}}"
 										noscroll
 										ddrtabletdmain
-										><strong class="fz10px lh90 d-block text-center wodrbreak">Исполнитель</strong>
+										>
+										<strong class="fz10px lh90 d-block text-center wodrbreak">Исполнитель</strong>
+										@if($columnFilter == $column)
+											<div class="placer placer-bottom placer-center">
+												<i onclick="$.cancelContractFilter(event)" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
+											</div>
+										@endif
 									</x-table.td>
 								@endif
 								

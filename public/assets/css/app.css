@@ -143382,6 +143382,9 @@ template {
 .ddrtable__td .icon-right {
   right: 4px;
 }
+.ddrtable__td .icon-center {
+  text-align: center;
+}
 .ddrtable__td .icon-top {
   top: 4px;
 }
@@ -143389,6 +143392,31 @@ template {
   bottom: 4px;
 }
 .ddrtable__td .icon-hidden {
+  opacity: 0;
+  transition: opacity 0.16s;
+}
+.ddrtable__td .placer {
+  position: absolute;
+  display: flex;
+  width: 100%;
+  left: 0;
+}
+.ddrtable__td .placer-center {
+  justify-content: center;
+}
+.ddrtable__td .placer-right {
+  justify-content: end;
+}
+.ddrtable__td .placer-top {
+  top: 0;
+}
+.ddrtable__td .placer-bottom {
+  bottom: 0;
+}
+.ddrtable__td .placer-bottom > * {
+  justify-content: center;
+}
+.ddrtable__td .placer-hidden {
   opacity: 0;
   transition: opacity 0.16s;
 }

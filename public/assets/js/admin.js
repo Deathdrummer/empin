@@ -13474,7 +13474,7 @@ __webpack_require__.r(__webpack_exports__);
 
 window.tippy = (__webpack_require__(/*! tippy.js */ "./node_modules/tippy.js/dist/tippy.esm.js")["default"]);
 
-$.fn.tooltip = function (params, callback) {
+$.fn.ddrTooltip = function (params, callback) {
   var _$assign = _.assign({
     cls: null,
     tag: null,

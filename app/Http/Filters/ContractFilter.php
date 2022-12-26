@@ -12,6 +12,7 @@ class ContractFilter extends AbstractFilter {
     public const ARCHIVE = 'archive';
     public const PIVOT = 'pivot';
     public const SEARCH = 'search';
+    public const FILER = 'filter';
 
     protected function getCallbacks(): array {
         return [
@@ -20,6 +21,7 @@ class ContractFilter extends AbstractFilter {
             self::ARCHIVE => [$this, 'archive'],
             self::PIVOT => [$this, 'pivot'],
             self::SEARCH => [$this, 'search'],
+            self::FILER => [$this, 'filter'],
         ];
     }
 	
@@ -94,6 +96,19 @@ class ContractFilter extends AbstractFilter {
 			if ($contractorsMatch) $query->orWhereIn('contractor', $contractorsMatch);
 		});
     }
+	
+	
+	
+	
+	
+	
+	public function filter(Builder $builder, $value) {
+		['column' => $column, 'value' => $value] = json_decode($value, true);
+		$builder->where($column, $value);
+	}
+	
+	
+	
 	
 	
 	

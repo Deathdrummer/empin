@@ -8105,8 +8105,12 @@ $.ddrCRUD = function () {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _index_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./index.css */ "./resources/js/plugins/ddrContextMenu/index.css");
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _index_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./index.css */ "./resources/js/plugins/ddrContextMenu/index.css");
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+
 
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 
@@ -8128,133 +8132,188 @@ function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Sy
 
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
 
 var functionsMap, loadedFuntionsMap, menuSelector, abortCtrl;
-$(document).on('contextmenu', '[contextmenu]', function (e) {
-  e.preventDefault();
-  var target = {};
-  target.selector = this;
-  target.pointer = e === null || e === void 0 ? void 0 : e.target;
-  var uniqueBlockId = 'ddrContextMenu'; // Получить название функции-построителя меню и ее аргументы
+$(document).on('contextmenu', '[contextmenu]', /*#__PURE__*/function () {
+  var _ref = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee(e) {
+    var target, uniqueBlockId, _parseAttribString2, _parseAttribString3, func, args, methods, menuData, _buildMenuHtml4, _buildMenuHtml5, menuHtml, funcMap;
 
-  var _parseAttribString2 = _parseAttribString($(target.selector).attr('contextmenu')),
-      _parseAttribString3 = _slicedToArray(_parseAttribString2, 2),
-      func = _parseAttribString3[0],
-      args = _parseAttribString3[1]; // Методы для основной функции
+    return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
+      while (1) {
+        switch (_context.prev = _context.next) {
+          case 0:
+            e.preventDefault();
+            target = {};
+            target.selector = this;
+            target.pointer = e === null || e === void 0 ? void 0 : e.target;
+            uniqueBlockId = 'ddrContextMenu'; // Получить название функции-построителя меню и ее аргументы
+
+            _parseAttribString2 = _parseAttribString($(target.selector).attr('contextmenu')), _parseAttribString3 = _slicedToArray(_parseAttribString2, 2), func = _parseAttribString3[0], args = _parseAttribString3[1]; // Методы для основной функции
+
+            methods = {
+              target: target,
+              close: function close() {
+                // закрыть контекстное меню
+                _close();
+              },
+              setCallback: function setCallback(cbFnc, cbArgs) {
+                for (var _len = arguments.length, addArgs = new Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
+                  addArgs[_key - 2] = arguments[_key];
+                }
+
+                // при перечислении пунктов меню применять данную функцию как построитель для передачи функции с аргументами
+                var argsData = _.isArray(cbArgs) ? cbArgs : _.concat(cbArgs, [].concat(addArgs));
+                return cbFnc + ':' + argsData.join(',');
+              },
+              closeOnScroll: function closeOnScroll() {
+                for (var _len2 = arguments.length, selectors = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+                  selectors[_key2] = arguments[_key2];
+                }
+
+                var s = [].concat(selectors);
+                selectors.push('html, body');
+                var allSelectorsStr = selectors.join(', ');
+                $(allSelectorsStr).one('scroll', function () {
+                  methods.close();
+                });
+              },
+              onContextMenu: function onContextMenu() {
+                var callback = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+                if (!_.isNull(callback) && _.isFunction(callback)) callback();
+              },
+              onCloseContextMenu: function onCloseContextMenu() {
+                var callback = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+                $(document).on('closeContextMenu', function (e) {
+                  if (!_.isNull(callback) && _.isFunction(callback)) callback(e);
+                });
+              },
+              changeAttrData: function changeAttrData() {
+                var argIndex = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+                var newData = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+                if (_.isNull(argIndex) || _.isNull(newData)) throw new Error('Ошибка! contextmenu changeAttrData -> неверно переданы аргументы!');
+
+                var _parseAttribString4 = _parseAttribString($(target.selector).attr('contextmenu')),
+                    _parseAttribString5 = _slicedToArray(_parseAttribString4, 2),
+                    chFn = _parseAttribString5[0],
+                    chArgs = _parseAttribString5[1];
+
+                var buildAttrString = chFn + ':',
+                    i = argIndex - 1;
+                if (!chArgs[i]) throw new Error('Ошибка! contextmenu changeAttrData -> аргумента с таким порядковым номером не существует!');
+                chArgs[i] = newData;
+                buildAttrString += chArgs.join(',');
+                $(target.selector).setAttrib('contextmenu', buildAttrString);
+              },
+              buildTitle: function buildTitle() {
+                var count = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+                var one = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+                var many = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+                var wordVariants = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
+                // сформировать заголовок исходя из кол-ва выбранных элементов
+                if (_.isNull(one) || _.isNull(many) && _.isNull(wordVariants)) return;
+                if (_.isNull(count)) return one;
+
+                if (_.isNull(wordVariants) && !_.isArray(many)) {
+                  if (count > 1) return many.replaceAll(/#/ig, count);else return one.replaceAll(/\s*#\s*/ig, count);
+                }
+
+                var oneWithoutNum = false;
+
+                if (_.isNull(wordVariants)) {
+                  wordVariants = many;
+                  many = one;
+                  oneWithoutNum = true;
+                }
+
+                var word = wordCase(count, wordVariants);
+
+                if (count > 1) {
+                  return many.replaceAll(/%/ig, word).replaceAll(/#/ig, count);
+                }
+
+                return one.replaceAll(/%/ig, word).replaceAll(/\s*#\s*/ig, oneWithoutNum ? ' ' : count);
+              },
+              preload: function preload() {
+                var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+
+                var _$$extend = $.extend({
+                  iconSize: '2rem'
+                }, params),
+                    iconSize = _$$extend.iconSize;
+
+                var _buildMenuHtml2 = _buildMenuHtml([{
+                  name: '<img src="/assets/images/loading.gif" class="w' + iconSize + ' h' + iconSize + '">'
+                }]),
+                    _buildMenuHtml3 = _slicedToArray(_buildMenuHtml2, 2),
+                    preloadMenuHtml = _buildMenuHtml3[0],
+                    _ = _buildMenuHtml3[1];
+
+                _renderDomElement(preloadMenuHtml, uniqueBlockId);
+
+                _setPositionByCursor(e, preloadMenuHtml, {
+                  strictX: false,
+                  strictY: true
+                });
+
+                _show();
+              }
+            }; // Вызвать функцию построения меню
+
+            _context.next = 9;
+            return _callBuildMenuFunc.apply(void 0, [func, methods].concat(_toConsumableArray(args)));
+
+          case 9:
+            menuData = _context.sent;
+
+            if (!$(target.pointer).closest('[nocontext]').length) {
+              _context.next = 12;
+              break;
+            }
+
+            return _context.abrupt("return");
+
+          case 12:
+            // Сформировать из данных HTML меню, карту функций и связать клик на пукнт меню с вызовом сооответствующей функции
+            _buildMenuHtml4 = _buildMenuHtml(menuData), _buildMenuHtml5 = _slicedToArray(_buildMenuHtml4, 2), menuHtml = _buildMenuHtml5[0], funcMap = _buildMenuHtml5[1];
+            menuSelector = menuHtml;
+            functionsMap = funcMap; // Отрисовать меню
+
+            _renderDomElement(menuHtml, uniqueBlockId); // Установить положение меню
 
 
-  var methods = {
-    target: target,
-    close: function close() {
-      // закрыть контекстное меню
-      _close();
-    },
-    setCallback: function setCallback(cbFnc, cbArgs) {
-      for (var _len = arguments.length, addArgs = new Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
-        addArgs[_key - 2] = arguments[_key];
+            _setPositionByCursor(e, menuHtml, {
+              strictX: false,
+              strictY: true
+            }); // Установить положение всех списков подменю
+
+
+            _initSubmenuPositions(menuHtml); // Показать меню
+
+
+            _show(); // клик на пункт меню
+
+
+            _clickToAction(menuHtml); // Скрытие меню при клике на любое место документа
+
+
+            _clickToHideEvent(menuHtml, uniqueBlockId);
+
+          case 21:
+          case "end":
+            return _context.stop();
+        }
       }
+    }, _callee, this);
+  }));
 
-      // при перечислении пунктов меню применять данную функцию как построитель для передачи функции с аргументами
-      var argsData = _.isArray(cbArgs) ? cbArgs : _.concat(cbArgs, [].concat(addArgs));
-      return cbFnc + ':' + argsData.join(',');
-    },
-    closeOnScroll: function closeOnScroll() {
-      for (var _len2 = arguments.length, selectors = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-        selectors[_key2] = arguments[_key2];
-      }
-
-      var s = [].concat(selectors);
-      selectors.push('html, body');
-      var allSelectorsStr = selectors.join(', ');
-      $(allSelectorsStr).one('scroll', function () {
-        methods.close();
-      });
-    },
-    onContextMenu: function onContextMenu() {
-      var callback = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
-      if (!_.isNull(callback) && _.isFunction(callback)) callback();
-    },
-    changeAttrData: function changeAttrData() {
-      var argIndex = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
-      var newData = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-      if (_.isNull(argIndex) || _.isNull(newData)) throw new Error('Ошибка! contextmenu changeAttrData -> неверно переданы аргументы!');
-
-      var _parseAttribString4 = _parseAttribString($(target.selector).attr('contextmenu')),
-          _parseAttribString5 = _slicedToArray(_parseAttribString4, 2),
-          chFn = _parseAttribString5[0],
-          chArgs = _parseAttribString5[1];
-
-      var buildAttrString = chFn + ':',
-          i = argIndex - 1;
-      if (!chArgs[i]) throw new Error('Ошибка! contextmenu changeAttrData -> аргумента с таким порядковым номером не существует!');
-      chArgs[i] = newData;
-      buildAttrString += chArgs.join(',');
-      $(target.selector).setAttrib('contextmenu', buildAttrString);
-    },
-    buildTitle: function buildTitle() {
-      var count = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
-      var one = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-      var many = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
-      var wordVariants = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
-      // сформировать заголовок исходя из кол-ва выбранных элементов
-      if (_.isNull(one) || _.isNull(many) && _.isNull(wordVariants)) return;
-      if (_.isNull(count)) return one;
-
-      if (_.isNull(wordVariants) && !_.isArray(many)) {
-        if (count > 1) return many.replaceAll(/#/ig, count);else return one.replaceAll(/\s*#\s*/ig, count);
-      }
-
-      var oneWithoutNum = false;
-
-      if (_.isNull(wordVariants)) {
-        wordVariants = many;
-        many = one;
-        oneWithoutNum = true;
-      }
-
-      var word = wordCase(count, wordVariants);
-
-      if (count > 1) {
-        return many.replaceAll(/%/ig, word).replaceAll(/#/ig, count);
-      }
-
-      return one.replaceAll(/%/ig, word).replaceAll(/\s*#\s*/ig, oneWithoutNum ? ' ' : count);
-    }
-  }; // Вызвать функцию построения меню
-
-  var menuData = _callBuildMenuFunc.apply(void 0, [func, methods].concat(_toConsumableArray(args))); // Если есть атрибут nocontext то меню не сработает, но onContextMenu сработает
-
-
-  if ($(target.pointer).closest('[nocontext]').length) return; // Сформировать из данных HTML меню, карту функций и связать клик на пукнт меню с вызовом сооответствующей функции
-
-  var _buildMenuHtml2 = _buildMenuHtml(menuData),
-      _buildMenuHtml3 = _slicedToArray(_buildMenuHtml2, 2),
-      menuHtml = _buildMenuHtml3[0],
-      funcMap = _buildMenuHtml3[1];
-
-  menuSelector = menuHtml;
-  functionsMap = funcMap; // Отрисовать меню
-
-  _renderDomElement(menuHtml, uniqueBlockId); // Установить положение меню
-
-
-  _setPositionByCursor(e, menuHtml, {
-    strictX: false,
-    strictY: true
-  }); // Установить положение всех списков подменю
-
-
-  _initSubmenuPositions(menuHtml); // Показать меню
-
-
-  _show(); // клик на пункт меню
-
-
-  _clickToAction(menuHtml); // Скрытие меню при клике на любое место документа
-
-
-  _clickToHideEvent(menuHtml, uniqueBlockId);
-}); //--------------------------------------------------------------------------------------------------------------------------
+  return function (_x) {
+    return _ref.apply(this, arguments);
+  };
+}()); //--------------------------------------------------------------------------------------------------------------------------
 
 $(document).on('mouseenter', '.ddrcontextmenu .ddrcontextmenu__item_main:not(.ddrcontextmenu__item-disabled)', function () {
   $(this).addClass('ddrcontextmenu__item-hovered');
@@ -8487,11 +8546,11 @@ function _loadSubmenu() {
       empty = _$assign.empty;
 
   abortCtrl = new AbortController();
-  axiosQuery(method, url, params, 'json', abortCtrl).then(function (_ref) {
-    var data = _ref.data,
-        error = _ref.error,
-        status = _ref.status,
-        headers = _ref.headers;
+  axiosQuery(method, url, params, 'json', abortCtrl).then(function (_ref2) {
+    var data = _ref2.data,
+        error = _ref2.error,
+        status = _ref2.status,
+        headers = _ref2.headers;
 
     if (error || _.isEmpty(data)) {
       if (error) console.log('Ошибка! contextmenu _loadSubmenu -> axiosQuery:', error.status, error.message);
@@ -8708,7 +8767,8 @@ function _close() {
   if (_.isNull(menuSelector)) return;
   menuSelector.removeClass("ddrcontextmenu-visible"); //setTimeout(function() {
 
-  menuSelector.remove(); //}, 100);
+  menuSelector.remove();
+  $(document).trigger('closeContextMenu'); //}, 100);
 }
 
 /***/ }),
@@ -16349,7 +16409,7 @@ __webpack_require__.r(__webpack_exports__);
 
 window.tippy = (__webpack_require__(/*! tippy.js */ "./node_modules/tippy.js/dist/tippy.esm.js")["default"]);
 
-$.fn.tooltip = function (params, callback) {
+$.fn.ddrTooltip = function (params, callback) {
   var _$assign = _.assign({
     cls: null,
     tag: null,

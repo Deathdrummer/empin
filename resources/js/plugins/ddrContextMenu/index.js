@@ -1,9 +1,8 @@
 import "./index.css";
 
-
 let functionsMap, loadedFuntionsMap, menuSelector, abortCtrl;
 
-$(document).on('contextmenu', '[contextmenu]', function(e) {
+$(document).on('contextmenu', '[contextmenu]', async function(e) {
 	e.preventDefault();
 	const target = {};
 	target.selector = this;
@@ -36,6 +35,11 @@ $(document).on('contextmenu', '[contextmenu]', function(e) {
 		},
 		onContextMenu(callback = null) {
 			if (!_.isNull(callback) && _.isFunction(callback)) callback();
+		},
+		onCloseContextMenu(callback = null) {
+			$(document).on('closeContextMenu', (e) => {
+				if (!_.isNull(callback) && _.isFunction(callback)) callback(e);
+			});
 		},
 		changeAttrData(argIndex = null, newData = null) {
 			if (_.isNull(argIndex) || _.isNull(newData)) throw new Error('Ошибка! contextmenu changeAttrData -> неверно переданы аргументы!');
@@ -76,12 +80,30 @@ $(document).on('contextmenu', '[contextmenu]', function(e) {
 			}
 			
 			return one.replaceAll(/%/ig, word).replaceAll(/\s*#\s*/ig, oneWithoutNum ? ' ' : count);
+		},
+		preload(params = null) {
+			
+			const {
+				iconSize
+			} = $.extend({
+				iconSize: '2rem'
+			}, params);
+			
+			const [preloadMenuHtml, _] = _buildMenuHtml([{name: '<img src="/assets/images/loading.gif" class="w'+iconSize+' h'+iconSize+'">'}]);
+			_renderDomElement(preloadMenuHtml, uniqueBlockId);
+			_setPositionByCursor(e, preloadMenuHtml, {
+				strictX: false,
+				strictY: true,
+			});
+			_show();
 		}
 	};
 	
 	
+	
+	
 	// Вызвать функцию построения меню
-	const menuData = _callBuildMenuFunc(func, methods, ...args);
+	const menuData = await _callBuildMenuFunc(func, methods, ...args);
 	
 	// Если есть атрибут nocontext то меню не сработает, но onContextMenu сработает
 	if ($(target.pointer).closest('[nocontext]').length) return;
@@ -590,6 +612,7 @@ function _close() {
 	if (_.isNull(menuSelector)) return;
 	menuSelector.removeClass("ddrcontextmenu-visible");
 	//setTimeout(function() {
-		menuSelector.remove();
+	menuSelector.remove();
+	$(document).trigger('closeContextMenu');
 	//}, 100);
 }

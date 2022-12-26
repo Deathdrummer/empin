@@ -228,6 +228,7 @@
 	
 	let abortCtrl,
 		abortCtrlCounts,
+		aAbortCtrlFilter,
 		currentList = 0,
 		sortField = ddrStore('site-contracts-sortfield') || 'id',
 		sortOrder = ddrStore('site-contracts-sortorder') || 'desc',
@@ -238,6 +239,7 @@
 		canRemoveCheckbox = '{{Auth::guard('site')->user()->can('contract-remove-checkbox::site')}}',
 		offset = 0,
 		search = null,
+		columnFilter = null, // поиск по значению из сстолбца
 		selection = null,
 		editSelection = null,
 		searchWithArchive = false,
@@ -694,7 +696,11 @@
 					//--------------------------------- Поделиться подборкой с другими сотрудниками
 					let statusesTooltip, destroyTooltip, sharePopper;
 					$.selectionShare = (btn, selection_id, subscribed = false) => {
-						statusesTooltip = $(btn).tooltip({
+						
+						console.log('rool');
+						
+						
+						statusesTooltip = $(btn).ddrTooltip({
 							cls: 'w30rem',
 							placement: 'auto',
 							tag: 'noscroll',
@@ -1271,7 +1277,7 @@
 	let statusesTooltip, contractId;
 	$.openColorsStatuses = (btn, cId) => {
 		contractId = cId;
-		statusesTooltip = $(btn).tooltip({
+		statusesTooltip = $(btn).ddrTooltip({
 			cls: 'w30rem',
 			placement: 'auto',
 			tag: 'noscroll',
@@ -2337,6 +2343,75 @@
 	
 	
 	
+	//----------------------------------------------------------------------------------------------------- Фильтрация по полю
+	$.contractFilterBy = async ({target, preload, closeOnScroll, onContextMenu, onCloseContextMenu, changeAttrData, buildTitle}, column) => {
+		if (aAbortCtrlFilter instanceof AbortController) aAbortCtrlFilter.abort();
+		ddrCssVar('cm-mainFontSize', '12px');
+		ddrCssVar('cm-mainMinHeight', '30px');
+		
+		preload({iconSize: '3rem'});
+		
+		
+		aAbortCtrlFilter = new AbortController();
+		const {data, error, status, headers, abort} = await axiosQuery('get', 'site/contracts/column_values', {column, currentList}, 'json', aAbortCtrlFilter);
+		
+		const navData = [];
+		$.each(data, (id, title) => {
+			navData.push({
+				name: title,
+				onClick() {
+					columnFilter = {
+						column,
+						value: id
+					};
+					
+					getList({
+						withCounts: search || selection,
+						callback: function() {}
+					});
+				}
+			});
+		});
+		
+		
+		
+		onCloseContextMenu(() => {
+			ddrCssVar('cm-mainFontSize', '16px');
+			ddrCssVar('cm-mainMinHeight', '48px');
+		});
+		
+		return navData;
+	}
+	
+	
+	
+	
+	
+	//----------------------------------------------------------------------------------------------------- Отменить фильтрацию
+	$.cancelContractFilter = (event) => {
+		event.stopPropagation();
+		
+		columnFilter = null;
+		getList({
+			withCounts: search || selection,
+			callback: function() {}
+		});
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	
@@ -2425,6 +2500,7 @@
 		params['offset'] = localOffset != null ? localOffset : offset;
 		params['append'] = append ? 1 : 0;
 		params['search'] = search;
+		params['filter'] = columnFilter;
 		params['selection'] = selection;
 		params['edit_selection'] = editSelection;
 		params['selected_contracts'] = selectedContracts.items;

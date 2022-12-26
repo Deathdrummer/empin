@@ -1,7 +1,7 @@
 import 'tippy.js/dist/tippy.css';
 window.tippy = require('tippy.js').default;
 
-$.fn.tooltip = function(params, callback) {
+$.fn.ddrTooltip = function(params, callback) {
 	const {
 		cls,
 		tag,

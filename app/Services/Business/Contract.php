@@ -525,6 +525,55 @@ class Contract {
 	
 	
 	
+	
+	
+	/** Получить значения заданного столбца
+	 * @param 
+	 * @return 
+	 */
+	public function getColumnValues($column = null, $currentList = 0) {
+		$isAchive = $currentList == -1;
+		$department = $currentList > 0 ? $currentList : false;
+		
+		$columnValues = ContractModel::select($column)
+			->when($isAchive, function($query) {
+				$query->where('archive', 1);
+			}, function($query) {
+				$query->whereNot('archive', 1);
+			})
+			->when($department, function($query) use($department) {
+				$query->whereRelation('departments', function(Builder $queryRelation) use($department) {
+					$queryRelation->where('department_id', $department);
+				});
+			})
+			->distinct()
+			->get()
+			->pluck($column)
+			->toArray();
+			
+		if (!$columnValues) return false;
+		if (!in_array($column, ['customer', 'type', 'contractor'])) return array_combine($columnValues, $columnValues);
+		
+		$settingsData = match ($column) {
+			'customer' 		=> $this->getSettings('contract-customers:customers', 'id', 'name'),
+			'type' 			=> $this->getSettings('contract-types:types', 'id', 'title'),
+			'contractor'	=> $this->getSettings('contract-contractors:contractors', 'id', 'name'),
+		};
+		
+		if (!$settingsData) return false;
+		
+		
+		$intersectedValues = array_intersect_key($settingsData, array_flip($columnValues));
+		return $intersectedValues;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
 	/**
 	 * @param 
 	 * @return 
