@@ -2,6 +2,7 @@
 
 use App\Http\Filters\Base\AbstractFilter;
 use App\Traits\Settingable;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 
 class ContractFilter extends AbstractFilter {
@@ -104,7 +105,19 @@ class ContractFilter extends AbstractFilter {
 	
 	public function filter(Builder $builder, $value) {
 		['column' => $column, 'value' => $value] = json_decode($value, true);
-		$builder->where($column, $value);
+		
+		if (in_array($column, ['date_start', 'date_end', 'date_close'])) {
+			$d = explode('|', $value);
+			
+			$dateFrom = $d[0] ?? null;
+			$dateTo = $d[1] ?? null;
+			
+			$builder->where($column, '>=', Carbon::parse($dateFrom));
+			$builder->where($column, '<=', Carbon::parse($dateTo));
+		
+		} else {
+			$builder->where($column, $value);
+		}
 	}
 	
 	

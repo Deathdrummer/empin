@@ -148,10 +148,16 @@
 									<x-table.td
 										class="w6rem sort{{$sortField == 'date_start' ? ' sort-'.$sortOrder : ''}}"
 										onclick="$.sorting(this, 'date_start')"
-										oncontextmenu="$.contractFilterByDate()"
+										oncontextmenu="$.contractFilterByDate('{{$column}}')"
 										noscroll
 										ddrtabletdmain
-										><strong class="fz10px lh90 d-block text-center wodrbreak">Дата подписания договора</strong>
+										>
+										<strong class="fz10px lh90 d-block text-center wodrbreak">Дата подписания договора</strong>
+										@if($columnFilter == $column)
+											<div class="placer placer-bottom placer-center">
+												<i onclick="$.cancelContractFilter(event)" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
+											</div>
+										@endif
 									</x-table.td>
 								@endif
 								
@@ -159,9 +165,16 @@
 									<x-table.td
 										class="w6rem sort{{$sortField == 'date_end' ? ' sort-'.$sortOrder : ''}}"
 										onclick="$.sorting(this, 'date_end')"
+										oncontextmenu="$.contractFilterByDate('{{$column}}')"
 										noscroll
 										ddrtabletdmain
-										><strong class="fz10px lh90 d-block text-center wodrbreak">Дата окончания работ по договору</strong>
+										>
+										<strong class="fz10px lh90 d-block text-center wodrbreak">Дата окончания работ по договору</strong>
+										@if($columnFilter == $column)
+											<div class="placer placer-bottom placer-center">
+												<i onclick="$.cancelContractFilter(event)" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
+											</div>
+										@endif
 									</x-table.td>
 								@endif
 								
@@ -238,9 +251,16 @@
 									<x-table.td
 										class="w6rem sort{{$sortField == 'date_close' ? ' sort-'.$sortOrder : ''}}"
 										onclick="$.sorting(this, 'date_close')"
+										oncontextmenu="$.contractFilterByDate('{{$column}}')"
 										noscroll
 										ddrtabletdmain
-										><strong class="fz10px lh90 d-block text-center wodrbreak">Дата закрытия договора</strong>
+										>
+										<strong class="fz10px lh90 d-block text-center wodrbreak">Дата закрытия договора</strong>
+										@if($columnFilter == $column)
+											<div class="placer placer-bottom placer-center">
+												<i onclick="$.cancelContractFilter(event)" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
+											</div>
+										@endif
 									</x-table.td>
 								@endif
 								

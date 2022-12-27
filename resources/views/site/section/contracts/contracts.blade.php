@@ -2399,18 +2399,26 @@
 	
 	
 	
+	//console.log(new Date('Thu Dec 29 2022 00:00:00 GMT+0300 (GMT+03:00)').getFullYear());
 	
 	
 	
 	
-	$.contractFilterByDate = () => {
-		if (abortCtrlFilterDates instanceof AbortController) abortCtrlFilterDates.abort();
-		statusesTooltip = $(event.currentTarget).ddrTooltip({
-			cls: 'w44rem',
+	let filterByDateTooltip, dateFromPicker, dateToPicker, dateFromValue = null, dateToValue = null, columnDateFilter;
+	$.contractFilterByDate = (column) => {
+		
+		if (filterByDateTooltip?.destroy != undefined) filterByDateTooltip.destroy();
+		if (dateFromPicker?.remove != undefined) dateFromPicker.remove();
+		if (dateToPicker?.remove != undefined) dateToPicker.remove();
+		
+		columnDateFilter = column;
+		
+		filterByDateTooltip = $(event.currentTarget).ddrTooltip({
+			//cls: 'w44rem',
 			placement: 'bottom',
 			tag: 'noscroll',
-			minWidth: '360px',
-			minHeight: '200px',
+			minWidth: '430px',
+			minHeight: '225px',
 			duration: [200, 200],
 			trigger: 'click',
 			wait: {
@@ -2422,60 +2430,109 @@
 				//const {data, error, status, headers, abort} = await axiosQuery('get', 'site/contracts/calendar', {}, 'text', abortCtrlFilterDates);
 				
 				
-				const calendarHtml = '<div class="row row-cols-2 g-10">' +
-										'<div class="col">' +
-											'<label class="form__label color-dark fz12px lh90">Дата от:</label>' +
-											'<input type="hidden" />' +
-											'<div id="custom1"></div>' +
-										'</div>' +
-										'<div>' +
-											'<label class="form__label color-dark fz12px lh90">Дата до:</label>' +
-											'<input type="hidden" />' +
-											'<div id="custom2"></div>' +
-										'</div>' +
-									'</div>';
+				const calendarHtml = '<div class="mt5px">' +
+					'<div class="row row-cols-2 g-10">' +
+						'<div class="col">' +
+							'<strong class="form__label color-dark fz12px lh90 mb4px">Дата от:</strong>' +
+							'<input type="hidden" id="filterDateFrom" />' +
+							'<div></div>' +
+						'</div>' +
+						'<div>' +
+							'<strong class="form__label color-dark fz12px lh90 mb4px">Дата до:</strong>' +
+							'<input type="hidden" id="filterDateTo" />' +
+							'<div></div>' +
+						'</div>' +
+					'</div>' +
+					'<div class="d-flex justify-content-end mt5px" style="position:absolute;right:10px;bottom:7px;width:100%;">' +
+						'<div class="button verysmall-button button-yellow">' +
+							'<button inpgroup="verysmall" onclick="$.setContractFilterByDate()">Применить</button>' +
+						'</div>' +
+					'</div>' +
+				'</div>';
 				
 				await setData(calendarHtml);
 				
-				const datePicker1 = ddrDatepicker('#custom1', {
-					alwaysShow: true,
-					position: false,
-					onShow: ({calendar}) => {
-						$(calendar).parent('.qs-datepicker-container').css({'box-shadow': 'none', 'position': 'relative'});
-						
-					    // Do stuff when the calendar is shown.
-					    // You have access to the datepicker instance for convenience.
-					}
-				});
-				
-				const datePicker2 = ddrDatepicker('#custom2', {
-					alwaysShow: true,
-					position: false,
-					onShow: ({calendar}) => {
-						$(calendar).parent('.qs-datepicker-container').css({'box-shadow': 'none', 'position': 'relative'});
-						
-					    // Do stuff when the calendar is shown.
-					    // You have access to the datepicker instance for convenience.
-					}
-				});
+				dateFromPicker = _setDatePicker('filterDateFrom', dateFromValue);
+				dateToPicker = _setDatePicker('filterDateTo', dateToValue);
 				
 				waitDetroy();
+				// initD.getFullYear()+'-'+addZero(initD.getMonth() + 1)+'-'+addZero(initD.getDate()),
 				
-				/*
-				query({method: 'get', route: 'users_to_share', data: {views: viewsPath, selection_id, subscribed}, responseType: 'text'}, (data, container, {error, status, headers}) => {
-					if (error) {
-						$.notify(error?.message, 'error');
-						console.log(error?.errors);
-					}
-					setData(data);
-					waitDetroy();
-				});*/
+				function _setDatePicker(id = null, initD = null) {
+					if (id == null) return;
+					const datePicker = ddrDatepicker('#'+id, {
+						id: 'filterDatePeriod',
+						alwaysShow: true,
+						position: false,
+						startDay: 1,
+						defaultView: 'calendar',
+						overlayPlaceholder: 'Введите год',
+						customDays: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
+						customMonths: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
+						dateSelected: initD ? new Date(initD) : null,
+						
+						onShow: ({calendar}) => {
+							$(calendar).parent('.qs-datepicker-container').css({
+								'box-shadow': 'none',
+								'position': 'static',
+								'width': '220px',
+							});
+							
+							$(calendar).css({
+								'position': 'relative',
+							});
+							
+						    // Do stuff when the calendar is shown.
+						    // You have access to the datepicker instance for convenience.
+						},
+						formatter: (input, cd, instance) => {
+							//$(input).setAttrib('date', addZero(cd.getDate())+'-'+addZero(cd.getMonth() + 1)+'-'+cd.getFullYear());
+							$(input).setAttrib('date', cd);
+						},
+						
+					});
+					return datePicker;
+				}
+				
+				
 			}
 		});
 	}
 	
 	
 	
+	
+	
+	
+	$.setContractFilterByDate = async () => {
+		
+		dateFromValue = $('input#filterDateFrom').attr('date'),
+		dateToValue = $('input#filterDateTo').attr('date');
+		
+		
+		const fd = new Date(dateFromValue);
+		const td = new Date(dateToValue);
+		
+		
+		const dateFromValueFormat = fd.getFullYear()+'-'+addZero(fd.getMonth() + 1)+'-'+addZero(fd.getDate())+'00:00:00';
+		const dateToValueFormat = td.getFullYear()+'-'+addZero(td.getMonth() + 1)+'-'+addZero(td.getDate())+'00:00:00';
+		
+		
+		columnFilter = {
+			column: columnDateFilter,
+			value: dateFromValueFormat+'|'+dateToValueFormat,
+		};
+		
+		getList({
+			withCounts: search || selection,
+			callback: function() {}
+		});
+		
+		filterByDateTooltip.destroy();
+		columnDateFilter = null;
+		dateFromPicker.remove()
+		dateToPicker.remove();
+	}
 	
 	
 	
