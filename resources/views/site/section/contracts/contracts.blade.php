@@ -2385,26 +2385,19 @@
 	
 	
 	
-	//----------------------------------------------------------------------------------------------------- Отменить фильтрацию
-	$.cancelContractFilter = (event) => {
-		event.stopPropagation();
-		
-		columnFilter = null;
-		getList({
-			withCounts: search || selection,
-			callback: function() {}
-		});
-	}
 	
 	
 	
 	
-	//console.log(new Date('Thu Dec 29 2022 00:00:00 GMT+0300 (GMT+03:00)').getFullYear());
 	
 	
-	
-	
-	let filterByDateTooltip, dateFromPicker, dateToPicker, dateFromValue = null, dateToValue = null, columnDateFilter;
+	//----------------------------------------------------------------------------------------------------- Фильтрация по дате
+	let filterByDateTooltip,
+		dateFromPicker,
+		dateToPicker,
+		dateFromValue = {},
+		dateToValue = {},
+		columnDateFilter;
 	$.contractFilterByDate = (column) => {
 		
 		if (filterByDateTooltip?.destroy != undefined) filterByDateTooltip.destroy();
@@ -2429,6 +2422,7 @@
 				//abortCtrlFilterDates = new AbortController();
 				//const {data, error, status, headers, abort} = await axiosQuery('get', 'site/contracts/calendar', {}, 'text', abortCtrlFilterDates);
 				
+				let disabledBtn = !dateFromValue[column] && !dateToValue[column] ? 'disabled' : '';
 				
 				const calendarHtml = '<div class="mt5px">' +
 					'<div class="row row-cols-2 g-10">' +
@@ -2445,15 +2439,15 @@
 					'</div>' +
 					'<div class="d-flex justify-content-end mt5px" style="position:absolute;right:10px;bottom:7px;width:100%;">' +
 						'<div class="button verysmall-button button-yellow">' +
-							'<button inpgroup="verysmall" onclick="$.setContractFilterByDate()">Применить</button>' +
+							'<button inpgroup="verysmall" onclick="$.setContractFilterByDate(\''+column+'\')" id="dateToPickerBtn" '+disabledBtn+'>Применить</button>' +
 						'</div>' +
 					'</div>' +
 				'</div>';
 				
 				await setData(calendarHtml);
 				
-				dateFromPicker = _setDatePicker('filterDateFrom', dateFromValue);
-				dateToPicker = _setDatePicker('filterDateTo', dateToValue);
+				dateFromPicker = _setDatePicker('filterDateFrom', dateFromValue[column]);
+				dateToPicker = _setDatePicker('filterDateTo', dateToValue[column]);
 				
 				waitDetroy();
 				// initD.getFullYear()+'-'+addZero(initD.getMonth() + 1)+'-'+addZero(initD.getDate()),
@@ -2485,6 +2479,20 @@
 						    // Do stuff when the calendar is shown.
 						    // You have access to the datepicker instance for convenience.
 						},
+						onSelect: (instance, date) => {
+							
+							if (date) $(instance.el).attr('date', date);
+							else $(instance.el).removeAttrib('date');
+							
+							let fDate = $('input#filterDateFrom').attr('date') || false,
+								tDate = $('input#filterDateTo').attr('date') || false;
+							
+							if (fDate || tDate) {
+								$('#dateToPickerBtn').removeAttrib('disabled');
+							} else {
+								$('#dateToPickerBtn').setAttrib('disabled');
+							}
+						},
 						formatter: (input, cd, instance) => {
 							//$(input).setAttrib('date', addZero(cd.getDate())+'-'+addZero(cd.getMonth() + 1)+'-'+cd.getFullYear());
 							$(input).setAttrib('date', cd);
@@ -2503,24 +2511,29 @@
 	
 	
 	
-	
-	$.setContractFilterByDate = async () => {
+	//----------------------------------------------------------------------------------------------------- Применить фильтр
+	$.setContractFilterByDate = async (column) => {
 		
-		dateFromValue = $('input#filterDateFrom').attr('date'),
-		dateToValue = $('input#filterDateTo').attr('date');
+		dateFromValue[column] = $('input#filterDateFrom').attr('date'),
+		dateToValue[column] = $('input#filterDateTo').attr('date');
 		
-		
-		const fd = new Date(dateFromValue);
-		const td = new Date(dateToValue);
+		const buildData = [];
 		
 		
-		const dateFromValueFormat = fd.getFullYear()+'-'+addZero(fd.getMonth() + 1)+'-'+addZero(fd.getDate())+'00:00:00';
-		const dateToValueFormat = td.getFullYear()+'-'+addZero(td.getMonth() + 1)+'-'+addZero(td.getDate())+'00:00:00';
+		if (dateFromValue[column]) {
+			const fd = new Date(dateFromValue[column]);
+			buildData.push(fd.getFullYear()+'-'+addZero(fd.getMonth() + 1)+'-'+addZero(fd.getDate())+' 00:00:00');
+		} else buildData.push('');
+		
+		if (dateToValue[column]) {
+			const td = new Date(dateToValue[column]);
+			buildData.push(td.getFullYear()+'-'+addZero(td.getMonth() + 1)+'-'+addZero(td.getDate())+' 00:00:00');
+		} else buildData.push('');
 		
 		
 		columnFilter = {
 			column: columnDateFilter,
-			value: dateFromValueFormat+'|'+dateToValueFormat,
+			value: buildData.join('|'), //dateFromValueFormat+'|'+dateToValueFormat,
 		};
 		
 		getList({
@@ -2537,6 +2550,29 @@
 	
 	
 	
+	
+	
+	
+	
+	
+	//----------------------------------------------------------------------------------------------------- Отменить фильтрацию
+	$.cancelContractFilter = (event, column) => {
+		event.stopPropagation();
+		
+		columnFilter = null;
+		delete(dateFromValue[column]);
+		delete(dateToValue[column]);
+		
+		filterByDateTooltip.destroy();
+		columnDateFilter = null;
+		dateFromPicker.remove()
+		dateToPicker.remove();
+		
+		getList({
+			withCounts: search || selection,
+			callback: function() {}
+		});
+	}
 	
 	
 	

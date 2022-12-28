@@ -109,11 +109,13 @@ class ContractFilter extends AbstractFilter {
 		if (in_array($column, ['date_start', 'date_end', 'date_close'])) {
 			$d = explode('|', $value);
 			
+			logger($d);
+			
 			$dateFrom = $d[0] ?? null;
 			$dateTo = $d[1] ?? null;
 			
-			$builder->where($column, '>=', Carbon::parse($dateFrom));
-			$builder->where($column, '<=', Carbon::parse($dateTo));
+			if ($dateFrom) $builder->where($column, '>=', Carbon::parse($dateFrom));
+			if ($dateTo) $builder->where($column, '<=', Carbon::parse($dateTo));
 		
 		} else {
 			$builder->where($column, $value);

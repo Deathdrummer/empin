@@ -105,7 +105,7 @@
 										
 										@if($columnFilter == $column)
 											<div class="placer placer-bottom placer-center">
-												<i onclick="$.cancelContractFilter(event)" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
+												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
 											</div>
 										@endif
 									</x-table.td>
@@ -155,7 +155,7 @@
 										<strong class="fz10px lh90 d-block text-center wodrbreak">Дата подписания договора</strong>
 										@if($columnFilter == $column)
 											<div class="placer placer-bottom placer-center">
-												<i onclick="$.cancelContractFilter(event)" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
+												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
 											</div>
 										@endif
 									</x-table.td>
@@ -172,7 +172,7 @@
 										<strong class="fz10px lh90 d-block text-center wodrbreak">Дата окончания работ по договору</strong>
 										@if($columnFilter == $column)
 											<div class="placer placer-bottom placer-center">
-												<i onclick="$.cancelContractFilter(event)" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
+												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
 											</div>
 										@endif
 									</x-table.td>
@@ -221,7 +221,7 @@
 										<strong class="fz10px lh90 d-block text-center wodrbreak">Исполнитель</strong>
 										@if($columnFilter == $column)
 											<div class="placer placer-bottom placer-center">
-												<i onclick="$.cancelContractFilter(event)" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
+												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
 											</div>
 										@endif
 									</x-table.td>
@@ -258,7 +258,7 @@
 										<strong class="fz10px lh90 d-block text-center wodrbreak">Дата закрытия договора</strong>
 										@if($columnFilter == $column)
 											<div class="placer placer-bottom placer-center">
-												<i onclick="$.cancelContractFilter(event)" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
+												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
 											</div>
 										@endif
 									</x-table.td>
