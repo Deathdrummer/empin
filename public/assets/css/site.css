@@ -6977,7 +6977,7 @@ body::-webkit-resizer {
 
 .notifyjs-corner {
   right: calc(-100vw + 100% + var(--ddr-notifyXOffset)) !important;
-  top: var(--ddr-notifyYOffset) !important;
+  bottom: var(--ddr-notifyYOffset) !important;
   text-shadow: none !important;
 }
 .notifyjs-corner [data-notify-text] {
