@@ -2364,8 +2364,16 @@
 		
 		const navData = [];
 		$.each(data, (id, title) => {
+			
+			let name;
+			if (columnFilter?.value == id) {
+				name = '<span class="color-blue">'+title+'</span>';
+			} else {
+				name = title;
+			}
+			
 			navData.push({
-				name: title,
+				name,
 				onClick() {
 					columnFilter = {
 						column,
