@@ -2574,6 +2574,7 @@
 		if (!column) {
 			columnFilter = null;
 			dateFromValue = {};
+			dateToValue = {};
 			columnDateFilter = null;
 		} else {
 			event.stopPropagation();
