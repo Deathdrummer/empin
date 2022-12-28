@@ -103,7 +103,7 @@
 										>
 										<strong class="fz10px lh90 d-block text-center wodrbreak">Заказчик</strong>
 										
-										@if($columnFilter == $column)
+										@if(isset($columnFilter) && $columnFilter == $column)
 											<div class="placer placer-bottom placer-center">
 												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
 											</div>
@@ -153,7 +153,7 @@
 										ddrtabletdmain
 										>
 										<strong class="fz10px lh90 d-block text-center wodrbreak">Дата подписания договора</strong>
-										@if($columnFilter == $column)
+										@if(isset($columnFilter) && $columnFilter == $column)
 											<div class="placer placer-bottom placer-center">
 												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
 											</div>
@@ -170,7 +170,7 @@
 										ddrtabletdmain
 										>
 										<strong class="fz10px lh90 d-block text-center wodrbreak">Дата окончания работ по договору</strong>
-										@if($columnFilter == $column)
+										@if(isset($columnFilter) && $columnFilter == $column)
 											<div class="placer placer-bottom placer-center">
 												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
 											</div>
@@ -219,7 +219,7 @@
 										ddrtabletdmain
 										>
 										<strong class="fz10px lh90 d-block text-center wodrbreak">Исполнитель</strong>
-										@if($columnFilter == $column)
+										@if(isset($columnFilter) && $columnFilter == $column)
 											<div class="placer placer-bottom placer-center">
 												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
 											</div>
@@ -256,7 +256,7 @@
 										ddrtabletdmain
 										>
 										<strong class="fz10px lh90 d-block text-center wodrbreak">Дата закрытия договора</strong>
-										@if($columnFilter == $column)
+										@if(isset($columnFilter) && $columnFilter == $column)
 											<div class="placer placer-bottom placer-center">
 												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
 											</div>
@@ -401,5 +401,12 @@
 		</x-horisontal>
 	@endif
 @elseif(!isset($append) || !$append)
-	<div class="h5rem-4px d-flex align-items-center justify-content-center"><p class="color-light">Нет данных</p></div>
+	<div class="h5rem-4px d-flex align-items-center justify-content-center">
+		<div class="text-center">
+			<p class="color-light">Нет данных</p>
+			@if(isset($columnFilter) && $columnFilter)
+				<p class="color-blue pointer fz12px mt5px" onclick="$.cancelContractFilter(event)">Очистить фильтр</p>
+			@endif
+		</div>
+	</div>
 @endisset

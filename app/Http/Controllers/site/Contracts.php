@@ -76,7 +76,13 @@ class Contracts extends Controller {
 		}
 		
 		
-		if (!$list || $list->isEmpty()) return $this->renderWithHeaders('list', [], $headers);
+		
+		$columnFilter = null;
+		if ($filterRequest = json_decode($request->get('filter', null), true)) {
+			$columnFilter = $filterRequest['column'] ?? null;
+		}
+		
+		if (!$list || $list->isEmpty()) return $this->renderWithHeaders('list', compact('columnFilter'), $headers);
 		
 		$alldeps = $this->department->getWithSteps($request);
 		
@@ -122,11 +128,6 @@ class Contracts extends Controller {
 		$selectionEdited = $request->has('edit_selection') && $request->get('edit_selection');
 		
 		$append = $request->has('append') && $request->get('append');
-		
-		$columnFilter = null;
-		if ($filterRequest = json_decode($request->get('filter', null), true)) {
-			$columnFilter = $filterRequest['column'] ?? null;
-		}
 		
 		$allSelections = $searched ? Selection::toChoose()->get()->mapWithKeys(function($item) {
 				return [$item['id'] => $item['title']];

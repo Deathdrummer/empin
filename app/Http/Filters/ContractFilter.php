@@ -109,8 +109,6 @@ class ContractFilter extends AbstractFilter {
 		if (in_array($column, ['date_start', 'date_end', 'date_close'])) {
 			$d = explode('|', $value);
 			
-			logger($d);
-			
 			$dateFrom = $d[0] ?? null;
 			$dateTo = $d[1] ?? null;
 			

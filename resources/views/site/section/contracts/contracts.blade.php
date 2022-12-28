@@ -2571,16 +2571,23 @@
 	
 	//----------------------------------------------------------------------------------------------------- Отменить фильтрацию
 	$.cancelContractFilter = (event, column) => {
-		event.stopPropagation();
+		if (!column) {
+			columnFilter = null;
+			dateFromValue = {};
+			columnDateFilter = null;
+		} else {
+			event.stopPropagation();
+			columnFilter = null;
+			
+			delete(dateFromValue[column]);
+			delete(dateToValue[column]);
+			
+			filterByDateTooltip.destroy();
+			columnDateFilter = null;
+			dateFromPicker.remove()
+			dateToPicker.remove();
+		}
 		
-		columnFilter = null;
-		delete(dateFromValue[column]);
-		delete(dateToValue[column]);
-		
-		filterByDateTooltip.destroy();
-		columnDateFilter = null;
-		dateFromPicker.remove()
-		dateToPicker.remove();
 		
 		getList({
 			withCounts: search || selection,
