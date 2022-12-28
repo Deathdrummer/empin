@@ -2342,6 +2342,15 @@
 	
 	
 	//----------------------------------------------------------------------------------------------------- Фильтрация по полю
+	
+	let filterByDateTooltip,
+		dateFromPicker,
+		dateToPicker,
+		dateFromValue = {},
+		dateToValue = {},
+		columnDateFilter;
+	
+	
 	$.contractFilterBy = async ({target, preload, closeOnScroll, onContextMenu, onCloseContextMenu, changeAttrData, buildTitle}, column) => {
 		if (abortCtrlFilter instanceof AbortController) abortCtrlFilter.abort();
 		ddrCssVar('cm-mainFontSize', '12px');
@@ -2362,6 +2371,9 @@
 						column,
 						value: id
 					};
+					
+					dateFromValue = {},
+					dateToValue = {},
 					
 					getList({
 						withCounts: search || selection,
@@ -2392,12 +2404,6 @@
 	
 	
 	//----------------------------------------------------------------------------------------------------- Фильтрация по дате
-	let filterByDateTooltip,
-		dateFromPicker,
-		dateToPicker,
-		dateFromValue = {},
-		dateToValue = {},
-		columnDateFilter;
 	$.contractFilterByDate = (column) => {
 		
 		if (filterByDateTooltip?.destroy != undefined) filterByDateTooltip.destroy();
