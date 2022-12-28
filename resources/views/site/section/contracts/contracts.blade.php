@@ -1970,10 +1970,10 @@
 								if (data) {
 									if (selectionId || searched) {
 										getCounts(() => {
-											$(target.selector).remove();
+											removeContractsRows(target);
 										});
 									} else {
-										$(target.selector).remove();
+										removeContractsRows(target);
 									}
 									
 									$.notify(buildTitle(countSelected, '% успешно отправлен в архив!', '# % успешно отправлены в архив!', ['Договор', 'договора', 'договоров']));
@@ -2005,10 +2005,10 @@
 								if (data) {
 									if (selectionId || searched) {
 										getCounts(() => {
-											$(target.selector).remove();
+											removeContractsRows(target);
 										});
 									} else {
-										$(target.selector).remove();
+										removeContractsRows(target);
 									}
 									
 									$.notify(buildTitle(countSelected, '% успешно возвращен в работу!', '# % успешно возвращены в работу!', ['Договор', 'договора', 'договоров']));
@@ -2097,7 +2097,7 @@
 							//target.changeAttrData(7, '0');
 							
 							getCounts(() => {
-								$(target.selector).remove();
+								removeContractsRows(target);
 								$('[selectionsbtn]').ddrInputs('enable');
 							});
 						}
@@ -2203,10 +2203,10 @@
 										if (selectionId || searched) {
 											let params = {};
 											getCounts(() => {
-												$(target.selector).remove();
+												removeContractsRows(target);
 											});
 										} else {
-											$(target.selector).remove();
+											removeContractsRows(target);
 										}
 										
 										if (data.length) {
@@ -2246,10 +2246,10 @@
 								if (data) {
 									if (selectionId || searched) {
 										getCounts(() => {
-											$(target.selector).remove();
+											removeContractsRows(target);
 										});
 									} else {
-										$(target.selector).remove();
+										removeContractsRows(target);
 									}
 									
 									$.notify(buildTitle(countSelected, '% успешно скрыт!', '# % успешно скрыты!', ['Договор', 'договора', 'договоров']));
@@ -2859,6 +2859,18 @@
 	
 	//------------------------------------------------------------------------------------------- Вспомогательные функции
 	
+	
+	
+	
+	function removeContractsRows(target) {
+		if (selectedContracts.items.length > 1) {
+			$.each(selectedContracts.items, function(k, contractId) {
+				$('#contractsList').find('[contractid="'+contractId+'"]').remove();
+			});
+		} else {
+			$(target.selector).remove();
+		}
+	}
 	
 	
 	function preg_quote (str, delimiter) {
