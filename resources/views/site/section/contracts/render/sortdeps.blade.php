@@ -8,8 +8,8 @@
 	<x-table.body id="contractDepsList">	
 		@forelse($sortDeps as $id => $name)
 			<x-table.tr sortdept="{{$id}}" class="h4rem">
-				<x-table.td class="h-center"><i class="fa-solid fa-fw fa-arrows-up-down color-gray fz12px"></i></x-table.td>
-				<x-table.td><p>{{$name}}</p></x-table.td>
+				<x-table.td class="h-center" noborder><i class="fa-solid fa-fw fa-arrows-up-down color-gray fz12px"></i></x-table.td>
+				<x-table.td noborder><p>{{$name}}</p></x-table.td>
 			</x-table.tr>
 		@empty
 			<x-table.tr>

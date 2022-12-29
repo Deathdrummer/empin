@@ -11,9 +11,9 @@
 		@forelse($colums as $field => $column)
 			@if(auth('site')->user()->can('contract-col-'.$field.':site'))
 				<x-table.tr class="h4rem">
-					<x-table.td class="h-center"><i class="fa-solid fa-fw fa-arrows-up-down color-gray fz12px"></i></x-table.td>
-					<x-table.td><p>{{$column['title']}}</p></x-table.td>
-					<x-table.td class="h-center" nohandle>
+					<x-table.td class="h-center" noborder><i class="fa-solid fa-fw fa-arrows-up-down color-gray fz12px"></i></x-table.td>
+					<x-table.td noborder><p>{{$column['title']}}</p></x-table.td>
+					<x-table.td class="h-center" nohandle noborder>
 						<x-checkbox
 							group="normal"
 							:checked="$column['checked']"
