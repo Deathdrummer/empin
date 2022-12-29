@@ -51,7 +51,7 @@ class Contracts extends Controller {
 	 */
 	public function list(Request $request) {
 		$list = $this->contract->getWithDepartments($request);
-		//c
+		
 		$headers = [];
 		$selectionId = null;
 		
