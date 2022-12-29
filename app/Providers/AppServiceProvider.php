@@ -16,6 +16,7 @@ use App\View\Components\Inputs\Select;
 use App\View\Components\Settings;
 use App\View\Components\Simplelist;
 use App\View\Components\Tabs;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
@@ -46,6 +47,10 @@ class AppServiceProvider extends ServiceProvider
      * @return void
      */
     public function boot() {
+		
+		
+		//Model::preventSilentlyDiscardingAttributes(!app()->isProduction()); // Это чтобы выдать ошибку, если попытка сохранить поле в БД, которое не прописано в fillable 
+		
         // свои директивы https://laravel.su/docs/8.x/blade#extending-blade
         //Blade::directive('padej', function ($num, $variants = '') {return "<?php  код ? >";});
         

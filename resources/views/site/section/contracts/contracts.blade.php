@@ -2583,10 +2583,11 @@
 			delete(dateFromValue[column]);
 			delete(dateToValue[column]);
 			
-			filterByDateTooltip.destroy();
+			if (filterByDateTooltip?.remove) filterByDateTooltip.destroy();
 			columnDateFilter = null;
-			dateFromPicker.remove()
-			dateToPicker.remove();
+			
+			if (dateFromPicker?.remove) dateFromPicker.remove()
+			if (dateToPicker?.remove) dateToPicker.remove();
 		}
 		
 		
