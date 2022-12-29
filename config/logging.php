@@ -48,6 +48,11 @@ return [
     */
 
     'channels' => [
+		'telegram' => [
+			'driver' => 'custom',
+			'via'    => Logger\TelegramLogger::class,
+			'level'  => 'debug',
+		],
         'stack' => [
             'driver' => 'stack',
             'channels' => ['single'],
