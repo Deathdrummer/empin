@@ -1788,7 +1788,6 @@
 		const isDeptCheckbox = !!$(target.pointer).closest('[ddrtabletd]').hasAttr('deptcheck') || false;
 		const hasCheckbox = !!$(target.pointer).closest('[ddrtabletd]').children().length
 		
-		
 		onContextMenu(() => {
 			// если кликнуть на НЕвыделенном договоре - то все выделенния отменятся и выделится текущий кликнутый договор
 			if ($(target.selector).hasAttr('contractselected') == false) {
@@ -2357,6 +2356,11 @@
 		ddrCssVar('cm-mainMinHeight', '30px');
 		
 		preload({iconSize: '3rem'});
+		
+		onContextMenu(({setMaxHeight}) => {
+			setMaxHeight('calc(100vh - 300px)');
+		});
+		
 		
 		
 		abortCtrlFilter = new AbortController();

@@ -104,7 +104,45 @@
 		box-shadow: var(--cm-mainBoxShadow);
 		z-index: 130;
 	}
-
+	
+		.ddrcontextmenu_main-scrolled {
+			overflow-y: auto;
+		}
+		
+		.ddrcontextmenu_main-scrolled::-webkit-scrollbar {
+			width: 2px;
+			height: 2px;
+		}
+		
+		.ddrcontextmenu_main-scrolled::-webkit-scrollbar-track {
+			background-color: #f3f1f1;
+			border-radius: 3px;
+			margin-top: 10px;
+			margin-bottom: 10px;
+			margin-right: 2px;
+		}
+		
+		.ddrcontextmenu_main-scrolled::-webkit-scrollbar-thumb  {
+			background-color: #d2d2db;
+			width: 13px;
+			height: 13px;
+			border-radius: 3px;
+		}
+			
+		.ddrcontextmenu_main-scrolled::-webkit-scrollbar-thumb:hover {
+			background-color: #c5c5d3;
+		}
+		
+		.ddrcontextmenu_main-scrolled::-webkit-resizer {
+			display: none;
+			width: 0px;
+			height: 0px;
+			background: transparent;
+			border-radius: 3px;
+		}
+		
+		
+		
 		.ddrcontextmenu_main-visible {
 			opacity: 1;
 			pointer-events: auto;

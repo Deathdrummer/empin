@@ -8,7 +8,7 @@ $(document).on('contextmenu', '[contextmenu]', async function(e) {
 	target.selector = this;
 	target.pointer = e?.target;
 	let uniqueBlockId = 'ddrContextMenu';
-	
+	let maxMenuHeight = null;
 	
 	// Получить название функции-построителя меню и ее аргументы
 	const [func, args] = _parseAttribString($(target.selector).attr('contextmenu'));
@@ -34,7 +34,13 @@ $(document).on('contextmenu', '[contextmenu]', async function(e) {
 			});
 		},
 		onContextMenu(callback = null) {
-			if (!_.isNull(callback) && _.isFunction(callback)) callback();
+			const cbMethods = { // Методы при инициализации контекстного меню
+				setMaxHeight(maxHeight = null) {
+					maxMenuHeight = maxHeight;
+				}
+			};
+			
+			if (!_.isNull(callback) && _.isFunction(callback)) callback(cbMethods);
 		},
 		onCloseContextMenu(callback = null) {
 			$(document).on('closeContextMenu', (e) => {
@@ -109,7 +115,7 @@ $(document).on('contextmenu', '[contextmenu]', async function(e) {
 	if ($(target.pointer).closest('[nocontext]').length) return;
 	
 	// Сформировать из данных HTML меню, карту функций и связать клик на пукнт меню с вызовом сооответствующей функции
-	const [menuHtml, funcMap] = _buildMenuHtml(menuData);
+	const [menuHtml, funcMap] = _buildMenuHtml(menuData, maxMenuHeight);
 	menuSelector = menuHtml;
 	functionsMap = funcMap;
 	
@@ -209,7 +215,7 @@ function _callBuildMenuFunc(func = null, methods, ...args) {
 
 
 // Сформировать из данных HTML меню, карту функций и связать клик на пукнт меню с вызовом сооответствующей функции
-function _buildMenuHtml(menuData = null) {
+function _buildMenuHtml(menuData = null, maxHeight = null) {
 	if (!menuData || _.isEmpty(menuData)) return [];
 	
 	menuData = menuData.filter(item => Boolean((item.hidden == undefined || !item.hidden) && (item.visible == undefined || item.visible)));
@@ -229,7 +235,7 @@ function _buildMenuHtml(menuData = null) {
 	
 	const funcMap = {};
 	
-	let menuHtml = '<ul class="ddrcontextmenu ddrcontextmenu_main noselect">';
+	let menuHtml = '<ul class="ddrcontextmenu ddrcontextmenu_main noselect '+(maxHeight ? 'ddrcontextmenu_main-scrolled' : '')+'" '+(maxHeight ? 'style="max-height:'+maxHeight+';"' : '')+'>';
 	$.each(menuData, function(k, item) {
 		if (item == 'divline') {
 			menuHtml += '<li><div class="ddrcontextmenu__divline"></div></li>';
