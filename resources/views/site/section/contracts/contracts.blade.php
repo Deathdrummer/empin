@@ -1513,6 +1513,25 @@
 						
 						
 						
+						$('#withoutBuyCheck').on('change', function() {
+							let isChecked = $(this).is(':checked');
+							if (isChecked) {
+								$('input[name="buy_number"]').ddrInputs('disable');
+								$('input[name="buy_number"]').val('БЕЗ ЗАКУПКИ');
+								$('input[name="buy_number"]').ddrInputs('state', 'clear');
+								
+								$('#dateBuyField').ddrInputs('disable');
+								$('#dateBuyField').val('');
+								$('#dateBuyField').removeAttrib('date');
+								
+							} else {
+								$('input[name="buy_number"]').ddrInputs('enable');
+								$('input[name="buy_number"]').val('');
+								$('#dateBuyField').ddrInputs('enable');
+							}
+						});
+						
+						
 						
 						
 						$('#contractForm').ddrInputs('change', function(item) {

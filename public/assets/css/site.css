@@ -643,6 +643,9 @@ p {
   font-size: 18px;
   color: #a6b9c1;
 }
+.auth-input-datepicker.input_disabled .icon i {
+  color: #eee !important;
+}
 .auth-input .postfix_icon {
   min-width: 34px;
   font-size: calc(14px  / 1.2);
@@ -723,6 +726,9 @@ p {
 }
 .auth-input_disabled .input__label {
   color: #cdcdcd;
+}
+.auth-input_disabled .icon i {
+  color: #eee !important;
 }
 .auth-input_iconed {
   padding-right: 34px;
@@ -1249,6 +1255,9 @@ p {
   font-size: 18px;
   color: #a6b9c1;
 }
+.large-input-datepicker.input_disabled .icon i {
+  color: #eee !important;
+}
 .large-input .postfix_icon {
   min-width: 34px;
   font-size: 14px;
@@ -1329,6 +1338,9 @@ p {
 }
 .large-input_disabled .input__label {
   color: #cdcdcd;
+}
+.large-input_disabled .icon i {
+  color: #eee !important;
 }
 .large-input_error > input {
   border-color: #ffa3a3 !important;
@@ -1768,6 +1780,12 @@ p {
 .normal-input-datepicker .icon i {
   font-size: 16px;
   color: #a6b9c1;
+}
+.normal-input-datepicker.input_disabled .icon i {
+  color: #eee !important;
+}
+.normal-input-datepicker.input_disabled .icon i {
+  color: #eee !important;
 }
 .normal-input .postfix_icon {
   min-width: calc(34px  / 1.4);
@@ -2310,6 +2328,9 @@ p {
   font-size: 14px;
   color: #a6b9c1;
 }
+.small-input-datepicker.input_disabled .icon i {
+  color: #eee !important;
+}
 .small-input .postfix_icon {
   min-width: calc(34px  / 1.6);
   font-size: calc(14px  / 1.3);
@@ -2390,6 +2411,9 @@ p {
 }
 .small-input_disabled .input__label {
   color: #cdcdcd;
+}
+.small-input_disabled .icon i {
+  color: #eee !important;
 }
 .small-input_error > input {
   border-color: #ffa3a3 !important;

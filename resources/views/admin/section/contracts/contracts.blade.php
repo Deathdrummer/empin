@@ -198,12 +198,6 @@
 						
 						
 						
-						
-						
-						
-						
-						
-						
 						$('#objectNumber').ddrInputs('change', function(item) {
 							let value = $(item).val(),
 								number = parseInt(value),
@@ -211,6 +205,29 @@
 								
 							$(item).val(String(sliceNumber).padStart(5, '0'));
 						});
+						
+						
+						
+						
+						$('#withoutBuyCheck').on('change', function() {
+							let isChecked = $(this).is(':checked');
+							if (isChecked) {
+								$('input[name="buy_number"]').ddrInputs('disable');
+								$('input[name="buy_number"]').val('БЕЗ ЗАКУПКИ');
+								$('input[name="buy_number"]').ddrInputs('state', 'clear');
+								
+								$('#dateBuyField').ddrInputs('disable');
+								$('#dateBuyField').val('');
+								$('#dateBuyField').removeAttrib('date');
+								
+							} else {
+								$('input[name="buy_number"]').ddrInputs('enable');
+								$('input[name="buy_number"]').val('');
+								$('#dateBuyField').ddrInputs('enable');
+							}
+						});
+						
+						
 						
 						let isEnabledBtns = false;
 						$('#contractForm').ddrInputs('change', function(item) {
@@ -399,15 +416,6 @@
 							
 							
 							
-							
-							
-							
-							
-							
-							
-							
-							
-							
 							$('#objectNumber').ddrInputs('change', function(item) {
 								let value = $(item).val(),
 									number = parseInt(value),
@@ -415,6 +423,29 @@
 									formatValue = slice.padStart(5, '0');
 								$(item).val(formatValue);
 							});
+							
+							
+							
+							$('#withoutBuyCheck').on('change', function() {
+								let isChecked = $(this).is(':checked');
+								if (isChecked) {
+									$('input[name="buy_number"]').ddrInputs('disable');
+									$('input[name="buy_number"]').val('БЕЗ ЗАКУПКИ');
+									$('input[name="buy_number"]').ddrInputs('state', 'clear');
+									
+									$('#dateBuyField').ddrInputs('disable');
+									$('#dateBuyField').val('');
+									$('#dateBuyField').removeAttrib('date');
+									
+								} else {
+									$('input[name="buy_number"]').ddrInputs('enable');
+									$('input[name="buy_number"]').val('');
+									$('#dateBuyField').ddrInputs('enable');
+								}
+							});
+							
+							
+							
 							
 							let isEnabledBtns = false;
 							$('#contractForm').ddrInputs('change', function(item) {

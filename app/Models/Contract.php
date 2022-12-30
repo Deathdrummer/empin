@@ -57,6 +57,7 @@ class Contract extends Model {
 	protected $fillable = [
 		'object_number',
 		'buy_number',
+		'without_buy',
 		'title',
 		'applicant',
 		'titul',

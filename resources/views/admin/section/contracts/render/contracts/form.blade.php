@@ -47,8 +47,16 @@
 					</div>
 					
 					<div class="form__item">
-						<label class="form__label color-dark">Номер закупки</label>
-						<x-input name="buy_number" value="{{$buy_number ?? null}}" class="w100" />
+						<div class="row g-10 align-items-end justify-content-between">
+							<div class="col">
+								<label class="form__label color-dark">Номер закупки</label>
+								<x-input name="buy_number" value="{{$buy_number ?? null}}" class="w100" />
+							</div>
+							<div class="col-auto">
+								<x-checkbox name="without_buy" id="withoutBuyCheck" class="mb7px" :checked="$without_buy ?? false" label="Без закупки" />
+							</div>
+						</div>
+								
 					</div>
 					
 					<div class="form__item">
@@ -82,7 +90,7 @@
 							</div>
 							<div class="col">
 								<label class="form__label color-dark">Дата закупки</label>
-								<x-datepicker name="date_buy" date="{{$date_buy ?? null}}" calendarid="contractForm2{{$data['rand_id']}}" class="w100" />
+								<x-datepicker name="date_buy" date="{{$date_buy ?? null}}" id="dateBuyField" calendarid="contractForm2{{$data['rand_id']}}" class="w100" />
 							</div>
 						</div>	
 					</div>

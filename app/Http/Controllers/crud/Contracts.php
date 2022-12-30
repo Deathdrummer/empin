@@ -175,6 +175,7 @@ class Contracts extends Controller {
 		$validFields = $request->validate([
 			'object_number'		=> 'required|string|unique:contracts,object_number',
 			'buy_number'		=> 'nullable|string',
+			'without_buy'		=> 'nullable|boolean',
 			'title' 			=> 'required|string',
 			'applicant' 		=> 'nullable|string',
 			'titul' 			=> 'nullable|string',
@@ -333,6 +334,7 @@ class Contracts extends Controller {
 				Rule::unique('contracts')->ignore(Contract::where('id', $id)->first()),
 			],
 			'buy_number' 		=> 'nullable|string',
+			'without_buy' 		=> 'nullable|boolean',
 			'title' 			=> 'required|string',
 			'applicant' 		=> 'nullable|string',
 			'titul' 			=> 'nullable|string',
