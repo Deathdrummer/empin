@@ -77,18 +77,6 @@
 					tag="selectionsbtn"
 					>Подборки</x-button>
 				
-				<x-button
-					style="border-radius: 10px; border-color:transparent;"
-					id="selectionsClearBtn"
-					group="large"
-					w="3rem"
-					variant="red"
-					action="clearSelection"
-					title="Отменить подборку"
-					tag="selectionsbtn"
-					disabled
-					hidden
-					><i class="fa-solid fa-xmark"></i></x-button>
 			
 			{{-- <div class="col-auto ms-auto">
 				<x-button
@@ -112,7 +100,7 @@
 			</div>
 		</div>
 		
-		<div class="row mb2rem">
+		<div class="row mb3rem">
 			<div class="col">
 				<x-chooser variant="neutral" group="normal" px="10">
 					<x-chooser.item
@@ -212,6 +200,30 @@
 								selectionscounts
 								></strong></x-chooser.item>
 				</x-chooser>
+			</div>
+		</div>
+		
+		
+		<div class="currentselection">
+			<div class="currentselection__block" id="currentSelection" hidden>
+				<div class="currentselection__label">
+					<p>dfdfhdfhdfhdfhdfjdtjrthsr</p>
+				</div>
+				
+			
+			
+				<x-button
+					style="border-radius: 5px; border-color:transparent;"
+					class="ml5px"
+					group="verysmall"
+					w="2rem"
+					variant="red"
+					action="clearSelection"
+					title="Отменить подборку"
+					tag="selectionsbtn"
+					disabled
+					><i class="fa-solid fa-xmark"></i></x-button>
+			
 			</div>
 		</div>
 			
@@ -778,7 +790,7 @@
 							withCounts: true,
 							callback: function() {
 								$('[selectionsbtn]').ddrInputs('enable');
-								$('#selectionsClearBtn').removeAttrib('hidden');
+								$('#currentSelection').removeAttrib('hidden');
 							}
 						});
 					}
@@ -795,7 +807,7 @@
 							withCounts: true,
 							callback: function() {
 								$('[selectionsbtn]').ddrInputs('enable');
-								$('#selectionsClearBtn').removeAttrib('hidden');
+								$('#currentSelection').removeAttrib('hidden');
 							}
 						});
 					}
@@ -829,8 +841,9 @@
 		getList({
 			withCounts: search || selection,
 			callback: function() {
-				$(btn).setAttrib('hidden');
+				$('#currentSelection').setAttrib('hidden');
 				$('[selectionsbtn]').ddrInputs('enable');
+				
 			}
 		});
 	}

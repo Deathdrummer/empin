@@ -7955,3 +7955,19 @@ section {
   font-size: 16px;
   color: #727272;
 }
+
+.currentselection {
+  position: relative;
+  top: -15px;
+  height: 0;
+}
+.currentselection__block {
+  display: inline-flex;
+  align-items: center;
+  transform: translateY(-50%);
+}
+.currentselection__label {
+  padding: 3px 10px;
+  background-color: #ededed;
+  border-radius: 5px;
+}
