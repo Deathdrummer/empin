@@ -207,7 +207,7 @@
 		<div class="currentselection">
 			<div class="currentselection__block" id="currentSelection" hidden>
 				<div class="currentselection__label">
-					<p>dfdfhdfhdfhdfhdfjdtjrthsr</p>
+					<p id="currentSelectionTitle"></p>
 				</div>
 				
 			
@@ -785,10 +785,14 @@
 						close();
 						selection = id;
 						editSelection = null;
+						
+						let selectionTitle = $(btn).closest('tr').find('input[name="title"]').val();
+						
 						_clearCounts();
 						getList({
 							withCounts: true,
 							callback: function() {
+								$('#currentSelectionTitle').text(selectionTitle);
 								$('[selectionsbtn]').ddrInputs('enable');
 								$('#currentSelection').removeAttrib('hidden');
 							}
@@ -802,10 +806,14 @@
 						close();
 						selection = id;
 						editSelection = true;
+						
+						let selectionTitle = $(btn).closest('tr').find('input[name="title"]').val();
+						
 						_clearCounts();
 						getList({
 							withCounts: true,
 							callback: function() {
+								$('#currentSelectionTitle').text(selectionTitle);
 								$('[selectionsbtn]').ddrInputs('enable');
 								$('#currentSelection').removeAttrib('hidden');
 							}
@@ -843,7 +851,7 @@
 			callback: function() {
 				$('#currentSelection').setAttrib('hidden');
 				$('[selectionsbtn]').ddrInputs('enable');
-				
+				$('#currentSelectionTitle').text('');
 			}
 		});
 	}
