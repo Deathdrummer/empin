@@ -2764,21 +2764,13 @@
 			
 			loadedContractsIds.add(contractIds);
 			
+			
 			if (append) {
 				if (currentCount) {
 					if (append == 'prepend') {
 						$('#contractsList').blockTable('prependData', data, limit);
 					} else if (append == 'append') {
 						$('#contractsList').blockTable('appendData', data);
-						
-						const showTotal = params['offset'] + params['limit'] >= totalCount;
-						if (showTotal) $('#contractsList').find('[ddrtabletr]:last').after('<div class="ddrtable__tr align-items-center h5rem-4px ddrtable__tr_visible" style="position:relative;" ddrtabletr><p id="teeest" class="totalcount">Всего договоров '+totalCount+'</p></div>');
-					
-						$(".horisontal").on("scroll", function (e) {
-						    let horizontal = e.currentTarget.scrollLeft;
-						    $('#teeest').css('left', horizontal+'px');
-						});
-						
 					}
 				}
 				
@@ -2787,6 +2779,14 @@
 				$('#contractsTable').html(data);
 			}
 			
+			
+			const showTotal = (params['offset'] + params['limit'] >= totalCount) || (totalCount <= params['limit']);
+			if (showTotal) $('#contractsList').find('[ddrtabletr]:last').after('<div class="ddrtable__tr align-items-center h5rem-4px ddrtable__tr_visible" style="position:relative;" ddrtabletr><p id="teeest" class="totalcount">Всего договоров '+totalCount+'</p></div>');
+		
+			$(".horisontal").on("scroll", function (e) {
+			    let horizontal = e.currentTarget.scrollLeft;
+			    $('#teeest').css('left', horizontal+'px');
+			});
 			
 			
 			
