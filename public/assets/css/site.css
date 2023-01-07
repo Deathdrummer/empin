@@ -7971,3 +7971,12 @@ section {
   background-color: #ededed;
   border-radius: 5px;
 }
+
+.totalcount {
+  position: absolute;
+  transform: translateX(calc(50vw - 80px));
+  font-size: 16px;
+  color: #dedfe5;
+  font-family: Helvetica, sans-serif, sans-serif;
+  font-weight: bold;
+}

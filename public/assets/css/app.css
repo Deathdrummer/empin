@@ -143162,29 +143162,53 @@ template {
   overflow-x: scroll;
   padding-bottom: 10px;
 }
-.horisontal::-webkit-scrollbar {
+.horisontal:not(.horisontal_hidescroll)::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
-.horisontal::-webkit-scrollbar-track {
+.horisontal:not(.horisontal_hidescroll)::-webkit-scrollbar-track {
   background-color: #f9fbfd;
   border-radius: 2px;
 }
-.horisontal::-webkit-scrollbar-thumb {
+.horisontal:not(.horisontal_hidescroll)::-webkit-scrollbar-thumb {
   background-color: #d6dbe0;
   width: 13px;
   height: 13px;
   border-radius: 2px;
 }
-.horisontal::-webkit-scrollbar-thumb:hover {
+.horisontal:not(.horisontal_hidescroll)::-webkit-scrollbar-thumb:hover {
   background-color: #b9c2ca;
 }
-.horisontal::-webkit-resizer {
+.horisontal:not(.horisontal_hidescroll)::-webkit-resizer {
   display: none;
   width: 0px;
   height: 0px;
   background: transparent;
   border-radius: 2px;
+}
+.horisontal_hidescroll::-webkit-scrollbar {
+  width: 0px;
+  height: 0px;
+}
+.horisontal_hidescroll::-webkit-scrollbar-track {
+  background-color: transparent;
+  border-radius: 0;
+}
+.horisontal_hidescroll::-webkit-scrollbar-thumb {
+  background-color: transparent;
+  width: 13px;
+  height: 13px;
+  border-radius: 0;
+}
+.horisontal_hidescroll::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0);
+}
+.horisontal_hidescroll::-webkit-resizer {
+  display: none;
+  width: 0px;
+  height: 0px;
+  background: transparent;
+  border-radius: 0;
 }
 .horisontal__track {
   display: inline-flex;
@@ -143279,24 +143303,48 @@ template {
 .ddrtable__body_scrolled {
   overflow-y: scroll;
 }
-.ddrtable__body_scrolled::-webkit-scrollbar {
+.ddrtable__body_scrolled:not(.ddrtable__body_hidescroll)::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
-.ddrtable__body_scrolled::-webkit-scrollbar-track {
+.ddrtable__body_scrolled:not(.ddrtable__body_hidescroll)::-webkit-scrollbar-track {
   background-color: #f9fbfd;
   border-radius: 0;
 }
-.ddrtable__body_scrolled::-webkit-scrollbar-thumb {
+.ddrtable__body_scrolled:not(.ddrtable__body_hidescroll)::-webkit-scrollbar-thumb {
   background-color: #d6dbe0;
   width: 13px;
   height: 13px;
   border-radius: 0;
 }
-.ddrtable__body_scrolled::-webkit-scrollbar-thumb:hover {
+.ddrtable__body_scrolled:not(.ddrtable__body_hidescroll)::-webkit-scrollbar-thumb:hover {
   background-color: #b9c2ca;
 }
-.ddrtable__body_scrolled::-webkit-resizer {
+.ddrtable__body_scrolled:not(.ddrtable__body_hidescroll)::-webkit-resizer {
+  display: none;
+  width: 0px;
+  height: 0px;
+  background: transparent;
+  border-radius: 0;
+}
+.ddrtable__body_hidescroll::-webkit-scrollbar {
+  width: 0px;
+  height: 0px;
+}
+.ddrtable__body_hidescroll::-webkit-scrollbar-track {
+  background-color: transparent;
+  border-radius: 0;
+}
+.ddrtable__body_hidescroll::-webkit-scrollbar-thumb {
+  background-color: transparent;
+  width: 13px;
+  height: 13px;
+  border-radius: 0;
+}
+.ddrtable__body_hidescroll::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0);
+}
+.ddrtable__body_hidescroll::-webkit-resizer {
   display: none;
   width: 0px;
   height: 0px;

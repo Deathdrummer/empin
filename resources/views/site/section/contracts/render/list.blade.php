@@ -14,12 +14,13 @@
 			</x-table.tr>
 		@endforeach
 	@else
-		<x-horisontal space="2rem" scroll="false" ignore="[noscroll], select, input, textarea">
+		<x-horisontal space="2rem" scroll="false" hidescroll="1" ignore="[noscroll], select, input, textarea">
 			<x-horisontal.item class="h100">
 				<x-table
 					scrollstart="doScrollStart"
 					scrollend="doScrollEnd"
 					scrollpart="doScrollPart"
+					hidescroll="1"
 					>
 					<x-table.head scrollfix>
 						<x-table.tr

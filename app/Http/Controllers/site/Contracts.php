@@ -67,7 +67,7 @@ class Contracts extends Controller {
 		
 		
 		//  Если поиск или подборка - то сформировать количество результатов
-		if ($request->has('search') || $request->has('selection')) {
+		if ($request->get('offset') == 0) {
 			$counts = $this->contract->getCounts($request);
 			
 			$headers['x-count-contracts-all'] = $counts['all'] ?? null;

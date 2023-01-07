@@ -1,14 +1,21 @@
 @props([
-	'id'		=> 'horisontal'.rand(0,9999999),
-	'speed'		=> 100,
-	'step'		=> 100,
-	'scroll'	=> true,
-	'ignore'	=> '[noscroll]',
-	'addict'	=> false
+	'id'			=> 'horisontal'.rand(0,9999999),
+	'speed'			=> 100,
+	'step'			=> 100,
+	'scroll'		=> true,
+	'ignore'		=> '[noscroll]',
+	'addict'		=> false,
+	'hidescroll'	=> false,
 ])
 
 
-<div class="horisontal" id="{{$id}}">
+<div
+	{{$attributes->class([
+		'horisontal',
+		'horisontal_hidescroll' => $hidescroll
+	])}}
+	id="{{$id}}"
+	>
 	<div @class([
 			'horisontal__track',
 		])>{{$slot}}</div>

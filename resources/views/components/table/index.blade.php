@@ -4,6 +4,7 @@
 	'scrollstart' 	=>  null,
 	'scrollend' 	=>  null,
 	'scrollpart' 	=>  null,
+	'hidescroll' 	=>  null,
 ])
 
 

@@ -858,7 +858,12 @@ $bPoints: map-remove($grid-breakpoints, xs)
 .horisontal
 	overflow-x: scroll
 	padding-bottom: 10px
-	+scrollbar(#f9fbfd, #d6dbe0, 6px, 2px, 2px)
+	
+	&:not(.horisontal_hidescroll)
+		+scrollbar(#f9fbfd, #d6dbe0, 6px, 2px, 2px)
+	
+	&_hidescroll
+		+scrollbar(transparent, transparent, 0px)
 	
 	&__track
 		display: inline-flex
@@ -980,9 +985,16 @@ $tableColor: #efefef
 			//visibility: visible
 		
 		&_scrolled
-			+scrollbar(#f9fbfd, #d6dbe0, 6px)
 			overflow-y: scroll
+			
+			&:not(.ddrtable__body_hidescroll)
+				+scrollbar(#f9fbfd, #d6dbe0, 6px)
+			
 			//padding-right: 6px
+		
+		&_hidescroll
+			+scrollbar(transparent, transparent, 0px)
+			
 		
 	&__tr
 		display: flex
