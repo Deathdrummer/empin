@@ -352,7 +352,7 @@ class Contract {
 	 * @return 
 	 */
 	public function getCounts($request) {
-		$filter = app()->make(ContractFilter::class, ['queryParams' => $request->only(['search', 'selection'/* , 'archive' */])]);
+		$filter = app()->make(ContractFilter::class, ['queryParams' => $request->only(['search', 'selection', 'filter'/* , 'archive' */])]);
 		
 		if (!$userId = auth('site')->user()->id) return false;
 		

@@ -2775,17 +2775,27 @@
 				}
 				
 			} else {
-				totalCount = headers['x-count-contracts-all'] || null;
 				$('#contractsTable').html(data);
 			}
 			
+			
+			
+			
+			totalCount = headers['x-count-contracts-all'] || null;
+			
+
 			const showTotal = headers['x-count-contracts-current'] && ((params['offset'] + params['limit'] >= totalCount) || (totalCount <= params['limit']));
-			if (showTotal) $('#contractsList').find('[ddrtabletr]:last').after('<div class="ddrtable__tr align-items-center h5rem-4px ddrtable__tr_visible" style="position:relative;" ddrtabletr><p id="teeest" class="totalcount">Всего договоров '+totalCount+'</p></div>');
-		
-			$(".horisontal").on("scroll", function (e) {
-			    let horizontal = e.currentTarget.scrollLeft;
-			    $('#teeest').css('left', horizontal+'px');
-			});
+			if (showTotal) {
+				$('#contractsList').find('[ddrtabletr]:last').after('<div class="ddrtable__tr align-items-center h5rem-4px ddrtable__tr_visible" style="position:relative;" ddrtabletr><p id="teeest" class="totalcount">Всего договоров '+totalCount+'</p></div>');
+				$(".horisontal").on("scroll", function (e) {
+				    let horizontal = e.currentTarget.scrollLeft;
+				    $('#teeest').css('left', horizontal+'px');
+				});
+			}
+			
+			
+			
+			
 			
 			
 			
