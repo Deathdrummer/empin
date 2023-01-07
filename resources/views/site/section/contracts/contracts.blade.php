@@ -2779,8 +2779,7 @@
 				$('#contractsTable').html(data);
 			}
 			
-			
-			const showTotal = (params['offset'] + params['limit'] >= totalCount) || (totalCount <= params['limit']);
+			const showTotal = headers['x-count-contracts-current'] && ((params['offset'] + params['limit'] >= totalCount) || (totalCount <= params['limit']));
 			if (showTotal) $('#contractsList').find('[ddrtabletr]:last').after('<div class="ddrtable__tr align-items-center h5rem-4px ddrtable__tr_visible" style="position:relative;" ddrtabletr><p id="teeest" class="totalcount">Всего договоров '+totalCount+'</p></div>');
 		
 			$(".horisontal").on("scroll", function (e) {
