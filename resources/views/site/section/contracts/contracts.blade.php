@@ -2775,13 +2775,11 @@
 				}
 				
 			} else {
+				totalCount = headers['x-count-contracts-all'] || null;
 				$('#contractsTable').html(data);
 			}
 			
 			
-			
-			
-			totalCount = headers['x-count-contracts-all'] || null;
 			
 
 			const showTotal = headers['x-count-contracts-current'] && ((params['offset'] + params['limit'] >= totalCount) || (totalCount <= params['limit']));
