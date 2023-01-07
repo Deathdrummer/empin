@@ -70,8 +70,6 @@ class Contracts extends Controller {
 		if ($request->get('offset') == 0) {
 			$counts = $this->contract->getCounts($request);
 			
-			logger($counts);
-			
 			$headers['x-count-contracts-all'] = $counts['all'] ?? null;
 			$headers['x-count-contracts-departments'] = json_encode($counts['departments']) ?? null;
 			$headers['x-count-contracts-archive'] = $counts['archive'] ?? null;
