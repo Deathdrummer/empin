@@ -574,16 +574,21 @@ class Contract {
 		$intersectedValues = array_intersect_key($settingsData, array_flip($columnValues));
 		
 		
-		logger($intersectedValues);
-		
 		if ($column == 'customer') {
 			usort($intersectedValues, function($a, $b) {
+				
+				logger($a);
 				if (!isset($a['sort']) || !isset($b['sort'])) return 0;
+				logger($a['sort'] ?? 0);
 				
 				if ($a['sort'] ?? 0 == $b['sort'] ?? 0) {
 					return 0;
 				}
+				
+				logger('rrr');
+				
 				return ($a['sort'] ?? 0 < $b['sort'] ?? 0) ? -1 : 1;
+				
 			});
 		}
 		
