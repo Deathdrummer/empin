@@ -7958,7 +7958,7 @@ section {
 
 .currentselection {
   position: relative;
-  top: -15px;
+  top: -20px;
   height: 0;
 }
 .currentselection__block {
@@ -7967,9 +7967,15 @@ section {
   transform: translateY(-50%);
 }
 .currentselection__label {
-  padding: 3px 10px;
+  display: flex;
+  align-items: center;
+  font-family: Helvetica, sans-serif, sans-serif;
+  font-weight: bold;
+  padding-left: 10px;
+  padding-right: 10px;
   background-color: #ededed;
   border-radius: 5px;
+  height: 26px;
 }
 
 .totalcount {

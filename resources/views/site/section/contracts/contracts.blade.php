@@ -100,7 +100,7 @@
 			</div>
 		</div>
 		
-		<div class="row mb3rem">
+		<div class="row mb2rem" id="tableContainer">
 			<div class="col">
 				<x-chooser variant="neutral" group="normal" px="10">
 					<x-chooser.item
@@ -213,7 +213,7 @@
 			
 			
 				<x-button
-					style="border-radius: 5px; border-color:transparent;"
+					style="border-radius: 5px; border-color:transparent;height:26px;"
 					class="ml5px"
 					group="verysmall"
 					w="2rem"
@@ -291,7 +291,6 @@
 			loadedContractsIds.parts = {};
 		}
 	});
-	
 	
 	
 	// Список ID выделенных договоров
@@ -2793,6 +2792,12 @@
 			
 			
 			
+			
+			if (selection) {
+				$('#tableContainer').removeClass('mb2rem').addClass('mb4rem');
+			} else {
+				$('#tableContainer').removeClass('mb4rem').addClass('mb2rem');
+			}
 			
 			
 			
