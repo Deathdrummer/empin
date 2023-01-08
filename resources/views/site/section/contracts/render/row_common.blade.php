@@ -183,7 +183,7 @@
 			@if(isset($date_buy) && $date_buy)
 				<p class="fz12px lh90">{{dateFormatter($date_buy, 'd.m.y')}}</p>
 			@else
-				<p class="color-gray">{!!$without_buy ? '<p class="fz2px text-center">БЕЗ ЗАКУПКИ</p>' : '-'!!}</p>
+				<p class="color-gray">{!!$without_buy ? '<p class="fz12px text-center">БЕЗ ЗАКУПКИ</p>' : '-'!!}</p>
 			@endif
 		</x-table.td>
 	@endif
