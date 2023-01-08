@@ -92,7 +92,7 @@ class AdminUser extends Authenticatable implements MustVerifyEmail {
 	 * @return 
 	 */
 	public function getEmailVerifiedAtAttribute($value) {
-		return Carbon::create($value)->timezone('Europe/Moscow');
+		return $value ? Carbon::create($value)->timezone('Europe/Moscow') : null;
 	}
 	
 	

@@ -1871,6 +1871,9 @@ p {
 .normal-input_disabled .input__label {
   color: #cdcdcd;
 }
+.normal-input_disabled .icon i {
+  color: #eee !important;
+}
 .normal-input_error > input {
   border-color: #ffa3a3 !important;
   color: #ff1818 !important;

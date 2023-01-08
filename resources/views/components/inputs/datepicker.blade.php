@@ -5,8 +5,9 @@
 
 @props([
 	'id' 			=> 'datepicker'.rand(0,9999999),
-	'calendarid'	=> null,
+	'calendarid'	=> null, // выставляется только если есть два поля с диапазоном
 	'disabled' 		=> false,
+	'enabled'		=> true,
 	'noedit' 		=> false,
 	'date'			=> false,
 	'onselect'		=> false,
@@ -19,7 +20,8 @@
 		'input',
 		$group.'-input' => $group,
 		($group ? $group.'-' : '').'input-datepicker',
-		($group ? $group.'-' : '').'input_noempty' => $value
+		($group ? $group.'-' : '').'input_noempty' => $value,
+		'input_disabled' => $group && ($disabled || !$enabled),
 	])}}>
 	<input
 		type="text"
@@ -102,7 +104,7 @@
 			$(selector).ddrInputs('value', date.getDate()+' '+monthesNamesFull[date.getMonth()]+' '+date.getFullYear()+(currentLocate == 'ru' ? ' г.' : ''));
 			$(selector).setAttrib('date', addZero(date.getDate())+'-'+addZero(date.getMonth() + 1)+'-'+date.getFullYear());
 			
-			let dateRange = calendarId ? datePicker.getRange() : null;
+			let dateRange = calendarId ? datePicker?.getRange() : null;
 			
 			if (onselectFn && typeof onselectFn == 'function') $[onselectFn](instance, date, dateRange);
 			

@@ -358,9 +358,14 @@ class Contracts extends Controller {
 		]);
 		
 		
+		//logger($validFields);
+		
+		
 		$contract = Contract::find($id);
 		$contract->fill($validFields);
+		logger($contract->toSql());
 		$contract->save();
+		
 		
 		$tableShowDepsData = $contract->departments()->get()->mapWithKeys(function($item) {
 			return [$item['id'] => !!$item['pivot']['show']];

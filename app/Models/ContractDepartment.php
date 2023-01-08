@@ -73,7 +73,7 @@ class ContractDepartment extends Pivot {
 	 * @return 
 	 */
 	public function getUpdatedShowAtAttribute($value) {
-		return Carbon::create($value)->timezone('Europe/Moscow');
+		return $value ? Carbon::create($value)->timezone('Europe/Moscow') : null;
 	}
 	
 	

@@ -184,7 +184,7 @@ class Contract extends Model {
 	 */
 	public function setDateStartAttribute($value) {
 		if (!$value) return false;
-		$this->attributes['date_start'] = Carbon::parse($value);
+		$this->attributes['date_start'] = $value ? Carbon::parse($value) : null;
 	}
 	
 	
@@ -196,7 +196,7 @@ class Contract extends Model {
 	 */
 	public function setDateEndAttribute($value) {
 		if (!$value) return false;
-		$this->attributes['date_end'] = Carbon::parse($value);
+		$this->attributes['date_end'] = $value ? Carbon::parse($value) : null;
 	}
 	
 	
@@ -208,7 +208,7 @@ class Contract extends Model {
 	 */
 	public function setDateCloseAttribute($value) {
 		if (!$value) return false;
-		$this->attributes['date_close'] = Carbon::parse($value);
+		$this->attributes['date_close'] = $value ? Carbon::parse($value) : null;
 	}
 	
 	
@@ -218,8 +218,7 @@ class Contract extends Model {
 	 * @return 
 	 */
 	public function setDateBuyAttribute($value) {
-		if (!$value) return false;
-		$this->attributes['date_buy'] = Carbon::parse($value);
+		$this->attributes['date_buy'] = $value ? Carbon::parse($value) : null;
 	}
 	
 	

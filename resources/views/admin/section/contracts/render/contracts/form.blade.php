@@ -50,7 +50,7 @@
 						<div class="row g-10 align-items-end justify-content-between">
 							<div class="col">
 								<label class="form__label color-dark">Номер закупки</label>
-								<x-input name="buy_number" value="{{$buy_number ?? null}}" class="w100" />
+								<x-input name="buy_number" value="{{$buy_number ?? null}}" class="w100" disabled="{{$without_buy}}" />
 							</div>
 							<div class="col-auto">
 								<x-checkbox name="without_buy" id="withoutBuyCheck" class="mb7px" :checked="$without_buy ?? false" label="Без закупки" />
@@ -73,11 +73,11 @@
 						<div class="row row-cols-2 g-10">
 							<div class="col">
 								<label class="form__label color-dark">Дата подписания договора</label>
-								<x-datepicker name="date_start" date="{{$date_start ?? null}}" calendarid="contractForm{{$data['rand_id']}}" class="w100" />
+								<x-datepicker name="date_start" date="{{$date_start ?? null}}" calendarid="contractDate{{$data['rand_id']}}" class="w100" />
 							</div>
 							<div class="col">
 								<label class="form__label color-dark">Дата окончания работ по договору</label>
-								<x-datepicker name="date_end" date="{{$date_end ?? null}}" calendarid="contractForm{{$data['rand_id']}}" class="w100" />
+								<x-datepicker name="date_end" date="{{$date_end ?? null}}" calendarid="contractDate{{$data['rand_id']}}" class="w100" />
 							</div>
 						</div>
 					</div>
@@ -86,11 +86,11 @@
 						<div class="row row-cols-2 g-10">
 							<div class="col">
 								<label class="form__label color-dark">Дата закрытия договора</label>
-								<x-datepicker name="date_close" date="{{$date_close ?? null}}" calendarid="contractForm2{{$data['rand_id']}}" class="w100" />
+								<x-datepicker name="date_close" date="{{$date_close ?? null}}" class="w100" />
 							</div>
 							<div class="col">
 								<label class="form__label color-dark">Дата закупки</label>
-								<x-datepicker name="date_buy" date="{{$date_buy ?? null}}" id="dateBuyField" calendarid="contractForm2{{$data['rand_id']}}" class="w100" />
+								<x-datepicker name="date_buy" date="{{$date_buy ?? null}}" id="dateBuyField" class="w100" disabled="{{$without_buy}}" />
 							</div>
 						</div>	
 					</div>

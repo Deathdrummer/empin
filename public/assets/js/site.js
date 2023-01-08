@@ -11008,6 +11008,12 @@ var DdrInput = /*#__PURE__*/function () {
             $(item).attr('contenteditable', false);
           } else {
             $(item).setAttrib('disabled');
+            var iconSelector = $(item).parent().find('input[datepicker]').length ? $(item).parent().find('.icon') : false;
+
+            if (iconSelector) {
+              $(iconSelector).removeClass('icon_active');
+              $(iconSelector).html('<i class="fa-solid fa-fw fa-calendar-days"></i>');
+            }
           }
         }
       });

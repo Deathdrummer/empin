@@ -219,6 +219,7 @@
 								$('#dateBuyField').ddrInputs('disable');
 								$('#dateBuyField').val('');
 								$('#dateBuyField').removeAttrib('date');
+								$('#dateBuyFieldhidden').val('');
 								
 							} else {
 								$('input[name="buy_number"]').ddrInputs('enable');
@@ -436,6 +437,7 @@
 									$('#dateBuyField').ddrInputs('disable');
 									$('#dateBuyField').val('');
 									$('#dateBuyField').removeAttrib('date');
+									$('#dateBuyFieldhidden').val('');
 									
 								} else {
 									$('input[name="buy_number"]').ddrInputs('enable');
