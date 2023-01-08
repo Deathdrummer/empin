@@ -240,7 +240,7 @@
 								
 								@if($column == 'date_buy' && auth('site')->user()->can('contract-col-date_buy:site'))
 									<x-table.td
-										class="w6rem sort{{$sortField == 'date_buy' ? ' sort-'.$sortOrder : ''}}"
+										class="w7rem sort{{$sortField == 'date_buy' ? ' sort-'.$sortOrder : ''}}"
 										onclick="$.sorting(this, 'date_buy')"
 										noscroll
 										ddrtabletdmain
