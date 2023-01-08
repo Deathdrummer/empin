@@ -10,7 +10,7 @@
 					>
 					<x-simplelist
 						setting="contract-customers"
-						fieldset="ID:w7rem|number|id,Имя:w20rem|text|name"
+						fieldset="ID:w7rem|number|id,Имя:w30rem|text|name,Сорт:w7rem|number|sort"
 						{{-- options="name_type;foo:fooval,bar:barval|name_radio;foo:rool,bar:tool" --}}
 						onRemove="removeCustomerAction"
 						group="small"
@@ -27,7 +27,7 @@
 					>
 					<x-simplelist
 						setting="contract-types"
-						fieldset="ID:w7rem|number|id,Название:w20rem|input|title"
+						fieldset="ID:w7rem|number|id,Название:w30rem|input|title"
 						group="small"
 					 />
 				</x-card>
@@ -42,7 +42,7 @@
 					>
 					<x-simplelist
 						setting="contract-contractors"
-						fieldset="ID:w7rem|number|id,Имя:w20rem|input|name,По-умолчанию|checkbox|active"
+						fieldset="ID:w7rem|number|id,Имя:w30rem|input|name,По-умолчанию|checkbox|active"
 						group="small"
 					 />
 				</x-card>

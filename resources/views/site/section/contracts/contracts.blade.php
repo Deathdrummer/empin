@@ -210,20 +210,17 @@
 					<p id="currentSelectionTitle"></p>
 				</div>
 				
-			
-			
 				<x-button
 					style="border-radius: 5px; border-color:transparent;height:26px;"
 					class="ml5px"
 					group="verysmall"
-					w="2rem"
+					w="2rem-6px"
 					variant="red"
 					action="clearSelection"
 					title="Отменить подборку"
 					tag="selectionsbtn"
 					disabled
 					><i class="fa-solid fa-xmark"></i></x-button>
-			
 			</div>
 		</div>
 			
@@ -2407,17 +2404,18 @@
 		const {data, error, status, headers, abort} = await axiosQuery('get', 'site/contracts/column_values', {column, currentList}, 'json', abortCtrlFilter);
 		
 		const navData = [];
-		$.each(data, (id, title) => {
+		$.each(data, (_, {id, name, title}) => {
+			let itemTitle = name || title;
 			
-			let name;
+			let itemName;
 			if (columnFilter?.value == id) {
-				name = '<span class="color-blue">'+title+'</span>';
+				itemName = '<span class="color-blue">'+itemTitle+'</span>';
 			} else {
-				name = title;
+				itemName = itemTitle;
 			}
 			
 			navData.push({
-				name,
+				name: itemName,
 				onClick() {
 					columnFilter = {
 						column,

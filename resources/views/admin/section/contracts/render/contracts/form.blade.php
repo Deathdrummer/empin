@@ -50,7 +50,7 @@
 						<div class="row g-10 align-items-end justify-content-between">
 							<div class="col">
 								<label class="form__label color-dark">Номер закупки</label>
-								<x-input name="buy_number" value="{{$buy_number ?? null}}" class="w100" disabled="{{$without_buy}}" />
+								<x-input name="buy_number" value="{{$buy_number ?? null}}" class="w100" disabled="{{$without_buy ?? null}}" />
 							</div>
 							<div class="col-auto">
 								<x-checkbox name="without_buy" id="withoutBuyCheck" class="mb7px" :checked="$without_buy ?? false" label="Без закупки" />
@@ -90,7 +90,7 @@
 							</div>
 							<div class="col">
 								<label class="form__label color-dark">Дата закупки</label>
-								<x-datepicker name="date_buy" date="{{$date_buy ?? null}}" id="dateBuyField" class="w100" disabled="{{$without_buy}}" />
+								<x-datepicker name="date_buy" date="{{$date_buy ?? null}}" id="dateBuyField" class="w100" disabled="{{$without_buy ?? null}}" />
 							</div>
 						</div>	
 					</div>

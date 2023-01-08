@@ -548,24 +548,40 @@ class Contract {
 					$queryRelation->where('department_id', $department);
 				});
 			})
+			->whereNotNull($column)
 			->distinct()
 			->get()
 			->pluck($column)
 			->toArray();
+		
 			
 		if (!$columnValues) return false;
 		if (!in_array($column, ['customer', 'type', 'contractor'])) return array_combine($columnValues, $columnValues);
 		
+		
+		
+		
+		
 		$settingsData = match ($column) {
-			'customer' 		=> $this->getSettings('contract-customers:customers', 'id', 'name'),
-			'type' 			=> $this->getSettings('contract-types:types', 'id', 'title'),
-			'contractor'	=> $this->getSettings('contract-contractors:contractors', 'id', 'name'),
+			'customer' 		=> $this->getSettings('contract-customers:customers', 'id'),
+			'type' 			=> $this->getSettings('contract-types:types'/* , 'id', 'title' */),
+			'contractor'	=> $this->getSettings('contract-contractors:contractors'/* , 'id', 'name' */),
 		};
 		
 		if (!$settingsData) return false;
 		
 		
 		$intersectedValues = array_intersect_key($settingsData, array_flip($columnValues));
+		
+		if ($column == 'customer') {
+			usort($intersectedValues, function($a, $b) {
+				if ($a['sort'] == $b['sort']) {
+					return 0;
+				}
+				return ($a['sort'] < $b['sort']) ? -1 : 1;
+			});
+		}
+		
 		return $intersectedValues;
 	}
 	

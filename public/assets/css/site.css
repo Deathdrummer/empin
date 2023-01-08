@@ -7980,13 +7980,16 @@ section {
 .currentselection__label {
   display: flex;
   align-items: center;
-  font-family: Helvetica, sans-serif, sans-serif;
-  font-weight: bold;
   padding-left: 10px;
   padding-right: 10px;
   background-color: #ededed;
   border-radius: 5px;
   height: 26px;
+}
+.currentselection__label p {
+  color: #454545;
+  font-family: Helvetica, sans-serif, sans-serif;
+  font-weight: bold;
 }
 
 .totalcount {
