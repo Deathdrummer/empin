@@ -575,10 +575,10 @@ class Contract {
 		
 		if ($column == 'customer') {
 			usort($intersectedValues, function($a, $b) {
-				if ($a['sort'] == $b['sort']) {
+				if ($a['sort'] ?? 0 == $b['sort'] ?? 0) {
 					return 0;
 				}
-				return ($a['sort'] < $b['sort']) ? -1 : 1;
+				return ($a['sort'] ?? 0 < $b['sort'] ?? 0) ? -1 : 1;
 			});
 		}
 		
