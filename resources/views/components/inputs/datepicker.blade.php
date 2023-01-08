@@ -40,8 +40,8 @@
 		id="{{$id}}hidden"
 		datepicker
 		>
-	<div class="icon">
-		<i class="fa-solid fa-calendar-days"></i>
+	<div class="icon" id="{{$id}}Icon">
+		<i class="fa-solid fa-fw fa-calendar-days"></i>
 	</div>
 	
 	
@@ -54,6 +54,7 @@
 	let cd,
 		currentDate = '{{$date}}' || '{{$setValue($value, $settings, $setting)}}',
 		selector = '#{{$id}}',
+		iconSelector = '#{{$id}}Icon',
 		hiddenSelector = selector+'hidden',
 		currentLocate = '{{App::currentLocale()}}',
 		weekDays = '{{__('ui.week_days')}}'.split('|'),
@@ -125,8 +126,8 @@
 			
 			$(selector).trigger('datepicker'); 
 			
-			// Do stuff when a date is selected (or unselected) on the calendar.
-			// You have access to the datepicker instance for convenience.
+			$(iconSelector).addClass('icon_active');
+			$(iconSelector).html('<i class="fa-solid fa-fw fa-xmark pointer"></i>'); 
 		},
 		//onShow: instance => {
 		//	// Do stuff when the calendar is shown.
@@ -144,6 +145,17 @@
 			}
 		}
 	};
+	
+	
+	
+	
+	$(selector).parent().on(tapEvent, iconSelector, function() {
+		$(selector).ddrInputs('clear'); 
+		$(selector).removeAttr('date'); 
+		$(hiddenSelector).val(''); 
+		$(iconSelector).removeClass('icon_active');
+		$(iconSelector).html('<i class="fa-solid fa-fw fa-calendar-days"></i>'); 
+	});
 	
 	
 	if (calendarId) ops['id'] = calendarId; // для диапазона дат

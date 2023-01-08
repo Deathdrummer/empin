@@ -586,7 +586,6 @@ p {
   align-items: center;
   right: calc(10px  / 1.2);
   height: calc(34px  / 1.4);
-  pointer-events: none;
   z-index: 10;
 }
 @media screen and (min-width: 576px) {
@@ -638,6 +637,9 @@ p {
   .auth-input-datepicker .icon {
     height: calc(40px / 1.4);
   }
+}
+.auth-input-datepicker .icon:not(.icon_active) {
+  pointer-events: none;
 }
 .auth-input-datepicker .icon i {
   font-size: 18px;
@@ -1198,7 +1200,6 @@ p {
   align-items: center;
   right: 10px;
   height: 34px;
-  pointer-events: none;
   z-index: 10;
 }
 @media screen and (min-width: 576px) {
@@ -1250,6 +1251,9 @@ p {
   .large-input-datepicker .icon {
     height: 40px;
   }
+}
+.large-input-datepicker .icon:not(.icon_active) {
+  pointer-events: none;
 }
 .large-input-datepicker .icon i {
   font-size: 18px;
@@ -1724,7 +1728,6 @@ p {
   align-items: center;
   right: calc(10px  / 1.2);
   height: calc(34px  / 1.4);
-  pointer-events: none;
   z-index: 10;
 }
 @media screen and (min-width: 576px) {
@@ -1776,6 +1779,9 @@ p {
   .normal-input-datepicker .icon {
     height: calc(40px / 1.4);
   }
+}
+.normal-input-datepicker .icon:not(.icon_active) {
+  pointer-events: none;
 }
 .normal-input-datepicker .icon i {
   font-size: 16px;
@@ -2271,7 +2277,6 @@ p {
   align-items: center;
   right: calc(10px  / 1.6);
   height: calc(34px  / 1.6);
-  pointer-events: none;
   z-index: 10;
 }
 @media screen and (min-width: 576px) {
@@ -2323,6 +2328,9 @@ p {
   .small-input-datepicker .icon {
     height: calc(40px / 1.6);
   }
+}
+.small-input-datepicker .icon:not(.icon_active) {
+  pointer-events: none;
 }
 .small-input-datepicker .icon i {
   font-size: 14px;
