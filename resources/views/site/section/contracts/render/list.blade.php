@@ -382,7 +382,7 @@
 					
 					
 					
-					<x-table.body style="max-height: calc(100vh - {{$selectionId ? '352px' : '342px'}});" id="contractsList">
+					<x-table.body style="max-height: calc(100vh - {{$selectionId ? '294px' : '274px'}});" id="contractsList">
 						@foreach ($list as $contract)
 							<x-table.tr
 								class="h5rem-4px"

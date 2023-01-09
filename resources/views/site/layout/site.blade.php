@@ -121,15 +121,15 @@
 		<main class="main">
 			<div id="sectionPlace" class="main__content"></div>
 			
-			<div class="footer">
+			{{-- <div class="footer">
 				<div class="row g-10">
 					<div class="col-auto">
 						<div class="footer__block">
-							{{-- <p>ЭМПИН {{date('Y')}} г.</p> --}}
+							<p>ЭМПИН {{date('Y')}} г.</p>
 						</div>
 					</div>
 				</div>
-			</div>
+			</div> --}}
 		</main>
 	</div>
 	

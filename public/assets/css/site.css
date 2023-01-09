@@ -7368,7 +7368,7 @@ teleport {
 }
 .main__content {
   flex: 1 1 100%;
-  padding: 1rem;
+  padding: 5px;
 }
 .main__content > * {
   pointer-events: none;

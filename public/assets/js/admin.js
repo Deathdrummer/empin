@@ -11638,8 +11638,6 @@ $.fn.ddrScrollX = function (scrollStep, scrollSpeed, enableMouseScroll, ignoreSe
   }
 
   $(block).mousedown(function (e) {
-    console.log(e);
-
     if ([2, 3].indexOf(e.which) !== -1 || e.altKey == true || e.metaKey == true) {
       e.stopPropagation();
       $(e.target).css('user-select', 'text');

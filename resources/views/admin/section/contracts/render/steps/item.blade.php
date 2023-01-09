@@ -1,7 +1,7 @@
 <x-input-group group="small">
 	<tr class="h6rem">
 		<td>
-			<x-input name="name" class="w100" value="{{$name}}" placeholder="Название" />
+			<x-input name="name" class="w100" value="{{$name ?? null}}" placeholder="Название" />
 		</td>
 		<td>
 			<ul>
@@ -12,15 +12,15 @@
 			</ul>
 		</td>
 		<td>
-			<x-input name="deadline" type="number" class="w100" value="{{$deadline}}" placeholder="0" showrows />
+			<x-input name="deadline" type="number" class="w100" value="{{$deadline ?? null}}" placeholder="0" showrows />
 		</td>
 		<td>
-			<x-input name="width" type="number" class="w100" value="{{$width}}" placeholder="0" showrows />
+			<x-input name="width" type="number" class="w100" value="{{$width ?? 0}}" placeholder="0" showrows />
 		</td>
 		
 		<td></td>
 		<td>
-			<x-input name="sort" type="number" class="w100" value="{{$sort}}" showrows />
+			<x-input name="sort" type="number" class="w100" value="{{$sort ?? 0}}" showrows />
 		</td>
 		<td class="center">
 			<x-buttons-group group="small" w="3rem">
