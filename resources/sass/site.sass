@@ -1010,10 +1010,20 @@ section
 
 .totalcount
 	position: absolute
-	transform: translateX(calc(50vw - 80px))
-	font-size: 16px
-	color: #dedfe5
-	+font('Helvetica, sans-serif', bold)
+	top: 0
+	left: 0
+	display: flex
+	align-items: center
+	justify-content: center
+	width: 100%
+	max-width: calc(100vw - 52px)
+	height: 100%
+	
+	
+	&__value
+		font-size: 16px
+		color: #dedfe5
+		+font('Helvetica, sans-serif', bold)
 
 
 

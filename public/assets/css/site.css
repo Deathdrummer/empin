@@ -7994,7 +7994,16 @@ section {
 
 .totalcount {
   position: absolute;
-  transform: translateX(calc(50vw - 80px));
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: calc(100vw - 52px);
+  height: 100%;
+}
+.totalcount__value {
   font-size: 16px;
   color: #dedfe5;
   font-family: Helvetica, sans-serif, sans-serif;

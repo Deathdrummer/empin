@@ -2771,7 +2771,13 @@
 				}
 				
 			} else {
-				totalCount = headers['x-count-contracts-all'] || null;
+				if (currentList && headers['x-count-contracts-departments']) {
+					let depsCounts = JSON.parse(headers['x-count-contracts-departments']);
+					totalCount = depsCounts[currentList]|| null;
+				} else {
+					totalCount = headers['x-count-contracts-all'] || null;
+				}
+				
 				$('#contractsTable').html(data);
 			}
 			
@@ -2780,10 +2786,17 @@
 
 			const showTotal = headers['x-count-contracts-current'] && ((params['offset'] + params['limit'] >= totalCount) || (totalCount <= params['limit']));
 			if (showTotal) {
-				$('#contractsList').find('[ddrtabletr]:last').after('<div class="ddrtable__tr align-items-center h5rem-4px ddrtable__tr_visible" style="position:relative;" ddrtabletr><p id="teeest" class="totalcount">Всего договоров '+totalCount+'</p></div>');
+				
+				const showTotalHtml = 	'<div class="ddrtable__tr h5rem-4px ddrtable__tr_visible" style="position:relative;" ddrtabletr>' +
+											'<div class="totalcount" id="totalCountBlock">' +
+												'<p class="totalcount__value">Всего договоров '+totalCount+'</p>' +
+											'</div>' +
+										'</div>';
+				
+				$('#contractsList').find('[ddrtabletr]:last').after(showTotalHtml);
 				$(".horisontal").on("scroll", function (e) {
 				    let horizontal = e.currentTarget.scrollLeft;
-				    $('#teeest').css('left', horizontal+'px');
+				    $('#totalCountBlock').css('left', horizontal+'px');
 				});
 			}
 			
