@@ -5760,6 +5760,23 @@ window.selectText = function (elem) {
   selection.addRange(range);
 };
 /*
+	Скопировать в буфер обмена 
+		- строка для копирования
+*/
+
+
+window.copyStringToClipboard = function (str) {
+  var el = document.createElement('textarea');
+  el.value = str;
+  el.setAttribute('readonly', '');
+  el.style.position = 'absolute';
+  el.style.left = '-9999px';
+  document.body.appendChild(el);
+  el.select();
+  document.execCommand('copy');
+  document.body.removeChild(el);
+};
+/*
 	Определение устройства: desktop или mobile
 */
 
@@ -12299,8 +12316,11 @@ $.fn.ddrScrollX = function (scrollStep, scrollSpeed, enableMouseScroll, ignoreSe
   }
 
   $(block).mousedown(function (e) {
-    if ([2, 3].indexOf(e.which) !== -1) {
-      e.preventDefault();
+    console.log(e);
+
+    if ([2, 3].indexOf(e.which) !== -1 || e.altKey == true || e.metaKey == true) {
+      e.stopPropagation();
+      $(e.target).css('user-select', 'text');
       return;
     }
 
@@ -12316,6 +12336,13 @@ $.fn.ddrScrollX = function (scrollStep, scrollSpeed, enableMouseScroll, ignoreSe
     }
   });
   $(block).mouseup(function (e) {
+    if (e.altKey == true || e.metaKey == true) {
+      var selObj = window.getSelection();
+      copyStringToClipboard(selObj.toString());
+      $.notify('Скопировано!');
+      return;
+    }
+
     if (!ignoreSelectors || isHover(ignoreSelectors) == false) {
       $(block).css('cursor', 'default');
       $(block).off("mousemove");

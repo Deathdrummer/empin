@@ -234,7 +234,6 @@
 
 
 <script type="module">
-	
 	let abortCtrl,
 		abortCtrlCounts,
 		abortCtrlFilter,

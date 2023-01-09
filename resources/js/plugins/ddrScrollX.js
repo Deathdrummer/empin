@@ -27,10 +27,13 @@ $.fn.ddrScrollX = function(scrollStep, scrollSpeed, enableMouseScroll, ignoreSel
 	
 	
 	$(block).mousedown(function(e) {
-		if ([2, 3].indexOf(e.which) !== -1) {
-			e.preventDefault();
+		console.log(e);
+		if ([2, 3].indexOf(e.which) !== -1 || (e.altKey == true || e.metaKey == true)) {
+			e.stopPropagation();
+			$(e.target).css('user-select', 'text');
 			return;
 		} 
+		
 		if (!ignoreSelectors || isHover(ignoreSelectors) == false) {
 			let startX = this.scrollLeft + e.pageX;
 			$(block).mousemove(function (e) {
@@ -45,6 +48,13 @@ $.fn.ddrScrollX = function(scrollStep, scrollSpeed, enableMouseScroll, ignoreSel
 	});
 	
 	$(block).mouseup(function (e) {
+		if (e.altKey == true || e.metaKey == true) {
+			const selObj = window.getSelection();
+			copyStringToClipboard(selObj.toString());
+			$.notify('Скопировано!');
+			return;
+		}
+		
 		if (!ignoreSelectors || isHover(ignoreSelectors) == false) {
 			$(block).css('cursor', 'default');
 			$(block).off("mousemove");
