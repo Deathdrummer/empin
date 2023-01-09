@@ -236,6 +236,21 @@
 				</tr>
 			@endcando
 			
+			@cando('contract-col-gencontracting:site')
+				<tr>
+					<td>
+						<p class="color-gray-500 noselect format">Генподряд:</p>
+					</td>
+					<td>
+						@if($contract['gencontracting'])
+							<p>Да</p>
+						@else
+							<p>Нет</p>
+						@endif
+					</td>
+				</tr>
+			@endcando
+			
 			@cando('contract-col-buy_number:site')
 				<tr>
 					<td>

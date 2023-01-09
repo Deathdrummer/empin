@@ -18,6 +18,7 @@ return new class extends Migration {
             $table->text('titul')->nullable()->comment('Титул');
             $table->string('contract')->nullable()->comment('Номер договора');
             $table->integer('subcontracting')->unsigned()->default(0)->comment('Субподряд');
+            $table->integer('gencontracting')->unsigned()->default(0)->comment('Генподряд');
             $table->integer('customer')->nullable()->comment('Заказчик');
             $table->string('locality')->nullable()->comment('Населенный пункт');
             $table->decimal('price', 10, 2)->nullable()->default(0)->comment('Стоимость договора');

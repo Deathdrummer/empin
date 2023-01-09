@@ -171,6 +171,10 @@
 					</div>
 					
 					<div class="form__item">
+						<x-checkbox name="gencontracting" id="gencontracting" :checked="$gencontracting ?? false" label="Генподряд" />
+					</div>
+					
+					<div class="form__item">
 						<x-checkbox name="hoz_method" :checked="$hoz_method ?? null" label="Хоз способ" />
 					</div>
 				</div>

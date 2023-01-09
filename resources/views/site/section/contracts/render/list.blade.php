@@ -199,6 +199,16 @@
 									</x-table.td>
 								@endif
 								
+								@if($column == 'gencontracting' && auth('site')->user()->can('contract-col-gencontracting:site'))
+									<x-table.td
+										class="w3rem sort{{$sortField == 'gencontracting' ? ' sort-'.$sortOrder : ''}}"
+										onclick="$.sorting(this, 'gencontracting')"
+										noscroll
+										ddrtabletdmain
+										><strong class="fz10px lh90 d-block text-center wodrbreak">Генподряд</strong>
+									</x-table.td>
+								@endif
+								
 								@if($column == 'type' && auth('site')->user()->can('contract-col-type:site'))
 									<x-table.td
 										style="width:{{isset($listWidth['type']) ? $listWidth['type'] : '80'}}px;"

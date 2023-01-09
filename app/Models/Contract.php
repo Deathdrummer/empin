@@ -74,6 +74,7 @@ class Contract extends Model {
 		'contractor',
 		'type',
 		'subcontracting',
+		'gencontracting',
 		'hoz_method',
 		'departments',
 		'archive',

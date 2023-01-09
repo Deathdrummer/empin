@@ -153,6 +153,14 @@
 			@endif
 		</x-table.td>
 	@endif
+	
+	@if($column == 'gencontracting' && auth('site')->user()->can('contract-col-gencontracting:site'))
+		<x-table.td class="h-center" commonlist>
+			@if(isset($gencontracting) && $gencontracting)
+				<i class="fa-solid fa-circle-check color-green fz16px"></i>
+			@endif
+		</x-table.td>
+	@endif
 
 	@if($column == 'type' && auth('site')->user()->can('contract-col-type:site'))
 		<x-table.td class="h-center breakword" commonlist>
