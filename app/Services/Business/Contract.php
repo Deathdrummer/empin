@@ -565,7 +565,7 @@ class Contract {
 		$settingsData = match ($column) {
 			'customer' 		=> $this->getSettings('contract-customers:customers', 'id'),
 			'type' 			=> $this->getSettings('contract-types:types'/* , 'id', 'title' */),
-			'contractor'	=> $this->getSettings('contract-contractors:contractors'/* , 'id', 'name' */),
+			'contractor'	=> $this->getSettings('contract-contractors:contractors', 'id'/* , 'name' */),
 		};
 		
 		if (!$settingsData) return false;
@@ -574,7 +574,7 @@ class Contract {
 		$intersectedValues = array_intersect_key($settingsData, array_flip($columnValues));
 		
 		
-		if ($column == 'customer') {
+		if (in_array($column, ['customer', 'contractor'])) {
 			usort($intersectedValues, fn($a, $b) => ($a['sort'] ?? 0) <=> ($b['sort'] ?? 0));
 		}
 		

@@ -42,7 +42,7 @@
 					>
 					<x-simplelist
 						setting="contract-contractors"
-						fieldset="ID:w7rem|number|id,Имя:w30rem|input|name,По-умолчанию|checkbox|active"
+						fieldset="ID:w7rem|number|id,Имя:w22rem|input|name,По-умолчанию|checkbox|active,Сорт:w7rem|number|sort"
 						group="small"
 					 />
 				</x-card>

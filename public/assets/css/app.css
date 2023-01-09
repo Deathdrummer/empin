@@ -110342,6 +110342,14 @@ template {
     max-height: calc(49rem + 9px) !important;
   }
 }
+.m0, .m-0 {
+  margin: 0 !important;
+}
+
+.p0, .p-0 {
+  padding: 0 !important;
+}
+
 .m0px, .m-0px {
   margin: 0px !important;
 }
