@@ -1831,7 +1831,7 @@
 		
 		onContextMenu(() => {
 			// если кликнуть на НЕвыделенном договоре - то все выделенния отменятся и выделится текущий кликнутый договор
-			if ($(target.selector).hasAttr('contractselected') == false) {
+			if (isCommon && $(target.selector).hasAttr('contractselected') == false) {
 				$('#contractsTable').find('[contractselected]').removeClass('ddrtable__tr-selected').removeAttrib('contractselected');
 				lastChoosedRow = target.selector;
 				$(target.selector).addClass('ddrtable__tr-selected').setAttrib('contractselected');
@@ -1841,9 +1841,9 @@
 			// Если клик НЕ на таблице общего перечня
 			if (!isCommon) {
 				$('#contractsTable').find('[contractselected]').removeClass('ddrtable__tr-selected').removeAttrib('contractselected');
-				lastChoosedRow = target.selector;
-				$(target.selector).addClass('ddrtable__tr-selected').setAttrib('contractselected');
-				selectedContracts.add($(target.selector).attr('contractid'));
+				// lastChoosedRow = target.selector;
+				// $(target.selector).addClass('ddrtable__tr-selected').setAttrib('contractselected');
+				//selectedContracts.add($(target.selector).attr('contractid'));
 				
 			}
 			// console.log(selectedContracts.items);

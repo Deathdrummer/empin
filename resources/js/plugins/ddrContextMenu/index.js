@@ -615,7 +615,7 @@ function _clickToAction(menuSelector = null, useLoadedFuncs = false) {
 
 // Закрыть меню
 function _close() {
-	if (_.isNull(menuSelector)) return;
+	if (_.isNull(menuSelector) || typeof menuSelector == 'undefined') return;
 	menuSelector.removeClass("ddrcontextmenu-visible");
 	//setTimeout(function() {
 	menuSelector.remove();

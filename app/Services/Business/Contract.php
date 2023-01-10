@@ -222,9 +222,6 @@ class Contract {
 					$query->whereNot('gencontracting', 1);
 				}
 			})
-			/* ->when($userContractsSettings, function ($query) use($userContractsSettings) {
-				
-			}) */
 			->orderBy('id', 'asc')
 			->groupBy('id')
 			->limit($limit)
