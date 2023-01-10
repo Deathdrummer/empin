@@ -318,6 +318,9 @@ Route::prefix('site')->middleware(['lang', 'isajax:site'])->group(function() {
 	
 	Route::post('/contracts/step_checkbox', [Contracts::class, 'step_checkbox']);
 	
+	Route::get('/contracts/settings', [Contracts::class, 'settings']);
+	Route::post('/contracts/settings', [Contracts::class, 'set_setting']);
+	
 	
 	
 	// Подборки

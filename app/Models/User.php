@@ -55,6 +55,7 @@ class User extends Authenticatable implements MustVerifyEmail {
 		'email_verified_at',
 		'contract_colums',
 		'contract_deps',
+		'settings',
 		'_sort',
 	];
 	
@@ -67,6 +68,7 @@ class User extends Authenticatable implements MustVerifyEmail {
 	protected $casts = [
         'contract_colums' => 'array',
         'contract_deps' => 'array',
+        'settings' => 'array',
     ];
 	
 	

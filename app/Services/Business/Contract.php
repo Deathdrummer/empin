@@ -149,6 +149,8 @@ class Contract {
 			default => false
 		};
 		
+		$userContractsSettings = $this->user->getSettings('contracts');
+		
 		
 		$data = ContractModel::filter($filter)
 			->withCount(['departments as has_deps_to_send' => function (Builder $query) {
@@ -215,6 +217,14 @@ class Contract {
 				}
 				
 			})
+			->where(function ($query) use($userContractsSettings) {
+				if (isset($userContractsSettings['gencontracting']) && $userContractsSettings['gencontracting']) {
+					$query->whereNot('gencontracting', 1);
+				}
+			})
+			/* ->when($userContractsSettings, function ($query) use($userContractsSettings) {
+				
+			}) */
 			->orderBy('id', 'asc')
 			->groupBy('id')
 			->limit($limit)

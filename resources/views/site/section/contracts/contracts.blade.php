@@ -6,7 +6,11 @@
 		>
 		
 		
-		
+		<li
+			onclick="$.commonSettings()"
+			teleport="#menuTeleport"
+			><span>Настройки</span>
+		</li>
 		<li
 			onclick="$.openSetColumsWin()"
 			teleport="#menuTeleport"
@@ -1777,6 +1781,7 @@
 			selectedContracts.clear();
 		}
 		
+		//console.log(selectedContracts.items);
 		//console.log(type, target, currentTarget, ctrlKey, shiftKey, detail, which);
 	});
 	
@@ -1833,6 +1838,7 @@
 				selectedContracts.add($(target.selector).attr('contractid'));
 			}
 			
+			// Если клик НЕ на таблице общего перечня
 			if (!isCommon) {
 				$('#contractsTable').find('[contractselected]').removeClass('ddrtable__tr-selected').removeAttrib('contractselected');
 				lastChoosedRow = target.selector;

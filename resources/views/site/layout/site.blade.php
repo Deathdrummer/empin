@@ -422,5 +422,103 @@
 	}
 	
 	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	//-------------------------------------------------------------------------------- Общие настройки
+	$.commonSettings = async () => {
+		const {
+			state, // isClosed
+			wait,
+			setTitle,
+			setButtons,
+			loadData,
+			setHtml,
+			setLHtml,
+			dialog,
+			close,
+			query,
+			onScroll,
+			disableButtons,
+			enableButtons,
+			setWidth
+		} = await ddrPopup({
+			//url: 'site/contracts/settings',
+			//method: 'get',
+			//params: {setting: 'contracts'},
+			title: 'Настройки',
+			width: '600px', // ширина окна
+			// frameOnly, // Загрузить только каркас
+			// html, // контент
+			// lhtml, // контент из языковых файлов
+			// buttons, // массив кнопок
+			// buttonsAlign, // выравнивание вправо
+			// disabledButtons, // при старте все кнопки кроме закрытия будут disabled
+			// closeByBackdrop, // Закрывать окно только по кнопкам [ddrpopupclose]
+			// changeWidthAnimationDuration, // ms
+			// buttonsGroup, // группа для кнопок
+			// winClass, // добавить класс к модальному окну
+			// centerMode, // контент по центру
+			// topClose // верхняя кнопка закрыть
+		})
+		
+		
+		wait();
+		
+		const {data, error, status, headers} = await axiosQuery('get', 'site/contracts/settings', {setting: 'contracts'});
+		
+		setHtml(data);
+		wait(false);	
+	}
+	
+	
+	
+	
+	
+	$.setUserSetting = async (setting, inpType) => {
+		const input = event.target;
+		
+		let value = null;
+		
+		switch (inpType) {
+		  case 'checkbox':
+			value = input?.checked || false;
+			break;
+		  
+		  case 'text':
+			value = input?.value || false;
+			break;
+		  
+		  default:
+			value = input?.checked || false;
+			break;
+		}
+		
+		$(input).ddrInputs('disable');
+		
+		const {data, error, status, headers} = await axiosQuery('post', 'site/contracts/settings', {setting, value});
+		
+		if (error || status != 200) {
+			$.notify('Ошибка сохранения настройки!', 'error');
+			console.error(error.message);
+			return;
+		}
+		
+		if (data) {
+			$.notify('Сохранено!');
+		}
+		
+		$(input).ddrInputs('enable');
+	}
+	
+	
+	
 </script>
 @endpush

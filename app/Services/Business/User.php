@@ -114,6 +114,44 @@ class User {
 	
 	
 	
+	/** Получить настройки для пользователя (поле settings)
+	 * @param 
+	 * @return 
+	 */
+	public function getSettings($setting = null): mixed {
+		$user = Usermodel::find(auth('site')->user()->id);
+        $settings = $user->settings;
+       
+	    if (is_null($setting)) return $settings;
+		
+		$setting = data_get($settings, $setting);
+        return $setting;
+	}
+	
+	
+	
+	
+	
+	/** Задать настройки для пользователя (поле settings)
+	 * @param 
+	 * @return 
+	 */
+	public function setSetting($setting = null, $value = null): bool {
+		if (is_null($setting)) return false;
+		
+		$user = Usermodel::find(auth('site')->user()->id);
+        $settings = $user->settings;
+        
+		$user->settings = data_set($settings, $setting, $value);
+        return $user->save();
+	}
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	

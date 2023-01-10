@@ -802,6 +802,28 @@ class Contracts extends Controller {
 	
 	
 	
+	// Настройки пользователя
+	public function settings() {
+		$settings = $this->user->getSettings(request('setting'));
+		return $this->render('settings', compact('settings'));
+	}
+	
+	public function set_setting(Request $request) {
+		[
+			'setting' 		=> $setting,
+			'value' 		=> $value,
+		] = $request->validate([
+			'setting' 		=> 'required|string',
+			'value' 		=> 'required',
+		]);
+		
+		$stat = $this->user->setSetting($setting, $value);
+		
+		return response()->json($stat);
+	}
+	
+
+	
 	
 	
 	

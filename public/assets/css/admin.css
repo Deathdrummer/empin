@@ -6647,6 +6647,18 @@ p {
 .table > table > tbody > tr td.vertical-bottom {
   vertical-align: bottom;
 }
+.table > table > tbody > tr td.h-center {
+  text-align: center;
+}
+.table > table > tbody > tr td.h-end {
+  text-align: right;
+}
+.table > table > tbody > tr td.v-start {
+  vertical-align: start;
+}
+.table > table > tbody > tr td.v-end {
+  vertical-align: end;
+}
 .table > table tfoot {
   position: relative;
   z-index: 10;
