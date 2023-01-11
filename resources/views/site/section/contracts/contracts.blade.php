@@ -2673,8 +2673,9 @@
 	$.commentsTooltip = (event) => {
 		const {target} = event;
 		const cell = $(target).closest('[ddrtabletd]');
+		const hasCheckbox = !!$(target).closest('[ddrtabletd]').children().length;
 		
-		if ($(cell).hasAttr('tooltiped')) return;
+		if ($(cell).hasAttr('tooltiped') || !hasCheckbox) return;
 		
 		clearTimeout(commentsTooltipTOut);
 		
