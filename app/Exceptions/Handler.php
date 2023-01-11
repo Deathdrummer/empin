@@ -2,6 +2,7 @@
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Session\TokenMismatchException;
 use App\Services\Locale;
 use Throwable;
 
@@ -11,9 +12,9 @@ class Handler extends ExceptionHandler {
      *
      * @var array
      */
-    protected $dontReport = [
-        //
-    ];
+	protected $dontReport = [
+		TokenMismatchException::class,
+	];
 
     /**
      * A list of the inputs that are never flashed for validation exceptions.
