@@ -1721,12 +1721,19 @@
 	
 	
 	
-	
+	let haSContextMenu = false;
 	//----------------------------------------------------------------------------------- Выделение договоров
 	$('#contractsTable').on(tapEvent, '[contractid]', function({type, target, currentTarget, ctrlKey, shiftKey, detail, which, metaKey}) {
 		let row = currentTarget,
 			contractId = $(row).attr('contractid'),
 			isCommon = !!$(target).closest('[ddrtabletd]').hasAttr('commonlist') || false;
+		
+		
+		if (haSContextMenu) {
+			selectedContracts.clear();
+			haSContextMenu = false; 
+			lastChoosedRow = null;
+		}
 		
 		if (!isCommon) {
 			$('#contractsTable').find('[contractselected]').removeClass('ddrtable__tr-selected').removeAttrib('contractselected');
@@ -1781,7 +1788,7 @@
 			selectedContracts.clear();
 		}
 		
-		//console.log(selectedContracts.items);
+		console.log('Выделение договоров', selectedContracts.items);
 		//console.log(type, target, currentTarget, ctrlKey, shiftKey, detail, which);
 	});
 	
@@ -1830,11 +1837,13 @@
 		const hasCheckbox = !!$(target.pointer).closest('[ddrtabletd]').children().length
 		
 		onContextMenu(() => {
+			haSContextMenu = true;
+			
 			// если кликнуть на НЕвыделенном договоре - то все выделенния отменятся и выделится текущий кликнутый договор
 			if (isCommon && $(target.selector).hasAttr('contractselected') == false) {
 				$('#contractsTable').find('[contractselected]').removeClass('ddrtable__tr-selected').removeAttrib('contractselected');
-				lastChoosedRow = target.selector;
-				$(target.selector).addClass('ddrtable__tr-selected').setAttrib('contractselected');
+				//lastChoosedRow = target.selector;
+				//$(target.selector).addClass('ddrtable__tr-selected').setAttrib('contractselected');
 				selectedContracts.add($(target.selector).attr('contractid'));
 			}
 			
