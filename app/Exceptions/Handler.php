@@ -36,7 +36,7 @@ class Handler extends ExceptionHandler {
     {
         /* $this->reportable(function (Throwable $e) {
             Log::error('['.$e->getCode().'] "'.$e->getMessage().'" on line '.$e->getLine().' of file '.$e->getFile());
-        }); */
+        });*/
     }
 	
 	
