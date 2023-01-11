@@ -4,6 +4,7 @@ use App\Http\Filters\ContractFilter;
 use App\Models\Contract as ContractModel;
 use App\Models\ContractData;
 use App\Models\ContractDepartment;
+use App\Models\ContractCellComment;
 use App\Models\Selection;
 use App\Models\User;
 use App\Services\Business\Department as DepartmentService;
@@ -671,6 +672,46 @@ class Contract {
 				];
 			})->values()->toArray();
 	}
+	
+	
+	
+	
+	
+	
+	/**
+	 * Получить комментарии из ячейки договора
+	 * @param 
+	 * @return 
+	 */
+	public function getCellComment($params = []): string|null {
+		$params['account_id'] = auth('site')->user()->id;
+		$row = ContractCellComment::where($params)->first();
+		return $row?->comment;
+	}
+	
+	/**
+	 * Обновить комментарии из ячейки договора
+	 * @param 
+	 * @return 
+	 */
+	public function setCellComment($params = []): bool {
+		$comment = $params['comment'];
+		unset($params['comment']);
+		
+		$params['account_id'] = auth('site')->user()->id;
+		
+		$row = ContractCellComment::firstOrNew($params);
+		
+		if ($row && !$comment) return $row->delete();
+		
+		$row->comment = $comment;
+		
+		return $row->save();
+	}
+	
+	
+	
+	
 	
 	
 	

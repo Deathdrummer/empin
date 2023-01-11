@@ -13,6 +13,8 @@
 					style="{{!($contractdata[$contract['id']][$dept['id']][$step['id']]['data'] ?? false) ? 'background-color: '.$contract['departments'][$dept['id']]['steps'][$step['id']]['color'] ?? null : 'tranparent'}};"
 					deadlinecolor="{{$contract['departments'][$dept['id']]['steps'][$step['id']]['color'] ?? null}}"
 					deptcheck="{{$contract['id']}},{{$dept['id']}},{{$step['id']}}"
+					onmouseenter="$.commentsTooltip(event);"
+					onmouseleave="$.commentsTooltipLeave();"
 					edited="{{$edited}}"
 					>
 					@if($edited)
@@ -107,6 +109,8 @@
 				<x-table.td
 					class="h-center"
 					deptcheck="{{$contract['id']}},{{$dept['id']}},{{$step['id']}}"
+					onmouseenter="$.commentsTooltip(event);"
+					onmouseleave="$.commentsTooltipLeave();"
 					edited="{{$edited}}"
 					></x-table.td>
 			@else

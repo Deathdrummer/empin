@@ -1094,6 +1094,7 @@
 	//--------------------------------------------------------------------------------- Открыть окно с общей информацией (убрать отметку нового договора)
 	$.openContractInfo = (tr, contractId) => {
 		let isNew = $(tr).attr('isnew');
+		if ($(event.target).hasAttr('noopen')) return;
 		
 		ddrPopup({
 			width: 1100,
@@ -2652,6 +2653,114 @@
 			callback: function() {}
 		});
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	//----------------------------------------------------------------------------------------------------- Тултип "комментарии"
+	let commentsTooltip, commentsTooltipTOut;
+	$.commentsTooltip = (event) => {
+		const {target} = event;
+		const cell = $(target).closest('[ddrtabletd]');
+		
+		if ($(cell).hasAttr('tooltiped')) return;
+		
+		clearTimeout(commentsTooltipTOut);
+		
+		if (commentsTooltip?.destroy != undefined) commentsTooltip.destroy();
+		
+		commentsTooltipTOut = setTimeout(async () => {
+			$(cell).setAttrib('tooltiped');
+			const attrData = $(cell).attr('deptcheck');
+			const [contractId = null, departmentId = null, stepId = null] = pregSplit(attrData);
+			
+			$('#contractsList').one('scroll', function() {
+				// При скролле списка скрыть тултип комментариев
+				if (commentsTooltip?.destroy != undefined) commentsTooltip.destroy();
+			});
+			
+			
+			commentsTooltip = $(cell).ddrTooltip({
+				//cls: 'w44rem',
+				placement: 'bottom',
+				tag: 'noscroll noopen',
+				offset: [0 -5],
+				minWidth: '430px',
+				minHeight: '225px',
+				duration: [200, 200],
+				trigger: 'click',
+				wait: {
+					iconHeight: '40px'
+				},
+				onShow: async function({reference, popper, show, hide, destroy, waitDetroy, setContent, setData, setProps}) {
+					
+					const {data, error, status, headers} = await axiosQuery('get', 'site/contracts/cell_comment', {
+						contract_id: contractId, 
+						department_id: departmentId,
+						step_id: stepId,
+					}, 'json');
+					
+					await setData($(data).html());
+					
+					waitDetroy();
+					
+					let inputCellCommentTOut;
+					$(popper).find('#sendCellComment').on('input', function() {
+						clearTimeout(inputCellCommentTOut);
+						inputCellCommentTOut = setTimeout(async () => {
+							const comment = $(this).val();
+							const {data: postRes, error: postErr, status, headers} = await axiosQuery('post', 'site/contracts/cell_comment', {
+								contract_id: contractId, 
+								department_id: departmentId,
+								step_id: stepId,
+								comment,
+							}, 'json');
+							
+							if (postErr) {
+								console.log(postErr);
+								$.notify('Ошибка! Не удалось задать комментарий!', 'error');
+								return;
+							}
+							
+							if (postRes) {
+								$.notify('Комментарий успешно сохранен!');
+							}
+							
+						}, 500);
+					});
+				},
+				onDestroy: function() {
+					$(cell).removeAttrib('tooltiped');
+				}
+			});
+			
+			
+			
+			// закрытие окна по нажатию клавиши ESC
+			$(document).one('keydown', (e) => {
+				if (e.keyCode == 27 && commentsTooltip?.destroy != undefined) {
+					commentsTooltip.destroy();
+				}
+			});
+		}, 1000);
+	}
+	
+	
+	$.commentsTooltipLeave = (event) => {
+		clearTimeout(commentsTooltipTOut);
+	}
+	
 	
 	
 	

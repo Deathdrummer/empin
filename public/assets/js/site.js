@@ -16455,6 +16455,7 @@ $.fn.ddrTooltip = function (params, callback) {
     tag: null,
     placement: 'right',
     trigger: 'mousedown',
+    offset: [0, 0],
     interactive: true,
     duration: [300, 250],
     hideOnClick: true,
@@ -16463,12 +16464,14 @@ $.fn.ddrTooltip = function (params, callback) {
     minWidth: false,
     minHeight: false,
     onCreate: false,
-    onShow: false
+    onShow: false,
+    onDestroy: false
   }, params),
       cls = _$assign.cls,
       tag = _$assign.tag,
       placement = _$assign.placement,
       trigger = _$assign.trigger,
+      offset = _$assign.offset,
       interactive = _$assign.interactive,
       duration = _$assign.duration,
       hideOnClick = _$assign.hideOnClick,
@@ -16477,7 +16480,8 @@ $.fn.ddrTooltip = function (params, callback) {
       minWidth = _$assign.minWidth,
       minHeight = _$assign.minHeight,
       _onCreate = _$assign.onCreate,
-      _onShow = _$assign.onShow;
+      _onShow = _$assign.onShow,
+      onDestroy = _$assign.onDestroy;
 
   var waitStat;
   var toolTipObj = tippy(this[0], {
@@ -16489,6 +16493,7 @@ $.fn.ddrTooltip = function (params, callback) {
     duration: duration,
     hideOnClick: hideOnClick,
     maxWidth: maxWidth,
+    offset: offset,
     onCreate: function onCreate(instance) {
       var _waitStat;
 
@@ -16534,7 +16539,8 @@ $.fn.ddrTooltip = function (params, callback) {
           setContent = _ref.setContent,
           setProps = _ref.setProps;
       destroy();
-    } //delay: [0,1000],
+    },
+    onDestroy: onDestroy //delay: [0,1000],
 
   });
 

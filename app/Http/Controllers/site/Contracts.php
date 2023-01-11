@@ -822,6 +822,44 @@ class Contracts extends Controller {
 		return response()->json($stat);
 	}
 	
+	
+	
+	
+	
+	
+	
+	
+	// Комментарии чекбокса
+	public function cell_comment(Request $request) {
+		$cellCommentData = $request->validate([
+			'contract_id'	=> 'required|integer',
+			'department_id'	=> 'required|integer',
+			'step_id' 		=> 'required|integer',
+		]);
+		$comment = $this->contract->getCellComment($cellCommentData);
+		return $this->render('cell_comments', compact('comment'));
+	}
+	
+	public function set_cell_comment(Request $request) {
+		$cellCommentData = $request->validate([
+			'contract_id'	=> 'required|integer',
+			'department_id'	=> 'required|integer',
+			'step_id' 		=> 'required|integer',
+			'comment' 		=> 'present|string|nullable',
+		]);
+		
+		$stat = $this->contract->setCellComment($cellCommentData);
+		
+		return response()->json($stat);
+	}
+	
+	
+	
+
+
+
+
+
 
 	
 	

@@ -321,6 +321,9 @@ Route::prefix('site')->middleware(['lang', 'isajax:site'])->group(function() {
 	Route::get('/contracts/settings', [Contracts::class, 'settings']);
 	Route::post('/contracts/settings', [Contracts::class, 'set_setting']);
 	
+	Route::get('/contracts/cell_comment', [Contracts::class, 'cell_comment']);
+	Route::post('/contracts/cell_comment', [Contracts::class, 'set_cell_comment']);
+	
 	
 	
 	// Подборки

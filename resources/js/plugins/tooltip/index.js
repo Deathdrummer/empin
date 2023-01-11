@@ -7,6 +7,7 @@ $.fn.ddrTooltip = function(params, callback) {
 		tag,
 		placement, // top top-start top-end right right-start right-end bottom bottom-start bottom-end left left-start left-end auto auto-start auto-end
 		trigger,
+		offset,
 		interactive,
 		duration,
 		hideOnClick,
@@ -15,12 +16,14 @@ $.fn.ddrTooltip = function(params, callback) {
 		minWidth,
 		minHeight,
 		onCreate,
-		onShow
+		onShow,
+		onDestroy,
 	} = _.assign({
 		cls: null,
 		tag: null,
 		placement: 'right',
 		trigger: 'mousedown',
+		offset: [0, 0],
 		interactive: true,
 		duration: [300, 250],
 		hideOnClick: true,
@@ -29,7 +32,8 @@ $.fn.ddrTooltip = function(params, callback) {
 		minWidth: false,
 		minHeight: false,
 		onCreate: false,
-		onShow: false
+		onShow: false,
+		onDestroy: false,
 	}, params);
 		
 	let waitStat;
@@ -44,6 +48,7 @@ $.fn.ddrTooltip = function(params, callback) {
 		duration,
 		hideOnClick,
 		maxWidth,
+		offset,
 		onCreate(instance) { // {reference, popper, show, hide, destroy, setContent, setProps}
 			if (wait) {
 				waitStat = $(instance.popper).ddrWait(_.assign({
@@ -74,6 +79,7 @@ $.fn.ddrTooltip = function(params, callback) {
 		onHidden({reference, popper, show, hide, destroy, setContent, setProps}) {
 			destroy();
 		},
+		onDestroy,
 		//delay: [0,1000],
 	});
 	
