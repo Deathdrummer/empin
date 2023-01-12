@@ -6388,6 +6388,25 @@ p {
   background-color: #ff1a41;
   border-color: #ff0d36;
 }
+.button-orange button {
+  background-color: #ff9540;
+  border: 1px solid #ff9540;
+  color: #fff;
+  box-shadow: none;
+  transition: background-color 0.16s, border-color 0.16s, box-shadow 0.16s;
+}
+.button-orange button i {
+  color: #fff;
+}
+.button-orange:not(:disabled):not(.disabled):hover button {
+  background-color: #f7903d;
+  border-color: #f7903d;
+}
+.button-orange:not(:disabled):not(.disabled).active button, .button-orange:not(:disabled):not(.disabled):active button {
+  box-shadow: 0 0 0 0.2rem rgba(255, 104, 129, 0.5);
+  background-color: #ef8734;
+  border-color: #ef8734;
+}
 .button-yellow button {
   background-color: #ffde73;
   border: 1px solid #ffde73;

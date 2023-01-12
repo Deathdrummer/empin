@@ -337,6 +337,32 @@
 	
 	
 	
+	
+	&-orange	
+		button
+			background-color: #ff9540
+			border: 1px solid #ff9540
+			color: #fff
+			box-shadow: none
+			transition: background-color 0.16s, border-color 0.16s, box-shadow 0.16s
+			
+			i
+				color: #fff
+		
+		&:not(:disabled):not(.disabled):hover
+			button
+				background-color: #f7903d
+				border-color: #f7903d
+		
+		&:not(:disabled):not(.disabled).active, &:not(:disabled):not(.disabled):active
+			button
+				box-shadow: 0 0 0 0.2rem rgb(255 104 129 / 50%)
+				background-color: #ef8734
+				border-color: #ef8734
+	
+	
+	
+	
 	&-yellow	
 		button
 			background-color: #ffde73

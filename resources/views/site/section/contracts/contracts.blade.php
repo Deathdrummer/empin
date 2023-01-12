@@ -442,7 +442,7 @@
 		ddrPopup({
 			title: 'Подборки договоров',
 			width: 1000,
-			buttons: ['Закрыть', {action: 'selectionAdd', title: 'Создать'}],
+			buttons: ['Закрыть', {action: 'selectionAdd', title: 'Создать подборку'}],
 			disabledButtons: true,
 			winClass: 'ddrpopup_white'
 		}).then(async ({state, wait, setTitle, setButtons, loadData, setHtml, setLHtml, dialog, close, query, onScroll, disableButtons, enableButtons, setWidth}) => { //isClosed
