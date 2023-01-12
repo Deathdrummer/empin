@@ -498,10 +498,11 @@ class Selections extends Controller {
 		$userId = auth('site')->user()->id;
 		
 		$subscribed = $row->subscribed;
+		
 		if (!in_array($userId, $subscribed['read'] ?? []) && !in_array($userId, $subscribed['write'] ?? [])) return true;
 		
-		if (($key = array_search($userId, $subscribed['read'] ?? [])) !== false) unset($subscribed['read'][$key]);
-		if (($key = array_search($userId, $subscribed['write'] ?? [])) !== false) unset($subscribed['write'][$key]);
+		if (($key = array_search($userId, $subscribed['read'] ?? [])) !== false) array_splice($subscribed['read'], $key, 1);
+		if (($key = array_search($userId, $subscribed['write'] ?? [])) !== false) array_splice($subscribed['write'], $key, 1);
 		
 		$row->subscribed = (empty($subscribed['read'] ?? []) && empty($subscribed['write'] ?? [])) ? null : $subscribed;
 		$stat = $row->save();

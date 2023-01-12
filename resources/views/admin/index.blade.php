@@ -28,7 +28,7 @@
 	
 		<link rel="shortcut icon" href="{{asset('favicon.png')}}" />
 		
-		<title>{{$company_name ?? 'ЭМПИН'}}</title>
+		<title>{{$company_name ?? 'ЭМПИН'}} | админ. панель</title>
 	</head>
     
 	<body>

@@ -712,10 +712,12 @@
 						
 						statusesTooltip = $(btn).ddrTooltip({
 							cls: 'w30rem',
-							placement: 'auto',
+							placement: 'left-start',
+							offset: [-5, 5],
 							tag: 'noscroll',
 							minWidth: '360px',
 							minHeight: '200px',
+							maxHeight: '400px',
 							duration: [200, 200],
 							trigger: 'click',
 							wait: {
