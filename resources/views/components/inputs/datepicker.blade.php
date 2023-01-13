@@ -20,12 +20,11 @@
 		'input',
 		$group.'-input' => $group,
 		($group ? $group.'-' : '').'input-datepicker',
-		($group ? $group.'-' : '').'input_noempty' => $value,
+		($group ? $group.'-' : '').'input_noempty' => $setValue($date, $settings, $setting),
 		'input_disabled' => $group && ($disabled || !$enabled),
 	])}}>
 	<input
 		type="text"
-		value="{{$setValue($value, $settings, $setting)}}"
 		date
 		id="{{$id}}"
 		placeholder="{{$placeholder}}"
@@ -42,9 +41,17 @@
 		id="{{$id}}hidden"
 		datepicker
 		>
-	<div class="icon" id="{{$id}}Icon">
-		<i class="fa-solid fa-fw fa-calendar-days"></i>
-	</div>
+	
+	@if($setValue($date, $settings, $setting))
+		<div class="icon icon_active" id="{{$id}}Icon">
+			<i class="fa-solid fa-fw fa-xmark pointer" cleardate></i>
+		</div>
+	@else
+		<div class="icon" id="{{$id}}Icon">
+			<i class="fa-solid fa-fw fa-calendar-days"></i>
+		</div>
+	@endif
+		
 	
 	
 	<div class="{{($group ? $group.'-' : '').'input__errorlabel'}}" errorlabel></div>
@@ -54,7 +61,7 @@
 
 <script type="module">
 	let cd,
-		currentDate = '{{$date}}' || '{{$setValue($value, $settings, $setting)}}',
+		currentDate = '{{$date}}' || '{{$setValue($date, $settings, $setting)}}',
 		selector = '#{{$id}}',
 		iconSelector = '#{{$id}}Icon',
 		hiddenSelector = selector+'hidden',
@@ -157,6 +164,7 @@
 		$(hiddenSelector).val(''); 
 		$(iconSelector).removeClass('icon_active');
 		$(iconSelector).html('<i class="fa-solid fa-fw fa-calendar-days"></i>'); 
+		$(selector).trigger('datepicker'); 
 	});
 	
 	

@@ -54,11 +54,10 @@ class Datepicker extends Component {
 	 * @param 
 	 * @return 
 	 */
-	public function setValue($value = null, $settings = null, $setting = null) {
-		if ($value) return Carbon::parse($value)->format('Y-m-d');
+	public function setValue($date = false, $settings = false, $setting = false) {
+		if ($date || $date === '0' || $date === 0) return $date;
 		if (!$setting || !$settings) return false;
-		$sett = data_get($settings, $setting);
-		return Carbon::parse($sett)->format('Y-m-d');
+		return data_get($settings, $setting);
 	}
 	
 	

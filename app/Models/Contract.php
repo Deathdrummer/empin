@@ -184,7 +184,6 @@ class Contract extends Model {
 	 * @return 
 	 */
 	public function setDateStartAttribute($value) {
-		if (!$value) return false;
 		$this->attributes['date_start'] = $value ? Carbon::parse($value) : null;
 	}
 	
@@ -196,7 +195,6 @@ class Contract extends Model {
 	 * @return 
 	 */
 	public function setDateEndAttribute($value) {
-		if (!$value) return false;
 		$this->attributes['date_end'] = $value ? Carbon::parse($value) : null;
 	}
 	
@@ -208,7 +206,6 @@ class Contract extends Model {
 	 * @return 
 	 */
 	public function setDateCloseAttribute($value) {
-		if (!$value) return false;
 		$this->attributes['date_close'] = $value ? Carbon::parse($value) : null;
 	}
 	
