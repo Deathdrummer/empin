@@ -92,6 +92,13 @@ class ContractFilter extends AbstractFilter {
 			$query->orWhere('buy_number', 'like', '%'.$value.'%');
 			$query->orWhere('archive_dir', 'like', '%'.$value.'%');
 			
+			// Поиск по JSON полю из relation таблицы
+			$query->orWhereHas('info', function ($query) use ($value) {
+				$query->where('data', 'like', '%'.$value.'%');
+			});
+			
+			
+			
 			if ($customersMatch) $query->orWhereIn('customer', $customersMatch);
 			if ($typesMatch) $query->orWhereIn('type', $typesMatch);
 			if ($contractorsMatch) $query->orWhereIn('contractor', $contractorsMatch);

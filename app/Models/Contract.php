@@ -120,7 +120,12 @@ class Contract extends Model {
 	}
 	
 	
-	
+	/**
+     * Информация 
+     */
+	public function info() {
+		return $this->hasOne(ContractInfo::class, 'contract_id', 'id');
+	}
 	
 	
 	

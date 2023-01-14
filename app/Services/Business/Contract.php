@@ -160,6 +160,7 @@ class Contract {
 			}])
 			->withCount('messages')
 			->with('departments')
+			//->with('info')
 			->with(['selections' => function ($query) use($userId) {
 				$query->where('account_id', $userId)
 					->orWhereJsonContains('subscribed', $userId)
