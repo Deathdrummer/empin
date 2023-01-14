@@ -2405,8 +2405,14 @@
 							
 							waitDetroy();
 							
+							const textarea = $(popper).find('#sendCellComment');
+							
+							$(textarea).focus();
+							
+							textarea[0].selectionStart = textarea[0].selectionEnd = textarea[0].value.length;
+							
 							let inputCellCommentTOut;
-							$(popper).find('#sendCellComment').on('input', function() {
+							$(textarea).on('input', function() {
 								clearTimeout(inputCellCommentTOut);
 								inputCellCommentTOut = setTimeout(async () => {
 									const comment = $(this).val();
