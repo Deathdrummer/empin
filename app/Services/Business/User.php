@@ -2,7 +2,9 @@
 
 
 use App\Models\User as Usermodel;
+use App\Models\ContractCellComment as ContractCellCommentModel;
 use Illuminate\Http\Request;
+
 
 class User {
 	
@@ -149,6 +151,67 @@ class User {
 	
 	
 	
+	
+	
+	
+	
+	/** Получить комменатрий ячейки
+	 * @param 
+	 * @return 
+	 */
+	public function getCellComment($params = []) {
+		$params['account_id'] = $params['account_id'] ?? auth('site')->user()->id;
+		$row = ContractCellCommentModel::where($params)->first();
+		return $row?->comment;
+	}
+	
+	
+	
+	
+	
+	/** Получить все комментарии всех ячеек указанных договоров
+	 * @param [account_id, contract_id, department_id] contract_id может быть массивом
+	 * @return 
+	 */
+	public function getCellComments($params = []) {
+		$params['account_id'] = $params['account_id'] ?? auth('site')->user()->id;
+		$commentsData = ContractCellCommentModel::when($params, function($query) use($params) {
+			$query->where('account_id', $params['account_id']);
+			if (isset($params['contract_id'])) $query->whereIn('contract_id', (array)$params['contract_id']);
+			if (isset($params['department_id'])) $query->where('department_id', $params['department_id']);
+		})->get();
+		
+		
+		if ($commentsData->isEmpty()) return false;
+		
+		$grouped = $commentsData->mapWithKeys(function ($item, $key) {
+			return [$item['contract_id'] => [$item['department_id'] =>[$item['step_id'] => true]]];
+		});
+		
+		return $grouped?->toArray() ?? false;
+	}
+	
+	
+	
+	
+	/** Задать комментарий ячейки
+	 * @param 
+	 * @return 
+	 */
+	public function setCellComment($params = []) {
+		$comment = $params['comment'];
+		unset($params['comment']);
+		
+		$params['account_id'] = $params['account_id'] ?? auth('site')->user()->id;
+		
+		$row = ContractCellCommentModel::firstOrNew($params);
+		
+		if ($row && !$comment) return $row->delete();
+		
+		$row->comment = $comment;
+		
+		return $row->save();
+	}
 	
 	
 	

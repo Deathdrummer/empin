@@ -1810,7 +1810,7 @@
 	
 	//----------------------------------------------------------------------------------- Контекстное меню
 	
-	let sendMessStat;
+	let sendMessStat, commentsTooltip;
 	$.contractContextMenu = (
 		{target, closeOnScroll, onContextMenu, changeAttrData, buildTitle},
 		contractId,
@@ -1859,6 +1859,8 @@
 				
 			}
 			// console.log(selectedContracts.items);
+			
+			if (commentsTooltip?.destroy != undefined) commentsTooltip.destroy();
 		});
 		
 		
@@ -2319,7 +2321,7 @@
 				name: hasCheckbox && canRemoveCheckbox ? 'Удалить чекбокс' : (!hasCheckbox && canCreateCheckbox ? 'Добавить чекбокс' : ''),
 				visible: isDeptCheckbox && !isArchive && ((!hasCheckbox && canCreateCheckbox) || (hasCheckbox && canRemoveCheckbox)),
 				sort: 1,
-				async onClick(foo) {	
+				async onClick() {	
 					const cell = $(target.pointer).closest('[ddrtabletd]');
 					const edited = !!$(cell).attr('edited');
 					const attrData = $(cell).attr('deptcheck');
@@ -2369,6 +2371,73 @@
 						}
 						waitCell.destroy();
 					}
+				}
+			}, {
+				name: 'Комментарии',
+				visible: hasCheckbox && isDeptCheckbox,
+				sort: 2,
+				async onClick() {
+					const cell = $(target.pointer).closest('[ddrtabletd]');
+					const attrData = $(cell).attr('deptcheck');
+					const [contractId = null, departmentId = null, stepId = null] = pregSplit(attrData);
+					
+					commentsTooltip = $(cell).ddrTooltip({
+						//cls: 'w44rem',
+						placement: 'bottom',
+						tag: 'noscroll noopen',
+						offset: [0 -5],
+						minWidth: '200px',
+						minHeight: '200px',
+						duration: [200, 200],
+						trigger: 'click',
+						wait: {
+							iconHeight: '40px'
+						},
+						onShow: async function({reference, popper, show, hide, destroy, waitDetroy, setContent, setData, setProps}) {
+							
+							const {data, error, status, headers} = await axiosQuery('get', 'site/contracts/cell_comment', {
+								contract_id: contractId, 
+								department_id: departmentId,
+								step_id: stepId,
+							}, 'json');
+							
+							await setData($(data).html());
+							
+							waitDetroy();
+							
+							let inputCellCommentTOut;
+							$(popper).find('#sendCellComment').on('input', function() {
+								clearTimeout(inputCellCommentTOut);
+								inputCellCommentTOut = setTimeout(async () => {
+									const comment = $(this).val();
+									const {data: postRes, error: postErr, status, headers} = await axiosQuery('post', 'site/contracts/cell_comment', {
+										contract_id: contractId, 
+										department_id: departmentId,
+										step_id: stepId,
+										comment,
+									}, 'json');
+									
+									if (postErr) {
+										console.log(postErr);
+										$.notify('Ошибка! Не удалось задать комментарий!', 'error');
+										return;
+									}
+									
+									if (postRes) {
+										if (comment) $(reference).append('<div class="trangled trangled-top-right"></div>');
+										else $(reference).find('.trangled').remove();
+										
+										//$.notify('Комментарий успешно сохранен!');
+										//$(this).ddrInputs('change');
+									}
+									
+								}, 500);
+							});
+						},
+						onDestroy: function() {
+							$(cell).removeAttrib('tooltiped');
+						}
+					});
 				}
 			}
 		];
@@ -2472,7 +2541,6 @@
 	
 	//----------------------------------------------------------------------------------------------------- Фильтрация по дате
 	$.contractFilterByDate = (column) => {
-		
 		if (filterByDateTooltip?.destroy != undefined) filterByDateTooltip.destroy();
 		if (dateFromPicker?.remove != undefined) dateFromPicker.remove();
 		if (dateToPicker?.remove != undefined) dateToPicker.remove();
@@ -2671,7 +2739,7 @@
 	
 	
 	//----------------------------------------------------------------------------------------------------- Тултип "комментарии"
-	let commentsTooltip, commentsTooltipTOut;
+	let commentsTooltipTOut;
 	$.commentsTooltip = (event) => {
 		const {target} = event;
 		const cell = $(target).closest('[ddrtabletd]');
@@ -2699,8 +2767,8 @@
 				placement: 'bottom',
 				tag: 'noscroll noopen',
 				offset: [0 -5],
-				minWidth: '430px',
-				minHeight: '225px',
+				minWidth: '200px',
+				minHeight: '200px',
 				duration: [200, 200],
 				trigger: 'click',
 				wait: {
@@ -2737,6 +2805,9 @@
 							}
 							
 							if (postRes) {
+								if (comment) $(reference).append('<div class="trangled trangled-top-right"></div>');
+								else $(reference).find('.trangled').remove();
+								
 								//$.notify('Комментарий успешно сохранен!');
 								//$(this).ddrInputs('change');
 							}

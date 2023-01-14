@@ -4,7 +4,6 @@ use App\Http\Filters\ContractFilter;
 use App\Models\Contract as ContractModel;
 use App\Models\ContractData;
 use App\Models\ContractDepartment;
-use App\Models\ContractCellComment;
 use App\Models\Selection;
 use App\Models\User;
 use App\Services\Business\Department as DepartmentService;
@@ -229,6 +228,7 @@ class Contract {
 			->offset($offset)
 			->get();
 		
+		
 		if ($data->isEmpty()) return false;
 		
 		
@@ -239,10 +239,16 @@ class Contract {
 		
 		['pinned' => $pinned, 'viewed' => $viewed] = $this->user->getContractsData();
 		
+		$userCellComments = $this->user->getCellComments([
+			'contract_id' 	=> $data->pluck('id')->toArray(),
+			'department_id' => $request->get('department_id', null)
+		]);
+		
 		$deadlinesContracts = $this->getSettings('contracts-deadlines');
 		$deadlinesSteps = $this->getSettings('steps-deadlines');
 		
-		$buildedData = $data->mapWithKeysMany(function($item) use($deadlinesContracts, $deadlinesSteps, $viewed, $pinned, $selectedContracts) {
+		
+		$buildedData = $data->mapWithKeysMany(function($item) use($deadlinesContracts, $deadlinesSteps, $viewed, $pinned, $selectedContracts, $userCellComments) {
 			if (!is_null($item['deadline_color_key'] )) {
 				$forcedColor = $deadlinesContracts[$item['deadline_color_key']]['color']?? null;
 				$forcedName = $deadlinesContracts[$item['deadline_color_key']]['name'] ?? '';
@@ -262,7 +268,7 @@ class Contract {
 			}
 			
 			
-			$departments = $item->departments->mapWithKeys(function($dep) use($item, $deadlinesSteps) {
+			$departments = $item->departments->mapWithKeys(function($dep) use($item, $deadlinesSteps, $userCellComments) {
 				$steps = null;
 				
 				if ($dep['pivot']['steps'] && $deadlinesSteps) {
@@ -279,6 +285,8 @@ class Contract {
 							$dateNow > $deadLine => $deadlinesSteps['after'],
 							default => 'transparent'
 						};
+						
+						$steps[$stepId]['has_comment'] = isset($userCellComments[$item['id']][$dep['id']][$stepId]);
 					}
 				}
 				
@@ -346,7 +354,6 @@ class Contract {
 		/* $pinnedItems = $pinnedItems->sortBy(function ($item) {
 			return $item['pinned'] < 0 ? -$item['pinned'] : false;
 		}); */
-		
 		
 		return $pinnedItems->union($buildedData);
 	}
@@ -421,6 +428,9 @@ class Contract {
 		
 		return $countData;
 	}
+	
+	
+	
 	
 	
 	
@@ -683,10 +693,8 @@ class Contract {
 	 * @param 
 	 * @return 
 	 */
-	public function getCellComment($params = []): string|null {
-		$params['account_id'] = auth('site')->user()->id;
-		$row = ContractCellComment::where($params)->first();
-		return $row?->comment;
+	public function getCellComment($params): string|null {
+		return $this->user->getCellComment($params);
 	}
 	
 	/**
@@ -694,19 +702,8 @@ class Contract {
 	 * @param 
 	 * @return 
 	 */
-	public function setCellComment($params = []): bool {
-		$comment = $params['comment'];
-		unset($params['comment']);
-		
-		$params['account_id'] = auth('site')->user()->id;
-		
-		$row = ContractCellComment::firstOrNew($params);
-		
-		if ($row && !$comment) return $row->delete();
-		
-		$row->comment = $comment;
-		
-		return $row->save();
+	public function setCellComment($params): bool {
+		return $this->user->setCellComment($params);
 	}
 	
 	

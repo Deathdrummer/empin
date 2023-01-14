@@ -1141,6 +1141,37 @@ $tableColor: #efefef
 				transition: opacity 0.16s
 		
 		
+		
+		.trangled
+			position: absolute
+			pointer-events: none
+			border-color: transparent transparent #7adeff transparent
+			border-style: solid
+			border-width: 0px 5px 5px 5px
+			height: 0px
+			width: 0px
+			
+			&-top-left
+				top: -1px
+				left: -3px
+				transform: rotate(-45deg)
+			
+			&-top-right
+				top: -1px
+				right: -3px
+				transform: rotate(45deg)
+			
+			&-bottom-left
+				bottom: -1px
+				left: -3px
+				transform: rotate(-140deg)
+			
+			&-bottom-right
+				bottom: -1px
+				right: -3px
+				transform: rotate(140deg)
+		
+		
 	
 	
 	// настройки для sortable

@@ -13,10 +13,15 @@
 					style="{{!($contractdata[$contract['id']][$dept['id']][$step['id']]['data'] ?? false) ? 'background-color: '.$contract['departments'][$dept['id']]['steps'][$step['id']]['color'] ?? null : 'tranparent'}};"
 					deadlinecolor="{{$contract['departments'][$dept['id']]['steps'][$step['id']]['color'] ?? null}}"
 					deptcheck="{{$contract['id']}},{{$dept['id']}},{{$step['id']}}"
-					onmouseenter="$.commentsTooltip(event);"
-					onmouseleave="$.commentsTooltipLeave();"
+					{{-- onmouseenter="{{isset($contract['departments'][$dept['id']]['steps'][$step['id']]['has_comment']) && $contract['departments'][$dept['id']]['steps'][$step['id']]['has_comment'] ? '$.commentsTooltip(event);' : ''}}" --}}
+					{{-- onmouseleave="$.commentsTooltipLeave();" --}}
 					edited="{{$edited}}"
 					>
+					
+					@if(isset($contract['departments'][$dept['id']]['steps'][$step['id']]['has_comment']) && $contract['departments'][$dept['id']]['steps'][$step['id']]['has_comment'])
+						<div class="trangled trangled-top-right"></div>
+					@endif
+					
 					@if($edited)
 						<x-checkbox
 							group="normal"
@@ -109,10 +114,14 @@
 				<x-table.td
 					class="h-center"
 					deptcheck="{{$contract['id']}},{{$dept['id']}},{{$step['id']}}"
-					onmouseenter="$.commentsTooltip(event);"
-					onmouseleave="$.commentsTooltipLeave();"
+					{{-- onmouseenter="{{isset($contract['departments'][$dept['id']]['steps'][$step['id']]['has_comment']) && $contract['departments'][$dept['id']]['steps'][$step['id']]['has_comment'] ? '$.commentsTooltip(event);' : ''}}"
+					onmouseleave="$.commentsTooltipLeave();" --}}
 					edited="{{$edited}}"
-					></x-table.td>
+					>
+					@if(isset($contract['departments'][$dept['id']]['steps'][$step['id']]['has_comment']) && $contract['departments'][$dept['id']]['steps'][$step['id']]['has_comment'])
+						<div class="trangled trangled-top-right"></div>
+					@endif
+					</x-table.td>
 			@else
 				<x-table.td class="center"></x-table.td>
 			@endif
