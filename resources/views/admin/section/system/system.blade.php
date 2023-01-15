@@ -254,6 +254,20 @@
 							inpclass="pr48px"
 							setting="price-nds"
 							/>
+						
+						
+						<div class="h3rem"></div>
+						
+						
+						<p class="color-gray mb1rem">При изменении Генподрядного процента менять:</p>
+						<div class="row gx-30">
+							<div class="col-auto">
+								<x-radio group="normal" label="Стоимость своего договора" value="self" setting="contract-genpercent-change" />
+							</div>
+							<div class="col-auto">
+								<x-radio group="normal" label="Стоимость Генподрядного договора" value="gen" setting="contract-genpercent-change" />
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>

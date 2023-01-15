@@ -122,6 +122,7 @@ class Contracts extends Controller {
 		$stepsdata = StepPattern::select('rules')->where('customer', 0)->first();
 		$stepspattern = $stepsdata['rules'];
 		
+		$headers['x-genpercent'] = $this->settings->get('contract-genpercent-change', 'self');
 		
         return $this->view($viewPath.'.form', [
 			'index' => $newItemIndex,
@@ -129,7 +130,7 @@ class Contracts extends Controller {
 			'new_object_number' => $newObjectNumber,
 			'guard' => $guard,
 			'stepspattern' => $stepspattern
-		]);
+		], [], $headers);
     }
 	
 	
@@ -304,13 +305,16 @@ class Contracts extends Controller {
 		
 		$this->_addDepsUsersToData($departments);
 		
+		$headers['x-genpercent'] = $this->settings->get('contract-genpercent-change', 'self');
+		
+		
         return $this->view($viewPath.'.form', [
 			'departments' 			=> $departments,
 			'deps_assigned_users'	=> $depsAssignedUsers,
 			'cd' 					=> $contrDeps,
 			'guard' 				=> $guard,
 			'stepspattern' 			=> [],
-		], $contractData->toArray());
+		], $contractData->toArray(), $headers);
     }
 	
 	

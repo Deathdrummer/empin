@@ -11,10 +11,12 @@ trait HasCrudController {
 	 * @param array  $mergeData
 	 * @return 
 	 */
-	protected function view(?string $viewPath = null, $data = null, array $mergeData = []) {
+	protected function view(?string $viewPath = null, $data = null, array $mergeData = [], array $headers = []) {
 		if (!$viewPath) return false;
 		$data['data'] = $this->data;
-		return view($viewPath, $data, $mergeData);
+		
+		return response(view($viewPath, $data, $mergeData))
+            ->withHeaders($headers);
 	}
 	
 	

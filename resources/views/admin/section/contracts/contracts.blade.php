@@ -121,7 +121,7 @@
 			}).then(({state, wait, setTitle, setButtons, loadData, setHtml, setLHtml, dialog, close, onScroll, disableButtons, enableButtons, setWidth}) => { //isClosed
 				wait();
 				
-				create((data, container, {error}) => {
+				create((data, container, {error, headers}) => {
 					wait(false);
 					if (data) setHtml(data, () => {
 						enableButtons('close');
@@ -132,20 +132,23 @@
 						
 						
 						
-						// Работа с НДС
-						let priceNds = $('input[name="nds"]').val();
+						// --------------------------------------------------- Работа с НДС
+						const priceNds = $('input[name="nds"]').val();
 						let genPercent = parseFloat($('#genPercent').val());
+						const genpercentVariant = headers['x-genpercent'] || 'gen';
 						
 						$('#genPercent').on('input', function() {
 							genPercent = parseFloat($(this).val());
 							
-							// меняется стоимость своего договора
-							$('input[name="price"]').val(parseFloat($('#genPrice').val()) * ((100 - genPercent) / 100));
-							$('input[name="price_nds"]').val(parseFloat($('#genPriceNds').val()) * ((100 - genPercent) / 100));
-							
-							// меняется стоимость не нашего договора
-							//$('#genPrice').val(parseFloat($('input[name="price"]').val()) + ($('input[name="price"]').val() / 100) * genPercent);
-							//$('#genPriceNds').val(parseFloat($('input[name="price_nds"]').val()) + ($('input[name="price_nds"]').val() / 100) * genPercent);
+							if (genpercentVariant == 'gen') {
+								// меняется стоимость генподрядного договора
+								$('#genPrice').val(parseFloat($('input[name="price"]').val()) + ($('input[name="price"]').val() / 100) * genPercent);
+								$('#genPriceNds').val(parseFloat($('input[name="price_nds"]').val()) + ($('input[name="price_nds"]').val() / 100) * genPercent);
+							} else if (genpercentVariant == 'self') {
+								// меняется стоимость своего договора
+								$('input[name="price"]').val(parseFloat($('#genPrice').val()) * ((100 - genPercent) / 100));
+								$('input[name="price_nds"]').val(parseFloat($('#genPriceNds').val()) * ((100 - genPercent) / 100));
+							}	
 						});
 						
 						
@@ -332,7 +335,7 @@
 			}).then(({state, wait, setTitle, setButtons, loadData, setHtml, setLHtml, dialog, close, onScroll, disableButtons, enableButtons, setWidth}) => { //isClosed
 				wait();
 				
-				edit(id, (data, container, {error}) => {
+				edit(id, (data, container, {error, headers}) => {
 					if (error) {
 						console.log(error);
 						$.notify('Ошибка открытия договора!', 'error');
@@ -349,21 +352,25 @@
 							$('#genPrice').number(true, 2, '.', ' ');
 							$('#genPriceNds').number(true, 2, '.', ' ');
 							
-							// Работа с НДС
-							// Работа с НДС
-							let priceNds = $('input[name="nds"]').val();
+							
+							
+							// --------------------------------------------------- Работа с НДС
+							const priceNds = $('input[name="nds"]').val();
 							let genPercent = parseFloat($('#genPercent').val());
+							const genpercentVariant = headers['x-genpercent'] || 'gen';
 							
 							$('#genPercent').on('input', function() {
 								genPercent = parseFloat($(this).val());
 								
-								// меняется стоимость своего договора
-								$('input[name="price"]').val(parseFloat($('#genPrice').val()) * ((100 - genPercent) / 100));
-								$('input[name="price_nds"]').val(parseFloat($('#genPriceNds').val()) * ((100 - genPercent) / 100));
-								
-								// меняется стоимость не нашего договора
-								//$('#genPrice').val(parseFloat($('input[name="price"]').val()) + ($('input[name="price"]').val() / 100) * genPercent);
-								//$('#genPriceNds').val(parseFloat($('input[name="price_nds"]').val()) + ($('input[name="price_nds"]').val() / 100) * genPercent);
+								if (genpercentVariant == 'gen') {
+									// меняется стоимость генподрядного договора
+									$('#genPrice').val(parseFloat($('input[name="price"]').val()) + ($('input[name="price"]').val() / 100) * genPercent);
+									$('#genPriceNds').val(parseFloat($('input[name="price_nds"]').val()) + ($('input[name="price_nds"]').val() / 100) * genPercent);
+								} else if (genpercentVariant == 'self') {
+									// меняется стоимость своего договора
+									$('input[name="price"]').val(parseFloat($('#genPrice').val()) * ((100 - genPercent) / 100));
+									$('input[name="price_nds"]').val(parseFloat($('#genPriceNds').val()) * ((100 - genPercent) / 100));
+								}
 							});
 							
 							

@@ -13,15 +13,15 @@ class Settings {
 	 * @param string  $key
 	 * @return Collection|string|bool
 	 */
-	public function get(?string $key = null): Collection|string|bool {
+	public function get(?string $key = null, ?string $default = null): Collection|string|bool {
 		if (!$key) return false;
 		['key' => $keyToFind, 'path' => $path] = $this->parseKey($key);
 		
-		if (!$row = Setting::where('key', $keyToFind)->first()) return false;
+		if (!$row = Setting::where('key', $keyToFind)->first()) return $default;
 		$value = $row->value;
 		
 		if (is_null($path)) return is_array($value) ? collect($value) : $value;
-		if (!$result = data_get($value, $path)) return false;
+		if (!$result = data_get($value, $path)) return $default;
 		return is_array($result) ? collect($result) : $result;
 	}
 	
