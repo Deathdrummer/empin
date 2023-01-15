@@ -353,7 +353,6 @@
 							$('#genPriceNds').number(true, 2, '.', ' ');
 							
 							
-							
 							// --------------------------------------------------- Работа с НДС
 							const priceNds = $('input[name="nds"]').val();
 							let genPercent = parseFloat($('#genPercent').val());
