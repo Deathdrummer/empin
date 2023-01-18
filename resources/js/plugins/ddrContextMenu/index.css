@@ -82,9 +82,8 @@
 	--cm-oppositeMargin: 10; /* px */
 }
 	
-	
-	
-	
+
+
 
 .ddrcontextmenu {
 	position: absolute;
@@ -165,7 +164,7 @@
 		transition: opacity var(--cm-hideSubMenu);
 		z-index: 131;
 		overflow-y: auto;
-		max-height: 90vh;
+		max-height: calc(100vh - 20px);
 	}
 	
 		
