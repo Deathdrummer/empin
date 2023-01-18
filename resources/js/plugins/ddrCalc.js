@@ -173,8 +173,9 @@ class DdrCalc {
 				value = this._valToNumber(value, 2);
 				
 				percent = _.isPlainObject(percent) ? percent.value : percent;
-				if (!reverse) return percent < 100 ? _.round(value / ((100 - percent) / 100), 2) : value;
-				return percent < 100 ? _.round(value * ((100 - percent) / 100), 2) : value;
+				
+				if (!reverse) return percent < 100 ? _.round(value / ((100 - percent) / 100), 2) : 0;
+				return percent < 100 ? _.round(value * ((100 - percent) / 100), 2) : 0;
 				break;
 			
 			case 'percentLess':
