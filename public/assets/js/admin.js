@@ -5369,6 +5369,8 @@ __webpack_require__(/*! @plugins/ddrFloatingBlock */ "./resources/js/plugins/ddr
 
 __webpack_require__(/*! @plugins/tooltip */ "./resources/js/plugins/tooltip/index.js");
 
+__webpack_require__(/*! @plugins/ddrCalc */ "./resources/js/plugins/ddrCalc.js");
+
 $.notify.defaults({
   clickToHide: true,
   autoHide: true,
@@ -5806,6 +5808,26 @@ $.fn.tripleTap = function (callback) {
       if (callback && typeof callback == 'function') callback(this);
     }
   });
+};
+
+window.isNumeric = function (num) {
+  return !isNaN(num);
+};
+
+window.ref = function (data) {
+  var target = {};
+  var proxy = new Proxy(target, {
+    get: function get(target, prop) {
+      if (prop in target) {
+        if (isNumeric(target[prop])) return Number(target[prop]);
+        return target[prop];
+      } else {
+        return null;
+      }
+    }
+  });
+  proxy.value = data;
+  return proxy;
 };
 /*
 	Массив данных брейкпоинтов, пример: {sm: 576, md: 768, lg: 992, xl: 1370}
@@ -8084,6 +8106,202 @@ $.ddrCRUD = function () {
     return form;
   }
 };
+
+/***/ }),
+
+/***/ "./resources/js/plugins/ddrCalc.js":
+/*!*****************************************!*\
+  !*** ./resources/js/plugins/ddrCalc.js ***!
+  \*****************************************/
+/***/ (function() {
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+/*window.ddrCalc = (value, percent, reverse = false) => {
+	value = Number(value);
+	percent = Number(percent);
+	
+	if (reverse) return value * ((100 - percent) / 100);
+	return value / ((100 - percent) / 100);
+	
+	if (reverse) return value / (1 + percent / 100);
+	return value * (1 + percent / 100);
+}
+*/
+$.fn.ddrCalc = function () {
+  var data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+  if (!data) throw Error('ddrCalc ошибка! Такого метода не существует!');
+  var mainSelector = this;
+  var methods = new DdrCalc(mainSelector);
+  data.forEach(function (item) {
+    var method = item.method;
+    delete item['method'];
+    if (['percent', 'percentLess'].indexOf(method) === -1) throw Error('ddrCalc ошибка! Такого метода не существует!');
+    methods[method](item);
+  });
+  return {
+    calc: function calc() {
+      $(mainSelector).trigger('input');
+    }
+  };
+};
+
+var DdrCalc = /*#__PURE__*/function () {
+  function DdrCalc(mainSelector) {
+    _classCallCheck(this, DdrCalc);
+
+    _defineProperty(this, "mainSelector", null);
+
+    this.mainSelector = mainSelector;
+  }
+
+  _createClass(DdrCalc, [{
+    key: "percent",
+    value: function percent(data) {
+      var _$$extend = $.extend({
+        selector: null,
+        percent: 0,
+        reverse: false,
+        twoWay: false,
+        middleware: false
+      }, data),
+          selector = _$$extend.selector,
+          percent = _$$extend.percent,
+          reverse = _$$extend.reverse,
+          twoWay = _$$extend.twoWay,
+          middleware = _$$extend.middleware,
+          thisCls = this;
+
+      $(thisCls.mainSelector).on('input', function (e) {
+        var val = thisCls._valToNumber(e.target.value, 2);
+
+        var result = _.round(thisCls._calc('percent', val, percent, reverse), 2);
+
+        if (_.isFunction(middleware[0])) {
+          result = middleware[0](result, thisCls._calc.bind(thisCls));
+        }
+
+        $(selector).val(_.round(result, 2));
+      });
+
+      if (twoWay) {
+        $(selector).on('input', function (e) {
+          var val = thisCls._valToNumber(e.target.value, 2);
+
+          var result = _.round(thisCls._calc('percent', val, percent, !reverse), 2);
+
+          if (middleware[1] !== undefined && middleware[1] !== false && _.isFunction(middleware[1])) {
+            result = middleware[1](result, thisCls._calc.bind(thisCls));
+          } else if (middleware[1] !== false && _.isFunction(middleware[0])) {
+            result = middleware[0](result, thisCls._calc.bind(thisCls));
+          }
+
+          $(thisCls.mainSelector).val(_.round(result, 2));
+        });
+      }
+    }
+  }, {
+    key: "percentLess",
+    value: function percentLess(data) {
+      var _$$extend2 = $.extend({
+        selector: null,
+        percent: 0,
+        reverse: false,
+        twoWay: false,
+        middleware: false
+      }, data),
+          selector = _$$extend2.selector,
+          percent = _$$extend2.percent,
+          reverse = _$$extend2.reverse,
+          twoWay = _$$extend2.twoWay,
+          middleware = _$$extend2.middleware,
+          thisCls = this;
+
+      $(thisCls.mainSelector).on('input', function (e) {
+        var val = thisCls._valToNumber(e.target.value, 2);
+
+        var result = _.round(thisCls._calc('percentLess', val, percent, reverse), 2);
+
+        if (_.isFunction(middleware[0])) {
+          result = middleware[0](result, thisCls._calc.bind(thisCls));
+        }
+
+        $(selector).val(_.round(result, 2));
+      });
+
+      if (twoWay) {
+        $(selector).on('input', function (e) {
+          var val = thisCls._valToNumber(e.target.value, 2);
+
+          var result = _.round(thisCls._calc('percentLess', val, percent, !reverse), 2);
+
+          if (middleware[1] !== undefined && middleware[1] !== false && _.isFunction(middleware[1])) {
+            result = middleware[1](result, thisCls._calc.bind(thisCls));
+          } else if (middleware[1] !== false && _.isFunction(middleware[0])) {
+            result = middleware[0](result, thisCls._calc.bind(thisCls));
+          }
+
+          $(thisCls.mainSelector).val(_.round(result, 2));
+        });
+      }
+    } //------------------------------------------------------------------------------------------
+
+  }, {
+    key: "_calc",
+    value: function _calc() {
+      var method = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+      if (_.isNull(method)) throw Error('ddrCalc -> _calc: ошибка! Не передан метод!');
+
+      for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+        args[_key - 1] = arguments[_key];
+      }
+
+      switch (method) {
+        case 'percent':
+          var value = args[0],
+              percent = args[1],
+              _args$ = args[2],
+              reverse = _args$ === void 0 ? false : _args$;
+          value = this._valToNumber(value, 2);
+          percent = _.isPlainObject(percent) ? percent.value : percent;
+          if (!reverse) return percent < 100 ? _.round(value / ((100 - percent) / 100), 2) : value;
+          return percent < 100 ? _.round(value * ((100 - percent) / 100), 2) : value;
+          break;
+
+        case 'percentLess':
+          var valueLess = args[0],
+              percentLess = args[1],
+              _args$2 = args[2],
+              reverseLess = _args$2 === void 0 ? false : _args$2;
+          valueLess = this._valToNumber(valueLess, 2);
+          percentLess = _.isPlainObject(percentLess) ? percentLess.value : percentLess;
+          if (!reverseLess) return _.round(valueLess * (1 + percentLess / 100), 2);
+          return _.round(valueLess / (1 + percentLess / 100), 2);
+          break;
+
+        default:
+          break;
+      }
+    }
+  }, {
+    key: "_valToNumber",
+    value: function _valToNumber() {
+      var value = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+      var toFixed = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+      if (_.isNull(value)) return false;
+      value = _.round(Number(('' + value).replaceAll(/\s/g, '')), toFixed);
+      return value;
+    }
+  }]);
+
+  return DdrCalc;
+}();
 
 /***/ }),
 

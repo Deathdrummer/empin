@@ -7,6 +7,7 @@ require('@plugins/jquery.mousewheel');
 require('@plugins/dropdown');
 require('@plugins/ddrFormSubmit');
 require('@plugins/ddrInputs');
+//require('@plugins/ddrInputsChain');
 require('@plugins/ddrWaitBlock');
 require('@plugins/ddrPopup');
 require('@plugins/ddrDatepicker');
@@ -18,6 +19,7 @@ require('@plugins/ddrTable');
 require('@plugins/blockTable');
 require('@plugins/ddrContextMenu');
 require('@plugins/jquery.ui');
+require('@plugins/ddrCalc');
 
 
 

@@ -125,11 +125,11 @@
 						<div class="row row-cols-2 g-10">
 							<div class="col">
 								<label class="form__label color-dark">Стоимость договора без НДС</label>
-								<x-input name="price" value="{{$price ?? 0}}" icon="ruble-sign" iconbg="yellow" class="w100" />
+								<x-input name="price" value="{{$price ?? 0}}" id="selfPrice" icon="ruble-sign" iconbg="yellow" class="w100" />
 							</div>
 							<div class="col">
 								<label class="form__label color-dark">Стоимость договора с НДС</label>
-								<x-input name="price_nds" value="{{$price_nds ?? 0}}" icon="ruble-sign" iconbg="yellow" class="w100" />
+								<x-input name="price_nds" value="{{$price_nds ?? 0}}" id="selfPriceNds" icon="ruble-sign" iconbg="yellow" class="w100" />
 							</div>
 						</div>	
 					</div>
@@ -138,11 +138,11 @@
 						<div class="row row-cols-3 g-10 align-items-end">
 							<div class="col-5">
 								<label class="form__label color-dark">Стоимость генподрядного {{$guard == 'admin' ? '(не нашего)' : ''}} договора без НДС</label>
-								<x-input id="genPrice" :value="($price ?? 0) / ((100 - ($gen_percent ?? 0)) / 100)" icon="ruble-sign" iconbg="yellow" class="w100" />
+								<x-input id="genPrice" {{-- :value="($price ?? 0) / ((100 - ($gen_percent ?? 0)) / 100)" --}} icon="ruble-sign" iconbg="yellow" class="w100" />
 							</div>
 							<div class="col-5">
 								<label class="form__label color-dark">Стоимость генподрядного {{$guard == 'admin' ? '(не нашего)' : ''}} договора с НДС</label>
-								<x-input id="genPriceNds" :value="($price_nds ?? 0) / ((100 - ($gen_percent ?? 0)) / 100)" icon="ruble-sign" iconbg="yellow" class="w100" />
+								<x-input id="genPriceNds"{{--  :value="($price_nds ?? 0) / ((100 - ($gen_percent ?? 0)) / 100)" --}} icon="ruble-sign" iconbg="yellow" class="w100" />
 							</div>
 							<div class="col-2">
 								<label class="form__label color-dark breakword">Генподрядный процент</label>

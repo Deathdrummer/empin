@@ -246,7 +246,7 @@
 		sortField = ddrStore('site-contracts-sortfield') || 'id',
 		sortOrder = ddrStore('site-contracts-sortorder') || 'desc',
 		limit = {{$setting['contracts-per-page'] ?? 10}},
-		priceNds = {{$setting['price-nds'] ?? 1}},
+		percentNds = {{$setting['price-nds'] ?? 1}},
 		countShownLoadings = {{$setting['count-shown-loadings'] ?? 2}},
 		canCreateCheckbox = '{{Auth::guard('site')->user()->can('contract-create-checkbox::site')}}',
 		canRemoveCheckbox = '{{Auth::guard('site')->user()->can('contract-remove-checkbox::site')}}',
@@ -1467,66 +1467,112 @@
 						console.log(error?.message, error.errors);
 					}
 					
-					
-					
 					if (data) setHtml(data, () => {
 						enableButtons('close');
-						$('input[name="price"]').number(true, 2, '.', ' ');
-						$('input[name="price_nds"]').number(true, 2, '.', ' ');
+						$('#selfPrice').number(true, 2, '.', ' ');
+						$('#selfPriceNds').number(true, 2, '.', ' ');
 						$('#genPrice').number(true, 2, '.', ' ');
 						$('#genPriceNds').number(true, 2, '.', ' ');
 						
 						
 						
-						// --------------------------------------------------- Работа с НДС
-						let genPercent = parseFloat($('#genPercent').val());
+						
+						// --------------------------------------------------- Работа с НДС					
+						const genPercent = ref($('#genPercent').val());
 						const genpercentVariant = headers['x-genpercent'] || 'gen';
 						
-						$('#genPercent').on('input', function() {
-							genPercent = parseFloat($(this).val());
-							
-							if (genpercentVariant == 'gen') {
-								// меняется стоимость генподрядного договора
-								$('#genPrice').val(parseFloat($('input[name="price"]').val()) + ($('input[name="price"]').val() / 100) * genPercent);
-								$('#genPriceNds').val(parseFloat($('input[name="price_nds"]').val()) + ($('input[name="price_nds"]').val() / 100) * genPercent);
-							} else if (genpercentVariant == 'self') {
-								// меняется стоимость своего договора
-								$('input[name="price"]').val(parseFloat($('#genPrice').val()) * ((100 - genPercent) / 100));
-								$('input[name="price_nds"]').val(parseFloat($('#genPriceNds').val()) * ((100 - genPercent) / 100));
-							}	
+						
+						const selfPriceNds = $('#selfPriceNds').ddrCalc([{
+							selector: '#selfPrice',
+							method: 'percentLess',
+							percent: percentNds,
+							reverse: true,
+						}, {
+							selector: '#genPriceNds',
+							method: 'percent',
+							percent: genPercent,
+						}, {
+							selector: '#genPrice',
+							method: 'percent',
+							percent: genPercent,
+							middleware: [(value, calc) => {
+								return calc('percentLess', $('#genPriceNds').val(), percentNds, true);
+							}, false],
+						}]);
+						
+						$('#selfPrice').ddrCalc([{
+							selector: '#selfPriceNds',
+							method: 'percentLess',
+							percent: percentNds,
+						}, {
+							selector: '#genPrice',
+							method: 'percent',
+							percent: genPercent,
+						}, {
+							selector: '#genPriceNds',
+							method: 'percent',
+							percent: genPercent,
+							middleware: [(value, calc) => {
+								return calc('percentLess', $('#genPrice').val(), percentNds);
+							}, false],
+						}]);
+						
+						
+						
+						
+						
+						const genPriceNds = $('#genPriceNds').ddrCalc([{
+							selector: '#genPrice',
+							method: 'percentLess',
+							percent: percentNds,
+							reverse: true,
+						}, {
+							selector: '#selfPriceNds',
+							method: 'percent',
+							percent: genPercent,
+							reverse: true,
+						}, {
+							selector: '#selfPrice',
+							method: 'percent',
+							percent: genPercent,
+							reverse: true,
+							middleware: [(value, calc) => {
+								return calc('percentLess', $('#selfPriceNds').val(), percentNds, true);
+							}, false],
+						}]);
+						
+						$('#genPrice').ddrCalc([{
+							selector: '#genPriceNds',
+							method: 'percentLess',
+							percent: percentNds,
+						}, {
+							selector: '#selfPrice',
+							method: 'percent',
+							percent: genPercent,
+							reverse: true,
+						}, {
+							selector: '#selfPriceNds',
+							method: 'percent',
+							percent: genPercent,
+							reverse: true,
+							middleware: [(value, calc) => {
+								return calc('percentLess', $('#selfPrice').val(), percentNds);
+							}, false],
+						}]);
+						
+						
+						selfPriceNds.calc();
+						
+						
+						$('#genPercent').on('input', function(e) {
+							genPercent.value = e.target.value;
+							if (genpercentVariant == 'gen') selfPriceNds.calc();
+							else if (genpercentVariant == 'self') genPriceNds.calc();
 						});
 						
 						
 						
-						$('input[name="price"]').on('input', function() {
-							let thisVal = parseFloat($(this).val());
-							$('input[name="price_nds"]').val($.number((thisVal * (1 + priceNds / 100)), 2, '.', ' '));
-							$('#genPrice').val($.number(thisVal / ((100 - genPercent) / 100), 2, '.', ' '));
-							$('#genPriceNds').val($.number(thisVal / ((100 - genPercent) / 100) * (1 + priceNds / 100), 2, '.', ' '));
-						});
 						
-						
-						$('input[name="price_nds"]').on('input', function() {
-							let thisVal = parseFloat($(this).val());
-							$('input[name="price"]').val($.number((thisVal / (1 + priceNds / 100)), 2, '.', ' '));
-							$('#genPrice').val($.number(thisVal / ((100 - genPercent) / 100) / (1 + priceNds / 100), 2, '.', ' '));
-							$('#genPriceNds').val($.number(thisVal / ((100 - genPercent) / 100), 2, '.', ' '));
-						});
-						
-						
-						$('#genPrice').on('input', function() {
-							let thisVal = parseFloat($(this).val());
-							$('#genPriceNds').val($.number((thisVal * (1 + priceNds / 100)), 2, '.', ' '));
-							$('input[name="price"]').val($.number(thisVal * ((100 - genPercent) / 100), 2, '.', ' '));
-							$('input[name="price_nds"]').val($.number(thisVal * ((100 - genPercent) / 100) * (1 + priceNds / 100), 2, '.', ' '));
-						});
-						
-						$('#genPriceNds').on('input', function() {
-							let thisVal = parseFloat($(this).val());
-							$('#genPrice').val($.number((thisVal / (1 + priceNds / 100)), 2, '.', ' '));
-							$('input[name="price"]').val($.number(thisVal * ((100 - genPercent) / 100) / (1 + priceNds / 100), 2, '.', ' '));
-							$('input[name="price_nds"]').val($.number(thisVal * ((100 - genPercent) / 100), 2, '.', ' '));
-						});
 						
 						
 						

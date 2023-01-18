@@ -13,6 +13,36 @@ $.fn.tripleTap = function(callback) {
 
 
 
+
+
+
+window.isNumeric = function(num) {
+	return !isNaN(num);
+}
+						
+window.ref = function (data) {
+	let target = {};
+	let proxy = new Proxy(target, {
+		get(target, prop) {
+	    	if (prop in target) {
+	    		if (isNumeric(target[prop])) return Number(target[prop]);
+	    		return target[prop]
+	    	} else {
+	      		return null;
+	    	}
+	  	}
+	});
+	proxy.value = data;
+	return proxy;
+}
+
+
+
+
+
+
+
+
 /*
 	Массив данных брейкпоинтов, пример: {sm: 576, md: 768, lg: 992, xl: 1370}
 	либо переменные: breakpointSM, breakpointMD, breakpointLG, breakpointXL
