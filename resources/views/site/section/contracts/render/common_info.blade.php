@@ -207,6 +207,7 @@
 			@endcando
 			
 			@cando('contract-col-date_gen_start:site')
+			@if($contract['subcontracting'])
 				<tr>
 					<td>
 						<p class="color-gray-500 noselect format">Дата подписания генподрядного договора:</p>
@@ -221,9 +222,11 @@
 						</p>
 					</td>
 				</tr>
+			@endif
 			@endcando
 			
 			@cando('contract-col-date_gen_end:site')
+			@if($contract['subcontracting'])
 				<tr>
 					<td>
 						<p class="color-gray-500 noselect format">Дата окончания работ по генподрядному договору:</p>
@@ -238,6 +241,7 @@
 						</p>
 					</td>
 				</tr>
+			@endif
 			@endcando
 			
 			@cando('contract-col-hoz_method:site')

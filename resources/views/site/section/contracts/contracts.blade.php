@@ -1586,6 +1586,9 @@
 								$('#genPercent').val('');
 								$('#genPrice').val('');
 								$('#genPriceNds').val('');
+								
+								$('#dateGenStart').ddrInputs('clear');
+								$('#dateGenEnd').ddrInputs('clear');
 							}
 						});
 						

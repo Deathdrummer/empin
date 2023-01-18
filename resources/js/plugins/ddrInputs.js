@@ -479,6 +479,14 @@ class DdrInput {
 			$(wrapperSelector).addClass(wrapperClass+'_changed');
 			$(wrapperSelector).removeClass(wrapperClass+'_noempty');
 			
+			
+			if ($(item).hasAttr('date')) {
+				$(item).setAttrib('date');
+				$(wrapperSelector).find('[datepicker]').val('');
+				$(wrapperSelector).find('.icon').html('<i class="fa-solid fa-fw fa-calendar-days"></i>'); 
+			}
+			
+			
 			if (['checkbox', 'radio'].indexOf(type) !== -1) {
 				$(wrapperSelector).removeClass(wrapperClass+'_checked');
 				if ($(item).is(':checked')) $(item).removeAttrib('checked');

@@ -163,11 +163,11 @@
 						<div class="row row-cols-2 g-10 mt10px">
 							<div class="col">
 								<label class="form__label color-dark">Дата подписания генподрядного договора</label>
-								<x-datepicker name="date_gen_start" date="{{$date_gen_start ?? null}}" calendarid="contractDateGen{{$data['rand_id']}}" class="w100" />
+								<x-datepicker name="date_gen_start" date="{{$date_gen_start ?? null}}" calendarid="contractDateGen{{$data['rand_id']}}" id="dateGenStart" class="w100" />
 							</div>
 							<div class="col">
 								<label class="form__label color-dark">Дата окончания работ по генподрядному договору</label>
-								<x-datepicker name="date_gen_end" date="{{$date_gen_end ?? null}}" calendarid="contractDateGen{{$data['rand_id']}}" class="w100" />
+								<x-datepicker name="date_gen_end" date="{{$date_gen_end ?? null}}" calendarid="contractDateGen{{$data['rand_id']}}" id="dateGenEnd" class="w100" />
 							</div>
 						</div>
 					</div>

@@ -143,7 +143,7 @@
 			@if(isset($date_gen_start) && $date_gen_start)
 				<p class="fz12px lh90">{{dateFormatter($date_gen_start, 'd.m.y')}}</p>
 			@else
-				<p class="color-gray">-</p>
+				<p class="color-gray">{!!$subcontracting ? '-' : '<p class="fz12px text-center">НЕТ</p>'!!}</p>
 			@endif
 		</x-table.td>
 	@endif
@@ -153,7 +153,7 @@
 			@if(isset($date_gen_end) && $date_gen_end)
 				<p class="fz12px lh90">{{dateFormatter($date_gen_end, 'd.m.y')}}</p>
 			@else
-				<p class="color-gray">-</p>
+				<p class="color-gray">{!!$subcontracting ? '-' : '<p class="fz12px text-center">НЕТ</p>'!!}</p>
 			@endif
 		</x-table.td>
 	@endif
