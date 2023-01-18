@@ -2455,7 +2455,8 @@
 								step_id: stepId,
 							}, 'json');
 							
-							await setData($(data).html());
+							
+							await setData(data);
 							
 							waitDetroy();
 							
@@ -3030,19 +3031,11 @@
 				}
 				
 			} else {
-				if (currentList && headers['x-count-contracts-departments']) {
-					let depsCounts = JSON.parse(headers['x-count-contracts-departments']);
-					totalCount = depsCounts[currentList]|| null;
-				} else {
-					totalCount = headers['x-count-contracts-all'] || null;
-				}
-				
+				totalCount = headers['x-count-contracts-current'] || null;
 				$('#contractsTable').html(data);
 			}
 			
 			
-			
-
 			const showTotal = headers['x-count-contracts-current'] && ((params['offset'] + params['limit'] >= totalCount) || (totalCount <= params['limit']));
 			if (showTotal) {
 				

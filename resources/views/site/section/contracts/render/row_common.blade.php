@@ -137,6 +137,26 @@
 			@endif
 		</x-table.td>
 	@endif
+	
+	@if($column == 'date_gen_start' && auth('site')->user()->can('contract-col-date_gen_start:site'))
+		<x-table.td commonlist>
+			@if(isset($date_gen_start) && $date_gen_start)
+				<p class="fz12px lh90">{{dateFormatter($date_gen_start, 'd.m.y')}}</p>
+			@else
+				<p class="color-gray">-</p>
+			@endif
+		</x-table.td>
+	@endif
+
+	@if($column == 'date_gen_end' && auth('site')->user()->can('contract-col-date_gen_end:site'))
+		<x-table.td commonlist>
+			@if(isset($date_gen_end) && $date_gen_end)
+				<p class="fz12px lh90">{{dateFormatter($date_gen_end, 'd.m.y')}}</p>
+			@else
+				<p class="color-gray">-</p>
+			@endif
+		</x-table.td>
+	@endif
 
 	@if($column == 'hoz_method' && auth('site')->user()->can('contract-col-hoz_method:site'))
 		<x-table.td class="h-center" commonlist>

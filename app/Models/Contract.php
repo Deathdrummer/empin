@@ -67,6 +67,8 @@ class Contract extends Model {
 		'gen_percent',
 		'date_start',
 		'date_end',
+		'date_gen_start',
+		'date_gen_end',
 		'date_close',
 		'date_buy',
 		'customer',
@@ -201,6 +203,27 @@ class Contract extends Model {
 	 */
 	public function setDateEndAttribute($value) {
 		$this->attributes['date_end'] = $value ? Carbon::parse($value) : null;
+	}
+	
+	
+	
+	/**
+	 * @param 
+	 * @return 
+	 */
+	public function setDateGenStartAttribute($value) {
+		$this->attributes['date_gen_start'] = $value ? Carbon::parse($value) : null;
+	}
+	
+	
+	
+	
+	/**
+	 * @param 
+	 * @return 
+	 */
+	public function setDateGenEndAttribute($value) {
+		$this->attributes['date_gen_end'] = $value ? Carbon::parse($value) : null;
 	}
 	
 	

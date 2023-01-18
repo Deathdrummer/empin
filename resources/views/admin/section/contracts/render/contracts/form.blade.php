@@ -137,11 +137,11 @@
 					<div class="form__item" id="genFields" {{!isset($subcontracting) || !$subcontracting ? 'hidden' : ''}}>
 						<div class="row row-cols-3 g-10 align-items-end">
 							<div class="col-5">
-								<label class="form__label color-dark">Стоимость генподрядного {{$guard == 'admin' ? '(не нашего)' : ''}} договора без НДС</label>
+								<label class="form__label color-dark">Стоимость генподрядного{{$guard == 'admin' ? ' (не нашего)' : ''}} договора без НДС</label>
 								<x-input id="genPrice" {{-- :value="($price ?? 0) / ((100 - ($gen_percent ?? 0)) / 100)" --}} icon="ruble-sign" iconbg="yellow" class="w100" />
 							</div>
 							<div class="col-5">
-								<label class="form__label color-dark">Стоимость генподрядного {{$guard == 'admin' ? '(не нашего)' : ''}} договора с НДС</label>
+								<label class="form__label color-dark">Стоимость генподрядного{{$guard == 'admin' ? ' (не нашего)' : ''}} договора с НДС</label>
 								<x-input id="genPriceNds"{{--  :value="($price_nds ?? 0) / ((100 - ($gen_percent ?? 0)) / 100)" --}} icon="ruble-sign" iconbg="yellow" class="w100" />
 							</div>
 							<div class="col-2">
@@ -158,7 +158,18 @@
 									inpclass="pr32px"
 									placeholder="%" />
 							</div>
-						</div>	
+						</div>
+						
+						<div class="row row-cols-2 g-10 mt10px">
+							<div class="col">
+								<label class="form__label color-dark">Дата подписания генподрядного договора</label>
+								<x-datepicker name="date_gen_start" date="{{$date_gen_start ?? null}}" calendarid="contractDateGen{{$data['rand_id']}}" class="w100" />
+							</div>
+							<div class="col">
+								<label class="form__label color-dark">Дата окончания работ по генподрядному договору</label>
+								<x-datepicker name="date_gen_end" date="{{$date_gen_end ?? null}}" calendarid="contractDateGen{{$data['rand_id']}}" class="w100" />
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>

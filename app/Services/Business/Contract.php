@@ -33,6 +33,8 @@ class Contract {
 		'locality' 			=> 'Населенный пункт',
 		'date_start' 		=> 'Дата подписания договора',
 		'date_end' 			=> 'Дата окончания работ по договору',
+		'date_gen_start'	=> 'Дата подписания генподрядного договора',
+		'date_gen_end' 		=> 'Дата окончания работ по генподрядному договору',
 		'price_nds' 		=> 'Стоимость договора с НДС',
 		'price' 			=> 'Стоимость договора без НДС',
 		'buy_number' 		=> 'Номер закупки',
@@ -94,6 +96,8 @@ class Contract {
 				'gen_percent' 		=> $item['gen_percent'] ?? null,
 				'date_start' 		=> $item['date_start'] ?? null,
 				'date_end' 			=> $item['date_end'] ?? null,
+				'date_gen_start' 	=> $item['date_gen_start'] ?? null,
+				'date_gen_end' 		=> $item['date_gen_end'] ?? null,
 				'date_close' 		=> $item['date_close'] ?? null,
 				'date_buy' 			=> $item['date_buy'] ?? null,
 				'hoz_method' 		=> $item['hoz_method'] ?? null,
@@ -320,6 +324,8 @@ class Contract {
 				'gen_percent' 		=> $item['gen_percent'] ?? null,
 				'date_start' 		=> $item['date_start'] ?? null,
 				'date_end' 			=> $item['date_end'] ?? null,
+				'date_gen_start' 	=> $item['date_gen_start'] ?? null,
+				'date_gen_end' 		=> $item['date_gen_end'] ?? null,
 				'date_close' 		=> $item['date_close'] ?? null,
 				'date_buy' 			=> $item['date_buy'] ?? null,
 				'hoz_method' 		=> $item['hoz_method'] ?? null,
@@ -660,10 +666,10 @@ class Contract {
 	public function getSelectionsToChoose($contractId = null) {
 		$userId = auth('site')->user()->id;
 
-		$choosedSelections = [];
+		$disabedSelections = [];
 		
 		if ($contractId) {
-				$contract = ContractModel::where('id', $contractId)
+			$contract = ContractModel::where('id', $contractId)
 				->with(['selections' => function ($query) use($userId) {
 					$query->where('account_id', $userId)
 						->orWhereJsonContains('subscribed', ['read' => $userId])
@@ -671,16 +677,16 @@ class Contract {
 				}])
 				->first();
 			
-			$choosedSelections = $contract->selections->pluck('id')->toArray() ?? [];
+			$disabedSelections = $contract->selections->pluck('id')->toArray() ?? [];
 		}
 		
 		$allSelections = Selection::toChoose()->get();
 		
-		return $allSelections->map(function($item) use($choosedSelections) {
+		return $allSelections->map(function($item) use($disabedSelections) {
 				return [
 					'id' 		=> $item['id'],
 					'title' 	=> $item['title'],
-					'choosed'	=> in_array($item['id'], $choosedSelections)
+					'choosed'	=> in_array($item['id'], $disabedSelections)
 				];
 			})->values()->toArray();
 	}

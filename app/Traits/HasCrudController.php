@@ -9,6 +9,7 @@ trait HasCrudController {
 	 * @param string|null  $viewPath
 	 * @param mixed  $data
 	 * @param array  $mergeData
+	 * @param array  $headers
 	 * @return 
 	 */
 	protected function view(?string $viewPath = null, $data = null, array $mergeData = [], array $headers = []) {

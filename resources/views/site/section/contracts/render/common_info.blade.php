@@ -206,6 +206,40 @@
 			@endif
 			@endcando
 			
+			@cando('contract-col-date_gen_start:site')
+				<tr>
+					<td>
+						<p class="color-gray-500 noselect format">Дата подписания генподрядного договора:</p>
+					</td>
+					<td>
+						<p class="breakword select-text" tripleselect>
+							@if($contract['date_gen_start'])
+								@date($contract['date_gen_start']) г.
+							@else
+								-
+							@endif
+						</p>
+					</td>
+				</tr>
+			@endcando
+			
+			@cando('contract-col-date_gen_end:site')
+				<tr>
+					<td>
+						<p class="color-gray-500 noselect format">Дата окончания работ по генподрядному договору:</p>
+					</td>
+					<td>
+						<p class="breakword select-text" tripleselect>
+							@if($contract['date_gen_end'])
+								@date($contract['date_gen_end']) г.
+							@else
+								-
+							@endif
+						</p>
+					</td>
+				</tr>
+			@endcando
+			
 			@cando('contract-col-hoz_method:site')
 				<tr>
 					<td>
