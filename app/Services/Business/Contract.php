@@ -666,7 +666,8 @@ class Contract {
 				$contract = ContractModel::where('id', $contractId)
 				->with(['selections' => function ($query) use($userId) {
 					$query->where('account_id', $userId)
-						->orWhereJsonContains('subscribed', $userId);
+						->orWhereJsonContains('subscribed', ['read' => $userId])
+						->orWhereJsonContains('subscribed', ['write' => $userId]);
 				}])
 				->first();
 			
