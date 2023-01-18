@@ -512,7 +512,8 @@ function _setPositionByCursor(e, blockSelector, options) {
 		leftPos = cursorX;
 	}
 	
-	if (cursorY + blockH > winH) {
+	
+	if (cursorY + blockH > winH - ddrCssVar('cm-oppositeMargin')) {
 		topPos = (strictY ? (cursorY - blockH < 0 ? 0 : cursorY - blockH) : cursorY - (cursorY + blockH - winH))
 	} else {
 		topPos = cursorY;
@@ -553,7 +554,10 @@ function _setSubmenuPosition(subMenu = null) {
 	}
 	
 	if (posY + itemH > winH) {
-		$(subMenu).addClass('oppositeY');
+		//$(subMenu).addClass('oppositeY');
+		let oopositeMargin = Number(ddrCssVar('cm-oppositeMargin'));
+		let calc = (itemH - (winH - posY)) + oopositeMargin;
+		$(subMenu).css({'transform': 'translateY(-'+calc+'px)'});
 	}
 }
 

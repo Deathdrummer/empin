@@ -1753,8 +1753,8 @@ window.ddrCssVar = function(variable, value) {
 	if (value !== undefined) {
 		return document.documentElement.style.setProperty('--'+v, value);
 	}
-	return document.documentElement.style.getPropertyValue('--'+v);
-	//return getComputedStyle(document.documentElement).getPropertyValue('--'+v);
+	//return document.documentElement.style.getPropertyValue('--'+v);
+	return getComputedStyle(document.documentElement).getPropertyValue('--'+v);
 }
 
 
