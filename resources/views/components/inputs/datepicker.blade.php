@@ -172,10 +172,15 @@
 	
 	const datePicker = ddrDatepicker(selector, ops);
 	
+	let observer = new MutationObserver((mutationRecords) => {
+		let isDate = !$(mutationRecords[0]['target']).attr('date');
+		if (isDate) datePicker.setDate(); // клик на крестик (очистка поля)
+	});
 	
-	
-	
-	
+	observer.observe(datePicker.el, {
+		attributes: true,
+		attributeFilter: ['date'],
+	});
 	
 	
 	

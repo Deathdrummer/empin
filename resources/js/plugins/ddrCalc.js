@@ -15,7 +15,13 @@ $.fn.ddrCalc = function(data = []) {
 	
 	const mainSelector = this;
 	
-	const methods = new DdrCalc(mainSelector); 
+	
+	let target = {
+		items: []
+	};
+	let eventListeners = new Proxy(target, {});
+
+	const methods = new DdrCalc(mainSelector, eventListeners); 
 	
 	data.forEach((item) => {
 		
@@ -31,7 +37,12 @@ $.fn.ddrCalc = function(data = []) {
 	
 	return {
 		calc() {
-			$(mainSelector).trigger('input');
+			$(mainSelector).trigger('input.ddrcalc');
+		},
+		destroy() {
+			eventListeners.items.forEach(function(evt) {
+				$(evt.target).off('.ddrcalc');
+			});
 		}
 	};
 };
@@ -43,9 +54,11 @@ $.fn.ddrCalc = function(data = []) {
 class DdrCalc {
 	
 	mainSelector = null;
+	eventListeners = null;
 	
-	constructor(mainSelector) {
+	constructor(mainSelector, eventListeners) {
 		this.mainSelector = mainSelector;
+		this.eventListeners = eventListeners;
 	}
 	
 	
@@ -66,7 +79,7 @@ class DdrCalc {
 		}, data),
 			thisCls = this;
 			
-		$(thisCls.mainSelector).on('input', function(e) {
+		$(thisCls.mainSelector).on('input.ddrcalc', function(e) {
 			let val = thisCls._valToNumber(e.target.value, 2);
 			let result = _.round(thisCls._calc('percent', val, percent, reverse), 2);
 			
@@ -74,10 +87,12 @@ class DdrCalc {
 				result = middleware[0](result, thisCls._calc.bind(thisCls));
 			}
 			$(selector).val(_.round(result, 2));
+			
+			thisCls.eventListeners.items.push(e);
 		});	
 		
 		if (twoWay) {
-			$(selector).on('input', function(e) {
+			$(selector).on('input.ddrcalc', function(e) {
 				
 				let val = thisCls._valToNumber(e.target.value, 2);
 				
@@ -90,6 +105,8 @@ class DdrCalc {
 				}
 				
 				$(thisCls.mainSelector).val(_.round(result, 2));
+				
+				thisCls.eventListeners.items.push(e);
 			});
 		}
 		
@@ -119,7 +136,7 @@ class DdrCalc {
 		}, data),
 			thisCls = this;
 			
-		$(thisCls.mainSelector).on('input', function(e) {
+		$(thisCls.mainSelector).on('input.ddrcalc', function(e) {
 			let val = thisCls._valToNumber(e.target.value, 2);
 			let result = _.round(thisCls._calc('percentLess', val, percent, reverse), 2);
 			
@@ -128,11 +145,13 @@ class DdrCalc {
 			}
 			
 			$(selector).val(_.round(result, 2));
+			
+			thisCls.eventListeners.items.push(e);
 		});	
 		
 		
 		if (twoWay) {
-			$(selector).on('input', function(e) {
+			$(selector).on('input.ddrcalc', function(e) {
 				let val = thisCls._valToNumber(e.target.value, 2);
 				let result = _.round(thisCls._calc('percentLess', val, percent, !reverse), 2);
 				
@@ -143,6 +162,8 @@ class DdrCalc {
 				}
 				
 				$(thisCls.mainSelector).val(_.round(result, 2));
+				
+				thisCls.eventListeners.items.push(e);
 			});
 		}
 		

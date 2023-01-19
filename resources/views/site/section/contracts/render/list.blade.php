@@ -213,6 +213,40 @@
 									</x-table.td>
 								@endif
 								
+								@if($column == 'date_sub_start' && auth('site')->user()->can('contract-col-date_sub_start:site'))
+									<x-table.td
+										class="w6rem sort{{$sortField == 'date_sub_start' ? ' sort-'.$sortOrder : ''}}"
+										onclick="$.sorting(this, 'date_sub_start')"
+										oncontextmenu="$.contractFilterByDate('{{$column}}')"
+										noscroll
+										ddrtabletdmain
+										>
+										<strong class="fz10px lh90 d-block text-center wodrbreak">Дата подписания субподрядного договора</strong>
+										@if(isset($columnFilter) && $columnFilter == $column)
+											<div class="placer placer-bottom placer-center">
+												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
+											</div>
+										@endif
+									</x-table.td>
+								@endif
+								
+								@if($column == 'date_sub_end' && auth('site')->user()->can('contract-col-date_sub_end:site'))
+									<x-table.td
+										class="w6rem sort{{$sortField == 'date_sub_end' ? ' sort-'.$sortOrder : ''}}"
+										onclick="$.sorting(this, 'date_sub_end')"
+										oncontextmenu="$.contractFilterByDate('{{$column}}')"
+										noscroll
+										ddrtabletdmain
+										>
+										<strong class="fz10px lh90 d-block text-center wodrbreak">Дата окончания работ по субподрядному договору</strong>
+										@if(isset($columnFilter) && $columnFilter == $column)
+											<div class="placer placer-bottom placer-center">
+												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
+											</div>
+										@endif
+									</x-table.td>
+								@endif
+								
 								@if($column == 'hoz_method' && auth('site')->user()->can('contract-col-hoz_method:site'))
 									<x-table.td
 										class="w3rem sort{{$sortField == 'hoz_method' ? ' sort-'.$sortOrder : ''}}"

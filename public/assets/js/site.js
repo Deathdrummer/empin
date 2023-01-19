@@ -8164,7 +8164,11 @@ $.fn.ddrCalc = function () {
   var data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
   if (!data) throw Error('ddrCalc ошибка! Такого метода не существует!');
   var mainSelector = this;
-  var methods = new DdrCalc(mainSelector);
+  var target = {
+    items: []
+  };
+  var eventListeners = new Proxy(target, {});
+  var methods = new DdrCalc(mainSelector, eventListeners);
   data.forEach(function (item) {
     var method = item.method;
     delete item['method'];
@@ -8173,18 +8177,26 @@ $.fn.ddrCalc = function () {
   });
   return {
     calc: function calc() {
-      $(mainSelector).trigger('input');
+      $(mainSelector).trigger('input.ddrcalc');
+    },
+    destroy: function destroy() {
+      eventListeners.items.forEach(function (evt) {
+        $(evt.target).off('.ddrcalc');
+      });
     }
   };
 };
 
 var DdrCalc = /*#__PURE__*/function () {
-  function DdrCalc(mainSelector) {
+  function DdrCalc(mainSelector, eventListeners) {
     _classCallCheck(this, DdrCalc);
 
     _defineProperty(this, "mainSelector", null);
 
+    _defineProperty(this, "eventListeners", null);
+
     this.mainSelector = mainSelector;
+    this.eventListeners = eventListeners;
   }
 
   _createClass(DdrCalc, [{
@@ -8204,7 +8216,7 @@ var DdrCalc = /*#__PURE__*/function () {
           middleware = _$$extend.middleware,
           thisCls = this;
 
-      $(thisCls.mainSelector).on('input', function (e) {
+      $(thisCls.mainSelector).on('input.ddrcalc', function (e) {
         var val = thisCls._valToNumber(e.target.value, 2);
 
         var result = _.round(thisCls._calc('percent', val, percent, reverse), 2);
@@ -8214,10 +8226,11 @@ var DdrCalc = /*#__PURE__*/function () {
         }
 
         $(selector).val(_.round(result, 2));
+        thisCls.eventListeners.items.push(e);
       });
 
       if (twoWay) {
-        $(selector).on('input', function (e) {
+        $(selector).on('input.ddrcalc', function (e) {
           var val = thisCls._valToNumber(e.target.value, 2);
 
           var result = _.round(thisCls._calc('percent', val, percent, !reverse), 2);
@@ -8229,6 +8242,7 @@ var DdrCalc = /*#__PURE__*/function () {
           }
 
           $(thisCls.mainSelector).val(_.round(result, 2));
+          thisCls.eventListeners.items.push(e);
         });
       }
     }
@@ -8249,7 +8263,7 @@ var DdrCalc = /*#__PURE__*/function () {
           middleware = _$$extend2.middleware,
           thisCls = this;
 
-      $(thisCls.mainSelector).on('input', function (e) {
+      $(thisCls.mainSelector).on('input.ddrcalc', function (e) {
         var val = thisCls._valToNumber(e.target.value, 2);
 
         var result = _.round(thisCls._calc('percentLess', val, percent, reverse), 2);
@@ -8259,10 +8273,11 @@ var DdrCalc = /*#__PURE__*/function () {
         }
 
         $(selector).val(_.round(result, 2));
+        thisCls.eventListeners.items.push(e);
       });
 
       if (twoWay) {
-        $(selector).on('input', function (e) {
+        $(selector).on('input.ddrcalc', function (e) {
           var val = thisCls._valToNumber(e.target.value, 2);
 
           var result = _.round(thisCls._calc('percentLess', val, percent, !reverse), 2);
@@ -8274,6 +8289,7 @@ var DdrCalc = /*#__PURE__*/function () {
           }
 
           $(thisCls.mainSelector).val(_.round(result, 2));
+          thisCls.eventListeners.items.push(e);
         });
       }
     } //------------------------------------------------------------------------------------------

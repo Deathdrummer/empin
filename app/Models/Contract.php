@@ -69,6 +69,8 @@ class Contract extends Model {
 		'date_end',
 		'date_gen_start',
 		'date_gen_end',
+		'date_sub_start',
+		'date_sub_end',
 		'date_close',
 		'date_buy',
 		'customer',
@@ -224,6 +226,27 @@ class Contract extends Model {
 	 */
 	public function setDateGenEndAttribute($value) {
 		$this->attributes['date_gen_end'] = $value ? Carbon::parse($value) : null;
+	}
+	
+	
+	
+	/**
+	 * @param 
+	 * @return 
+	 */
+	public function setDateSubStartAttribute($value) {
+		$this->attributes['date_sub_start'] = $value ? Carbon::parse($value) : null;
+	}
+	
+	
+	
+	
+	/**
+	 * @param 
+	 * @return 
+	 */
+	public function setDateSubEndAttribute($value) {
+		$this->attributes['date_sub_end'] = $value ? Carbon::parse($value) : null;
 	}
 	
 	

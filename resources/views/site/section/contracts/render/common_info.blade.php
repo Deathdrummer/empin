@@ -244,6 +244,44 @@
 			@endif
 			@endcando
 			
+			@cando('contract-col-date_sub_start:site')
+			@if($contract['gencontracting'])
+				<tr>
+					<td>
+						<p class="color-gray-500 noselect format">Дата подписания субподрядного договора:</p>
+					</td>
+					<td>
+						<p class="breakword select-text" tripleselect>
+							@if($contract['date_sub_start'])
+								@date($contract['date_sub_start']) г.
+							@else
+								-
+							@endif
+						</p>
+					</td>
+				</tr>
+			@endif
+			@endcando
+			
+			@cando('contract-col-date_sub_end:site')
+			@if($contract['gencontracting'])
+				<tr>
+					<td>
+						<p class="color-gray-500 noselect format">Дата окончания работ по субподрядному договору:</p>
+					</td>
+					<td>
+						<p class="breakword select-text" tripleselect>
+							@if($contract['date_sub_end'])
+								@date($contract['date_sub_end']) г.
+							@else
+								-
+							@endif
+						</p>
+					</td>
+				</tr>
+			@endif
+			@endcando
+			
 			@cando('contract-col-hoz_method:site')
 				<tr>
 					<td>

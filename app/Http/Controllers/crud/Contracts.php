@@ -186,8 +186,10 @@ class Contracts extends Controller {
 			'gen_percent' 		=> 'nullable|numeric',
 			'date_start' 		=> 'nullable|date_format:d-m-Y',
 			'date_gen_start' 	=> 'nullable|date_format:d-m-Y',
+			'date_sub_start' 	=> 'nullable|date_format:d-m-Y',
 			'date_end' 			=> 'nullable|date_format:d-m-Y',
 			'date_gen_end' 		=> 'nullable|date_format:d-m-Y',
+			'date_sub_end' 		=> 'nullable|date_format:d-m-Y',
 			'date_close' 		=> 'nullable|date_format:d-m-Y',
 			'date_buy' 			=> 'nullable|date_format:d-m-Y',
 			'customer' 			=> 'nullable|numeric',
@@ -332,6 +334,9 @@ class Contracts extends Controller {
      */
     public function update(Request $request, $id) {
 		
+		
+		logger($request->all());
+		
 		$request->merge(['object_number' => Str::padLeft($request->input('object_number'), 5, 0)]);
 		
 		$validFields = $request->validate([
@@ -351,8 +356,10 @@ class Contracts extends Controller {
 			'gen_percent' 		=> 'nullable|numeric',
 			'date_start' 		=> 'nullable|date_format:d-m-Y',
 			'date_gen_start' 	=> 'nullable|date_format:d-m-Y',
+			'date_sub_start' 	=> 'nullable|date_format:d-m-Y',
 			'date_end' 			=> 'nullable|date_format:d-m-Y',
 			'date_gen_end' 		=> 'nullable|date_format:d-m-Y',
+			'date_sub_end' 		=> 'nullable|date_format:d-m-Y',
 			'date_close' 		=> 'nullable|date_format:d-m-Y',
 			'date_buy' 			=> 'nullable|date_format:d-m-Y',
 			'customer' 			=> 'nullable|numeric',

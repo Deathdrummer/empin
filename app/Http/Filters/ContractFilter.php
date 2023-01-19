@@ -113,7 +113,7 @@ class ContractFilter extends AbstractFilter {
 	public function filter(Builder $builder, $value) {
 		['column' => $column, 'value' => $value] = json_decode($value, true);
 		
-		if (in_array($column, ['date_start', 'date_end', 'date_gen_start', 'date_gen_end', 'date_close'])) {
+		if (in_array($column, ['date_start', 'date_end', 'date_gen_start', 'date_gen_end', 'date_sub_start', 'date_sub_end', 'date_close'])) {
 			$d = explode('|', $value);
 			
 			$dateFrom = $d[0] ?? null;
