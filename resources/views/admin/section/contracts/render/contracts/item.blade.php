@@ -10,13 +10,14 @@
 		<td><p class="fz12px">{{$applicant ?? '-'}}</p></td>
 		<td><p class="fz12px">{{$contract ?? '-'}}</p></td>
 		<td class="breakword">
-			<div class="scrollblock-hidden h5rem vertical-center">
+			<div class="scrollblock-hidden maxh5rem pr3px">
 				@if(isset($customer) && isset($data['customers'][$customer]))
-					<p class="fz12px">{{$data['customers'][$customer]}}</p></td>
+					<p class="format fz12px mt2px mb2px">{{$data['customers'][$customer]}}</p></td>
 				@else
 					<p class="color-gray">-</p>
 				@endif
 			</div>
+		</td>	
 		<td><p class="fz12px">{{$locality ?? '-'}}</p></td>
 		<td class="text-end">
 			@isset($price_nds)
