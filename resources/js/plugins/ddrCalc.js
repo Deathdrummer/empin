@@ -20,8 +20,10 @@ $.fn.ddrCalc = function(data = []) {
 		items: []
 	};
 	let eventListeners = new Proxy(target, {});
+	
+	let eventRandStr = generateCode('LllnnnlLnLnLllnnn');
 
-	const methods = new DdrCalc(mainSelector, eventListeners); 
+	const methods = new DdrCalc(mainSelector, eventListeners, eventRandStr); 
 	
 	data.forEach((item) => {
 		
@@ -29,7 +31,7 @@ $.fn.ddrCalc = function(data = []) {
 		
 		delete(item['method']);
 		
-		if (['percent', 'percentLess'].indexOf(method) === -1) throw Error('ddrCalc ошибка! Такого метода не существует!');
+		if (['percent', 'nds'].indexOf(method) === -1) throw Error('ddrCalc ошибка! Такого метода не существует!');
 		
 		methods[method](item);
 	});
@@ -37,11 +39,11 @@ $.fn.ddrCalc = function(data = []) {
 	
 	return {
 		calc() {
-			$(mainSelector).trigger('input.ddrcalc');
+			$(mainSelector).trigger('input.'+eventRandStr);
 		},
 		destroy() {
 			eventListeners.items.forEach(function(evt) {
-				$(evt.target).off('.ddrcalc');
+				$(evt.target).off('input.'+eventRandStr);
 			});
 		}
 	};
@@ -55,10 +57,12 @@ class DdrCalc {
 	
 	mainSelector = null;
 	eventListeners = null;
+	inputEvent = null;
 	
-	constructor(mainSelector, eventListeners) {
+	constructor(mainSelector, eventListeners, eventRandStr) {
 		this.mainSelector = mainSelector;
 		this.eventListeners = eventListeners;
+		this.inputEvent = 'input.'+eventRandStr;
 	}
 	
 	
@@ -79,7 +83,7 @@ class DdrCalc {
 		}, data),
 			thisCls = this;
 			
-		$(thisCls.mainSelector).on('input.ddrcalc', function(e) {
+		$(thisCls.mainSelector).on(thisCls.inputEvent, function(e) {
 			let val = thisCls._valToNumber(e.target.value, 2);
 			let result = _.round(thisCls._calc('percent', val, percent, reverse), 2);
 			
@@ -92,7 +96,7 @@ class DdrCalc {
 		});	
 		
 		if (twoWay) {
-			$(selector).on('input.ddrcalc', function(e) {
+			$(selector).on(thisCls.inputEvent, function(e) {
 				
 				let val = thisCls._valToNumber(e.target.value, 2);
 				
@@ -120,7 +124,7 @@ class DdrCalc {
 	
 	
 	
-	percentLess(data) {
+	nds(data) {
 		let {
 			selector,
 			percent,
@@ -136,9 +140,9 @@ class DdrCalc {
 		}, data),
 			thisCls = this;
 			
-		$(thisCls.mainSelector).on('input.ddrcalc', function(e) {
+		$(thisCls.mainSelector).on(thisCls.inputEvent, function(e) {
 			let val = thisCls._valToNumber(e.target.value, 2);
-			let result = _.round(thisCls._calc('percentLess', val, percent, reverse), 2);
+			let result = _.round(thisCls._calc('nds', val, percent, reverse), 2);
 			
 			if (_.isFunction(middleware[0])) {
 				result = middleware[0](result, thisCls._calc.bind(thisCls));
@@ -151,9 +155,9 @@ class DdrCalc {
 		
 		
 		if (twoWay) {
-			$(selector).on('input.ddrcalc', function(e) {
+			$(selector).on(thisCls.inputEvent, function(e) {
 				let val = thisCls._valToNumber(e.target.value, 2);
-				let result = _.round(thisCls._calc('percentLess', val, percent, !reverse), 2);
+				let result = _.round(thisCls._calc('nds', val, percent, !reverse), 2);
 				
 				if (middleware[1] !== undefined && middleware[1] !== false && _.isFunction(middleware[1])) {
 					result = middleware[1](result, thisCls._calc.bind(thisCls));
@@ -194,19 +198,22 @@ class DdrCalc {
 				value = this._valToNumber(value, 2);
 				
 				percent = _.isPlainObject(percent) ? percent.value : percent;
+				percent = Number(percent);
 				
 				if (!reverse) return percent < 100 ? _.round(value / ((100 - percent) / 100), 2) : 0;
 				return percent < 100 ? _.round(value * ((100 - percent) / 100), 2) : 0;
 				break;
 			
-			case 'percentLess':
-				let [valueLess, percentLess, reverseLess = false] = args;
+			case 'nds':
+				let [valueLess, nds, reverseLess = false] = args;
 				
 				valueLess = this._valToNumber(valueLess, 2);
 				
-				percentLess = _.isPlainObject(percentLess) ? percentLess.value : percentLess;
-				if (!reverseLess) return _.round(valueLess * (1 + percentLess / 100), 2);
-				return _.round(valueLess / (1 + percentLess / 100), 2);
+				nds = _.isPlainObject(nds) ? nds.value : nds;
+				nds = Number(nds);
+				
+				if (!reverseLess) return _.round(valueLess * (1 + nds / 100), 2);
+				return _.round(valueLess / (1 + nds / 100), 2);
 				break;
 				
 			default:

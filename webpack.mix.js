@@ -49,6 +49,7 @@ mix
 	//.copy('resources/fonts', 'public/assets/fonts')
 	.js('resources/js/admin.js', 'public/assets/js')
 	.js('resources/js/site.js', 'public/assets/js')
+	.js('resources/js/sections.js', 'public/assets/js')
 	.disableNotifications()
 	.disableSuccessNotifications()
 	.version();

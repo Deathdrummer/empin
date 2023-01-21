@@ -5530,6 +5530,8 @@ __webpack_require__(/*! @/functions */ "./resources/js/functions.js");
 
 __webpack_require__(/*! @/common */ "./resources/js/common.js");
 
+__webpack_require__(/*! @/sections */ "./resources/js/sections.js");
+
 /***/ }),
 
 /***/ "./resources/js/common.js":
@@ -8143,35 +8145,39 @@ $.fn.ddrCalc = function () {
     items: []
   };
   var eventListeners = new Proxy(target, {});
-  var methods = new DdrCalc(mainSelector, eventListeners);
+  var eventRandStr = generateCode('LllnnnlLnLnLllnnn');
+  var methods = new DdrCalc(mainSelector, eventListeners, eventRandStr);
   data.forEach(function (item) {
     var method = item.method;
     delete item['method'];
-    if (['percent', 'percentLess'].indexOf(method) === -1) throw Error('ddrCalc ошибка! Такого метода не существует!');
+    if (['percent', 'nds'].indexOf(method) === -1) throw Error('ddrCalc ошибка! Такого метода не существует!');
     methods[method](item);
   });
   return {
     calc: function calc() {
-      $(mainSelector).trigger('input.ddrcalc');
+      $(mainSelector).trigger('input.' + eventRandStr);
     },
     destroy: function destroy() {
       eventListeners.items.forEach(function (evt) {
-        $(evt.target).off('.ddrcalc');
+        $(evt.target).off('input.' + eventRandStr);
       });
     }
   };
 };
 
 var DdrCalc = /*#__PURE__*/function () {
-  function DdrCalc(mainSelector, eventListeners) {
+  function DdrCalc(mainSelector, eventListeners, eventRandStr) {
     _classCallCheck(this, DdrCalc);
 
     _defineProperty(this, "mainSelector", null);
 
     _defineProperty(this, "eventListeners", null);
 
+    _defineProperty(this, "inputEvent", null);
+
     this.mainSelector = mainSelector;
     this.eventListeners = eventListeners;
+    this.inputEvent = 'input.' + eventRandStr;
   }
 
   _createClass(DdrCalc, [{
@@ -8191,7 +8197,7 @@ var DdrCalc = /*#__PURE__*/function () {
           middleware = _$$extend.middleware,
           thisCls = this;
 
-      $(thisCls.mainSelector).on('input.ddrcalc', function (e) {
+      $(thisCls.mainSelector).on(thisCls.inputEvent, function (e) {
         var val = thisCls._valToNumber(e.target.value, 2);
 
         var result = _.round(thisCls._calc('percent', val, percent, reverse), 2);
@@ -8205,7 +8211,7 @@ var DdrCalc = /*#__PURE__*/function () {
       });
 
       if (twoWay) {
-        $(selector).on('input.ddrcalc', function (e) {
+        $(selector).on(thisCls.inputEvent, function (e) {
           var val = thisCls._valToNumber(e.target.value, 2);
 
           var result = _.round(thisCls._calc('percent', val, percent, !reverse), 2);
@@ -8222,8 +8228,8 @@ var DdrCalc = /*#__PURE__*/function () {
       }
     }
   }, {
-    key: "percentLess",
-    value: function percentLess(data) {
+    key: "nds",
+    value: function nds(data) {
       var _$$extend2 = $.extend({
         selector: null,
         percent: 0,
@@ -8238,10 +8244,10 @@ var DdrCalc = /*#__PURE__*/function () {
           middleware = _$$extend2.middleware,
           thisCls = this;
 
-      $(thisCls.mainSelector).on('input.ddrcalc', function (e) {
+      $(thisCls.mainSelector).on(thisCls.inputEvent, function (e) {
         var val = thisCls._valToNumber(e.target.value, 2);
 
-        var result = _.round(thisCls._calc('percentLess', val, percent, reverse), 2);
+        var result = _.round(thisCls._calc('nds', val, percent, reverse), 2);
 
         if (_.isFunction(middleware[0])) {
           result = middleware[0](result, thisCls._calc.bind(thisCls));
@@ -8252,10 +8258,10 @@ var DdrCalc = /*#__PURE__*/function () {
       });
 
       if (twoWay) {
-        $(selector).on('input.ddrcalc', function (e) {
+        $(selector).on(thisCls.inputEvent, function (e) {
           var val = thisCls._valToNumber(e.target.value, 2);
 
-          var result = _.round(thisCls._calc('percentLess', val, percent, !reverse), 2);
+          var result = _.round(thisCls._calc('nds', val, percent, !reverse), 2);
 
           if (middleware[1] !== undefined && middleware[1] !== false && _.isFunction(middleware[1])) {
             result = middleware[1](result, thisCls._calc.bind(thisCls));
@@ -8287,19 +8293,21 @@ var DdrCalc = /*#__PURE__*/function () {
               reverse = _args$ === void 0 ? false : _args$;
           value = this._valToNumber(value, 2);
           percent = _.isPlainObject(percent) ? percent.value : percent;
+          percent = Number(percent);
           if (!reverse) return percent < 100 ? _.round(value / ((100 - percent) / 100), 2) : 0;
           return percent < 100 ? _.round(value * ((100 - percent) / 100), 2) : 0;
           break;
 
-        case 'percentLess':
+        case 'nds':
           var valueLess = args[0],
-              percentLess = args[1],
+              nds = args[1],
               _args$2 = args[2],
               reverseLess = _args$2 === void 0 ? false : _args$2;
           valueLess = this._valToNumber(valueLess, 2);
-          percentLess = _.isPlainObject(percentLess) ? percentLess.value : percentLess;
-          if (!reverseLess) return _.round(valueLess * (1 + percentLess / 100), 2);
-          return _.round(valueLess / (1 + percentLess / 100), 2);
+          nds = _.isPlainObject(nds) ? nds.value : nds;
+          nds = Number(nds);
+          if (!reverseLess) return _.round(valueLess * (1 + nds / 100), 2);
+          return _.round(valueLess / (1 + nds / 100), 2);
           break;
 
         default:
@@ -13850,6 +13858,230 @@ $.fn.ddrTooltip = function (params, callback) {
 
   return toolTipObj;
 };
+
+/***/ }),
+
+/***/ "./resources/js/sections.js":
+/*!**********************************!*\
+  !*** ./resources/js/sections.js ***!
+  \**********************************/
+/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+
+window.loadSectionScripts = function () {
+  var ops = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  if (_.isEmpty(ops)) throw Error('loadSectionScripts -> не переданы параметры!');
+
+  var _$assign = _.assign({
+    guard: 'site',
+    section: null
+  }, ops),
+      guard = _$assign.guard,
+      section = _$assign.section; //console.log(get);
+
+
+  if (_.isNull(section)) throw Error('loadSectionScripts -> не указан параметр section');
+
+  var data = __webpack_require__("./resources/js/sections sync recursive ^\\.\\/.*\\/index\\.js$")("./" + guard + '/' + section + "/index.js");
+
+  return data;
+};
+
+/***/ }),
+
+/***/ "./resources/js/sections/site/contracts/calcGencontracting.js":
+/*!********************************************************************!*\
+  !*** ./resources/js/sections/site/contracts/calcGencontracting.js ***!
+  \********************************************************************/
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "calcGencontracting": function() { return /* binding */ calcGencontracting; }
+/* harmony export */ });
+function calcGencontracting() {
+  var ops = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  var percentNds = ops.percentNds,
+      contractingPercent = ops.contractingPercent;
+  var selfPriceNds = $('#selfPriceNds').ddrCalc([{
+    selector: '#subPriceNds',
+    method: 'percent',
+    percent: contractingPercent,
+    reverse: true
+  }, {
+    selector: '#subPrice',
+    method: 'percent',
+    percent: contractingPercent,
+    reverse: true,
+    middleware: [function (value, calc) {
+      return calc('nds', $('#subPriceNds').val(), percentNds, true);
+    }, false]
+  }]);
+  var selfPrice = $('#selfPrice').ddrCalc([{
+    selector: '#subPrice',
+    method: 'percent',
+    percent: contractingPercent,
+    reverse: true
+  }, {
+    selector: '#subPriceNds',
+    method: 'percent',
+    percent: contractingPercent,
+    reverse: true,
+    middleware: [function (value, calc) {
+      return calc('nds', $('#subPrice').val(), percentNds);
+    }, false]
+  }]);
+  var subPriceNds = $('#subPriceNds').ddrCalc([{
+    selector: '#subPrice',
+    method: 'nds',
+    percent: percentNds,
+    reverse: true
+  }, {
+    selector: '#selfPriceNds',
+    method: 'percent',
+    percent: contractingPercent //reverse: true,
+
+  }, {
+    selector: '#selfPrice',
+    method: 'percent',
+    percent: contractingPercent,
+    //reverse: true,
+    middleware: [function (value, calc) {
+      return calc('nds', $('#selfPriceNds').val(), percentNds, true);
+    }, false]
+  }]);
+  var subPrice = $('#subPrice').ddrCalc([{
+    selector: '#subPriceNds',
+    method: 'nds',
+    percent: percentNds
+  }, {
+    selector: '#selfPrice',
+    method: 'percent',
+    percent: contractingPercent //reverse: true,
+
+  }, {
+    selector: '#selfPriceNds',
+    method: 'percent',
+    percent: contractingPercent,
+    //reverse: true,
+    middleware: [function (value, calc) {
+      return calc('nds', $('#selfPrice').val(), percentNds);
+    }, false]
+  }]);
+  return {
+    selfPriceNds: selfPriceNds,
+    selfPrice: selfPrice,
+    subPriceNds: subPriceNds,
+    subPrice: subPrice
+  };
+}
+
+/***/ }),
+
+/***/ "./resources/js/sections/site/contracts/calcSubcontracting.js":
+/*!********************************************************************!*\
+  !*** ./resources/js/sections/site/contracts/calcSubcontracting.js ***!
+  \********************************************************************/
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "calcSubcontracting": function() { return /* binding */ calcSubcontracting; }
+/* harmony export */ });
+function calcSubcontracting() {
+  var ops = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  var percentNds = ops.percentNds,
+      contractingPercent = ops.contractingPercent;
+  var selfPriceNds = $('#selfPriceNds').ddrCalc([{
+    selector: '#genPriceNds',
+    method: 'percent',
+    percent: contractingPercent
+  }, {
+    selector: '#genPrice',
+    method: 'percent',
+    percent: contractingPercent,
+    middleware: [function (value, calc) {
+      return calc('nds', $('#genPriceNds').val(), percentNds, true);
+    }, false]
+  }]);
+  var selfPrice = $('#selfPrice').ddrCalc([{
+    selector: '#genPrice',
+    method: 'percent',
+    percent: contractingPercent
+  }, {
+    selector: '#genPriceNds',
+    method: 'percent',
+    percent: contractingPercent,
+    middleware: [function (value, calc) {
+      return calc('nds', $('#genPrice').val(), percentNds);
+    }, false]
+  }]);
+  var genPriceNds = $('#genPriceNds').ddrCalc([{
+    selector: '#genPrice',
+    method: 'nds',
+    percent: percentNds,
+    reverse: true
+  }, {
+    selector: '#selfPriceNds',
+    method: 'percent',
+    percent: contractingPercent,
+    reverse: true
+  }, {
+    selector: '#selfPrice',
+    method: 'percent',
+    percent: contractingPercent,
+    reverse: true,
+    middleware: [function (value, calc) {
+      return calc('nds', $('#selfPriceNds').val(), percentNds, true);
+    }, false]
+  }]);
+  var genPrice = $('#genPrice').ddrCalc([{
+    selector: '#genPriceNds',
+    method: 'nds',
+    percent: percentNds
+  }, {
+    selector: '#selfPrice',
+    method: 'percent',
+    percent: contractingPercent,
+    reverse: true
+  }, {
+    selector: '#selfPriceNds',
+    method: 'percent',
+    percent: contractingPercent,
+    reverse: true,
+    middleware: [function (value, calc) {
+      return calc('nds', $('#selfPrice').val(), percentNds);
+    }, false]
+  }]);
+  return {
+    selfPriceNds: selfPriceNds,
+    selfPrice: selfPrice,
+    genPriceNds: genPriceNds,
+    genPrice: genPrice
+  };
+}
+
+/***/ }),
+
+/***/ "./resources/js/sections/site/contracts/index.js":
+/*!*******************************************************!*\
+  !*** ./resources/js/sections/site/contracts/index.js ***!
+  \*******************************************************/
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "calcGencontracting": function() { return /* reexport safe */ _calcGencontracting_js__WEBPACK_IMPORTED_MODULE_1__.calcGencontracting; },
+/* harmony export */   "calcSubcontracting": function() { return /* reexport safe */ _calcSubcontracting_js__WEBPACK_IMPORTED_MODULE_0__.calcSubcontracting; },
+/* harmony export */   "data": function() { return /* binding */ data; }
+/* harmony export */ });
+/* harmony import */ var _calcSubcontracting_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./calcSubcontracting.js */ "./resources/js/sections/site/contracts/calcSubcontracting.js");
+/* harmony import */ var _calcGencontracting_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./calcGencontracting.js */ "./resources/js/sections/site/contracts/calcGencontracting.js");
+
+
+var data = 'dfgfdfg';
 
 /***/ }),
 
@@ -46859,6 +47091,38 @@ tippy.setDefaultProps({
 
 //# sourceMappingURL=tippy.esm.js.map
 
+
+/***/ }),
+
+/***/ "./resources/js/sections sync recursive ^\\.\\/.*\\/index\\.js$":
+/*!*********************************************************!*\
+  !*** ./resources/js/sections/ sync ^\.\/.*\/index\.js$ ***!
+  \*********************************************************/
+/***/ (function(module, __unused_webpack_exports, __webpack_require__) {
+
+var map = {
+	"./site/contracts/index.js": "./resources/js/sections/site/contracts/index.js"
+};
+
+
+function webpackContext(req) {
+	var id = webpackContextResolve(req);
+	return __webpack_require__(id);
+}
+function webpackContextResolve(req) {
+	if(!__webpack_require__.o(map, req)) {
+		var e = new Error("Cannot find module '" + req + "'");
+		e.code = 'MODULE_NOT_FOUND';
+		throw e;
+	}
+	return map[req];
+}
+webpackContext.keys = function webpackContextKeys() {
+	return Object.keys(map);
+};
+webpackContext.resolve = webpackContextResolve;
+module.exports = webpackContext;
+webpackContext.id = "./resources/js/sections sync recursive ^\\.\\/.*\\/index\\.js$";
 
 /***/ })
 

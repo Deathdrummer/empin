@@ -238,6 +238,10 @@
 
 
 <script type="module">
+	
+	const {calcSubcontracting, calcGencontracting} = loadSectionScripts({section: 'contracts'});
+	
+	
 	let abortCtrl,
 		abortCtrlCounts,
 		abortCtrlFilter,
@@ -1480,131 +1484,58 @@
 						
 						
 						// --------------------------------------------------- Работа с НДС					
-						const genPercent = ref($('#genPercent:visible').val() || $('#subPercent:visible').val());
+						const contractingPercent = ref($('#contractingPercent').val());
 						const genpercentVariant = headers['x-genpercent'] || 'gen';
-						
-						let selfPriceNds, selfPrice, genPriceNds, genPrice, subPrice, subPriceNds;
-						
-						
-						$('#genPercent').on('input', function(e) {
-							genPercent.value = e.target.value;
-							genPriceNds.calc();
-							/*if (genpercentVariant == 'gen') selfPriceNds.calc();
-							else if (genpercentVariant == 'self') genPriceNds.calc();*/
-						});
-						
-						$('#subPercent').on('input', function(e) {
-							genPercent.value = e.target.value;
-							selfPriceNds.calc();
-						});
+						/*if (genpercentVariant == 'gen') selfPriceNds.calc();
+						else if (genpercentVariant == 'self') genPriceNds.calc();*/
 						
 						
+						const selfNds = $('#selfPrice').ddrCalc([{
+							selector: '#selfPriceNds',
+							method: 'nds',
+							percent: percentNds,
+							twoWay: true
+						}]);
+						
+						
+						let genSelfPriceNds, genSelfPrice, subSelfPriceNds, subSelfPrice, genPriceNds, genPrice, subPriceNds, subPrice;
 						
 						$('#subcontracting').on('change slavechange', function(e) {
 							if (e.type == 'change') $('#gencontracting').trigger('slavechange');
-							else if (e.type == 'slavechange') $(this).ddrInputs('checked', false);
+							else if (e.type == 'slavechange') {
+								if ($(this).is(':checked')) $(this).ddrInputs('checked', false);
+								else return;
+							}
 							
-							let isChecked = $(this).is(':checked');
-							
-							if (isChecked) {
-								$('#genFields').removeAttrib('hidden');
+							if ($(this).is(':checked')) {
+								const calcSubData = calcSubcontracting({percentNds, contractingPercent});
 								
-								$('#genPercent').val(genPercent.value);
+								genSelfPriceNds = calcSubData.selfPriceNds;
+								genSelfPrice = calcSubData.selfPrice;
+								genPriceNds = calcSubData.genPriceNds;
+								genPrice = calcSubData.genPrice;
 								
-								selfPriceNds = $('#selfPriceNds').ddrCalc([{
-									selector: '#selfPrice',
-									method: 'percentLess',
-									percent: percentNds,
-									reverse: true,
-								}, {
-									selector: '#genPriceNds',
-									method: 'percent',
-									percent: genPercent,
-								}, {
-									selector: '#genPrice',
-									method: 'percent',
-									percent: genPercent,
-									middleware: [(value, calc) => {
-										return calc('percentLess', $('#genPriceNds').val(), percentNds, true);
-									}, false],
-								}]);
+								genSelfPriceNds.calc();
 								
-								selfPrice = $('#selfPrice').ddrCalc([{
-									selector: '#selfPriceNds',
-									method: 'percentLess',
-									percent: percentNds,
-								}, {
-									selector: '#genPrice',
-									method: 'percent',
-									percent: genPercent,
-								}, {
-									selector: '#genPriceNds',
-									method: 'percent',
-									percent: genPercent,
-									middleware: [(value, calc) => {
-										return calc('percentLess', $('#genPrice').val(), percentNds);
-									}, false],
-								}]);
+								$('#contractingPercent').on('input.calc', function(e) {
+									contractingPercent.value = e.target.value;
+									genPriceNds.calc();
+								});
 								
-								
-								
-								
-								
-								genPriceNds = $('#genPriceNds').ddrCalc([{
-									selector: '#genPrice',
-									method: 'percentLess',
-									percent: percentNds,
-									reverse: true,
-								}, {
-									selector: '#selfPriceNds',
-									method: 'percent',
-									percent: genPercent,
-									reverse: true,
-								}, {
-									selector: '#selfPrice',
-									method: 'percent',
-									percent: genPercent,
-									reverse: true,
-									middleware: [(value, calc) => {
-										return calc('percentLess', $('#selfPriceNds').val(), percentNds, true);
-									}, false],
-								}]);
-								
-								genPrice = $('#genPrice').ddrCalc([{
-									selector: '#genPriceNds',
-									method: 'percentLess',
-									percent: percentNds,
-								}, {
-									selector: '#selfPrice',
-									method: 'percent',
-									percent: genPercent,
-									reverse: true,
-								}, {
-									selector: '#selfPriceNds',
-									method: 'percent',
-									percent: genPercent,
-									reverse: true,
-									middleware: [(value, calc) => {
-										return calc('percentLess', $('#selfPrice').val(), percentNds);
-									}, false],
-								}]);
-								
-								
-								selfPriceNds.calc();
+								$('[genfields]').removeAttrib('hidden');
+								$('[contractingpercent]').removeAttrib('hidden');
 								
 							} else {
-								$('#genFields').setAttrib('hidden');
-								$('#genPercent').val('');
-								$('#genPrice').val('');
-								$('#genPriceNds').val('');
+								genSelfPriceNds.destroy();
+								genSelfPrice.destroy();
+								genPriceNds.destroy();
+								genPrice.destroy();
 								
-								$('#dateGenStart').ddrInputs('clear');
-								$('#dateGenEnd').ddrInputs('clear');
-								
-								selfPriceNds?.destroy();
-								selfPrice?.destroy();
-								genPrice?.destroy();
-								genPriceNds?.destroy();
+								$('[genfields]').setAttrib('hidden');
+								if (!$('#gencontracting').is(':checked')) $('[contractingpercent]').setAttrib('hidden');
+								$('#calcForm').find('input').ddrInputs('state', 'clear');
+								$('#calcDates').find('[date]').ddrInputs('clear');
+								$('#contractingPercent').off('.calc');
 							}
 						});
 						
@@ -1613,127 +1544,43 @@
 						
 						
 						$('#gencontracting').on('change slavechange', function(e) {
-							if (e.type == 'change') $('#subcontracting').trigger('slavechange');
-							else if (e.type == 'slavechange') $(this).ddrInputs('checked', false);
+							if (e.type == 'change'/* && $('#subcontracting').is(':checked')*/) $('#subcontracting').trigger('slavechange');
+							else if (e.type == 'slavechange') {
+								if ($(this).is(':checked')) $(this).ddrInputs('checked', false);
+								else return;
+							}
 							
-							let isChecked = $(this).is(':checked');
+							if ($(this).is(':checked')) {
+								const calcGenData = calcGencontracting({percentNds, contractingPercent});
+								
+								subSelfPriceNds = calcGenData.selfPriceNds;
+								subSelfPrice = calcGenData.selfPrice;
+								subPriceNds = calcGenData.subPriceNds;
+								subPrice = calcGenData.subPrice;
+								
+								subSelfPriceNds.calc();
+								
+								$('#contractingPercent').on('input.calc', function(e) {
+									contractingPercent.value = e.target.value;
+									subSelfPriceNds.calc();
+								});
+								
+								$('[subfields]').removeAttrib('hidden');
+								$('[contractingpercent]').removeAttrib('hidden');
 							
-							if (isChecked) {
-								$('#subFields').removeAttrib('hidden');
-								
-								$('#subPercent').val(genPercent.value);
-								
-								selfPriceNds = $('#selfPriceNds').ddrCalc([{
-									selector: '#selfPrice',
-									method: 'percentLess',
-									percent: percentNds,
-									reverse: true,
-								}, {
-									selector: '#subPriceNds',
-									method: 'percent',
-									percent: genPercent,
-									reverse: true,
-								}, {
-									selector: '#subPrice',
-									method: 'percent',
-									percent: genPercent,
-									reverse: true,
-									middleware: [(value, calc) => {
-										return calc('percentLess', $('#subPriceNds').val(), percentNds, true);
-									}, false],
-								}]);
-								
-								selfPrice = $('#selfPrice').ddrCalc([{
-									selector: '#selfPriceNds',
-									method: 'percentLess',
-									percent: percentNds,
-								}, {
-									selector: '#subPrice',
-									method: 'percent',
-									percent: genPercent,
-									reverse: true,
-								}, {
-									selector: '#subPriceNds',
-									method: 'percent',
-									percent: genPercent,
-									reverse: true,
-									middleware: [(value, calc) => {
-										return calc('percentLess', $('#subPrice').val(), percentNds);
-									}, false],
-								}]);
-								
-								
-								
-								
-								
-								subPriceNds = $('#subPriceNds').ddrCalc([{
-									selector: '#subPrice',
-									method: 'percentLess',
-									percent: percentNds,
-									reverse: true,
-								}, {
-									selector: '#selfPriceNds',
-									method: 'percent',
-									percent: genPercent,
-									//reverse: true,
-								}, {
-									selector: '#selfPrice',
-									method: 'percent',
-									percent: genPercent,
-									//reverse: true,
-									middleware: [(value, calc) => {
-										return calc('percentLess', $('#selfPriceNds').val(), percentNds, true);
-									}, false],
-								}]);
-								
-								subPrice = $('#subPrice').ddrCalc([{
-									selector: '#subPriceNds',
-									method: 'percentLess',
-									percent: percentNds,
-								}, {
-									selector: '#selfPrice',
-									method: 'percent',
-									percent: genPercent,
-									//reverse: true,
-								}, {
-									selector: '#selfPriceNds',
-									method: 'percent',
-									percent: genPercent,
-									//reverse: true,
-									middleware: [(value, calc) => {
-										return calc('percentLess', $('#selfPrice').val(), percentNds);
-									}, false],
-								}]);
-								
-								
-								selfPriceNds.calc();
-								
-								
 							} else {
-								$('#subFields').setAttrib('hidden');
-								$('#subPercent').val('');
-								$('#subPrice').val('');
-								$('#subPriceNds').val('');
+								subSelfPriceNds.destroy();
+								subSelfPrice.destroy();
+								subPriceNds.destroy();
+								subPrice.destroy();
 								
-								$('#dateSubStart').ddrInputs('clear');
-								$('#dateSubEnd').ddrInputs('clear');
-								
-								selfPriceNds?.destroy();
-								selfPrice?.destroy();
-								subPrice?.destroy();
-								subPriceNds?.destroy();
+								$('[subfields]').setAttrib('hidden');
+								if (!$('#subcontracting').is(':checked')) $('[contractingpercent]').setAttrib('hidden');
+								$('#calcForm').find('input').ddrInputs('state', 'clear');
+								$('#calcDates').find('[date]').ddrInputs('clear');
+								$('#contractingPercent').off('.calc');
 							}
 						});
-						
-						
-						
-						if ($('#subcontracting').is(':checked')) selfPriceNds.calc();
-						else if ($('#gencontracting').is(':checked')) selfPriceNds.calc();
-						
-						
-						
-						
-								
 						
 						
 						

@@ -2,6 +2,7 @@ window.$ = window.jQuery = require('jquery');
 window._ = require('lodash');
 require('tapjs');
 
+
 window.strtr = require('locutus/php/strings/strtr');
  
 _.mixin({
@@ -58,3 +59,4 @@ window.axiosQuery = require('@plugins/axiosQuery').default;
 
 require('@/functions');
 require('@/common');
+require('@/sections');

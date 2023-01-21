@@ -134,83 +134,100 @@
 						</div>	
 					</div>
 					
-					<div class="form__item" id="genFields" {{!isset($subcontracting) || !$subcontracting ? 'hidden' : ''}}>
+					
+					
+					<div class="form__item" id="calcForm">
 						<div class="row row-cols-3 g-10 align-items-end">
 							<div class="col-5">
-								<label class="form__label color-dark">Стоимость генподрядного{{$guard == 'admin' ? ' (не нашего)' : ''}} договора без НДС</label>
-								<x-input id="genPrice" {{-- :value="($price ?? 0) / ((100 - ($gen_percent ?? 0)) / 100)" --}} icon="ruble-sign" iconbg="yellow" class="w100" />
+								<div genfields{{!isset($subcontracting) || !$subcontracting ? ' hidden' : ''}}>
+									<label class="form__label color-dark">Стоимость генподрядного{{$guard == 'admin' ? ' (не нашего)' : ''}} договора без НДС</label>
+									<x-input
+										id="genPrice" {{-- :value="($price ?? 0) / ((100 - ($gen_percent ?? 0)) / 100)" --}}
+										icon="ruble-sign"
+										iconbg="yellow"
+										class="w100"
+										placeholder="Введите сумму"
+										/>
+								</div>
+								
+								<div subfields{{!isset($gencontracting) || !$gencontracting ? ' hidden' : ''}}>
+									<label class="form__label color-dark">Стоимость субподрядного{{$guard == 'admin' ? ' (не нашего)' : ''}} договора без НДС</label>
+									<x-input
+										id="subPrice" {{-- :value="($price ?? 0) / ((100 - ($gen_percent ?? 0)) / 100)" --}}
+										icon="ruble-sign"
+										iconbg="yellow"
+										class="w100"
+										placeholder="Введите сумму"
+										/>
+								</div>
 							</div>
 							<div class="col-5">
-								<label class="form__label color-dark">Стоимость генподрядного{{$guard == 'admin' ? ' (не нашего)' : ''}} договора с НДС</label>
-								<x-input id="genPriceNds"{{--  :value="($price_nds ?? 0) / ((100 - ($gen_percent ?? 0)) / 100)" --}} icon="ruble-sign" iconbg="yellow" class="w100" />
+								<div genfields{{!isset($subcontracting) || !$subcontracting ? ' hidden' : ''}}>
+									<label class="form__label color-dark">Стоимость генподрядного{{$guard == 'admin' ? ' (не нашего)' : ''}} договора с НДС</label>
+									<x-input
+										id="genPriceNds"{{--  :value="($price_nds ?? 0) / ((100 - ($gen_percent ?? 0)) / 100)" --}}
+										icon="ruble-sign"
+										iconbg="yellow"
+										class="w100"
+										placeholder="Введите сумму"
+										/>
+								</div>
+									
+								<div subfields{{!isset($gencontracting) || !$gencontracting ? ' hidden' : ''}}>
+									<label class="form__label color-dark">Стоимость субподрядного{{$guard == 'admin' ? ' (не нашего)' : ''}} договора с НДС</label>
+									<x-input
+										id="subPriceNds"{{--  :value="($price_nds ?? 0) / ((100 - ($gen_percent ?? 0)) / 100)" --}}
+										icon="ruble-sign"
+										iconbg="yellow"
+										class="w100"
+										placeholder="Введите сумму"
+										/>
+								</div>
 							</div>
 							<div class="col-2">
-								<label class="form__label color-dark breakword">Генподрядный процент</label>
-								<x-input
-									id="genPercent"
-									type="number"
-									showrows
-									value="{{$gen_percent ?? 0}}"
-									icon="percent"
-									iconbg="yellow"
-									class="w100"
-									inpclass="pr32px"
-									placeholder="%" />
+								<div contractingpercent {{(!isset($gencontracting) || !$gencontracting) && (!isset($subcontracting) || !$subcontracting) ? ' hidden' : ''}}>
+									<label class="form__label color-dark breakword">Генподрядный процент</label>
+									<x-input
+										id="contractingPercent"
+										type="number"
+										name="gen_percent"
+										showrows
+										value="{{$gen_percent ?? 0}}"
+										icon="percent"
+										iconbg="yellow"
+										class="w100"
+										inpclass="pr32px"
+										placeholder="%"
+										/>
+								</div>
+									
 							</div>
 						</div>
 						
-						<div class="row row-cols-2 g-10 mt10px">
+						<div class="row row-cols-2 g-10 mt10px" id="calcDates">
 							<div class="col">
-								<label class="form__label color-dark">Дата подписания генподрядного договора</label>
-								<x-datepicker name="date_gen_start" date="{{$date_gen_start ?? null}}" calendarid="contractDateGen{{$data['rand_id']}}" id="dateGenStart" class="w100" />
+								<div genfields{{!isset($subcontracting) || !$subcontracting ? ' hidden' : ''}}>
+									<label class="form__label color-dark">Дата подписания генподрядного договора</label>
+									<x-datepicker name="date_gen_start" date="{{$date_gen_start ?? null}}" calendarid="contractDateGen{{$data['rand_id']}}" id="dateGenStart" class="w100" />
+								</div>
+								<div subfields{{!isset($gencontracting) || !$gencontracting ? ' hidden' : ''}}>
+									<label class="form__label color-dark">Дата подписания субподрядного договора</label>
+									<x-datepicker name="date_sub_start" date="{{$date_sub_start ?? null}}" calendarid="contractDateSub{{$data['rand_id']}}" id="dateSubStart" class="w100" />
+								</div>
+								
 							</div>
 							<div class="col">
-								<label class="form__label color-dark">Дата окончания работ по генподрядному договору</label>
-								<x-datepicker name="date_gen_end" date="{{$date_gen_end ?? null}}" calendarid="contractDateGen{{$data['rand_id']}}" id="dateGenEnd" class="w100" />
+								<div genfields{{!isset($subcontracting) || !$subcontracting ? ' hidden' : ''}}>
+									<label class="form__label color-dark">Дата окончания работ по генподрядному договору</label>
+									<x-datepicker name="date_gen_end" date="{{$date_gen_end ?? null}}" calendarid="contractDateGen{{$data['rand_id']}}" id="dateGenEnd" class="w100" />
+								</div>
+								<div subfields{{!isset($gencontracting) || !$gencontracting ? ' hidden' : ''}}>
+									<label class="form__label color-dark">Дата окончания работ по субподрядному договору</label>
+									<x-datepicker name="date_sub_end" date="{{$date_sub_end ?? null}}" calendarid="contractDateSub{{$data['rand_id']}}" id="dateSubEnd" class="w100" />
+								</div>
 							</div>
 						</div>
 					</div>
-					
-					
-					<div class="form__item" id="subFields" {{!isset($gencontracting) || !$gencontracting ? 'hidden' : ''}}>
-						<div class="row row-cols-3 g-10 align-items-end">
-							<div class="col-5">
-								<label class="form__label color-dark">Стоимость субподрядного{{$guard == 'admin' ? ' (не нашего)' : ''}} договора без НДС</label>
-								<x-input id="subPrice" {{-- :value="($price ?? 0) / ((100 - ($gen_percent ?? 0)) / 100)" --}} icon="ruble-sign" iconbg="yellow" class="w100" />
-							</div>
-							<div class="col-5">
-								<label class="form__label color-dark">Стоимость субподрядного{{$guard == 'admin' ? ' (не нашего)' : ''}} договора с НДС</label>
-								<x-input id="subPriceNds"{{--  :value="($price_nds ?? 0) / ((100 - ($gen_percent ?? 0)) / 100)" --}} icon="ruble-sign" iconbg="yellow" class="w100" />
-							</div>
-							<div class="col-2">
-								<label class="form__label color-dark breakword">Генподрядный процент</label>
-								<x-input
-									id="subPercent"
-									type="number"
-									showrows
-									value="{{$gen_percent ?? 0}}"
-									icon="percent"
-									iconbg="yellow"
-									class="w100"
-									inpclass="pr32px"
-									placeholder="%" />
-							</div>
-						</div>
-						
-						<div class="row row-cols-2 g-10 mt10px">
-							<div class="col">
-								<label class="form__label color-dark">Дата подписания субподрядного договора</label>
-								<x-datepicker name="date_sub_start" date="{{$date_sub_start ?? null}}" calendarid="contractDateSub{{$data['rand_id']}}" id="dateSubStart" class="w100" />
-							</div>
-							<div class="col">
-								<label class="form__label color-dark">Дата окончания работ по субподрядному договору</label>
-								<x-datepicker name="date_sub_end" date="{{$date_sub_end ?? null}}" calendarid="contractDateSub{{$data['rand_id']}}" id="dateSubEnd" class="w100" />
-							</div>
-						</div>
-					</div>
-					
-					<input type="hidden" name="gen_percent" id="genPercentFormField">
-					
 				</div>
 			</div>
 			
@@ -218,12 +235,10 @@
 			<div class="col-2">
 				<div class="form">
 					<div class="form__item">
-						<x-checkbox name="subcontracting" id="subcontracting" :checked="$subcontracting ?? false" label="Субподряд" />
-					</div>
-					
-					<div class="form__item">
+						<x-checkbox name="subcontracting" id="subcontracting" :checked="$subcontracting ?? false" label="Субподряд" class="mb6px" />
 						<x-checkbox name="gencontracting" id="gencontracting" :checked="$gencontracting ?? false" label="Генподряд" />
 					</div>
+					
 					
 					<div class="form__item">
 						<x-checkbox name="hoz_method" :checked="$hoz_method ?? null" label="Хоз способ" />
