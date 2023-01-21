@@ -3022,7 +3022,6 @@
 			
 			loadedContractsIds.add(contractIds);
 			
-			
 			if (append) {
 				if (currentCount) {
 					if (append == 'prepend') {
@@ -3033,28 +3032,13 @@
 				}
 				
 			} else {
-				totalCount = headers['x-count-contracts-current'] || null;
+				totalCount = getTotalCount(headers, currentList);
 				$('#contractsTable').html(data);
 			}
 			
-			
 			const showTotal = headers['x-count-contracts-current'] && ((params['offset'] + params['limit'] >= totalCount) || (totalCount <= params['limit']));
-			if (showTotal) {
-				
-				const showTotalHtml = 	'<div class="ddrtable__tr h5rem-4px ddrtable__tr_visible" style="position:relative;" ddrtabletr>' +
-											'<div class="totalcount" id="totalCountBlock">' +
-												'<p class="totalcount__value">Всего договоров '+totalCount+'</p>' +
-											'</div>' +
-										'</div>';
-				
-				$('#contractsList').find('[ddrtabletr]:last').after(showTotalHtml);
-				$(".horisontal").on("scroll", function (e) {
-				    let horizontal = e.currentTarget.scrollLeft;
-				    $('#totalCountBlock').css('left', horizontal+'px');
-				});
-			}
 			
-			
+			showTotalFn(showTotal, totalCount);
 			
 			
 			if (selection) {
@@ -3062,8 +3046,6 @@
 			} else {
 				$('#tableContainer').removeClass('mb4rem').addClass('mb2rem');
 			}
-			
-			
 			
 			
 			if (init) $('#contractsCard').card('ready');
@@ -3114,6 +3096,49 @@
 		});
 	}
 	
+	
+	
+	
+	
+	
+	
+	
+	
+	function showTotalFn(showTotal = false, totalCount = '--') {
+		if (showTotal) {
+			const showTotalHtml = 	'<div class="ddrtable__tr h5rem-4px ddrtable__tr_visible" style="position:relative;" ddrtabletr>' +
+										'<div class="totalcount" id="totalCountBlock">' +
+											'<p class="totalcount__value">Всего договоров '+totalCount+'</p>' +
+										'</div>' +
+									'</div>';
+			
+			$('#contractsList').find('[ddrtabletr]:last').after(showTotalHtml);
+			$(".horisontal").on("scroll", function (e) {
+			    let horizontal = e.currentTarget.scrollLeft;
+			    $('#totalCountBlock').css('left', horizontal+'px');
+			});
+		}
+	}
+	
+	
+	
+	
+	
+	//---------- Получить общее количество договоров выбранной вкладки
+	function getTotalCount(headers, currentList) {
+		if (currentList > 0) {
+			if (headers['x-count-contracts-departments']) {
+				let depsCounts = JSON.parse(headers['x-count-contracts-departments']);
+				return depsCounts[currentList] || false;
+			}		
+		} else if (currentList === -1) {
+			return headers['x-count-contracts-archive'] || false;
+		} else if (currentList === 0) {
+			return headers['x-count-contracts-all'] || false;
+		}
+		console.log('------');
+		return false;
+	}
 	
 	
 	
