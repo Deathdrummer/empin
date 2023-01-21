@@ -405,6 +405,7 @@ class Contract {
 			};
 		}
 		
+		$userContractsSettings = $this->user->getSettings('contracts');
 		
 		$countData = ['all' => 0, 'departments' => [], 'archive' => 0];
 		
@@ -415,6 +416,11 @@ class Contract {
 			}) */
 			->when($selectionContracts, function ($query) use($selectionContracts) {
 				return $query->whereIn('id', $selectionContracts->contracts->pluck('id'));
+			})
+			->where(function ($query) use($userContractsSettings) {
+				if (isset($userContractsSettings['gencontracting']) && $userContractsSettings['gencontracting']) {
+					$query->whereNot('gencontracting', 1);
+				}
 			})
 			->get()
 			->toArray();
