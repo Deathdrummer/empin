@@ -324,6 +324,10 @@ Route::prefix('site')->middleware(['lang', 'isajax:site'])->group(function() {
 	Route::get('/contracts/cell_comment', [Contracts::class, 'cell_comment']);
 	Route::post('/contracts/cell_comment', [Contracts::class, 'set_cell_comment']);
 	
+	Route::get('/contracts/contract_selections', [Contracts::class, 'contract_selections']);
+	Route::get('/contracts/selections_to_choose', [Contracts::class, 'selections_to_choose']);
+	
+	
 	
 	
 	// Подборки
@@ -338,14 +342,9 @@ Route::prefix('site')->middleware(['lang', 'isajax:site'])->group(function() {
 	Route::post('/selections/share', [Selections::class, 'share']);
 	Route::post('/selections/unsubscribe', [Selections::class, 'unsubscribe']);
 	
-	
 	Route::post('/selections/add_selection_from_contextmenu', [Selections::class, 'add_selection_from_contextmenu']);
 	
-	
 	Route::resource('selections', Selections::class);
-	
-	Route::get('/contracts/selections_to_choose', [Contracts::class, 'selections_to_choose']);
-	
 });
 
 

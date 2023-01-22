@@ -405,9 +405,8 @@ class Contract {
 			};
 		}
 		
-		$userContractsSettings = $this->user->getSettings('contracts');
 		
-		$countData = ['all' => 0, 'departments' => [], 'archive' => 0];
+		$countData = ['all' => 0, 'departments' => [], 'archive' => 0, 'gencontracting' => 0];
 		
 		$data = ContractModel::filter($filter)
 			->with('departments:id')
@@ -417,16 +416,22 @@ class Contract {
 			->when($selectionContracts, function ($query) use($selectionContracts) {
 				return $query->whereIn('id', $selectionContracts->contracts->pluck('id'));
 			})
-			->where(function ($query) use($userContractsSettings) {
-				if (isset($userContractsSettings['gencontracting']) && $userContractsSettings['gencontracting']) {
-					$query->whereNot('gencontracting', 1);
-				}
-			})
-			->get()
-			->toArray();
+			->get();
+			
+		if ($data->isEmpty()) return $countData;
 		
+		$userContractsSettings = $this->user->getSettings('contracts');
+		$gencontracting = false;
+		if (isset($userContractsSettings['gencontracting']) && $userContractsSettings['gencontracting']) {
+			$gencontracting = true;
+		}
 		
-		foreach ($data as $item) {
+		foreach ($data->toArray() as $item) {
+			if ($item['gencontracting'] == 1 && $gencontracting) {
+				$countData['gencontracting'] += 1;
+				continue;
+			}
+			
 			if ($item['archive'] == 1) {
 				$countData['archive'] += 1;
 			} elseif (count($item['departments'])) {
@@ -435,7 +440,7 @@ class Contract {
 					if ($dep['pivot']['show'] == 1 && $dep['pivot']['hide'] == 0) $countData['departments'][$dep['id']] += 1;
 				}
 				
-			}/*  else { // это чтобы показывать количество БЕЗ учета тех, что ейчас в отделах
+			}/*  else { // это чтобы показывать количество БЕЗ учета тех, что сейчас в отделах
 				$countData['all'] += 1;
 			} */
 			
@@ -443,8 +448,6 @@ class Contract {
 				$countData['all'] += 1;
 			}
 		}
-			
-		
 		return $countData;
 	}
 	
@@ -700,8 +703,48 @@ class Contract {
 					'title' 	=> $item['title'],
 					'choosed'	=> in_array($item['id'], $disabedSelections)
 				];
-			})->values()->toArray();
+			})
+			->values()
+			->toArray();
 	}
+	
+	
+	
+	
+	
+	/**
+	 * Получить список подборок договора.
+	 * @param 
+	 * @return 
+	 */
+	public function getSelections($contractId = null) {
+		$userId = auth('site')->user()->id;
+		
+		$selections = [];
+		
+		if ($contractId) {
+			$contract = ContractModel::where('id', $contractId)
+				->with(['selections' => function ($query) use($userId) {
+					$query->where('account_id', $userId)
+						->orWhereJsonContains('subscribed', ['read' => $userId])
+						->orWhereJsonContains('subscribed', ['write' => $userId]);
+				}])
+				->first();
+			
+			$selections = $contract->selections->pluck('id')->toArray() ?? [];
+		}
+		
+		$allSelections = Selection::toTooltip()->get();
+		
+		
+		
+		$allSelectionsWithKeys = $allSelections->mapWithKeys(function ($item, $key) {
+			return [$item['id'] => $item];
+		})->toArray();
+		
+		return array_intersect_key($allSelectionsWithKeys, array_flip($selections));
+	}
+	
 	
 	
 	

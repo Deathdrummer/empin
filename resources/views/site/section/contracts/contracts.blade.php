@@ -105,7 +105,7 @@
 		</div>
 		
 		<div class="row mb2rem" id="tableContainer">
-			<div class="col">
+			<div class="col-auto">
 				<x-chooser variant="neutral" group="normal" px="10">
 					<x-chooser.item
 						id="chooserAll"
@@ -205,6 +205,9 @@
 								></strong></x-chooser.item>
 				</x-chooser>
 			</div>
+			<div class="col">
+				<div id="gencontractingCount" class="h100 d-flex align-items-center"></div>
+			</div>
 		</div>
 		
 		
@@ -239,7 +242,7 @@
 
 <script type="module">
 	
-	const {calcSubcontracting, calcGencontracting} = loadSectionScripts({section: 'contracts'});
+	const {calcSubcontracting, calcGencontracting, showSelections} = loadSectionScripts({section: 'contracts'});
 	
 	
 	let abortCtrl,
@@ -2468,6 +2471,12 @@
 							
 							textarea[0].selectionStart = textarea[0].selectionEnd = textarea[0].value.length;
 							
+							$('#contractsList').one('scroll', function() {
+								// При скролле списка скрыть тултип комментариев
+								if (commentsTooltip?.destroy != undefined) commentsTooltip.destroy();
+							});
+							
+							
 							let inputCellCommentTOut;
 							$(textarea).on('input', function() {
 								clearTimeout(inputCellCommentTOut);
@@ -2802,7 +2811,7 @@
 	
 	
 	//----------------------------------------------------------------------------------------------------- Тултип "комментарии"
-	let commentsTooltipTOut;
+	/*let commentsTooltipTOut;
 	$.commentsTooltip = (event) => {
 		const {target} = event;
 		const cell = $(target).closest('[ddrtabletd]');
@@ -2845,7 +2854,7 @@
 						step_id: stepId,
 					}, 'json');
 					
-					await setData($(data).html());
+					await setData(data);
 					
 					waitDetroy();
 					
@@ -2897,6 +2906,35 @@
 	
 	$.commentsTooltipLeave = (event) => {
 		clearTimeout(commentsTooltipTOut);
+	}*/
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	//-------------------------------------------------- Отобразить тултип с подборками договора
+	let showselectionsTOut, selectionsTooltip;
+	$.showselections = (contractId) => {
+		const cell = event.target;
+		clearTimeout(showselectionsTOut);
+		$(cell).one('mouseleave', () => {
+			clearTimeout(showselectionsTOut);
+		});
+		$('#contractsList').one('scroll', function() {
+			// При скролле списка скрыть тултип с подборками
+			if (selectionsTooltip?.destroy != undefined) selectionsTooltip.destroy();
+		});
+		showselectionsTOut = setTimeout(() => {selectionsTooltip = showSelections(cell, contractId, selectionsTooltip)}, 20);
 	}
 	
 	
@@ -3019,6 +3057,7 @@
 			
 			const currentCount = headers ? headers['x-count-contracts-current'] : null;
 			const contractIds = headers ? headers['x-contracts-ids'] : null;
+			const gencontractingCount = headers ? headers['x-count-contracts-gencontracting'] : null;
 			
 			loadedContractsIds.add(contractIds);
 			
@@ -3033,10 +3072,18 @@
 				
 			} else {
 				totalCount = getTotalCount(headers, currentList);
+				
+				if (search && gencontractingCount > 0) {
+					const genCunt = '<strong class="ml5px iconed iconed-noempty border-rounded-8px border-all border-white bg-gray color-white w2rem-8px h2rem-2px fz13px lh100">'+gencontractingCount+'</strong>';
+					$('#gencontractingCount').html(genCunt+'<p class="color-gray-500 fz14px ml5px"> в генподрядных договорах</p>');
+				} else {
+					$('#gencontractingCount').empty();
+				}
+				
 				$('#contractsTable').html(data);
 			}
 			
-			const showTotal = headers['x-count-contracts-current'] && ((params['offset'] + params['limit'] >= totalCount) || (totalCount <= params['limit']));
+			const showTotal = headers && headers['x-count-contracts-current'] && ((params['offset'] + params['limit'] >= totalCount) || (totalCount <= params['limit']));
 			
 			showTotalFn(showTotal, totalCount);
 			
@@ -3051,7 +3098,7 @@
 			if (init) $('#contractsCard').card('ready');
 			else listWait.destroy();
 			
-			if (abort) listWait.destroy();
+			if (abort && listWait) listWait.destroy();
 			
 			if (search && currentCount) {
 				let findSubStr = $('#contractsTable').find('p:icontains("'+search+'")');
@@ -3064,10 +3111,13 @@
 			
 			if (currentCount) $('[stepprice]').number(true, 2, '.', ' ');
 			
+			
 			if (withCounts && headers) {
 				$('#chooserAll').find('[selectionscounts]').empty();
 				$('#chooserArchive').find('[selectionscounts]').empty();
 				$('[chooserdepartment]').find('[selectionscounts]').empty();
+				
+				
 				
 				
 				if (headers['x-count-contracts-all']) {
@@ -3125,7 +3175,8 @@
 	
 	
 	//---------- Получить общее количество договоров выбранной вкладки
-	function getTotalCount(headers, currentList) {
+	function getTotalCount(headers = {}, currentList = null) {
+		if (!headers || _.isNull(currentList)) return false;
 		if (currentList > 0) {
 			if (headers['x-count-contracts-departments']) {
 				let depsCounts = JSON.parse(headers['x-count-contracts-departments']);
@@ -3136,7 +3187,6 @@
 		} else if (currentList === 0) {
 			return headers['x-count-contracts-all'] || false;
 		}
-		console.log('------');
 		return false;
 	}
 	

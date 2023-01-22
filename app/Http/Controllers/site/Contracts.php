@@ -73,6 +73,7 @@ class Contracts extends Controller {
 			$headers['x-count-contracts-all'] = $counts['all'] ?? null;
 			$headers['x-count-contracts-departments'] = json_encode($counts['departments']) ?? null;
 			$headers['x-count-contracts-archive'] = $counts['archive'] ?? null;
+			$headers['x-count-contracts-gencontracting'] = $counts['gencontracting'] ?? null;
 		}
 		
 		
@@ -238,6 +239,23 @@ class Contracts extends Controller {
 		$selectionsToChoose = $this->contract->getSelectionsToChoose($contractId);
 		
 		return response()->json($selectionsToChoose);
+	}
+	
+	
+	
+	
+	
+	/** Отобразить подборки, в которых присутствует договор
+	 * @param 
+	 * @return 
+	 */
+	public function contract_selections() {
+		$contractId = request('contract_id', null);
+		if (is_null($contractId)) return response()->json(false);
+		
+		$selections = $this->contract->getSelections($contractId);
+		logger($selections);
+		return $this->render('contract_selections', compact('selections'));
 	}
 	
 	

@@ -49,7 +49,7 @@
 	@endif
 
 	@if($column == 'object_number' && auth('site')->user()->can('contract-col-object_number:site'))
-		<x-table.td class="h-center" commonlist><strong class="fz16px">{{$object_number ?? '-'}}</strong></x-table.td>
+		<x-table.td class="h-center" commonlist onmouseenter="$.showselections('{{$id}}');"><strong class="fz16px">{{$object_number ?? '-'}}</strong></x-table.td>
 	@endif
 
 	@if($column == 'title' && auth('site')->user()->can('contract-col-title:site'))

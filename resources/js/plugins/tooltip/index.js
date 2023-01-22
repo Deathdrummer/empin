@@ -31,9 +31,9 @@ $.fn.ddrTooltip = function(params, callback) {
 		maxWidth: 'none',
 		minWidth: false,
 		minHeight: false,
-		onCreate: false,
-		onShow: false,
-		onDestroy: false,
+		onCreate: null,
+		onShow: null,
+		onDestroy: () => {},
 	}, params);
 		
 	let waitStat;

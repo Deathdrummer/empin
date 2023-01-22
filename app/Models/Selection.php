@@ -113,4 +113,20 @@ class Selection extends Model {
     }
 	
 	
+	
+	/**
+     * Список подборок для тултипа в списке договоров
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return void
+     */
+    public function scopeToTooltip($query) {
+		$userId = auth('site')->user()->id;
+        $query->where('account_id', $userId)
+			->orWhereJsonContains('subscribed', ['write' => $userId])
+			->orWhereJsonContains('subscribed', ['read' => $userId])
+			->orderBy('_sort', 'ASC');
+    }
+	
+	
 }

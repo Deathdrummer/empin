@@ -16714,9 +16714,9 @@ $.fn.ddrTooltip = function (params, callback) {
     maxWidth: 'none',
     minWidth: false,
     minHeight: false,
-    onCreate: false,
-    onShow: false,
-    onDestroy: false
+    onCreate: null,
+    onShow: null,
+    onDestroy: function onDestroy() {}
   }, params),
       cls = _$assign.cls,
       tag = _$assign.tag,
@@ -17021,13 +17021,115 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "calcGencontracting": function() { return /* reexport safe */ _calcGencontracting_js__WEBPACK_IMPORTED_MODULE_1__.calcGencontracting; },
 /* harmony export */   "calcSubcontracting": function() { return /* reexport safe */ _calcSubcontracting_js__WEBPACK_IMPORTED_MODULE_0__.calcSubcontracting; },
-/* harmony export */   "data": function() { return /* binding */ data; }
+/* harmony export */   "showSelections": function() { return /* reexport safe */ _showSelections_js__WEBPACK_IMPORTED_MODULE_2__.showSelections; }
 /* harmony export */ });
 /* harmony import */ var _calcSubcontracting_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./calcSubcontracting.js */ "./resources/js/sections/site/contracts/calcSubcontracting.js");
 /* harmony import */ var _calcGencontracting_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./calcGencontracting.js */ "./resources/js/sections/site/contracts/calcGencontracting.js");
+/* harmony import */ var _showSelections_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./showSelections.js */ "./resources/js/sections/site/contracts/showSelections.js");
 
 
-var data = 'dfgfdfg';
+
+
+/***/ }),
+
+/***/ "./resources/js/sections/site/contracts/showSelections.js":
+/*!****************************************************************!*\
+  !*** ./resources/js/sections/site/contracts/showSelections.js ***!
+  \****************************************************************/
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "showSelections": function() { return /* binding */ showSelections; }
+/* harmony export */ });
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
+
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+function showSelections(cell) {
+  var contractId = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+  var selectionsTooltip = arguments.length > 2 ? arguments[2] : undefined;
+  if (_.isNull(contractId)) return false;
+  selectionsTooltip = $(cell).ddrTooltip({
+    //cls: 'w44rem',
+    placement: 'right-start',
+    tag: 'noscroll noopen',
+    offset: [0, 0],
+    minWidth: '200px',
+    minHeight: '200px',
+    duration: [200, 200],
+    trigger: 'mouseenter focus',
+    wait: {
+      iconHeight: '40px'
+    },
+    onShow: function () {
+      var _onShow = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee(_ref) {
+        var reference, popper, show, hide, destroy, waitDetroy, setContent, setData, setProps, _yield$axiosQuery, data, error, status, headers;
+
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                reference = _ref.reference, popper = _ref.popper, show = _ref.show, hide = _ref.hide, destroy = _ref.destroy, waitDetroy = _ref.waitDetroy, setContent = _ref.setContent, setData = _ref.setData, setProps = _ref.setProps;
+                _context.next = 3;
+                return axiosQuery('get', 'site/contracts/contract_selections', {
+                  contract_id: contractId
+                }, 'json');
+
+              case 3:
+                _yield$axiosQuery = _context.sent;
+                data = _yield$axiosQuery.data;
+                error = _yield$axiosQuery.error;
+                status = _yield$axiosQuery.status;
+                headers = _yield$axiosQuery.headers;
+
+                if (!error) {
+                  _context.next = 13;
+                  break;
+                }
+
+                $.notify('Ошибка! Не удалось загрузить список подборок!', 'error');
+                console.log(error.message);
+                waitDetroy();
+                return _context.abrupt("return");
+
+              case 13:
+                _context.next = 15;
+                return setData(data);
+
+              case 15:
+                waitDetroy();
+
+              case 16:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee);
+      }));
+
+      function onShow(_x) {
+        return _onShow.apply(this, arguments);
+      }
+
+      return onShow;
+    }()
+  }); // закрытие окна по нажатию клавиши ESC
+
+  $(document).one('keydown', function (e) {
+    var _selectionsTooltip;
+
+    if (e.keyCode == 27 && ((_selectionsTooltip = selectionsTooltip) === null || _selectionsTooltip === void 0 ? void 0 : _selectionsTooltip.destroy) != undefined) {
+      selectionsTooltip.destroy();
+    }
+  });
+  return selectionsTooltip;
+}
 
 /***/ }),
 
