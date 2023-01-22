@@ -254,7 +254,6 @@ class Contracts extends Controller {
 		if (is_null($contractId)) return response()->json(false);
 		
 		$selections = $this->contract->getSelections($contractId);
-		logger($selections);
 		return $this->render('contract_selections', compact('selections'));
 	}
 	
