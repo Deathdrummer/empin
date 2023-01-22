@@ -2934,7 +2934,7 @@
 			// При скролле списка скрыть тултип с подборками
 			if (selectionsTooltip?.destroy != undefined) selectionsTooltip.destroy();
 		});
-		showselectionsTOut = setTimeout(() => {selectionsTooltip = showSelections(cell, contractId, selectionsTooltip)}, 20);
+		showselectionsTOut = setTimeout(() => {selectionsTooltip = showSelections(cell, contractId, selectionsTooltip)}, 1000);
 	}
 	
 	
