@@ -5790,16 +5790,20 @@ window.selectText = function (elem) {
 window.copyStringToClipboard = function () {
   var str = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
   if (_.isNull(str)) return false;
-  navigator.clipboard.writeText(str);
-  /*let el = document.createElement('textarea');
-  el.value = str;
-  el.setAttribute('readonly', '');
-  el.style.position = 'absolute';
-  el.style.left = '-9999px';
-  document.body.appendChild(el);
-  el.select();
-  document.execCommand('copy');
-  document.body.removeChild(el);*/
+
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(str);
+  } else {
+    var el = document.createElement('textarea');
+    el.value = str;
+    el.setAttribute('readonly', '');
+    el.style.position = 'absolute';
+    el.style.left = '-9999px';
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+  }
 };
 /*
 	Определение устройства: desktop или mobile
