@@ -31,7 +31,7 @@
 	<div class="commoninfo__label">
 		<p>Основная информация</p>
 	</div>
-	<table class="w100 commoninfo__table">
+	<table class="w100 commoninfo__table" id="commoninfoContent">
 		<tbody>
 			@cando('contract-col-customer:site')
 				<tr>

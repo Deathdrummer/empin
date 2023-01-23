@@ -1100,7 +1100,7 @@
 	
 	
 	
-	//--------------------------------------------------------------------------------- Открыть окно с общей информацией (убрать отметку нового договора)
+	//---------------------------------------- Открыть окно с общей информацией (убрать отметку нового договора)
 	$.openContractInfo = (tr, contractId) => {
 		let isNew = $(tr).attr('isnew');
 		if ($(event.target).hasAttr('noopen')) return;
@@ -1165,6 +1165,16 @@
 			$('[tripleselect]').tripleTap((elem) => {
 				selectText(elem);
 			});
+			
+			$('#commoninfoContent').find('.select-text').mouseup(function (e) {
+				const selObj = window.getSelection();
+				const selectString =  selObj.toString();
+				if (selectString.length) {
+					copyStringToClipboard(selObj.toString());
+					$.notify('Скопировано!');
+				}
+			});
+			
 			
 			$('#commonInfoFields').ddrInputs('change', (field) => {
 				let fieldId = $(field).attr('commoninfofield'),
@@ -1969,6 +1979,15 @@
 									
 									$('#chatMessageBlock').focus();
 									
+									$('#chatMessageList').find('.chat__post').mouseup(function (e) {
+										const selObj = window.getSelection();
+										const selectString =  selObj.toString();
+										if (selectString.length) {
+											copyStringToClipboard(selObj.toString());
+											$.notify('Скопировано!');
+										}
+									});
+															
 									$('#chatMessageBlock').ddrInputs('change', () => {
 										let mess = getContenteditable('#chatMessageBlock');
 										

@@ -154,8 +154,12 @@ window.selectText = function(elem) {
 	Скопировать в буфер обмена 
 		- строка для копирования
 */
-window.copyStringToClipboard = function(str) {
-	let el = document.createElement('textarea');
+window.copyStringToClipboard = function(str = null) {
+	if (_.isNull(str)) return false;
+	navigator.clipboard.writeText(str);
+	
+	
+	/*let el = document.createElement('textarea');
 	el.value = str;
 	el.setAttribute('readonly', '');
 	el.style.position = 'absolute';
@@ -163,7 +167,7 @@ window.copyStringToClipboard = function(str) {
 	document.body.appendChild(el);
 	el.select();
 	document.execCommand('copy');
-	document.body.removeChild(el);
+	document.body.removeChild(el);*/
 }
 
 

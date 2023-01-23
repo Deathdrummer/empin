@@ -5787,8 +5787,11 @@ window.selectText = function (elem) {
 */
 
 
-window.copyStringToClipboard = function (str) {
-  var el = document.createElement('textarea');
+window.copyStringToClipboard = function () {
+  var str = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+  if (_.isNull(str)) return false;
+  navigator.clipboard.writeText(str);
+  /*let el = document.createElement('textarea');
   el.value = str;
   el.setAttribute('readonly', '');
   el.style.position = 'absolute';
@@ -5796,7 +5799,7 @@ window.copyStringToClipboard = function (str) {
   document.body.appendChild(el);
   el.select();
   document.execCommand('copy');
-  document.body.removeChild(el);
+  document.body.removeChild(el);*/
 };
 /*
 	Определение устройства: desktop или mobile
@@ -12588,8 +12591,13 @@ $.fn.ddrScrollX = function (scrollStep, scrollSpeed, enableMouseScroll, ignoreSe
   $(block).mouseup(function (e) {
     if (e.altKey == true || e.metaKey == true) {
       var selObj = window.getSelection();
-      copyStringToClipboard(selObj.toString());
-      $.notify('Скопировано!');
+      var selectString = selObj.toString();
+
+      if (selectString.length) {
+        copyStringToClipboard(selObj.toString());
+        $.notify('Скопировано!');
+      }
+
       return;
     }
 

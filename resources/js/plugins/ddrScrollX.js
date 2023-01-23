@@ -49,8 +49,11 @@ $.fn.ddrScrollX = function(scrollStep, scrollSpeed, enableMouseScroll, ignoreSel
 	$(block).mouseup(function (e) {
 		if (e.altKey == true || e.metaKey == true) {
 			const selObj = window.getSelection();
-			copyStringToClipboard(selObj.toString());
-			$.notify('Скопировано!');
+			const selectString =  selObj.toString();
+			if (selectString.length) {
+				copyStringToClipboard(selObj.toString());
+				$.notify('Скопировано!');
+			}
 			return;
 		}
 		
