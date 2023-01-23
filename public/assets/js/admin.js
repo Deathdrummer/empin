@@ -14115,7 +14115,7 @@ function showSelections(cell) {
     tag: 'noscroll noopen',
     offset: [0, 0],
     minWidth: '200px',
-    minHeight: '200px',
+    minHeight: '40px',
     duration: [200, 200],
     trigger: 'mouseenter focus',
     wait: {
