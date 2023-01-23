@@ -85,7 +85,7 @@ $(document).on('contextmenu', '[contextmenu]', async function(e) {
 				return many.replaceAll(/%/ig, word).replaceAll(/#/ig, count);
 			}
 			
-			return one.replaceAll(/%/ig, word).replaceAll(/\s*#\s*/ig, oneWithoutNum ? ' ' : count);
+			return one.replaceAll(/%/ig, word).replaceAll(/\s*#\s*/ig, oneWithoutNum ? ' ' : count+' ');
 		},
 		preload(params = null) {
 			
@@ -395,7 +395,8 @@ function _loadSubmenu(menuItem = null) {
 				return;
 			}
 			
-			let subData = data.map(map);
+			let subData = data?.map(map);
+			if (_.isEmpty(subData)) return;
 	
 			subData = subData.filter(item => Boolean((item.hidden == undefined || !item.hidden) && (item.visible == undefined || item.visible)));
 			if (_.isEmpty(subData)) return;

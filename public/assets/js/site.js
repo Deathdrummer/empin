@@ -8501,7 +8501,7 @@ $(document).on('contextmenu', '[contextmenu]', /*#__PURE__*/function () {
                   return many.replaceAll(/%/ig, word).replaceAll(/#/ig, count);
                 }
 
-                return one.replaceAll(/%/ig, word).replaceAll(/\s*#\s*/ig, oneWithoutNum ? ' ' : count);
+                return one.replaceAll(/%/ig, word).replaceAll(/\s*#\s*/ig, oneWithoutNum ? ' ' : count + ' ');
               },
               preload: function preload() {
                 var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
@@ -8825,7 +8825,8 @@ function _loadSubmenu() {
       return;
     }
 
-    var subData = data.map(map);
+    var subData = data === null || data === void 0 ? void 0 : data.map(map);
+    if (_.isEmpty(subData)) return;
     subData = subData.filter(function (item) {
       return Boolean((item.hidden == undefined || !item.hidden) && (item.visible == undefined || item.visible));
     });

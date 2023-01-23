@@ -2081,6 +2081,7 @@
 							wait();
 							axiosQuery('post', 'site/contracts/to_archive', {contractIds: selectedContracts.items}, 'json')
 							.then(({data, error, status, headers}) => {
+								let contractTitle = countSelected == 1 ? ' '+objectNumber+' '+title : '';
 								if (data) {
 									if (selectionId || searched) {
 										getCounts(() => {
@@ -2090,9 +2091,9 @@
 										removeContractsRows(target);
 									}
 									
-									$.notify(buildTitle(countSelected, '% успешно отправлен в архив!', '# % успешно отправлены в архив!', ['Договор', 'договора', 'договоров']));
+									$.notify(buildTitle(countSelected, '%'+contractTitle+' успешно отправлен в архив!', '# % успешно отправлены в архив!', ['Договор', 'договора', 'договоров']));
 								} else {
-									$.notify(buildTitle(countSelected, 'Ошибка! % не был отправлен в архив!', 'Ошибка! % не были отправлены в архив!', ['договор', 'договора', 'договоров']), 'error');
+									$.notify(buildTitle(countSelected, 'Ошибка! %'+contractTitle+' не был отправлен в архив!', 'Ошибка! % не были отправлены в архив!', ['договор', 'договора', 'договоров']), 'error');
 								}
 								close();
 							});
@@ -2116,6 +2117,7 @@
 							wait();
 							axiosQuery('post', 'site/contracts/to_work', {contractIds: selectedContracts.items}, 'json')
 							.then(({data, error, status, headers}) => {
+								let contractTitle = countSelected == 1 ? ' '+objectNumber+' '+title : '';
 								if (data) {
 									if (selectionId || searched) {
 										getCounts(() => {
@@ -2125,10 +2127,10 @@
 										removeContractsRows(target);
 									}
 									
-									$.notify(buildTitle(countSelected, '% успешно возвращен в работу!', '# % успешно возвращены в работу!', ['Договор', 'договора', 'договоров']));
+									$.notify(buildTitle(countSelected, '%'+contractTitle+' успешно возвращен в работу!', '# % успешно возвращены в работу!', ['Договор', 'договора', 'договоров']));
 									//target.changeAttrData(15, '0');
 								} else {
-									$.notify(buildTitle(countSelected, 'Ошибка! % не был возвращен в работу!', 'Ошибка! # % не были возвращены в работу!', ['Договор', 'договора', 'договоров']), 'error');
+									$.notify(buildTitle(countSelected, 'Ошибка! %'+contractTitle+' не был возвращен в работу!', 'Ошибка! # % не были возвращены в работу!', ['Договор', 'договора', 'договоров']), 'error');
 								}
 								close();
 							});
@@ -2173,7 +2175,8 @@
 										procNotif.error({message: 'Ошибка добавления в подборку!'});
 										console.log(error?.message, error.errors);
 									} else {
-										procNotif.done({message: buildTitle(countSelected, '% успешно добавлен в подборку!', '# % успешно добавлены в подборку!', ['Договор', 'договора', 'договоров'])});
+										let contractTitle = countSelected == 1 ? ' '+objectNumber+' '+title : '';
+										procNotif.done({message: buildTitle(countSelected, '%'+contractTitle+' успешно добавлен в подборку!', '# % успешно добавлены в подборку!', ['Договор', 'договора', 'договоров'])});
 									}
 								});
 							}
@@ -2202,12 +2205,14 @@
 					
 					axiosQuery('put', 'site/selections/'+method, params)
 					.then(({data, error, status, headers}) => {
+						let contractTitle = countSelected == 1 ? ' '+objectNumber+' '+title : '';
 						if (error) {
 							//$.notify('Ошибка удаления из подборки!', 'error');
-							procNotif.error({message: 'Ошибка удаления договора из подборки!'});
+							procNotif.error({message: 'Ошибка удаления договора'+contractTitle+' из подборки!'});
 							console.log(error?.message, error.errors);
 						} else {
-							procNotif.done({message: buildTitle(countSelected, '% успешно удален из подборки!', '# % успешно удалены из подборки!', ['Договор', 'договора', 'договоров'])});
+							
+							procNotif.done({message: buildTitle(countSelected, '%'+contractTitle+' успешно удален из подборки!', '# % успешно удалены из подборки!', ['Договор', 'договора', 'договоров'])});
 							//target.changeAttrData(7, '0');
 							
 							getCounts(() => {
@@ -2317,14 +2322,15 @@
 										if (selectionId || searched) {
 											let params = {};
 											getCounts(() => {
-												removeContractsRows(target);
+												//if (currentList > 0) removeContractsRows(target);
 											});
 										} else {
-											removeContractsRows(target);
+											//if (currentList > 0) removeContractsRows(target);
 										}
 										
 										if (data.length) {
-											let mess = buildTitle(data.length, '# % успешно отправлен в '+departmentName+'!', '# % успешно отправлены в '+departmentName+'!', ['договор', 'договора', 'договоров']);
+											let contractTitle = countSelected == 1 ? ' '+objectNumber+' '+title : '';
+											let mess = buildTitle(data.length, '# %'+contractTitle+' успешно отправлен в '+departmentName+'!', '# % успешно отправлены в '+departmentName+'!', ['договор', 'договора', 'договоров']);
 											procNotif.done({message: mess});
 										} else {
 											procNotif.error({message: 'Ни один договор не был отправлен!'});
@@ -2357,6 +2363,7 @@
 							wait();
 							axiosQuery('post', 'site/contracts/hide', {contractIds: selectedContracts.items, departmentId}, 'json')
 							.then(({data, error, status, headers}) => {
+								let contractTitle = countSelected == 1 ? ' '+objectNumber+' '+title : '';
 								if (data) {
 									if (selectionId || searched) {
 										getCounts(() => {
@@ -2366,10 +2373,10 @@
 										removeContractsRows(target);
 									}
 									
-									$.notify(buildTitle(countSelected, '% успешно скрыт!', '# % успешно скрыты!', ['Договор', 'договора', 'договоров']));
+									$.notify(buildTitle(countSelected, '%'+contractTitle+' успешно скрыт!', '# % успешно скрыты!', ['Договор', 'договора', 'договоров']));
 									//target.changeAttrData(9, '0');
 								} else {
-									$.notify(buildTitle(countSelected, 'Ошибка! договор не был скрыт!', 'Ошибка! договоры не были скрыты!'), 'error');
+									$.notify(buildTitle(countSelected, 'Ошибка! договор'+contractTitle+' не был скрыт!', 'Ошибка! договоры не были скрыты!'), 'error');
 								}
 								close();
 							});
