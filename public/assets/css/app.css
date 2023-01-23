@@ -45607,24 +45607,24 @@ template {
   display: none !important;
 }
 
-.scrollblock:not(.scrollblock-hidden)::-webkit-scrollbar {
+.scrollblock:not(.scrollblock-hidden):not(.scrollblock-light)::-webkit-scrollbar {
   width: 4px;
   height: 4px;
 }
-.scrollblock:not(.scrollblock-hidden)::-webkit-scrollbar-track {
+.scrollblock:not(.scrollblock-hidden):not(.scrollblock-light)::-webkit-scrollbar-track {
   background-color: #e6eaed;
   border-radius: 1px;
 }
-.scrollblock:not(.scrollblock-hidden)::-webkit-scrollbar-thumb {
+.scrollblock:not(.scrollblock-hidden):not(.scrollblock-light)::-webkit-scrollbar-thumb {
   background-color: #bfcfdb;
   width: 13px;
   height: 13px;
   border-radius: 0;
 }
-.scrollblock:not(.scrollblock-hidden)::-webkit-scrollbar-thumb:hover {
+.scrollblock:not(.scrollblock-hidden):not(.scrollblock-light)::-webkit-scrollbar-thumb:hover {
   background-color: #9eb7c9;
 }
-.scrollblock:not(.scrollblock-hidden)::-webkit-resizer {
+.scrollblock:not(.scrollblock-hidden):not(.scrollblock-light)::-webkit-resizer {
   display: none;
   width: 0px;
   height: 0px;
@@ -45664,6 +45664,33 @@ template {
 }
 .scrollblock-auto {
   overflow-y: auto;
+}
+.scrollblock-light {
+  overflow-y: scroll;
+}
+.scrollblock-light::-webkit-scrollbar {
+  width: 3px;
+  height: 3px;
+}
+.scrollblock-light::-webkit-scrollbar-track {
+  background-color: transparent;
+  border-radius: 1px;
+}
+.scrollblock-light::-webkit-scrollbar-thumb {
+  background-color: #e6eaed;
+  width: 13px;
+  height: 13px;
+  border-radius: 0;
+}
+.scrollblock-light::-webkit-scrollbar-thumb:hover {
+  background-color: #c8d1d8;
+}
+.scrollblock-light::-webkit-resizer {
+  display: none;
+  width: 0px;
+  height: 0px;
+  background: transparent;
+  border-radius: 1px;
 }
 
 .circle {
