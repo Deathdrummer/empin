@@ -1,5 +1,5 @@
 <h4 class="fz16px mb1rem">Подборки</h4>
-<div class="scrollblock-light pr5px style="max-height: calc(100vh - 100px);">
+<div class="scrollblock-light pr5px minh2rem" style="max-height: calc(100vh - 100px);">
 	@if($selections)
 		<ul>
 			@foreach($selections as $selection)
