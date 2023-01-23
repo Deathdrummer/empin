@@ -2925,6 +2925,7 @@
 	//-------------------------------------------------- Отобразить тултип с подборками договора
 	let showselectionsTOut, selectionsTooltip;
 	$.showselections = (contractId) => {
+		if (haSContextMenu) return;
 		const cell = event.target;
 		clearTimeout(showselectionsTOut);
 		$(cell).one('mouseleave', () => {
@@ -2934,7 +2935,10 @@
 			// При скролле списка скрыть тултип с подборками
 			if (selectionsTooltip?.destroy != undefined) selectionsTooltip.destroy();
 		});
-		showselectionsTOut = setTimeout(() => {selectionsTooltip = showSelections(cell, contractId, selectionsTooltip)}, 1000);
+		showselectionsTOut = setTimeout(() => {
+			if (haSContextMenu) return;
+			selectionsTooltip = showSelections(cell, contractId, selectionsTooltip);
+		}, 1000);
 	}
 	
 	
