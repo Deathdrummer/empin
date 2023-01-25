@@ -7093,6 +7093,7 @@ body::-webkit-resizer {
   position: fixed;
   top: 0;
   left: 0;
+  transform: translateX(-10px);
   width: 100vw;
   box-shadow: 18px 1px 20px rgba(0, 0, 0, 0.1);
   z-index: 11;
@@ -7105,6 +7106,7 @@ body::-webkit-resizer {
   flex: 0 0 250px;
   padding-left: 1rem;
   padding-right: 1rem;
+  transform: translateX(10px);
 }
 .header__logo {
   width: 100%;
@@ -7126,8 +7128,8 @@ body::-webkit-resizer {
 }
 .header__right {
   flex: 0 1 100%;
-  padding-left: 1rem;
-  padding-right: 25px;
+  padding-left: 2rem;
+  padding-right: 15px;
 }
 .header__block {
   height: 50px;
@@ -7307,10 +7309,36 @@ body::-webkit-resizer {
   height: 100%;
 }
 .aside__nav {
-  margin-top: 1rem;
   position: sticky;
+  top: 50px;
+  transform: translateY(1rem);
   z-index: 1;
   padding-bottom: 20px;
+}
+@media screen and (min-width: 576px) {
+  .aside__nav {
+    top: 50px;
+  }
+}
+@media screen and (min-width: 768px) {
+  .aside__nav {
+    top: 60px;
+  }
+}
+@media screen and (min-width: 992px) {
+  .aside__nav {
+    top: 60px;
+  }
+}
+@media screen and (min-width: 1200px) {
+  .aside__nav {
+    top: 70px;
+  }
+}
+@media screen and (min-width: 1400px) {
+  .aside__nav {
+    top: 70px;
+  }
 }
 .aside__nav ul li:not(.opened) .aside__navitem .navitemhandler:hover {
   background-color: #51516a;

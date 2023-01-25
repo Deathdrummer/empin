@@ -17,24 +17,128 @@ $.fn.tripleTap = function(callback) {
 
 
 window.isNumeric = function(num) {
-	return !isNaN(num);
+	return !_.isNaN(num) && !_.isBoolean(num);
 }
 						
 window.ref = function (data) {
 	let target = {};
 	let proxy = new Proxy(target, {
 		get(target, prop) {
-	    	if (prop in target) {
-	    		if (isNumeric(target[prop])) return Number(target[prop]);
-	    		return target[prop]
-	    	} else {
-	      		return null;
-	    	}
-	  	}
+			if (prop in target) {
+				if (isNumeric(target[prop])) return Number(target[prop]);
+				return target[prop]
+			} else {
+				return null;
+			}
+		}
 	});
 	proxy.value = data;
 	return proxy;
 }
+
+
+
+
+
+
+
+$.fn.ddrScroll = function(callback, condition = true) {
+	if (!callback || !_.isFunction(callback)) return;
+	
+	const selector = this;
+	const randEventHash = generateCode('lLnlLllnnnLll');
+	
+	let lastScrollTop = 0;
+	let accumulateDir;
+	let accumulate = 0;
+	
+	$(selector).on('scroll.'+randEventHash, function(event) {
+		if (!condition || !condition?.value) return;
+		var st = $(event.target).scrollTop();
+		if (st > lastScrollTop) {
+			
+			if (accumulateDir != 'down') {
+				accumulate = 0;
+				accumulateDir = 'down';
+			}
+			 
+			accumulate += (st - lastScrollTop);
+			
+			callback({dir: 'down', top: st, step: st - lastScrollTop, accumulate});
+		} else {
+			
+			if (accumulateDir != 'up') {
+				accumulate = 0;
+				accumulateDir = 'up';
+			} 
+			
+			accumulate += Math.abs(st - lastScrollTop);
+			
+			callback({dir: 'up', top: st, step: lastScrollTop - st, accumulate});
+		}
+		lastScrollTop = st;
+	});
+	
+	return {
+		destroy() {
+			$(selector).off('scroll.'+randEventHash);
+		}
+	}
+}
+
+
+
+
+
+
+
+$.fn.ddrWatch = function(method = null, opsOrCb = null, callback = null) {
+	if (_.isNull(method)) throw Error('Ошибка! watch не указан метод!');
+	if (_.isNull(callback)) {
+		callback = opsOrCb;
+		opsOrCb = {};
+	}
+	
+	if (!callback || !_.isFunction(callback)) throw Error('Ошибка! watch не указан коллбэк!');
+	
+	const selector = this;
+	
+	if (method == 'mutate') {
+		let observer = new MutationObserver(callback);
+		
+		const {
+			childList,
+			subtree,
+			attributes,
+			attributeFilter,
+		} = _.assign(ops, {
+			childList: true,
+			subtree: true,
+			attributes: true,
+			attributeFilter: ['class'],
+		});
+		
+		observer.observe($(selector)[0], {
+			childList,
+			subtree,
+			attributes,
+			attributeFilter,
+		});
+		
+	} else if (method == 'resize') {
+		let observer = new ResizeObserver((entries) => {
+			callback(entries);
+		});
+		
+		observer.observe($(selector)[0]);
+	}
+	
+};
+
+
+
+
+
 
 
 

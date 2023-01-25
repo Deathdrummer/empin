@@ -134,7 +134,8 @@
 	});
 	
 	
-	$('#navBlock').ddrFloatingBlock('#navItems');
+	
+	$('.aside').ddrFloatingBlock('#navBlock', {top: 70, bottom: 10});
 	
 	
 	

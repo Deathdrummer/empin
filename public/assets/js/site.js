@@ -5669,7 +5669,7 @@ $.fn.tripleTap = function (callback) {
 };
 
 window.isNumeric = function (num) {
-  return !isNaN(num);
+  return !_.isNaN(num) && !_.isBoolean(num);
 };
 
 window.ref = function (data) {
@@ -5686,6 +5686,98 @@ window.ref = function (data) {
   });
   proxy.value = data;
   return proxy;
+};
+
+$.fn.ddrScroll = function (callback) {
+  var condition = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+  if (!callback || !_.isFunction(callback)) return;
+  var selector = this;
+  var randEventHash = generateCode('lLnlLllnnnLll');
+  var lastScrollTop = 0;
+  var accumulateDir;
+  var accumulate = 0;
+  $(selector).on('scroll.' + randEventHash, function (event) {
+    if (!condition || !(condition !== null && condition !== void 0 && condition.value)) return;
+    var st = $(event.target).scrollTop();
+
+    if (st > lastScrollTop) {
+      if (accumulateDir != 'down') {
+        accumulate = 0;
+        accumulateDir = 'down';
+      }
+
+      accumulate += st - lastScrollTop;
+      callback({
+        dir: 'down',
+        top: st,
+        step: st - lastScrollTop,
+        accumulate: accumulate
+      });
+    } else {
+      if (accumulateDir != 'up') {
+        accumulate = 0;
+        accumulateDir = 'up';
+      }
+
+      accumulate += Math.abs(st - lastScrollTop);
+      callback({
+        dir: 'up',
+        top: st,
+        step: lastScrollTop - st,
+        accumulate: accumulate
+      });
+    }
+
+    lastScrollTop = st;
+  });
+  return {
+    destroy: function destroy() {
+      $(selector).off('scroll.' + randEventHash);
+    }
+  };
+};
+
+$.fn.ddrWatch = function () {
+  var method = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+  var opsOrCb = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+  var callback = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+  if (_.isNull(method)) throw Error('Ошибка! watch не указан метод!');
+
+  if (_.isNull(callback)) {
+    callback = opsOrCb;
+    opsOrCb = {};
+  }
+
+  if (!callback || !_.isFunction(callback)) throw Error('Ошибка! watch не указан коллбэк!');
+  var selector = this;
+
+  if (method == 'mutate') {
+    var observer = new MutationObserver(callback);
+
+    var _$assign = _.assign(ops, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['class']
+    }),
+        childList = _$assign.childList,
+        subtree = _$assign.subtree,
+        attributes = _$assign.attributes,
+        attributeFilter = _$assign.attributeFilter;
+
+    observer.observe($(selector)[0], {
+      childList: childList,
+      subtree: subtree,
+      attributes: attributes,
+      attributeFilter: attributeFilter
+    });
+  } else if (method == 'resize') {
+    var _observer = new ResizeObserver(function (entries) {
+      callback(entries);
+    });
+
+    _observer.observe($(selector)[0]);
+  }
 };
 /*
 	Массив данных брейкпоинтов, пример: {sm: 576, md: 768, lg: 992, xl: 1370}
@@ -7200,12 +7292,12 @@ window.ddrStore = function (key, value) {
 
 
 window.translit = function (str, params) {
-  var _$assign = _.assign({
+  var _$assign2 = _.assign({
     slug: false,
     lower: false
   }, params),
-      slug = _$assign.slug,
-      lower = _$assign.lower;
+      slug = _$assign2.slug,
+      lower = _$assign2.lower;
 
   var converter = {
     'а': 'a',
@@ -7301,16 +7393,16 @@ window.processNotify = function () {
   $.extend(waitNotifyDOM, {
     done: function done(params) {
       var item = this,
-          _$assign2 = _.assign({
+          _$assign3 = _.assign({
         message: null,
         iconFa: '<i class="fa-regular fa-fw fa-circle-check"></i>',
         icon: null,
         close: 5
       }, params),
-          message = _$assign2.message,
-          close = _$assign2.close,
-          iconFa = _$assign2.iconFa,
-          icon = _$assign2.icon;
+          message = _$assign3.message,
+          close = _$assign3.close,
+          iconFa = _$assign3.iconFa,
+          icon = _$assign3.icon;
 
       $(item).addClass('waitnotify__item_done');
       if (message) $(item).find('[waitnotifymessage]').html(message);
@@ -7321,16 +7413,16 @@ window.processNotify = function () {
     },
     cancelled: function cancelled(params) {
       var item = this,
-          _$assign3 = _.assign({
+          _$assign4 = _.assign({
         message: null,
         iconFa: '<i class="fa-solid fa-fw fa-ban"></i>',
         icon: null,
         close: 5
       }, params),
-          message = _$assign3.message,
-          close = _$assign3.close,
-          iconFa = _$assign3.iconFa,
-          icon = _$assign3.icon;
+          message = _$assign4.message,
+          close = _$assign4.close,
+          iconFa = _$assign4.iconFa,
+          icon = _$assign4.icon;
 
       $(item).addClass('waitnotify__item_cancelled');
       if (message) $(item).find('[waitnotifymessage]').html(message);
@@ -7341,16 +7433,16 @@ window.processNotify = function () {
     },
     error: function error(params) {
       var item = this,
-          _$assign4 = _.assign({
+          _$assign5 = _.assign({
         message: null,
         iconFa: '<i class="fa-solid fa-fw fa-triangle-exclamation"></i>',
         icon: null,
         close: 5
       }, params),
-          message = _$assign4.message,
-          close = _$assign4.close,
-          iconFa = _$assign4.iconFa,
-          icon = _$assign4.icon;
+          message = _$assign5.message,
+          close = _$assign5.close,
+          iconFa = _$assign5.iconFa,
+          icon = _$assign5.icon;
 
       $(item).addClass('waitnotify__item_error');
       if (message) $(item).find('[waitnotifymessage]').html(message);

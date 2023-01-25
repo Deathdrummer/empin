@@ -5813,7 +5813,7 @@ $.fn.tripleTap = function (callback) {
 };
 
 window.isNumeric = function (num) {
-  return !isNaN(num);
+  return !_.isNaN(num) && !_.isBoolean(num);
 };
 
 window.ref = function (data) {
@@ -5830,6 +5830,98 @@ window.ref = function (data) {
   });
   proxy.value = data;
   return proxy;
+};
+
+$.fn.ddrScroll = function (callback) {
+  var condition = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+  if (!callback || !_.isFunction(callback)) return;
+  var selector = this;
+  var randEventHash = generateCode('lLnlLllnnnLll');
+  var lastScrollTop = 0;
+  var accumulateDir;
+  var accumulate = 0;
+  $(selector).on('scroll.' + randEventHash, function (event) {
+    if (!condition || !(condition !== null && condition !== void 0 && condition.value)) return;
+    var st = $(event.target).scrollTop();
+
+    if (st > lastScrollTop) {
+      if (accumulateDir != 'down') {
+        accumulate = 0;
+        accumulateDir = 'down';
+      }
+
+      accumulate += st - lastScrollTop;
+      callback({
+        dir: 'down',
+        top: st,
+        step: st - lastScrollTop,
+        accumulate: accumulate
+      });
+    } else {
+      if (accumulateDir != 'up') {
+        accumulate = 0;
+        accumulateDir = 'up';
+      }
+
+      accumulate += Math.abs(st - lastScrollTop);
+      callback({
+        dir: 'up',
+        top: st,
+        step: lastScrollTop - st,
+        accumulate: accumulate
+      });
+    }
+
+    lastScrollTop = st;
+  });
+  return {
+    destroy: function destroy() {
+      $(selector).off('scroll.' + randEventHash);
+    }
+  };
+};
+
+$.fn.ddrWatch = function () {
+  var method = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+  var opsOrCb = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+  var callback = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+  if (_.isNull(method)) throw Error('Ошибка! watch не указан метод!');
+
+  if (_.isNull(callback)) {
+    callback = opsOrCb;
+    opsOrCb = {};
+  }
+
+  if (!callback || !_.isFunction(callback)) throw Error('Ошибка! watch не указан коллбэк!');
+  var selector = this;
+
+  if (method == 'mutate') {
+    var observer = new MutationObserver(callback);
+
+    var _$assign = _.assign(ops, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['class']
+    }),
+        childList = _$assign.childList,
+        subtree = _$assign.subtree,
+        attributes = _$assign.attributes,
+        attributeFilter = _$assign.attributeFilter;
+
+    observer.observe($(selector)[0], {
+      childList: childList,
+      subtree: subtree,
+      attributes: attributes,
+      attributeFilter: attributeFilter
+    });
+  } else if (method == 'resize') {
+    var _observer = new ResizeObserver(function (entries) {
+      callback(entries);
+    });
+
+    _observer.observe($(selector)[0]);
+  }
 };
 /*
 	Массив данных брейкпоинтов, пример: {sm: 576, md: 768, lg: 992, xl: 1370}
@@ -7344,12 +7436,12 @@ window.ddrStore = function (key, value) {
 
 
 window.translit = function (str, params) {
-  var _$assign = _.assign({
+  var _$assign2 = _.assign({
     slug: false,
     lower: false
   }, params),
-      slug = _$assign.slug,
-      lower = _$assign.lower;
+      slug = _$assign2.slug,
+      lower = _$assign2.lower;
 
   var converter = {
     'а': 'a',
@@ -7445,16 +7537,16 @@ window.processNotify = function () {
   $.extend(waitNotifyDOM, {
     done: function done(params) {
       var item = this,
-          _$assign2 = _.assign({
+          _$assign3 = _.assign({
         message: null,
         iconFa: '<i class="fa-regular fa-fw fa-circle-check"></i>',
         icon: null,
         close: 5
       }, params),
-          message = _$assign2.message,
-          close = _$assign2.close,
-          iconFa = _$assign2.iconFa,
-          icon = _$assign2.icon;
+          message = _$assign3.message,
+          close = _$assign3.close,
+          iconFa = _$assign3.iconFa,
+          icon = _$assign3.icon;
 
       $(item).addClass('waitnotify__item_done');
       if (message) $(item).find('[waitnotifymessage]').html(message);
@@ -7465,16 +7557,16 @@ window.processNotify = function () {
     },
     cancelled: function cancelled(params) {
       var item = this,
-          _$assign3 = _.assign({
+          _$assign4 = _.assign({
         message: null,
         iconFa: '<i class="fa-solid fa-fw fa-ban"></i>',
         icon: null,
         close: 5
       }, params),
-          message = _$assign3.message,
-          close = _$assign3.close,
-          iconFa = _$assign3.iconFa,
-          icon = _$assign3.icon;
+          message = _$assign4.message,
+          close = _$assign4.close,
+          iconFa = _$assign4.iconFa,
+          icon = _$assign4.icon;
 
       $(item).addClass('waitnotify__item_cancelled');
       if (message) $(item).find('[waitnotifymessage]').html(message);
@@ -7485,16 +7577,16 @@ window.processNotify = function () {
     },
     error: function error(params) {
       var item = this,
-          _$assign4 = _.assign({
+          _$assign5 = _.assign({
         message: null,
         iconFa: '<i class="fa-solid fa-fw fa-triangle-exclamation"></i>',
         icon: null,
         close: 5
       }, params),
-          message = _$assign4.message,
-          close = _$assign4.close,
-          iconFa = _$assign4.iconFa,
-          icon = _$assign4.icon;
+          message = _$assign5.message,
+          close = _$assign5.close,
+          iconFa = _$assign5.iconFa,
+          icon = _$assign5.icon;
 
       $(item).addClass('waitnotify__item_error');
       if (message) $(item).find('[waitnotifymessage]').html(message);
@@ -9949,83 +10041,171 @@ window.ddrDatepicker = datepicker["default"];
   \**************************************************/
 /***/ (function() {
 
+$.fn.ddrFloatingBlock = function () {
+  var blockSelector = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+  var params = arguments.length > 1 ? arguments[1] : undefined;
+  var containerSelector = this;
+  var condition = ref(false);
+  var rool = ((params === null || params === void 0 ? void 0 : params.top) || 0) + ((params === null || params === void 0 ? void 0 : params.bottom) || 0);
+  var //containerHeight	= $(containerSelector).outerHeight(),
+  blockHeight = $(blockSelector).outerHeight(),
+      winHeight = $(window).height() - rool,
+      initialTop = (params === null || params === void 0 ? void 0 : params.top) || 0,
+      // положение от верха
+  offsetDown = (params === null || params === void 0 ? void 0 : params.bottom) || 0,
+      // промежуток до низа в конце списка
+  downLimit;
+
+  _setCondition();
+
+  _setDownLimit();
+
+  var upLimit = initialTop;
+  var currentTop = Number($(window).scrollTop());
+  currentTop = currentTop == 0 ? 0 : -currentTop;
+  $(blockSelector).css('top', Math.max(currentTop, downLimit) + 'px');
+  $(window).ddrScroll(function (_ref) {
+    var dir = _ref.dir,
+        top = _ref.top,
+        step = _ref.step,
+        accumulate = _ref.accumulate;
+
+    if (dir == 'down') {
+      currentTop = currentTop - step < downLimit ? downLimit : currentTop - step;
+      $(blockSelector).css('top', Math.max(currentTop, downLimit) + 'px');
+    } else if (dir == 'up') {
+      currentTop = currentTop + step > upLimit ? upLimit : currentTop + step;
+      $(blockSelector).css('top', Math.min(currentTop, upLimit) + 'px');
+    }
+  }, condition);
+  /*$(containerSelector).ddrWatch('resize', (data) => {
+  	containerHeight = data[0]?.contentRect?.height || $(containerSelector).outerHeight();
+  	//_setDownLimit();
+  	_setCondition();
+  });*/
+
+  $(blockSelector).ddrWatch('resize', function (data) {
+    var _data$, _data$$contentRect;
+
+    blockHeight = ((_data$ = data[0]) === null || _data$ === void 0 ? void 0 : (_data$$contentRect = _data$.contentRect) === null || _data$$contentRect === void 0 ? void 0 : _data$$contentRect.height) || $(blockSelector).outerHeight();
+
+    _setDownLimit();
+
+    _setCondition();
+
+    currentTop = initialTop;
+    $(blockSelector).css('top', initialTop + 'px');
+  });
+  $(window).resize(function () {
+    winHeight = $(window).height() - rool;
+
+    _setDownLimit();
+
+    _setCondition();
+
+    currentTop = initialTop;
+    $(blockSelector).css('top', initialTop + 'px');
+  });
+
+  function _setDownLimit() {
+    downLimit = -blockHeight + (winHeight + initialTop) - offsetDown;
+  }
+
+  function _setCondition() {
+    if (blockHeight > winHeight) {
+      condition.value = true;
+    } else {
+      condition.value = false;
+      $(blockSelector).css('top', initialTop);
+    }
+  }
+};
 /*Добавить css стили
 #модуль
 	z-index: 998
 	position: sticky
 */
-$.fn.ddrFloatingBlock = function () {
-  var mutationSelector = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
-  var block = this,
-      setParams,
-      blockHeight = 0,
-      blockPos = 0,
-      winHeight = 0,
-      scrTop,
-      startScrSpace,
-      scrPos,
-      scrSpace;
-  (setParams = function setParams() {
-    blockHeight = $(block).outerHeight();
-    blockPos = $(block).offset().top;
-    winHeight = $(window).height();
-    startScrSpace = -(blockHeight - winHeight);
-    scrPos = $(window).scrollTop();
-    scrSpace = -(blockHeight - winHeight);
-  })();
 
-  if (mutationSelector) {
-    var observer = new MutationObserver(mutateNav);
-    observer.observe($(mutationSelector)[0], {
-      childList: true,
-      subtree: true,
-      attributes: true,
-      attributeFilter: ['class']
-    });
-  }
-
-  var rsTOut;
-  $(window).resize(function () {
-    clearTimeout(rsTOut);
-    rsTOut = setTimeout(function () {
-      $(block).removeAttrib('style');
-      setParams();
-      if (blockPos + blockHeight <= winHeight) $(block).css('top', blockPos);else $(block).css('top', scrSpace);
-    }, 100);
-  });
-
-  function mutateNav() {
-    $(block).removeAttrib('style');
-    setParams();
-    if (blockPos + blockHeight <= winHeight) $(block).css('top', blockPos);else $(block).css('top', scrSpace);
-  }
-
-  if (blockPos + blockHeight <= winHeight) $(block).css('top', blockPos);else $(block).css('top', scrSpace);
-  $(window).scroll(function () {
-    if (blockPos + blockHeight <= winHeight) return false;
-    scrTop = $(window).scrollTop();
-
-    if (scrPos < scrTop) {
-      // прокрутка вниз
-      var posDiff = scrPos - scrTop; // отрицательное
-
-      var shift = scrSpace + posDiff;
-      scrSpace = shift > startScrSpace ? shift : startScrSpace;
-      $(block).css('top', scrSpace);
-    } else {
-      // прокрутка вверх
-      var _posDiff = scrPos - scrTop; // положительное
+/*$.fn.ddrFloatingBlock = function(mutationSelector = null) {
+	
+	let block = this,
+		setParams,
+		blockHeight = 0,
+		blockPos = 0,
+		winHeight = 0,
+		scrTop,
+		startScrSpace,
+		scrPos,
+		scrSpace;
 
 
-      var _shift = scrSpace + _posDiff;
+	(setParams = function() {
+		blockHeight = $(block).outerHeight();
+		blockPos = $(block).offset().top;
+		winHeight = $(window).height();
+		startScrSpace = -(blockHeight - winHeight);
+		scrPos = $(window).scrollTop();
+		scrSpace = -(blockHeight - winHeight);
+	})();
+	
+	
+	if (mutationSelector) {
+		let observer = new MutationObserver(mutateNav);
+		observer.observe($(mutationSelector)[0], {
+			childList: true,
+			subtree: true,
+			attributes: true,
+			attributeFilter: ['class']
+		});
+	}
+	
+	
 
-      scrSpace = _shift < blockPos ? _shift : blockPos;
-      $(block).css('top', scrSpace);
-    }
 
-    scrPos = scrTop;
-  });
-};
+	let rsTOut;
+	$(window).resize(function() {
+		clearTimeout(rsTOut);
+		rsTOut = setTimeout(function() {
+			$(block).removeAttrib('style');
+			setParams();
+			if (blockPos + blockHeight <= winHeight) $(block).css('top', blockPos);
+			else $(block).css('top', scrSpace);
+		}, 100);
+	});
+	
+	
+	function mutateNav() {
+		$(block).removeAttrib('style');
+		setParams();
+		if (blockPos + blockHeight <= winHeight) $(block).css('top', blockPos);
+		else $(block).css('top', scrSpace);
+	}
+	
+
+	if (blockPos + blockHeight <= winHeight) $(block).css('top', blockPos);
+	else $(block).css('top', scrSpace);
+
+
+	$(window).scroll(function() {
+		if (blockPos + blockHeight <= winHeight) return false;
+		scrTop = $(window).scrollTop();
+		if (scrPos < scrTop) { // прокрутка вниз
+			let posDiff = (scrPos - scrTop); // отрицательное
+			let shift = scrSpace + posDiff;
+			scrSpace = shift > startScrSpace ? shift : startScrSpace;
+			$(block).css('top', scrSpace);
+
+		} else { // прокрутка вверх
+			let posDiff = (scrPos - scrTop); // положительное
+			let shift = scrSpace + posDiff;
+			scrSpace = shift < (blockPos) ? shift : (blockPos);
+			$(block).css('top', scrSpace);
+		}
+
+		scrPos = scrTop;
+	});
+}
+*/
 
 /***/ }),
 

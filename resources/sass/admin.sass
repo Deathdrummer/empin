@@ -62,6 +62,7 @@ input, textarea, [contenteditable]
 	position: fixed
 	top: 0
 	left: 0
+	transform: translateX(-10px)
 	width: 100vw
 	box-shadow: 18px 1px 20px rgb(0 0 0 / 10%)
 	z-index: 11
@@ -75,6 +76,7 @@ input, textarea, [contenteditable]
 		flex: 0 0 250px
 		padding-left: 1rem
 		padding-right: 1rem
+		transform: translateX(10px)
 	
 	&__logo
 		width: 100%
@@ -99,8 +101,8 @@ input, textarea, [contenteditable]
 	
 	&__right
 		flex: 0 1 100%
-		padding-left: 1rem
-		padding-right: 25px
+		padding-left: 2rem
+		padding-right: 15px
 	
 	&__block
 		+resp(height, $headerHeight)
@@ -187,12 +189,12 @@ input, textarea, [contenteditable]
 .aside
 	background-color: #181824
 	height: 100%
-	//position: relative
 	
 	
 	&__nav
-		margin-top: 1rem
 		position: sticky
+		+resp(top, $headerHeight)
+		transform: translateY(1rem)
 		z-index: 1
 		padding-bottom: 20px
 		

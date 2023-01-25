@@ -51,6 +51,8 @@ class Handler extends ExceptionHandler {
 		$line = $e->getLine();
 		$file = $e->getFile();
 		
+		if ($e instanceof TokenMismatchException) return false;
+		
 		Log::error("[{$code}] \"{$message}\" of file: {$file}:{$line} on line: {$line}");
 		
 		//parent::report($e);
