@@ -235,7 +235,7 @@
 			<div class="col-2">
 				<div class="form">
 					<div class="form__item">
-						<x-checkbox name="subcontracting" id="subcontracting" :checked="$subcontracting ?? false" label="Субподряд" class="mb6px" />
+						<x-checkbox name="subcontracting" id="subcontracting" :checked="$subcontracting ?? false" label="Субподряд" />
 					</div>
 					
 					<div class="form__item">
