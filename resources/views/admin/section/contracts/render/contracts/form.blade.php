@@ -236,9 +236,11 @@
 				<div class="form">
 					<div class="form__item">
 						<x-checkbox name="subcontracting" id="subcontracting" :checked="$subcontracting ?? false" label="Субподряд" class="mb6px" />
-						<x-checkbox name="gencontracting" id="gencontracting" :checked="$gencontracting ?? false" label="Генподряд" />
 					</div>
 					
+					<div class="form__item">
+						<x-checkbox name="gencontracting" id="gencontracting" :checked="$gencontracting ?? false" label="Генподряд" />
+					</div>
 					
 					<div class="form__item">
 						<x-checkbox name="hoz_method" :checked="$hoz_method ?? null" label="Хоз способ" />
