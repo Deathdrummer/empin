@@ -891,9 +891,6 @@ class Contracts extends Controller {
 	}
 	
 	public function set_cell_edit(Request $request) {
-		
-		logger($request->all());
-		
 		[
 			'contract_id'	=> $contractId,
 			'column' 		=> $column,
@@ -903,8 +900,6 @@ class Contracts extends Controller {
 			'column'		=> 'required|string',
 			'data' 			=> 'present|nullable',
 		]);
-		
-		
 		
 		$stat = $this->contract->setCellData($contractId, $column, $data);
 		
