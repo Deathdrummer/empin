@@ -89,7 +89,7 @@
 			@if(isset($customer) && isset($customers[$customer]))
 				<p class="fz12px lh90" edittedplace>{{Str::of($customers[$customer])->limit(60, '...')}}</p>
 			@else
-				<p class="color-gray">-</p>
+				<p class="fz12px" edittedplace>-</p>
 			@endif
 		</x-table.td>
 	@endif
@@ -107,7 +107,7 @@
 			@isset($price_nds)
 				<p class="fz12px lh90 nobreak"><span edittedplace="0.00">@number($price_nds, 2)</span> <strong>@symbal(money)</strong></p>
 			@else
-				<p class="color-gray">-</p>
+				<p class="fz12px" edittedplace="0.00">-</p>
 			@endisset
 		</x-table.td>
 	@endif
@@ -117,7 +117,7 @@
 			@isset($price)
 				<p class="fz12px lh90 nobreak"><span edittedplace="0.00">@number($price, 2)</span> <strong>@symbal(money)</strong></p>
 			@else
-				<p class="color-gray">-</p>
+				<p class="fz12px" edittedplace="0.00">-</p>
 			@endisset
 		</x-table.td>
 	@endif
@@ -150,7 +150,7 @@
 				@if($subcontracting)
 					<p class="fz12px" edittedplace="-">-</p>
 				@else
-					<p class="color-gray fz12px text-center" edittedplace="-">НЕТ</p>
+					<p class="fz12px text-center" edittedplace="-">НЕТ</p>
 				@endif
 			@endif
 		</x-table.td>
@@ -164,7 +164,7 @@
 				@if($subcontracting)
 					<p class="fz12px" edittedplace="-">-</p>
 				@else
-					<p class="color-gray fz12px text-center" edittedplace="-">НЕТ</p>
+					<p class="fz12px text-center" edittedplace="-">НЕТ</p>
 				@endif
 			@endif
 		</x-table.td>
@@ -178,7 +178,7 @@
 				@if($gencontracting)
 					<p class="fz12px" edittedplace="-">-</p>
 				@else
-					<p class="color-gray fz12px text-center" edittedplace="-">НЕТ</p>
+					<p class="fz12px text-center" edittedplace="-">НЕТ</p>
 				@endif
 			@endif
 		</x-table.td>
@@ -192,7 +192,7 @@
 				@if($gencontracting)
 					<p class="fz12px" edittedplace="-">-</p>
 				@else
-					<p class="color-gray fz12px text-center" edittedplace="-">НЕТ</p>
+					<p class="fz12px text-center" edittedplace="-">НЕТ</p>
 				@endif
 			@endif
 		</x-table.td>
@@ -227,7 +227,7 @@
 			@if(isset($type) && isset($types[$type]))
 				<p class="fz12px lh110" edittedplace="-">{{$types[$type]}}</p>
 			@else
-				<p class="color-gray">-</p>
+				<p class="fz12px" edittedplace="-">-</p>
 			@endif
 		</x-table.td>
 	@endif
@@ -237,7 +237,7 @@
 			@if(isset($contractor) && isset($contractors[$contractor]))
 				<p class="fz12px lh90" edittedplace="-">{{$contractors[$contractor]}}</p>
 			@else
-				<p class="color-gray">-</p>
+				<p class="fz12px" edittedplace="-">-</p>
 			@endif
 		</x-table.td>
 	@endif
@@ -256,7 +256,7 @@
 				@if(!$without_buy)
 					<p class="fz12px" edittedplace="-">-</p>
 				@else
-					<p class="color-gray fz12px text-center" edittedplace="-">БЕЗ ЗАКУПКИ</p>
+					<p class="fz12px text-center" edittedplace="-">БЕЗ ЗАКУПКИ</p>
 				@endif
 			@endif
 		</x-table.td>
