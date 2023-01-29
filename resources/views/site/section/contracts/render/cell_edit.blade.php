@@ -11,16 +11,16 @@
 	
 	
 	@if($type == '1')
-		<div class="placer placer-top placer-right pt3px pr3px" edittedplacer>
-			<i class="fa-solid fa-floppy-disk fz12px pointer saveicon" title="Сохранить" savecelldata onclick="event.stopPropagation();"></i>
+		<div class="placer placer-top placer-right pt3px pr3px" ondblclick="event.stopPropagation();" edittedplacer>
+			<i class="fa-solid fa-floppy-disk fz12px pointer saveicon" title="Сохранить" savecelldata></i>
 		</div>
 		
 		<div class="editted" ondblclick="event.stopPropagation();" edittedblock>
 			<textarea id="edittedCellData" class="fz12px lh100 mt1px mb1px text-justify" placeholder="...">{{$content ?? null}}</textarea>
 		</div>
 	@elseif($type == '2')
-		<div class="placer placer-top placer-right pt3px pr3px" edittedplacer>
-			<i class="fa-solid fa-floppy-disk fz12px pointer saveicon" title="Сохранить" savecelldata onclick="event.stopPropagation();"></i>
+		<div class="placer placer-top placer-right pt3px pr3px" ondblclick="event.stopPropagation();" edittedplacer>
+			<i class="fa-solid fa-floppy-disk fz12px pointer saveicon" title="Сохранить" savecelldata></i>
 		</div>
 		
 		<div class="editted editted_centred" ondblclick="event.stopPropagation();" edittedblock>
@@ -30,7 +30,7 @@
 	@elseif($type == '3')
 		
 	@elseif($type == '4')
-		<ul ondblclick="event.stopPropagation();">
+		<ul ondblclick="event.stopPropagation();" onclick="event.stopPropagation();">
 			@forelse($list as $item)
 				<li
 					@class([
@@ -40,6 +40,7 @@
 						'border-bottom border-gray-200' => !$loop->last,
 					])
 					edittedlistvalue="{{$item['id']}}"
+					onclick="event.stopPropagation();"
 					>
 				{{$item['name'] ?? $item['title']}}</li>
 			@empty

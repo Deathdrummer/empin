@@ -143487,7 +143487,7 @@ template {
   width: 100%;
   left: 0;
   pointer-events: none;
-  z-index: 11;
+  z-index: 9;
 }
 .ddrtable__td .placer > * {
   pointer-events: auto;
@@ -143556,7 +143556,7 @@ template {
   height: 100%;
   background-color: #fff;
   outline: 1px dashed #91cddb !important;
-  z-index: 10;
+  z-index: 8;
   padding: 4px 5px 4px 5px;
   font-size: inherit;
   line-height: inherit;

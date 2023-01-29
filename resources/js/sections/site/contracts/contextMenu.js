@@ -724,7 +724,6 @@ export function contextMenu(
 					
 					
 					if ([1,2].indexOf(type) !== -1) { // текст
-						console.log(type);
 						const {data, error, status, headers} = await axiosQuery('get', 'site/contracts/cell_edit', {
 							contract_id: contractId, 
 							column,
@@ -737,6 +736,9 @@ export function contextMenu(
 						
 						
 						$(cell).on(tapEvent, '[savecelldata]', async function() {
+							
+							$(this).hide();
+							
 							cellWait.on();
 						
 							const cellData = $(cell).find('#edittedCellData').val();
@@ -745,6 +747,7 @@ export function contextMenu(
 							const {data, error, status, headers} = await axiosQuery('post', 'site/contracts/cell_edit', {
 								contract_id: contractId, 
 								column,
+								type,
 								data: cellData,
 							}, 'json');
 							
@@ -767,8 +770,6 @@ export function contextMenu(
 											
 						
 					} else if([3,4].indexOf(type) !== -1) { // 3 - дата 4 - вып. список
-						console.log(type);
-						
 						$(cell).addClass('editted');
 						
 						cellEditTooltip = $(cell).ddrTooltip({
@@ -805,10 +806,12 @@ export function contextMenu(
 											
 											const emptyVal = $(cell).find('[edittedplace]').attr('edittedplace');
 											
-											const cellDateWait = $(cell).ddrWait({
+											const cellDateWait = $(reference).ddrWait({
 												iconHeight: '30px',
 												tag: 'noscroll noopen edittedwait'
 											});
+											
+											
 											
 											const {data, error} = await axiosQuery('post', 'site/contracts/cell_edit', {
 												contract_id: contractId,
@@ -855,6 +858,8 @@ export function contextMenu(
 								
 								
 								$(popper).find('[edittedlistvalue]').on(tapEvent, async function() {
+									cellWait.on();
+									
 									let value = $(this).attr('edittedlistvalue');
 									const emptyVal = $(cell).find('[edittedplace]').attr('edittedplace');
 									const {data: savedRes, error: savedErr} = await axiosQuery('post', 'site/contracts/cell_edit', {
@@ -926,11 +931,7 @@ export function contextMenu(
 					
 					
 					
-					
-					
-					
-					cellWait.off();
-						
+					cellWait.off();	
 				}
 			}
 		];

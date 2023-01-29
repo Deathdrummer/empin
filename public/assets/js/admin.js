@@ -15204,20 +15204,18 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                   });
 
                   if (!([1, 2].indexOf(type) !== -1)) {
-                    _context9.next = 21;
+                    _context9.next = 20;
                     break;
                   }
 
-                  // текст
-                  console.log(type);
-                  _context9.next = 11;
+                  _context9.next = 10;
                   return axiosQuery('get', 'site/contracts/cell_edit', {
                     contract_id: contractId,
                     column: column,
                     type: type
                   });
 
-                case 11:
+                case 10:
                   _yield$axiosQuery4 = _context9.sent;
                   data = _yield$axiosQuery4.data;
                   error = _yield$axiosQuery4.error;
@@ -15232,17 +15230,19 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                       while (1) {
                         switch (_context5.prev = _context5.next) {
                           case 0:
+                            $(this).hide();
                             cellWait.on();
                             cellData = $(cell).find('#edittedCellData').val();
                             emptyVal = $(cell).find('[edittedplace]').attr('edittedplace');
-                            _context5.next = 5;
+                            _context5.next = 6;
                             return axiosQuery('post', 'site/contracts/cell_edit', {
                               contract_id: contractId,
                               column: column,
+                              type: type,
                               data: cellData
                             }, 'json');
 
-                          case 5:
+                          case 6:
                             _yield$axiosQuery5 = _context5.sent;
                             data = _yield$axiosQuery5.data;
                             error = _yield$axiosQuery5.error;
@@ -15262,20 +15262,19 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                               unEditCell(cell);
                             }
 
-                          case 12:
+                          case 13:
                           case "end":
                             return _context5.stop();
                         }
                       }
-                    }, _callee5);
+                    }, _callee5, this);
                   })));
-                  _context9.next = 22;
+                  _context9.next = 21;
                   break;
 
-                case 21:
+                case 20:
                   if ([3, 4].indexOf(type) !== -1) {
                     // 3 - дата 4 - вып. список
-                    console.log(type);
                     $(cell).addClass('editted');
                     cellEditTooltip = $(cell).ddrTooltip({
                       //cls: 'w44rem',
@@ -15330,7 +15329,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                                 rawDate = date.getFullYear() + '-' + addZero(date.getMonth() + 1) + '-' + addZero(date.getDate()) + ' 00:00:00';
                                                 toCellText = addZero(date.getDate()) + '.' + addZero(date.getMonth() + 1) + '.' + date.getFullYear().toString().substr(-2);
                                                 emptyVal = $(cell).find('[edittedplace]').attr('edittedplace');
-                                                cellDateWait = $(cell).ddrWait({
+                                                cellDateWait = $(reference).ddrWait({
                                                   iconHeight: '30px',
                                                   tag: 'noscroll noopen edittedwait'
                                                 });
@@ -15413,9 +15412,10 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                       while (1) {
                                         switch (_context7.prev = _context7.next) {
                                           case 0:
+                                            cellWait.on();
                                             value = $(this).attr('edittedlistvalue');
                                             emptyVal = $(cell).find('[edittedplace]').attr('edittedplace');
-                                            _context7.next = 4;
+                                            _context7.next = 5;
                                             return axiosQuery('post', 'site/contracts/cell_edit', {
                                               contract_id: contractId,
                                               column: column,
@@ -15423,7 +15423,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                               data: value
                                             }, 'json');
 
-                                          case 4:
+                                          case 5:
                                             _yield$axiosQuery8 = _context7.sent;
                                             savedRes = _yield$axiosQuery8.data;
                                             savedErr = _yield$axiosQuery8.error;
@@ -15442,7 +15442,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                               (_cellEditTooltip4 = cellEditTooltip) === null || _cellEditTooltip4 === void 0 ? void 0 : _cellEditTooltip4.destroy();
                                             }
 
-                                          case 9:
+                                          case 10:
                                           case "end":
                                             return _context7.stop();
                                         }
@@ -15500,10 +15500,10 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                     });
                   }
 
-                case 22:
+                case 21:
                   cellWait.off();
 
-                case 23:
+                case 22:
                 case "end":
                   return _context9.stop();
               }
