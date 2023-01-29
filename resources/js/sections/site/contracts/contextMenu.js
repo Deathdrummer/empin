@@ -42,6 +42,10 @@ export function contextMenu(
 		onContextMenu(() => {
 			haSContextMenu.value = true;
 			
+			$('#contractsList').find('[editted]').each(function(k, cell) {
+				unEditCell(cell);
+			});
+			
 			// если кликнуть на НЕвыделенном договоре - то все выделенния отменятся и выделится текущий кликнутый договор
 			if (isCommon && $(target.selector).hasAttr('contractselected') == false) {
 				$('#contractsTable').find('[contractselected]').removeClass('ddrtable__tr-selected').removeAttrib('contractselected');
@@ -66,6 +70,20 @@ export function contextMenu(
 		
 		
 		const countSelected = selectedContracts.items?.length || 0;
+		
+		function unEditCell(cell = null) {
+			if (_.isNull(cell)) return;
+			if ($(cell).find('#edittedCellData').tagName() == 'input') {
+				$(cell).find('[edittedplace]').number(true, 2, '.', ' ');
+			}
+			$(cell).removeClass('editted');
+			$(cell).find('[edittedwait]').remove();
+			$(cell).find('[edittedplacer]').remove();
+			$(cell).find('[edittedblock]').remove();
+			$(cell).removeAttrib('editted');
+		} 
+		
+		
 		
 		
 		closeOnScroll('#contractsList');
@@ -683,31 +701,83 @@ export function contextMenu(
 					const attrData = $(cell).attr('contextedit');
 					const [contractId = null, column = null, type = null] = pregSplit(attrData);
 					
+					
+					$('#contractsList').find('[editted]').each(function(k, cell) {
+						unEditCell(cell);
+					});
+					
+					
+					$('#contractsList').on(tapEvent+'.unEditCell', function(e) {
+						if ($(e.target).closest('[ddrtabletd]').hasAttr('editted') && [3,4].indexOf(type) === -1) return;
+						unEditCell(cell);
+						$('#contractsList').off('.unEditCell');
+					});
+					
+					
 					$(cell).setAttrib('editted');
 					
 					const cellWait = $(cell).ddrWait({
-						iconHeight: '30px'
+						iconHeight: '30px',
+						tag: 'noscroll noopen edittedwait'
 					});
 					
-						
 					
-					if (type == 1) {
+					
+					if ([1,2].indexOf(type) !== -1) { // текст
+						console.log(type);
 						const {data, error, status, headers} = await axiosQuery('get', 'site/contracts/cell_edit', {
 							contract_id: contractId, 
 							column,
 							type,
-						}, 'json');
+						});
 						
 						$(cell).append(data);
 						
-					} else if(type == 2) {
+						if (type == 2) $(cell).find('#edittedCellData').number(true, 2, '.', ' ');
+						
+						
+						$(cell).on(tapEvent, '[savecelldata]', async function() {
+							cellWait.on();
+						
+							const cellData = $(cell).find('#edittedCellData').val();
+							const emptyVal = $(cell).find('[edittedplace]').attr('edittedplace');
+							
+							const {data, error, status, headers} = await axiosQuery('post', 'site/contracts/cell_edit', {
+								contract_id: contractId, 
+								column,
+								data: cellData,
+							}, 'json');
+							
+							
+							if (error) {
+								cellWait.off();
+								$.notify('Ошибка сохранения ячейки!', 'error');
+								console.log(error?.message, error.errors);
+							}
+							
+							if (data) {
+								$.notify('Сохранено!');
+								$(cell).find('[edittedplace]').text(cellData || emptyVal);
+								cellWait.destroy();
+								unEditCell(cell);
+							}
+						});
+						
+						
+											
+						
+					} else if([3,4].indexOf(type) !== -1) { // 3 - дата 4 - вып. список
+						console.log(type);
+						
+						$(cell).addClass('editted');
+						
 						cellEditTooltip = $(cell).ddrTooltip({
 							//cls: 'w44rem',
 							placement: 'bottom',
-							tag: 'noscroll noopen',
+							tag: 'noscroll noopen nouneditted',
 							offset: [0 -5],
-							minWidth: '200px',
-							minHeight: '200px',
+							minWidth: type == 3 ? '202px' : '50px',
+							minHeight: type == 3 ? '170px' : '50px',
 							duration: [200, 200],
 							trigger: 'click',
 							wait: {
@@ -715,27 +785,107 @@ export function contextMenu(
 							},
 							onShow: async function({reference, popper, show, hide, destroy, waitDetroy, setContent, setData, setProps}) {
 								
-								const {data, error, status, headers} = await axiosQuery('get', 'site/contracts/cell_edit', {
-									contract_id: contractId, 
-									column,
-									type,
-								}, 'json');
-								
-								
-								await setData(data);
+								if (type == 3) {
+									const calendarBlock = '<div onclick="event.stopPropagation();" ondblclick="event.stopPropagation();" id="editCellCalendar"></div>';
+									await setData(calendarBlock);
+									
+									const currentDate = $(cell).find('[edittedplace]').attr('date') || false;
+									
+									const datePicker = ddrDatepicker($(popper).find('#editCellCalendar')[0], {
+										startDay: 1,
+										defaultView: 'calendar',
+										overlayPlaceholder: 'Введите год',
+										customDays: ['пн', 'вт', 'ср', 'чт', 'пт', 'сб', 'вс'],
+										customMonths: ['январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь'],
+										alwaysShow: true,
+										dateSelected: currentDate ? new Date(currentDate) : new Date(),
+										onSelect: async ({el, destroy}, date) => {
+											const rawDate = date.getFullYear()+'-'+addZero(date.getMonth() + 1)+'-'+addZero(date.getDate())+' 00:00:00';
+											const toCellText = addZero(date.getDate())+'.'+addZero(date.getMonth() + 1)+'.'+date.getFullYear().toString().substr(-2);
+											
+											const emptyVal = $(cell).find('[edittedplace]').attr('edittedplace');
+											
+											const cellDateWait = $(cell).ddrWait({
+												iconHeight: '30px',
+												tag: 'noscroll noopen edittedwait'
+											});
+											
+											const {data, error} = await axiosQuery('post', 'site/contracts/cell_edit', {
+												contract_id: contractId,
+												column,
+												type,
+												data: rawDate,
+											}, 'json');
+											
+											if (error) {
+												cellDateWait.off();
+												$.notify('Ошибка сохранения ячейки!', 'error');
+												console.log(error?.message, error.errors);
+											}
+											
+											if (data) {
+												$.notify('Сохранено!');
+												$(cell).find('[edittedplace]').setAttrib('date', rawDate);
+												$(cell).find('[edittedplace]').text(toCellText || emptyVal);
+												cellDateWait.destroy();
+												unEditCell(cell);
+												cellEditTooltip?.destroy();
+											}
+										},
+									});
+									
+									$(datePicker.el).siblings('.qs-datepicker-container').addClass('qs-datepicker-container-noshadow');
+									
+								} else {
+									const {data, error, status, headers} = await axiosQuery('get', 'site/contracts/cell_edit', {
+										contract_id: contractId, 
+										column,
+										type,
+									}, 'json');
+									
+									await setData(data);
+								}
 								
 								waitDetroy();
-								
-								const textarea = $(popper).find('#edittedCellData');
-								
-								$(textarea).focus();
-								
-								textarea[0].selectionStart = textarea[0].selectionEnd = textarea[0].value.length;
 								
 								$('#contractsList').one('scroll', function() {
 									// При скролле списка скрыть тултип комментариев
 									if (cellEditTooltip?.destroy != undefined) cellEditTooltip.destroy();
 								});
+								
+								
+								$(popper).find('[edittedlistvalue]').on(tapEvent, async function() {
+									let value = $(this).attr('edittedlistvalue');
+									const emptyVal = $(cell).find('[edittedplace]').attr('edittedplace');
+									const {data: savedRes, error: savedErr} = await axiosQuery('post', 'site/contracts/cell_edit', {
+										contract_id: contractId,
+										column,
+										type,
+										data: value,
+									}, 'json');
+									
+									if (savedErr) {
+										cellWait.off();
+										$.notify('Ошибка сохранения ячейки!', 'error');
+										console.log(savedErr?.message, savedErr.errors);
+									}
+									
+									if (savedRes) {
+										$.notify('Сохранено!');
+										$(cell).find('[edittedplace]').text(savedRes || emptyVal);
+										cellWait.destroy();
+										unEditCell(cell);
+										cellEditTooltip?.destroy();
+									}
+								});
+								
+									
+								
+								
+								//$(textarea).focus();
+								
+								//textarea[0].selectionStart = textarea[0].selectionEnd = textarea[0].value.length;
+								
 								
 								
 								/*let inputCellCommentTOut;
@@ -772,39 +922,8 @@ export function contextMenu(
 							}
 						});
 						
-					} else if (type == 3) {
-						
 					}
 					
-					
-					
-					$.saveCellData = async () => {
-						cellWait.on();
-						
-						const cellData = $(cell).find('#edittedCellData').val();
-						const emptyVal = $(cell).find('[edittedplace]').attr('edittedplace');
-						
-						const {data, error, status, headers} = await axiosQuery('post', 'site/contracts/cell_edit', {
-							contract_id: contractId, 
-							column,
-							data: cellData,
-						}, 'json');
-						
-						
-						if (error) {
-							cellWait.off();
-							$.notify('Ошибка сохранения ячейки!', 'error');
-							console.log(error?.message, error.errors);
-						}
-						
-						if (data) {
-							$.notify('Сохранено!');
-							$(cell).find('[edittedplace]').text(cellData || emptyVal);
-							cellWait.destroy();
-							$(cell).find('[edittedblock]').remove();
-							$(cell).removeAttrib('editted');
-						}
-					}
 					
 					
 					

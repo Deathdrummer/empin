@@ -798,7 +798,7 @@ class Contract {
 	 * @param 
 	 * @return 
 	 */
-	public function setCellData($contractId, $column, $data): bool {
+	public function setCellData($contractId, $column, $type, $data): bool {
 		$contract = ContractModel::find($contractId);
 		$contract[$column] = $data;
 		return $contract->save();

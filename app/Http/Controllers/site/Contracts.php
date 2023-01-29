@@ -886,7 +886,19 @@ class Contracts extends Controller {
 		]);
 		
 		$data = $this->contract->getCellData($contractId, $column);
+		
+		$data['list'] = null;
+		
+		if ($type == 4) {
+			$data['list'] = match ($column) {
+				'customer' 		=> $this->getSettings('contract-customers:customers'),
+				'type' 			=> $this->getSettings('contract-types:types'),
+				'contractor'	=> $this->getSettings('contract-contractors:contractors'),
+			};
+		}
+		
 		$data['type'] = $type;
+		
 		return $this->render('cell_edit', $data);
 	}
 	
@@ -894,14 +906,26 @@ class Contracts extends Controller {
 		[
 			'contract_id'	=> $contractId,
 			'column' 		=> $column,
+			'type' 			=> $type,
 			'data' 			=> $data,
 		] = $request->validate([
 			'contract_id'	=> 'required|integer',
+			'type'			=> 'required|integer',
 			'column'		=> 'required|string',
 			'data' 			=> 'present|nullable',
 		]);
 		
-		$stat = $this->contract->setCellData($contractId, $column, $data);
+		$stat = $this->contract->setCellData($contractId, $column, $type, $data);
+		
+		if ($type == 4) {
+			$listData = match ($column) {
+				'type' 			=> array_column($this->getSettings('contract-types'), 'title', 'id'),
+				'contractor' 	=> array_column($this->getSettings('contract-contractors'), 'name', 'id'),
+				'customer' 		=> array_column($this->getSettings('contract-customers'), 'name', 'id'),
+			};
+			
+			return $listData[$data] ?? null;
+		}
 		
 		return response()->json($stat);
 	}

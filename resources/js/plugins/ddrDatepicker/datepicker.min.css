@@ -27,6 +27,11 @@
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
 }
+	.qs-datepicker-container-noshadow {
+		box-shadow: none !important;
+		border: none !important;
+		border-radius: 0 !important;
+	}
 
 .qs-centered {
 	position: fixed;

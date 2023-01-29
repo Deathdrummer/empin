@@ -220,137 +220,213 @@ p {
 }
 
 .color-black {
-  color: #3d3e4e !important;
+  color: #3d3e4e;
 }
 .color-black-hovered:hover {
-  color: #3d3e4e !important;
+  color: #3d3e4e;
   transition: color 0.16s;
+}
+.color-black-active:active {
+  color: #3d3e4e !important;
+  transition: color 0s !important;
 }
 .color-light {
-  color: #d2d2df !important;
+  color: #d2d2df;
 }
 .color-light-hovered:hover {
-  color: #d2d2df !important;
+  color: #d2d2df;
   transition: color 0.16s;
+}
+.color-light-active:active {
+  color: #d2d2df !important;
+  transition: color 0s !important;
 }
 .color-white {
-  color: #fff !important;
+  color: #fff;
 }
 .color-white-hovered:hover {
-  color: #fff !important;
+  color: #fff;
   transition: color 0.16s;
+}
+.color-white-active:active {
+  color: #fff !important;
+  transition: color 0s !important;
 }
 .color-blue {
-  color: #03d1ff !important;
+  color: #03d1ff;
 }
 .color-blue-hovered:hover {
-  color: #03d1ff !important;
+  color: #03d1ff;
   transition: color 0.16s;
+}
+.color-blue-active:active {
+  color: #03d1ff !important;
+  transition: color 0s !important;
 }
 .color-orange {
-  color: #ffb100 !important;
+  color: #ffb100;
 }
 .color-orange-hovered:hover {
-  color: #ffb100 !important;
+  color: #ffb100;
   transition: color 0.16s;
+}
+.color-orange-active:active {
+  color: #ffb100 !important;
+  transition: color 0s !important;
 }
 .color-red {
-  color: #ff8585 !important;
+  color: #ff8585;
 }
 .color-red-hovered:hover {
-  color: #ff8585 !important;
+  color: #ff8585;
   transition: color 0.16s;
+}
+.color-red-active:active {
+  color: #ff8585 !important;
+  transition: color 0s !important;
 }
 .color-green {
-  color: #1ed52c !important;
+  color: #1ed52c;
 }
 .color-green-hovered:hover {
-  color: #1ed52c !important;
+  color: #1ed52c;
   transition: color 0.16s;
+}
+.color-green-active:active {
+  color: #1ed52c !important;
+  transition: color 0s !important;
 }
 .color-gray {
-  color: #c1c1c1 !important;
+  color: #c1c1c1;
 }
 .color-gray-hovered:hover {
-  color: #c1c1c1 !important;
+  color: #c1c1c1;
   transition: color 0.16s;
+}
+.color-gray-active:active {
+  color: #c1c1c1 !important;
+  transition: color 0s !important;
 }
 .color-gray-100 {
-  color: #f8f9fa !important;
+  color: #f8f9fa;
 }
 .color-gray-100-hovered:hover {
-  color: #f8f9fa !important;
+  color: #f8f9fa;
   transition: color 0.16s;
+}
+.color-gray-100-active:active {
+  color: #f8f9fa !important;
+  transition: color 0s !important;
 }
 .color-gray-200 {
-  color: #e9ecef !important;
+  color: #e9ecef;
 }
 .color-gray-200-hovered:hover {
-  color: #e9ecef !important;
+  color: #e9ecef;
   transition: color 0.16s;
+}
+.color-gray-200-active:active {
+  color: #e9ecef !important;
+  transition: color 0s !important;
 }
 .color-gray-300 {
-  color: #dee2e6 !important;
+  color: #dee2e6;
 }
 .color-gray-300-hovered:hover {
-  color: #dee2e6 !important;
+  color: #dee2e6;
   transition: color 0.16s;
+}
+.color-gray-300-active:active {
+  color: #dee2e6 !important;
+  transition: color 0s !important;
 }
 .color-gray-400 {
-  color: #ced4da !important;
+  color: #ced4da;
 }
 .color-gray-400-hovered:hover {
-  color: #ced4da !important;
+  color: #ced4da;
   transition: color 0.16s;
+}
+.color-gray-400-active:active {
+  color: #ced4da !important;
+  transition: color 0s !important;
 }
 .color-gray-500 {
-  color: #adb5bd !important;
+  color: #adb5bd;
 }
 .color-gray-500-hovered:hover {
-  color: #adb5bd !important;
+  color: #adb5bd;
   transition: color 0.16s;
+}
+.color-gray-500-active:active {
+  color: #adb5bd !important;
+  transition: color 0s !important;
 }
 .color-gray-600 {
-  color: #6c757d !important;
+  color: #6c757d;
 }
 .color-gray-600-hovered:hover {
-  color: #6c757d !important;
+  color: #6c757d;
   transition: color 0.16s;
+}
+.color-gray-600-active:active {
+  color: #6c757d !important;
+  transition: color 0s !important;
 }
 .color-gray-700 {
-  color: #495057 !important;
+  color: #495057;
 }
 .color-gray-700-hovered:hover {
-  color: #495057 !important;
+  color: #495057;
   transition: color 0.16s;
+}
+.color-gray-700-active:active {
+  color: #495057 !important;
+  transition: color 0s !important;
 }
 .color-gray-800 {
-  color: #343a40 !important;
+  color: #343a40;
 }
 .color-gray-800-hovered:hover {
-  color: #343a40 !important;
+  color: #343a40;
   transition: color 0.16s;
+}
+.color-gray-800-active:active {
+  color: #343a40 !important;
+  transition: color 0s !important;
 }
 .color-gray-900 {
-  color: #212529 !important;
+  color: #212529;
 }
 .color-gray-900-hovered:hover {
-  color: #212529 !important;
+  color: #212529;
   transition: color 0.16s;
+}
+.color-gray-900-active:active {
+  color: #212529 !important;
+  transition: color 0s !important;
 }
 .color-darkgray {
-  color: #99acad !important;
+  color: #99acad;
 }
 .color-darkgray-hovered:hover {
-  color: #99acad !important;
+  color: #99acad;
   transition: color 0.16s;
+}
+.color-darkgray-active:active {
+  color: #99acad !important;
+  transition: color 0s !important;
 }
 .color-dark {
-  color: #6a6b76 !important;
+  color: #6a6b76;
 }
 .color-dark-hovered:hover {
-  color: #6a6b76 !important;
+  color: #6a6b76;
   transition: color 0.16s;
+}
+.color-dark-active:active {
+  color: #6a6b76 !important;
+  transition: color 0s !important;
 }
 
 .input_focused.normal-input-datepicker .icon i {

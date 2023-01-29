@@ -5358,11 +5358,18 @@ jQuery.expr[":"].icontains = jQuery.expr.createPseudo(function (arg) {
     return jQuery(elem).text().toUpperCase().indexOf(arg.toUpperCase()) >= 0;
   };
 });
+
+jQuery.fn.tagName = function () {
+  var _this$prop;
+
+  return this === null || this === void 0 ? void 0 : (_this$prop = this.prop("tagName")) === null || _this$prop === void 0 ? void 0 : _this$prop.toLowerCase();
+};
 /**
  * We'll load the axios HTTP library which allows us to easily issue requests
  * to our Laravel back-end. This library automatically handles sending the
  * CSRF token as a header based on the value of the "XSRF" token cookie.
  */
+
 
 window.axios = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
 window.axios.defaults.baseURL = process.env.APP_URL;
@@ -17182,7 +17189,10 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
     onContextMenu(function () {
       var _commentsTooltip, _cellEditTooltip;
 
-      haSContextMenu.value = true; // если кликнуть на НЕвыделенном договоре - то все выделенния отменятся и выделится текущий кликнутый договор
+      haSContextMenu.value = true;
+      $('#contractsList').find('[editted]').each(function (k, cell) {
+        unEditCell(cell);
+      }); // если кликнуть на НЕвыделенном договоре - то все выделенния отменятся и выделится текущий кликнутый договор
 
       if (isCommon && $(target.selector).hasAttr('contractselected') == false) {
         $('#contractsTable').find('[contractselected]').removeClass('ddrtable__tr-selected').removeAttrib('contractselected');
@@ -17203,6 +17213,22 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
       if (((_cellEditTooltip = cellEditTooltip) === null || _cellEditTooltip === void 0 ? void 0 : _cellEditTooltip.destroy) != undefined) cellEditTooltip.destroy();
     });
     var countSelected = ((_selectedContracts$it = selectedContracts.items) === null || _selectedContracts$it === void 0 ? void 0 : _selectedContracts$it.length) || 0;
+
+    function unEditCell() {
+      var cell = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+      if (_.isNull(cell)) return;
+
+      if ($(cell).find('#edittedCellData').tagName() == 'input') {
+        $(cell).find('[edittedplace]').number(true, 2, '.', ' ');
+      }
+
+      $(cell).removeClass('editted');
+      $(cell).find('[edittedwait]').remove();
+      $(cell).find('[edittedplacer]').remove();
+      $(cell).find('[edittedblock]').remove();
+      $(cell).removeAttrib('editted');
+    }
+
     closeOnScroll('#contractsList');
     return [{
       name: buildTitle(countSelected, 'Чат договора', 'Cообщение в чаты'),
@@ -18012,93 +18038,278 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
       disabled: $(target.pointer).closest('[ddrtabletd]').hasAttr('editted') || disableEditCell,
       sort: 7,
       onClick: function onClick() {
-        return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee7() {
+        return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee9() {
           var cell, attrData, _pregSplit5, _pregSplit6, _pregSplit6$, contractId, _pregSplit6$2, column, _pregSplit6$3, type, cellWait, _yield$axiosQuery4, data, error, status, headers;
 
-          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee7$(_context7) {
+          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee9$(_context9) {
             while (1) {
-              switch (_context7.prev = _context7.next) {
+              switch (_context9.prev = _context9.next) {
                 case 0:
                   cell = $(target.pointer).closest('[ddrtabletd]');
                   attrData = $(cell).attr('contextedit');
                   _pregSplit5 = pregSplit(attrData), _pregSplit6 = _slicedToArray(_pregSplit5, 3), _pregSplit6$ = _pregSplit6[0], contractId = _pregSplit6$ === void 0 ? null : _pregSplit6$, _pregSplit6$2 = _pregSplit6[1], column = _pregSplit6$2 === void 0 ? null : _pregSplit6$2, _pregSplit6$3 = _pregSplit6[2], type = _pregSplit6$3 === void 0 ? null : _pregSplit6$3;
+                  $('#contractsList').find('[editted]').each(function (k, cell) {
+                    unEditCell(cell);
+                  });
+                  $('#contractsList').on(tapEvent + '.unEditCell', function (e) {
+                    if ($(e.target).closest('[ddrtabletd]').hasAttr('editted') && [3, 4].indexOf(type) === -1) return;
+                    unEditCell(cell);
+                    $('#contractsList').off('.unEditCell');
+                  });
                   $(cell).setAttrib('editted');
                   cellWait = $(cell).ddrWait({
-                    iconHeight: '30px'
+                    iconHeight: '30px',
+                    tag: 'noscroll noopen edittedwait'
                   });
 
-                  if (!(type == 1)) {
-                    _context7.next = 16;
+                  if (!([1, 2].indexOf(type) !== -1)) {
+                    _context9.next = 21;
                     break;
                   }
 
-                  _context7.next = 8;
+                  // текст
+                  console.log(type);
+                  _context9.next = 11;
                   return axiosQuery('get', 'site/contracts/cell_edit', {
                     contract_id: contractId,
                     column: column,
                     type: type
-                  }, 'json');
+                  });
 
-                case 8:
-                  _yield$axiosQuery4 = _context7.sent;
+                case 11:
+                  _yield$axiosQuery4 = _context9.sent;
                   data = _yield$axiosQuery4.data;
                   error = _yield$axiosQuery4.error;
                   status = _yield$axiosQuery4.status;
                   headers = _yield$axiosQuery4.headers;
                   $(cell).append(data);
-                  _context7.next = 17;
+                  if (type == 2) $(cell).find('#edittedCellData').number(true, 2, '.', ' ');
+                  $(cell).on(tapEvent, '[savecelldata]', /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee5() {
+                    var cellData, emptyVal, _yield$axiosQuery5, data, error, status, headers;
+
+                    return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee5$(_context5) {
+                      while (1) {
+                        switch (_context5.prev = _context5.next) {
+                          case 0:
+                            cellWait.on();
+                            cellData = $(cell).find('#edittedCellData').val();
+                            emptyVal = $(cell).find('[edittedplace]').attr('edittedplace');
+                            _context5.next = 5;
+                            return axiosQuery('post', 'site/contracts/cell_edit', {
+                              contract_id: contractId,
+                              column: column,
+                              data: cellData
+                            }, 'json');
+
+                          case 5:
+                            _yield$axiosQuery5 = _context5.sent;
+                            data = _yield$axiosQuery5.data;
+                            error = _yield$axiosQuery5.error;
+                            status = _yield$axiosQuery5.status;
+                            headers = _yield$axiosQuery5.headers;
+
+                            if (error) {
+                              cellWait.off();
+                              $.notify('Ошибка сохранения ячейки!', 'error');
+                              console.log(error === null || error === void 0 ? void 0 : error.message, error.errors);
+                            }
+
+                            if (data) {
+                              $.notify('Сохранено!');
+                              $(cell).find('[edittedplace]').text(cellData || emptyVal);
+                              cellWait.destroy();
+                              unEditCell(cell);
+                            }
+
+                          case 12:
+                          case "end":
+                            return _context5.stop();
+                        }
+                      }
+                    }, _callee5);
+                  })));
+                  _context9.next = 22;
                   break;
 
-                case 16:
-                  if (type == 2) {
+                case 21:
+                  if ([3, 4].indexOf(type) !== -1) {
+                    // 3 - дата 4 - вып. список
+                    console.log(type);
+                    $(cell).addClass('editted');
                     cellEditTooltip = $(cell).ddrTooltip({
                       //cls: 'w44rem',
                       placement: 'bottom',
-                      tag: 'noscroll noopen',
+                      tag: 'noscroll noopen nouneditted',
                       offset: [0 - 5],
-                      minWidth: '200px',
-                      minHeight: '200px',
+                      minWidth: type == 3 ? '202px' : '50px',
+                      minHeight: type == 3 ? '170px' : '50px',
                       duration: [200, 200],
                       trigger: 'click',
                       wait: {
                         iconHeight: '40px'
                       },
                       onShow: function () {
-                        var _onShow2 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee5(_ref19) {
-                          var reference, popper, show, hide, destroy, waitDetroy, setContent, setData, setProps, _yield$axiosQuery5, data, error, status, headers, textarea;
+                        var _onShow2 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee8(_ref20) {
+                          var reference, popper, show, hide, destroy, waitDetroy, setContent, setData, setProps, calendarBlock, currentDate, datePicker, _yield$axiosQuery7, _data, _error, _status, _headers;
 
-                          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee5$(_context5) {
+                          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee8$(_context8) {
                             while (1) {
-                              switch (_context5.prev = _context5.next) {
+                              switch (_context8.prev = _context8.next) {
                                 case 0:
-                                  reference = _ref19.reference, popper = _ref19.popper, show = _ref19.show, hide = _ref19.hide, destroy = _ref19.destroy, waitDetroy = _ref19.waitDetroy, setContent = _ref19.setContent, setData = _ref19.setData, setProps = _ref19.setProps;
-                                  _context5.next = 3;
+                                  reference = _ref20.reference, popper = _ref20.popper, show = _ref20.show, hide = _ref20.hide, destroy = _ref20.destroy, waitDetroy = _ref20.waitDetroy, setContent = _ref20.setContent, setData = _ref20.setData, setProps = _ref20.setProps;
+
+                                  if (!(type == 3)) {
+                                    _context8.next = 10;
+                                    break;
+                                  }
+
+                                  calendarBlock = '<div onclick="event.stopPropagation();" ondblclick="event.stopPropagation();" id="editCellCalendar"></div>';
+                                  _context8.next = 5;
+                                  return setData(calendarBlock);
+
+                                case 5:
+                                  currentDate = $(cell).find('[edittedplace]').attr('date') || false;
+                                  datePicker = ddrDatepicker($(popper).find('#editCellCalendar')[0], {
+                                    startDay: 1,
+                                    defaultView: 'calendar',
+                                    overlayPlaceholder: 'Введите год',
+                                    customDays: ['пн', 'вт', 'ср', 'чт', 'пт', 'сб', 'вс'],
+                                    customMonths: ['январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь'],
+                                    alwaysShow: true,
+                                    dateSelected: currentDate ? new Date(currentDate) : new Date(),
+                                    onSelect: function () {
+                                      var _onSelect = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee6(_ref21, date) {
+                                        var el, destroy, rawDate, toCellText, emptyVal, cellDateWait, _yield$axiosQuery6, data, error, _cellEditTooltip2;
+
+                                        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee6$(_context6) {
+                                          while (1) {
+                                            switch (_context6.prev = _context6.next) {
+                                              case 0:
+                                                el = _ref21.el, destroy = _ref21.destroy;
+                                                rawDate = date.getFullYear() + '-' + addZero(date.getMonth() + 1) + '-' + addZero(date.getDate()) + ' 00:00:00';
+                                                toCellText = addZero(date.getDate()) + '.' + addZero(date.getMonth() + 1) + '.' + date.getFullYear().toString().substr(-2);
+                                                emptyVal = $(cell).find('[edittedplace]').attr('edittedplace');
+                                                cellDateWait = $(cell).ddrWait({
+                                                  iconHeight: '30px',
+                                                  tag: 'noscroll noopen edittedwait'
+                                                });
+                                                _context6.next = 7;
+                                                return axiosQuery('post', 'site/contracts/cell_edit', {
+                                                  contract_id: contractId,
+                                                  column: column,
+                                                  type: type,
+                                                  data: rawDate
+                                                }, 'json');
+
+                                              case 7:
+                                                _yield$axiosQuery6 = _context6.sent;
+                                                data = _yield$axiosQuery6.data;
+                                                error = _yield$axiosQuery6.error;
+
+                                                if (error) {
+                                                  cellDateWait.off();
+                                                  $.notify('Ошибка сохранения ячейки!', 'error');
+                                                  console.log(error === null || error === void 0 ? void 0 : error.message, error.errors);
+                                                }
+
+                                                if (data) {
+                                                  $.notify('Сохранено!');
+                                                  $(cell).find('[edittedplace]').setAttrib('date', rawDate);
+                                                  $(cell).find('[edittedplace]').text(toCellText || emptyVal);
+                                                  cellDateWait.destroy();
+                                                  unEditCell(cell);
+                                                  (_cellEditTooltip2 = cellEditTooltip) === null || _cellEditTooltip2 === void 0 ? void 0 : _cellEditTooltip2.destroy();
+                                                }
+
+                                              case 12:
+                                              case "end":
+                                                return _context6.stop();
+                                            }
+                                          }
+                                        }, _callee6);
+                                      }));
+
+                                      function onSelect(_x3, _x4) {
+                                        return _onSelect.apply(this, arguments);
+                                      }
+
+                                      return onSelect;
+                                    }()
+                                  });
+                                  $(datePicker.el).siblings('.qs-datepicker-container').addClass('qs-datepicker-container-noshadow');
+                                  _context8.next = 19;
+                                  break;
+
+                                case 10:
+                                  _context8.next = 12;
                                   return axiosQuery('get', 'site/contracts/cell_edit', {
                                     contract_id: contractId,
                                     column: column,
                                     type: type
                                   }, 'json');
 
-                                case 3:
-                                  _yield$axiosQuery5 = _context5.sent;
-                                  data = _yield$axiosQuery5.data;
-                                  error = _yield$axiosQuery5.error;
-                                  status = _yield$axiosQuery5.status;
-                                  headers = _yield$axiosQuery5.headers;
-                                  _context5.next = 10;
-                                  return setData(data);
+                                case 12:
+                                  _yield$axiosQuery7 = _context8.sent;
+                                  _data = _yield$axiosQuery7.data;
+                                  _error = _yield$axiosQuery7.error;
+                                  _status = _yield$axiosQuery7.status;
+                                  _headers = _yield$axiosQuery7.headers;
+                                  _context8.next = 19;
+                                  return setData(_data);
 
-                                case 10:
+                                case 19:
                                   waitDetroy();
-                                  textarea = $(popper).find('#edittedCellData');
-                                  $(textarea).focus();
-                                  textarea[0].selectionStart = textarea[0].selectionEnd = textarea[0].value.length;
                                   $('#contractsList').one('scroll', function () {
-                                    var _cellEditTooltip2;
+                                    var _cellEditTooltip3;
 
                                     // При скролле списка скрыть тултип комментариев
-                                    if (((_cellEditTooltip2 = cellEditTooltip) === null || _cellEditTooltip2 === void 0 ? void 0 : _cellEditTooltip2.destroy) != undefined) cellEditTooltip.destroy();
+                                    if (((_cellEditTooltip3 = cellEditTooltip) === null || _cellEditTooltip3 === void 0 ? void 0 : _cellEditTooltip3.destroy) != undefined) cellEditTooltip.destroy();
                                   });
+                                  $(popper).find('[edittedlistvalue]').on(tapEvent, /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee7() {
+                                    var value, emptyVal, _yield$axiosQuery8, savedRes, savedErr, _cellEditTooltip4;
+
+                                    return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee7$(_context7) {
+                                      while (1) {
+                                        switch (_context7.prev = _context7.next) {
+                                          case 0:
+                                            value = $(this).attr('edittedlistvalue');
+                                            emptyVal = $(cell).find('[edittedplace]').attr('edittedplace');
+                                            _context7.next = 4;
+                                            return axiosQuery('post', 'site/contracts/cell_edit', {
+                                              contract_id: contractId,
+                                              column: column,
+                                              type: type,
+                                              data: value
+                                            }, 'json');
+
+                                          case 4:
+                                            _yield$axiosQuery8 = _context7.sent;
+                                            savedRes = _yield$axiosQuery8.data;
+                                            savedErr = _yield$axiosQuery8.error;
+
+                                            if (savedErr) {
+                                              cellWait.off();
+                                              $.notify('Ошибка сохранения ячейки!', 'error');
+                                              console.log(savedErr === null || savedErr === void 0 ? void 0 : savedErr.message, savedErr.errors);
+                                            }
+
+                                            if (savedRes) {
+                                              $.notify('Сохранено!');
+                                              $(cell).find('[edittedplace]').text(savedRes || emptyVal);
+                                              cellWait.destroy();
+                                              unEditCell(cell);
+                                              (_cellEditTooltip4 = cellEditTooltip) === null || _cellEditTooltip4 === void 0 ? void 0 : _cellEditTooltip4.destroy();
+                                            }
+
+                                          case 9:
+                                          case "end":
+                                            return _context7.stop();
+                                        }
+                                      }
+                                    }, _callee7, this);
+                                  }))); //$(textarea).focus();
+                                  //textarea[0].selectionStart = textarea[0].selectionEnd = textarea[0].value.length;
+
                                   /*let inputCellCommentTOut;
                                   $(textarea).on('input', function() {
                                   	clearTimeout(inputCellCommentTOut);
@@ -18128,12 +18339,12 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                   	}, 500);
                                   });*/
 
-                                case 15:
+                                case 22:
                                 case "end":
-                                  return _context5.stop();
+                                  return _context8.stop();
                               }
                             }
-                          }, _callee5);
+                          }, _callee8);
                         }));
 
                         function onShow(_x2) {
@@ -18146,62 +18357,17 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                         $(cell).removeAttrib('tooltiped');
                       }
                     });
-                  } else if (type == 3) {}
+                  }
 
-                case 17:
-                  $.saveCellData = /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee6() {
-                    var cellData, emptyVal, _yield$axiosQuery6, data, error, status, headers;
-
-                    return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee6$(_context6) {
-                      while (1) {
-                        switch (_context6.prev = _context6.next) {
-                          case 0:
-                            cellWait.on();
-                            cellData = $(cell).find('#edittedCellData').val();
-                            emptyVal = $(cell).find('[edittedplace]').attr('edittedplace');
-                            _context6.next = 5;
-                            return axiosQuery('post', 'site/contracts/cell_edit', {
-                              contract_id: contractId,
-                              column: column,
-                              data: cellData
-                            }, 'json');
-
-                          case 5:
-                            _yield$axiosQuery6 = _context6.sent;
-                            data = _yield$axiosQuery6.data;
-                            error = _yield$axiosQuery6.error;
-                            status = _yield$axiosQuery6.status;
-                            headers = _yield$axiosQuery6.headers;
-
-                            if (error) {
-                              cellWait.off();
-                              $.notify('Ошибка сохранения ячейки!', 'error');
-                              console.log(error === null || error === void 0 ? void 0 : error.message, error.errors);
-                            }
-
-                            if (data) {
-                              $.notify('Сохранено!');
-                              $(cell).find('[edittedplace]').text(cellData || emptyVal);
-                              cellWait.destroy();
-                              $(cell).find('[edittedblock]').remove();
-                              $(cell).removeAttrib('editted');
-                            }
-
-                          case 12:
-                          case "end":
-                            return _context6.stop();
-                        }
-                      }
-                    }, _callee6);
-                  }));
+                case 22:
                   cellWait.off();
 
-                case 19:
+                case 23:
                 case "end":
-                  return _context7.stop();
+                  return _context9.stop();
               }
             }
-          }, _callee7);
+          }, _callee9);
         }))();
       }
     }];
@@ -18392,7 +18558,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, ".qs-datepicker-container {\r\n\tfont-size: 1.3rem;\r\n\tcolor: var(--ddr-fontColor);\r\n\tposition: absolute;\r\n\twidth: 15.625em;\r\n\tdisplay: flex;\r\n\tflex-direction: column;\r\n\tz-index: 9001;\r\n\t-webkit-user-select: none;\r\n\t-ms-user-select: none;\r\n\tuser-select: none;\r\n\tborder: 1px solid #ebf1f1;\r\n\tborder-radius: .263921875em;\r\n\toverflow: hidden;\r\n\tbackground: #fff;\r\n\tbox-shadow: 0 1.25em 1.25em -.9375em rgba(0,0,0,.3);\r\n}\r\n\r\n.qs-datepicker-container * {\r\n\tbox-sizing: border-box;\r\n}\r\n\r\n.qs-centered {\r\n\tposition: fixed;\r\n\ttop: 50%;\r\n\tleft: 50%;\r\n\ttransform: translate(-50%,-50%);\r\n}\r\n\r\n.qs-hidden {\r\n\tdisplay: none;\r\n}\r\n\r\n.qs-overlay {\r\n\tposition: absolute;\r\n\ttop: 0;\r\n\tleft: 0;\r\n\tbackground: rgba(0,0,0,.75);\r\n\tcolor: #fff;\r\n\twidth: 100%;\r\n\theight: 100%;\r\n\tpadding: .5em;\r\n\tz-index: 1;\r\n\topacity: 1;\r\n\ttransition: opacity .3s;\r\n\tdisplay: flex;\r\n\tflex-direction: column;\r\n}\r\n\r\n.qs-overlay.qs-hidden {\r\n\topacity: 0;\r\n\tz-index: -1;\r\n}\r\n\r\n.qs-overlay .qs-overlay-year {\r\n\tbackground: rgba(0,0,0,0);\r\n\tborder: none;\r\n\tborder-bottom: 1px solid #fff;\r\n\tborder-radius: 0;\r\n\tcolor: #fff;\r\n\tfont-size: .875em;\r\n\tpadding: .25em 0;\r\n\twidth: 80%;\r\n\ttext-align: center;\r\n\tmargin: 0 auto;\r\n\tdisplay: block;\r\n}\r\n\r\n.qs-overlay .qs-overlay-year::-webkit-inner-spin-button {\r\n\t-webkit-appearance: none;\r\n}\r\n\r\n.qs-overlay .qs-close {\r\n\tpadding: .5em;\r\n\tcursor: pointer;\r\n\tposition: absolute;\r\n\ttop: 0;\r\n\tright: 0;\r\n}\r\n\r\n.qs-overlay .qs-submit {\r\n\tborder: 1px solid #fff;\r\n\tborder-radius: .263921875em;\r\n\tpadding: .5em;\r\n\tmargin: 0 auto auto;\r\n\tcursor: pointer;\r\n\tbackground: hsla(0,0%,50.2%,.4);\r\n\tdisplay: none;\r\n}\r\n\r\n.qs-overlay .qs-submit.qs-disabled {\r\n\tcolor: grey;\r\n\tborder-color: grey;\r\n\tcursor: not-allowed;\r\n}\r\n\r\n.qs-overlay .qs-overlay-month-container {\r\n\tdisplay: flex;\r\n\tflex-wrap: wrap;\r\n\tflex-grow: 1;\r\n}\r\n\r\n.qs-overlay .qs-overlay-month {\r\n\tdisplay: flex;\r\n\tjustify-content: center;\r\n\talign-items: center;\r\n\twidth: calc(100% / 3);\r\n\tcursor: pointer;\r\n\topacity: .5;\r\n\ttransition: opacity .15s;\r\n}\r\n\r\n.qs-overlay .qs-overlay-month.active,.qs-overlay .qs-overlay-month:hover {\r\n\topacity: 1;\r\n}\r\n\r\n.qs-controls {\r\n\twidth: 100%;\r\n\tdisplay: flex;\r\n\tjustify-content: space-between;\r\n\talign-items: center;\r\n\tflex-grow: 1;\r\n\tflex-shrink: 0;\r\n\tbackground: #1bdbe0;\r\n\tfilter: blur(0);\r\n\ttransition: filter .3s;\r\n}\r\n\r\n.qs-controls.qs-blur {\r\n\tfilter: blur(5px);\r\n}\r\n\r\n.qs-arrow {\r\n\theight: 1.5625em;\r\n\twidth: 1.5625em;\r\n\tposition: relative;\r\n\tcursor: pointer;\r\n\tborder-radius: .263921875em;\r\n\ttransition: background .15s;\r\n}\r\n\r\n.qs-arrow:hover {\r\n\tbackground: rgba(0,0,0,.1);\r\n}\r\n\r\n.qs-arrow:hover.qs-left:after {\r\n\tborder-right-color: #000;\r\n}\r\n\r\n.qs-arrow:hover.qs-right:after {\r\n\tborder-left-color: #000;\r\n}\r\n\r\n.qs-arrow:after {\r\n\tcontent: \"\";\r\n\tborder: .390625em solid rgba(0,0,0,0);\r\n\tposition: absolute;\r\n\ttop: 50%;\r\n\ttransition: border .2s;\r\n}\r\n\r\n.qs-arrow.qs-left:after {\r\n\tborder-right-color: grey;\r\n\tright: 50%;\r\n\ttransform: translate(25%,-50%);\r\n}\r\n\r\n.qs-arrow.qs-right:after {\r\n\tborder-left-color: grey;\r\n\tleft: 50%;\r\n\ttransform: translate(-25%,-50%);\r\n}\r\n\r\n.qs-month-year {\r\n\tfont-weight: 700;\r\n\ttransition: border .2s;\r\n\tborder-bottom: 1px solid rgba(0,0,0,0);\r\n\tcursor: pointer;\r\n}\r\n\r\n.qs-month-year:hover {\r\n\tborder-bottom: 1px solid grey;\r\n}\r\n\r\n.qs-month-year:active:focus,.qs-month-year:focus {\r\n\toutline: none;\r\n}\r\n\r\n.qs-month {\r\n\tpadding-right: .5ex;\r\n}\r\n\r\n.qs-year {\r\n\tpadding-left: .5ex;\r\n}\r\n\r\n.qs-squares {\r\n\tdisplay: flex;\r\n\tflex-wrap: wrap;\r\n\tpadding: .3125em;\r\n\tfilter: blur(0);\r\n\ttransition: filter .3s;\r\n}\r\n\r\n.qs-squares.qs-blur {\r\n\tfilter: blur(5px);\r\n}\r\n\r\n.qs-square {\r\n\twidth: calc(100% / 7);\r\n\theight: 1.5625em;\r\n\tdisplay: flex;\r\n\talign-items: center;\r\n\tjustify-content: center;\r\n\tcursor: pointer;\r\n\ttransition: background .1s;\r\n\tborder-radius: .263921875em;\r\n}\r\n\r\n.qs-square:not(.qs-empty):not(.qs-disabled):not(.qs-day):not(.qs-active):hover {\r\n\tbackground: orange;\r\n}\r\n\r\n.qs-current {\r\n\tfont-weight: 700;\r\n\ttext-decoration: underline;\r\n}\r\n\r\n.qs-active,.qs-range-end,.qs-range-start {\r\n\tbackground: #add8e6;\r\n}\r\n\r\n.qs-range-start:not(.qs-range-6) {\r\n\tborder-top-right-radius: 0;\r\n\tborder-bottom-right-radius: 0;\r\n}\r\n\r\n.qs-range-middle {\r\n\tbackground: #d4ebf2;\r\n}\r\n\r\n.qs-range-middle:not(.qs-range-0):not(.qs-range-6) {\r\n\tborder-radius: 0;\r\n}\r\n\r\n.qs-range-middle.qs-range-0 {\r\n\tborder-top-right-radius: 0;\r\n\tborder-bottom-right-radius: 0;\r\n}\r\n\r\n.qs-range-end:not(.qs-range-0),.qs-range-middle.qs-range-6 {\r\n\tborder-top-left-radius: 0;\r\n\tborder-bottom-left-radius: 0;\r\n}\r\n\r\n.qs-disabled,.qs-outside-current-month {\r\n\topacity: .2;\r\n}\r\n\r\n.qs-disabled {\r\n\tcursor: not-allowed;\r\n}\r\n\r\n.qs-day,.qs-empty {\r\n\tcursor: default;\r\n}\r\n\r\n.qs-day {\r\n\tfont-weight: 700;\r\n\tcolor: grey;\r\n}\r\n\t\r\n.qs-num {\r\n\tcolor: grey;\r\n}\r\n\t\r\n.qs-event {\r\n\tposition: relative;\r\n}\r\n\r\n.qs-event:after {\r\n\tcontent: \"\";\r\n\tposition: absolute;\r\n\twidth: .46875em;\r\n\theight: .46875em;\r\n\tborder-radius: 50%;\r\n\tbackground: #07f;\r\n\tbottom: 0;\r\n\tright: 0;\r\n}", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, ".qs-datepicker-container {\r\n\tfont-size: 1.3rem;\r\n\tcolor: var(--ddr-fontColor);\r\n\tposition: absolute;\r\n\twidth: 15.625em;\r\n\tdisplay: flex;\r\n\tflex-direction: column;\r\n\tz-index: 9001;\r\n\t-webkit-user-select: none;\r\n\t-ms-user-select: none;\r\n\tuser-select: none;\r\n\tborder: 1px solid #ebf1f1;\r\n\tborder-radius: .263921875em;\r\n\toverflow: hidden;\r\n\tbackground: #fff;\r\n\tbox-shadow: 0 1.25em 1.25em -.9375em rgba(0,0,0,.3);\r\n}\r\n\r\n.qs-datepicker-container * {\r\n\tbox-sizing: border-box;\r\n}\r\n\t.qs-datepicker-container-noshadow {\r\n\t\tbox-shadow: none !important;\r\n\t\tborder: none !important;\r\n\t\tborder-radius: 0 !important;\r\n\t}\r\n\r\n.qs-centered {\r\n\tposition: fixed;\r\n\ttop: 50%;\r\n\tleft: 50%;\r\n\ttransform: translate(-50%,-50%);\r\n}\r\n\r\n.qs-hidden {\r\n\tdisplay: none;\r\n}\r\n\r\n.qs-overlay {\r\n\tposition: absolute;\r\n\ttop: 0;\r\n\tleft: 0;\r\n\tbackground: rgba(0,0,0,.75);\r\n\tcolor: #fff;\r\n\twidth: 100%;\r\n\theight: 100%;\r\n\tpadding: .5em;\r\n\tz-index: 1;\r\n\topacity: 1;\r\n\ttransition: opacity .3s;\r\n\tdisplay: flex;\r\n\tflex-direction: column;\r\n}\r\n\r\n.qs-overlay.qs-hidden {\r\n\topacity: 0;\r\n\tz-index: -1;\r\n}\r\n\r\n.qs-overlay .qs-overlay-year {\r\n\tbackground: rgba(0,0,0,0);\r\n\tborder: none;\r\n\tborder-bottom: 1px solid #fff;\r\n\tborder-radius: 0;\r\n\tcolor: #fff;\r\n\tfont-size: .875em;\r\n\tpadding: .25em 0;\r\n\twidth: 80%;\r\n\ttext-align: center;\r\n\tmargin: 0 auto;\r\n\tdisplay: block;\r\n}\r\n\r\n.qs-overlay .qs-overlay-year::-webkit-inner-spin-button {\r\n\t-webkit-appearance: none;\r\n}\r\n\r\n.qs-overlay .qs-close {\r\n\tpadding: .5em;\r\n\tcursor: pointer;\r\n\tposition: absolute;\r\n\ttop: 0;\r\n\tright: 0;\r\n}\r\n\r\n.qs-overlay .qs-submit {\r\n\tborder: 1px solid #fff;\r\n\tborder-radius: .263921875em;\r\n\tpadding: .5em;\r\n\tmargin: 0 auto auto;\r\n\tcursor: pointer;\r\n\tbackground: hsla(0,0%,50.2%,.4);\r\n\tdisplay: none;\r\n}\r\n\r\n.qs-overlay .qs-submit.qs-disabled {\r\n\tcolor: grey;\r\n\tborder-color: grey;\r\n\tcursor: not-allowed;\r\n}\r\n\r\n.qs-overlay .qs-overlay-month-container {\r\n\tdisplay: flex;\r\n\tflex-wrap: wrap;\r\n\tflex-grow: 1;\r\n}\r\n\r\n.qs-overlay .qs-overlay-month {\r\n\tdisplay: flex;\r\n\tjustify-content: center;\r\n\talign-items: center;\r\n\twidth: calc(100% / 3);\r\n\tcursor: pointer;\r\n\topacity: .5;\r\n\ttransition: opacity .15s;\r\n}\r\n\r\n.qs-overlay .qs-overlay-month.active,.qs-overlay .qs-overlay-month:hover {\r\n\topacity: 1;\r\n}\r\n\r\n.qs-controls {\r\n\twidth: 100%;\r\n\tdisplay: flex;\r\n\tjustify-content: space-between;\r\n\talign-items: center;\r\n\tflex-grow: 1;\r\n\tflex-shrink: 0;\r\n\tbackground: #1bdbe0;\r\n\tfilter: blur(0);\r\n\ttransition: filter .3s;\r\n}\r\n\r\n.qs-controls.qs-blur {\r\n\tfilter: blur(5px);\r\n}\r\n\r\n.qs-arrow {\r\n\theight: 1.5625em;\r\n\twidth: 1.5625em;\r\n\tposition: relative;\r\n\tcursor: pointer;\r\n\tborder-radius: .263921875em;\r\n\ttransition: background .15s;\r\n}\r\n\r\n.qs-arrow:hover {\r\n\tbackground: rgba(0,0,0,.1);\r\n}\r\n\r\n.qs-arrow:hover.qs-left:after {\r\n\tborder-right-color: #000;\r\n}\r\n\r\n.qs-arrow:hover.qs-right:after {\r\n\tborder-left-color: #000;\r\n}\r\n\r\n.qs-arrow:after {\r\n\tcontent: \"\";\r\n\tborder: .390625em solid rgba(0,0,0,0);\r\n\tposition: absolute;\r\n\ttop: 50%;\r\n\ttransition: border .2s;\r\n}\r\n\r\n.qs-arrow.qs-left:after {\r\n\tborder-right-color: grey;\r\n\tright: 50%;\r\n\ttransform: translate(25%,-50%);\r\n}\r\n\r\n.qs-arrow.qs-right:after {\r\n\tborder-left-color: grey;\r\n\tleft: 50%;\r\n\ttransform: translate(-25%,-50%);\r\n}\r\n\r\n.qs-month-year {\r\n\tfont-weight: 700;\r\n\ttransition: border .2s;\r\n\tborder-bottom: 1px solid rgba(0,0,0,0);\r\n\tcursor: pointer;\r\n}\r\n\r\n.qs-month-year:hover {\r\n\tborder-bottom: 1px solid grey;\r\n}\r\n\r\n.qs-month-year:active:focus,.qs-month-year:focus {\r\n\toutline: none;\r\n}\r\n\r\n.qs-month {\r\n\tpadding-right: .5ex;\r\n}\r\n\r\n.qs-year {\r\n\tpadding-left: .5ex;\r\n}\r\n\r\n.qs-squares {\r\n\tdisplay: flex;\r\n\tflex-wrap: wrap;\r\n\tpadding: .3125em;\r\n\tfilter: blur(0);\r\n\ttransition: filter .3s;\r\n}\r\n\r\n.qs-squares.qs-blur {\r\n\tfilter: blur(5px);\r\n}\r\n\r\n.qs-square {\r\n\twidth: calc(100% / 7);\r\n\theight: 1.5625em;\r\n\tdisplay: flex;\r\n\talign-items: center;\r\n\tjustify-content: center;\r\n\tcursor: pointer;\r\n\ttransition: background .1s;\r\n\tborder-radius: .263921875em;\r\n}\r\n\r\n.qs-square:not(.qs-empty):not(.qs-disabled):not(.qs-day):not(.qs-active):hover {\r\n\tbackground: orange;\r\n}\r\n\r\n.qs-current {\r\n\tfont-weight: 700;\r\n\ttext-decoration: underline;\r\n}\r\n\r\n.qs-active,.qs-range-end,.qs-range-start {\r\n\tbackground: #add8e6;\r\n}\r\n\r\n.qs-range-start:not(.qs-range-6) {\r\n\tborder-top-right-radius: 0;\r\n\tborder-bottom-right-radius: 0;\r\n}\r\n\r\n.qs-range-middle {\r\n\tbackground: #d4ebf2;\r\n}\r\n\r\n.qs-range-middle:not(.qs-range-0):not(.qs-range-6) {\r\n\tborder-radius: 0;\r\n}\r\n\r\n.qs-range-middle.qs-range-0 {\r\n\tborder-top-right-radius: 0;\r\n\tborder-bottom-right-radius: 0;\r\n}\r\n\r\n.qs-range-end:not(.qs-range-0),.qs-range-middle.qs-range-6 {\r\n\tborder-top-left-radius: 0;\r\n\tborder-bottom-left-radius: 0;\r\n}\r\n\r\n.qs-disabled,.qs-outside-current-month {\r\n\topacity: .2;\r\n}\r\n\r\n.qs-disabled {\r\n\tcursor: not-allowed;\r\n}\r\n\r\n.qs-day,.qs-empty {\r\n\tcursor: default;\r\n}\r\n\r\n.qs-day {\r\n\tfont-weight: 700;\r\n\tcolor: grey;\r\n}\r\n\t\r\n.qs-num {\r\n\tcolor: grey;\r\n}\r\n\t\r\n.qs-event {\r\n\tposition: relative;\r\n}\r\n\r\n.qs-event:after {\r\n\tcontent: \"\";\r\n\tposition: absolute;\r\n\twidth: .46875em;\r\n\theight: .46875em;\r\n\tborder-radius: 50%;\r\n\tbackground: #07f;\r\n\tbottom: 0;\r\n\tright: 0;\r\n}", ""]);
 // Exports
 /* harmony default export */ __webpack_exports__["default"] = (___CSS_LOADER_EXPORT___);
 

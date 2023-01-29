@@ -42,6 +42,14 @@ window.ref = function (data) {
 
 
 
+
+
+
+
+
+
+
+
 $.fn.ddrScroll = function(callback, condition = true) {
 	if (!callback || !_.isFunction(callback)) return;
 	

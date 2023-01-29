@@ -143451,6 +143451,10 @@ template {
 .ddrtable__td.sort-asc > *, .ddrtable__td.sort-desc > *, .ddrtable__td [ddrtabletdmain].sort-asc > *, .ddrtable__td [ddrtabletdmain].sort-desc > * {
   color: #00c4ff;
 }
+.ddrtable__td.editted {
+  outline: 1px dashed #91cddb !important;
+  z-index: 1;
+}
 .ddrtable__td:hover .icon-hidden {
   opacity: 1;
   transition: opacity 0.16s;
@@ -143553,7 +143557,7 @@ template {
   background-color: #fff;
   outline: 1px dashed #91cddb !important;
   z-index: 10;
-  padding: 4px 2px 4px 5px;
+  padding: 4px 5px 4px 5px;
   font-size: inherit;
   line-height: inherit;
 }
@@ -143571,8 +143575,8 @@ template {
   overflow-y: auto;
 }
 .ddrtable__td .editted textarea::-webkit-scrollbar {
-  width: 2px;
-  height: 2px;
+  width: 4px;
+  height: 4px;
 }
 .ddrtable__td .editted textarea::-webkit-scrollbar-track {
   background-color: transparent;
