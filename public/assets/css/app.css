@@ -143583,13 +143583,13 @@ template {
   border-radius: 2px;
 }
 .ddrtable__td .editted textarea::-webkit-scrollbar-thumb {
-  background-color: #efeff2;
+  background-color: transparent;
   width: 13px;
   height: 13px;
   border-radius: 0;
 }
 .ddrtable__td .editted textarea::-webkit-scrollbar-thumb:hover {
-  background-color: #d3d3db;
+  background-color: rgba(0, 0, 0, 0);
 }
 .ddrtable__td .editted textarea::-webkit-resizer {
   display: none;
