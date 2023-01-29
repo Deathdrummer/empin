@@ -18063,7 +18063,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                   });
 
                   if (!([1, 2].indexOf(type) !== -1)) {
-                    _context9.next = 20;
+                    _context9.next = 22;
                     break;
                   }
 
@@ -18082,7 +18082,13 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                   headers = _yield$axiosQuery4.headers;
                   $(cell).append(data);
                   if (type == 2) $(cell).find('#edittedCellData').number(true, 2, '.', ' ');
-                  $(cell).on(tapEvent, '[savecelldata]', /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee5() {
+                  $(cell).find('#edittedCellData').focus();
+                  $(cell).find('#edittedCellData').on('keypress', function (e) {
+                    if (e.keyCode == 13 && !e.shiftKey) {
+                      $(cell).find('[savecelldata]').trigger(tapEvent);
+                    }
+                  });
+                  $(cell).one(tapEvent, '[savecelldata]', /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee5() {
                     var cellData, emptyVal, _yield$axiosQuery5, data, error, status, headers;
 
                     return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee5$(_context5) {
@@ -18128,10 +18134,10 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                       }
                     }, _callee5, this);
                   })));
-                  _context9.next = 21;
+                  _context9.next = 23;
                   break;
 
-                case 20:
+                case 22:
                   if ([3, 4].indexOf(type) !== -1) {
                     // 3 - дата 4 - вып. список
                     $(cell).addClass('editted');
@@ -18307,37 +18313,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                         }
                                       }
                                     }, _callee7, this);
-                                  }))); //$(textarea).focus();
-                                  //textarea[0].selectionStart = textarea[0].selectionEnd = textarea[0].value.length;
-
-                                  /*let inputCellCommentTOut;
-                                  $(textarea).on('input', function() {
-                                  	clearTimeout(inputCellCommentTOut);
-                                  	inputCellCommentTOut = setTimeout(async () => {
-                                  		const comment = $(this).val();
-                                  		const {data: postRes, error: postErr, status, headers} = await axiosQuery('post', 'site/contracts/cell_comment', {
-                                  			contract_id: contractId, 
-                                  			department_id: departmentId,
-                                  			step_id: stepId,
-                                  			comment,
-                                  		}, 'json');
-                                  		
-                                  		if (postErr) {
-                                  			console.log(postErr);
-                                  			$.notify('Ошибка! Не удалось задать комментарий!', 'error');
-                                  			return;
-                                  		}
-                                  		
-                                  		if (postRes) {
-                                  			if (comment) $(reference).append('<div class="trangled trangled-top-right"></div>');
-                                  			else $(reference).find('.trangled').remove();
-                                  			
-                                  			//$.notify('Комментарий успешно сохранен!');
-                                  			//$(this).ddrInputs('change');
-                                  		}
-                                  		
-                                  	}, 500);
-                                  });*/
+                                  })));
 
                                 case 22:
                                 case "end":
@@ -18359,10 +18335,10 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                     });
                   }
 
-                case 21:
+                case 23:
                   cellWait.off();
 
-                case 22:
+                case 24:
                 case "end":
                   return _context9.stop();
               }

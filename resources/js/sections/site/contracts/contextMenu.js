@@ -734,8 +734,17 @@ export function contextMenu(
 						
 						if (type == 2) $(cell).find('#edittedCellData').number(true, 2, '.', ' ');
 						
+						$(cell).find('#edittedCellData').focus();
 						
-						$(cell).on(tapEvent, '[savecelldata]', async function() {
+						$(cell).find('#edittedCellData').on('keypress', (e) => {
+							if (e.keyCode == 13 && !e.shiftKey) {
+								$(cell).find('[savecelldata]').trigger(tapEvent); 
+							}
+						});
+						
+						
+						
+						$(cell).one(tapEvent, '[savecelldata]', async function() {
 							
 							$(this).hide();
 							
@@ -884,43 +893,6 @@ export function contextMenu(
 									}
 								});
 								
-									
-								
-								
-								//$(textarea).focus();
-								
-								//textarea[0].selectionStart = textarea[0].selectionEnd = textarea[0].value.length;
-								
-								
-								
-								/*let inputCellCommentTOut;
-								$(textarea).on('input', function() {
-									clearTimeout(inputCellCommentTOut);
-									inputCellCommentTOut = setTimeout(async () => {
-										const comment = $(this).val();
-										const {data: postRes, error: postErr, status, headers} = await axiosQuery('post', 'site/contracts/cell_comment', {
-											contract_id: contractId, 
-											department_id: departmentId,
-											step_id: stepId,
-											comment,
-										}, 'json');
-										
-										if (postErr) {
-											console.log(postErr);
-											$.notify('Ошибка! Не удалось задать комментарий!', 'error');
-											return;
-										}
-										
-										if (postRes) {
-											if (comment) $(reference).append('<div class="trangled trangled-top-right"></div>');
-											else $(reference).find('.trangled').remove();
-											
-											//$.notify('Комментарий успешно сохранен!');
-											//$(this).ddrInputs('change');
-										}
-										
-									}, 500);
-								});*/
 							},
 							onDestroy: function() {
 								$(cell).removeAttrib('tooltiped');
