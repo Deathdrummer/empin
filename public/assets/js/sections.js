@@ -188,6 +188,1091 @@ function calcSubcontracting() {
 
 /***/ }),
 
+/***/ "./resources/js/sections/site/contracts/contextMenu.js":
+/*!*************************************************************!*\
+  !*** ./resources/js/sections/site/contracts/contextMenu.js ***!
+  \*************************************************************/
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "contextMenu": function() { return /* binding */ contextMenu; }
+/* harmony export */ });
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
+
+
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"]; if (_i == null) return; var _arr = []; var _n = true; var _d = false; var _s, _e; try { for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sendMessStat, lastChoosedRow, canEditCell, canCreateCheckbox, canRemoveCheckbox) {
+  var commentsTooltip, cellEditTooltip;
+
+  $.contractContextMenu = function (_ref, contractId, departmentId, selectionId, objectNumber, title, hasDepsToSend, messagesCount, searched, selectionEdited, isArchive, canToArchive, // отправка договора в архив
+  canSending, // отправка договора в другой отдел из отдела
+  canSendingAll, // отправка договора в другой отдел из общего списка
+  canHiding, // скрыть договор
+  canChat, // просмотр чата
+  canChatSending, // возможность отправлять сообщения в чате
+  canReturnToWork // вернуть договор в работу из архива
+  ) {
+    var _selectedContracts$it;
+
+    var target = _ref.target,
+        closeOnScroll = _ref.closeOnScroll,
+        onContextMenu = _ref.onContextMenu,
+        changeAttrData = _ref.changeAttrData,
+        buildTitle = _ref.buildTitle;
+    var isCommon = !!$(target.pointer).closest('[ddrtabletd]').hasAttr('commonlist') || false;
+    var isDeptCheckbox = !!$(target.pointer).closest('[ddrtabletd]').hasAttr('deptcheck') || false;
+    var hasCheckbox = !!$(target.pointer).closest('[ddrtabletd]').children().length;
+    var contextEdited = !!$(target.pointer).closest('[ddrtabletd]').hasAttr('contextedit');
+    var disableEditCell = !$(target.pointer).closest('[ddrtabletd]').attr('contextedit');
+    onContextMenu(function () {
+      var _commentsTooltip, _cellEditTooltip;
+
+      haSContextMenu.value = true; // если кликнуть на НЕвыделенном договоре - то все выделенния отменятся и выделится текущий кликнутый договор
+
+      if (isCommon && $(target.selector).hasAttr('contractselected') == false) {
+        $('#contractsTable').find('[contractselected]').removeClass('ddrtable__tr-selected').removeAttrib('contractselected');
+        lastChoosedRow.value = target.selector; //$(target.selector).addClass('ddrtable__tr-selected').setAttrib('contractselected');
+
+        selectedContracts.add($(target.selector).attr('contractid'));
+      } // Если клик НЕ на таблице общего перечня
+
+
+      if (!isCommon) {
+        $('#contractsTable').find('[contractselected]').removeClass('ddrtable__tr-selected').removeAttrib('contractselected'); // lastChoosedRow.value = target.selector;
+        // $(target.selector).addClass('ddrtable__tr-selected').setAttrib('contractselected');
+        //selectedContracts.add($(target.selector).attr('contractid'));
+      }
+
+      console.log('onContextMenu', selectedContracts.items);
+      if (((_commentsTooltip = commentsTooltip) === null || _commentsTooltip === void 0 ? void 0 : _commentsTooltip.destroy) != undefined) commentsTooltip.destroy();
+      if (((_cellEditTooltip = cellEditTooltip) === null || _cellEditTooltip === void 0 ? void 0 : _cellEditTooltip.destroy) != undefined) cellEditTooltip.destroy();
+    });
+    var countSelected = ((_selectedContracts$it = selectedContracts.items) === null || _selectedContracts$it === void 0 ? void 0 : _selectedContracts$it.length) || 0;
+    closeOnScroll('#contractsList');
+    return [{
+      name: buildTitle(countSelected, 'Чат договора', 'Cообщение в чаты'),
+      countLeft: countSelected > 1 ? countSelected : null,
+      countRight: countSelected == 1 ? messagesCount : null,
+      countOnArrow: true,
+      visible: isCommon && canChat,
+      sort: 1,
+      onClick: function onClick() {
+        if (countSelected == 1) {
+          // Если выделен 1 договор
+          ddrPopup({
+            title: '<small class="fz12px color-gray">Чат договора:</small> «' + title + '»',
+            width: 800,
+            buttons: ['Закрыть'],
+            winClass: 'ddrpopup_chat'
+          }).then(function (_ref2) {
+            var state = _ref2.state,
+                wait = _ref2.wait,
+                setTitle = _ref2.setTitle,
+                setButtons = _ref2.setButtons,
+                loadData = _ref2.loadData,
+                setHtml = _ref2.setHtml,
+                setLHtml = _ref2.setLHtml,
+                dialog = _ref2.dialog,
+                close = _ref2.close,
+                onScroll = _ref2.onScroll,
+                disableButtons = _ref2.disableButtons,
+                enableButtons = _ref2.enableButtons,
+                setWidth = _ref2.setWidth;
+            wait();
+            axiosQuery('get', 'site/contracts/chat', {
+              contract_id: contractId
+            }).then(function (_ref3) {
+              var data = _ref3.data,
+                  error = _ref3.error,
+                  status = _ref3.status,
+                  headers = _ref3.headers;
+
+              if (error) {
+                $.notify('Не удалось загрузить чат!', 'error');
+                console.log(error === null || error === void 0 ? void 0 : error.message, error === null || error === void 0 ? void 0 : error.errors);
+                return;
+              }
+
+              setHtml(data, function () {
+                sendMessStat.value = false;
+                wait(false);
+                $('.chat__message').tripleTap(function (elem) {
+                  selectText(elem);
+                });
+                var chatVisibleHeight = $('#chatMessageList').outerHeight(),
+                    chatScrollHeight = $('#chatMessageList')[0].scrollHeight;
+                $('#chatMessageList').scrollTop(chatScrollHeight - chatVisibleHeight);
+                $('#chatMessageBlock').focus();
+                $('#chatMessageList').find('.chat__post').mouseup(function (e) {
+                  var selObj = window.getSelection();
+                  var selectString = selObj.toString();
+
+                  if (selectString.length) {
+                    copyStringToClipboard(selObj.toString());
+                    $.notify('Скопировано!');
+                  }
+                });
+                $('#chatMessageBlock').ddrInputs('change', function () {
+                  var mess = getContenteditable('#chatMessageBlock');
+
+                  if (mess && !sendMessStat.value) {
+                    sendMessStat.value = true;
+                    $('#chatSendMesageBtn').ddrInputs('enable');
+                  } else if (!mess && sendMessStat.value) {
+                    sendMessStat.value = false;
+                    $('#chatSendMesageBtn').ddrInputs('disable');
+                  }
+                });
+              });
+            })["catch"](function (e) {
+              console.log(e);
+            });
+          });
+        } else {
+          // Если выделено более 1 договора - отправить сообщение в чаты с выделеными договорами
+          var html = '<p class="d-block mb5px fz14px color-darkgray">Сообщение:</p>' + '<div class="textarea normal-textarea w100" id="sendMessagesToManyContractsField">' + '<textarea name="" rows="10" class="w100"></textarea>' + '</div>';
+          ddrPopup({
+            title: 'Отправить сообщение в выбранные договоры',
+            width: 500,
+            html: html,
+            buttons: ['Закрыть', {
+              title: 'Отправить',
+              variant: 'blue',
+              action: 'sendMessagesToManyContracts',
+              disabled: 1,
+              id: 'sendMessagesToManyContractsBtn'
+            }],
+            winClass: 'ddrpopup_chat'
+          }).then(function (_ref4) {
+            var state = _ref4.state,
+                wait = _ref4.wait,
+                setTitle = _ref4.setTitle,
+                setButtons = _ref4.setButtons,
+                loadData = _ref4.loadData,
+                setHtml = _ref4.setHtml,
+                setLHtml = _ref4.setLHtml,
+                dialog = _ref4.dialog,
+                close = _ref4.close,
+                onClose = _ref4.onClose,
+                onScroll = _ref4.onScroll,
+                disableButtons = _ref4.disableButtons,
+                enableButtons = _ref4.enableButtons,
+                setWidth = _ref4.setWidth;
+            var isEmpty = true;
+            $('#sendMessagesToManyContractsField').find('textarea').focus();
+            $('#sendMessagesToManyContractsField').ddrInputs('change', function (textarea) {
+              if ($(textarea).val() && isEmpty) {
+                $('#sendMessagesToManyContractsBtn').ddrInputs('enable');
+                isEmpty = false;
+              } else if (!$(textarea).val() && !isEmpty) {
+                $('#sendMessagesToManyContractsBtn').ddrInputs('disable');
+                isEmpty = true;
+              }
+            });
+
+            $.sendMessagesToManyContracts = function () {
+              wait();
+              $('#sendMessagesToManyContractsBtn').ddrInputs('disable');
+              var message = $('#sendMessagesToManyContractsField').find('textarea').val();
+              var sendMessAbortCtrl = new AbortController();
+              axiosQuery('put', 'site/contracts/chats', {
+                contractIds: selectedContracts.items,
+                message: message
+              }, 'json', sendMessAbortCtrl).then(function (_ref5) {
+                var data = _ref5.data,
+                    error = _ref5.error,
+                    status = _ref5.status,
+                    headers = _ref5.headers;
+
+                if (error) {
+                  $.notify('Ошибка отправки сообщения!', 'error');
+                  return;
+                }
+
+                if (data) {
+                  if (data == -1) {
+                    $.notify('Сообщение не было разослано!', 'info');
+                  } else {
+                    $.notify('Сообщение успешно отправлено во все чаты выбранных договоров!');
+                    close();
+                  }
+                } else {
+                  $.notify('Не удалось отправить сообщение в чаты выбранных договоров!', 'error');
+                  wait(false);
+                }
+              })["catch"](function (e) {
+                console.log(e);
+              });
+              onClose(function () {
+                sendMessAbortCtrl.abort();
+              });
+            };
+          });
+        }
+      }
+    }, {
+      name: 'Отправить в архив',
+      visible: isCommon && canToArchive && !isArchive,
+      countLeft: countSelected > 1 ? countSelected : null,
+      sort: 5,
+      onClick: function onClick() {
+        var html = '';
+        html += '<div>';
+
+        if (countSelected == 1) {
+          html += '<p class="fz14px color-darkgray text-start">Номер объекта: <span class="color-black">' + objectNumber + '</span></p>';
+          html += '<p class="fz14px color-darkgray text-start">Название/заявитель: <span class="color-black">' + title + '</span></p>';
+          html += '<p class="fz18px color-red mt15px">Вы действительно хотите отправить договор в архив?</p>';
+        } else if (countSelected > 1) {
+          html += '<p class="fz18px color-red mt15px">' + buildTitle(countSelected, 'Вы действительно хотите отправить # % в архив?', ['договор', 'договора', 'договоров']) + '</p>';
+        }
+
+        html += '</div>';
+        ddrPopup({
+          width: 400,
+          // ширина окна
+          html: html,
+          // контент
+          buttons: ['ui.cancel', {
+            title: 'Отправить',
+            variant: 'red',
+            action: 'contractToArchiveAction'
+          }],
+          centerMode: true,
+          winClass: 'ddrpopup_dialog'
+        }).then(function (_ref6) {
+          var close = _ref6.close,
+              wait = _ref6.wait;
+
+          $.contractToArchiveAction = function (_) {
+            wait();
+            axiosQuery('post', 'site/contracts/to_archive', {
+              contractIds: selectedContracts.items
+            }, 'json').then(function (_ref7) {
+              var data = _ref7.data,
+                  error = _ref7.error,
+                  status = _ref7.status,
+                  headers = _ref7.headers;
+              var contractTitle = countSelected == 1 ? ' ' + objectNumber + ' ' + title : '';
+
+              if (data) {
+                if (selectionId || searched) {
+                  getCounts(function () {
+                    removeContractsRows(target);
+                  });
+                } else {
+                  removeContractsRows(target);
+                }
+
+                $.notify(buildTitle(countSelected, '%' + contractTitle + ' успешно отправлен в архив!', '# % успешно отправлены в архив!', ['Договор', 'договора', 'договоров']));
+              } else {
+                $.notify(buildTitle(countSelected, 'Ошибка! %' + contractTitle + ' не был отправлен в архив!', 'Ошибка! % не были отправлены в архив!', ['договор', 'договора', 'договоров']), 'error');
+              }
+
+              close();
+            });
+          };
+        });
+      }
+    }, {
+      name: 'Вернуть в работу',
+      visible: isCommon && canReturnToWork && isArchive,
+      countLeft: countSelected > 1 ? countSelected : null,
+      sort: 5,
+      onClick: function onClick() {
+        ddrPopup({
+          width: 400,
+          // ширина окна
+          html: '<p class="fz18px color-green">' + buildTitle(countSelected, 'Вы действительно хотите вернуть # % в работу?', ['договор', 'договора', 'договоров']) + '</p>',
+          // контент
+          buttons: ['ui.cancel', {
+            title: 'Вернуть',
+            variant: 'blue',
+            action: 'returnContractToWorkBtn'
+          }],
+          centerMode: true,
+          winClass: 'ddrpopup_dialog'
+        }).then(function (_ref8) {
+          var close = _ref8.close,
+              wait = _ref8.wait;
+
+          $.returnContractToWorkBtn = function (_) {
+            wait();
+            axiosQuery('post', 'site/contracts/to_work', {
+              contractIds: selectedContracts.items
+            }, 'json').then(function (_ref9) {
+              var data = _ref9.data,
+                  error = _ref9.error,
+                  status = _ref9.status,
+                  headers = _ref9.headers;
+              var contractTitle = countSelected == 1 ? ' ' + objectNumber + ' ' + title : '';
+
+              if (data) {
+                if (selectionId || searched) {
+                  getCounts(function () {
+                    removeContractsRows(target);
+                  });
+                } else {
+                  removeContractsRows(target);
+                }
+
+                $.notify(buildTitle(countSelected, '%' + contractTitle + ' успешно возвращен в работу!', '# % успешно возвращены в работу!', ['Договор', 'договора', 'договоров'])); //target.changeAttrData(15, '0');
+              } else {
+                $.notify(buildTitle(countSelected, 'Ошибка! %' + contractTitle + ' не был возвращен в работу!', 'Ошибка! # % не были возвращены в работу!', ['Договор', 'договора', 'договоров']), 'error');
+              }
+
+              close();
+            });
+          };
+        });
+      }
+    }, {
+      name: 'Добавить в подборку',
+      //hidden: selectionId,
+      visible: isCommon,
+      countLeft: countSelected > 1 ? countSelected : null,
+      sort: 2,
+      load: {
+        url: 'site/contracts/selections_to_choose',
+        params: {
+          contractIds: selectedContracts.items
+        },
+        method: 'get',
+        map: function map(item) {
+          return {
+            name: item.title,
+            //faIcon: 'fa-solid fa-clipboard-check',
+            disabled: !!item.choosed,
+            onClick: function onClick(selector) {
+              var selectionId = item.id;
+              var procNotif = processNotify(buildTitle(countSelected, 'Добавление # % в подборку...', ['договора', 'договоров', 'договоров']));
+              var contractIds = selectedContracts.items;
+              var params, method;
+
+              if (contractIds.length == 1) {
+                params = {
+                  contractId: contractIds[0],
+                  selectionId: selectionId
+                };
+                method = 'add_contract';
+              } else {
+                params = {
+                  contractIds: contractIds,
+                  selectionId: selectionId
+                };
+                method = 'add_contracts';
+              }
+
+              axiosQuery('put', 'site/selections/' + method, params).then(function (_ref10) {
+                var data = _ref10.data,
+                    error = _ref10.error,
+                    status = _ref10.status,
+                    headers = _ref10.headers;
+
+                if (error) {
+                  procNotif.error({
+                    message: 'Ошибка добавления в подборку!'
+                  });
+                  console.log(error === null || error === void 0 ? void 0 : error.message, error.errors);
+                } else {
+                  var contractTitle = countSelected == 1 ? ' ' + objectNumber + ' ' + title : '';
+                  procNotif.done({
+                    message: buildTitle(countSelected, '%' + contractTitle + ' успешно добавлен в подборку!', '# % успешно добавлены в подборку!', ['Договор', 'договора', 'договоров'])
+                  });
+                }
+              });
+            }
+          };
+        }
+      }
+    }, {
+      name: 'Удалить из подборки',
+      visible: isCommon && selectionId,
+      countLeft: countSelected > 1 ? countSelected : null,
+      sort: 4,
+      onClick: function onClick() {
+        var procNotif = processNotify(buildTitle(countSelected, 'Удаление # % из подборки...', ['договора', 'договоров', 'договоров']));
+        var contractIds = selectedContracts.items;
+        var params, method;
+
+        if (contractIds.length == 1) {
+          params = {
+            contractId: contractIds[0],
+            selectionId: selectionId
+          };
+          method = 'remove_contract';
+        } else {
+          params = {
+            contractIds: contractIds,
+            selectionId: selectionId
+          };
+          method = 'remove_contracts';
+        }
+
+        axiosQuery('put', 'site/selections/' + method, params).then(function (_ref11) {
+          var data = _ref11.data,
+              error = _ref11.error,
+              status = _ref11.status,
+              headers = _ref11.headers;
+          var contractTitle = countSelected == 1 ? ' ' + objectNumber + ' ' + title : '';
+
+          if (error) {
+            //$.notify('Ошибка удаления из подборки!', 'error');
+            procNotif.error({
+              message: 'Ошибка удаления договора' + contractTitle + ' из подборки!'
+            });
+            console.log(error === null || error === void 0 ? void 0 : error.message, error.errors);
+          } else {
+            procNotif.done({
+              message: buildTitle(countSelected, '%' + contractTitle + ' успешно удален из подборки!', '# % успешно удалены из подборки!', ['Договор', 'договора', 'договоров'])
+            }); //target.changeAttrData(7, '0');
+
+            getCounts(function () {
+              removeContractsRows(target);
+              $('[selectionsbtn]').ddrInputs('enable');
+            });
+          }
+        });
+      }
+    }, {
+      name: 'Создать новую подборку',
+      sort: 3,
+      visible: isCommon,
+      countLeft: countSelected > 1 ? countSelected : null,
+      onClick: function onClick() {
+        var html = '<p class="d-block mb5px fz14px color-darkgray">Название подборки:</p>' + '<div class="input normal-input normal-input-text w100">' + '<input type="text" value="" id="selectionNameInput" placeholder="Введите текст" autocomplete="off" inpgroup="normal">' + '<div class="normal-input__errorlabel noselect" errorlabel=""></div>' + '</div>';
+        ddrPopup({
+          title: 'Создать подборку из выбранных договоров',
+          width: 500,
+          html: html,
+          buttons: ['Закрыть', {
+            title: 'Создать',
+            variant: 'blue',
+            action: 'createNewSelection',
+            disabled: 1,
+            id: 'createNewSelectionBtn'
+          }],
+          winClass: 'ddrpopup_chat'
+        }).then(function (_ref12) {
+          var state = _ref12.state,
+              wait = _ref12.wait,
+              setTitle = _ref12.setTitle,
+              setButtons = _ref12.setButtons,
+              loadData = _ref12.loadData,
+              setHtml = _ref12.setHtml,
+              setLHtml = _ref12.setLHtml,
+              dialog = _ref12.dialog,
+              close = _ref12.close,
+              onClose = _ref12.onClose,
+              onScroll = _ref12.onScroll,
+              disableButtons = _ref12.disableButtons,
+              enableButtons = _ref12.enableButtons,
+              setWidth = _ref12.setWidth;
+          var isEmpty = true;
+          $('#selectionNameInput').ddrInputs('change', function (input) {
+            if ($(input).val() && isEmpty) {
+              $('#createNewSelectionBtn').ddrInputs('enable');
+              isEmpty = false;
+            } else if (!$(input).val() && !isEmpty) {
+              $('#createNewSelectionBtn').ddrInputs('disable');
+              isEmpty = true;
+            }
+          });
+
+          $.createNewSelection = function () {
+            wait();
+            var title = $('#selectionNameInput').val();
+            var newSelectionAbortCtrl = new AbortController();
+            axiosQuery('post', 'site/selections/add_selection_from_contextmenu', {
+              title: title,
+              contractIds: selectedContracts.items
+            }, 'json', newSelectionAbortCtrl).then(function (_ref13) {
+              var data = _ref13.data,
+                  error = _ref13.error,
+                  status = _ref13.status,
+                  headers = _ref13.headers;
+
+              if (error) {
+                $.notify('Ошибка создания подборки!', 'error');
+                return;
+              }
+
+              if (data) {
+                if (data == -1) {
+                  $.notify('Подборка не была создана!', 'info');
+                  wait(false);
+                } else {
+                  $.notify(buildTitle(countSelected, 'Поодборка с # % была успешна создана!', ['договором', 'договорами', 'договорами']));
+                  close();
+                }
+              } else {
+                $.notify('Не удалось создать подборку!', 'error');
+                wait(false);
+              }
+            })["catch"](function (e) {
+              console.log(e);
+            });
+            onClose(function () {
+              newSelectionAbortCtrl.abort();
+            });
+          };
+        });
+      }
+    }, {
+      name: 'Отправить в другой отдел',
+      enabled: selectedContracts.items.length > 1 || !!hasDepsToSend && (canSending && departmentId || canSendingAll && !departmentId),
+      hidden: isArchive || !isCommon,
+      countLeft: countSelected > 1 ? countSelected : null,
+      sort: 4,
+      load: {
+        url: 'site/contracts/departments',
+        params: {
+          contractId: selectedContracts.items.length == 1 ? selectedContracts.items[0] : null
+        },
+        method: 'get',
+        map: function map(item) {
+          return {
+            name: item.name,
+            //faIcon: 'fa-solid fa-angles-right',
+            visible: true,
+            onClick: function onClick(selector) {
+              var departmentName = selector.text(),
+                  itemsCount = selector.items().length;
+              var procNotif = processNotify('Отправка договора в другой отдел...');
+              axiosQuery('post', 'site/contracts/send', {
+                contractIds: selectedContracts.items,
+                departmentId: item.id
+              }, 'json').then(function (_ref14) {
+                var data = _ref14.data,
+                    error = _ref14.error,
+                    status = _ref14.status,
+                    headers = _ref14.headers;
+
+                if (data) {
+                  //$.notify('Договор успешно отправлен в '+departmentName+'!');
+                  if (selectionId || searched) {
+                    var params = {};
+                    getCounts(function () {//if (currentList > 0) removeContractsRows(target);
+                    });
+                  } else {//if (currentList > 0) removeContractsRows(target);
+                  }
+
+                  if (data.length) {
+                    var contractTitle = countSelected == 1 ? ' ' + objectNumber + ' ' + title : '';
+                    var mess = buildTitle(data.length, '# %' + contractTitle + ' успешно отправлен в ' + departmentName + '!', '# % успешно отправлены в ' + departmentName + '!', ['договор', 'договора', 'договоров']);
+                    procNotif.done({
+                      message: mess
+                    });
+                  } else {
+                    procNotif.error({
+                      message: 'Ни один договор не был отправлен!'
+                    });
+                  }
+
+                  if (countSelected == 1 && itemsCount == 0) changeAttrData(6, '0');
+                } else {
+                  //$.notify('Ошибка! Договор не был отправлен!', 'error');
+                  procNotif.error({
+                    message: 'Ошибка! Договор не был отправлен!'
+                  });
+                }
+              });
+            }
+          };
+        }
+      }
+    }, {
+      name: 'Скрыть',
+      visible: isCommon && canHiding && departmentId && !isArchive,
+      countLeft: countSelected > 1 ? countSelected : null,
+      sort: 6,
+      onClick: function onClick() {
+        ddrPopup({
+          width: 400,
+          // ширина окна
+          html: buildTitle(countSelected, '<p class="fz18px color-red">Вы действительно хотите скрыть # %?</p>', ['договор', 'договора', 'договоров']),
+          // контент
+          buttons: ['ui.cancel', {
+            title: 'Скрыть',
+            variant: 'red',
+            action: 'contractHide'
+          }],
+          centerMode: true,
+          winClass: 'ddrpopup_dialog'
+        }).then(function (_ref15) {
+          var close = _ref15.close,
+              wait = _ref15.wait;
+
+          $.contractHide = function (_) {
+            wait();
+            axiosQuery('post', 'site/contracts/hide', {
+              contractIds: selectedContracts.items,
+              departmentId: departmentId
+            }, 'json').then(function (_ref16) {
+              var data = _ref16.data,
+                  error = _ref16.error,
+                  status = _ref16.status,
+                  headers = _ref16.headers;
+              var contractTitle = countSelected == 1 ? ' ' + objectNumber + ' ' + title : '';
+
+              if (data) {
+                if (selectionId || searched) {
+                  getCounts(function () {
+                    removeContractsRows(target);
+                  });
+                } else {
+                  removeContractsRows(target);
+                }
+
+                $.notify(buildTitle(countSelected, '%' + contractTitle + ' успешно скрыт!', '# % успешно скрыты!', ['Договор', 'договора', 'договоров'])); //target.changeAttrData(9, '0');
+              } else {
+                $.notify(buildTitle(countSelected, 'Ошибка! договор' + contractTitle + ' не был скрыт!', 'Ошибка! договоры не были скрыты!'), 'error');
+              }
+
+              close();
+            });
+          };
+        });
+      }
+    }, {
+      name: hasCheckbox && canRemoveCheckbox ? 'Удалить чекбокс' : !hasCheckbox && canCreateCheckbox ? 'Добавить чекбокс' : '',
+      visible: isDeptCheckbox && !isArchive && (!hasCheckbox && canCreateCheckbox || hasCheckbox && canRemoveCheckbox),
+      sort: 1,
+      onClick: function onClick() {
+        return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
+          var cell, edited, attrData, _pregSplit, _pregSplit2, _pregSplit2$, contractId, _pregSplit2$2, departmentId, _pregSplit2$3, stepId, waitCell, _yield$axiosQuery, data, error, status, headers, randId, editedCheckbox;
+
+          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
+            while (1) {
+              switch (_context.prev = _context.next) {
+                case 0:
+                  cell = $(target.pointer).closest('[ddrtabletd]');
+                  edited = !!$(cell).attr('edited');
+                  attrData = $(cell).attr('deptcheck');
+                  _pregSplit = pregSplit(attrData), _pregSplit2 = _slicedToArray(_pregSplit, 3), _pregSplit2$ = _pregSplit2[0], contractId = _pregSplit2$ === void 0 ? null : _pregSplit2$, _pregSplit2$2 = _pregSplit2[1], departmentId = _pregSplit2$2 === void 0 ? null : _pregSplit2$2, _pregSplit2$3 = _pregSplit2[2], stepId = _pregSplit2$3 === void 0 ? null : _pregSplit2$3;
+                  waitCell = $(cell).ddrWait({
+                    iconHeight: '30px',
+                    bgColor: '#efe9f9'
+                  });
+                  _context.next = 7;
+                  return axiosQuery('post', 'site/contracts/step_checkbox', {
+                    contractId: contractId,
+                    departmentId: departmentId,
+                    stepId: stepId,
+                    value: hasCheckbox
+                  }, 'json');
+
+                case 7:
+                  _yield$axiosQuery = _context.sent;
+                  data = _yield$axiosQuery.data;
+                  error = _yield$axiosQuery.error;
+                  status = _yield$axiosQuery.status;
+                  headers = _yield$axiosQuery.headers;
+
+                  if (!error) {
+                    _context.next = 17;
+                    break;
+                  }
+
+                  console.log(error);
+                  $.notify('Ошибка! Не удалось ' + (hasCheckbox ? 'удалить' : 'добавить') + ' чекбокс!', 'error');
+                  waitCell.destroy();
+                  return _context.abrupt("return");
+
+                case 17:
+                  // canCreateCheckbox canRemoveCheckbox
+                  if (data) {
+                    if (!hasCheckbox) {
+                      if (edited) {
+                        randId = generateCode('nnnnnnn');
+                        editedCheckbox = '<div class="checkbox normal-checkbox">' + '<input type="checkbox" name="assigned_primary" id="checkbox' + randId + '" inpgroup="normal" oninput="$.contractSetData(this, ' + contractId + ',' + departmentId + ',' + stepId + ',1)">' + '<label class="noselect" for="checkbox' + randId + '"></label>' + '<label for="checkbox' + randId + '" class="checkbox__label lh90 d-inline-block normal-checkbox__label noselect"></label>' + '<div class="normal-checkbox__errorlabel" errorlabel=""></div>' + '</div>';
+                        $(cell).html(editedCheckbox);
+                      } else {
+                        $(cell).html('<div class="checkbox-empty checkbox-empty-normal border-gray-400"></div>');
+                      }
+
+                      $.notify('Чекбокс успешно добавлен!');
+                    } else {
+                      $(cell).empty();
+                      $.notify('Чекбокс успешно удален!');
+                    }
+
+                    waitCell.destroy();
+                  }
+
+                case 18:
+                case "end":
+                  return _context.stop();
+              }
+            }
+          }, _callee);
+        }))();
+      }
+    }, {
+      name: 'Комментарии',
+      visible: hasCheckbox && isDeptCheckbox,
+      sort: 2,
+      onClick: function onClick() {
+        return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee4() {
+          var cell, attrData, _pregSplit3, _pregSplit4, _pregSplit4$, contractId, _pregSplit4$2, departmentId, _pregSplit4$3, stepId;
+
+          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee4$(_context4) {
+            while (1) {
+              switch (_context4.prev = _context4.next) {
+                case 0:
+                  cell = $(target.pointer).closest('[ddrtabletd]');
+                  attrData = $(cell).attr('deptcheck');
+                  _pregSplit3 = pregSplit(attrData), _pregSplit4 = _slicedToArray(_pregSplit3, 3), _pregSplit4$ = _pregSplit4[0], contractId = _pregSplit4$ === void 0 ? null : _pregSplit4$, _pregSplit4$2 = _pregSplit4[1], departmentId = _pregSplit4$2 === void 0 ? null : _pregSplit4$2, _pregSplit4$3 = _pregSplit4[2], stepId = _pregSplit4$3 === void 0 ? null : _pregSplit4$3;
+                  commentsTooltip = $(cell).ddrTooltip({
+                    //cls: 'w44rem',
+                    placement: 'bottom',
+                    tag: 'noscroll noopen',
+                    offset: [0 - 5],
+                    minWidth: '200px',
+                    minHeight: '200px',
+                    duration: [200, 200],
+                    trigger: 'click',
+                    wait: {
+                      iconHeight: '40px'
+                    },
+                    onShow: function () {
+                      var _onShow = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee3(_ref17) {
+                        var reference, popper, show, hide, destroy, waitDetroy, setContent, setData, setProps, _yield$axiosQuery2, data, error, status, headers, textarea, inputCellCommentTOut;
+
+                        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee3$(_context3) {
+                          while (1) {
+                            switch (_context3.prev = _context3.next) {
+                              case 0:
+                                reference = _ref17.reference, popper = _ref17.popper, show = _ref17.show, hide = _ref17.hide, destroy = _ref17.destroy, waitDetroy = _ref17.waitDetroy, setContent = _ref17.setContent, setData = _ref17.setData, setProps = _ref17.setProps;
+                                _context3.next = 3;
+                                return axiosQuery('get', 'site/contracts/cell_comment', {
+                                  contract_id: contractId,
+                                  department_id: departmentId,
+                                  step_id: stepId
+                                }, 'json');
+
+                              case 3:
+                                _yield$axiosQuery2 = _context3.sent;
+                                data = _yield$axiosQuery2.data;
+                                error = _yield$axiosQuery2.error;
+                                status = _yield$axiosQuery2.status;
+                                headers = _yield$axiosQuery2.headers;
+                                _context3.next = 10;
+                                return setData(data);
+
+                              case 10:
+                                waitDetroy();
+                                textarea = $(popper).find('#sendCellComment');
+                                $(textarea).focus();
+                                textarea[0].selectionStart = textarea[0].selectionEnd = textarea[0].value.length;
+                                $('#contractsList').one('scroll', function () {
+                                  var _commentsTooltip2;
+
+                                  // При скролле списка скрыть тултип комментариев
+                                  if (((_commentsTooltip2 = commentsTooltip) === null || _commentsTooltip2 === void 0 ? void 0 : _commentsTooltip2.destroy) != undefined) commentsTooltip.destroy();
+                                });
+                                $(textarea).on('input', function () {
+                                  var _this = this;
+
+                                  clearTimeout(inputCellCommentTOut);
+                                  inputCellCommentTOut = setTimeout( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee2() {
+                                    var comment, _yield$axiosQuery3, postRes, postErr, status, headers;
+
+                                    return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee2$(_context2) {
+                                      while (1) {
+                                        switch (_context2.prev = _context2.next) {
+                                          case 0:
+                                            comment = $(_this).val();
+                                            _context2.next = 3;
+                                            return axiosQuery('post', 'site/contracts/cell_comment', {
+                                              contract_id: contractId,
+                                              department_id: departmentId,
+                                              step_id: stepId,
+                                              comment: comment
+                                            }, 'json');
+
+                                          case 3:
+                                            _yield$axiosQuery3 = _context2.sent;
+                                            postRes = _yield$axiosQuery3.data;
+                                            postErr = _yield$axiosQuery3.error;
+                                            status = _yield$axiosQuery3.status;
+                                            headers = _yield$axiosQuery3.headers;
+
+                                            if (!postErr) {
+                                              _context2.next = 12;
+                                              break;
+                                            }
+
+                                            console.log(postErr);
+                                            $.notify('Ошибка! Не удалось задать комментарий!', 'error');
+                                            return _context2.abrupt("return");
+
+                                          case 12:
+                                            if (postRes) {
+                                              if (comment) $(reference).append('<div class="trangled trangled-top-right"></div>');else $(reference).find('.trangled').remove(); //$.notify('Комментарий успешно сохранен!');
+                                              //$(this).ddrInputs('change');
+                                            }
+
+                                          case 13:
+                                          case "end":
+                                            return _context2.stop();
+                                        }
+                                      }
+                                    }, _callee2);
+                                  })), 500);
+                                });
+
+                              case 16:
+                              case "end":
+                                return _context3.stop();
+                            }
+                          }
+                        }, _callee3);
+                      }));
+
+                      function onShow(_x) {
+                        return _onShow.apply(this, arguments);
+                      }
+
+                      return onShow;
+                    }(),
+                    onDestroy: function onDestroy() {//$(cell).removeAttrib('tooltiped');
+                    }
+                  });
+
+                case 4:
+                case "end":
+                  return _context4.stop();
+              }
+            }
+          }, _callee4);
+        }))();
+      }
+    }, {
+      name: 'Редактировать',
+      visible: countSelected == 1 && isCommon && canEditCell && contextEdited
+      /* && !isArchive*/
+      ,
+      // добавить !isArchive - если не нужно редактировать в архиве 
+      disabled: $(target.pointer).closest('[ddrtabletd]').hasAttr('editted') || disableEditCell,
+      sort: 7,
+      onClick: function onClick() {
+        return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee7() {
+          var cell, attrData, _pregSplit5, _pregSplit6, _pregSplit6$, contractId, _pregSplit6$2, column, _pregSplit6$3, type, cellWait, _yield$axiosQuery4, data, error, status, headers;
+
+          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee7$(_context7) {
+            while (1) {
+              switch (_context7.prev = _context7.next) {
+                case 0:
+                  cell = $(target.pointer).closest('[ddrtabletd]');
+                  attrData = $(cell).attr('contextedit');
+                  _pregSplit5 = pregSplit(attrData), _pregSplit6 = _slicedToArray(_pregSplit5, 3), _pregSplit6$ = _pregSplit6[0], contractId = _pregSplit6$ === void 0 ? null : _pregSplit6$, _pregSplit6$2 = _pregSplit6[1], column = _pregSplit6$2 === void 0 ? null : _pregSplit6$2, _pregSplit6$3 = _pregSplit6[2], type = _pregSplit6$3 === void 0 ? null : _pregSplit6$3;
+                  $(cell).setAttrib('editted');
+                  cellWait = $(cell).ddrWait({
+                    iconHeight: '30px'
+                  });
+
+                  if (!(type == 1)) {
+                    _context7.next = 16;
+                    break;
+                  }
+
+                  _context7.next = 8;
+                  return axiosQuery('get', 'site/contracts/cell_edit', {
+                    contract_id: contractId,
+                    column: column,
+                    type: type
+                  }, 'json');
+
+                case 8:
+                  _yield$axiosQuery4 = _context7.sent;
+                  data = _yield$axiosQuery4.data;
+                  error = _yield$axiosQuery4.error;
+                  status = _yield$axiosQuery4.status;
+                  headers = _yield$axiosQuery4.headers;
+                  $(cell).append(data);
+                  _context7.next = 17;
+                  break;
+
+                case 16:
+                  if (type == 2) {
+                    cellEditTooltip = $(cell).ddrTooltip({
+                      //cls: 'w44rem',
+                      placement: 'bottom',
+                      tag: 'noscroll noopen',
+                      offset: [0 - 5],
+                      minWidth: '200px',
+                      minHeight: '200px',
+                      duration: [200, 200],
+                      trigger: 'click',
+                      wait: {
+                        iconHeight: '40px'
+                      },
+                      onShow: function () {
+                        var _onShow2 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee5(_ref19) {
+                          var reference, popper, show, hide, destroy, waitDetroy, setContent, setData, setProps, _yield$axiosQuery5, data, error, status, headers, textarea;
+
+                          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee5$(_context5) {
+                            while (1) {
+                              switch (_context5.prev = _context5.next) {
+                                case 0:
+                                  reference = _ref19.reference, popper = _ref19.popper, show = _ref19.show, hide = _ref19.hide, destroy = _ref19.destroy, waitDetroy = _ref19.waitDetroy, setContent = _ref19.setContent, setData = _ref19.setData, setProps = _ref19.setProps;
+                                  _context5.next = 3;
+                                  return axiosQuery('get', 'site/contracts/cell_edit', {
+                                    contract_id: contractId,
+                                    column: column,
+                                    type: type
+                                  }, 'json');
+
+                                case 3:
+                                  _yield$axiosQuery5 = _context5.sent;
+                                  data = _yield$axiosQuery5.data;
+                                  error = _yield$axiosQuery5.error;
+                                  status = _yield$axiosQuery5.status;
+                                  headers = _yield$axiosQuery5.headers;
+                                  _context5.next = 10;
+                                  return setData(data);
+
+                                case 10:
+                                  waitDetroy();
+                                  textarea = $(popper).find('#edittedCellData');
+                                  $(textarea).focus();
+                                  textarea[0].selectionStart = textarea[0].selectionEnd = textarea[0].value.length;
+                                  $('#contractsList').one('scroll', function () {
+                                    var _cellEditTooltip2;
+
+                                    // При скролле списка скрыть тултип комментариев
+                                    if (((_cellEditTooltip2 = cellEditTooltip) === null || _cellEditTooltip2 === void 0 ? void 0 : _cellEditTooltip2.destroy) != undefined) cellEditTooltip.destroy();
+                                  });
+                                  /*let inputCellCommentTOut;
+                                  $(textarea).on('input', function() {
+                                  	clearTimeout(inputCellCommentTOut);
+                                  	inputCellCommentTOut = setTimeout(async () => {
+                                  		const comment = $(this).val();
+                                  		const {data: postRes, error: postErr, status, headers} = await axiosQuery('post', 'site/contracts/cell_comment', {
+                                  			contract_id: contractId, 
+                                  			department_id: departmentId,
+                                  			step_id: stepId,
+                                  			comment,
+                                  		}, 'json');
+                                  		
+                                  		if (postErr) {
+                                  			console.log(postErr);
+                                  			$.notify('Ошибка! Не удалось задать комментарий!', 'error');
+                                  			return;
+                                  		}
+                                  		
+                                  		if (postRes) {
+                                  			if (comment) $(reference).append('<div class="trangled trangled-top-right"></div>');
+                                  			else $(reference).find('.trangled').remove();
+                                  			
+                                  			//$.notify('Комментарий успешно сохранен!');
+                                  			//$(this).ddrInputs('change');
+                                  		}
+                                  		
+                                  	}, 500);
+                                  });*/
+
+                                case 15:
+                                case "end":
+                                  return _context5.stop();
+                              }
+                            }
+                          }, _callee5);
+                        }));
+
+                        function onShow(_x2) {
+                          return _onShow2.apply(this, arguments);
+                        }
+
+                        return onShow;
+                      }(),
+                      onDestroy: function onDestroy() {
+                        $(cell).removeAttrib('tooltiped');
+                      }
+                    });
+                  } else if (type == 3) {}
+
+                case 17:
+                  $.saveCellData = /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee6() {
+                    var cellData, emptyVal, _yield$axiosQuery6, data, error, status, headers;
+
+                    return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee6$(_context6) {
+                      while (1) {
+                        switch (_context6.prev = _context6.next) {
+                          case 0:
+                            cellWait.on();
+                            cellData = $(cell).find('#edittedCellData').val();
+                            emptyVal = $(cell).find('[edittedplace]').attr('edittedplace');
+                            _context6.next = 5;
+                            return axiosQuery('post', 'site/contracts/cell_edit', {
+                              contract_id: contractId,
+                              column: column,
+                              data: cellData
+                            }, 'json');
+
+                          case 5:
+                            _yield$axiosQuery6 = _context6.sent;
+                            data = _yield$axiosQuery6.data;
+                            error = _yield$axiosQuery6.error;
+                            status = _yield$axiosQuery6.status;
+                            headers = _yield$axiosQuery6.headers;
+
+                            if (error) {
+                              cellWait.off();
+                              $.notify('Ошибка сохранения ячейки!', 'error');
+                              console.log(error === null || error === void 0 ? void 0 : error.message, error.errors);
+                            }
+
+                            if (data) {
+                              $.notify('Сохранено!');
+                              $(cell).find('[edittedplace]').text(cellData || emptyVal);
+                              cellWait.destroy();
+                              $(cell).find('[edittedblock]').remove();
+                              $(cell).removeAttrib('editted');
+                            }
+
+                          case 12:
+                          case "end":
+                            return _context6.stop();
+                        }
+                      }
+                    }, _callee6);
+                  }));
+                  cellWait.off();
+
+                case 19:
+                case "end":
+                  return _context7.stop();
+              }
+            }
+          }, _callee7);
+        }))();
+      }
+    }];
+  };
+}
+
+/***/ }),
+
 /***/ "./resources/js/sections/site/contracts/index.js":
 /*!*******************************************************!*\
   !*** ./resources/js/sections/site/contracts/index.js ***!
@@ -199,11 +1284,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "calcGencontracting": function() { return /* reexport safe */ _calcGencontracting_js__WEBPACK_IMPORTED_MODULE_1__.calcGencontracting; },
 /* harmony export */   "calcSubcontracting": function() { return /* reexport safe */ _calcSubcontracting_js__WEBPACK_IMPORTED_MODULE_0__.calcSubcontracting; },
+/* harmony export */   "contextMenu": function() { return /* reexport safe */ _contextMenu_js__WEBPACK_IMPORTED_MODULE_3__.contextMenu; },
 /* harmony export */   "showSelections": function() { return /* reexport safe */ _showSelections_js__WEBPACK_IMPORTED_MODULE_2__.showSelections; }
 /* harmony export */ });
 /* harmony import */ var _calcSubcontracting_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./calcSubcontracting.js */ "./resources/js/sections/site/contracts/calcSubcontracting.js");
 /* harmony import */ var _calcGencontracting_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./calcGencontracting.js */ "./resources/js/sections/site/contracts/calcGencontracting.js");
 /* harmony import */ var _showSelections_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./showSelections.js */ "./resources/js/sections/site/contracts/showSelections.js");
+/* harmony import */ var _contextMenu_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./contextMenu.js */ "./resources/js/sections/site/contracts/contextMenu.js");
+
 
 
 

@@ -1124,6 +1124,11 @@ $tableColor: #efefef
 			display: flex
 			width: 100%
 			left: 0
+			pointer-events: none
+			z-index: 11
+			
+			> *
+				pointer-events: auto
 			
 			&-center
 				justify-content: center
@@ -1143,6 +1148,16 @@ $tableColor: #efefef
 			&-hidden
 				opacity: 0
 				transition: opacity 0.16s
+		
+		
+		.saveicon
+			color: #2fa2e5
+			opacity: 0.3
+			transition: opacity 0.16s
+			
+			&:hover
+				opacity: 1
+			
 		
 		
 		
@@ -1174,6 +1189,43 @@ $tableColor: #efefef
 				bottom: -1px
 				right: -3px
 				transform: rotate(140deg)
+		
+		
+		.editted
+			position: absolute
+			top: 0
+			left: 0
+			width: 100%
+			height: 100%
+			background-color: #fff
+			outline: 1px dashed #91cddb !important
+			z-index: 10
+			padding: 4px 2px 4px 5px
+			font-size: inherit
+			line-height: inherit
+			
+			&_centred
+				display: flex
+				align-items: center
+				justify-content: center
+			
+			textarea
+				border: none
+				font-size: inherit
+				line-height: inherit
+				width: 100%
+				height: 100%
+				+scrollbar(transparent, #efeff2, 2px, 2px)
+				overflow-y: auto
+			
+			input
+				border: none
+				font-size: inherit
+				line-height: inherit
+				width: 100%
+				
+			
+		
 		
 		
 	

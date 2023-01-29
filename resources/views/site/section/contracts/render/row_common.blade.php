@@ -49,13 +49,15 @@
 	@endif
 
 	@if($column == 'object_number' && auth('site')->user()->can('contract-col-object_number:site'))
-		<x-table.td class="h-center" commonlist onmouseenter="$.showselections('{{$id}}');"><strong class="fz16px">{{$object_number ?? '-'}}</strong></x-table.td>
+		<x-table.td class="h-center" commonlist onmouseenter="$.showselections('{{$id}}');">
+			<strong class="fz16px">{{$object_number ?? '-'}}</strong>
+		</x-table.td>
 	@endif
 
 	@if($column == 'title' && auth('site')->user()->can('contract-col-title:site'))
-		<x-table.td class="breakword h-start" commonlist>
+		<x-table.td class="breakword h-start" commonlist contextedit="{{$id}},{{$column}},1">
 			<div class="scrollblock-hidden maxh4rem-6px pr3px">
-				<p class="fz12px lh100 mt2px mb2px">{{Str::of($title ?? '-')->limit(60, '...')}}</p>
+				<p class="fz12px lh100 mt2px mb2px" edittedplace="-">{{Str::of($title ?? '-')->limit(60, '...')}}</p>
 			</div>
 		</x-table.td>
 	@endif
@@ -69,15 +71,17 @@
 	@endif
 
 	@if($column == 'titul' && auth('site')->user()->can('contract-col-titul:site'))
-		<x-table.td class="pr2px breakword" commonlist>
+		<x-table.td class="pr2px breakword" commonlist contextedit="{{$id}},{{$column}},1">
 			<div class="scrollblock-hidden maxh4rem-6px pr3px">
-				<p class="format fz12px lh100 mt2px mb2px text-justify">{{$titul ?? '-'}}</p>
+				<p class="format fz12px lh100 mt2px mb2px text-justify" edittedplace="-">{{$titul ?? '-'}}</p>
 			</div>
 		</x-table.td>
 	@endif
 
 	@if($column == 'contract' && auth('site')->user()->can('contract-col-contract:site'))
-		<x-table.td class="breakword" commonlist><p class="fz12px lh110">{{$contract ?? '-'}}</p></x-table.td>
+		<x-table.td class="breakword" commonlist contextedit="{{$id}},{{$column}},1">
+			<p class="fz12px lh110" edittedplace="-">{{$contract ?? '-'}}</p>
+		</x-table.td>
 	@endif
 
 	@if($column == 'customer' && auth('site')->user()->can('contract-col-customer:site'))
@@ -91,17 +95,17 @@
 	@endif
 
 	@if($column == 'locality' && auth('site')->user()->can('contract-col-locality:site'))
-		<x-table.td class="breakword h-center" commonlist>
+		<x-table.td class="breakword h-center" commonlist contextedit="{{$id}},{{$column}},1">
 			<div class="scrollblock-hidden maxh4rem-6px pr3px">
-				<p class="fz12px lh100 mt2px mb2px">{{$locality ?? '-'}}</p>
+				<p class="fz12px lh100 mt2px mb2px" edittedplace="-">{{$locality ?? '-'}}</p>
 			</div>
 		</x-table.td>
 	@endif
 
 	@if($column == 'price_nds' && auth('site')->user()->can('contract-col-price_nds:site'))
-		<x-table.td class="text-end" commonlist>
+		<x-table.td class="text-end" commonlist contextedit="{{$id}},{{$column}},1">
 			@isset($price_nds)
-				<p class="fz12px lh90 nobreak">@number($price_nds, 2) <strong>@symbal(money)</strong></p>
+				<p class="fz12px lh90 nobreak"><span edittedplace="0.00">@number($price_nds, 2)</span> <strong>@symbal(money)</strong></p>
 			@else
 				<p class="color-gray">-</p>
 			@endisset
@@ -109,9 +113,9 @@
 	@endif
 
 	@if($column == 'price' && auth('site')->user()->can('contract-col-price:site'))
-		<x-table.td class="text-end" commonlist>
+		<x-table.td class="text-end" commonlist contextedit="{{$id}},{{$column}},1">
 			@isset($price)
-				<p class="fz12px lh90 nobreak">@number($price, 2) <strong>@symbal(money)</strong></p>
+				<p class="fz12px lh90 nobreak"><span edittedplace="0.00">@number($price, 2)</span> <strong>@symbal(money)</strong></p>
 			@else
 				<p class="color-gray">-</p>
 			@endisset
@@ -119,9 +123,9 @@
 	@endif
 
 	@if($column == 'date_start' && auth('site')->user()->can('contract-col-date_start:site'))
-		<x-table.td commonlist>
+		<x-table.td commonlist contextedit="{{$id}},{{$column}},1">
 			@if(isset($date_start) && $date_start)
-				<p class="fz12px lh90">{{dateFormatter($date_start, 'd.m.y')}}</p>
+				<p class="fz12px lh90" edittedplace="-">{{dateFormatter($date_start, 'd.m.y')}}</p>
 			@else
 				<p class="color-gray">-</p>
 			@endif
@@ -129,9 +133,9 @@
 	@endif
 
 	@if($column == 'date_end' && auth('site')->user()->can('contract-col-date_end:site'))
-		<x-table.td commonlist>
+		<x-table.td commonlist contextedit="{{$id}},{{$column}},1">
 			@if(isset($date_end) && $date_end)
-				<p class="fz12px lh90">{{dateFormatter($date_end, 'd.m.y')}}</p>
+				<p class="fz12px lh90" edittedplace="-">{{dateFormatter($date_end, 'd.m.y')}}</p>
 			@else
 				<p class="color-gray">-</p>
 			@endif
@@ -139,9 +143,9 @@
 	@endif
 	
 	@if($column == 'date_gen_start' && auth('site')->user()->can('contract-col-date_gen_start:site'))
-		<x-table.td commonlist>
+		<x-table.td commonlist contextedit="{{!isset($date_gen_start) && !$subcontracting ? '' : $id.','.$column.','.'1'}}">
 			@if(isset($date_gen_start) && $date_gen_start)
-				<p class="fz12px lh90">{{dateFormatter($date_gen_start, 'd.m.y')}}</p>
+				<p class="fz12px lh90" edittedplace="-">{{dateFormatter($date_gen_start, 'd.m.y')}}</p>
 			@else
 				<p class="color-gray">{!!$subcontracting ? '-' : '<p class="fz12px text-center">НЕТ</p>'!!}</p>
 			@endif
@@ -149,9 +153,9 @@
 	@endif
 
 	@if($column == 'date_gen_end' && auth('site')->user()->can('contract-col-date_gen_end:site'))
-		<x-table.td commonlist>
+		<x-table.td commonlist contextedit="{{!isset($date_gen_end) && !$subcontracting ? '' : $id.','.$column.','.'1'}}">
 			@if(isset($date_gen_end) && $date_gen_end)
-				<p class="fz12px lh90">{{dateFormatter($date_gen_end, 'd.m.y')}}</p>
+				<p class="fz12px lh90" edittedplace="-">{{dateFormatter($date_gen_end, 'd.m.y')}}</p>
 			@else
 				<p class="color-gray">{!!$subcontracting ? '-' : '<p class="fz12px text-center">НЕТ</p>'!!}</p>
 			@endif
@@ -159,9 +163,9 @@
 	@endif
 	
 	@if($column == 'date_sub_start' && auth('site')->user()->can('contract-col-date_sub_start:site'))
-		<x-table.td commonlist>
+		<x-table.td commonlist contextedit="{{!isset($date_sub_start) && !$gencontracting ? '' : $id.','.$column.','.'1'}}">
 			@if(isset($date_sub_start) && $date_sub_start)
-				<p class="fz12px lh90">{{dateFormatter($date_sub_start, 'd.m.y')}}</p>
+				<p class="fz12px lh90" edittedplace="-">{{dateFormatter($date_sub_start, 'd.m.y')}}</p>
 			@else
 				<p class="color-gray">{!!$gencontracting ? '-' : '<p class="fz12px text-center">НЕТ</p>'!!}</p>
 			@endif
@@ -169,9 +173,9 @@
 	@endif
 
 	@if($column == 'date_sub_end' && auth('site')->user()->can('contract-col-date_sub_end:site'))
-		<x-table.td commonlist>
+		<x-table.td commonlist contextedit="{{!isset($date_sub_end) && !$gencontracting ? '' : $id.','.$column.','.'1'}}">
 			@if(isset($date_sub_end) && $date_sub_end)
-				<p class="fz12px lh90">{{dateFormatter($date_sub_end, 'd.m.y')}}</p>
+				<p class="fz12px lh90" edittedplace="-">{{dateFormatter($date_sub_end, 'd.m.y')}}</p>
 			@else
 				<p class="color-gray">{!!$gencontracting ? '-' : '<p class="fz12px text-center">НЕТ</p>'!!}</p>
 			@endif
@@ -223,13 +227,15 @@
 	@endif
 
 	@if($column == 'buy_number' && auth('site')->user()->can('contract-col-buy_number:site'))
-		<x-table.td class="breakword h-center" commonlist><p class="fz12px">{{$buy_number ?? '-'}}</p></x-table.td>
+		<x-table.td class="breakword h-center" commonlist contextedit="{{$buy_number == 'БЕЗ ЗАКУПКИ' ? '' : $id.','.$column.','.'1'}}">
+			<p class="fz12px" edittedplace="-">{{$buy_number ?? '-'}}</p>
+		</x-table.td>
 	@endif
 
 	@if($column == 'date_buy' && auth('site')->user()->can('contract-col-date_buy:site'))
-		<x-table.td commonlist>
+		<x-table.td commonlist contextedit="{{!isset($date_buy) && $without_buy ? '' : $id.','.$column.','.'1'}}">
 			@if(isset($date_buy) && $date_buy)
-				<p class="fz12px lh90">{{dateFormatter($date_buy, 'd.m.y')}}</p>
+				<p class="fz12px lh90" edittedplace="-">{{dateFormatter($date_buy, 'd.m.y')}}</p>
 			@else
 				<p class="color-gray">{!!$without_buy ? '<p class="fz12px text-center">БЕЗ ЗАКУПКИ</p>' : '-'!!}</p>
 			@endif
@@ -237,9 +243,9 @@
 	@endif
 
 	@if($column == 'date_close' && auth('site')->user()->can('contract-col-date_close:site'))
-		<x-table.td commonlist>
+		<x-table.td commonlist contextedit="{{$id}},{{$column}},1">
 			@if(isset($date_close) && $date_close)
-				<p class="fz12px lh90">{{dateFormatter($date_close, 'd.m.y')}}</p>
+				<p class="fz12px lh90" edittedplace="-">{{dateFormatter($date_close, 'd.m.y')}}</p>
 			@else
 				<p class="color-gray">-</p>
 			@endif
@@ -247,9 +253,9 @@
 	@endif
 
 	@if($column == 'archive_dir' && auth('site')->user()->can('contract-col-archive_dir:site'))
-		<x-table.td class="breakword h-center" commonlist>
+		<x-table.td class="breakword h-center" commonlist contextedit="{{$id}},{{$column}},1">
 			<div class="scrollblock-hidden maxh4rem-6px pr3px">
-				<p class="fz12px lh100 mt2px mb2px">{{$archive_dir ?? '-'}}</p>
+				<p class="fz12px lh100 mt2px mb2px" edittedplace="-">{{$archive_dir ?? '-'}}</p>
 			</div>
 		</x-table.td>
 	@endif

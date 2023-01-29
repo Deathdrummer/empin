@@ -872,6 +872,46 @@ class Contracts extends Controller {
 	
 	
 	
+	
+	// Редактировать ячейку
+	public function cell_edit(Request $request) {
+		[
+			'contract_id'	=> $contractId,
+			'column' 		=> $column,
+			'type' 			=> $type,
+		] = $request->validate([
+			'contract_id'	=> 'required|integer',
+			'column'		=> 'required|string',
+			'type' 			=> 'required|integer',
+		]);
+		
+		$data = $this->contract->getCellData($contractId, $column);
+		$data['type'] = $type;
+		return $this->render('cell_edit', $data);
+	}
+	
+	public function set_cell_edit(Request $request) {
+		
+		logger($request->all());
+		
+		[
+			'contract_id'	=> $contractId,
+			'column' 		=> $column,
+			'data' 			=> $data,
+		] = $request->validate([
+			'contract_id'	=> 'required|integer',
+			'column'		=> 'required|string',
+			'data' 			=> 'present|nullable',
+		]);
+		
+		
+		
+		$stat = $this->contract->setCellData($contractId, $column, $data);
+		
+		return response()->json($stat);
+	}
+	
+	
 
 
 

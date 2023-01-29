@@ -17,7 +17,7 @@ $.fn.tripleTap = function(callback) {
 
 
 window.isNumeric = function(num) {
-	return !_.isNaN(num) && !_.isBoolean(num);
+	return !_.isNaN(num) && !_.isBoolean(num) && !_.isString(num) && !_.isNull(num);
 }
 						
 window.ref = function (data) {
@@ -26,7 +26,7 @@ window.ref = function (data) {
 		get(target, prop) {
 			if (prop in target) {
 				if (isNumeric(target[prop])) return Number(target[prop]);
-				return target[prop]
+				return target[prop];
 			} else {
 				return null;
 			}

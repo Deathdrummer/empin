@@ -773,6 +773,41 @@ class Contract {
 	
 	
 	
+	/**
+	 * Получить комментарии из ячейки договора
+	 * @param 
+	 * @return 
+	 */
+	public function getCellData($contractId, $column): array|null {
+		$data = ContractModel::select([$column, 'object_number'])
+			->whereId($contractId)
+			->first()
+			->toArray();
+		
+		$content = $data[$column] ?? null;
+		
+		$objectNumber = $data['object_number'] ?? null;
+
+		$columnTitle = $this->allColumsMap[$column] ?? null;
+		
+		return compact('content', 'objectNumber', 'columnTitle');
+	}
+	
+	/**
+	 * Обновить комментарии из ячейки договора
+	 * @param 
+	 * @return 
+	 */
+	public function setCellData($contractId, $column, $data): bool {
+		$contract = ContractModel::find($contractId);
+		$contract[$column] = $data;
+		return $contract->save();
+	}
+	
+	
+	
+	
+	
 	
 	
 	

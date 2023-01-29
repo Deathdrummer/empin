@@ -324,6 +324,12 @@ Route::prefix('site')->middleware(['lang', 'isajax:site'])->group(function() {
 	Route::get('/contracts/cell_comment', [Contracts::class, 'cell_comment']);
 	Route::post('/contracts/cell_comment', [Contracts::class, 'set_cell_comment']);
 	
+	Route::get('/contracts/cell_edit', [Contracts::class, 'cell_edit']);
+	Route::post('/contracts/cell_edit', [Contracts::class, 'set_cell_edit']);
+	
+	
+	
+	
 	Route::get('/contracts/contract_selections', [Contracts::class, 'contract_selections']);
 	Route::get('/contracts/selections_to_choose', [Contracts::class, 'selections_to_choose']);
 	

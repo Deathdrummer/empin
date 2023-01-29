@@ -78,6 +78,16 @@ $.fn.ddrWait = function(params = null) {
 	});
 	
 	return {
+		off() {
+			if (isBtn) $(block).ddrInputs('enable');
+			$(block).removeClass(ddrwaitwrapper);
+			$(block).find('#'+ddrwBId).setAttrib('hidden');
+		},
+		on() {
+			if (isBtn) $(block).ddrInputs('disable');
+			$(block).addClass(ddrwaitwrapper);
+			$(block).find('#'+ddrwBId).removeAttrib('hidden');
+		},
 		destroy() {
 			if (isBtn) $(block).ddrInputs('enable');
 			$(block).removeClass(ddrwaitwrapper);
