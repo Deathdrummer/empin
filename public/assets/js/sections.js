@@ -1227,7 +1227,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                     break;
                                   }
 
-                                  calendarBlock = '<div onclick="event.stopPropagation();" ondblclick="event.stopPropagation();">' + '<div><div id="editCellCalendar"></div></div>' + '<div class="mt5px text-end">' + '<div class="button verysmall-button button-light">' + '<button title="Очистить" id="editCellCalendarClear">Очистить</button>' + '</div>' + '</div>' + '</div>';
+                                  calendarBlock = '<div ondblclick="event.stopPropagation();">' + '<div><div id="editCellCalendar"></div></div>' + '<div class="mt5px text-end">' + '<div class="button verysmall-button button-light">' + '<button title="Очистить" id="editCellCalendarClear">Очистить</button>' + '</div>' + '</div>' + '</div>';
                                   _context9.next = 5;
                                   return setData(calendarBlock);
 

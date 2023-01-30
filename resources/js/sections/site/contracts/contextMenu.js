@@ -801,7 +801,7 @@ export function contextMenu(
 							onShow: async function({reference, popper, show, hide, destroy, waitDetroy, setContent, setData, setProps}) {
 								
 								if (type == 3) {
-									const calendarBlock = 	'<div onclick="event.stopPropagation();" ondblclick="event.stopPropagation();">'+
+									const calendarBlock = 	'<div ondblclick="event.stopPropagation();">'+
 																'<div><div id="editCellCalendar"></div></div>'+
 																'<div class="mt5px text-end">'+
 																	'<div class="button verysmall-button button-light">'+
