@@ -1095,12 +1095,12 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
       disabled: $(target.pointer).closest('[ddrtabletd]').hasAttr('editted') || disableEditCell,
       sort: 7,
       onClick: function onClick() {
-        return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee9() {
+        return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee10() {
           var cell, attrData, _pregSplit5, _pregSplit6, _pregSplit6$, contractId, _pregSplit6$2, column, _pregSplit6$3, type, cellWait, _yield$axiosQuery4, data, error, status, headers;
 
-          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee9$(_context9) {
+          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee10$(_context10) {
             while (1) {
-              switch (_context9.prev = _context9.next) {
+              switch (_context10.prev = _context10.next) {
                 case 0:
                   cell = $(target.pointer).closest('[ddrtabletd]');
                   attrData = $(cell).attr('contextedit');
@@ -1120,11 +1120,11 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                   });
 
                   if (!([1, 2].indexOf(type) !== -1)) {
-                    _context9.next = 22;
+                    _context10.next = 22;
                     break;
                   }
 
-                  _context9.next = 10;
+                  _context10.next = 10;
                   return axiosQuery('get', 'site/contracts/cell_edit', {
                     contract_id: contractId,
                     column: column,
@@ -1132,7 +1132,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                   });
 
                 case 10:
-                  _yield$axiosQuery4 = _context9.sent;
+                  _yield$axiosQuery4 = _context10.sent;
                   data = _yield$axiosQuery4.data;
                   error = _yield$axiosQuery4.error;
                   status = _yield$axiosQuery4.status;
@@ -1191,7 +1191,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                       }
                     }, _callee5, this);
                   })));
-                  _context9.next = 23;
+                  _context10.next = 23;
                   break;
 
                 case 22:
@@ -1204,29 +1204,29 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                       tag: 'noscroll noopen nouneditted',
                       offset: [0 - 5],
                       minWidth: type == 3 ? '202px' : '50px',
-                      minHeight: type == 3 ? '170px' : '50px',
+                      minHeight: type == 3 ? '176px' : '50px',
                       duration: [200, 200],
                       trigger: 'click',
                       wait: {
                         iconHeight: '40px'
                       },
                       onShow: function () {
-                        var _onShow2 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee8(_ref20) {
-                          var reference, popper, show, hide, destroy, waitDetroy, setContent, setData, setProps, calendarBlock, currentDate, datePicker, _yield$axiosQuery7, _data, _error, _status, _headers;
+                        var _onShow2 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee9(_ref20) {
+                          var reference, popper, show, hide, destroy, waitDetroy, setContent, setData, setProps, calendarBlock, currentDate, datePicker, _yield$axiosQuery8, _data, _error, _status, _headers;
 
-                          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee8$(_context8) {
+                          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee9$(_context9) {
                             while (1) {
-                              switch (_context8.prev = _context8.next) {
+                              switch (_context9.prev = _context9.next) {
                                 case 0:
                                   reference = _ref20.reference, popper = _ref20.popper, show = _ref20.show, hide = _ref20.hide, destroy = _ref20.destroy, waitDetroy = _ref20.waitDetroy, setContent = _ref20.setContent, setData = _ref20.setData, setProps = _ref20.setProps;
 
                                   if (!(type == 3)) {
-                                    _context8.next = 10;
+                                    _context9.next = 11;
                                     break;
                                   }
 
-                                  calendarBlock = '<div onclick="event.stopPropagation();" ondblclick="event.stopPropagation();" id="editCellCalendar"></div>';
-                                  _context8.next = 5;
+                                  calendarBlock = '<div onclick="event.stopPropagation();" ondblclick="event.stopPropagation();">' + '<div><div id="editCellCalendar"></div></div>' + '<div class="mt5px text-end">' + '<div class="button verysmall-button button-light">' + '<button title="Очистить" id="editCellCalendarClear">Очистить</button>' + '</div>' + '</div>' + '</div>';
+                                  _context9.next = 5;
                                   return setData(calendarBlock);
 
                                 case 5:
@@ -1298,46 +1298,93 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                       return onSelect;
                                     }()
                                   });
-                                  $(datePicker.el).siblings('.qs-datepicker-container').addClass('qs-datepicker-container-noshadow');
-                                  _context8.next = 19;
+                                  $('#editCellCalendarClear').one(tapEvent, /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee7() {
+                                    var cellDateWait, emptyVal, _yield$axiosQuery7, data, error, _cellEditTooltip3;
+
+                                    return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee7$(_context7) {
+                                      while (1) {
+                                        switch (_context7.prev = _context7.next) {
+                                          case 0:
+                                            cellDateWait = $(reference).ddrWait({
+                                              iconHeight: '30px',
+                                              tag: 'noscroll noopen edittedwait'
+                                            });
+                                            emptyVal = $(cell).find('[edittedplace]').attr('edittedplace');
+                                            _context7.next = 4;
+                                            return axiosQuery('post', 'site/contracts/cell_edit', {
+                                              contract_id: contractId,
+                                              column: column,
+                                              type: type,
+                                              data: null
+                                            }, 'json');
+
+                                          case 4:
+                                            _yield$axiosQuery7 = _context7.sent;
+                                            data = _yield$axiosQuery7.data;
+                                            error = _yield$axiosQuery7.error;
+
+                                            if (error) {
+                                              cellDateWait.off();
+                                              $.notify('Ошибка сохранения ячейки!', 'error');
+                                              console.log(error === null || error === void 0 ? void 0 : error.message, error.errors);
+                                            }
+
+                                            if (data) {
+                                              $.notify('Сохранено!');
+                                              $(cell).find('[edittedplace]').removeAttrib('date');
+                                              $(cell).find('[edittedplace]').text(emptyVal);
+                                              cellDateWait.destroy();
+                                              unEditCell(cell);
+                                              (_cellEditTooltip3 = cellEditTooltip) === null || _cellEditTooltip3 === void 0 ? void 0 : _cellEditTooltip3.destroy();
+                                            }
+
+                                          case 9:
+                                          case "end":
+                                            return _context7.stop();
+                                        }
+                                      }
+                                    }, _callee7);
+                                  })));
+                                  $(datePicker.el).siblings('.qs-datepicker-container').addClass('qs-datepicker-container-noshadow qs-datepicker-container-relative ');
+                                  _context9.next = 20;
                                   break;
 
-                                case 10:
-                                  _context8.next = 12;
+                                case 11:
+                                  _context9.next = 13;
                                   return axiosQuery('get', 'site/contracts/cell_edit', {
                                     contract_id: contractId,
                                     column: column,
                                     type: type
                                   }, 'json');
 
-                                case 12:
-                                  _yield$axiosQuery7 = _context8.sent;
-                                  _data = _yield$axiosQuery7.data;
-                                  _error = _yield$axiosQuery7.error;
-                                  _status = _yield$axiosQuery7.status;
-                                  _headers = _yield$axiosQuery7.headers;
-                                  _context8.next = 19;
+                                case 13:
+                                  _yield$axiosQuery8 = _context9.sent;
+                                  _data = _yield$axiosQuery8.data;
+                                  _error = _yield$axiosQuery8.error;
+                                  _status = _yield$axiosQuery8.status;
+                                  _headers = _yield$axiosQuery8.headers;
+                                  _context9.next = 20;
                                   return setData(_data);
 
-                                case 19:
+                                case 20:
                                   waitDetroy();
                                   $('#contractsList').one('scroll', function () {
-                                    var _cellEditTooltip3;
+                                    var _cellEditTooltip4;
 
                                     // При скролле списка скрыть тултип комментариев
-                                    if (((_cellEditTooltip3 = cellEditTooltip) === null || _cellEditTooltip3 === void 0 ? void 0 : _cellEditTooltip3.destroy) != undefined) cellEditTooltip.destroy();
+                                    if (((_cellEditTooltip4 = cellEditTooltip) === null || _cellEditTooltip4 === void 0 ? void 0 : _cellEditTooltip4.destroy) != undefined) cellEditTooltip.destroy();
                                   });
-                                  $(popper).find('[edittedlistvalue]').on(tapEvent, /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee7() {
-                                    var value, emptyVal, _yield$axiosQuery8, savedRes, savedErr, _cellEditTooltip4;
+                                  $(popper).find('[edittedlistvalue]').on(tapEvent, /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee8() {
+                                    var value, emptyVal, _yield$axiosQuery9, savedRes, savedErr, _cellEditTooltip5;
 
-                                    return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee7$(_context7) {
+                                    return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee8$(_context8) {
                                       while (1) {
-                                        switch (_context7.prev = _context7.next) {
+                                        switch (_context8.prev = _context8.next) {
                                           case 0:
                                             cellWait.on();
                                             value = $(this).attr('edittedlistvalue');
                                             emptyVal = $(cell).find('[edittedplace]').attr('edittedplace');
-                                            _context7.next = 5;
+                                            _context8.next = 5;
                                             return axiosQuery('post', 'site/contracts/cell_edit', {
                                               contract_id: contractId,
                                               column: column,
@@ -1346,9 +1393,9 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                             }, 'json');
 
                                           case 5:
-                                            _yield$axiosQuery8 = _context7.sent;
-                                            savedRes = _yield$axiosQuery8.data;
-                                            savedErr = _yield$axiosQuery8.error;
+                                            _yield$axiosQuery9 = _context8.sent;
+                                            savedRes = _yield$axiosQuery9.data;
+                                            savedErr = _yield$axiosQuery9.error;
 
                                             if (savedErr) {
                                               cellWait.off();
@@ -1361,23 +1408,23 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                               $(cell).find('[edittedplace]').text(savedRes || emptyVal);
                                               cellWait.destroy();
                                               unEditCell(cell);
-                                              (_cellEditTooltip4 = cellEditTooltip) === null || _cellEditTooltip4 === void 0 ? void 0 : _cellEditTooltip4.destroy();
+                                              (_cellEditTooltip5 = cellEditTooltip) === null || _cellEditTooltip5 === void 0 ? void 0 : _cellEditTooltip5.destroy();
                                             }
 
                                           case 10:
                                           case "end":
-                                            return _context7.stop();
+                                            return _context8.stop();
                                         }
                                       }
-                                    }, _callee7, this);
+                                    }, _callee8, this);
                                   })));
 
-                                case 22:
+                                case 23:
                                 case "end":
-                                  return _context8.stop();
+                                  return _context9.stop();
                               }
                             }
-                          }, _callee8);
+                          }, _callee9);
                         }));
 
                         function onShow(_x2) {
@@ -1397,10 +1444,10 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
 
                 case 24:
                 case "end":
-                  return _context9.stop();
+                  return _context10.stop();
               }
             }
-          }, _callee9);
+          }, _callee10);
         }))();
       }
     }];

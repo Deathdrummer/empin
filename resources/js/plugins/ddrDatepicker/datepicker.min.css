@@ -32,6 +32,10 @@
 		border: none !important;
 		border-radius: 0 !important;
 	}
+	
+	.qs-datepicker-container-relative {
+		position: relative !important;
+	}
 
 .qs-centered {
 	position: fixed;

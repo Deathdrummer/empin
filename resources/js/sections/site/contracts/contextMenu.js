@@ -788,7 +788,7 @@ export function contextMenu(
 							tag: 'noscroll noopen nouneditted',
 							offset: [0 -5],
 							minWidth: type == 3 ? '202px' : '50px',
-							minHeight: type == 3 ? '170px' : '50px',
+							minHeight: type == 3 ? '176px' : '50px',
 							duration: [200, 200],
 							trigger: 'click',
 							wait: {
@@ -797,7 +797,15 @@ export function contextMenu(
 							onShow: async function({reference, popper, show, hide, destroy, waitDetroy, setContent, setData, setProps}) {
 								
 								if (type == 3) {
-									const calendarBlock = '<div onclick="event.stopPropagation();" ondblclick="event.stopPropagation();" id="editCellCalendar"></div>';
+									const calendarBlock = 	'<div onclick="event.stopPropagation();" ondblclick="event.stopPropagation();">'+
+																'<div><div id="editCellCalendar"></div></div>'+
+																'<div class="mt5px text-end">'+
+																	'<div class="button verysmall-button button-light">'+
+																		'<button title="Очистить" id="editCellCalendarClear">Очистить</button>'+
+																	'</div>'+
+																'</div>'+
+															'</div>';
+															
 									await setData(calendarBlock);
 									
 									const currentDate = $(cell).find('[edittedplace]').attr('date') || false;
@@ -847,7 +855,42 @@ export function contextMenu(
 										},
 									});
 									
-									$(datePicker.el).siblings('.qs-datepicker-container').addClass('qs-datepicker-container-noshadow');
+									
+									
+									$('#editCellCalendarClear').one(tapEvent, async function() {
+										const cellDateWait = $(reference).ddrWait({
+											iconHeight: '30px',
+											tag: 'noscroll noopen edittedwait'
+										});
+										
+										const emptyVal = $(cell).find('[edittedplace]').attr('edittedplace');
+										
+										const {data, error} = await axiosQuery('post', 'site/contracts/cell_edit', {
+											contract_id: contractId,
+											column,
+											type,
+											data: null,
+										}, 'json');
+										
+										if (error) {
+											cellDateWait.off();
+											$.notify('Ошибка сохранения ячейки!', 'error');
+											console.log(error?.message, error.errors);
+										}
+										
+										if (data) {
+											$.notify('Сохранено!');
+											$(cell).find('[edittedplace]').removeAttrib('date');
+											$(cell).find('[edittedplace]').text(emptyVal);
+											cellDateWait.destroy();
+											unEditCell(cell);
+											cellEditTooltip?.destroy();
+										}
+									});
+									
+									
+									
+									$(datePicker.el).siblings('.qs-datepicker-container').addClass('qs-datepicker-container-noshadow qs-datepicker-container-relative ');
 									
 								} else {
 									const {data, error, status, headers} = await axiosQuery('get', 'site/contracts/cell_edit', {
