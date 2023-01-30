@@ -143554,7 +143554,7 @@ template {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: #fff;
+  background-color: #fffefb;
   outline: 1px dashed #91cddb !important;
   z-index: 8;
   padding: 4px 5px 4px 5px;
@@ -143567,6 +143567,7 @@ template {
   justify-content: center;
 }
 .ddrtable__td .editted textarea {
+  background-color: #fffefb;
   border: none;
   font-size: inherit;
   line-height: inherit;
@@ -143599,6 +143600,7 @@ template {
   border-radius: 2px;
 }
 .ddrtable__td .editted input {
+  background-color: #fffefb;
   border: none;
   font-size: inherit;
   line-height: inherit;
