@@ -737,6 +737,10 @@ export function contextMenu(
 						
 						$(cell).find('#edittedCellData').focus();
 						
+						const edittedBlock = $(cell).find('#edittedCellData');
+						
+						edittedBlock[0].selectionStart = edittedBlock[0].selectionEnd = edittedBlock[0].value.length;
+						
 						$(cell).find('#edittedCellData').on('keypress', (e) => {
 							if (e.keyCode == 13 && !e.shiftKey) {
 								$(cell).find('[savecelldata]').trigger(tapEvent); 

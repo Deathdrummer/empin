@@ -1096,7 +1096,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
       sort: 7,
       onClick: function onClick() {
         return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee10() {
-          var cell, attrData, _pregSplit5, _pregSplit6, _pregSplit6$, contractId, _pregSplit6$2, column, _pregSplit6$3, type, cellWait, _yield$axiosQuery4, data, error, status, headers;
+          var cell, attrData, _pregSplit5, _pregSplit6, _pregSplit6$, contractId, _pregSplit6$2, column, _pregSplit6$3, type, cellWait, _yield$axiosQuery4, data, error, status, headers, edittedBlock;
 
           return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee10$(_context10) {
             while (1) {
@@ -1120,7 +1120,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                   });
 
                   if (!([1, 2].indexOf(type) !== -1)) {
-                    _context10.next = 22;
+                    _context10.next = 24;
                     break;
                   }
 
@@ -1140,6 +1140,8 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                   $(cell).append(data);
                   if (type == 2) $(cell).find('#edittedCellData').number(true, 2, '.', ' ');
                   $(cell).find('#edittedCellData').focus();
+                  edittedBlock = $(cell).find('#edittedCellData');
+                  edittedBlock[0].selectionStart = edittedBlock[0].selectionEnd = edittedBlock[0].value.length;
                   $(cell).find('#edittedCellData').on('keypress', function (e) {
                     if (e.keyCode == 13 && !e.shiftKey) {
                       $(cell).find('[savecelldata]').trigger(tapEvent);
@@ -1191,10 +1193,10 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                       }
                     }, _callee5, this);
                   })));
-                  _context10.next = 23;
+                  _context10.next = 25;
                   break;
 
-                case 22:
+                case 24:
                   if ([3, 4].indexOf(type) !== -1) {
                     // 3 - дата 4 - вып. список
                     $(cell).addClass('editted');
@@ -1439,10 +1441,10 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                     });
                   }
 
-                case 23:
+                case 25:
                   cellWait.off();
 
-                case 24:
+                case 26:
                 case "end":
                   return _context10.stop();
               }
