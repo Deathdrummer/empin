@@ -1374,7 +1374,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                     // При скролле списка скрыть тултип комментариев
                                     if (((_cellEditTooltip4 = cellEditTooltip) === null || _cellEditTooltip4 === void 0 ? void 0 : _cellEditTooltip4.destroy) != undefined) cellEditTooltip.destroy();
                                   });
-                                  $(popper).find('[edittedlistvalue]').on(tapEvent, /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee8() {
+                                  $(popper).find('[edittedlistvalue]').one(tapEvent, /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee8() {
                                     var value, emptyVal, _yield$axiosQuery9, savedRes, savedErr, _cellEditTooltip5;
 
                                     return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee8$(_context8) {

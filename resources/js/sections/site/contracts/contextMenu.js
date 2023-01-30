@@ -910,7 +910,7 @@ export function contextMenu(
 								});
 								
 								
-								$(popper).find('[edittedlistvalue]').on(tapEvent, async function() {
+								$(popper).find('[edittedlistvalue]').one(tapEvent, async function() {
 									cellWait.on();
 									
 									let value = $(this).attr('edittedlistvalue');

@@ -29,21 +29,25 @@
 	</div>
 @elseif($type == '3')
 @elseif($type == '4')
-	<ul ondblclick="event.stopPropagation();" onclick="event.stopPropagation();">
-		@forelse($list as $item)
-			<li
-				@class([
-					'h3rem d-flex align-items-center',
-					'color-black' => $item['id'] == $content,
-					'color-gray color-gray-600-hovered color-black-active pointer' => $item['id'] != $content,
-					'border-bottom border-gray-200' => !$loop->last,
-				])
-				edittedlistvalue="{{$item['id']}}"
-				onclick="event.stopPropagation();"
-				>
-			{{$item['name'] ?? $item['title']}}</li>
-		@empty
-			<li class="empty">Нет данных</li>
-		@endforelse
-	</ul>
+	<div class="scrollblock-light" style="max-height: 200px;" ondblclick="event.stopPropagation();" onclick="event.stopPropagation();">
+		<ul>
+			@forelse($list as $item)
+				<li
+					@class([
+						'h3rem d-flex align-items-center',
+						'color-black' => $item['id'] == $content,
+						'color-gray color-gray-600-hovered color-black-active pointer' => $item['id'] != $content,
+						'border-bottom border-gray-200' => !$loop->last,
+					])
+					
+					@if($item['id'] != $content)
+						edittedlistvalue="{{$item['id']}}"
+					@endif
+					>
+				{{$item['name'] ?? $item['title']}}</li>
+			@empty
+				<li class="empty">Нет данных</li>
+			@endforelse
+		</ul>
+	</div>
 @endif
