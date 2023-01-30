@@ -17220,6 +17220,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
 
       if ($(cell).find('#edittedCellData').tagName() == 'input') {
         $(cell).find('[edittedplace]').number(true, 2, '.', ' ');
+        $(cell).find('[hiddenplace]').removeAttrib('hidden');
       }
 
       $(cell).removeClass('editted');

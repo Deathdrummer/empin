@@ -107,7 +107,7 @@
 			@isset($price_nds)
 				<p class="fz12px lh90 nobreak"><span edittedplace="0.00">@number($price_nds, 2)</span> <strong>@symbal(money)</strong></p>
 			@else
-				<p class="fz12px" edittedplace="0.00">-</p>
+				<p class="fz12px"><span edittedplace="0.00">-</span> <strong hidden hiddenplace>@symbal(money)</strong></p>
 			@endisset
 		</x-table.td>
 	@endif
@@ -117,7 +117,7 @@
 			@isset($price)
 				<p class="fz12px lh90 nobreak"><span edittedplace="0.00">@number($price, 2)</span> <strong>@symbal(money)</strong></p>
 			@else
-				<p class="fz12px" edittedplace="0.00">-</p>
+				<p class="fz12px"><span edittedplace="0.00">-</span> <strong hidden>@symbal(money)</strong></p>
 			@endisset
 		</x-table.td>
 	@endif
