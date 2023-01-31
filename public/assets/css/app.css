@@ -143453,6 +143453,7 @@ template {
 }
 .ddrtable__td.editted {
   outline: 1px dashed #91cddb !important;
+  background-color: #fffefb !important;
   z-index: 1;
 }
 .ddrtable__td:hover .icon-hidden {
