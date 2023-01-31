@@ -40,8 +40,25 @@ window.ref = function (data) {
 
 
 
-
-
+/*
+	AJAX экспорт файла клиенту
+*/
+window.exportFile = (ops = {}, cb) => {
+	const {data, headers, filename = null} = ops;
+	const headerContentDisp = headers["content-disposition"];
+	const fName = filename || (headerContentDisp && headerContentDisp.split("filename=")[1].replace(/["']/g, ""));
+	const contentType = headers["content-type"];
+	const blob = new Blob([data], {contentType});
+	const href = window.URL.createObjectURL(blob);
+	const el = document.createElement("a");
+	el.setAttribute("hidden", true);
+	el.setAttribute("href", href);
+	el.setAttribute("download", fName);
+	el.click();
+	window.URL.revokeObjectURL(blob);
+	
+	if (_.isFunction(cb)) cb();
+}
 
 
 

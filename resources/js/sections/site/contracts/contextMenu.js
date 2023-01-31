@@ -953,7 +953,160 @@ export function contextMenu(
 					
 					cellWait.off();	
 				}
-			}
+			}, {
+				name: 'Экспорт в Excel',
+				//visible: hasCheckbox && isDeptCheckbox,
+				sort: 8,
+				async onClick() {
+					let contractsIds = selectedContracts.items;
+					
+					const {
+						state, // isClosed
+						popper,
+						wait,
+						setTitle,
+						setButtons,
+						loadData,
+						setHtml,
+						setLHtml,
+						dialog,
+						close,
+						query,
+						onScroll,
+						disableButtons,
+						enableButtons,
+						setWidth
+					} = await ddrPopup({
+						title: 'Экспорт данных в Excel', // заголовок
+						width: 400, // ширина окна
+						//frameOnly, // Загрузить только каркас
+						//html, // контент
+						//lhtml, // контент из языковых файлов
+						buttons: ['ui.cancel', {title: 'Экспорт', variant: 'blue', action: 'exportContractsData'}], // массив кнопок
+						//buttonsAlign, // выравнивание вправо
+						//disabledButtons, // при старте все кнопки кроме закрытия будут disabled
+						//closeByBackdrop, // Закрывать окно только по кнопкам [ddrpopupclose]
+						//changeWidthAnimationDuration, // ms
+						//buttonsGroup, // группа для кнопок
+						//winClass, // добавить класс к модальному окну
+						//centerMode, // контент по центру
+						//topClose // верхняя кнопка закрыть
+					});
+					
+					
+					const {data, error, status, headers} = await axiosQuery('get', 'site/contracts/to_export', {
+						contracts_ids: contractsIds,
+					});
+					
+					
+					if (error) {
+						$.notify('Ошибка! Не удалось открыть окно настроек экспорта!', 'error');
+						console.log(error?.message, error.errors);
+					}
+					
+					await setHtml(data);
+					
+					
+					
+					wait(false);
+					
+					
+					$.exportContractsData = async () => {
+						wait();
+						const colums = [];
+						$(popper).find('[columtoxeport]:checked').each((k, item) => {
+							let field = $(item).attr('columtoxeport');
+							colums.push(field);
+						});
+						
+						const {data, error, status, headers} = await axiosQuery('post', 'site/contracts/to_export', {
+							contracts_ids: contractsIds,
+							colums,
+						}, 'blob');
+						
+						exportFile({data, headers,}, () => {
+							wait(false);
+						});
+					}
+					
+					
+					
+					
+					
+					
+					
+					/*commentsTooltip = $(cell).ddrTooltip({
+						//cls: 'w44rem',
+						placement: 'bottom',
+						tag: 'noscroll noopen',
+						offset: [0 -5],
+						minWidth: '200px',
+						minHeight: '200px',
+						duration: [200, 200],
+						trigger: 'click',
+						wait: {
+							iconHeight: '40px'
+						},
+						onShow: async function({reference, popper, show, hide, destroy, waitDetroy, setContent, setData, setProps}) {
+							
+							const {data, error, status, headers} = await axiosQuery('get', 'site/contracts/cell_comment', {
+								contract_id: contractId, 
+								department_id: departmentId,
+								step_id: stepId,
+							}, 'json');
+							
+							
+							await setData(data);
+							
+							waitDetroy();
+							
+							const textarea = $(popper).find('#sendCellComment');
+							
+							$(textarea).focus();
+							
+							textarea[0].selectionStart = textarea[0].selectionEnd = textarea[0].value.length;
+							
+							$('#contractsList').one('scroll', function() {
+								// При скролле списка скрыть тултип комментариев
+								if (commentsTooltip?.destroy != undefined) commentsTooltip.destroy();
+							});
+							
+							
+							let inputCellCommentTOut;
+							$(textarea).on('input', function() {
+								clearTimeout(inputCellCommentTOut);
+								inputCellCommentTOut = setTimeout(async () => {
+									const comment = $(this).val();
+									const {data: postRes, error: postErr, status, headers} = await axiosQuery('post', 'site/contracts/cell_comment', {
+										contract_id: contractId, 
+										department_id: departmentId,
+										step_id: stepId,
+										comment,
+									}, 'json');
+									
+									if (postErr) {
+										console.log(postErr);
+										$.notify('Ошибка! Не удалось задать комментарий!', 'error');
+										return;
+									}
+									
+									if (postRes) {
+										if (comment) $(reference).append('<div class="trangled trangled-top-right"></div>');
+										else $(reference).find('.trangled').remove();
+										
+										//$.notify('Комментарий успешно сохранен!');
+										//$(this).ddrInputs('change');
+									}
+									
+								}, 500);
+							});
+						},
+						onDestroy: function() {
+							//$(cell).removeAttrib('tooltiped');
+						}
+					});*/
+				}
+			},
 		];
 		
 	}

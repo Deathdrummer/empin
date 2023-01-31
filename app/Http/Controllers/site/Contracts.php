@@ -1,5 +1,6 @@
 <?php namespace App\Http\Controllers\site;
 
+use App\Exports\ContractsExport;
 use App\Http\Controllers\Controller;
 use App\Models\Contract;
 use App\Models\ContractChat;
@@ -17,6 +18,7 @@ use App\Traits\Settingable;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Maatwebsite\Excel\Facades\Excel;
 
 class Contracts extends Controller {
 	use Renderable, Settingable;
@@ -873,6 +875,9 @@ class Contracts extends Controller {
 	
 	
 	
+	
+	
+	
 	// Редактировать ячейку
 	public function cell_edit(Request $request) {
 		[
@@ -931,6 +936,41 @@ class Contracts extends Controller {
 	}
 	
 	
+
+
+
+
+
+
+
+
+	/** Экспорт данных в Excel
+	 * @param 
+	 * @return 
+	 */
+	public function get_to_export(Request $request) {
+		$colums = $this->contract->getContractColums();
+		return $this->render('colums_to_export', compact('colums'));
+		
+	}
+	
+	/**
+	 * @param 
+	 * @return 
+	 */
+	public function set_to_export(Request $request) {
+		$data = $request->validate([
+			'contracts_ids'	=> 'required|array',
+			'colums'		=> 'required|array',
+		]);
+		
+		return Excel::download(new ContractsExport($data), 'contracts.xlsx');
+	}
+	
+
+
+
+
 
 
 

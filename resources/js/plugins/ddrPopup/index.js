@@ -55,6 +55,7 @@ window.ddrPopup = function(settings = {}, callback = false) {
 	
 	const methods = {
 		state: pr, // isClosed
+		popper: ddrPopupSelector,
 		wait(stat = true) {
 			if (stat) _showWait();
 			else _hideWait();

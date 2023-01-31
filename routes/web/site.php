@@ -327,6 +327,9 @@ Route::prefix('site')->middleware(['lang', 'isajax:site'])->group(function() {
 	Route::get('/contracts/cell_edit', [Contracts::class, 'cell_edit']);
 	Route::post('/contracts/cell_edit', [Contracts::class, 'set_cell_edit']);
 	
+	Route::get('/contracts/to_export', [Contracts::class, 'get_to_export']);
+	Route::post('/contracts/to_export', [Contracts::class, 'set_to_export']);
+	
 	
 	
 	

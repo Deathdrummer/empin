@@ -1,17 +1,23 @@
 @aware([
-	'scrollsync' =>  null,
-	'scrollstart' =>  null,
-	'scrollend' =>  null,
-	'hidescroll' =>  null,
+	'scrolled' 		=>  null,
+	'scrollsync' 	=>  null,
+	'scrollstart' 	=>  null,
+	'scrollend' 	=>  null,
+	'hidescroll' 	=>  null,
 ])
 
 
 <div
 	{{$attributes->class([
 		'ddrtable__body',
-		'ddrtable__body_scrolled' => $scrollstart || $scrollend,
+		'ddrtable__body_scrolled' 	=> $scrollstart || $scrollend || $scrolled,
 		'ddrtable__body_hidescroll' => $hidescroll
 	])}}
+	
+	@if($scrolled)
+		style="max-height: {{$scrolled}};"
+	@endif
+	
 	ddrtablebody
 	{{$scrollsync}}
 	>

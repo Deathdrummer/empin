@@ -1452,6 +1452,201 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
           }, _callee10);
         }))();
       }
+    }, {
+      name: 'Экспорт в Excel',
+      //visible: hasCheckbox && isDeptCheckbox,
+      sort: 8,
+      onClick: function onClick() {
+        return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee12() {
+          var contractsIds, _yield$ddrPopup, state, popper, wait, setTitle, setButtons, loadData, setHtml, setLHtml, dialog, close, query, onScroll, disableButtons, enableButtons, setWidth, _yield$axiosQuery10, data, error, status, headers;
+
+          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee12$(_context12) {
+            while (1) {
+              switch (_context12.prev = _context12.next) {
+                case 0:
+                  contractsIds = selectedContracts.items;
+                  _context12.next = 3;
+                  return ddrPopup({
+                    title: 'Экспорт данных в Excel',
+                    // заголовок
+                    width: 400,
+                    // ширина окна
+                    //frameOnly, // Загрузить только каркас
+                    //html, // контент
+                    //lhtml, // контент из языковых файлов
+                    buttons: ['ui.cancel', {
+                      title: 'Экспорт',
+                      variant: 'blue',
+                      action: 'exportContractsData'
+                    }] // массив кнопок
+                    //buttonsAlign, // выравнивание вправо
+                    //disabledButtons, // при старте все кнопки кроме закрытия будут disabled
+                    //closeByBackdrop, // Закрывать окно только по кнопкам [ddrpopupclose]
+                    //changeWidthAnimationDuration, // ms
+                    //buttonsGroup, // группа для кнопок
+                    //winClass, // добавить класс к модальному окну
+                    //centerMode, // контент по центру
+                    //topClose // верхняя кнопка закрыть
+
+                  });
+
+                case 3:
+                  _yield$ddrPopup = _context12.sent;
+                  state = _yield$ddrPopup.state;
+                  popper = _yield$ddrPopup.popper;
+                  wait = _yield$ddrPopup.wait;
+                  setTitle = _yield$ddrPopup.setTitle;
+                  setButtons = _yield$ddrPopup.setButtons;
+                  loadData = _yield$ddrPopup.loadData;
+                  setHtml = _yield$ddrPopup.setHtml;
+                  setLHtml = _yield$ddrPopup.setLHtml;
+                  dialog = _yield$ddrPopup.dialog;
+                  close = _yield$ddrPopup.close;
+                  query = _yield$ddrPopup.query;
+                  onScroll = _yield$ddrPopup.onScroll;
+                  disableButtons = _yield$ddrPopup.disableButtons;
+                  enableButtons = _yield$ddrPopup.enableButtons;
+                  setWidth = _yield$ddrPopup.setWidth;
+                  _context12.next = 21;
+                  return axiosQuery('get', 'site/contracts/to_export', {
+                    contracts_ids: contractsIds
+                  });
+
+                case 21:
+                  _yield$axiosQuery10 = _context12.sent;
+                  data = _yield$axiosQuery10.data;
+                  error = _yield$axiosQuery10.error;
+                  status = _yield$axiosQuery10.status;
+                  headers = _yield$axiosQuery10.headers;
+
+                  if (error) {
+                    $.notify('Ошибка! Не удалось открыть окно настроек экспорта!', 'error');
+                    console.log(error === null || error === void 0 ? void 0 : error.message, error.errors);
+                  }
+
+                  _context12.next = 29;
+                  return setHtml(data);
+
+                case 29:
+                  wait(false);
+                  $.exportContractsData = /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee11() {
+                    var colums, _yield$axiosQuery11, data, error, status, headers;
+
+                    return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee11$(_context11) {
+                      while (1) {
+                        switch (_context11.prev = _context11.next) {
+                          case 0:
+                            wait();
+                            colums = [];
+                            $(popper).find('[columtoxeport]:checked').each(function (k, item) {
+                              var field = $(item).attr('columtoxeport');
+                              colums.push(field);
+                            });
+                            _context11.next = 5;
+                            return axiosQuery('post', 'site/contracts/to_export', {
+                              contracts_ids: contractsIds,
+                              colums: colums
+                            }, 'blob');
+
+                          case 5:
+                            _yield$axiosQuery11 = _context11.sent;
+                            data = _yield$axiosQuery11.data;
+                            error = _yield$axiosQuery11.error;
+                            status = _yield$axiosQuery11.status;
+                            headers = _yield$axiosQuery11.headers;
+                            exportFile({
+                              data: data,
+                              headers: headers
+                            }, function () {
+                              wait(false);
+                            });
+
+                          case 11:
+                          case "end":
+                            return _context11.stop();
+                        }
+                      }
+                    }, _callee11);
+                  }));
+                  /*commentsTooltip = $(cell).ddrTooltip({
+                  	//cls: 'w44rem',
+                  	placement: 'bottom',
+                  	tag: 'noscroll noopen',
+                  	offset: [0 -5],
+                  	minWidth: '200px',
+                  	minHeight: '200px',
+                  	duration: [200, 200],
+                  	trigger: 'click',
+                  	wait: {
+                  		iconHeight: '40px'
+                  	},
+                  	onShow: async function({reference, popper, show, hide, destroy, waitDetroy, setContent, setData, setProps}) {
+                  		
+                  		const {data, error, status, headers} = await axiosQuery('get', 'site/contracts/cell_comment', {
+                  			contract_id: contractId, 
+                  			department_id: departmentId,
+                  			step_id: stepId,
+                  		}, 'json');
+                  		
+                  		
+                  		await setData(data);
+                  		
+                  		waitDetroy();
+                  		
+                  		const textarea = $(popper).find('#sendCellComment');
+                  		
+                  		$(textarea).focus();
+                  		
+                  		textarea[0].selectionStart = textarea[0].selectionEnd = textarea[0].value.length;
+                  		
+                  		$('#contractsList').one('scroll', function() {
+                  			// При скролле списка скрыть тултип комментариев
+                  			if (commentsTooltip?.destroy != undefined) commentsTooltip.destroy();
+                  		});
+                  		
+                  		
+                  		let inputCellCommentTOut;
+                  		$(textarea).on('input', function() {
+                  			clearTimeout(inputCellCommentTOut);
+                  			inputCellCommentTOut = setTimeout(async () => {
+                  				const comment = $(this).val();
+                  				const {data: postRes, error: postErr, status, headers} = await axiosQuery('post', 'site/contracts/cell_comment', {
+                  					contract_id: contractId, 
+                  					department_id: departmentId,
+                  					step_id: stepId,
+                  					comment,
+                  				}, 'json');
+                  				
+                  				if (postErr) {
+                  					console.log(postErr);
+                  					$.notify('Ошибка! Не удалось задать комментарий!', 'error');
+                  					return;
+                  				}
+                  				
+                  				if (postRes) {
+                  					if (comment) $(reference).append('<div class="trangled trangled-top-right"></div>');
+                  					else $(reference).find('.trangled').remove();
+                  					
+                  					//$.notify('Комментарий успешно сохранен!');
+                  					//$(this).ddrInputs('change');
+                  				}
+                  				
+                  			}, 500);
+                  		});
+                  	},
+                  	onDestroy: function() {
+                  		//$(cell).removeAttrib('tooltiped');
+                  	}
+                  });*/
+
+                case 31:
+                case "end":
+                  return _context12.stop();
+              }
+            }
+          }, _callee12);
+        }))();
+      }
     }];
   };
 }
