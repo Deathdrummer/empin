@@ -797,7 +797,7 @@
 						selection = id;
 						editSelection = null;
 						
-						let selectionTitle = $(btn).closest('tr').find('input[name="title"]').val();
+						let selectionTitle = $(btn).closest('tr').find('input[name="title"]').val() || $(btn).closest('tr').find('p').text();
 						
 						_clearCounts();
 						getList({

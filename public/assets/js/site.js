@@ -5797,7 +5797,7 @@ window.getDateFromString = function () {
     hours: d.getHours(),
     minutes: d.getMinutes(),
     seconds: d.getSeconds()
-  }; //return day+' '+monthNames[month]+' '+year+'г';
+  };
 };
 
 $.fn.ddrWatch = function () {

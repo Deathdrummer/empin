@@ -128,7 +128,7 @@ window.getDateFromString = function() {
 
     const d = new Date();
 
-     return {
+	return {
         year: d.getFullYear(),
         month: d.getMonth() + 1,
         namedMonth: monthNames[d.getMonth() + 1],
@@ -137,8 +137,6 @@ window.getDateFromString = function() {
         minutes: d.getMinutes(),
         seconds: d.getSeconds(),
     };
-    
-    //return day+' '+monthNames[month]+' '+year+'г';
 };
 
 
