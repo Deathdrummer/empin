@@ -5705,9 +5705,11 @@ window.exportFile = function () {
   var data = ops.data,
       headers = ops.headers,
       _ops$filename = ops.filename,
-      filename = _ops$filename === void 0 ? null : _ops$filename;
-  var headerContentDisp = headers["content-disposition"];
-  var fName = filename || headerContentDisp && headerContentDisp.split("filename=")[1].replace(/["']/g, "");
+      filename = _ops$filename === void 0 ? 'noname' : _ops$filename;
+  var headerContentDisp = headers["content-disposition"] || null;
+  var fName = headerContentDisp && headerContentDisp.split("filename=")[1].replace(/["']/g, "");
+  var fExt = getFileName(fName, 2);
+  var finalFileName = filename ? filename + '.' + fExt : fName;
   var contentType = headers["content-type"];
   var blob = new Blob([data], {
     contentType: contentType
@@ -5716,7 +5718,7 @@ window.exportFile = function () {
   var el = document.createElement("a");
   el.setAttribute("hidden", true);
   el.setAttribute("href", href);
-  el.setAttribute("download", fName);
+  el.setAttribute("download", finalFileName);
   el.click();
   window.URL.revokeObjectURL(blob);
   if (_.isFunction(cb)) cb();
@@ -5769,6 +5771,33 @@ $.fn.ddrScroll = function (callback) {
       $(selector).off('scroll.' + randEventHash);
     }
   };
+};
+
+window.getDateFromString = function () {
+  var monthNames = {
+    1: 'января',
+    2: 'февраля',
+    3: 'марта',
+    4: 'апреля',
+    5: 'мая',
+    6: 'июня',
+    7: 'июля',
+    8: 'августа',
+    9: 'августа',
+    10: 'октября',
+    11: 'ноября',
+    12: 'декабря'
+  };
+  var d = new Date();
+  return {
+    year: d.getFullYear(),
+    month: d.getMonth() + 1,
+    namedMonth: monthNames[d.getMonth() + 1],
+    day: d.getDate(),
+    hours: d.getHours(),
+    minutes: d.getMinutes(),
+    seconds: d.getSeconds()
+  }; //return day+' '+monthNames[month]+' '+year+'г';
 };
 
 $.fn.ddrWatch = function () {
@@ -18502,7 +18531,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                 case 29:
                   wait(false);
                   $.exportContractsData = /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee11() {
-                    var colums, _yield$axiosQuery11, data, error, status, headers;
+                    var colums, _yield$axiosQuery11, data, error, status, headers, d;
 
                     return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee11$(_context11) {
                       while (1) {
@@ -18526,14 +18555,16 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                             error = _yield$axiosQuery11.error;
                             status = _yield$axiosQuery11.status;
                             headers = _yield$axiosQuery11.headers;
+                            d = getDateFromString();
                             exportFile({
                               data: data,
-                              headers: headers
+                              headers: headers,
+                              filename: 'Договоры ' + d.day + ' ' + d.namedMonth + ' ' + d.year + 'г. в ' + d.hours + '-' + d.minutes
                             }, function () {
                               wait(false);
                             });
 
-                          case 11:
+                          case 12:
                           case "end":
                             return _context11.stop();
                         }

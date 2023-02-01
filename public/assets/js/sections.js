@@ -1530,7 +1530,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                 case 29:
                   wait(false);
                   $.exportContractsData = /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee11() {
-                    var colums, _yield$axiosQuery11, data, error, status, headers;
+                    var colums, _yield$axiosQuery11, data, error, status, headers, d;
 
                     return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee11$(_context11) {
                       while (1) {
@@ -1554,14 +1554,16 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                             error = _yield$axiosQuery11.error;
                             status = _yield$axiosQuery11.status;
                             headers = _yield$axiosQuery11.headers;
+                            d = getDateFromString();
                             exportFile({
                               data: data,
-                              headers: headers
+                              headers: headers,
+                              filename: 'Договоры ' + d.day + ' ' + d.namedMonth + ' ' + d.year + 'г. в ' + d.hours + '-' + d.minutes
                             }, function () {
                               wait(false);
                             });
 
-                          case 11:
+                          case 12:
                           case "end":
                             return _context11.stop();
                         }

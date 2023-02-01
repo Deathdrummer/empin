@@ -1024,7 +1024,9 @@ export function contextMenu(
 							colums,
 						}, 'blob');
 						
-						exportFile({data, headers,}, () => {
+						const d = getDateFromString();
+						
+						exportFile({data, headers, filename: 'Договоры '+d.day+' '+d.namedMonth+' '+d.year+'г. в '+d.hours+'-'+d.minutes}, () => {
 							wait(false);
 						});
 					}

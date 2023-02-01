@@ -51,6 +51,10 @@ class Contract {
 	];
 	
 	
+
+	
+	
+	
 	
 	public function __construct(DateTime $datetime, DepartmentService $department, UserService $user) {
 		$this->datetime = $datetime;
@@ -378,6 +382,31 @@ class Contract {
 	
 	
 	
+	
+	
+	
+	/** Получить список договоров для экспорта
+	 * @param 
+	 * @return 
+	 */
+	public function getToExport($data = []): array {
+		$res = ContractModel::select($data['colums'])->whereIn('id', $data['contracts_ids'])->get();
+		return $res->toArray();
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	/**
 	 * @param 
 	 * @return 
@@ -531,6 +560,26 @@ class Contract {
 	public function pin(Request $request) {
 		return $this->user->pinContract($request);
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	/**
+	 * @param 
+	 * @return 
+	 */
+	public function getColumsMap() {
+		return $this->allColumsMap;
+	}
+	
+	
+	
+	
 	
 	
 	

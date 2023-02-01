@@ -964,9 +964,7 @@ class Contracts extends Controller {
 			'colums'		=> 'required|array',
 		]);
 		
-		$date = Carbon::now();
-		
-		return Excel::download(new ContractsExport($data), 'contracts_'.$date.'.xlsx');
+		return Excel::download(new ContractsExport($data), 'contracts.xlsx');
 	}
 	
 

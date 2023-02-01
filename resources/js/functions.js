@@ -44,16 +44,21 @@ window.ref = function (data) {
 	AJAX экспорт файла клиенту
 */
 window.exportFile = (ops = {}, cb) => {
-	const {data, headers, filename = null} = ops;
-	const headerContentDisp = headers["content-disposition"];
-	const fName = filename || (headerContentDisp && headerContentDisp.split("filename=")[1].replace(/["']/g, ""));
+	const {data, headers, filename = 'noname'} = ops;
+	const headerContentDisp = headers["content-disposition"] || null;
+	
+	const fName = headerContentDisp && headerContentDisp.split("filename=")[1].replace(/["']/g, "");
+	const fExt = getFileName(fName, 2);
+	
+	const finalFileName = filename ? filename+'.'+fExt : fName;
+	
 	const contentType = headers["content-type"];
 	const blob = new Blob([data], {contentType});
 	const href = window.URL.createObjectURL(blob);
 	const el = document.createElement("a");
 	el.setAttribute("hidden", true);
 	el.setAttribute("href", href);
-	el.setAttribute("download", fName);
+	el.setAttribute("download", finalFileName);
 	el.click();
 	window.URL.revokeObjectURL(blob);
 	
@@ -110,6 +115,42 @@ $.fn.ddrScroll = function(callback, condition = true) {
 		}
 	}
 }
+
+
+
+
+
+
+
+
+window.getDateFromString = function() {
+    var monthNames = {1: 'января', 2: 'февраля', 3: 'марта', 4: 'апреля', 5: 'мая', 6: 'июня', 7: 'июля', 8: 'августа', 9: 'августа', 10: 'октября', 11: 'ноября', 12: 'декабря'};
+
+    const d = new Date();
+
+     return {
+        year: d.getFullYear(),
+        month: d.getMonth() + 1,
+        namedMonth: monthNames[d.getMonth() + 1],
+        day: d.getDate(),
+        hours: d.getHours(),
+        minutes: d.getMinutes(),
+        seconds: d.getSeconds(),
+    };
+    
+    //return day+' '+monthNames[month]+' '+year+'г';
+};
+
+
+
+
+
+
+
+
+
+
+
 
 
 
