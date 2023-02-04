@@ -431,6 +431,7 @@ class Contract {
 					//$res[$k][$field] = Carbon::parse($value)->locale('ru')->isoFormat('DD MMMM YYYY', 'Do MMMM');
 					$res[$k][$field] = Carbon::parse($value)->isoFormat('DD.MM.YYYY');
 				} */
+				
 			}
 		
 		}

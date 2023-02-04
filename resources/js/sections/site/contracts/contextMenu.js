@@ -1024,10 +1024,16 @@ export function contextMenu(
 							colums,
 						}, 'blob');
 						
+						if (headers['content-type'] != 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
+							$.notify('Ошибка экспорта данных', 'error');
+							wait(false);
+							return;
+						}
+						
 						const d = getDateFromString();
 						
 						exportFile({data, headers, filename: 'Договоры '+d.day+' '+d.namedMonth+' '+d.year+'г. в '+d.hours+'-'+d.minutes}, () => {
-							wait(false);
+							close();
 						});
 					}
 					

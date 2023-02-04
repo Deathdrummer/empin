@@ -969,6 +969,7 @@ class Contracts extends Controller {
 			'colums'		=> 'required|array',
 		]);
 		
+		
 		return Excel::download(new ContractsExport($contractsIds, $colums), 'contracts.xlsx');
 	}
 	

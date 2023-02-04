@@ -15,9 +15,11 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use Maatwebsite\Excel\Concerns\WithBackgroundColor;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use Maatwebsite\Excel\Events\AfterSheet;
+use Maatwebsite\Excel\Concerns\WithEvents;
 
 
-class ContractsExport extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBinder implements FromArray , WithStyles/*, WithColumnWidths, WithDefaultStyles, WithBackgroundColor */ {
+class ContractsExport extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBinder implements FromArray, WithStyles, WithEvents/*, WithColumnWidths, WithDefaultStyles, WithBackgroundColor */ {
 		
 	use Settingable;
 	
@@ -41,6 +43,9 @@ class ContractsExport extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBinder i
 	
 	
 	
+	
+	
+	
 	/**
     * @return \Illuminate\Support\Array
     */
@@ -56,6 +61,36 @@ class ContractsExport extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBinder i
 	
 	
 	
+	
+	
+	
+	
+	
+	/**
+     * @return array
+     */
+    public function registerEvents(): array {
+        return [
+            // Handle by a closure.
+            /* BeforeImport::class => function(BeforeImport $event) {
+                $creator = $event->reader->getProperties()->getCreator();
+            }, */
+			
+		   
+            // Using a class with an __invoke method.
+            //BeforeSheet::class => new BeforeSheetHandler(),
+            
+            // Array callable, refering to a static method.
+            AfterSheet::class => [self::class, 'afterSheet'],
+                        
+        ];
+    }
+	
+	
+	public static function afterSheet(AfterSheet $event)  {
+        $workSheet = $event->sheet->getDelegate();
+		$workSheet->freezePane('A2'); // freezing here
+    }
 	
 	
 	

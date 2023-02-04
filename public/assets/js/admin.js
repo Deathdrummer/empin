@@ -5828,7 +5828,7 @@ window.ref = function (data) {
   var proxy = new Proxy(target, {
     get: function get(target, prop) {
       if (prop in target) {
-        if (isNumeric(target[prop])) return Number(target[prop]);
+        if (_.isNumber(target[prop])) return Number(target[prop]);
         return target[prop];
       } else {
         return null;
@@ -15696,16 +15696,27 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                             error = _yield$axiosQuery11.error;
                             status = _yield$axiosQuery11.status;
                             headers = _yield$axiosQuery11.headers;
+
+                            if (!(headers['content-type'] != 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')) {
+                              _context11.next = 14;
+                              break;
+                            }
+
+                            $.notify('Ошибка экспорта данных', 'error');
+                            wait(false);
+                            return _context11.abrupt("return");
+
+                          case 14:
                             d = getDateFromString();
                             exportFile({
                               data: data,
                               headers: headers,
                               filename: 'Договоры ' + d.day + ' ' + d.namedMonth + ' ' + d.year + 'г. в ' + d.hours + '-' + d.minutes
                             }, function () {
-                              wait(false);
+                              close();
                             });
 
-                          case 12:
+                          case 16:
                           case "end":
                             return _context11.stop();
                         }

@@ -25,7 +25,7 @@ window.ref = function (data) {
 	let proxy = new Proxy(target, {
 		get(target, prop) {
 			if (prop in target) {
-				if (isNumeric(target[prop])) return Number(target[prop]);
+				if (_.isNumber(target[prop])) return Number(target[prop]);
 				return target[prop];
 			} else {
 				return null;
