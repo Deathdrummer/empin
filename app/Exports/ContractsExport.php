@@ -70,8 +70,6 @@ class ContractsExport extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBinder i
 		
 		
 		
-		
-		
 		// global
 		$sheet->getDefaultRowDimension()->setRowHeight(45);
 		
@@ -92,9 +90,6 @@ class ContractsExport extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBinder i
 			->getFill()
     		->setFillType(Fill::FILL_SOLID)
     		->getStartColor()->setRGB('FEFFF1');
-		
-		
-		
 		
 		
 		
