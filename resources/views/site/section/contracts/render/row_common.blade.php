@@ -221,6 +221,14 @@
 			@endif
 		</x-table.td>
 	@endif
+	
+	@if($column == 'gen_percent' && auth('site')->user()->can('contract-col-gen_percent:site'))
+		<x-table.td class="h-center" commonlist contextedit="-">
+			@if(isset($gen_percent) && $gen_percent)
+				<p class="fz12px" edittedplace="-">{{$gen_percent ?? '-'}}</p>
+			@endif
+		</x-table.td>
+	@endif
 
 	@if($column == 'type' && auth('site')->user()->can('contract-col-type:site'))
 		<x-table.td class="h-center breakword" commonlist contextedit="{{$id}},{{$column}},4">

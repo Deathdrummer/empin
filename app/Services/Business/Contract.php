@@ -44,6 +44,7 @@ class Contract {
 		'hoz_method' 		=> 'Хоз способ',
 		'subcontracting' 	=> 'Субподряд',
 		'gencontracting' 	=> 'Генподряд',
+		'gen_percent' 		=> 'Генподрядный процент',
 		'date_close' 	 	=> 'Дата закрытия договора',
 		'archive_dir' 		=> 'Архивная папка',
 		'period' 			=> 'Срок исполнения договора',
@@ -389,9 +390,52 @@ class Contract {
 	 * @param 
 	 * @return 
 	 */
-	public function getToExport($data = []): array {
-		$res = ContractModel::select($data['colums'])->whereIn('id', $data['contracts_ids'])->get();
-		return $res->toArray();
+	public function getToExport($contractsIds = [], $colums = []): array {
+		$res = ContractModel::select($colums)->whereIn('id', $contractsIds)
+			->get()
+			->toArray();
+		
+		['contractor' => $contractor, 'customer' => $customer, 'type' => $type] = $this->getSettings([[
+				'setting'	=> 'contract-customers:customer',
+				'key'		=> 'id',
+				'value'		=> 'name'
+			], [
+				'setting'	=> 'contract-types:type',
+				'key'		=> 'id',
+				'value'		=> 'title'
+			], [
+				'setting'	=> 'contract-contractors:contractor',
+				'key'		=> 'id',
+				'value'		=> 'name'
+			]
+		]);
+		
+		foreach ($res as $k => $row) {
+			if (in_array('contractor', array_keys($row))) $res[$k]['contractor'] = $customer[$row['contractor']] ?? 'Несуществующий исполнитель';
+			if (in_array('customer', array_keys($row))) $res[$k]['customer'] = $customer[$row['customer']] ?? 'Несуществующий заказчик';
+			if (in_array('type', array_keys($row))) $res[$k]['type'] = $customer[$row['type']] ?? 'Несуществующий тип договора';
+			
+			
+			foreach ($row as $field => $value) {
+				if (in_array($field, ['date_start', 'date_end', 'date_gen_start', 'date_gen_end', 'date_sub_start', 'date_sub_end', 'date_close', 'date_buy'])) {
+					//$res[$k][$field] = Carbon::parse($value)->locale('ru')->isoFormat('DD MMMM YYYY', 'Do MMMM');
+					$res[$k][$field] = Carbon::parse($value)->isoFormat('DD.MM.YYYY');
+				}
+				
+				if (in_array($field, ['without_buy', 'subcontracting', 'gencontracting', 'hoz_method'])) {
+					//$res[$k][$field] = Carbon::parse($value)->locale('ru')->isoFormat('DD MMMM YYYY', 'Do MMMM');
+					$res[$k][$field] = $value ? 'P' : null;
+				}
+				
+				/* if (in_array($field, ['price_nds', 'price'])) {
+					//$res[$k][$field] = Carbon::parse($value)->locale('ru')->isoFormat('DD MMMM YYYY', 'Do MMMM');
+					$res[$k][$field] = Carbon::parse($value)->isoFormat('DD.MM.YYYY');
+				} */
+			}
+		
+		}
+		
+		return $res;
 	}
 	
 	
@@ -573,8 +617,15 @@ class Contract {
 	 * @param 
 	 * @return 
 	 */
-	public function getColumsMap() {
-		return $this->allColumsMap;
+	public function getColumsMap($colums = null) {
+		if (is_null($colums)) return $this->allColumsMap;
+		
+		$intersectedColums = [];
+		foreach ($colums as $field) {
+			$intersectedColums[$field] = $this->allColumsMap[$field] ?? null;
+		}
+		
+		return $intersectedColums;
 	}
 	
 	

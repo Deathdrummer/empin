@@ -277,6 +277,16 @@
 									</x-table.td>
 								@endif
 								
+								@if($column == 'gen_percent' && auth('site')->user()->can('contract-col-gen_percent:site'))
+									<x-table.td
+										class="w6rem sort{{$sortField == 'gen_percent' ? ' sort-'.$sortOrder : ''}}"
+										onclick="$.sorting(this, 'gen_percent')"
+										noscroll
+										ddrtabletdmain
+										><strong class="fz10px lh90 d-block text-center wodrbreak">Генподрядный процент</strong>
+									</x-table.td>
+								@endif
+								
 								@if($column == 'type' && auth('site')->user()->can('contract-col-type:site'))
 									<x-table.td
 										style="width:{{isset($listWidth['type']) ? $listWidth['type'] : '80'}}px;"
