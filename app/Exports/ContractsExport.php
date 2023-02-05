@@ -17,30 +17,46 @@ use Maatwebsite\Excel\Concerns\WithStyles;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use Maatwebsite\Excel\Events\AfterSheet;
 use Maatwebsite\Excel\Concerns\WithEvents;
+use Maatwebsite\Excel\Concerns\WithProperties;
+use Maatwebsite\Excel\Concerns\WithTitle;
 
 
-class ContractsExport extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBinder implements FromArray, WithStyles, WithEvents/*, WithColumnWidths, WithDefaultStyles, WithBackgroundColor */ {
+class ContractsExport extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBinder implements FromArray, WithStyles, WithEvents, WithProperties, WithTitle/*, WithColumnWidths, WithDefaultStyles, WithBackgroundColor */ {
 		
 	use Settingable;
 	
 	private $colums = [];
-	//private $contractsIds = [];
 	private $contractsList = [];
 	private $columsNames = [];
 	
 	
 	
-	public function __construct($contractsIds, $colums) {
+	public function __construct($params) {
+		[
+			'contracts_ids' => $contractsIds,
+			'colums' 		=> $colums,
+			'sort'			=> $sort,
+			'order'			=> $order,
+		] = $params;
+		
 		$this->contract = app()->make(Contract::class);
 		
 		$this->colums = $colums;
-        //$this->contractsIds = $contractsIds;
         
-		$this->contractsList = $this->contract->getToExport($contractsIds, $colums);
+		$this->contractsList = $this->contract->getToExport($contractsIds, $colums, $sort, $order);
 		$this->columsNames = $this->contract->getColumsMap($colums);
     }
 	
 	
+	
+	
+	
+	/** Задать аназвание вкладки
+     * @return string
+     */
+    public function title(): string {
+        return 'Список договоров';
+    }
 	
 	
 	
@@ -58,6 +74,18 @@ class ContractsExport extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBinder i
 	
 	
 	
+	
+	
+	
+	
+	public function properties(): array {
+        return [
+            'creator'        => 'Empin',
+            'title'          => 'Empin договоры',
+            'description'    => 'Список договоров',
+            'company'        => 'Empin',
+        ];
+    }
 	
 	
 	
@@ -86,7 +114,7 @@ class ContractsExport extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBinder i
 	/**
     * @return \Illuminate\Support\Array
     */
-	public function styles(Worksheet $sheet): void {
+	public function styles(Worksheet $sheet): array {
 		[$colsInfo, $lastColCoord] = $this->getColumsInfo();
 		$lastRow = count($this->contractsList) + 1;
 		
@@ -110,10 +138,10 @@ class ContractsExport extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBinder i
 			->getAllBorders()
     		->setBorderStyle(Border::BORDER_THIN);
 		
-		$sheet->getStyle('A1:'.$lastColCoord.'1')
+		/* $sheet->getStyle('A1:'.$lastColCoord.'1')
 			->getFill()
     		->setFillType(Fill::FILL_SOLID)
-    		->getStartColor()->setRGB('FEFFF1');
+    		->getStartColor()->setRGB('FEFFF1'); */
 		
 		
 		
@@ -159,6 +187,14 @@ class ContractsExport extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBinder i
 		for ($row = 2; $row <= $lastRow; $row++) {
 			$sheet->getRowDimension($row)->setRowHeight(45);
 		}
+		
+		
+		return [
+			1	=>	['fill' => [
+                'fillType'   => Fill::FILL_SOLID,
+                'startColor' => ['rgb' => 'FEFFF1'],
+            ],
+		]];
 	}
 	
 	

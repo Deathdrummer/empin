@@ -961,16 +961,14 @@ class Contracts extends Controller {
 	 * @return 
 	 */
 	public function set_to_export(Request $request) {
-		[
-			'contracts_ids' => $contractsIds,
-			'colums' => $colums,
-		] = $request->validate([
+		$params = $request->validate([
 			'contracts_ids'	=> 'required|array',
 			'colums'		=> 'required|array',
+			'sort'			=> 'required|string',
+			'order'			=> 'required|string',
 		]);
 		
-		
-		return Excel::download(new ContractsExport($contractsIds, $colums), 'contracts.xlsx');
+		return Excel::download(new ContractsExport($params), 'contracts.xlsx');
 	}
 	
 

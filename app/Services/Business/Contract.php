@@ -390,8 +390,9 @@ class Contract {
 	 * @param 
 	 * @return 
 	 */
-	public function getToExport($contractsIds = [], $colums = []): array {
+	public function getToExport($contractsIds = [], $colums = [], $sort = 'id' , $order = 'ASC'): array {
 		$res = ContractModel::select($colums)->whereIn('id', $contractsIds)
+			->orderBy($sort, $order)
 			->get()
 			->toArray();
 		

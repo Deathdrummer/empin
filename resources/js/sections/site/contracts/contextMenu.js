@@ -1019,9 +1019,14 @@ export function contextMenu(
 							colums.push(field);
 						});
 						
+						const sort = ddrStore('site-contracts-sortfield') || 'id',
+							order =  ddrStore('site-contracts-sortorder') || 'ASC';
+						
 						const {data, error, status, headers} = await axiosQuery('post', 'site/contracts/to_export', {
 							contracts_ids: contractsIds,
 							colums,
+							sort,
+							order,
 						}, 'blob');
 						
 						if (headers['content-type'] != 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {

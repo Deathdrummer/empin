@@ -15672,7 +15672,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                 case 29:
                   wait(false);
                   $.exportContractsData = /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee11() {
-                    var colums, _yield$axiosQuery11, data, error, status, headers, d;
+                    var colums, sort, order, _yield$axiosQuery11, data, error, status, headers, d;
 
                     return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee11$(_context11) {
                       while (1) {
@@ -15684,13 +15684,16 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                               var field = $(item).attr('columtoxeport');
                               colums.push(field);
                             });
-                            _context11.next = 5;
+                            sort = ddrStore('site-contracts-sortfield') || 'id', order = ddrStore('site-contracts-sortorder') || 'ASC';
+                            _context11.next = 6;
                             return axiosQuery('post', 'site/contracts/to_export', {
                               contracts_ids: contractsIds,
-                              colums: colums
+                              colums: colums,
+                              sort: sort,
+                              order: order
                             }, 'blob');
 
-                          case 5:
+                          case 6:
                             _yield$axiosQuery11 = _context11.sent;
                             data = _yield$axiosQuery11.data;
                             error = _yield$axiosQuery11.error;
@@ -15698,7 +15701,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                             headers = _yield$axiosQuery11.headers;
 
                             if (!(headers['content-type'] != 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')) {
-                              _context11.next = 14;
+                              _context11.next = 15;
                               break;
                             }
 
@@ -15706,7 +15709,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                             wait(false);
                             return _context11.abrupt("return");
 
-                          case 14:
+                          case 15:
                             d = getDateFromString();
                             exportFile({
                               data: data,
@@ -15716,7 +15719,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                               close();
                             });
 
-                          case 16:
+                          case 17:
                           case "end":
                             return _context11.stop();
                         }
