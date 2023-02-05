@@ -64,32 +64,19 @@ class ContractsExport extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBinder i
 	
 	
 	
-	
-	
 	/**
      * @return array
      */
     public function registerEvents(): array {
         return [
-            // Handle by a closure.
-            /* BeforeImport::class => function(BeforeImport $event) {
-                $creator = $event->reader->getProperties()->getCreator();
-            }, */
-			
-		   
-            // Using a class with an __invoke method.
-            //BeforeSheet::class => new BeforeSheetHandler(),
-            
-            // Array callable, refering to a static method.
-            AfterSheet::class => [self::class, 'afterSheet'],
-                        
+            AfterSheet::class => [self::class, 'afterSheet'],          
         ];
     }
 	
 	
 	public static function afterSheet(AfterSheet $event)  {
         $workSheet = $event->sheet->getDelegate();
-		$workSheet->freezePane('A2'); // freezing here
+		$workSheet->freezePane('A2');
     }
 	
 	
@@ -107,6 +94,8 @@ class ContractsExport extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBinder i
 		
 		// global
 		$sheet->getDefaultRowDimension()->setRowHeight(45);
+		
+		$sheet->getRowDimension('1')->setRowHeight(60);
 		
 		$sheet->getStyle('1:'.$lastRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 		$sheet->getStyle('1:'.$lastRow)->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
