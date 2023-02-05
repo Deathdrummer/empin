@@ -93,9 +93,9 @@ class ContractsExport extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBinder i
 		
 		
 		// global
-		$sheet->getDefaultRowDimension()->setRowHeight(45);
 		
 		$sheet->getRowDimension('1')->setRowHeight(60);
+		//$sheet->getDefaultRowDimension()->setRowHeight(45);
 		
 		$sheet->getStyle('1:'.$lastRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 		$sheet->getStyle('1:'.$lastRow)->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
@@ -152,6 +152,12 @@ class ContractsExport extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBinder i
 					->getNumberFormat()
 					->setFormatCode('#,##0.00_-"%"');
 			}
+		}
+		
+		
+		// rows
+		for ($row = 2; $row <= $lastRow; $row++) {
+			$sheet->getRowDimension($row)->setRowHeight(45);
 		}
 	}
 	
