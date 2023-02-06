@@ -3,11 +3,12 @@
 		<x-table.head noborder scrollfix>
 			<x-table.tr noborder class="h3rem">
 				<x-table.td class="w100" noborder><strong class="fz14px">Название столбца</strong></x-table.td>
-				<x-table.td class="w4rem h-center" noborder></x-table.td>
-				
+				<x-table.td class="w4rem h-center" noborder>
+					<i class="fa-solid fa-check-double fz16px mr15px pointer color-gray-500 color-blue-hovered" onclick="$.selectAllChecks();" title="Выделить все\снять выделение"></i>
+				</x-table.td>
 			</x-table.tr>
 		</x-table.head>
-		<x-table.body scrolled="30rem">	
+		<x-table.body scrolled="calc(100vh - 200px)" id="excelColumsList">	
 			@forelse($colums as $field => $column)
 				@if(auth('site')->user()->can('contract-col-'.$field.':site'))
 					<x-table.tr class="h4rem">

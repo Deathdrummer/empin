@@ -123,20 +123,39 @@ $.fn.ddrScroll = function(callback, condition = true) {
 
 
 
-window.getDateFromString = function() {
+window.ddrDateBuilder = function(dateStr = false) {
     var monthNames = {1: 'января', 2: 'февраля', 3: 'марта', 4: 'апреля', 5: 'мая', 6: 'июня', 7: 'июля', 8: 'августа', 9: 'августа', 10: 'октября', 11: 'ноября', 12: 'декабря'};
 
-    const d = new Date();
+    const d = dateStr ? new Date(dateStr) : new Date();
+    
+    const year = {
+    	short: d.getFullYear().toString().substr(-2),
+    	full: d.getFullYear(),
+    };
+    
+    const month = {
+    	short: d.getMonth() + 1,
+    	zero: addZero(d.getMonth() + 1),
+    	named: monthNames[d.getMonth() + 1],
+    };
+    
+    const day = {
+    	short: d.getDate(),
+    	zero: addZero(d.getDate()),
+    };
+    
 
 	return {
-        year: d.getFullYear(),
-        month: d.getMonth() + 1,
-        namedMonth: monthNames[d.getMonth() + 1],
-        day: d.getDate(),
+		year,
+		month,
+		day,
         hours: d.getHours(),
         minutes: d.getMinutes(),
         seconds: d.getSeconds(),
     };
+    
+    
+    
 };
 
 

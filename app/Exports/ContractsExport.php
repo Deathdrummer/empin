@@ -132,11 +132,24 @@ class ContractsExport extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBinder i
 		$sheet->getStyle('A1:'.$lastColCoord.'1')->getFont()->setSize(10)->setBold(true);
 		$sheet->getStyle('A2:'.$lastColCoord.$lastRow)->getFont()->setSize(10);
 		
+		#d1d0d1
 		
-		$sheet->getStyle('A1:'.$lastColCoord.'1')
+		$sheet->getStyle('A1:'.$lastColCoord.$lastRow)->applyFromArray([
+			'borders' => [
+				'allBorders' => [
+					'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+					'color' => ['argb' => 'FFD1D0D1'],
+				],
+			],
+		]);
+		
+		
+		
+		/* $sheet->getStyle('A1:'.$lastColCoord.'1')
 			->getBorders()
 			->getAllBorders()
-    		->setBorderStyle(Border::BORDER_THIN);
+    		->setBorderStyle(Border::BORDER_THIN)
+			->setColor('Black'); */
 		
 		/* $sheet->getStyle('A1:'.$lastColCoord.'1')
 			->getFill()

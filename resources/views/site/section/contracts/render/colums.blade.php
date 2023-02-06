@@ -3,8 +3,9 @@
 		<x-table.tr noborder class="h3rem">
 			<x-table.td class="w4rem" noborder></x-table.td>
 			<x-table.td class="w100" noborder><strong class="fz14px">Название столбца</strong></x-table.td>
-			<x-table.td class="w4rem h-center" noborder><i class="fa-solid fa-eye"></i></x-table.td>
-			
+			<x-table.td class="w4rem h-center" noborder>
+				<i class="fa-solid fa-check-double fz16px mr5px pointer color-gray-500 color-blue-hovered" onclick="$.selectAllChecks();" title="Выделить все\снять выделение"></i>
+			</x-table.td>
 		</x-table.tr>
 	</x-table.head>
 	<x-table.body id="contractColumnList">	

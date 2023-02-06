@@ -956,6 +956,15 @@
 						//handle: ".handle"
 					});
 					
+					
+					let selectAllChecksStat = false;
+					$.selectAllChecks = () => {
+						$('#contractColumnList').find('[contractcolumn]').ddrInputs('checked', !selectAllChecksStat ? true : false);
+						selectAllChecksStat = !selectAllChecksStat;
+					};
+					
+					
+					
 					/*$('#contractColumnList').sortable({
 						animation: 150,
 						invertSwap: true,

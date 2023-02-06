@@ -982,7 +982,7 @@ export function contextMenu(
 						//frameOnly, // Загрузить только каркас
 						//html, // контент
 						//lhtml, // контент из языковых файлов
-						buttons: ['ui.cancel', {title: 'Экспорт', variant: 'blue', action: 'exportContractsData'}], // массив кнопок
+						buttons: ['ui.cancel', {title: 'Экспорт', variant: 'blue', action: 'exportContractsData', id: 'exportContractsData'}], // массив кнопок
 						//buttonsAlign, // выравнивание вправо
 						//disabledButtons, // при старте все кнопки кроме закрытия будут disabled
 						//closeByBackdrop, // Закрывать окно только по кнопкам [ddrpopupclose]
@@ -1006,9 +1006,32 @@ export function contextMenu(
 					
 					await setHtml(data);
 					
-					
-					
 					wait(false);
+					
+					
+					let selectAllChecksStat = false;
+					$.selectAllChecks = () => {
+						$('#excelColumsList').find('[columtoxeport]').ddrInputs('checked', !selectAllChecksStat ? true : false);
+						selectAllChecksStat = !selectAllChecksStat;
+						checkCountChecked()
+					};
+					
+					
+					$('#excelColumsList').find('[columtoxeport]').on('change', function() {
+						checkCountChecked()
+					});
+					
+					
+					function checkCountChecked() {
+						let countChecked = $('#excelColumsList').find('[columtoxeport]:checked').length;
+						if (countChecked) {
+							$('#exportContractsData').ddrInputs('enable');
+						} else {
+							$('#exportContractsData').ddrInputs('disable');
+						}
+					}
+					
+					
 					
 					
 					$.exportContractsData = async () => {
@@ -1035,89 +1058,12 @@ export function contextMenu(
 							return;
 						}
 						
-						const d = getDateFromString();
+						const d = ddrDateBuilder();
 						
-						exportFile({data, headers, filename: 'Договоры '+d.day+' '+d.namedMonth+' '+d.year+'г. в '+d.hours+'-'+d.minutes}, () => {
+						exportFile({data, headers, filename: 'Договоры_'+d.day.zero+'.'+d.month.zero+'.'+d.year.full}, () => {
 							close();
 						});
 					}
-					
-					
-					
-					
-					
-					
-					
-					/*commentsTooltip = $(cell).ddrTooltip({
-						//cls: 'w44rem',
-						placement: 'bottom',
-						tag: 'noscroll noopen',
-						offset: [0 -5],
-						minWidth: '200px',
-						minHeight: '200px',
-						duration: [200, 200],
-						trigger: 'click',
-						wait: {
-							iconHeight: '40px'
-						},
-						onShow: async function({reference, popper, show, hide, destroy, waitDetroy, setContent, setData, setProps}) {
-							
-							const {data, error, status, headers} = await axiosQuery('get', 'site/contracts/cell_comment', {
-								contract_id: contractId, 
-								department_id: departmentId,
-								step_id: stepId,
-							}, 'json');
-							
-							
-							await setData(data);
-							
-							waitDetroy();
-							
-							const textarea = $(popper).find('#sendCellComment');
-							
-							$(textarea).focus();
-							
-							textarea[0].selectionStart = textarea[0].selectionEnd = textarea[0].value.length;
-							
-							$('#contractsList').one('scroll', function() {
-								// При скролле списка скрыть тултип комментариев
-								if (commentsTooltip?.destroy != undefined) commentsTooltip.destroy();
-							});
-							
-							
-							let inputCellCommentTOut;
-							$(textarea).on('input', function() {
-								clearTimeout(inputCellCommentTOut);
-								inputCellCommentTOut = setTimeout(async () => {
-									const comment = $(this).val();
-									const {data: postRes, error: postErr, status, headers} = await axiosQuery('post', 'site/contracts/cell_comment', {
-										contract_id: contractId, 
-										department_id: departmentId,
-										step_id: stepId,
-										comment,
-									}, 'json');
-									
-									if (postErr) {
-										console.log(postErr);
-										$.notify('Ошибка! Не удалось задать комментарий!', 'error');
-										return;
-									}
-									
-									if (postRes) {
-										if (comment) $(reference).append('<div class="trangled trangled-top-right"></div>');
-										else $(reference).find('.trangled').remove();
-										
-										//$.notify('Комментарий успешно сохранен!');
-										//$(this).ddrInputs('change');
-									}
-									
-								}, 500);
-							});
-						},
-						onDestroy: function() {
-							//$(cell).removeAttrib('tooltiped');
-						}
-					});*/
 				}
 			},
 		];
