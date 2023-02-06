@@ -122,8 +122,8 @@ class ContractsExport extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBinder i
 		
 		// global
 		
-		$sheet->getRowDimension('1')->setRowHeight(60);
 		//$sheet->getDefaultRowDimension()->setRowHeight(45);
+		$sheet->getRowDimension('1')->setRowHeight(60);
 		
 		$sheet->getStyle('1:'.$lastRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 		$sheet->getStyle('1:'.$lastRow)->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);

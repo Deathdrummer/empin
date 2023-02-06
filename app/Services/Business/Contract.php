@@ -391,7 +391,8 @@ class Contract {
 	 * @return 
 	 */
 	public function getToExport($contractsIds = [], $colums = [], $sort = 'id' , $order = 'ASC'): array {
-		$res = ContractModel::select($colums)->whereIn('id', $contractsIds)
+		
+		$res = ContractModel::select([...$colums, 'without_buy'])->whereIn('id', $contractsIds)
 			->orderBy($sort, $order)
 			->get()
 			->toArray();
@@ -411,27 +412,45 @@ class Contract {
 			]
 		]);
 		
+		$hiddenFields = ['without_buy']; // Удалить поля, которые не нужно выводить
+		
+		
 		foreach ($res as $k => $row) {
-			if (in_array('contractor', array_keys($row))) $res[$k]['contractor'] = $customer[$row['contractor']] ?? 'Несуществующий исполнитель';
+			if (in_array('contractor', array_keys($row))) $res[$k]['contractor'] = $contractor[$row['contractor']] ?? 'Несуществующий исполнитель';
 			if (in_array('customer', array_keys($row))) $res[$k]['customer'] = $customer[$row['customer']] ?? 'Несуществующий заказчик';
 			if (in_array('type', array_keys($row))) $res[$k]['type'] = $customer[$row['type']] ?? 'Несуществующий тип договора';
 			
 			
-			foreach ($row as $field => $value) {
-				if (in_array($field, ['date_start', 'date_end', 'date_gen_start', 'date_gen_end', 'date_sub_start', 'date_sub_end', 'date_close', 'date_buy'])) {
-					//$res[$k][$field] = Carbon::parse($value)->locale('ru')->isoFormat('DD MMMM YYYY', 'Do MMMM');
-					$res[$k][$field] = Carbon::parse($value)->isoFormat('DD.MM.YYYY');
+			foreach ($row as $column => $value) {
+				if (in_array($column, ['date_start', 'date_end', 'date_gen_start', 'date_gen_end', 'date_sub_start', 'date_sub_end', 'date_close', 'date_buy'])) {
+					//$res[$k][$column] = Carbon::parse($value)->locale('ru')->isoFormat('DD MMMM YYYY', 'Do MMMM');
+					
+					$date = $value ? Carbon::parse($value)->isoFormat('DD.MM.YYYY') : false;
+					
+					if (!$date && $column == 'date_gen_start' && !$row['subcontracting']) $date = 'НЕТ';
+					if (!$date && $column == 'date_gen_end' && !$row['subcontracting']) $date = 'НЕТ';
+					if (!$date && $column == 'date_sub_start' && !$row['gencontracting']) $date = 'НЕТ';
+					if (!$date && $column == 'date_sub_end' && !$row['gencontracting']) $date = 'НЕТ';
+					if (!$date && $column == 'date_buy' && $row['without_buy']) $date = 'БЕЗ ЗАКУПКИ';
+					
+					
+					if (!$date) $date = '-';
+					
+					
+					$res[$k][$column] = $date;
 				}
 				
-				if (in_array($field, ['without_buy', 'subcontracting', 'gencontracting', 'hoz_method'])) {
-					//$res[$k][$field] = Carbon::parse($value)->locale('ru')->isoFormat('DD MMMM YYYY', 'Do MMMM');
-					$res[$k][$field] = $value ? 'P' : null;
+				if (in_array($column, ['subcontracting', 'gencontracting', 'hoz_method'])) {
+					//$res[$k][$column] = Carbon::parse($value)->locale('ru')->isoFormat('DD MMMM YYYY', 'Do MMMM');
+					$res[$k][$column] = $value ? 'P' : null;
 				}
 				
-				/* if (in_array($field, ['price_nds', 'price'])) {
-					//$res[$k][$field] = Carbon::parse($value)->locale('ru')->isoFormat('DD MMMM YYYY', 'Do MMMM');
-					$res[$k][$field] = Carbon::parse($value)->isoFormat('DD.MM.YYYY');
+				/* if (in_array($column, ['price_nds', 'price'])) {
+					//$res[$k][$column] = Carbon::parse($value)->locale('ru')->isoFormat('DD MMMM YYYY', 'Do MMMM');
+					$res[$k][$column] = Carbon::parse($value)->isoFormat('DD.MM.YYYY');
 				} */
+				
+				$res[$k] = array_diff_key($res[$k], array_flip($hiddenFields)); // Удалить поля, которые не нужно выводить
 				
 			}
 		
