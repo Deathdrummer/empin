@@ -10,7 +10,7 @@ export function contextMenu(
 	
 	let commentsTooltip, cellEditTooltip;
 	$.contractContextMenu = (
-		{target, closeOnScroll, onContextMenu, changeAttrData, buildTitle},
+		{target, closeOnScroll, onContextMenu, onCloseContextMenu, changeAttrData, buildTitle},
 		contractId,
 		departmentId,
 		selectionId,
@@ -66,6 +66,11 @@ export function contextMenu(
 			
 			if (commentsTooltip?.destroy != undefined) commentsTooltip.destroy();
 			if (cellEditTooltip?.destroy != undefined) cellEditTooltip.destroy();
+		});
+		
+		
+		onCloseContextMenu(() => {
+			haSContextMenu.value = false;
 		});
 		
 		
@@ -325,7 +330,10 @@ export function contextMenu(
 							name: item.title,
 							//faIcon: 'fa-solid fa-clipboard-check',
 							disabled: !!item.choosed,
-							onClick(selector) {
+							async onClick(selector) {
+								
+								console.log('Добавить в подборку', selector);
+								
 								let selectionId = item.id;
 								
 								let procNotif = processNotify(buildTitle(countSelected, 'Добавление # % в подборку...', ['договора', 'договоров', 'договоров']));
@@ -342,16 +350,18 @@ export function contextMenu(
 									method = 'add_contracts';
 								}
 								
-								axiosQuery('put', 'site/selections/'+method, params)
-								.then(({data, error, status, headers}) => {
-									if (error) {
-										procNotif.error({message: 'Ошибка добавления в подборку!'});
-										console.log(error?.message, error.errors);
-									} else {
-										let contractTitle = countSelected == 1 ? ' '+objectNumber+' '+title : '';
-										procNotif.done({message: buildTitle(countSelected, '%'+contractTitle+' успешно добавлен в подборку!', '# % успешно добавлены в подборку!', ['Договор', 'договора', 'договоров'])});
-									}
-								});
+								const {data, error, status, headers} = await axiosQuery('put', 'site/selections/'+method, params);
+								
+								if (error) {
+									procNotif.error({message: 'Ошибка добавления в подборку!'});
+									console.log(error?.message, error.errors);
+									return;
+								} 
+								
+								if (data) {
+									let contractTitle = countSelected == 1 ? ' '+objectNumber+' '+title : '';
+									procNotif.done({message: buildTitle(countSelected, '%'+contractTitle+' успешно добавлен в подборку!', '# % успешно добавлены в подборку!', ['Договор', 'договора', 'договоров'])});
+								}
 							}
 						};
 					}
@@ -468,7 +478,7 @@ export function contextMenu(
 				}
 			}, {
 				name: 'Отправить в другой отдел',
-				enabled: selectedContracts.items.length > 1 || (!!hasDepsToSend && ((canSending && departmentId) || (canSendingAll && !departmentId))),
+				enabled: countSelected > 1 || (!!hasDepsToSend && ((canSending && departmentId) || (canSendingAll && !departmentId))),
 				hidden: isArchive || !isCommon,
 				countLeft: countSelected > 1 ? countSelected : null,
 				sort: 4,
@@ -955,7 +965,7 @@ export function contextMenu(
 				}
 			}, {
 				name: 'Экспорт в Excel',
-				//visible: hasCheckbox && isDeptCheckbox,
+				visible: countSelected,
 				sort: 8,
 				async onClick() {
 					let contractsIds = selectedContracts.items;
@@ -979,20 +989,10 @@ export function contextMenu(
 					} = await ddrPopup({
 						title: 'Экспорт данных в Excel', // заголовок
 						width: 400, // ширина окна
-						//frameOnly, // Загрузить только каркас
-						//html, // контент
-						//lhtml, // контент из языковых файлов
 						buttons: ['ui.cancel', {title: 'Экспорт', variant: 'blue', action: 'exportContractsData', id: 'exportContractsData'}], // массив кнопок
-						//buttonsAlign, // выравнивание вправо
-						//disabledButtons, // при старте все кнопки кроме закрытия будут disabled
-						//closeByBackdrop, // Закрывать окно только по кнопкам [ddrpopupclose]
-						//changeWidthAnimationDuration, // ms
-						//buttonsGroup, // группа для кнопок
-						//winClass, // добавить класс к модальному окну
-						//centerMode, // контент по центру
-						//topClose // верхняя кнопка закрыть
 					});
 					
+					wait();
 					
 					const {data, error, status, headers} = await axiosQuery('get', 'site/contracts/to_export', {
 						contracts_ids: contractsIds,

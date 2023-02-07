@@ -2300,6 +2300,7 @@
 	//-------------------------------------------------- Отобразить тултип с подборками договора
 	let showselectionsTOut, selectionsTooltip;
 	$.showselections = (contractId) => {
+		console.log(haSContextMenu.value);
 		if (haSContextMenu.value) return;
 		const cell = event.target;
 		clearTimeout(showselectionsTOut);
@@ -2313,7 +2314,7 @@
 		showselectionsTOut = setTimeout(() => {
 			if (haSContextMenu.value) return;
 			selectionsTooltip = showSelections(cell, contractId, selectionsTooltip);
-		}, 1000);
+		}, 500);
 	}
 	
 	
