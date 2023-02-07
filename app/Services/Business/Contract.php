@@ -392,7 +392,7 @@ class Contract {
 	 */
 	public function getToExport($contractsIds = [], $colums = [], $sort = 'id' , $order = 'ASC'): array {
 		
-		$res = ContractModel::select([...$colums, 'without_buy'])->whereIn('id', $contractsIds)
+		$res = ContractModel::select([...$colums, 'without_buy', 'subcontracting', 'gencontracting'])->whereIn('id', $contractsIds)
 			->orderBy($sort, $order)
 			->get()
 			->toArray();
@@ -413,6 +413,10 @@ class Contract {
 		]);
 		
 		$hiddenFields = ['without_buy']; // Удалить поля, которые не нужно выводить
+		
+		// Есла таковых постоянных полей нет в выборке - то удалить их из выборки
+		if (!in_array('subcontracting', $colums)) array_push($hiddenFields, 'subcontracting');
+		if (!in_array('gencontracting', $colums)) array_push($hiddenFields, 'gencontracting');
 		
 		
 		foreach ($res as $k => $row) {
