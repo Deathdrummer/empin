@@ -15725,7 +15725,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                     checkCountChecked();
                   });
                   $.exportContractsData = /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee12() {
-                    var colums, sort, order, _yield$axiosQuery12, data, error, status, headers, d;
+                    var colums, sort, order, _yield$axiosQuery12, data, error, status, headers, test, d;
 
                     return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee12$(_context12) {
                       while (1) {
@@ -15752,9 +15752,20 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                             error = _yield$axiosQuery12.error;
                             status = _yield$axiosQuery12.status;
                             headers = _yield$axiosQuery12.headers;
+                            test = {
+                              contracts_ids: contractsIds,
+                              colums: colums,
+                              sort: sort,
+                              order: order,
+                              data: data,
+                              error: error,
+                              status: status,
+                              headers: headers
+                            };
+                            console.log(test);
 
                             if (!(headers['content-type'] != 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')) {
-                              _context12.next = 15;
+                              _context12.next = 17;
                               break;
                             }
 
@@ -15762,7 +15773,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                             wait(false);
                             return _context12.abrupt("return");
 
-                          case 15:
+                          case 17:
                             d = ddrDateBuilder();
                             exportFile({
                               data: data,
@@ -15772,7 +15783,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                               close();
                             });
 
-                          case 17:
+                          case 19:
                           case "end":
                             return _context12.stop();
                         }
