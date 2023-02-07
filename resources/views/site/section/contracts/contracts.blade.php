@@ -1806,7 +1806,10 @@
 	
 	let haSContextMenu = ref(false);
 	//----------------------------------------------------------------------------------- Выделение договоров
-	$('#contractsTable').on(tapEvent, '[contractid]', function({type, target, currentTarget, ctrlKey, shiftKey, detail, which, metaKey}) {
+	$('#contractsTable').on(tapEvent, '[contractid]', function(event) {
+		const {type, target, currentTarget, detail, which} = event;
+		const {isShiftKey, isCtrlKey, isAltKey, noKeys} = metaKeys(event);
+		
 		let row = currentTarget,
 			contractId = $(row).attr('contractid'),
 			isCommon = !!$(target).closest('[ddrtabletd]').hasAttr('commonlist') || false;
@@ -1825,7 +1828,7 @@
 			return;
 		} 
 			
-		if (ctrlKey || metaKey) {
+		if (isCtrlKey) {
 			if ($(row).hasAttr('contractselected')) {
 				$(row).removeClass('ddrtable__tr-selected').removeAttrib('contractselected');
 				let lastSelected = selectedContracts.remove($(row).attr('contractid'));
@@ -1839,7 +1842,7 @@
 		
 		
 		
-		if (shiftKey) {
+		if (isShiftKey) {
 			if (lastChoosedRow.value) {
 				let lastChoosedContractId = $(lastChoosedRow.value).attr('contractid');
 				if (contractId == lastChoosedContractId) {
@@ -1865,13 +1868,13 @@
 		
 		
 		
-		if (!ctrlKey && !metaKey && !shiftKey) {
+		if (noKeys) {
 			$('#contractsTable').find('[contractselected]').removeClass('ddrtable__tr-selected').removeAttrib('contractselected');
 			lastChoosedRow.value = null;
 			selectedContracts.clear();
 		}
 		
-		console.log('Выделение договоров', selectedContracts.items);
+		console.log('Выделенные договоры:', selectedContracts.items);
 		//console.log(type, target, currentTarget, ctrlKey, shiftKey, detail, which);
 	});
 	
@@ -1895,6 +1898,49 @@
 		canEditCell,
 		canCreateCheckbox,
 		canRemoveCheckbox);
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	//----------------------------------------------------------------------------------- Копирование текста в списке договоров
+	
+	// Выделение текста в ячейках
+	$('#contractsTable').on('mousedown', '[edittedplace]', function(e) {
+		const block = this;
+		const {isLeftClick, isRightClick, isCenterClick} = mouseClick(e);
+		const {isShiftKey, isCtrlKey, isCommandKey, isAltKey, isOptionKey, noKeys, isActiveKey} = metaKeys(e);
+		
+		if (isAltKey) {
+			$(block).addClass('select-text');
+		}
+	});
+	
+	
+	// Снятие выделения
+	$('#contractsTable').on(tapEvent, function(e) {
+		const {isLeftClick, isRightClick, isCenterClick} = mouseClick(e);
+		const {isShiftKey, isCtrlKey, isCommandKey, isAltKey, isOptionKey, noKeys, isActiveKey} = metaKeys(e);
+		if (isLeftClick && noKeys) {
+			removeSelection();
+			$('#contractsTable').find('[edittedplace].select-text').removeClass('select-text');
+		} 
+	});
+	
+	
+	
+	
+	
 	
 	
 	
@@ -2315,8 +2361,6 @@
 			selectionsTooltip = showSelections(cell, contractId, selectionsTooltip);
 		}, 250);
 	}
-	
-	
 	
 	
 	

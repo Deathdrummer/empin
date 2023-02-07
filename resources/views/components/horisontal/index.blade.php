@@ -1,11 +1,13 @@
 @props([
-	'id'			=> 'horisontal'.rand(0,9999999),
-	'speed'			=> 100,
-	'step'			=> 100,
-	'scroll'		=> true,
-	'ignore'		=> '[noscroll]',
-	'addict'		=> false,
-	'hidescroll'	=> false,
+	'id'				=> 'horisontal'.rand(0,9999999),
+	'speed'				=> 100,
+	'step'				=> 100,
+	'scroll'			=> true,
+	'ignore'			=> '[noscroll]',
+	'addict'			=> false,
+	'hidescroll'		=> false,
+	'movekey'			=> null,
+	'ignoremovekeys'	=> null,
 ])
 
 
@@ -27,7 +29,10 @@
 		ignoreSelectors = '{{$ignore}}',
 		addict = '{{$addict}}',
 		step = '{{$step}}',
-		speed = '{{$speed}}';
+		speed = '{{$speed}}',
+		moveKey = '{{$movekey}}',
+		ignoreMoveKeys = '{{$ignoremovekeys}}';
+	
 	
 	//Горизонтальная прокрутка блока мышью и колесиком
 	//	- шаг прокрутки (для колеса)
@@ -35,5 +40,13 @@
 	//	- разрешить прокрутку колесом
 	//	- Игнорировать селекторы
 	//	- добавить блок к синхронному скроллу
-	$(selector).ddrScrollX(step, speed, scroll, ignoreSelectors, addict);
+	$(selector).ddrScrollX({
+		scrollStep: step,
+		scrollSpeed: speed,
+		enableMouseScroll: scroll,
+		ignoreSelectors,
+		addict,
+		moveKey,
+		ignoreMoveKeys,
+	});
 </script>

@@ -14,7 +14,7 @@
 			</x-table.tr>
 		@endforeach
 	@else
-		<x-horisontal space="2rem" scroll="false" hidescroll="1" ignore="[noscroll], select, input, textarea">
+		<x-horisontal space="2rem" scroll="false" hidescroll="1" ignore="[noscroll], select, input, textarea" ignoremovekeys="alt, ctrl, shift">
 			<x-horisontal.item class="h100">
 				<x-table
 					scrollstart="doScrollStart"

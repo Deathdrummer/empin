@@ -1050,19 +1050,6 @@ export function contextMenu(
 						}, 'blob');
 						
 						
-						let test = {
-							contracts_ids: contractsIds,
-							colums: colums,
-							sort: sort,
-							order: order,
-							data: data, 
-							error: error,
-							status: status,
-							headers: headers,
-						}
-						
-						console.log(test);
-						
 						if (headers['content-type'] != 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
 							$.notify('Ошибка экспорта данных', 'error');
 							wait(false);

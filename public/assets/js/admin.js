@@ -5839,6 +5839,68 @@ window.ref = function (data) {
   return proxy;
 };
 /*
+	shift  		shift 	shiftKey
+	option 		alt  	altKey
+	command  	ctrl 	metaKey \ ctrlKey
+*/
+
+
+window.metaKeys = function () {
+  var event = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+  if (_.isNull(event)) throw new Error('metaKeys ошибка! Не передан event!');
+  var shiftKey = event.shiftKey,
+      ctrlKey = event.ctrlKey,
+      altKey = event.altKey,
+      metaKey = event.metaKey;
+  return {
+    isShiftKey: shiftKey,
+    isCtrlKey: ctrlKey || metaKey,
+    isCommandKey: ctrlKey || metaKey,
+    isAltKey: altKey,
+    isOptionKey: altKey,
+    noKeys: !shiftKey && !altKey && !(ctrlKey || metaKey),
+    isActiveKey: function isActiveKey() {
+      var key = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+      if (_.isNull(event)) return false;
+
+      if (_.isArray(key)) {
+        if (['ctrl', 'command'].some(function (k) {
+          return key.indexOf(k) !== -1;
+        }) && (ctrlKey || metaKey)) return true;
+        if (['shift'].some(function (k) {
+          return key.indexOf(k) !== -1;
+        }) && shiftKey) return true;
+        if (['alt', 'option'].some(function (k) {
+          return key.indexOf(k) !== -1;
+        }) && altKey) return true;
+        return false;
+      }
+
+      if (['ctrl', 'command'].indexOf(key) !== -1 && (ctrlKey || metaKey)) return true;
+      if (key == 'shift' && shiftKey) return true;
+      if (['alt', 'option'].indexOf(key) !== -1 && altKey) return true;
+      return false;
+    }
+  };
+};
+/*
+	shift  		shift 	shiftKey
+	option 		alt  	altKey
+	command  	ctrl 	metaKey \ ctrlKey
+*/
+
+
+window.mouseClick = function () {
+  var event = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+  if (_.isNull(event)) throw new Error('mouseClick ошибка! Не передан event!');
+  var which = event.which;
+  return {
+    isLeftClick: which == 1,
+    isRightClick: which == 3,
+    isCenterClick: which == 2
+  };
+};
+/*
 	AJAX экспорт файла клиенту
 */
 
@@ -6092,6 +6154,21 @@ window.selectText = function (elem) {
   range.selectNodeContents(elem);
   selection.removeAllRanges();
   selection.addRange(range);
+};
+
+window.removeSelection = function (elem) {
+  if (window.getSelection) {
+    if (window.getSelection().empty) {
+      // Chrome
+      window.getSelection().empty();
+    } else if (window.getSelection().removeAllRanges) {
+      // Firefox
+      window.getSelection().removeAllRanges();
+    }
+  } else if (document.selection) {
+    // IE?
+    document.selection.empty();
+  }
 };
 /*
 	Скопировать в буфер обмена 
@@ -12129,62 +12206,74 @@ window.ddrPopup = function () {
 		- Игнорировать селекторы
 		- добавить блок к синхронному скроллу
 */
-$.fn.ddrScrollX = function (scrollStep, scrollSpeed, enableMouseScroll, ignoreSelectors, addict) {
+$.fn.ddrScrollX = function (params) {
   var block = this,
-      scrollStep = scrollStep || 50,
-      scrollSpeed = scrollSpeed || 100,
-      ignoreSelectors = _.isArray(ignoreSelectors) ? ignoreSelectors.join(', ') : ignoreSelectors;
+      _$assign = _.assign({
+    scrollStep: 50,
+    scrollSpeed: 100,
+    enableMouseScroll: false,
+    ignoreSelectors: false,
+    addict: false,
+    moveKey: false,
+    // alt shift ctrl
+    ignoreMoveKeys: []
+  }, params),
+      scrollStep = _$assign.scrollStep,
+      scrollSpeed = _$assign.scrollSpeed,
+      enableMouseScroll = _$assign.enableMouseScroll,
+      ignoreSelectors = _$assign.ignoreSelectors,
+      addict = _$assign.addict,
+      moveKey = _$assign.moveKey,
+      ignoreMoveKeys = _$assign.ignoreMoveKeys;
 
-  if (enableMouseScroll != undefined && enableMouseScroll == true) {
-    $(block).mousewheel(function (e) {
-      var _e$target, _e$target$tagName;
+  if (ignoreSelectors) ignoreSelectors = _.isArray(ignoreSelectors) ? ignoreSelectors.join(', ') : ignoreSelectors;
+  if (ignoreMoveKeys) ignoreMoveKeys = pregSplit(ignoreMoveKeys); //console.log(ignoreMoveKeys);
+  //if (enableMouseScroll == true) {
 
-      var tag = (_e$target = e.target) === null || _e$target === void 0 ? void 0 : (_e$target$tagName = _e$target.tagName) === null || _e$target$tagName === void 0 ? void 0 : _e$target$tagName.toLowerCase();
-
-      if (!ignoreSelectors || isHover(ignoreSelectors)) {
-        e.preventDefault();
-        $(this).stop(false, true).animate({
-          scrollLeft: $(this).scrollLeft() + scrollStep * -e.deltaY
-        }, scrollSpeed);
-      }
-    });
-  }
+  /*$(block).mousewheel(function(e) {
+  	let tag = e.target?.tagName?.toLowerCase();
+  	if (!ignoreSelectors || isHover(ignoreSelectors)) {
+  		e.preventDefault();
+  		$(this).stop(false, true).animate({scrollLeft: ($(this).scrollLeft() + scrollStep * -e.deltaY)}, scrollSpeed);
+  	}
+  });*/
+  //}
 
   $(block).mousedown(function (e) {
-    if ([2, 3].indexOf(e.which) !== -1 || e.altKey == true || e.metaKey == true) {
-      e.stopPropagation();
-      $(e.target).css('user-select', 'text');
-      return;
-    }
+    var _metaKeys = metaKeys(e),
+        isShiftKey = _metaKeys.isShiftKey,
+        isCtrlKey = _metaKeys.isCtrlKey,
+        isCommandKey = _metaKeys.isCommandKey,
+        isAltKey = _metaKeys.isAltKey,
+        isOptionKey = _metaKeys.isOptionKey,
+        noKeys = _metaKeys.noKeys,
+        isActiveKey = _metaKeys.isActiveKey;
 
-    if (!ignoreSelectors || isHover(ignoreSelectors) == false) {
-      var startX = this.scrollLeft + e.pageX;
-      $(block).mousemove(function (e) {
-        $(block).css('cursor', 'e-resize');
-        var pos = startX - e.pageX;
-        this.scrollLeft = pos;
-        if (addict) $(addict)[0].scrollLeft = pos;
-        return false;
-      });
-    }
-  });
-  $(block).mouseup(function (e) {
-    if (e.altKey == true || e.metaKey == true) {
-      var selObj = window.getSelection();
-      var selectString = selObj.toString();
+    var _mouseClick = mouseClick(e),
+        isLeftClick = _mouseClick.isLeftClick,
+        isRightClick = _mouseClick.isRightClick,
+        isCenterClick = _mouseClick.isCenterClick;
 
-      if (selectString.length) {
-        copyStringToClipboard(selObj.toString());
-        $.notify('Скопировано!');
+    if (isLeftClick && (moveKey && isActiveKey(moveKey) || ignoreMoveKeys && !isActiveKey(ignoreMoveKeys))) {
+      if (!ignoreSelectors || isHover(ignoreSelectors) == false) {
+        var startX = this.scrollLeft + e.pageX;
+        $(block).mousemove(function (e) {
+          $(block).css('cursor', 'e-resize');
+          var pos = startX - e.pageX;
+          this.scrollLeft = pos;
+          if (addict) $(addict)[0].scrollLeft = pos;
+          return false;
+        });
       }
 
-      return;
-    }
+      $(block).one('mouseup', function (e) {
+        if (!ignoreSelectors || isHover(ignoreSelectors) == false) {
+          $(block).css('cursor', 'default');
+          $(block).off("mousemove");
+        }
+      });
+    } //if (!isLeftClick || (moveKey && !isActiveKey(moveKey)) || (ignoreMoveKeys && isActiveKey(ignoreMoveKeys))) return false;
 
-    if (!ignoreSelectors || isHover(ignoreSelectors) == false) {
-      $(block).css('cursor', 'default');
-      $(block).off("mousemove");
-    }
   });
 };
 
@@ -15725,7 +15814,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                     checkCountChecked();
                   });
                   $.exportContractsData = /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee12() {
-                    var colums, sort, order, _yield$axiosQuery12, data, error, status, headers, test, d;
+                    var colums, sort, order, _yield$axiosQuery12, data, error, status, headers, d;
 
                     return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee12$(_context12) {
                       while (1) {
@@ -15752,20 +15841,9 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                             error = _yield$axiosQuery12.error;
                             status = _yield$axiosQuery12.status;
                             headers = _yield$axiosQuery12.headers;
-                            test = {
-                              contracts_ids: contractsIds,
-                              colums: colums,
-                              sort: sort,
-                              order: order,
-                              data: data,
-                              error: error,
-                              status: status,
-                              headers: headers
-                            };
-                            console.log(test);
 
                             if (!(headers['content-type'] != 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')) {
-                              _context12.next = 17;
+                              _context12.next = 15;
                               break;
                             }
 
@@ -15773,7 +15851,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                             wait(false);
                             return _context12.abrupt("return");
 
-                          case 17:
+                          case 15:
                             d = ddrDateBuilder();
                             exportFile({
                               data: data,
@@ -15783,7 +15861,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                               close();
                             });
 
-                          case 19:
+                          case 17:
                           case "end":
                             return _context12.stop();
                         }

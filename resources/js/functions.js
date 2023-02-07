@@ -40,6 +40,73 @@ window.ref = function (data) {
 
 
 
+
+/*
+	shift  		shift 	shiftKey
+	option 		alt  	altKey
+	command  	ctrl 	metaKey \ ctrlKey
+*/
+window.metaKeys = function(event = null) {
+	if (_.isNull(event)) throw new Error('metaKeys ошибка! Не передан event!');
+	
+	const {shiftKey, ctrlKey, altKey, metaKey} = event;
+	
+	return {
+		isShiftKey: shiftKey,
+		isCtrlKey: ctrlKey || metaKey,
+		isCommandKey: ctrlKey || metaKey,
+		isAltKey: altKey,
+		isOptionKey: altKey,
+		noKeys: !shiftKey && !altKey && !(ctrlKey || metaKey),
+		isActiveKey(key = null) {
+			if (_.isNull(event)) return false;
+			
+			if (_.isArray(key)) {
+				if (['ctrl', 'command'].some((k) => key.indexOf(k) !== -1) && (ctrlKey || metaKey)) return true;
+				if (['shift'].some((k) => key.indexOf(k) !== -1) && shiftKey) return true;
+				if (['alt', 'option'].some((k) => key.indexOf(k) !== -1) && altKey) return true;
+				return false;
+			}
+			
+			if (['ctrl', 'command'].indexOf(key) !== -1 && (ctrlKey || metaKey)) return true;
+			if (key == 'shift' && shiftKey) return true;
+			if (['alt', 'option'].indexOf(key) !== -1 && altKey) return true;
+			return false;
+		},
+	};
+}
+
+
+
+
+/*
+	shift  		shift 	shiftKey
+	option 		alt  	altKey
+	command  	ctrl 	metaKey \ ctrlKey
+*/
+window.mouseClick = function(event = null) {
+	if (_.isNull(event)) throw new Error('mouseClick ошибка! Не передан event!');
+	
+	const {which} = event;
+	
+	return {
+		isLeftClick: which == 1,
+		isRightClick: which == 3,
+		isCenterClick: which == 2,
+	};
+}
+
+
+
+
+
+
+
+
+
+
+
+
 /*
 	AJAX экспорт файла клиенту
 */
@@ -332,6 +399,21 @@ window.selectText = function(elem) {
 
 
 
+
+window.removeSelection = function(elem) {
+	if (window.getSelection) {
+		if (window.getSelection().empty) {  // Chrome
+			window.getSelection().empty();
+		} else if (window.getSelection().removeAllRanges) {  // Firefox
+			window.getSelection().removeAllRanges();
+		}
+	} else if (document.selection) {  // IE?
+		document.selection.empty();
+	}
+}
+
+	
+	
 
 
 /*
