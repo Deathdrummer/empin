@@ -593,7 +593,6 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                   while (1) {
                     switch (_context.prev = _context.next) {
                       case 0:
-                        console.log('Добавить в подборку', selector);
                         selectionId = item.id;
                         procNotif = processNotify(buildTitle(countSelected, 'Добавление # % в подборку...', ['договора', 'договоров', 'договоров']));
                         contractIds = selectedContracts.items;
@@ -612,10 +611,10 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                           method = 'add_contracts';
                         }
 
-                        _context.next = 7;
+                        _context.next = 6;
                         return axiosQuery('put', 'site/selections/' + method, params);
 
-                      case 7:
+                      case 6:
                         _yield$axiosQuery = _context.sent;
                         data = _yield$axiosQuery.data;
                         error = _yield$axiosQuery.error;
@@ -623,7 +622,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                         headers = _yield$axiosQuery.headers;
 
                         if (!error) {
-                          _context.next = 16;
+                          _context.next = 15;
                           break;
                         }
 
@@ -633,7 +632,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                         console.log(error === null || error === void 0 ? void 0 : error.message, error.errors);
                         return _context.abrupt("return");
 
-                      case 16:
+                      case 15:
                         if (data) {
                           contractTitle = countSelected == 1 ? ' ' + objectNumber + ' ' + title : '';
                           procNotif.done({
@@ -641,7 +640,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                           });
                         }
 
-                      case 17:
+                      case 16:
                       case "end":
                         return _context.stop();
                     }

@@ -331,9 +331,6 @@ export function contextMenu(
 							//faIcon: 'fa-solid fa-clipboard-check',
 							disabled: !!item.choosed,
 							async onClick(selector) {
-								
-								console.log('Добавить в подборку', selector);
-								
 								let selectionId = item.id;
 								
 								let procNotif = processNotify(buildTitle(countSelected, 'Добавление # % в подборку...', ['договора', 'договоров', 'договоров']));
