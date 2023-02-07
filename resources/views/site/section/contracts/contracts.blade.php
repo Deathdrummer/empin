@@ -2313,7 +2313,7 @@
 		showselectionsTOut = setTimeout(() => {
 			if (haSContextMenu.value) return;
 			selectionsTooltip = showSelections(cell, contractId, selectionsTooltip);
-		}, 500);
+		}, 250);
 	}
 	
 	
