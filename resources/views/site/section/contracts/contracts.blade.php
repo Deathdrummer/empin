@@ -1115,6 +1115,9 @@
 	$.openContractInfo = (tr, contractId) => {
 		let isNew = $(tr).attr('isnew');
 		if ($(event.target).hasAttr('noopen')) return;
+		const {isShiftKey, isCtrlKey, isCommandKey, isAltKey, isOptionKey, noKeys, isActiveKey} = metaKeys(event);
+		
+		if (!noKeys) return;
 		
 		ddrPopup({
 			width: 1100,
@@ -1921,9 +1924,15 @@
 		const {isLeftClick, isRightClick, isCenterClick} = mouseClick(e);
 		const {isShiftKey, isCtrlKey, isCommandKey, isAltKey, isOptionKey, noKeys, isActiveKey} = metaKeys(e);
 		
-		if (isAltKey) {
-			$(block).addClass('select-text');
+		if (isLeftClick) {
+			removeSelection();
+			$('#contractsTable').find('[edittedplace].select-text').removeClass('select-text');	
+			if (isAltKey) {
+				$(block).addClass('select-text');
+			}
 		}
+			
+		
 	});
 	
 	

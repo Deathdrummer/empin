@@ -6012,6 +6012,18 @@ window.selectText = function (elem) {
   selection.addRange(range);
 };
 
+window.getSelectionStr = function () {
+  var text = "";
+
+  if (window.getSelection) {
+    text = window.getSelection().toString();
+  } else if (document.selection && document.selection.type != "Control") {
+    text = document.selection.createRange().text;
+  }
+
+  return text;
+};
+
 window.removeSelection = function (elem) {
   if (window.getSelection) {
     if (window.getSelection().empty) {
@@ -17346,6 +17358,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
     var hasCheckbox = !!$(target.pointer).closest('[ddrtabletd]').children().length;
     var contextEdited = !!$(target.pointer).closest('[ddrtabletd]').hasAttr('contextedit');
     var disableEditCell = !$(target.pointer).closest('[ddrtabletd]').attr('contextedit');
+    var selectedTextCell = !!$(target.pointer).closest('[ddrtabletd]').find('[edittedplace]').hasClass('select-text');
     onContextMenu(function () {
       var _commentsTooltip, _cellEditTooltip;
 
@@ -17399,7 +17412,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
       countLeft: countSelected > 1 ? countSelected : null,
       countRight: countSelected == 1 ? messagesCount : null,
       countOnArrow: true,
-      visible: isCommon && canChat,
+      visible: isCommon && canChat && !selectedTextCell,
       sort: 1,
       onClick: function onClick() {
         if (countSelected == 1) {
@@ -17557,7 +17570,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
       }
     }, {
       name: 'Отправить в архив',
-      visible: isCommon && canToArchive && !isArchive,
+      visible: isCommon && canToArchive && !isArchive && !selectedTextCell,
       countLeft: countSelected > 1 ? countSelected : null,
       sort: 5,
       onClick: function onClick() {
@@ -17621,7 +17634,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
       }
     }, {
       name: 'Вернуть в работу',
-      visible: isCommon && canReturnToWork && isArchive,
+      visible: isCommon && canReturnToWork && isArchive && !selectedTextCell,
       countLeft: countSelected > 1 ? countSelected : null,
       sort: 5,
       onClick: function onClick() {
@@ -17674,7 +17687,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
     }, {
       name: 'Добавить в подборку',
       //hidden: selectionId,
-      visible: isCommon,
+      visible: isCommon && !selectedTextCell,
       countLeft: countSelected > 1 ? countSelected : null,
       sort: 2,
       load: {
@@ -17756,7 +17769,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
       }
     }, {
       name: 'Удалить из подборки',
-      visible: isCommon && selectionId,
+      visible: isCommon && selectionId && !selectedTextCell,
       countLeft: countSelected > 1 ? countSelected : null,
       sort: 4,
       onClick: function onClick() {
@@ -17806,7 +17819,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
     }, {
       name: 'Создать новую подборку',
       sort: 3,
-      visible: isCommon,
+      visible: isCommon && !selectedTextCell,
       countLeft: countSelected > 1 ? countSelected : null,
       onClick: function onClick() {
         var html = '<p class="d-block mb5px fz14px color-darkgray">Название подборки:</p>' + '<div class="input normal-input normal-input-text w100">' + '<input type="text" value="" id="selectionNameInput" placeholder="Введите текст" autocomplete="off" inpgroup="normal">' + '<div class="normal-input__errorlabel noselect" errorlabel=""></div>' + '</div>';
@@ -17890,7 +17903,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
     }, {
       name: 'Отправить в другой отдел',
       enabled: countSelected > 1 || !!hasDepsToSend && (canSending && departmentId || canSendingAll && !departmentId),
-      hidden: isArchive || !isCommon,
+      hidden: isArchive || !isCommon || selectedTextCell,
       countLeft: countSelected > 1 ? countSelected : null,
       sort: 4,
       load: {
@@ -17952,7 +17965,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
       }
     }, {
       name: 'Скрыть',
-      visible: isCommon && canHiding && departmentId && !isArchive,
+      visible: isCommon && canHiding && departmentId && !isArchive && !selectedTextCell,
       countLeft: countSelected > 1 ? countSelected : null,
       sort: 6,
       onClick: function onClick() {
@@ -18005,7 +18018,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
       }
     }, {
       name: hasCheckbox && canRemoveCheckbox ? 'Удалить чекбокс' : !hasCheckbox && canCreateCheckbox ? 'Добавить чекбокс' : '',
-      visible: isDeptCheckbox && !isArchive && (!hasCheckbox && canCreateCheckbox || hasCheckbox && canRemoveCheckbox),
+      visible: isDeptCheckbox && !isArchive && (!hasCheckbox && canCreateCheckbox || hasCheckbox && canRemoveCheckbox) && !selectedTextCell,
       sort: 1,
       onClick: function onClick() {
         return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee2() {
@@ -18079,7 +18092,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
       }
     }, {
       name: 'Комментарии',
-      visible: hasCheckbox && isDeptCheckbox,
+      visible: hasCheckbox && isDeptCheckbox && !selectedTextCell,
       sort: 2,
       onClick: function onClick() {
         return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee5() {
@@ -18219,9 +18232,9 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
       }
     }, {
       name: 'Редактировать',
-      visible: countSelected == 1 && isCommon && canEditCell && contextEdited
+      visible: countSelected == 1 && isCommon && canEditCell && contextEdited && !selectedTextCell,
+
       /* && !isArchive*/
-      ,
       // добавить !isArchive - если не нужно редактировать в архиве 
       disabled: $(target.pointer).closest('[ddrtabletd]').hasAttr('editted') || disableEditCell,
       sort: 7,
@@ -18585,7 +18598,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
       }
     }, {
       name: 'Экспорт в Excel',
-      visible: countSelected,
+      visible: countSelected && !selectedTextCell,
       sort: 8,
       onClick: function onClick() {
         return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee13() {
@@ -18734,6 +18747,28 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
               }
             }
           }, _callee13);
+        }))();
+      }
+    }, {
+      name: 'Копировать',
+      visible: selectedTextCell,
+      sort: 1,
+      onClick: function onClick() {
+        return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee14() {
+          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee14$(_context14) {
+            while (1) {
+              switch (_context14.prev = _context14.next) {
+                case 0:
+                  copyStringToClipboard(getSelectionStr());
+                  removeSelection();
+                  $('#contractsTable').find('[edittedplace].select-text').removeClass('select-text');
+
+                case 3:
+                case "end":
+                  return _context14.stop();
+              }
+            }
+          }, _callee14);
         }))();
       }
     }];
