@@ -2340,7 +2340,7 @@
 	
 	
 	$('.header__logo').on(tapEvent, function({shiftKey, ctrlKey, altKey, metaKey}) {
-		console.log({'shiftKey': shiftKey, 'ctrlKey': ctrlKey, 'altKey': altKey, 'metaKey': altKey});
+		console.log({'shiftKey': shiftKey, 'ctrlKey': ctrlKey, 'altKey': altKey, 'metaKey': metaKey});
 	});
 	
 	
