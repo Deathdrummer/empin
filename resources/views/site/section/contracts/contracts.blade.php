@@ -1935,6 +1935,23 @@
 	
 	
 	
+	$('#contractsTable').on('mousemove', '[ddrtabletr]', function(e) {
+		const {isLeftClick, isRightClick, isCenterClick} = mouseClick(e);
+		const {isShiftKey, isCtrlKey, isCommandKey, isAltKey, isOptionKey, noKeys, isActiveKey} = metaKeys(e);
+		
+		if (!(isAltKey && isShiftKey) || !isLeftClick) return;
+		
+		let edittedText = $(e.currentTarget).find('[edittedplace]');
+		
+		
+		//if ($(edittedText).hasClass('select-text') == false) {
+			$(edittedText).not('.select-text').addClass('select-text');
+			//selectText(e.target);
+		//}
+	});
+	
+	
+	
 	$('#contractsTable').on('mousemove', '[ddrtabletd]', function(e) {
 		const {isLeftClick, isRightClick, isCenterClick} = mouseClick(e);
 		const {isShiftKey, isCtrlKey, isCommandKey, isAltKey, isOptionKey, noKeys, isActiveKey} = metaKeys(e);
@@ -1944,11 +1961,14 @@
 		let edittedText = $(e.target).find('[edittedplace]');
 		
 		
-		if ($(edittedText).hasClass('select-text') == false) {
-			$(edittedText).addClass('select-text');
+		//if ($(edittedText).hasClass('select-text') == false) {
+			$(edittedText).not('.select-text').addClass('select-text');
 			//selectText(e.target);
-		}
+		//}
 	});
+	
+	
+	
 	
 	
 	
