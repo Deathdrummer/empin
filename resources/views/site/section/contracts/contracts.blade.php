@@ -1916,6 +1916,15 @@
 	
 	
 	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	//----------------------------------------------------------------------------------- Копирование текста в списке договоров
 	
 	// Выделение текста в ячейках
@@ -1939,15 +1948,10 @@
 		const {isLeftClick, isRightClick, isCenterClick} = mouseClick(e);
 		const {isShiftKey, isCtrlKey, isCommandKey, isAltKey, isOptionKey, noKeys, isActiveKey} = metaKeys(e);
 		
-		if (!(isAltKey && isShiftKey) || !isLeftClick) return;
-		
-		let edittedText = $(e.currentTarget).find('[edittedplace]');
-		
-		
-		//if ($(edittedText).hasClass('select-text') == false) {
+		if (isAltKey && isShiftKey && isLeftClick) {
+			let edittedText = $(e.currentTarget).find('[edittedplace]');
 			$(edittedText).not('.select-text').addClass('select-text');
-			//selectText(e.target);
-		//}
+		}
 	});
 	
 	
@@ -1956,15 +1960,10 @@
 		const {isLeftClick, isRightClick, isCenterClick} = mouseClick(e);
 		const {isShiftKey, isCtrlKey, isCommandKey, isAltKey, isOptionKey, noKeys, isActiveKey} = metaKeys(e);
 		
-		if (!isAltKey || !isLeftClick) return;
-		
-		let edittedText = $(e.target).find('[edittedplace]');
-		
-		
-		//if ($(edittedText).hasClass('select-text') == false) {
+		if (isAltKey && isLeftClick) {
+			let edittedText = $(e.target).find('[edittedplace]');
 			$(edittedText).not('.select-text').addClass('select-text');
-			//selectText(e.target);
-		//}
+		}
 	});
 	
 	
@@ -1976,11 +1975,24 @@
 	$('#contractsTable').on(tapEvent, function(e) {
 		const {isLeftClick, isRightClick, isCenterClick} = mouseClick(e);
 		const {isShiftKey, isCtrlKey, isCommandKey, isAltKey, isOptionKey, noKeys, isActiveKey} = metaKeys(e);
-		if (isLeftClick && noKeys) {
+		
+		let isEdittedBlock = !!$(e.target).closest('[ddrtabletd]').find('[edittedblock]').length;
+		
+		console.log(isEdittedBlock);
+		if (isLeftClick && noKeys && !isEdittedBlock) {
 			removeSelection();
 			$('#contractsTable').find('[edittedplace].select-text').removeClass('select-text');
 		} 
 	});
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	

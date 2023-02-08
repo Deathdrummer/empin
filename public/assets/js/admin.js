@@ -14499,7 +14499,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
     var hasCheckbox = !!$(target.pointer).closest('[ddrtabletd]').children().length;
     var contextEdited = !!$(target.pointer).closest('[ddrtabletd]').hasAttr('contextedit');
     var disableEditCell = !$(target.pointer).closest('[ddrtabletd]').attr('contextedit');
-    var selectedTextCell = !!$(target.pointer).closest('[ddrtabletd]').find('[edittedplace]').hasClass('select-text'); // Если это оин пункт "копировать"
+    var selectedTextCell = !!$(target.pointer).closest('[ddrtabletd]').find('[edittedplace]').hasClass('select-text') || !!$(target.pointer).closest('[ddrtabletd]').find('[edittedblock]').length; // Если это оин пункт "копировать"
 
     if (selectedTextCell) {
       ddrCssVar('cm-mainMinHeight', '30px');
@@ -14511,9 +14511,13 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
       var _commentsTooltip, _cellEditTooltip;
 
       haSContextMenu.value = true;
-      $('#contractsList').find('[editted]').each(function (k, cell) {
-        unEditCell(cell);
-      }); // если кликнуть на НЕвыделенном договоре - то все выделенния отменятся и выделится текущий кликнутый договор
+
+      if (!selectedTextCell) {
+        $('#contractsList').find('[editted]').each(function (k, cell) {
+          unEditCell(cell);
+        });
+      } // если кликнуть на НЕвыделенном договоре - то все выделенния отменятся и выделится текущий кликнутый договор
+
 
       if (isCommon && $(target.selector).hasAttr('contractselected') == false) {
         $('#contractsTable').find('[contractselected]').removeClass('ddrtable__tr-selected').removeAttrib('contractselected');
@@ -15480,6 +15484,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                               $.notify('Сохранено!');
                               $(cell).find('[edittedplace]').text(cellData || emptyVal);
                               cellWait.destroy();
+                              if (type == 2) $(cell).find('[edittedplace]').number(true, 2, '.', ' ');
                               unEditCell(cell);
                             }
 

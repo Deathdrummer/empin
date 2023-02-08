@@ -39,7 +39,7 @@ export function contextMenu(
 		const hasCheckbox = !!$(target.pointer).closest('[ddrtabletd]').children().length;
 		const contextEdited = !!$(target.pointer).closest('[ddrtabletd]').hasAttr('contextedit');
 		const disableEditCell = !$(target.pointer).closest('[ddrtabletd]').attr('contextedit');
-		const selectedTextCell = !!$(target.pointer).closest('[ddrtabletd]').find('[edittedplace]').hasClass('select-text');
+		const selectedTextCell = !!$(target.pointer).closest('[ddrtabletd]').find('[edittedplace]').hasClass('select-text') || !!$(target.pointer).closest('[ddrtabletd]').find('[edittedblock]').length;
 		
 		
 		// Если это оин пункт "копировать"
@@ -55,9 +55,12 @@ export function contextMenu(
 		onContextMenu(() => {
 			haSContextMenu.value = true;
 			
-			$('#contractsList').find('[editted]').each(function(k, cell) {
-				unEditCell(cell);
-			});
+			if (!selectedTextCell) {
+				$('#contractsList').find('[editted]').each(function(k, cell) {
+					unEditCell(cell);
+				});
+			}
+				
 			
 			// если кликнуть на НЕвыделенном договоре - то все выделенния отменятся и выделится текущий кликнутый договор
 			if (isCommon && $(target.selector).hasAttr('contractselected') == false) {
@@ -803,6 +806,7 @@ export function contextMenu(
 								$.notify('Сохранено!');
 								$(cell).find('[edittedplace]').text(cellData || emptyVal);
 								cellWait.destroy();
+								if (type == 2) $(cell).find('[edittedplace]').number(true, 2, '.', ' ');
 								unEditCell(cell);
 							}
 						});
