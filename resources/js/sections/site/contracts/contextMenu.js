@@ -41,6 +41,17 @@ export function contextMenu(
 		const disableEditCell = !$(target.pointer).closest('[ddrtabletd]').attr('contextedit');
 		const selectedTextCell = !!$(target.pointer).closest('[ddrtabletd]').find('[edittedplace]').hasClass('select-text');
 		
+		
+		// Если это оин пункт "копировать"
+		if (selectedTextCell) {
+			ddrCssVar('cm-mainMinHeight', '30px');
+		} else {
+			ddrCssVar('cm-mainMinHeight', '48px');
+		}
+		
+		
+		
+		
 		onContextMenu(() => {
 			haSContextMenu.value = true;
 			
@@ -64,6 +75,13 @@ export function contextMenu(
 				//selectedContracts.add($(target.selector).attr('contractid'));
 				
 			}
+			
+			if (!selectedTextCell) {
+				removeSelection();
+				$('#contractsTable').find('[edittedplace].select-text').removeClass('select-text');	
+			}
+			
+			
 			console.log('onContextMenu', selectedContracts.items);
 			
 			if (commentsTooltip?.destroy != undefined) commentsTooltip.destroy();

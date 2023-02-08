@@ -17358,7 +17358,14 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
     var hasCheckbox = !!$(target.pointer).closest('[ddrtabletd]').children().length;
     var contextEdited = !!$(target.pointer).closest('[ddrtabletd]').hasAttr('contextedit');
     var disableEditCell = !$(target.pointer).closest('[ddrtabletd]').attr('contextedit');
-    var selectedTextCell = !!$(target.pointer).closest('[ddrtabletd]').find('[edittedplace]').hasClass('select-text');
+    var selectedTextCell = !!$(target.pointer).closest('[ddrtabletd]').find('[edittedplace]').hasClass('select-text'); // Если это оин пункт "копировать"
+
+    if (selectedTextCell) {
+      ddrCssVar('cm-mainMinHeight', '30px');
+    } else {
+      ddrCssVar('cm-mainMinHeight', '48px');
+    }
+
     onContextMenu(function () {
       var _commentsTooltip, _cellEditTooltip;
 
@@ -17379,6 +17386,11 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
         $('#contractsTable').find('[contractselected]').removeClass('ddrtable__tr-selected').removeAttrib('contractselected'); // lastChoosedRow.value = target.selector;
         // $(target.selector).addClass('ddrtable__tr-selected').setAttrib('contractselected');
         //selectedContracts.add($(target.selector).attr('contractid'));
+      }
+
+      if (!selectedTextCell) {
+        removeSelection();
+        $('#contractsTable').find('[edittedplace].select-text').removeClass('select-text');
       }
 
       console.log('onContextMenu', selectedContracts.items);
