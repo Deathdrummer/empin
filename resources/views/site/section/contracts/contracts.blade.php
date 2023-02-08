@@ -1931,9 +1931,25 @@
 				$(block).addClass('select-text');
 			}
 		}
-			
-		
 	});
+	
+	
+	
+	$('#contractsTable').on('mousemove', '[ddrtabletd]', function(e) {
+		const {isLeftClick, isRightClick, isCenterClick} = mouseClick(e);
+		const {isShiftKey, isCtrlKey, isCommandKey, isAltKey, isOptionKey, noKeys, isActiveKey} = metaKeys(e);
+		
+		if (!isAltKey || !isLeftClick) return;
+		
+		let edittedText = $(e.target).find('[edittedplace]');
+		
+		
+		if ($(edittedText).hasClass('select-text') == false) {
+			$(edittedText).addClass('select-text');
+			//selectText(e.target);
+		}
+	});
+	
 	
 	
 	// Снятие выделения
