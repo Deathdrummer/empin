@@ -15977,6 +15977,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 function showSelections(cell) {
   var contractId = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
   var selectionsTooltip = arguments.length > 2 ? arguments[2] : undefined;
+  var selection = arguments.length > 3 ? arguments[3] : undefined;
   if (_.isNull(contractId)) return false;
   selectionsTooltip = $(cell).ddrTooltip({
     //cls: 'w44rem',
@@ -15991,49 +15992,104 @@ function showSelections(cell) {
       iconHeight: '40px'
     },
     onShow: function () {
-      var _onShow = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee(_ref) {
+      var _onShow = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee2(_ref) {
         var reference, popper, show, hide, destroy, waitDetroy, setContent, setData, setProps, _yield$axiosQuery, data, error, status, headers;
 
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee2$(_context2) {
           while (1) {
-            switch (_context.prev = _context.next) {
+            switch (_context2.prev = _context2.next) {
               case 0:
                 reference = _ref.reference, popper = _ref.popper, show = _ref.show, hide = _ref.hide, destroy = _ref.destroy, waitDetroy = _ref.waitDetroy, setContent = _ref.setContent, setData = _ref.setData, setProps = _ref.setProps;
-                _context.next = 3;
+                _context2.next = 3;
                 return axiosQuery('get', 'site/contracts/contract_selections', {
                   contract_id: contractId
                 }, 'json');
 
               case 3:
-                _yield$axiosQuery = _context.sent;
+                _yield$axiosQuery = _context2.sent;
                 data = _yield$axiosQuery.data;
                 error = _yield$axiosQuery.error;
                 status = _yield$axiosQuery.status;
                 headers = _yield$axiosQuery.headers;
 
                 if (!error) {
-                  _context.next = 13;
+                  _context2.next = 13;
                   break;
                 }
 
                 $.notify('Ошибка! Не удалось загрузить список подборок!', 'error');
                 console.log(error.message);
                 waitDetroy();
-                return _context.abrupt("return");
+                return _context2.abrupt("return");
 
               case 13:
-                _context.next = 15;
+                _context2.next = 15;
                 return setData(data);
 
               case 15:
                 waitDetroy();
 
-              case 16:
+                $.removeContractFromSelection = /*#__PURE__*/function () {
+                  var _ref2 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee(btn, selectionId) {
+                    var _yield$axiosQuery2, data, error, status, headers;
+
+                    return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
+                      while (1) {
+                        switch (_context.prev = _context.next) {
+                          case 0:
+                            $(btn).ddrWait({
+                              iconHeight: '20px'
+                            });
+                            _context.next = 3;
+                            return axiosQuery('put', 'site/selections/remove_contract', {
+                              contractId: contractId,
+                              selectionId: selectionId
+                            }, 'json');
+
+                          case 3:
+                            _yield$axiosQuery2 = _context.sent;
+                            data = _yield$axiosQuery2.data;
+                            error = _yield$axiosQuery2.error;
+                            status = _yield$axiosQuery2.status;
+                            headers = _yield$axiosQuery2.headers;
+
+                            if (!error) {
+                              _context.next = 12;
+                              break;
+                            }
+
+                            $.notify('Ошибка! Не удалось удалить подборку из договора!', 'error');
+                            console.log(error.message);
+                            return _context.abrupt("return");
+
+                          case 12:
+                            if (data) {
+                              $(btn).closest('li').remove();
+
+                              if (selectionId == selection.value) {
+                                $('#contractsTable').find('[contractid="' + contractId + '"]').remove();
+                              }
+                            }
+
+                          case 13:
+                          case "end":
+                            return _context.stop();
+                        }
+                      }
+                    }, _callee);
+                  }));
+
+                  return function (_x2, _x3) {
+                    return _ref2.apply(this, arguments);
+                  };
+                }();
+
+              case 17:
               case "end":
-                return _context.stop();
+                return _context2.stop();
             }
           }
-        }, _callee);
+        }, _callee2);
       }));
 
       function onShow(_x) {

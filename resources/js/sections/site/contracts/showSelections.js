@@ -1,4 +1,4 @@
-export function showSelections(cell, contractId = null, selectionsTooltip) {
+export function showSelections(cell, contractId = null, selectionsTooltip, selection) {
 	if (_.isNull(contractId)) return false;
 	
 	selectionsTooltip = $(cell).ddrTooltip({
@@ -29,6 +29,35 @@ export function showSelections(cell, contractId = null, selectionsTooltip) {
 			await setData(data);
 			
 			waitDetroy();
+			
+			
+			
+			$.removeContractFromSelection = async (btn, selectionId) => {
+				$(btn).ddrWait({
+					iconHeight: '20px',
+				});
+				
+				const {data, error, status, headers} = await axiosQuery('put', 'site/selections/remove_contract', {
+					contractId,
+					selectionId,
+				}, 'json');
+				
+				if (error) {
+					$.notify('Ошибка! Не удалось удалить подборку из договора!', 'error');
+					console.log(error.message);
+					return;
+				}
+				
+				if (data) {
+					$(btn).closest('li').remove();
+					
+					if (selectionId == selection.value) {
+						$('#contractsTable').find('[contractid="'+contractId+'"]').remove();
+					}
+					
+				}
+			}
+			
 		}
 	});
 	
@@ -40,6 +69,9 @@ export function showSelections(cell, contractId = null, selectionsTooltip) {
 			selectionsTooltip.destroy();
 		}
 	});
+	
+	
+	
 	
 	return selectionsTooltip;
 }

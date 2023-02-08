@@ -261,7 +261,7 @@
 		offset 					= 0,
 		search 					= null,
 		columnFilter 			= null, // поиск по значению из сстолбца
-		selection 				= null,
+		selection 				= ref(null),
 		editSelection 			= null,
 		searchWithArchive 		= false,
 		selectedContracts 		= {},
@@ -380,7 +380,7 @@
 				let replaceIconHtml = '<div class="postfix_icon bg-light"><i class="fa-solid fa-magnifying-glass"></i></div>';	
 				$('#contractsSearchField').parent('.input').find('.postfix_icon').replaceWith(replaceIconHtml);
 				getList({
-					withCounts: search || selection,
+					withCounts: search || selection.value,
 					callback: function() {
 						//$('#clearSearch').ddrInputs('disable');
 					}
@@ -411,7 +411,7 @@
 		search = null;
 		_clearCounts();
 		getList({
-			withCounts: search || selection,
+			withCounts: search || selection.value,
 			callback: function() {
 				//$('#contractsSearchField').parent('.input').ddrInputs('enable');
 			}
@@ -794,7 +794,7 @@
 					$.selectionBuildList = (btn, id) => {
 						$('[selectionsbtn]').ddrInputs('disable');
 						close();
-						selection = id;
+						selection.value = id;
 						editSelection = null;
 						
 						let selectionTitle = $(btn).closest('tr').find('input[name="title"]').val() || $(btn).closest('tr').find('p').text();
@@ -815,7 +815,7 @@
 					$.selectionBuildToEdit = (btn, id) => {
 						$('[selectionsbtn]').ddrInputs('disable');
 						close();
-						selection = id;
+						selection.value = id;
 						editSelection = true;
 						
 						let selectionTitle = $(btn).closest('tr').find('input[name="title"]').val();
@@ -854,11 +854,11 @@
 	//--------------------------------------------------------------------------------- отменить текущую подборку
 	$.clearSelection = (btn) => {
 		$('[selectionsbtn]').ddrInputs('disable');
-		selection = null;
+		selection.value = null;
 		editSelection = null;
 		_clearCounts();
 		getList({
-			withCounts: search || selection,
+			withCounts: search || selection.value,
 			callback: function() {
 				$('#currentSelection').setAttrib('hidden');
 				$('[selectionsbtn]').ddrInputs('enable');
@@ -2050,7 +2050,7 @@
 					dateToValue = {},
 					
 					getList({
-						withCounts: search || selection,
+						withCounts: search || selection.value,
 						callback: function() {}
 					});
 				}
@@ -2216,7 +2216,7 @@
 		};
 		
 		getList({
-			withCounts: search || selection,
+			withCounts: search || selection.value,
 			callback: function() {}
 		});
 		
@@ -2257,7 +2257,7 @@
 		
 		
 		getList({
-			withCounts: search || selection,
+			withCounts: search || selection.value,
 			callback: function() {}
 		});
 	}
@@ -2403,7 +2403,7 @@
 		});
 		showselectionsTOut = setTimeout(() => {
 			if (haSContextMenu.value) return;
-			selectionsTooltip = showSelections(cell, contractId, selectionsTooltip);
+			selectionsTooltip = showSelections(cell, contractId, selectionsTooltip, selection);
 		}, 250);
 	}
 	
@@ -2490,7 +2490,7 @@
 		params['append'] = append ? 1 : 0;
 		params['search'] = search;
 		params['filter'] = columnFilter;
-		params['selection'] = selection;
+		params['selection'] = selection.value;
 		params['edit_selection'] = editSelection;
 		params['selected_contracts'] = selectedContracts.items;
 		
@@ -2548,7 +2548,7 @@
 			showTotalFn(showTotal, totalCount);
 			
 			
-			if (selection) {
+			if (selection.value) {
 				$('#tableContainer').removeClass('mb2rem').addClass('mb4rem');
 			} else {
 				$('#tableContainer').removeClass('mb4rem').addClass('mb2rem');
@@ -2675,7 +2675,7 @@
 		}*/
 		
 		params['search'] = search;
-		params['selection'] = selection;
+		params['selection'] = selection.value;
 		
 		const {data, error, status, headers, abort} = await axiosQuery('get', 'site/contracts/counts', params, 'json', abortCtrlCounts);
 		

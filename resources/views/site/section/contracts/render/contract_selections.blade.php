@@ -7,10 +7,25 @@
 					<li
 						@class([
 							'border-top border-light' => !$loop->first,
-							'color-gray-600',
-							'd-flex align-items-center h3rem',
+							'd-flex align-items-center justify-content-between h4rem',
 						])
-					>{{$selection['title'] ?? '--'}}</li>
+						>
+						<div class="currentselection__label">
+							<p id="currentSelectionTitle">{{$selection['title'] ?? '--'}}</p>
+						</div>
+							
+						<x-button
+							variant="red"
+							group="verysmall"
+							title="Отменить подборку"
+							class="noselect w2rem-6px"
+							{{-- inpgroup="verysmall" --}}
+							action="removeContractFromSelection:{{$selection['id'] ?? null}}"
+							style="border-radius: 5px; border-color:transparent;height:26px;"
+							>
+							<i class="fa-solid fa-xmark"></i>
+						</x-button>	
+					</li>
 				@endforeach
 			</ul>
 		@else
@@ -18,3 +33,5 @@
 		@endif
 	</div>
 </div>
+
+
