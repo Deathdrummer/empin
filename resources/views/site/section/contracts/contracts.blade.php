@@ -242,7 +242,7 @@
 
 <script type="module">
 	
-	const {calcSubcontracting, calcGencontracting, showSelections, contextMenu} = loadSectionScripts({section: 'contracts'});
+	const {calcSubcontracting, calcGencontracting, showSelections, contextMenu, contentSelection} = loadSectionScripts({section: 'contracts'});
 	
 	
 	let abortCtrl,
@@ -1911,94 +1911,8 @@
 	
 	
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	//----------------------------------------------------------------------------------- Копирование текста в списке договоров
-	
-	// Выделение текста в ячейках
-	$('#contractsTable').on('mousedown', '[edittedplace]', function(e) {
-		const block = this;
-		const {isLeftClick, isRightClick, isCenterClick} = mouseClick(e);
-		const {isShiftKey, isCtrlKey, isCommandKey, isAltKey, isOptionKey, noKeys, isActiveKey} = metaKeys(e);
-		
-		if (isLeftClick) {
-			removeSelection();
-			$('#contractsTable').find('[edittedplace].select-text').removeClass('select-text');	
-			if (isAltKey) {
-				$(block).addClass('select-text');
-			}
-		}
-	});
-	
-	
-	
-	$('#contractsTable').on('mousemove', '[ddrtabletr]', function(e) {
-		const {isLeftClick, isRightClick, isCenterClick} = mouseClick(e);
-		const {isShiftKey, isCtrlKey, isCommandKey, isAltKey, isOptionKey, noKeys, isActiveKey} = metaKeys(e);
-		
-		if (isAltKey && isShiftKey && isLeftClick) {
-			let edittedText = $(e.currentTarget).find('[edittedplace]');
-			$(edittedText).not('.select-text').addClass('select-text');
-		}
-	});
-	
-	
-	
-	$('#contractsTable').on('mousemove', '[ddrtabletd]', function(e) {
-		const {isLeftClick, isRightClick, isCenterClick} = mouseClick(e);
-		const {isShiftKey, isCtrlKey, isCommandKey, isAltKey, isOptionKey, noKeys, isActiveKey} = metaKeys(e);
-		
-		if (isAltKey && isLeftClick) {
-			let edittedText = $(e.target).find('[edittedplace]');
-			$(edittedText).not('.select-text').addClass('select-text');
-		}
-	});
-	
-	
-	
-	
-	
-	
-	// Снятие выделения
-	$('#contractsTable').on(tapEvent, function(e) {
-		const {isLeftClick, isRightClick, isCenterClick} = mouseClick(e);
-		const {isShiftKey, isCtrlKey, isCommandKey, isAltKey, isOptionKey, noKeys, isActiveKey} = metaKeys(e);
-		
-		let isEdittedBlock = !!$(e.target).closest('[ddrtabletd]').find('[edittedblock]').length;
-		
-		console.log(isEdittedBlock);
-		if (isLeftClick && noKeys && !isEdittedBlock) {
-			removeSelection();
-			$('#contractsTable').find('[edittedplace].select-text').removeClass('select-text');
-		} 
-	});
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	contentSelection();
 	
 	
 	
@@ -2403,7 +2317,8 @@
 	//-------------------------------------------------- Отобразить тултип с подборками договора
 	let showselectionsTOut, selectionsTooltip;
 	$.showselections = (contractId) => {
-		if (haSContextMenu.value) return;
+		const {isAltKey} = metaKeys(event);
+		if (haSContextMenu.value || isAltKey) return;
 		const cell = event.target;
 		clearTimeout(showselectionsTOut);
 		$(cell).one('mouseleave', () => {

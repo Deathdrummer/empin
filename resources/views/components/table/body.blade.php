@@ -17,7 +17,7 @@
 	@if($scrolled)
 		style="max-height: {{$scrolled}};"
 	@endif
-	
+	role="rowgroup"
 	ddrtablebody
 	{{$scrollsync}}
 	>

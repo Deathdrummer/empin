@@ -3,6 +3,7 @@
 		'ddrtable__head',
 	])}}
 	ddrtablehead
+	role="rowgroup"
 	>
 	{{$slot}}
 </div>

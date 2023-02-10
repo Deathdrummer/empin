@@ -3,6 +3,7 @@
 		'ddrtable__foot',
 	])}}
 	ddrtablefoot
+	role="rowgroup"
 	>
 	{{$slot}}
 </div>

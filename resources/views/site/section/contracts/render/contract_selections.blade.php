@@ -7,7 +7,7 @@
 					<li
 						@class([
 							'border-top border-light' => !$loop->first,
-							'd-flex align-items-center justify-content-between h4rem',
+							'd-flex align-items-center h4rem',
 						])
 						>
 						<div class="currentselection__label">
@@ -18,10 +18,9 @@
 							variant="red"
 							group="verysmall"
 							title="Отменить подборку"
-							class="noselect w2rem-6px"
-							{{-- inpgroup="verysmall" --}}
+							class="noselect w2rem-6px ml5px"
 							action="removeContractFromSelection:{{$selection['id'] ?? null}}"
-							style="border-radius: 5px; border-color:transparent;height:26px;"
+							style="border-radius:5px;border-color:transparent;height:26px;"
 							>
 							<i class="fa-solid fa-xmark"></i>
 						</x-button>	

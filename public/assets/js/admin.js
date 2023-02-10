@@ -14444,6 +14444,240 @@ function calcSubcontracting() {
 
 /***/ }),
 
+/***/ "./resources/js/sections/site/contracts/contentSelection.js":
+/*!******************************************************************!*\
+  !*** ./resources/js/sections/site/contracts/contentSelection.js ***!
+  \******************************************************************/
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "contentSelection": function() { return /* binding */ contentSelection; }
+/* harmony export */ });
+function contentSelection() {
+  var selectedRowStart,
+      selectedRowEnd,
+      selectedColStart,
+      selectedColEnd,
+      isActiveSelecting = false,
+      cells = [];
+  $('#contractsTable').on('mousedown', function (e) {
+    var _metaKeys = metaKeys(e),
+        isShiftKey = _metaKeys.isShiftKey,
+        isCtrlKey = _metaKeys.isCtrlKey,
+        isCommandKey = _metaKeys.isCommandKey,
+        isAltKey = _metaKeys.isAltKey,
+        isOptionKey = _metaKeys.isOptionKey,
+        noKeys = _metaKeys.noKeys,
+        isActiveKey = _metaKeys.isActiveKey;
+
+    var _mouseClick = mouseClick(e),
+        isLeftClick = _mouseClick.isLeftClick,
+        isRightClick = _mouseClick.isRightClick,
+        isCenterClick = _mouseClick.isCenterClick;
+
+    var cell = $(e.target).closest('[ddrtabletd]');
+    var row = $(e.target).closest('[ddrtabletr]');
+
+    if (isLeftClick) {
+      if (isAltKey) {
+        isActiveSelecting = true;
+        selectedColEnd = $(cell).index();
+        selectedRowEnd = $(row).index();
+
+        if (!selectedColStart || !selectedRowStart) {
+          selectedColStart = $(cell).index();
+          selectedRowStart = $(row).index();
+          $(cell).find('[edittedplace]:not(.select-text)').addClass('select-text'); //selectionAction();
+        } else {
+          if ($(cell).index() !== -1 || $(row).index() !== -1) {
+            if (selectedColEnd !== $(cell).index()) selectedColEnd = $(cell).index();
+            if (selectedRowEnd !== $(row).index()) selectedRowEnd = $(row).index();
+            selectionAction();
+          }
+        }
+      } else {
+        selectedColStart = selectedColEnd = null;
+        selectedRowStart = selectedRowEnd = null;
+        selectionAction();
+      }
+    }
+
+    $(this).one('mouseup', function () {
+      isActiveSelecting = false;
+    });
+  });
+  $('#contractsTable').on('mousemove.contentSelection', function (e) {
+    var _mouseClick2 = mouseClick(e),
+        isLeftClick = _mouseClick2.isLeftClick,
+        isRightClick = _mouseClick2.isRightClick,
+        isCenterClick = _mouseClick2.isCenterClick;
+
+    var _metaKeys2 = metaKeys(e),
+        isShiftKey = _metaKeys2.isShiftKey,
+        isCtrlKey = _metaKeys2.isCtrlKey,
+        isCommandKey = _metaKeys2.isCommandKey,
+        isAltKey = _metaKeys2.isAltKey,
+        isOptionKey = _metaKeys2.isOptionKey,
+        noKeys = _metaKeys2.noKeys,
+        isActiveKey = _metaKeys2.isActiveKey;
+
+    var cell = $(e.target).closest('[ddrtabletd][commonlist]');
+
+    if (isLeftClick && isAltKey && isActiveSelecting) {
+      var selectedCol = $(e.target).closest('[ddrtabletd]'),
+          selectedRow = $(e.target).closest('[ddrtabletr]');
+
+      if (isAltKey && ($(selectedCol).index() !== -1 && selectedColEnd !== $(selectedCol).index() || $(selectedRow).index() !== -1 && selectedRowEnd !== $(selectedRow).index())) {
+        if (selectedColEnd !== $(selectedCol).index()) selectedColEnd = $(selectedCol).index();
+        if (selectedRowEnd !== $(selectedRow).index()) selectedRowEnd = $(selectedRow).index();
+        selectionAction();
+      }
+    }
+  });
+  $(document).on('keydown', function (e) {
+    var _metaKeys3 = metaKeys(e),
+        isShiftKey = _metaKeys3.isShiftKey,
+        isCtrlKey = _metaKeys3.isCtrlKey,
+        isCommandKey = _metaKeys3.isCommandKey,
+        isAltKey = _metaKeys3.isAltKey,
+        isOptionKey = _metaKeys3.isOptionKey,
+        noKeys = _metaKeys3.noKeys,
+        isActiveKey = _metaKeys3.isActiveKey;
+
+    if (isCtrlKey && e.keyCode == 67) {
+      if (!getSelectionStr()) {
+        e.preventDefault();
+        var row = null,
+            allData = '';
+        $('#contractsTable').find('[ddrtabletd][copied]').each(function (k, item) {
+          if (k == 0) row = $(item).closest('[ddrtabletr]')[0];
+
+          if (k > 0 && row !== $(item).closest('[ddrtabletr]')[0]) {
+            row = $(item).closest('[ddrtabletr]')[0];
+            allData += "\n";
+          }
+
+          allData += $(item).find('[edittedplace]').text() + "\t";
+        });
+        copyStringToClipboard(allData);
+        return false;
+      }
+
+      console.log('default');
+    }
+  });
+
+  function selectionAction() {
+    unSelect($('#contractsTable').find('[ddrtabletd][commonlist]'));
+    var minRow = Math.min(selectedRowStart, selectedRowEnd),
+        maxRow = Math.max(selectedRowStart, selectedRowEnd),
+        minCol = Math.min(selectedColStart, selectedColEnd),
+        maxCol = Math.max(selectedColStart, selectedColEnd);
+    cells = [];
+
+    for (var r = minRow; r <= maxRow; r++) {
+      var row = $('#contractsTable').find('[ddrtabletr]').eq(r);
+
+      for (var c = minCol; c <= maxCol; c++) {
+        cells.push($(row).find('[ddrtabletd][commonlist]').eq(c)[0]);
+      }
+    }
+
+    select(cells);
+  }
+
+  function select(cells) {
+    cells = cells.filter(function (item) {
+      return !!item;
+    });
+    if (!cells.length) return;
+    $(cells).addClass('selected');
+    $(cells).setAttrib('copied'); //$(cells).find('[edittedplace]:not(.select-text)').addClass('select-text');	
+  }
+
+  function unSelect(selector) {
+    $(selector).find('[edittedplace].select-text').removeClass('select-text');
+    $(selector).removeAttrib('copied');
+    $(selector).removeClass('selected');
+  }
+  /*$('#contractsTable').on('mousemove', '[ddrtabletd]', function(e) {
+  	console.log('mousemove');
+  	mouseMoveEvent = e;
+  	const {isLeftClick, isRightClick, isCenterClick} = mouseClick(e);
+  	
+  	if (isLeftClick) {
+  		let movedCell = $(e.target).closest('[ddrtabletd]')[0];
+  		
+  		//removeSelection();
+  		$('#contractsTable').find('[edittedplace].select-text').removeClass('select-text');	
+  		if (isAltKey && initialCell === movedCell) {
+  			$(e.target).addClass('select-text');
+  		}
+  		
+  		
+  		if (initialCell !== movedCell) {
+  			console.log('cross');
+  			initialCell = movedCell;
+  		}
+  	}
+  });*/
+  // Выделение текста в ячейках
+
+  /*$('#contractsTable').on('mousedown', '[edittedplace]', function(e) {
+  	const block = this;
+  	const {isLeftClick, isRightClick, isCenterClick} = mouseClick(e);
+  	const {isShiftKey, isCtrlKey, isCommandKey, isAltKey, isOptionKey, noKeys, isActiveKey} = metaKeys(e);
+  	
+  	if (isLeftClick) {
+  		removeSelection();
+  		$('#contractsTable').find('[edittedplace].select-text').removeClass('select-text');	
+  		if (isAltKey) {
+  			$(block).addClass('select-text');
+  		}
+  	}
+  });*/
+
+  /*$('#contractsTable').on('mousemove', '[ddrtabletr]', function(e) {
+  	const {isLeftClick, isRightClick, isCenterClick} = mouseClick(e);
+  	const {isShiftKey, isCtrlKey, isCommandKey, isAltKey, isOptionKey, noKeys, isActiveKey} = metaKeys(e);
+  	
+  	if (isAltKey && isShiftKey && isLeftClick) {
+  		let edittedText = $(e.currentTarget).find('[edittedplace]');
+  		$(edittedText).not('.select-text').addClass('select-text');
+  	}
+  });
+  
+  
+  
+  $('#contractsTable').on('mousemove', '[ddrtabletd]', function(e) {
+  	const {isLeftClick, isRightClick, isCenterClick} = mouseClick(e);
+  	const {isShiftKey, isCtrlKey, isCommandKey, isAltKey, isOptionKey, noKeys, isActiveKey} = metaKeys(e);
+  	
+  	if (isAltKey && isLeftClick) {
+  		let edittedText = $(e.target).find('[edittedplace]');
+  		$(edittedText).not('.select-text').addClass('select-text');
+  	}
+  });*/
+  // Снятие выделения
+
+  /*$('#contractsTable').on(tapEvent, function(e) {
+  	const {isLeftClick, isRightClick, isCenterClick} = mouseClick(e);
+  	const {isShiftKey, isCtrlKey, isCommandKey, isAltKey, isOptionKey, noKeys, isActiveKey} = metaKeys(e);
+  	
+  	let isEdittedBlock = !!$(e.target).closest('[ddrtabletd]').find('[edittedblock]').length;
+  	
+  	if (isLeftClick && noKeys && !isEdittedBlock) {
+  		removeSelection();
+  		$('#contractsTable').find('[edittedplace].select-text').removeClass('select-text');
+  	} 
+  });*/
+
+}
+
+/***/ }),
+
 /***/ "./resources/js/sections/site/contracts/contextMenu.js":
 /*!*************************************************************!*\
   !*** ./resources/js/sections/site/contracts/contextMenu.js ***!
@@ -15946,6 +16180,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "calcGencontracting": function() { return /* reexport safe */ _calcGencontracting_js__WEBPACK_IMPORTED_MODULE_1__.calcGencontracting; },
 /* harmony export */   "calcSubcontracting": function() { return /* reexport safe */ _calcSubcontracting_js__WEBPACK_IMPORTED_MODULE_0__.calcSubcontracting; },
+/* harmony export */   "contentSelection": function() { return /* reexport safe */ _contentSelection_js__WEBPACK_IMPORTED_MODULE_4__.contentSelection; },
 /* harmony export */   "contextMenu": function() { return /* reexport safe */ _contextMenu_js__WEBPACK_IMPORTED_MODULE_3__.contextMenu; },
 /* harmony export */   "showSelections": function() { return /* reexport safe */ _showSelections_js__WEBPACK_IMPORTED_MODULE_2__.showSelections; }
 /* harmony export */ });
@@ -15953,6 +16188,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _calcGencontracting_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./calcGencontracting.js */ "./resources/js/sections/site/contracts/calcGencontracting.js");
 /* harmony import */ var _showSelections_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./showSelections.js */ "./resources/js/sections/site/contracts/showSelections.js");
 /* harmony import */ var _contextMenu_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./contextMenu.js */ "./resources/js/sections/site/contracts/contextMenu.js");
+/* harmony import */ var _contentSelection_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./contentSelection.js */ "./resources/js/sections/site/contracts/contentSelection.js");
+
 
 
 

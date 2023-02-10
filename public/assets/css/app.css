@@ -143653,6 +143653,12 @@ template {
 .ddrtable__td.v-end {
   align-items: end;
 }
+.ddrtable__td.selected {
+  background-color: #008feb;
+}
+.ddrtable__td.selected * {
+  color: #fff;
+}
 .ddrtable__td.sort, .ddrtable__td [ddrtabletdmain].sort {
   position: relative;
   cursor: pointer;

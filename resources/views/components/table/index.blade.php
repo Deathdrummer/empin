@@ -15,6 +15,7 @@
 	id="{{$id}}"
 	ddrtable
 	scrollsync="{{$scrollsync}}"
+	role="table"
 	>
 	{{$slot}}
 </div>
