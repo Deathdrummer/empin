@@ -17425,8 +17425,12 @@ function contentSelection() {
 
           allData += $(item).find('[edittedplace]').text();
         });
-        copyStringToClipboard(allData.trim());
-        $.notify('Скопировано!');
+
+        if (allData.trim()) {
+          copyStringToClipboard(allData.trim());
+          $.notify('Скопировано!');
+        }
+
         return false;
       }
 
@@ -17598,9 +17602,9 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
     var hasCheckbox = !!$(target.pointer).closest('[ddrtabletd]').children().length;
     var contextEdited = !!$(target.pointer).closest('[ddrtabletd]').hasAttr('contextedit');
     var disableEditCell = !$(target.pointer).closest('[ddrtabletd]').attr('contextedit');
-    var selectedTextCell = !!$(target.pointer).closest('[ddrtabletd]').find('[edittedplace]').hasClass('select-text') || !!$(target.pointer).closest('[ddrtabletd]').find('[edittedblock]').length || !!$('#contractsTable').find('[ddrtabletd].selected').length; // Если это оин пункт "копировать"
+    var selectedTextCell = !!$(target.pointer).closest('[ddrtabletd]').find('[edittedplace]').hasClass('select-text') || !!$(target.pointer).closest('[ddrtabletd]').find('[edittedblock]').length || !!$('#contractsTable').find('[ddrtabletd].selected').length && $(target.pointer).closest('[ddrtabletd]').hasClass('selected'); // Если это оин пункт "копировать"
 
-    if (selectedTextCell) {
+    if (selectedTextCell && $(target.pointer).closest('[ddrtabletd]').hasClass('selected') || !!$(target.pointer).closest('[ddrtabletd]').find('[edittedplace]').hasClass('select-text')) {
       ddrCssVar('cm-mainMinHeight', '30px');
     } else {
       ddrCssVar('cm-mainMinHeight', '48px');
@@ -17615,6 +17619,10 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
         $('#contractsList').find('[editted]').each(function (k, cell) {
           unEditCell(cell);
         });
+      }
+
+      if ($(target.pointer).closest('[ddrtabletd]').hasClass('selected') == false) {
+        $('#contractsList').find('[ddrtabletd].selected').removeClass('selected');
       } // если кликнуть на НЕвыделенном договоре - то все выделенния отменятся и выделится текущий кликнутый договор
 
 
@@ -19034,8 +19042,9 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                   $.notify('Скопировано!');
                   removeSelection();
                   $('#contractsTable').find('[edittedplace].select-text').removeClass('select-text');
+                  $('#contractsList').find('[ddrtabletd].selected').removeClass('selected');
 
-                case 6:
+                case 7:
                 case "end":
                   return _context14.stop();
               }

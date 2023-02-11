@@ -39,11 +39,11 @@ export function contextMenu(
 		const hasCheckbox = !!$(target.pointer).closest('[ddrtabletd]').children().length;
 		const contextEdited = !!$(target.pointer).closest('[ddrtabletd]').hasAttr('contextedit');
 		const disableEditCell = !$(target.pointer).closest('[ddrtabletd]').attr('contextedit');
-		const selectedTextCell = !!$(target.pointer).closest('[ddrtabletd]').find('[edittedplace]').hasClass('select-text') || !!$(target.pointer).closest('[ddrtabletd]').find('[edittedblock]').length || !!$('#contractsTable').find('[ddrtabletd].selected').length;
+		const selectedTextCell = !!$(target.pointer).closest('[ddrtabletd]').find('[edittedplace]').hasClass('select-text') || !!$(target.pointer).closest('[ddrtabletd]').find('[edittedblock]').length || (!!$('#contractsTable').find('[ddrtabletd].selected').length && $(target.pointer).closest('[ddrtabletd]').hasClass('selected'));
 		
 		
 		// Если это оин пункт "копировать"
-		if (selectedTextCell) {
+		if ((selectedTextCell && $(target.pointer).closest('[ddrtabletd]').hasClass('selected')) || !!$(target.pointer).closest('[ddrtabletd]').find('[edittedplace]').hasClass('select-text')) {
 			ddrCssVar('cm-mainMinHeight', '30px');
 		} else {
 			ddrCssVar('cm-mainMinHeight', '48px');
@@ -59,6 +59,12 @@ export function contextMenu(
 				$('#contractsList').find('[editted]').each(function(k, cell) {
 					unEditCell(cell);
 				});
+			}
+			
+			
+			if ($(target.pointer).closest('[ddrtabletd]').hasClass('selected') == false) {
+				$('#contractsList').find('[ddrtabletd].selected').removeClass('selected');
+				
 			}
 				
 			
@@ -1110,6 +1116,7 @@ export function contextMenu(
 					
 					removeSelection();
 					$('#contractsTable').find('[edittedplace].select-text').removeClass('select-text');	
+					$('#contractsList').find('[ddrtabletd].selected').removeClass('selected');
 				}
 			}
 		];

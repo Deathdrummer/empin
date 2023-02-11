@@ -94,9 +94,12 @@ export function contentSelection() {
 					allData += $(item).find('[edittedplace]').text();
 				});
 				
-				copyStringToClipboard(allData.trim());
 				
-				$.notify('Скопировано!');
+				if (allData.trim()) {
+					copyStringToClipboard(allData.trim());
+					$.notify('Скопировано!');
+				}
+					
 				
 				return false;
 			}
