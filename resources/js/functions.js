@@ -413,7 +413,7 @@ window.getSelectionStr = function() {
 
 
 
-window.removeSelection = function(elem) {
+window.removeSelection = function() {
 	if (window.getSelection) {
 		if (window.getSelection().empty) {  // Chrome
 			window.getSelection().empty();

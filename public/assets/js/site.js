@@ -6024,7 +6024,7 @@ window.getSelectionStr = function () {
   return text;
 };
 
-window.removeSelection = function (elem) {
+window.removeSelection = function () {
   if (window.getSelection) {
     if (window.getSelection().empty) {
       // Chrome
@@ -17350,6 +17350,9 @@ function contentSelection() {
           selectedRowStart = $(row).index();
           $(cell).find('[edittedplace]:not(.select-text)').addClass('select-text'); //selectionAction();
         } else {
+          $(cell).find('[edittedplace].select-text').removeClass('select-text');
+          removeSelection();
+
           if ($(cell).index() !== -1 || $(row).index() !== -1) {
             if (selectedColEnd !== $(cell).index()) selectedColEnd = $(cell).index();
             if (selectedRowEnd !== $(row).index()) selectedRowEnd = $(row).index();
@@ -17416,11 +17419,13 @@ function contentSelection() {
           if (k > 0 && row !== $(item).closest('[ddrtabletr]')[0]) {
             row = $(item).closest('[ddrtabletr]')[0];
             allData += "\n";
+          } else if (k > 0) {
+            allData += "\t";
           }
 
-          allData += $(item).find('[edittedplace]').text() + "\t";
+          allData += $(item).find('[edittedplace]').text();
         });
-        copyStringToClipboard(allData);
+        copyStringToClipboard(allData.trim());
         return false;
       }
 
