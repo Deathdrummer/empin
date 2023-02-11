@@ -143654,10 +143654,7 @@ template {
   align-items: end;
 }
 .ddrtable__td.selected {
-  background-color: #008feb;
-}
-.ddrtable__td.selected * {
-  color: #fff;
+  background-color: #e5ddf3;
 }
 .ddrtable__td.sort, .ddrtable__td [ddrtabletdmain].sort {
   position: relative;

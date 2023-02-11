@@ -14567,6 +14567,7 @@ function contentSelection() {
           allData += $(item).find('[edittedplace]').text();
         });
         copyStringToClipboard(allData.trim());
+        $.notify('Скопировано!');
         return false;
       }
 
@@ -14738,7 +14739,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
     var hasCheckbox = !!$(target.pointer).closest('[ddrtabletd]').children().length;
     var contextEdited = !!$(target.pointer).closest('[ddrtabletd]').hasAttr('contextedit');
     var disableEditCell = !$(target.pointer).closest('[ddrtabletd]').attr('contextedit');
-    var selectedTextCell = !!$(target.pointer).closest('[ddrtabletd]').find('[edittedplace]').hasClass('select-text') || !!$(target.pointer).closest('[ddrtabletd]').find('[edittedblock]').length; // Если это оин пункт "копировать"
+    var selectedTextCell = !!$(target.pointer).closest('[ddrtabletd]').find('[edittedplace]').hasClass('select-text') || !!$(target.pointer).closest('[ddrtabletd]').find('[edittedblock]').length || !!$('#contractsTable').find('[ddrtabletd].selected').length; // Если это оин пункт "копировать"
 
     if (selectedTextCell) {
       ddrCssVar('cm-mainMinHeight', '30px');
@@ -16152,15 +16153,30 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
       sort: 1,
       onClick: function onClick() {
         return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee14() {
+          var row, allData;
           return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee14$(_context14) {
             while (1) {
               switch (_context14.prev = _context14.next) {
                 case 0:
-                  copyStringToClipboard(getSelectionStr());
+                  row = null, allData = '';
+                  $('#contractsTable').find('[ddrtabletd][copied]').each(function (k, item) {
+                    if (k == 0) row = $(item).closest('[ddrtabletr]')[0];
+
+                    if (k > 0 && row !== $(item).closest('[ddrtabletr]')[0]) {
+                      row = $(item).closest('[ddrtabletr]')[0];
+                      allData += "\n";
+                    } else if (k > 0) {
+                      allData += "\t";
+                    }
+
+                    allData += $(item).find('[edittedplace]').text();
+                  });
+                  copyStringToClipboard(allData.trim());
+                  $.notify('Скопировано!');
                   removeSelection();
                   $('#contractsTable').find('[edittedplace].select-text').removeClass('select-text');
 
-                case 3:
+                case 6:
                 case "end":
                   return _context14.stop();
               }

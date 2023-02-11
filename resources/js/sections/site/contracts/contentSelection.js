@@ -96,6 +96,8 @@ export function contentSelection() {
 				
 				copyStringToClipboard(allData.trim());
 				
+				$.notify('Скопировано!');
+				
 				return false;
 			}
 				

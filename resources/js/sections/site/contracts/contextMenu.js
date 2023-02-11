@@ -39,7 +39,7 @@ export function contextMenu(
 		const hasCheckbox = !!$(target.pointer).closest('[ddrtabletd]').children().length;
 		const contextEdited = !!$(target.pointer).closest('[ddrtabletd]').hasAttr('contextedit');
 		const disableEditCell = !$(target.pointer).closest('[ddrtabletd]').attr('contextedit');
-		const selectedTextCell = !!$(target.pointer).closest('[ddrtabletd]').find('[edittedplace]').hasClass('select-text') || !!$(target.pointer).closest('[ddrtabletd]').find('[edittedblock]').length;
+		const selectedTextCell = !!$(target.pointer).closest('[ddrtabletd]').find('[edittedplace]').hasClass('select-text') || !!$(target.pointer).closest('[ddrtabletd]').find('[edittedblock]').length || !!$('#contractsTable').find('[ddrtabletd].selected').length;
 		
 		
 		// Если это оин пункт "копировать"
@@ -1090,7 +1090,23 @@ export function contextMenu(
 				visible: selectedTextCell,
 				sort: 1,
 				async onClick() {
-					copyStringToClipboard(getSelectionStr());
+					let row = null, allData = '';
+					$('#contractsTable').find('[ddrtabletd][copied]').each((k, item) => {
+						if (k == 0) row = $(item).closest('[ddrtabletr]')[0];
+						
+						if (k > 0 && row !== $(item).closest('[ddrtabletr]')[0]) {
+							row = $(item).closest('[ddrtabletr]')[0];
+							allData += "\n";
+						} else if (k > 0) {
+							allData += "\t";
+						}
+						
+						allData += $(item).find('[edittedplace]').text();
+					});
+					
+					copyStringToClipboard(allData.trim());
+					
+					$.notify('Скопировано!');
 					
 					removeSelection();
 					$('#contractsTable').find('[edittedplace].select-text').removeClass('select-text');	
