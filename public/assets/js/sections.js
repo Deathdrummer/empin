@@ -284,6 +284,8 @@ function contentSelection() {
     }
   });
   $(document).on('keydown', function (e) {
+    console.log('keydown');
+
     var _metaKeys3 = metaKeys(e),
         isShiftKey = _metaKeys3.isShiftKey,
         isCtrlKey = _metaKeys3.isCtrlKey,
@@ -294,6 +296,8 @@ function contentSelection() {
         isActiveKey = _metaKeys3.isActiveKey;
 
     if (isCtrlKey && e.keyCode == 67) {
+      console.log(isCtrlKey, e.keyCode, getSelectionStr());
+
       if (!getSelectionStr()) {
         e.preventDefault();
         var row = null,
