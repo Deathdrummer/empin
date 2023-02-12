@@ -97,14 +97,14 @@ export function contentSelection() {
 				
 				if (allData.trim()) {
 					copyStringToClipboard(allData.trim());
-					$.notify('Скопировано!');
+					$.notify('Скопировано 555!');
 				}
 					
 				
 				return false;
 			}
 				
-			console.log('default');
+			//console.log('default');
 		}
 	});
 	

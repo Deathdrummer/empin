@@ -401,10 +401,6 @@ window.selectText = function(elem) {
 
 
 window.getSelectionStr = function(toString = true) {
-	
-	
-	console.log(window.getSelection());
-	
     var text = "";
     if (window.getSelection) {
         text = toString ? window.getSelection().toString() : window.getSelection();

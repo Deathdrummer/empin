@@ -1185,9 +1185,14 @@
 			$(document).on('keydown', function(e) {
 				const {isShiftKey, isCtrlKey, isCommandKey, isAltKey, isOptionKey, noKeys, isActiveKey} = metaKeys(e);
 				if (isCtrlKey && e.keyCode == 67) {
+					e.preventDefault();
+					
 					if (getSelectionStr()) {
-						$.notify('Скопировано!');
+						copyStringToClipboard(getSelectionStr());
+						$.notify('Скопировано 444!');
 					}
+					
+					return false;
 				}
 			});
 			
@@ -1213,8 +1218,6 @@
 	
 	
 	$.copyCommonInfoItem = ({target, closeOnScroll, onContextMenu, onCloseContextMenu, changeAttrData, buildTitle, setStyle}) => {
-
-
 		const hasSelectedStr = !!getSelectionStr();
 
 		setStyle({
@@ -1233,8 +1236,8 @@
 			visible: hasSelectedStr,
 			sort: 1,
 			async onClick() {
-				copyStringToClipboard(getSelectionStr(false));
-				$.notify('Скопировано!');
+				copyStringToClipboard(getSelectionStr());
+				$.notify('Скопировано 333!');
 				//removeSelection();
 			}
 		}];

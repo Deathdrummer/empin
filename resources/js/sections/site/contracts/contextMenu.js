@@ -169,7 +169,7 @@ export function contextMenu(
 										const selectString =  selObj.toString();
 										if (selectString.length) {
 											copyStringToClipboard(selObj.toString());
-											$.notify('Скопировано!');
+											$.notify('Скопировано 111!');
 										}
 									});
 															
@@ -1112,7 +1112,7 @@ export function contextMenu(
 					
 					copyStringToClipboard(allData.trim());
 					
-					$.notify('Скопировано!');
+					$.notify('Скопировано 222!');
 					
 					removeSelection();
 					$('#contractsTable').find('[edittedplace].select-text').removeClass('select-text');	

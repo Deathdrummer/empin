@@ -313,13 +313,12 @@ function contentSelection() {
 
         if (allData.trim()) {
           copyStringToClipboard(allData.trim());
-          $.notify('Скопировано!');
+          $.notify('Скопировано 555!');
         }
 
         return false;
-      }
+      } //console.log('default');
 
-      console.log('default');
     }
   });
 
@@ -617,7 +616,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
 
                   if (selectString.length) {
                     copyStringToClipboard(selObj.toString());
-                    $.notify('Скопировано!');
+                    $.notify('Скопировано 111!');
                   }
                 });
                 $('#chatMessageBlock').ddrInputs('change', function () {
@@ -1925,7 +1924,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                     allData += $(item).find('[edittedplace]').text();
                   });
                   copyStringToClipboard(allData.trim());
-                  $.notify('Скопировано!');
+                  $.notify('Скопировано 222!');
                   removeSelection();
                   $('#contractsTable').find('[edittedplace].select-text').removeClass('select-text');
                   $('#contractsList').find('[ddrtabletd].selected').removeClass('selected');
