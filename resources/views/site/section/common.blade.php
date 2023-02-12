@@ -27,7 +27,20 @@
 
 <script type="module">
 	
-	$.testContextMenu = (id, foo, bar) => {
+	
+	
+	
+	
+	$(document).on('keydown', function(e) {
+		console.log(e);
+	}
+	
+	
+	
+	
+	
+	
+	/*$.testContextMenu = (id, foo, bar) => {
 		return [
 			{
 				name: 'name 1',
@@ -56,5 +69,5 @@
 			}
 		];
 	}
-	
+	*/
 </script>
