@@ -400,10 +400,14 @@ window.selectText = function(elem) {
 
 
 
-window.getSelectionStr = function() {
+window.getSelectionStr = function(toString = true) {
+	
+	
+	console.log(window.getSelection());
+	
     var text = "";
     if (window.getSelection) {
-        text = window.getSelection().toString();
+        text = toString ? window.getSelection().toString() : window.getSelection();
     } else if (document.selection && document.selection.type != "Control") {
         text = document.selection.createRange().text;
     }

@@ -6157,10 +6157,12 @@ window.selectText = function (elem) {
 };
 
 window.getSelectionStr = function () {
+  var toString = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+  console.log(window.getSelection());
   var text = "";
 
   if (window.getSelection) {
-    text = window.getSelection().toString();
+    text = toString ? window.getSelection().toString() : window.getSelection();
   } else if (document.selection && document.selection.type != "Control") {
     text = document.selection.createRange().text;
   }
@@ -14737,7 +14739,8 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
         onContextMenu = _ref.onContextMenu,
         onCloseContextMenu = _ref.onCloseContextMenu,
         changeAttrData = _ref.changeAttrData,
-        buildTitle = _ref.buildTitle;
+        buildTitle = _ref.buildTitle,
+        setStyle = _ref.setStyle;
     var isCommon = !!$(target.pointer).closest('[ddrtabletd]').hasAttr('commonlist') || false;
     var isDeptCheckbox = !!$(target.pointer).closest('[ddrtabletd]').hasAttr('deptcheck') || false;
     var hasCheckbox = !!$(target.pointer).closest('[ddrtabletd]').children().length;
@@ -14746,9 +14749,9 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
     var selectedTextCell = !!$(target.pointer).closest('[ddrtabletd]').find('[edittedplace]').hasClass('select-text') || !!$(target.pointer).closest('[ddrtabletd]').find('[edittedblock]').length || !!$('#contractsTable').find('[ddrtabletd].selected').length && $(target.pointer).closest('[ddrtabletd]').hasClass('selected'); // Если это оин пункт "копировать"
 
     if (selectedTextCell && $(target.pointer).closest('[ddrtabletd]').hasClass('selected') || !!$(target.pointer).closest('[ddrtabletd]').find('[edittedplace]').hasClass('select-text')) {
-      ddrCssVar('cm-mainMinHeight', '30px');
-    } else {
-      ddrCssVar('cm-mainMinHeight', '48px');
+      setStyle({
+        mainMinHeight: '30px'
+      });
     }
 
     onContextMenu(function () {
@@ -16303,7 +16306,7 @@ function showSelections(cell) {
 
                 $.removeContractFromSelection = /*#__PURE__*/function () {
                   var _ref2 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee(btn, selectionId) {
-                    var _yield$axiosQuery2, data, error, status, headers;
+                    var _yield$axiosQuery2, data, error, status, headers, objectNum;
 
                     return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
                       while (1) {
@@ -16341,6 +16344,9 @@ function showSelections(cell) {
                               if (selectionId == selection.value) {
                                 $('#contractsTable').find('[contractid="' + contractId + '"]').remove();
                               }
+
+                              objectNum = $(reference).text().trim();
+                              $.notify('Объект: ' + objectNum + ' удален из подборки!');
                             }
 
                           case 13:

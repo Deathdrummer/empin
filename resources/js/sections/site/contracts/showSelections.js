@@ -31,7 +31,6 @@ export function showSelections(cell, contractId = null, selectionsTooltip, selec
 			waitDetroy();
 			
 			
-			
 			$.removeContractFromSelection = async (btn, selectionId) => {
 				$(btn).ddrWait({
 					iconHeight: '20px',
@@ -54,6 +53,10 @@ export function showSelections(cell, contractId = null, selectionsTooltip, selec
 					if (selectionId == selection.value) {
 						$('#contractsTable').find('[contractid="'+contractId+'"]').remove();
 					}
+					
+					
+					const objectNum = $(reference).text().trim();
+					$.notify('Объект: '+objectNum+' удален из подборки!');
 					
 				}
 			}

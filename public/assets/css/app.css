@@ -45515,6 +45515,9 @@ template {
   -ms-user-select: none;
   user-select: none;
 }
+.noselect::before, [noselect]::before {
+  content: attr(noselect);
+}
 
 .select-text {
   -webkit-user-select: text;

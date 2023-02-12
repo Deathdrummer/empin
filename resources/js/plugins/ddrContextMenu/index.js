@@ -1,6 +1,7 @@
 import "./index.css";
 
 let functionsMap, loadedFuntionsMap, menuSelector, abortCtrl;
+const initStyles = {};
 
 $(document).on('contextmenu', '[contextmenu]', async function(e) {
 	e.preventDefault();
@@ -12,6 +13,9 @@ $(document).on('contextmenu', '[contextmenu]', async function(e) {
 	
 	// Получить название функции-построителя меню и ее аргументы
 	const [func, args] = _parseAttribString($(target.selector).attr('contextmenu'));
+	
+	
+	console.log(func, args);
 	
 	
 	// Методы для основной функции
@@ -102,6 +106,12 @@ $(document).on('contextmenu', '[contextmenu]', async function(e) {
 				strictY: true,
 			});
 			_show();
+		},
+		setStyle(styles) { // Переопределить стили
+			$.each(styles, function(prop, value) {
+				initStyles[prop] = ddrCssVar('cm-'+prop);
+				ddrCssVar('cm-'+prop, value);
+			});
 		}
 	};
 	
@@ -193,7 +203,8 @@ function _parseAttribString(stringToParse = null) {
 	if (_.isNull(stringToParse)) throw new Error('Ошибка! contextmenu _parseStringToFuncArgs -> не передан аргумент!');
 	if (!_.isString(stringToParse)) throw new Error('Ошибка! contextmenu _parseStringToFuncArgs -> передаваемый аргумент должен быть строкой!');
 	
-	let [func, args] = ddrSplit(stringToParse?.replace(/\n+/gm, ''), ':', ',');
+	const splitSrt = ddrSplit(stringToParse?.replace(/\n+/gm, ''), ':', ',');
+	let [func, args] = _.isArray(splitSrt) ? splitSrt : [splitSrt, null];
 	if (!_.isArray(args)) args = [args];
 	return [func, args];
 }
@@ -624,5 +635,10 @@ function _close() {
 	//setTimeout(function() {
 	menuSelector.remove();
 	$(document).trigger('closeContextMenu');
+	
+	// Вернуть все переопределенные стили в исходное состояние
+	$.each(initStyles, function(prop, value) {
+		ddrCssVar('cm-'+prop, value);
+	});
 	//}, 100);
 }

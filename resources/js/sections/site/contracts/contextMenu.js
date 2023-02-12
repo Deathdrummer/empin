@@ -10,7 +10,7 @@ export function contextMenu(
 	
 	let commentsTooltip, cellEditTooltip;
 	$.contractContextMenu = (
-		{target, closeOnScroll, onContextMenu, onCloseContextMenu, changeAttrData, buildTitle},
+		{target, closeOnScroll, onContextMenu, onCloseContextMenu, changeAttrData, buildTitle, setStyle},
 		contractId,
 		departmentId,
 		selectionId,
@@ -44,9 +44,9 @@ export function contextMenu(
 		
 		// Если это оин пункт "копировать"
 		if ((selectedTextCell && $(target.pointer).closest('[ddrtabletd]').hasClass('selected')) || !!$(target.pointer).closest('[ddrtabletd]').find('[edittedplace]').hasClass('select-text')) {
-			ddrCssVar('cm-mainMinHeight', '30px');
-		} else {
-			ddrCssVar('cm-mainMinHeight', '48px');
+			setStyle({
+				mainMinHeight: '30px',
+			});
 		}
 		
 		

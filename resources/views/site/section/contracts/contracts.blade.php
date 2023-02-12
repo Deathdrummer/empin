@@ -1180,14 +1180,17 @@
 				selectText(elem);
 			});
 			
-			$('#commoninfoContent').find('.select-text').mouseup(function (e) {
-				const selObj = window.getSelection();
-				const selectString =  selObj.toString();
-				if (selectString.length) {
-					copyStringToClipboard(selObj.toString());
-					$.notify('Скопировано!');
+			
+			
+			$(document).on('keydown', function(e) {
+				const {isShiftKey, isCtrlKey, isCommandKey, isAltKey, isOptionKey, noKeys, isActiveKey} = metaKeys(e);
+				if (isCtrlKey && e.keyCode == 67) {
+					if (getSelectionStr()) {
+						$.notify('Скопировано!');
+					}
 				}
 			});
+			
 			
 			
 			$('#commonInfoFields').ddrInputs('change', (field) => {
@@ -1208,6 +1211,34 @@
 	}
 	
 	
+	
+	$.copyCommonInfoItem = ({target, closeOnScroll, onContextMenu, onCloseContextMenu, changeAttrData, buildTitle, setStyle}) => {
+
+
+		const hasSelectedStr = !!getSelectionStr();
+
+		setStyle({
+			mainMinHeight: '30px',
+			mainZIndex: 1001
+		});
+		
+		onContextMenu(() => {
+			
+		});
+		
+		closeOnScroll('#commonInfoBlock');
+		
+		return [{
+			name: 'Копировать',
+			visible: hasSelectedStr,
+			sort: 1,
+			async onClick() {
+				copyStringToClipboard(getSelectionStr(false));
+				$.notify('Скопировано!');
+				//removeSelection();
+			}
+		}];
+	}
 	
 	
 	

@@ -80,6 +80,8 @@
 	--cm-divSpace: 20px;
 	
 	--cm-oppositeMargin: 10; /* px */
+	
+	--cm-mainZIndex: 130;
 }
 	
 
@@ -103,7 +105,7 @@
 		border: var(--cm-mainBorderWidth) solid var(--cm-mainBorderColor);
 		border-radius: var(--cm-mainMenuRadius);
 		box-shadow: var(--cm-mainBoxShadow);
-		z-index: 130;
+		z-index: var(--cm-mainZIndex);
 	}
 	
 		.ddrcontextmenu_main-scrolled {
@@ -162,7 +164,7 @@
 		opacity: 0;
 		pointer-events: none;
 		transition: opacity var(--cm-hideSubMenu);
-		z-index: 131;
+		z-index: calc(var(--cm-mainZIndex) + 1);
 		overflow-y: auto;
 		max-height: calc(100vh - 20px);
 	}
