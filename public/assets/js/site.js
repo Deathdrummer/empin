@@ -6059,6 +6059,7 @@ window.copyStringToClipboard = function () {
     el.style.left = '-9999px';
     document.body.appendChild(el);
     el.select();
+    console.log('execCommand', event);
     document.execCommand('copy');
     document.body.removeChild(el);
   }
@@ -17414,8 +17415,6 @@ function contentSelection() {
     }
   });
   $(document).on('keydown', function (e) {
-    console.log('keydown');
-
     var _metaKeys3 = metaKeys(e),
         isShiftKey = _metaKeys3.isShiftKey,
         isCtrlKey = _metaKeys3.isCtrlKey,
@@ -17425,10 +17424,7 @@ function contentSelection() {
         noKeys = _metaKeys3.noKeys,
         isActiveKey = _metaKeys3.isActiveKey;
 
-    console.log(isShiftKey, isCtrlKey, isAltKey, e.keyCode);
-
     if (isCtrlKey && e.keyCode == 67) {
-      //console.log(isCtrlKey, e.keyCode, getSelectionStr());
       if (!getSelectionStr()) {
         e.preventDefault();
         var row = null,

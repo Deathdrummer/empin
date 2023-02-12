@@ -446,6 +446,7 @@ window.copyStringToClipboard = function(str = null) {
 		el.style.left = '-9999px';
 		document.body.appendChild(el);
 		el.select();
+		console.log('execCommand', event);
 		document.execCommand('copy');
 		document.body.removeChild(el);
 	}	

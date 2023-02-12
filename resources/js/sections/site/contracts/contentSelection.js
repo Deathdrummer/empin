@@ -74,19 +74,11 @@ export function contentSelection() {
 	
 	
 	$(document).on('keydown', function(e) {
-		console.log('keydown');
 		const {isShiftKey, isCtrlKey, isCommandKey, isAltKey, isOptionKey, noKeys, isActiveKey} = metaKeys(e);
-		
-		console.log(isShiftKey, isCtrlKey, isAltKey, e.keyCode);
-		
-		
 		if (isCtrlKey && e.keyCode == 67) {
-			
-			//console.log(isCtrlKey, e.keyCode, getSelectionStr());
 			
 			if (!getSelectionStr()) {
 				e.preventDefault();
-				
 				
 				let row = null, allData = '';
 				$('#contractsTable').find('[ddrtabletd][copied]').each((k, item) => {
