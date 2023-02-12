@@ -77,7 +77,7 @@ export function contentSelection() {
 		console.log('keydown');
 		const {isShiftKey, isCtrlKey, isCommandKey, isAltKey, isOptionKey, noKeys, isActiveKey} = metaKeys(e);
 		
-		console.log(e);
+		console.log(isShiftKey, isCtrlKey, isAltKey, e.keyCode);
 		
 		
 		if (isCtrlKey && e.keyCode == 67) {
