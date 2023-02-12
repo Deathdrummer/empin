@@ -295,9 +295,10 @@ function contentSelection() {
         noKeys = _metaKeys3.noKeys,
         isActiveKey = _metaKeys3.isActiveKey;
 
-    if (isCtrlKey && e.keyCode == 67) {
-      console.log(isCtrlKey, e.keyCode, getSelectionStr());
+    console.log(e);
 
+    if (isCtrlKey && e.keyCode == 67) {
+      //console.log(isCtrlKey, e.keyCode, getSelectionStr());
       if (!getSelectionStr()) {
         e.preventDefault();
         var row = null,
