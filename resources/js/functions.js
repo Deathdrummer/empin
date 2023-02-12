@@ -437,6 +437,7 @@ window.copyStringToClipboard = function(str = null) {
 	if (_.isNull(str)) return false;
 	
 	if (navigator.clipboard) {
+		console.log('navigator.clipboard');
 		navigator.clipboard.writeText(str);
 	} else {
 		let el = document.createElement('textarea');

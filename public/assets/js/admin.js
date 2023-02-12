@@ -6194,6 +6194,7 @@ window.copyStringToClipboard = function () {
   if (_.isNull(str)) return false;
 
   if (navigator.clipboard) {
+    console.log('navigator.clipboard');
     navigator.clipboard.writeText(str);
   } else {
     var el = document.createElement('textarea');
