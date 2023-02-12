@@ -73,9 +73,9 @@ export function contentSelection() {
 	
 	
 	
-	$(document).on('keydown', function(e) {
-		console.log(2222222222222222222);
+	$(document).on('keyup', function(e) {
 		const {isShiftKey, isCtrlKey, isCommandKey, isAltKey, isOptionKey, noKeys, isActiveKey} = metaKeys(e);
+		
 		if (isCtrlKey && e.keyCode == 67) {
 			
 			if (!getSelectionStr()) {
@@ -98,9 +98,8 @@ export function contentSelection() {
 				
 				if (allData.trim()) {
 					copyStringToClipboard(allData.trim());
-					$.notify('Скопировано 555!');
-				}
-					
+					$.notify('Скопировано!');
+				}	
 				
 				return false;
 			}

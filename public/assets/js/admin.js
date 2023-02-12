@@ -14540,9 +14540,7 @@ function contentSelection() {
       }
     }
   });
-  $(document).on('keydown', function (e) {
-    console.log(2222222222222222222);
-
+  $(document).on('keyup', function (e) {
     var _metaKeys3 = metaKeys(e),
         isShiftKey = _metaKeys3.isShiftKey,
         isCtrlKey = _metaKeys3.isCtrlKey,
@@ -14572,7 +14570,7 @@ function contentSelection() {
 
         if (allData.trim()) {
           copyStringToClipboard(allData.trim());
-          $.notify('Скопировано 555!');
+          $.notify('Скопировано!');
         }
 
         return false;

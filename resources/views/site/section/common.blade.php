@@ -27,25 +27,7 @@
 
 <script type="module">
 	
-	
-	
-	
-	
-	$(document).on('keydown', function(e) {
-		console.log('keydown');
-		
-		const {isShiftKey, isCtrlKey, isCommandKey, isAltKey, isOptionKey, noKeys, isActiveKey} = metaKeys(e);
-		
-		console.log(isShiftKey, isCtrlKey, isAltKey, e.keyCode);
-		
-	});
-	
-	
-	
-	
-	
-	
-	/*$.testContextMenu = (id, foo, bar) => {
+	$.testContextMenu = (id, foo, bar) => {
 		return [
 			{
 				name: 'name 1',
@@ -74,5 +56,5 @@
 			}
 		];
 	}
-	*/
+	
 </script>
