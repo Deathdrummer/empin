@@ -32,7 +32,12 @@
 	
 	
 	$(document).on('keydown', function(e) {
-		console.log(e);
+		console.log('keydown');
+		
+		const {isShiftKey, isCtrlKey, isCommandKey, isAltKey, isOptionKey, noKeys, isActiveKey} = metaKeys(e);
+		
+		console.log(isShiftKey, isCtrlKey, isAltKey, e.keyCode);
+		
 	});
 	
 	
