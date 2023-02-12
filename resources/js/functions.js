@@ -437,7 +437,6 @@ window.copyStringToClipboard = function(str = null) {
 	if (_.isNull(str)) return false;
 	
 	if (navigator.clipboard) {
-		console.log('navigator.clipboard');
 		navigator.clipboard.writeText(str);
 	} else {
 		let el = document.createElement('textarea');
@@ -447,7 +446,6 @@ window.copyStringToClipboard = function(str = null) {
 		el.style.left = '-9999px';
 		document.body.appendChild(el);
 		el.select();
-		console.log('execCommand', event);
 		document.execCommand('copy');
 		document.body.removeChild(el);
 	}	

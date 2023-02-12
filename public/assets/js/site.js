@@ -6050,7 +6050,6 @@ window.copyStringToClipboard = function () {
   if (_.isNull(str)) return false;
 
   if (navigator.clipboard) {
-    console.log('navigator.clipboard');
     navigator.clipboard.writeText(str);
   } else {
     var el = document.createElement('textarea');
@@ -6060,7 +6059,6 @@ window.copyStringToClipboard = function () {
     el.style.left = '-9999px';
     document.body.appendChild(el);
     el.select();
-    console.log('execCommand', event);
     document.execCommand('copy');
     document.body.removeChild(el);
   }
@@ -17416,6 +17414,8 @@ function contentSelection() {
     }
   });
   $(document).on('keydown', function (e) {
+    console.log(2222222222222222222);
+
     var _metaKeys3 = metaKeys(e),
         isShiftKey = _metaKeys3.isShiftKey,
         isCtrlKey = _metaKeys3.isCtrlKey,

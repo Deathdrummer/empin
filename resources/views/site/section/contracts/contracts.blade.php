@@ -1183,6 +1183,7 @@
 			
 			
 			$(document).on('keydown', function(e) {
+				console.log(111111111111);
 				const {isShiftKey, isCtrlKey, isCommandKey, isAltKey, isOptionKey, noKeys, isActiveKey} = metaKeys(e);
 				if (isCtrlKey && e.keyCode == 67) {
 					e.preventDefault();

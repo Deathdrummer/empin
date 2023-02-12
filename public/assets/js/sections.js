@@ -284,6 +284,8 @@ function contentSelection() {
     }
   });
   $(document).on('keydown', function (e) {
+    console.log(2222222222222222222);
+
     var _metaKeys3 = metaKeys(e),
         isShiftKey = _metaKeys3.isShiftKey,
         isCtrlKey = _metaKeys3.isCtrlKey,
