@@ -200,7 +200,7 @@ function _parseAttribString(stringToParse = null) {
 	if (!_.isString(stringToParse)) throw new Error('Ошибка! contextmenu _parseStringToFuncArgs -> передаваемый аргумент должен быть строкой!');
 	
 	const splitSrt = ddrSplit(stringToParse?.replace(/\n+/gm, ''), ':', ',');
-	let [func, args] = _.isArray(splitSrt) ? splitSrt : [splitSrt, null];
+	let [func, args] = _.isArray(splitSrt) ? splitSrt : [splitSrt, []];
 	//if (!_.isArray(args)) args = [];
 	return [func, args];
 }

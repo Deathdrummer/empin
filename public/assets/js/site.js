@@ -8957,7 +8957,7 @@ function _parseAttribString() {
   if (!_.isString(stringToParse)) throw new Error('Ошибка! contextmenu _parseStringToFuncArgs -> передаваемый аргумент должен быть строкой!');
   var splitSrt = ddrSplit(stringToParse === null || stringToParse === void 0 ? void 0 : stringToParse.replace(/\n+/gm, ''), ':', ',');
 
-  var _ref2 = _.isArray(splitSrt) ? splitSrt : [splitSrt, null],
+  var _ref2 = _.isArray(splitSrt) ? splitSrt : [splitSrt, []],
       _ref3 = _slicedToArray(_ref2, 2),
       func = _ref3[0],
       args = _ref3[1]; //if (!_.isArray(args)) args = [];
