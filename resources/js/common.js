@@ -145,7 +145,7 @@ jQuery(function() {
 	$(document).on('copy keyup', function(e) {
 		selection = getSelectionStr();
 		if (e.type == 'copy' && selection) {
-			$.notify('Скопировано!');
+			$.notify('Скопировано!', {autoHideDelay: 2000});
 		
 		} else if (e.type == 'keyup') {
 			if (selection == getSelectionStr()) {
@@ -156,7 +156,7 @@ jQuery(function() {
 			if (isCtrlKey && e.keyCode == 67) {
 				const os = getOS();
 				if (os == 'Windows' && e.type == 'keyup' && getSelectionStr()) {
-					$.notify('Скопировано!');
+					$.notify('Скопировано!', {autoHideDelay: 2000});
 				}
 			}	
 		}

@@ -90,7 +90,7 @@ export function contentSelection() {
 		
 		if (copiedData) {
 			copyStringToClipboard(copiedData);
-			$.notify('Скопировано!');
+			$.notify('Скопировано!', {autoHideDelay: 2000});
 		}	
 	}, () => !!$('#contractsTable').find('[ddrtabletd].selected').length);
 	

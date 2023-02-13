@@ -5513,7 +5513,9 @@ jQuery(function () {
     selection = getSelectionStr();
 
     if (e.type == 'copy' && selection) {
-      $.notify('Скопировано!');
+      $.notify('Скопировано!', {
+        autoHideDelay: 2000
+      });
     } else if (e.type == 'keyup') {
       if (selection == getSelectionStr()) {
         selection = null;
@@ -5527,7 +5529,9 @@ jQuery(function () {
         var os = getOS();
 
         if (os == 'Windows' && e.type == 'keyup' && getSelectionStr()) {
-          $.notify('Скопировано!');
+          $.notify('Скопировано!', {
+            autoHideDelay: 2000
+          });
         }
       }
     }
@@ -7464,6 +7468,12 @@ window.notify = function () {
   var message = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
   var className = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'success';
   var timeOut = arguments.length > 2 ? arguments[2] : undefined;
+
+  if (!_.isString(className) && _.isNumber(className)) {
+    timeOut = className;
+    className = 'success';
+  }
+
   var icon = 'fa fa-info';
 
   if (className == 'success') {
@@ -17513,7 +17523,9 @@ function contentSelection() {
 
     if (copiedData) {
       copyStringToClipboard(copiedData);
-      $.notify('Скопировано!');
+      $.notify('Скопировано!', {
+        autoHideDelay: 2000
+      });
     }
   }, function () {
     return !!$('#contractsTable').find('[ddrtabletd].selected').length;
@@ -19100,7 +19112,9 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                 case 0:
                   if (getSelectionStr()) {
                     copyStringToClipboard(getSelectionStr());
-                    $.notify('Скопировано!');
+                    $.notify('Скопировано!', {
+                      autoHideDelay: 2000
+                    });
                   } else {
                     row = null, allData = '';
                     $('#contractsTable').find('[ddrtabletd][copied]').each(function (k, item) {
@@ -19119,7 +19133,9 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
 
                     if (copiedData) {
                       copyStringToClipboard(copiedData);
-                      $.notify('Скопировано!');
+                      $.notify('Скопировано!', {
+                        autoHideDelay: 2000
+                      });
                     }
                   } //$('#contractsTable').find('[edittedplace].select-text').removeClass('select-text');	
                   //$('#contractsList').find('[ddrtabletd].selected').removeClass('selected');

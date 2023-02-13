@@ -1089,7 +1089,7 @@ export function contextMenu(
 				async onClick() {
 					if (getSelectionStr()) {
 						copyStringToClipboard(getSelectionStr());
-						$.notify('Скопировано!');
+						$.notify('Скопировано!', {autoHideDelay: 2000});
 						
 					} else {
 						let row = null, allData = '';
@@ -1110,7 +1110,7 @@ export function contextMenu(
 			
 						if (copiedData) {
 							copyStringToClipboard(copiedData);
-							$.notify('Скопировано!');
+							$.notify('Скопировано!', {autoHideDelay: 2000});
 						}
 					}
 					

@@ -2042,6 +2042,11 @@ window.clientFileManager = function(callback) {
 
 
 window.notify = function(message = '', className = 'success', timeOut) {
+	if (!_.isString(className) && _.isNumber(className)) {
+		timeOut = className;
+		className = 'success';
+	} 
+	
 	let icon = 'fa fa-info';
 
 	if (className == 'success') {

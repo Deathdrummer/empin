@@ -1222,7 +1222,7 @@
 			sort: 1,
 			async onClick() {
 				copyStringToClipboard(getSelectionStr());
-				$.notify('Скопировано!');
+				$.notify('Скопировано!', {autoHideDelay: 2000});
 			}
 		}];
 	}
