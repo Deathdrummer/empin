@@ -735,10 +735,10 @@ export function contextMenu(
 					});
 					
 					
-					$('#contractsList').on(tapEvent+'.unEditCell', function(e) {
+					$('.app').on(tapEvent+'.unEditCell', function(e) {
 						if ($(e.target).closest('[ddrtabletd]').hasAttr('editted') && [3,4].indexOf(type) === -1) return;
 						unEditCell(cell);
-						$('#contractsList').off('.unEditCell');
+						$('.app').off('.unEditCell');
 					});
 					
 					
@@ -775,8 +775,9 @@ export function contextMenu(
 						});
 						
 						
+						$(cell).off('.savecelldata');
 						
-						$(cell).one(tapEvent, '[savecelldata]', async function() {
+						$(cell).one(tapEvent+'.savecelldata', '[savecelldata]', async function() {
 							
 							$(this).hide();
 							

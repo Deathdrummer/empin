@@ -18601,10 +18601,10 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                   $('#contractsList').find('[editted]').each(function (k, cell) {
                     unEditCell(cell);
                   });
-                  $('#contractsList').on(tapEvent + '.unEditCell', function (e) {
+                  $('.app').on(tapEvent + '.unEditCell', function (e) {
                     if ($(e.target).closest('[ddrtabletd]').hasAttr('editted') && [3, 4].indexOf(type) === -1) return;
                     unEditCell(cell);
-                    $('#contractsList').off('.unEditCell');
+                    $('.app').off('.unEditCell');
                   });
                   $(cell).setAttrib('editted');
                   cellWait = $(cell).ddrWait({
@@ -18613,7 +18613,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                   });
 
                   if (!([1, 2].indexOf(type) !== -1)) {
-                    _context11.next = 24;
+                    _context11.next = 25;
                     break;
                   }
 
@@ -18640,7 +18640,8 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                       $(cell).find('[savecelldata]').trigger(tapEvent);
                     }
                   });
-                  $(cell).one(tapEvent, '[savecelldata]', /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee6() {
+                  $(cell).off('.savecelldata');
+                  $(cell).one(tapEvent + '.savecelldata', '[savecelldata]', /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee6() {
                     var cellData, emptyVal, _yield$axiosQuery6, data, error, status, headers;
 
                     return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee6$(_context6) {
@@ -18687,10 +18688,10 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                       }
                     }, _callee6, this);
                   })));
-                  _context11.next = 25;
+                  _context11.next = 26;
                   break;
 
-                case 24:
+                case 25:
                   if ([3, 4].indexOf(type) !== -1) {
                     // 3 - дата 4 - вып. список
                     $(cell).addClass('editted');
@@ -18935,10 +18936,10 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                     });
                   }
 
-                case 25:
+                case 26:
                   cellWait.off();
 
-                case 26:
+                case 27:
                 case "end":
                   return _context11.stop();
               }
