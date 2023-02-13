@@ -8759,8 +8759,7 @@ $(document).on('contextmenu', '[contextmenu]', /*#__PURE__*/function () {
             uniqueBlockId = 'ddrContextMenu';
             maxMenuHeight = null; // Получить название функции-построителя меню и ее аргументы
 
-            _parseAttribString2 = _parseAttribString($(target.selector).attr('contextmenu')), _parseAttribString3 = _slicedToArray(_parseAttribString2, 2), func = _parseAttribString3[0], args = _parseAttribString3[1];
-            console.log(func, args); // Методы для основной функции
+            _parseAttribString2 = _parseAttribString($(target.selector).attr('contextmenu')), _parseAttribString3 = _slicedToArray(_parseAttribString2, 2), func = _parseAttribString3[0], args = _parseAttribString3[1]; // Методы для основной функции
 
             methods = {
               target: target,
@@ -8885,20 +8884,20 @@ $(document).on('contextmenu', '[contextmenu]', /*#__PURE__*/function () {
               }
             }; // Вызвать функцию построения меню
 
-            _context.next = 11;
+            _context.next = 10;
             return _callBuildMenuFunc.apply(void 0, [func, methods].concat(_toConsumableArray(args)));
 
-          case 11:
+          case 10:
             menuData = _context.sent;
 
             if (!$(target.pointer).closest('[nocontext]').length) {
-              _context.next = 14;
+              _context.next = 13;
               break;
             }
 
             return _context.abrupt("return");
 
-          case 14:
+          case 13:
             // Сформировать из данных HTML меню, карту функций и связать клик на пукнт меню с вызовом сооответствующей функции
             _buildMenuHtml4 = _buildMenuHtml(menuData, maxMenuHeight), _buildMenuHtml5 = _slicedToArray(_buildMenuHtml4, 2), menuHtml = _buildMenuHtml5[0], funcMap = _buildMenuHtml5[1];
             menuSelector = menuHtml;
@@ -8924,7 +8923,7 @@ $(document).on('contextmenu', '[contextmenu]', /*#__PURE__*/function () {
 
             _clickToHideEvent(menuHtml, uniqueBlockId);
 
-          case 23:
+          case 22:
           case "end":
             return _context.stop();
         }
@@ -8961,9 +8960,9 @@ function _parseAttribString() {
   var _ref2 = _.isArray(splitSrt) ? splitSrt : [splitSrt, null],
       _ref3 = _slicedToArray(_ref2, 2),
       func = _ref3[0],
-      args = _ref3[1];
+      args = _ref3[1]; //if (!_.isArray(args)) args = [];
 
-  if (!_.isArray(args)) args = [args];
+
   return [func, args];
 } // Вызвать функцию построения меню
 

@@ -14,10 +14,6 @@ $(document).on('contextmenu', '[contextmenu]', async function(e) {
 	// Получить название функции-построителя меню и ее аргументы
 	const [func, args] = _parseAttribString($(target.selector).attr('contextmenu'));
 	
-	
-	console.log(func, args);
-	
-	
 	// Методы для основной функции
 	const methods = {
 		target,
@@ -205,7 +201,7 @@ function _parseAttribString(stringToParse = null) {
 	
 	const splitSrt = ddrSplit(stringToParse?.replace(/\n+/gm, ''), ':', ',');
 	let [func, args] = _.isArray(splitSrt) ? splitSrt : [splitSrt, null];
-	if (!_.isArray(args)) args = [args];
+	//if (!_.isArray(args)) args = [];
 	return [func, args];
 }
 
