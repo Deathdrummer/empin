@@ -134,6 +134,23 @@
 				</tr>
 			@endcando
 		
+			@cando('contract-col-price:site')
+				<tr>
+					<td>
+						<p class="color-gray-500 format" noselect="Стоимость договора без НДС:"></p>
+					</td>
+					<td>
+						<p class="breakword select-text" tripleselect>
+							@if(isset($contract['price']) && $contract['price'])
+								@number($contract['price']) @symbal(money)
+							@else
+								-
+							@endif
+						</p>
+					</td>
+				</tr>
+			@endcando
+		
 			@cando('contract-col-price_nds:site')
 				<tr>
 					<td>
@@ -152,20 +169,22 @@
 			@endcando
 			
 			@cando('contract-col-price:site')
+			@if($contract['subcontracting'])
 				<tr>
 					<td>
-						<p class="color-gray-500 format" noselect="Стоимость договора без НДС:"></p>
+						<p class="color-gray-500 format" noselect="Стоимость генподрядного договора без НДС:"></p>
 					</td>
 					<td>
 						<p class="breakword select-text" tripleselect>
 							@if(isset($contract['price']) && $contract['price'])
-								@number($contract['price']) @symbal(money)
+								@number($contract['price'] / ((100 - $contract['gen_percent']) / 100)) @symbal(money)
 							@else
 								-
 							@endif
 						</p>
 					</td>
 				</tr>
+			@endif
 			@endcando
 			
 			@cando('contract-col-price_nds:site')
@@ -178,25 +197,6 @@
 						<p class="breakword select-text" tripleselect>
 							@if(isset($contract['price_nds']) && $contract['price_nds'])
 								@number($contract['price_nds'] / ((100 - $contract['gen_percent']) / 100)) @symbal(money)
-							@else
-								-
-							@endif
-						</p>
-					</td>
-				</tr>
-			@endif
-			@endcando
-			
-			@cando('contract-col-price:site')
-			@if($contract['subcontracting'])
-				<tr>
-					<td>
-						<p class="color-gray-500 format" noselect="Стоимость генподрядного договора без НДС:"></p>
-					</td>
-					<td>
-						<p class="breakword select-text" tripleselect>
-							@if(isset($contract['price']) && $contract['price'])
-								@number($contract['price'] / ((100 - $contract['gen_percent']) / 100)) @symbal(money)
 							@else
 								-
 							@endif
