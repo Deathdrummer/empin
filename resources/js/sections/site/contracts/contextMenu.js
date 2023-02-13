@@ -43,7 +43,7 @@ export function contextMenu(
 		
 		
 		// Если это оин пункт "копировать"
-		if ((selectedTextCell && $(target.pointer).closest('[ddrtabletd]').hasClass('selected')) || !!$(target.pointer).closest('[ddrtabletd]').find('[edittedplace]').hasClass('select-text')) {
+		if ((selectedTextCell || $(target.pointer).closest('[ddrtabletd]').hasClass('selected')) || !!$(target.pointer).closest('[ddrtabletd]').find('[edittedplace]').hasClass('select-text')) {
 			setStyle({
 				mainMinHeight: '30px',
 			});
@@ -1085,6 +1085,7 @@ export function contextMenu(
 			}, {
 				name: 'Копировать',
 				visible: selectedTextCell,
+				disabled: !!$(target.pointer).closest('[ddrtabletd]').find('[edittedblock]').length && !getSelectionStr(),
 				sort: 1,
 				async onClick() {
 					if (getSelectionStr()) {

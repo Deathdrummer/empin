@@ -477,7 +477,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
     var disableEditCell = !$(target.pointer).closest('[ddrtabletd]').attr('contextedit');
     var selectedTextCell = !!$(target.pointer).closest('[ddrtabletd]').find('[edittedplace]').hasClass('select-text') || !!$(target.pointer).closest('[ddrtabletd]').find('[edittedblock]').length || !!$('#contractsTable').find('[ddrtabletd].selected').length && $(target.pointer).closest('[ddrtabletd]').hasClass('selected'); // Если это оин пункт "копировать"
 
-    if (selectedTextCell && $(target.pointer).closest('[ddrtabletd]').hasClass('selected') || !!$(target.pointer).closest('[ddrtabletd]').find('[edittedplace]').hasClass('select-text')) {
+    if (selectedTextCell || $(target.pointer).closest('[ddrtabletd]').hasClass('selected') || !!$(target.pointer).closest('[ddrtabletd]').find('[edittedplace]').hasClass('select-text')) {
       setStyle({
         mainMinHeight: '30px'
       });
@@ -1881,6 +1881,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
     }, {
       name: 'Копировать',
       visible: selectedTextCell,
+      disabled: !!$(target.pointer).closest('[ddrtabletd]').find('[edittedblock]').length && !getSelectionStr(),
       sort: 1,
       onClick: function onClick() {
         return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee14() {
