@@ -283,43 +283,29 @@ function contentSelection() {
       }
     }
   });
-  $(document).on('keyup', function (e) {
-    var _metaKeys3 = metaKeys(e),
-        isShiftKey = _metaKeys3.isShiftKey,
-        isCtrlKey = _metaKeys3.isCtrlKey,
-        isCommandKey = _metaKeys3.isCommandKey,
-        isAltKey = _metaKeys3.isAltKey,
-        isOptionKey = _metaKeys3.isOptionKey,
-        noKeys = _metaKeys3.noKeys,
-        isActiveKey = _metaKeys3.isActiveKey;
+  ddrCopy(function () {
+    var row = null,
+        allData = '';
+    $('#contractsTable').find('[ddrtabletd][copied]').each(function (k, item) {
+      if (k == 0) row = $(item).closest('[ddrtabletr]')[0];
 
-    if (isCtrlKey && e.keyCode == 67) {
-      if (!getSelectionStr()) {
-        e.preventDefault();
-        var row = null,
-            allData = '';
-        $('#contractsTable').find('[ddrtabletd][copied]').each(function (k, item) {
-          if (k == 0) row = $(item).closest('[ddrtabletr]')[0];
+      if (k > 0 && row !== $(item).closest('[ddrtabletr]')[0]) {
+        row = $(item).closest('[ddrtabletr]')[0];
+        allData += "\n";
+      } else if (k > 0) {
+        allData += "\t";
+      }
 
-          if (k > 0 && row !== $(item).closest('[ddrtabletr]')[0]) {
-            row = $(item).closest('[ddrtabletr]')[0];
-            allData += "\n";
-          } else if (k > 0) {
-            allData += "\t";
-          }
+      allData += $(item).find('[edittedplace]').text();
+    });
+    var copiedData = allData.trim();
 
-          allData += $(item).find('[edittedplace]').text();
-        });
-
-        if (allData.trim()) {
-          copyStringToClipboard(allData.trim());
-          $.notify('Скопировано!');
-        }
-
-        return false;
-      } //console.log('default');
-
+    if (copiedData) {
+      copyStringToClipboard(copiedData);
+      $.notify('Скопировано!');
     }
+  }, function () {
+    return !!$('#contractsTable').find('[ddrtabletd].selected').length;
   });
 
   function selectionAction() {
@@ -610,15 +596,6 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                     chatScrollHeight = $('#chatMessageList')[0].scrollHeight;
                 $('#chatMessageList').scrollTop(chatScrollHeight - chatVisibleHeight);
                 $('#chatMessageBlock').focus();
-                $('#chatMessageList').find('.chat__post').mouseup(function (e) {
-                  var selObj = window.getSelection();
-                  var selectString = selObj.toString();
-
-                  if (selectString.length) {
-                    copyStringToClipboard(selObj.toString());
-                    $.notify('Скопировано 111!');
-                  }
-                });
                 $('#chatMessageBlock').ddrInputs('change', function () {
                   var mess = getContenteditable('#chatMessageBlock');
 
@@ -1905,31 +1882,39 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
       sort: 1,
       onClick: function onClick() {
         return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee14() {
-          var row, allData;
+          var row, allData, copiedData;
           return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee14$(_context14) {
             while (1) {
               switch (_context14.prev = _context14.next) {
                 case 0:
-                  row = null, allData = '';
-                  $('#contractsTable').find('[ddrtabletd][copied]').each(function (k, item) {
-                    if (k == 0) row = $(item).closest('[ddrtabletr]')[0];
+                  if (getSelectionStr()) {
+                    copyStringToClipboard(getSelectionStr());
+                    $.notify('Скопировано!');
+                  } else {
+                    row = null, allData = '';
+                    $('#contractsTable').find('[ddrtabletd][copied]').each(function (k, item) {
+                      if (k == 0) row = $(item).closest('[ddrtabletr]')[0];
 
-                    if (k > 0 && row !== $(item).closest('[ddrtabletr]')[0]) {
-                      row = $(item).closest('[ddrtabletr]')[0];
-                      allData += "\n";
-                    } else if (k > 0) {
-                      allData += "\t";
+                      if (k > 0 && row !== $(item).closest('[ddrtabletr]')[0]) {
+                        row = $(item).closest('[ddrtabletr]')[0];
+                        allData += "\n";
+                      } else if (k > 0) {
+                        allData += "\t";
+                      }
+
+                      allData += $(item).find('[edittedplace]').text();
+                    });
+                    copiedData = allData.trim();
+
+                    if (copiedData) {
+                      copyStringToClipboard(copiedData);
+                      $.notify('Скопировано!');
                     }
+                  } //$('#contractsTable').find('[edittedplace].select-text').removeClass('select-text');	
+                  //$('#contractsList').find('[ddrtabletd].selected').removeClass('selected');
 
-                    allData += $(item).find('[edittedplace]').text();
-                  });
-                  copyStringToClipboard(allData.trim());
-                  $.notify('Скопировано 222!');
-                  removeSelection();
-                  $('#contractsTable').find('[edittedplace].select-text').removeClass('select-text');
-                  $('#contractsList').find('[ddrtabletd].selected').removeClass('selected');
 
-                case 7:
+                case 1:
                 case "end":
                   return _context14.stop();
               }

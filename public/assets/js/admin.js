@@ -5649,8 +5649,33 @@ jQuery(function () {
     $('body').on('blur', 'input[type="text"]:not([noedit]), input[type="password"]:not([noedit]), input[type="email"]:not([noedit]), input[type="tel"]:not([noedit])', function () {
       $(this).setAttrib('readonly');
     });
-  } //--------------------------------------------- Вверх страницы
+  } //--------------------------------------------- Нативное копирование
 
+
+  var selection = null;
+  $(document).on('copy keyup', function (e) {
+    selection = getSelectionStr();
+
+    if (e.type == 'copy' && selection) {
+      $.notify('Скопировано!');
+    } else if (e.type == 'keyup') {
+      if (selection == getSelectionStr()) {
+        selection = null;
+        return false;
+      }
+
+      var _metaKeys = metaKeys(e),
+          isCtrlKey = _metaKeys.isCtrlKey;
+
+      if (isCtrlKey && e.keyCode == 67) {
+        var os = getOS();
+
+        if (os == 'Windows' && e.type == 'keyup' && getSelectionStr()) {
+          $.notify('Скопировано!');
+        }
+      }
+    }
+  }); //--------------------------------------------- Вверх страницы
 
   var scrTop;
   scrTop = $(window).scrollTop();
@@ -5815,6 +5840,63 @@ $.fn.tripleTap = function (callback) {
 
     if (e.detail >= 3) {
       if (callback && typeof callback == 'function') callback(this);
+    }
+  });
+};
+
+window.getOS = function () {
+  var _window$navigator, _window$navigator$use;
+
+  var userAgent = window.navigator.userAgent,
+      platform = ((_window$navigator = window.navigator) === null || _window$navigator === void 0 ? void 0 : (_window$navigator$use = _window$navigator.userAgentData) === null || _window$navigator$use === void 0 ? void 0 : _window$navigator$use.platform) || window.navigator.platform,
+      macosPlatforms = ['Macintosh', 'MacIntel', 'MacPPC', 'Mac68K'],
+      windowsPlatforms = ['Win32', 'Win64', 'Windows', 'WinCE'],
+      iosPlatforms = ['iPhone', 'iPad', 'iPod'],
+      os = null;
+
+  if (macosPlatforms.indexOf(platform) !== -1) {
+    os = 'MacOS';
+  } else if (iosPlatforms.indexOf(platform) !== -1) {
+    os = 'iOS';
+  } else if (windowsPlatforms.indexOf(platform) !== -1) {
+    os = 'Windows';
+  } else if (/Android/.test(userAgent)) {
+    os = 'Android';
+  } else if (/Linux/.test(platform)) {
+    os = 'Linux';
+  }
+
+  return os;
+};
+
+window.ddrCopy = function () {
+  var callback = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+  var rule = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+  $(document).on('keyup keydown', function (e) {
+    if (rule()) {
+      var _metaKeys = metaKeys(e),
+          isShiftKey = _metaKeys.isShiftKey,
+          isCtrlKey = _metaKeys.isCtrlKey,
+          isCommandKey = _metaKeys.isCommandKey,
+          isAltKey = _metaKeys.isAltKey,
+          isOptionKey = _metaKeys.isOptionKey,
+          noKeys = _metaKeys.noKeys,
+          isActiveKey = _metaKeys.isActiveKey;
+
+      if (isCtrlKey && e.keyCode == 67) {
+        var os = getOS();
+
+        if (os !== 'Windows' && e.type == 'keydown' || os == 'Windows' && e.type == 'keyup') {
+          e.preventDefault();
+          return false;
+        }
+
+        if (!getSelectionStr()) {
+          e.preventDefault();
+          if (callback && _.isFunction(callback)) callback();
+          return false;
+        }
+      }
     }
   });
 };
@@ -14540,43 +14622,29 @@ function contentSelection() {
       }
     }
   });
-  $(document).on('keyup', function (e) {
-    var _metaKeys3 = metaKeys(e),
-        isShiftKey = _metaKeys3.isShiftKey,
-        isCtrlKey = _metaKeys3.isCtrlKey,
-        isCommandKey = _metaKeys3.isCommandKey,
-        isAltKey = _metaKeys3.isAltKey,
-        isOptionKey = _metaKeys3.isOptionKey,
-        noKeys = _metaKeys3.noKeys,
-        isActiveKey = _metaKeys3.isActiveKey;
+  ddrCopy(function () {
+    var row = null,
+        allData = '';
+    $('#contractsTable').find('[ddrtabletd][copied]').each(function (k, item) {
+      if (k == 0) row = $(item).closest('[ddrtabletr]')[0];
 
-    if (isCtrlKey && e.keyCode == 67) {
-      if (!getSelectionStr()) {
-        e.preventDefault();
-        var row = null,
-            allData = '';
-        $('#contractsTable').find('[ddrtabletd][copied]').each(function (k, item) {
-          if (k == 0) row = $(item).closest('[ddrtabletr]')[0];
+      if (k > 0 && row !== $(item).closest('[ddrtabletr]')[0]) {
+        row = $(item).closest('[ddrtabletr]')[0];
+        allData += "\n";
+      } else if (k > 0) {
+        allData += "\t";
+      }
 
-          if (k > 0 && row !== $(item).closest('[ddrtabletr]')[0]) {
-            row = $(item).closest('[ddrtabletr]')[0];
-            allData += "\n";
-          } else if (k > 0) {
-            allData += "\t";
-          }
+      allData += $(item).find('[edittedplace]').text();
+    });
+    var copiedData = allData.trim();
 
-          allData += $(item).find('[edittedplace]').text();
-        });
-
-        if (allData.trim()) {
-          copyStringToClipboard(allData.trim());
-          $.notify('Скопировано!');
-        }
-
-        return false;
-      } //console.log('default');
-
+    if (copiedData) {
+      copyStringToClipboard(copiedData);
+      $.notify('Скопировано!');
     }
+  }, function () {
+    return !!$('#contractsTable').find('[ddrtabletd].selected').length;
   });
 
   function selectionAction() {
@@ -14867,15 +14935,6 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                     chatScrollHeight = $('#chatMessageList')[0].scrollHeight;
                 $('#chatMessageList').scrollTop(chatScrollHeight - chatVisibleHeight);
                 $('#chatMessageBlock').focus();
-                $('#chatMessageList').find('.chat__post').mouseup(function (e) {
-                  var selObj = window.getSelection();
-                  var selectString = selObj.toString();
-
-                  if (selectString.length) {
-                    copyStringToClipboard(selObj.toString());
-                    $.notify('Скопировано 111!');
-                  }
-                });
                 $('#chatMessageBlock').ddrInputs('change', function () {
                   var mess = getContenteditable('#chatMessageBlock');
 
@@ -16162,31 +16221,39 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
       sort: 1,
       onClick: function onClick() {
         return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee14() {
-          var row, allData;
+          var row, allData, copiedData;
           return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee14$(_context14) {
             while (1) {
               switch (_context14.prev = _context14.next) {
                 case 0:
-                  row = null, allData = '';
-                  $('#contractsTable').find('[ddrtabletd][copied]').each(function (k, item) {
-                    if (k == 0) row = $(item).closest('[ddrtabletr]')[0];
+                  if (getSelectionStr()) {
+                    copyStringToClipboard(getSelectionStr());
+                    $.notify('Скопировано!');
+                  } else {
+                    row = null, allData = '';
+                    $('#contractsTable').find('[ddrtabletd][copied]').each(function (k, item) {
+                      if (k == 0) row = $(item).closest('[ddrtabletr]')[0];
 
-                    if (k > 0 && row !== $(item).closest('[ddrtabletr]')[0]) {
-                      row = $(item).closest('[ddrtabletr]')[0];
-                      allData += "\n";
-                    } else if (k > 0) {
-                      allData += "\t";
+                      if (k > 0 && row !== $(item).closest('[ddrtabletr]')[0]) {
+                        row = $(item).closest('[ddrtabletr]')[0];
+                        allData += "\n";
+                      } else if (k > 0) {
+                        allData += "\t";
+                      }
+
+                      allData += $(item).find('[edittedplace]').text();
+                    });
+                    copiedData = allData.trim();
+
+                    if (copiedData) {
+                      copyStringToClipboard(copiedData);
+                      $.notify('Скопировано!');
                     }
+                  } //$('#contractsTable').find('[edittedplace].select-text').removeClass('select-text');	
+                  //$('#contractsList').find('[ddrtabletd].selected').removeClass('selected');
 
-                    allData += $(item).find('[edittedplace]').text();
-                  });
-                  copyStringToClipboard(allData.trim());
-                  $.notify('Скопировано 222!');
-                  removeSelection();
-                  $('#contractsTable').find('[edittedplace].select-text').removeClass('select-text');
-                  $('#contractsList').find('[ddrtabletd].selected').removeClass('selected');
 
-                case 7:
+                case 1:
                 case "end":
                   return _context14.stop();
               }

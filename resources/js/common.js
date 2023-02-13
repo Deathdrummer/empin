@@ -133,6 +133,45 @@ jQuery(function() {
 	
 	
 	
+	
+	
+	
+	
+	
+	
+	
+	//--------------------------------------------- Нативное копирование
+	let selection = null;
+	$(document).on('copy keyup', function(e) {
+		selection = getSelectionStr();
+		if (e.type == 'copy' && selection) {
+			$.notify('Скопировано!');
+		
+		} else if (e.type == 'keyup') {
+			if (selection == getSelectionStr()) {
+				selection = null;
+				return false;
+			}
+			const {isCtrlKey} = metaKeys(e);
+			if (isCtrlKey && e.keyCode == 67) {
+				const os = getOS();
+				if (os == 'Windows' && e.type == 'keyup' && getSelectionStr()) {
+					$.notify('Скопировано!');
+				}
+			}	
+		}
+	});
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	//--------------------------------------------- Вверх страницы
 	var scrTop;
 	scrTop = $(window).scrollTop();

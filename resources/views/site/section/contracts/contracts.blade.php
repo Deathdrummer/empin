@@ -1181,24 +1181,6 @@
 			});
 			
 			
-			
-			$(document).on('keydown', function(e) {
-				console.log(111111111111);
-				const {isShiftKey, isCtrlKey, isCommandKey, isAltKey, isOptionKey, noKeys, isActiveKey} = metaKeys(e);
-				if (isCtrlKey && e.keyCode == 67) {
-					e.preventDefault();
-					
-					if (getSelectionStr()) {
-						copyStringToClipboard(getSelectionStr());
-						$.notify('Скопировано 444!');
-					}
-					
-					return false;
-				}
-			});
-			
-			
-			
 			$('#commonInfoFields').ddrInputs('change', (field) => {
 				let fieldId = $(field).attr('commoninfofield'),
 					fieldValue = $(field).val();
@@ -1220,6 +1202,8 @@
 	
 	$.copyCommonInfoItem = ({target, closeOnScroll, onContextMenu, onCloseContextMenu, changeAttrData, buildTitle, setStyle}) => {
 		const hasSelectedStr = !!getSelectionStr();
+		
+		if (!hasSelectedStr) return false;
 
 		setStyle({
 			mainMinHeight: '30px',
@@ -1238,8 +1222,7 @@
 			sort: 1,
 			async onClick() {
 				copyStringToClipboard(getSelectionStr());
-				$.notify('Скопировано 333!');
-				//removeSelection();
+				$.notify('Скопировано!');
 			}
 		}];
 	}

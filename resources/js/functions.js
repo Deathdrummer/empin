@@ -12,6 +12,64 @@ $.fn.tripleTap = function(callback) {
 	
 
 
+window.getOS = function() {
+	let userAgent = window.navigator.userAgent,
+		platform = window.navigator?.userAgentData?.platform || window.navigator.platform,
+		macosPlatforms = ['Macintosh', 'MacIntel', 'MacPPC', 'Mac68K'],
+		windowsPlatforms = ['Win32', 'Win64', 'Windows', 'WinCE'],
+		iosPlatforms = ['iPhone', 'iPad', 'iPod'],
+		os = null;
+
+	if (macosPlatforms.indexOf(platform) !== -1) {
+		os = 'MacOS';
+	} else if (iosPlatforms.indexOf(platform) !== -1) {
+		os = 'iOS';
+	} else if (windowsPlatforms.indexOf(platform) !== -1) {
+		os = 'Windows';
+	} else if (/Android/.test(userAgent)) {
+		os = 'Android';
+	} else if (/Linux/.test(platform)) {
+		os = 'Linux';
+	}
+
+	return os;
+}
+
+
+
+
+
+
+
+
+window.ddrCopy = (callback = false, rule = false) => {
+	$(document).on('keyup keydown', function(e) {
+		if (rule()) {
+			const {isShiftKey, isCtrlKey, isCommandKey, isAltKey, isOptionKey, noKeys, isActiveKey} = metaKeys(e);
+			
+			if (isCtrlKey && e.keyCode == 67) {
+				const os = getOS();
+			
+				if ((os !== 'Windows' && e.type == 'keydown') || (os == 'Windows' && e.type == 'keyup')) {
+					e.preventDefault();
+					return false;
+				} 
+				
+				if (!getSelectionStr()) {
+					e.preventDefault();
+					if (callback && _.isFunction(callback)) callback();
+					return false;
+				}
+			}
+		}
+	});
+}
+
+
+
+
+
+
 
 
 
@@ -191,38 +249,38 @@ $.fn.ddrScroll = function(callback, condition = true) {
 
 
 window.ddrDateBuilder = function(dateStr = false) {
-    var monthNames = {1: 'января', 2: 'февраля', 3: 'марта', 4: 'апреля', 5: 'мая', 6: 'июня', 7: 'июля', 8: 'августа', 9: 'августа', 10: 'октября', 11: 'ноября', 12: 'декабря'};
+	var monthNames = {1: 'января', 2: 'февраля', 3: 'марта', 4: 'апреля', 5: 'мая', 6: 'июня', 7: 'июля', 8: 'августа', 9: 'августа', 10: 'октября', 11: 'ноября', 12: 'декабря'};
 
-    const d = dateStr ? new Date(dateStr) : new Date();
-    
-    const year = {
-    	short: d.getFullYear().toString().substr(-2),
-    	full: d.getFullYear(),
-    };
-    
-    const month = {
-    	short: d.getMonth() + 1,
-    	zero: addZero(d.getMonth() + 1),
-    	named: monthNames[d.getMonth() + 1],
-    };
-    
-    const day = {
-    	short: d.getDate(),
-    	zero: addZero(d.getDate()),
-    };
-    
+	const d = dateStr ? new Date(dateStr) : new Date();
+	
+	const year = {
+		short: d.getFullYear().toString().substr(-2),
+		full: d.getFullYear(),
+	};
+	
+	const month = {
+		short: d.getMonth() + 1,
+		zero: addZero(d.getMonth() + 1),
+		named: monthNames[d.getMonth() + 1],
+	};
+	
+	const day = {
+		short: d.getDate(),
+		zero: addZero(d.getDate()),
+	};
+	
 
 	return {
 		year,
 		month,
 		day,
-        hours: d.getHours(),
-        minutes: d.getMinutes(),
-        seconds: d.getSeconds(),
-    };
-    
-    
-    
+		hours: d.getHours(),
+		minutes: d.getMinutes(),
+		seconds: d.getSeconds(),
+	};
+	
+	
+	
 };
 
 
@@ -401,13 +459,13 @@ window.selectText = function(elem) {
 
 
 window.getSelectionStr = function(toString = true) {
-    var text = "";
-    if (window.getSelection) {
-        text = toString ? window.getSelection().toString() : window.getSelection();
-    } else if (document.selection && document.selection.type != "Control") {
-        text = document.selection.createRange().text;
-    }
-    return text;
+	var text = "";
+	if (window.getSelection) {
+		text = toString ? window.getSelection().toString() : window.getSelection();
+	} else if (document.selection && document.selection.type != "Control") {
+		text = document.selection.createRange().text;
+	}
+	return text;
 }
 
 

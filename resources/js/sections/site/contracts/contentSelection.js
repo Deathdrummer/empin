@@ -71,42 +71,29 @@ export function contentSelection() {
 	
 	
 	
-	
-	
-	$(document).on('keyup', function(e) {
-		const {isShiftKey, isCtrlKey, isCommandKey, isAltKey, isOptionKey, noKeys, isActiveKey} = metaKeys(e);
-		
-		if (isCtrlKey && e.keyCode == 67) {
+	ddrCopy(() => {
+		let row = null, allData = '';
+		$('#contractsTable').find('[ddrtabletd][copied]').each((k, item) => {
+			if (k == 0) row = $(item).closest('[ddrtabletr]')[0];
 			
-			if (!getSelectionStr()) {
-				e.preventDefault();
-				
-				let row = null, allData = '';
-				$('#contractsTable').find('[ddrtabletd][copied]').each((k, item) => {
-					if (k == 0) row = $(item).closest('[ddrtabletr]')[0];
-					
-					if (k > 0 && row !== $(item).closest('[ddrtabletr]')[0]) {
-						row = $(item).closest('[ddrtabletr]')[0];
-						allData += "\n";
-					} else if (k > 0) {
-						allData += "\t";
-					}
-					
-					allData += $(item).find('[edittedplace]').text();
-				});
-				
-				
-				if (allData.trim()) {
-					copyStringToClipboard(allData.trim());
-					$.notify('Скопировано!');
-				}	
-				
-				return false;
+			if (k > 0 && row !== $(item).closest('[ddrtabletr]')[0]) {
+				row = $(item).closest('[ddrtabletr]')[0];
+				allData += "\n";
+			} else if (k > 0) {
+				allData += "\t";
 			}
-				
-			//console.log('default');
-		}
-	});
+			
+			allData += $(item).find('[edittedplace]').text();
+		});
+		
+		let copiedData = allData.trim();
+		
+		if (copiedData) {
+			copyStringToClipboard(copiedData);
+			$.notify('Скопировано!');
+		}	
+	}, () => !!$('#contractsTable').find('[ddrtabletd].selected').length);
+	
 	
 	
 	

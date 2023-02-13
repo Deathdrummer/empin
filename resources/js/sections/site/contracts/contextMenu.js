@@ -163,15 +163,6 @@ export function contextMenu(
 									$('#chatMessageList').scrollTop(chatScrollHeight - chatVisibleHeight);
 									
 									$('#chatMessageBlock').focus();
-									
-									$('#chatMessageList').find('.chat__post').mouseup(function (e) {
-										const selObj = window.getSelection();
-										const selectString =  selObj.toString();
-										if (selectString.length) {
-											copyStringToClipboard(selObj.toString());
-											$.notify('Скопировано 111!');
-										}
-									});
 															
 									$('#chatMessageBlock').ddrInputs('change', () => {
 										let mess = getContenteditable('#chatMessageBlock');
@@ -1096,27 +1087,35 @@ export function contextMenu(
 				visible: selectedTextCell,
 				sort: 1,
 				async onClick() {
-					let row = null, allData = '';
-					$('#contractsTable').find('[ddrtabletd][copied]').each((k, item) => {
-						if (k == 0) row = $(item).closest('[ddrtabletr]')[0];
+					if (getSelectionStr()) {
+						copyStringToClipboard(getSelectionStr());
+						$.notify('Скопировано!');
 						
-						if (k > 0 && row !== $(item).closest('[ddrtabletr]')[0]) {
-							row = $(item).closest('[ddrtabletr]')[0];
-							allData += "\n";
-						} else if (k > 0) {
-							allData += "\t";
+					} else {
+						let row = null, allData = '';
+						$('#contractsTable').find('[ddrtabletd][copied]').each((k, item) => {
+							if (k == 0) row = $(item).closest('[ddrtabletr]')[0];
+							
+							if (k > 0 && row !== $(item).closest('[ddrtabletr]')[0]) {
+								row = $(item).closest('[ddrtabletr]')[0];
+								allData += "\n";
+							} else if (k > 0) {
+								allData += "\t";
+							}
+							
+							allData += $(item).find('[edittedplace]').text();
+						});
+						
+						let copiedData = allData.trim();
+			
+						if (copiedData) {
+							copyStringToClipboard(copiedData);
+							$.notify('Скопировано!');
 						}
-						
-						allData += $(item).find('[edittedplace]').text();
-					});
+					}
 					
-					copyStringToClipboard(allData.trim());
-					
-					$.notify('Скопировано 222!');
-					
-					removeSelection();
-					$('#contractsTable').find('[edittedplace].select-text').removeClass('select-text');	
-					$('#contractsList').find('[ddrtabletd].selected').removeClass('selected');
+					//$('#contractsTable').find('[edittedplace].select-text').removeClass('select-text');	
+					//$('#contractsList').find('[ddrtabletd].selected').removeClass('selected');
 				}
 			}
 		];
