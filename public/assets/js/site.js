@@ -5509,31 +5509,18 @@ jQuery(function () {
 
 
   var selection = null;
-  $(document).on('copy keyup', function (e) {
+  var os = getOS();
+  $(document).on('copy', function (e) {
     selection = getSelectionStr();
 
-    if (e.type == 'copy' && selection) {
+    if (e.type == 'copy' && os == 'Windows' && selection) {
       $.notify('Скопировано!', {
         autoHideDelay: 2000
       });
-    } else if (e.type == 'keyup') {
-      if (selection == getSelectionStr()) {
-        selection = null;
-        return false;
-      }
-
-      var _metaKeys = metaKeys(e),
-          isCtrlKey = _metaKeys.isCtrlKey;
-
-      if (isCtrlKey && e.keyCode == 67) {
-        var os = getOS();
-
-        if (os == 'Windows' && e.type == 'keyup' && getSelectionStr()) {
-          $.notify('Скопировано!', {
-            autoHideDelay: 2000
-          });
-        }
-      }
+    } else if (e.type == 'copy' && os == 'MacOS' && selection) {
+      $.notify('Скопировано!', {
+        autoHideDelay: 2000
+      });
     }
   }); //--------------------------------------------- Вверх страницы
 
@@ -5709,7 +5696,7 @@ window.getOS = function () {
 
   var userAgent = window.navigator.userAgent,
       platform = ((_window$navigator = window.navigator) === null || _window$navigator === void 0 ? void 0 : (_window$navigator$use = _window$navigator.userAgentData) === null || _window$navigator$use === void 0 ? void 0 : _window$navigator$use.platform) || window.navigator.platform,
-      macosPlatforms = ['Macintosh', 'MacIntel', 'MacPPC', 'Mac68K'],
+      macosPlatforms = ['Macintosh', 'MacIntel', 'MacPPC', 'Mac68K', 'macOS'],
       windowsPlatforms = ['Win32', 'Win64', 'Windows', 'WinCE'],
       iosPlatforms = ['iPhone', 'iPad', 'iPod'],
       os = null;
@@ -5732,30 +5719,16 @@ window.getOS = function () {
 window.ddrCopy = function () {
   var callback = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
   var rule = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-  $(document).on('keyup keydown', function (e) {
+  var selection = null;
+  var os = getOS();
+  $(document).on('copy', function (e) {
     if (rule()) {
-      var _metaKeys = metaKeys(e),
-          isShiftKey = _metaKeys.isShiftKey,
-          isCtrlKey = _metaKeys.isCtrlKey,
-          isCommandKey = _metaKeys.isCommandKey,
-          isAltKey = _metaKeys.isAltKey,
-          isOptionKey = _metaKeys.isOptionKey,
-          noKeys = _metaKeys.noKeys,
-          isActiveKey = _metaKeys.isActiveKey;
+      selection = getSelectionStr();
 
-      if (isCtrlKey && e.keyCode == 67) {
-        var os = getOS();
-
-        if (os !== 'Windows' && e.type == 'keydown' || os == 'Windows' && e.type == 'keyup') {
-          e.preventDefault();
-          return false;
-        }
-
-        if (!getSelectionStr()) {
-          e.preventDefault();
-          if (callback && _.isFunction(callback)) callback();
-          return false;
-        }
+      if (e.type == 'copy' && os == 'Windows' && !selection) {
+        if (callback && _.isFunction(callback)) callback();
+      } else if (e.type == 'copy' && os == 'MacOS' && !selection) {
+        if (callback && _.isFunction(callback)) callback();
       }
     }
   });

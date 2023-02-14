@@ -27,13 +27,13 @@
 				title="Сформировать список подборки"
 				>Сформировать</x-button>
 			
-			<x-button
+			{{-- <x-button
 				variant="neutral"
 				w="2rem-5px"
 				action="selectionBuildToEdit:{{$id}}"
 				:enabled="(($contracts_count ?? false) && (!$subscribed || $subscribed_write))"
 				title="Редактировать список подборки"
-				><i class="fa-solid fa-pen-to-square"></i></x-button>
+				><i class="fa-solid fa-pen-to-square"></i></x-button> --}}
 		</x-buttons-group>
 	</td>
 	<td class="center">
@@ -60,6 +60,10 @@
 	<td class="center">
 		<x-buttons-group group="verysmall" w="2rem-5px" gx="5">
 			<x-button variant="blue" action="selectionUpdate:{{$id}}" disabled update title="Обновить"><i class="fa-solid fa-save"></i></x-button>
+			<x-button variant="light" action="selectionExport:{{$id}}" title="Экспорт"><i class="fa-solid fa-download"></i></x-button>
+			
+			
+			
 			@if($subscribed)
 				<x-button variant="orange" action="selectionUnsubscribe:{{$id}}" remove title="Отписаться"><i class="fa-solid fa-link-slash"></i></x-button>
 			@else

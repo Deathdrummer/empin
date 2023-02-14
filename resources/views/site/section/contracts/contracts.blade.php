@@ -532,6 +532,28 @@
 					
 					
 					
+					
+					$.selectionExport = (btn, id) => {
+						let row = $(btn).closest('tr');
+						
+						$(btn).setAttrib('disabled');
+					
+						let selectionSaveWait = $(btn).ddrWait({
+							iconHeight: '16px',
+							bgColor: '#ffffffd6'
+						});
+						
+						
+						setTimeout(() => {
+							$(btn).removeAttrib('disabled');
+							selectionSaveWait.destroy();
+						}, 2000);
+					}
+					
+					
+					
+					
+					
 					$.selectionUpdate = (btn, id) => {
 						let row = $(btn).closest('tr');
 						
