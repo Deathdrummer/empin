@@ -27,6 +27,8 @@
 				title="Сформировать список подборки"
 				>Сформировать</x-button>
 			
+			<x-button variant="blue" action="selectionExport:{{$id}}" title="Экспорт"><i class="fa-solid fa-download"></i></x-button>
+			
 			{{-- <x-button
 				variant="neutral"
 				w="2rem-5px"
@@ -60,9 +62,6 @@
 	<td class="center">
 		<x-buttons-group group="verysmall" w="2rem-5px" gx="5">
 			<x-button variant="blue" action="selectionUpdate:{{$id}}" disabled update title="Обновить"><i class="fa-solid fa-save"></i></x-button>
-			<x-button variant="light" action="selectionExport:{{$id}}" title="Экспорт"><i class="fa-solid fa-download"></i></x-button>
-			
-			
 			
 			@if($subscribed)
 				<x-button variant="orange" action="selectionUnsubscribe:{{$id}}" remove title="Отписаться"><i class="fa-solid fa-link-slash"></i></x-button>

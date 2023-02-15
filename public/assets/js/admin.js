@@ -5859,6 +5859,10 @@ window.getOS = function () {
 
   return os;
 };
+/*
+	Вызвать событие нативного копирование при отсутсвующем выделении
+*/
+
 
 window.ddrCopy = function () {
   var callback = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
@@ -5869,9 +5873,9 @@ window.ddrCopy = function () {
     if (rule()) {
       selection = getSelectionStr();
 
-      if (e.type == 'copy' && os == 'Windows' && !selection) {
+      if (os == 'Windows' && !selection) {
         if (callback && _.isFunction(callback)) callback();
-      } else if (e.type == 'copy' && os == 'MacOS' && !selection) {
+      } else if (os == 'MacOS' && !selection) {
         if (callback && _.isFunction(callback)) callback();
       }
     }

@@ -41,7 +41,9 @@ window.getOS = function() {
 
 
 
-
+/*
+	Вызвать событие нативного копирование при отсутсвующем выделении
+*/
 window.ddrCopy = (callback = false, rule = false) => {
 	let selection = null;
 	const os = getOS();
@@ -50,10 +52,10 @@ window.ddrCopy = (callback = false, rule = false) => {
 		if (rule()) {
 			selection = getSelectionStr();
 			
-			if (e.type == 'copy' && os == 'Windows' && !selection) {
+			if (os == 'Windows' && !selection) {
 				if (callback && _.isFunction(callback)) callback();
 			
-			} else if (e.type == 'copy' && os == 'MacOS' && !selection) {
+			} else if (os == 'MacOS' && !selection) {
 				if (callback && _.isFunction(callback)) callback();
 			}
 		}
