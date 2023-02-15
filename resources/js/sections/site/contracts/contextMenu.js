@@ -1011,9 +1011,7 @@ export function contextMenu(
 					
 					wait();
 					
-					const {data, error, status, headers} = await axiosQuery('get', 'site/contracts/to_export', {
-						contracts_ids: contractsIds,
-					});
+					const {data, error, status, headers} = await axiosQuery('get', 'site/contracts/to_export');
 					
 					
 					if (error) {
@@ -1030,7 +1028,7 @@ export function contextMenu(
 					$.selectAllChecks = () => {
 						$('#excelColumsList').find('[columtoxeport]').ddrInputs('checked', !selectAllChecksStat ? true : false);
 						selectAllChecksStat = !selectAllChecksStat;
-						checkCountChecked()
+						checkCountChecked();
 					};
 					
 					

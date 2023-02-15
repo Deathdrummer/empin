@@ -533,21 +533,91 @@
 					
 					
 					
-					$.selectionExport = (btn, id) => {
+					$.selectionExport = async (btn, selectionId) => {
 						let row = $(btn).closest('tr');
 						
 						$(btn).setAttrib('disabled');
 					
-						let selectionSaveWait = $(btn).ddrWait({
+						let selectionExportBtnWait = $(btn).ddrWait({
 							iconHeight: '16px',
-							bgColor: '#ffffffd6'
+							bgColor: '#d2fafb99'
+						});
+						
+						const winHeight = $('[ddrpopupdata]').outerHeight() - 100;
+						
+						const {data, error, status, headers} = await axiosQuery('get', 'site/contracts/to_export', {
+							height: (winHeight < 300 ? 300 : winHeight)+'px',
 						});
 						
 						
-						setTimeout(() => {
-							$(btn).removeAttrib('disabled');
-							selectionSaveWait.destroy();
-						}, 2000);
+						const exportDialogHtml = '<div class="w38rem text-start">'+
+							'<h6 class="fz16px color-blue mb1rem text-center" style="color:#487c91;">Экспорт данных в Excel</h6>'+
+							data+
+						'</div>';
+						
+						dialog(exportDialogHtml, {
+							buttons: {
+								'Отмена|light': function({closeDialog}) {
+									closeDialog();
+									selectionExportBtnWait.destroy();
+								},
+								'Экспорт|blue': async function({closeDialog}) {
+									let selectionExportWinWait = $('[ddrpopupdialogwin]').ddrWait({
+										iconHeight: '25px',
+										//bgColor: '#d2fafb99'
+									});
+									
+									
+									const colums = [];
+									$('[ddrpopupdialogwin]').find('[columtoxeport]:checked').each((k, item) => {
+										let field = $(item).attr('columtoxeport');
+										colums.push(field);
+									});
+									
+									const {data, error, status, headers} = await axiosQuery('post', 'site/contracts/to_export', {
+										selection_id: selectionId,
+										colums,
+									}, 'blob');
+									
+									
+									if (headers['content-type'] != 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
+										$.notify('Ошибка экспорта данных', 'error');
+										selectionExportWinWait.off();
+										return;
+									}
+									
+									const d = ddrDateBuilder();
+									
+									exportFile({data, headers, filename: 'Договоры_подборки_'+d.day.zero+'.'+d.month.zero+'.'+d.year.full}, () => {
+										closeDialog();
+										selectionExportBtnWait.destroy();
+									});
+								},
+							}
+						}, () => {
+							
+							let selectAllChecksStat = false;
+							$.selectAllChecks = () => {
+								$('#excelColumsList').find('[columtoxeport]').ddrInputs('checked', !selectAllChecksStat ? true : false);
+								selectAllChecksStat = !selectAllChecksStat;
+								checkCountChecked();
+							};
+							
+							
+							$('#excelColumsList').find('[columtoxeport]').on('change', function() {
+								checkCountChecked()
+							});
+							
+							
+							function checkCountChecked() {
+								let countChecked = $('#excelColumsList').find('[columtoxeport]:checked').length;
+								if (countChecked) {
+									$('#ddrpopupDialogBtn1').ddrInputs('enable');
+								} else {
+									$('#ddrpopupDialogBtn1').ddrInputs('disable');
+								}
+							}
+						});
 					}
 					
 					

@@ -16109,9 +16109,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                   setWidth = _yield$ddrPopup.setWidth;
                   wait();
                   _context13.next = 23;
-                  return axiosQuery('get', 'site/contracts/to_export', {
-                    contracts_ids: contractsIds
-                  });
+                  return axiosQuery('get', 'site/contracts/to_export');
 
                 case 23:
                   _yield$axiosQuery11 = _context13.sent;

@@ -4,7 +4,7 @@ use App\Http\Filters\ContractFilter;
 use App\Models\Contract as ContractModel;
 use App\Models\ContractData;
 use App\Models\ContractDepartment;
-use App\Models\Selection;
+use App\Models\Selection as SelectionModel;
 use App\Models\User;
 use App\Services\Business\Department as DepartmentService;
 use App\Services\Business\User as UserService;
@@ -158,7 +158,7 @@ class Contract {
 		};
 		
 		$selectionContracts = match (true) {
-			!is_null($selection) => Selection::where('id', $selection)->with('contracts:id')->first(),
+			!is_null($selection) => SelectionModel::where('id', $selection)->with('contracts:id')->first(),
 			default => false
 		};
 		
@@ -391,9 +391,79 @@ class Contract {
 	 * @return 
 	 */
 	public function getToExport($contractsIds = [], $colums = [], $sort = 'id' , $order = 'ASC'): array {
+		return $this->_buildDataToExport([
+			'contracts_ids'	=> $contractsIds,
+			'colums' 		=> $colums,
+			'sort' 			=> $sort,
+			'order' 		=> $order,
+		]);
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	/** Получить список договоров для экспорта из подборки
+	 * @param 
+	 * @return 
+	 */
+	public function getSelectionToExport($selectionId = [], $colums = []) {
+		return $this->_buildDataToExport([
+			'selection_id' 	=> $selectionId,
+			'colums' 		=> $colums,
+		]);
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	/**
+	 * @param 
+	 * @return 
+	 */
+	private function _buildDataToExport($params = []): array {
+		[
+			'contracts_ids' => $contractsIds,
+			'selection_id' 	=> $selectionId,
+			'colums' 		=> $colums,
+			'sort'			=> $sort,
+			'order'			=> $order,
+		] = array_replace_recursive([
+			'contracts_ids' => null,
+			'selection_id' 	=> null,
+			'colums' 		=> null,
+			'sort'			=> null,
+			'order'			=> null,
+		], $params);
+		
+		if ($selectionId) {
+			$selectionContracts = SelectionModel::where('id', $selectionId)->with('contracts:id')->first();
+			if (!$contractsIds = $selectionContracts->contracts->pluck('id')) return false;
+		}
+		
+		
 		
 		$res = ContractModel::select([...$colums, 'without_buy', 'subcontracting', 'gencontracting'])->whereIn('id', $contractsIds)
-			->orderBy($sort, $order)
+			->when($sort && $order, function($query) use($sort, $order) {
+				$query->orderBy($sort, $order);
+			})
 			->get()
 			->toArray();
 		
@@ -476,6 +546,8 @@ class Contract {
 	
 	
 	
+	
+	
 	/**
 	 * @param 
 	 * @return 
@@ -498,7 +570,7 @@ class Contract {
 		if ($request->has('selection')) {
 			$selection = $request->input('selection');
 			$selectionContracts = match (true) {
-				!is_null($selection) => Selection::where('id', $selection)->with('contracts:id')->first(),
+				!is_null($selection) => SelectionModel::where('id', $selection)->with('contracts:id')->first(),
 				default => false
 			};
 		}
@@ -820,7 +892,7 @@ class Contract {
 			$disabedSelections = $contract->selections->pluck('id')->toArray() ?? [];
 		}
 		
-		$allSelections = Selection::toChoose()->get();
+		$allSelections = SelectionModel::toChoose()->get();
 		
 		return $allSelections->map(function($item) use($disabedSelections) {
 				return [
@@ -859,7 +931,7 @@ class Contract {
 			$selections = $contract->selections->pluck('id')->toArray() ?? [];
 		}
 		
-		$allSelections = Selection::toTooltip()->get();
+		$allSelections = SelectionModel::toTooltip()->get();
 		
 		
 		

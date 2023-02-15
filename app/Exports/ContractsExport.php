@@ -34,16 +34,25 @@ class ContractsExport extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBinder i
 	public function __construct($params) {
 		[
 			'contracts_ids' => $contractsIds,
+			'selection_id' 	=> $selectionId,
 			'colums' 		=> $colums,
 			'sort'			=> $sort,
 			'order'			=> $order,
-		] = $params;
+		] = array_replace_recursive([
+			'contracts_ids' => null,
+			'selection_id' 	=> null,
+			'colums' 		=> null,
+			'sort'			=> null,
+			'order'			=> null,
+		], $params);
 		
 		$this->contract = app()->make(Contract::class);
 		
 		$this->colums = $colums;
         
-		$this->contractsList = $this->contract->getToExport($contractsIds, $colums, $sort, $order);
+		
+		if ($contractsIds) $this->contractsList = $this->contract->getToExport($contractsIds, $colums, $sort, $order);
+		elseif($selectionId) $this->contractsList = $this->contract->getSelectionToExport($selectionId, $colums);
 		$this->columsNames = $this->contract->getColumsMap($colums);
     }
 	

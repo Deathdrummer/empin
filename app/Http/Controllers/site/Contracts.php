@@ -953,7 +953,9 @@ class Contracts extends Controller {
 		
 		unset($colums['period']);
 		
-		return $this->render('colums_to_export', compact('colums'));
+		$height = $request['height'] ?? null;
+		
+		return $this->render('colums_to_export', compact('colums', 'height'));
 	}
 	
 	/**
@@ -962,14 +964,18 @@ class Contracts extends Controller {
 	 */
 	public function set_to_export(Request $request) {
 		$params = $request->validate([
-			'contracts_ids'	=> 'required|array',
+			'contracts_ids'	=> 'exclude_unless:selection_id,null',
+			'selection_id'	=> 'exclude_unless:contracts_ids,null',
 			'colums'		=> 'required|array',
-			'sort'			=> 'required|string',
-			'order'			=> 'required|string',
+			'sort'			=> 'filled|string',
+			'order'			=> 'filled|string',
 		]);
 		
 		return Excel::download(new ContractsExport($params), 'contracts.xlsx');
 	}
+	
+	
+
 	
 
 

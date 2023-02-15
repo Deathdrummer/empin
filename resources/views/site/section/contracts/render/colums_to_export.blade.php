@@ -8,7 +8,7 @@
 				</x-table.td>
 			</x-table.tr>
 		</x-table.head>
-		<x-table.body scrolled="calc(100vh - 200px)" id="excelColumsList">	
+		<x-table.body scrolled="{{$height ?? 'calc(100vh - 200px)'}}" id="excelColumsList">	
 			@forelse($colums as $field => $column)
 				@if(auth('site')->user()->can('contract-col-'.$field.':site'))
 					<x-table.tr class="h4rem">
