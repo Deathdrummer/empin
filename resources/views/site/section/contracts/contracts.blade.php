@@ -488,6 +488,18 @@
 					enableButtons(true);
 					changeInputs({'[save], [update]': 'enable'});
 					
+					$('#selectionsList').find('[ddrtabletr][archive="1"]').setAttrib('hidden');
+					
+					$.changeSelectionsList = (btn, isActive, id) => {
+						if (id == 'archive') {
+							$('#selectionsList').find('[ddrtabletr][archive]:not([hidden])').setAttrib('hidden');
+							$('#selectionsList').find('[ddrtabletr][archive="1"]').removeAttrib('hidden');
+						} else if (id == 'active') {
+							$('#selectionsList').find('[ddrtabletr][archive]:not([hidden])').setAttrib('hidden');
+							$('#selectionsList').find('[ddrtabletr][archive="0"]').removeAttrib('hidden');
+						}
+					}
+					
 					
 					
 					$.selectionAdd = (btn) => {
@@ -784,7 +796,7 @@
 									$(sendMessDialogBtn).ddrInputs('enable');
 									closeDialog();
 									sendMessAbortCtrl.abort();
-								} 
+								}
 							},
 							callback() {
 								$('#ddrpopupDialogBtn0').ddrInputs('disable');
@@ -926,26 +938,57 @@
 					
 					
 					
-					
-					
 					$.selectionToArchive = (btn, id) => {
-						$('[selectionsbtn]').ddrInputs('disable');
-						close();
-						selection.value = id;
-						editSelection = null;
-						
-						let selectionTitle = $(btn).closest('[ddrtabletr]').find('input[name="title"]').val() || $(btn).closest('[ddrtabletr]').find('p').text();
-						
-						_clearCounts();
-						getList({
-							withCounts: true,
-							callback: function() {
-								$('#currentSelectionTitle').text(selectionTitle);
-								$('[selectionsbtn]').ddrInputs('enable');
-								$('#currentSelection').removeAttrib('hidden');
-							}
+						let selectionToArchiveBtn = $(btn).ddrWait({
+							iconHeight: '15px',
+							bgColor: '#ffffff91'
 						});
+						
+						$(btn).ddrInputs('disable');
+						
+						
+						const isArchive = $(btn).closest('[ddrtabletr]').attr('archive') == 1;
+						const command = isArchive ? 'from' : 'to';
+						const mess = isArchive ? 'Вернуть подборку в активные?' : 'Отправить подборку в архив?';
+						const actionBtn = isArchive ? 'Вернуть' : 'Отправить';
+						const success = isArchive ? 'Подборка успешно возвращена в активные!' : 'Подборка успешно отправлена в архив!';
+						
+						dialog(mess, {
+							buttons: {
+								[actionBtn]: async ({closeDialog}) => {
+									const {data, error, status, headers, abort} = await axiosQuery('put', 'site/selections/archive', {id, command}, 'json');
+						
+									if (error) {
+										$.notify('Ошибка отправки подборки в архив!', 'error');
+										console.log(error?.message, error?.errors);
+									} 
+									
+									if (data) {
+										$(btn).closest('[ddrtabletr]').setAttrib('hidden');
+										$(btn).closest('[ddrtabletr]').attr('archive', isArchive ? '0' : '1');
+										
+										if (isArchive) {
+											$(btn).parent('.button').removeClass('button-light').addClass('button-purple');
+											$(btn).html('<i class="fa-solid fa-fw fa-box-archive"></i>');
+										} else {
+											$(btn).parent('.button').removeClass('button-purple').addClass('button-light');
+											$(btn).html('<i class="fa-solid fa-fw fa-arrow-rotate-left"></i>');
+										}
+										
+										closeDialog();
+										$.notify(success);
+										selectionToArchiveBtn.destroy();
+										$(btn).ddrInputs('enable');
+									}
+								},
+								'Отмена|red': ({closeDialog}) => {
+									selectionToArchiveBtn.destroy();
+									$(btn).ddrInputs('enable');
+									closeDialog();
+								} 
+						}});
 					}
+					
 				});
 			});
 		});

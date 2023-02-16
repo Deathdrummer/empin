@@ -1,4 +1,7 @@
-<x-table.tr class="h6rem">
+<x-table.tr
+	class="h6rem"
+	archive="{{$archive}}"
+	>
 	<x-table.td>
 		@if($subscribed_read)
 			<p class="fz12px ml6px">{{$title}}</p>
@@ -63,27 +66,38 @@
 			action="selectionShare:{{$id}},{{$subscribed}}"
 			title="Поделиться подборкой с другими сотрудниками"
 			>
-			<i class="fa-solid fa-share-nodes"></i>
+			<i class="fa-solid fa-fw fa-share-nodes"></i>
 		</x-button>
 	</x-table.td>
 	<x-table.td class="h-center">
-		<x-button
-			group="verysmall"
-			variant="purple"
-			action="selectionToArchive:{{$id}}"
-			title="Отправить подборку в архив"
-			>
-			<i class="fa-solid fa-box-archive"></i>
-		</x-button>
+		@if($archive)
+			<x-button
+				group="verysmall"
+				variant="light"
+				action="selectionToArchive:{{$id}}"
+				title="Вернуть подборку в активные"
+				>
+				<i class="fa-solid fa-fw fa-arrow-rotate-left"></i>
+			</x-button>
+		@else
+			<x-button
+				group="verysmall"
+				variant="purple"
+				action="selectionToArchive:{{$id}}"
+				title="Отправить подборку в архив"
+				>
+				<i class="fa-solid fa-fw fa-box-archive"></i>
+			</x-button>
+		@endif
 	</x-table.td>
 	<x-table.td class="h-center">
 		<x-buttons-group group="verysmall" w="2rem-5px" gx="5">
-			<x-button variant="blue" action="selectionUpdate:{{$id}}" update disabled title="Обновить"><i class="fa-solid fa-save"></i></x-button>
+			<x-button variant="blue" action="selectionUpdate:{{$id}}" update disabled title="Обновить"><i class="fa-solid fa-fw fa-save"></i></x-button>
 			
 			@if($subscribed)
-				<x-button variant="orange" action="selectionUnsubscribe:{{$id}}" remove title="Отписаться"><i class="fa-solid fa-link-slash"></i></x-button>
+				<x-button variant="orange" action="selectionUnsubscribe:{{$id}}" remove title="Отписаться"><i class="fa-solid fa-fw fa-link-slash"></i></x-button>
 			@else
-				<x-button variant="red" action="selectionRemove:{{$id}}" remove title="Удалить"><i class="fa-solid fa-trash-can"></i></x-button>
+				<x-button variant="red" action="selectionRemove:{{$id}}" remove title="Удалить"><i class="fa-solid fa-fw fa-trash-can"></i></x-button>
 			@endif
 		</x-buttons-group>
 	</x-table.td>

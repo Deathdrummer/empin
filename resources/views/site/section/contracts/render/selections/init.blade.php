@@ -1,24 +1,20 @@
-{{-- <x-chooser
+<x-chooser
 	class="mb2rem"
 	variant="neutral"
 	group="normal"
 	px="10"
 	>
 	<x-chooser.item
-		action="getListAction"
+		action="changeSelectionsList:active"
+		active
 		>Активные
 		</x-chooser.item>
 	
 	<x-chooser.item
-		id="chooserArchive"
-		action="getListAction:-1"
+		action="changeSelectionsList:archive"
 		>Архив
 		</x-chooser.item>
 </x-chooser>
- --}}
-
-
-
 
 
 
@@ -41,7 +37,7 @@
 				<strong class="d-block fz12px lh90">Поделиться</strong>
 			</x-table.td>
 			<x-table.td class="w7rem h-center" title="Отправить подборку в архив">
-				<strong class="d-block fz12px lh90">В архив</strong>
+				<strong class="d-block fz12px lh90">Архив</strong>
 			</x-table.td>
 			<x-table.td class="w8rem h-center">
 				<strong class="d-block fz12px lh90">Действия</strong>

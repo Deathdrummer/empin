@@ -541,5 +541,28 @@ class Selections extends Controller {
 	
 	
 	
+	
+	
+	
+	/**
+	 * @param 
+	 * @return 
+	 */
+	public function archive(Request $request) {
+		[
+			'id' => $selectionId,
+			'command' => $command,
+		] = $request->validate([
+			'id'		=> 'required|numeric',
+			'command' 	=> 'required|string',
+		]);
+		
+		$row = ContractSelection::find($selectionId);
+		$row->archive = $command == 'to' ? 1 : ($command == 'from' ? 0 : 1);
+		$stat = $row->save();
+		return $stat;
+	}
+	
+	
 
 }

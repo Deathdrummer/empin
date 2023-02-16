@@ -862,7 +862,7 @@ class Contract {
 	 */
 	public function getSelectionsToChoose($contractId = null) {
 		$userId = auth('site')->user()->id;
-
+		
 		$disabedSelections = [];
 		
 		if ($contractId) {
