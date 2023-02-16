@@ -2047,10 +2047,14 @@
 		columnDateFilter;
 	
 	
-	$.contractFilterBy = async ({target, preload, closeOnScroll, onContextMenu, onCloseContextMenu, changeAttrData, buildTitle}, column) => {
+	$.contractFilterBy = async ({target, preload, closeOnScroll, onContextMenu, onCloseContextMenu, changeAttrData, buildTitle, setStyle}, column) => {
 		if (abortCtrlFilter instanceof AbortController) abortCtrlFilter.abort();
-		ddrCssVar('cm-mainFontSize', '12px');
-		ddrCssVar('cm-mainMinHeight', '30px');
+		
+		setStyle({
+			'mainFontSize': '12px',
+			'mainMinHeight': '30px',
+		});
+		
 		
 		preload({iconSize: '3rem'});
 		
@@ -2059,9 +2063,17 @@
 		});
 		
 		
+		//console.log(column, currentList);
+		
 		
 		abortCtrlFilter = new AbortController();
 		const {data, error, status, headers, abort} = await axiosQuery('get', 'site/contracts/column_values', {column, currentList}, 'json', abortCtrlFilter);
+		
+		if (error) {
+			$.notify('Ошибка загрузки данных', 'error');
+			console.log(error?.message, error.errors);
+		}
+		
 		
 		const navData = [];
 		$.each(data, (_, {id, name, title}) => {
@@ -2095,10 +2107,7 @@
 		
 		
 		
-		onCloseContextMenu(() => {
-			ddrCssVar('cm-mainFontSize', '16px');
-			ddrCssVar('cm-mainMinHeight', '48px');
-		});
+		onCloseContextMenu(() => {});
 		
 		return navData;
 	}

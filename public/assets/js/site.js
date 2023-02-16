@@ -8971,9 +8971,9 @@ function _parseAttribString() {
   var _ref2 = _.isArray(splitSrt) ? splitSrt : [splitSrt, []],
       _ref3 = _slicedToArray(_ref2, 2),
       func = _ref3[0],
-      args = _ref3[1]; //if (!_.isArray(args)) args = [];
+      args = _ref3[1];
 
-
+  if (!_.isArray(args)) args = [args];
   return [func, args];
 } // Вызвать функцию построения меню
 

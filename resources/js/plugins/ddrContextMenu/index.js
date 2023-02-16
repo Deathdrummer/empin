@@ -201,7 +201,7 @@ function _parseAttribString(stringToParse = null) {
 	
 	const splitSrt = ddrSplit(stringToParse?.replace(/\n+/gm, ''), ':', ',');
 	let [func, args] = _.isArray(splitSrt) ? splitSrt : [splitSrt, []];
-	//if (!_.isArray(args)) args = [];
+	if (!_.isArray(args)) args = [args];
 	return [func, args];
 }
 
