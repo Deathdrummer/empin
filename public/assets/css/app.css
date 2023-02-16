@@ -143618,10 +143618,11 @@ template {
   background-color: rgba(255, 255, 255, 0.8117647059);
 }
 .ddrtable__td {
-  height: 100%;
+  height: auto;
   position: relative;
   display: grid;
   align-items: center;
+  justify-content: initial;
   min-height: 20px;
   font-size: 14px;
 }
@@ -143636,6 +143637,10 @@ template {
 }
 .ddrtable__td:not([style]) {
   width: 50px;
+  word-break: break-word;
+}
+.ddrtable__td.w-auto {
+  flex: 1 1 auto;
   word-break: break-word;
 }
 .ddrtable__td.h-start {

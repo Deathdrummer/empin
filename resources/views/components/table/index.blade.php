@@ -49,7 +49,8 @@
 	} else {
 		$(bodyRows).find('[ddrtabletd]').css('width', (100 / headCells.length)+'%');
 	}
-		
+	
+	
 	
 		
 	/*$(headCells).each(function(index, cell) {

@@ -299,7 +299,7 @@ window.ddrDateBuilder = function(dateStr = false) {
 
 $.fn.ddrWatch = function(method = null, opsOrCb = null, callback = null) {
 	if (_.isNull(method)) throw Error('Ошибка! watch не указан метод!');
-	if (_.isNull(callback)) {
+	if (_.isNull(callback) && _.isFunction(opsOrCb)) {
 		callback = opsOrCb;
 		opsOrCb = {};
 	}
@@ -316,7 +316,7 @@ $.fn.ddrWatch = function(method = null, opsOrCb = null, callback = null) {
 			subtree,
 			attributes,
 			attributeFilter,
-		} = _.assign(ops, {
+		} = _.assign(opsOrCb, {
 			childList: true,
 			subtree: true,
 			attributes: true,

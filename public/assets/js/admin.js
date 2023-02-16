@@ -6088,7 +6088,7 @@ $.fn.ddrWatch = function () {
   var callback = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
   if (_.isNull(method)) throw Error('Ошибка! watch не указан метод!');
 
-  if (_.isNull(callback)) {
+  if (_.isNull(callback) && _.isFunction(opsOrCb)) {
     callback = opsOrCb;
     opsOrCb = {};
   }
@@ -6099,7 +6099,7 @@ $.fn.ddrWatch = function () {
   if (method == 'mutate') {
     var observer = new MutationObserver(callback);
 
-    var _$assign = _.assign(ops, {
+    var _$assign = _.assign(opsOrCb, {
       childList: true,
       subtree: true,
       attributes: true,

@@ -482,6 +482,8 @@
 					//},
 					viewsPath,
 				}).then(({error, list, changeInputs, create, store, storeWithShow, update, destroy, remove, query, getParams}) => {
+					
+					$('#selectionsTable').blockTable('buildTable');
 					wait(false);
 					enableButtons(true);
 					changeInputs({'[save], [update]': 'enable'});

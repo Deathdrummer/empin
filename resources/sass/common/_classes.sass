@@ -1266,11 +1266,12 @@ $tableColor: #efefef
 		
 		
 	&__td
-		height: 100%
+		height: auto
 		//min-width: min-content
 		position: relative
 		display: grid
 		align-items: center
+		justify-content: initial
 		min-height: 20px
 		font-size: 14px
 		//+font('Fira Sans', 400)
@@ -1286,8 +1287,13 @@ $tableColor: #efefef
 		
 		&:not([style])
 			width: 50px
+			//max-width: max-content
 			word-break: break-word
 		
+		&.w-auto
+			//min-width: max-content
+			flex: 1 1 auto
+			word-break: break-word
 		
 		&.h-start
 			justify-content: start

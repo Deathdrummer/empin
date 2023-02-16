@@ -104,27 +104,54 @@ class BlockTable {
 	*/
 	buildTable(listSelector) {
 		const selector = $(listSelector).closest('[ddrtable]'),
+			isScrolled = $(selector).find('[ddrtablebody]').hasClass('ddrtable__body_scrolled'),
 			headCells = $(selector).find('[ddrtablehead]').find('[ddrtabletr]').find('[ddrtabletdmain]').length
 				? $(selector).find('[ddrtablehead]').find('[ddrtabletr]').find('[ddrtabletdmain]')
 				: $(selector).find('[ddrtablehead]').find('[ddrtabletr]').find('[ddrtabletd]'),
-			bodyRows = $(selector).find('[ddrtablebody] [ddrtabletr]'),
-			cellsWidths = [];
-			
-		$(headCells).each(function(index, cell) {
-			let width = Math.max($(cell).width(), $(cell)[0].offsetWidth, $(cell)[0].clientWidth, $(cell).outerWidth());
-			cellsWidths.push(width);
+			bodyRows = $(selector).find('[ddrtablebody] [ddrtabletr]');
+		
+		let cellsWidths = [];
+		
+		
+		_initHeadCellsWidths();
+		_buildBodyRows();
+		
+		
+		if (isScrolled) $(headCells).last().css('margin-right', '6px');
+		
+		let stat = 2;
+		$(headCells).ddrWatch('resize', entries => {
+			if (stat > 0) {
+				cellsWidths = [];
+				_initHeadCellsWidths();
+				_buildBodyRows();
+				stat--;
+			}
 		});
 		
-		if (cellsWidths) {
-			$(bodyRows).each(function(rIndex, row) {
-				$.each(cellsWidths, function(cIndex, width) {
-					$(row).find('[ddrtabletd]:eq('+cIndex+')').css('width', width+'px');
-				});
-				$(row).addClass('ddrtable__tr_visible');
-				if (bodyRows.length == rIndex + 1) $(row).setAttrib('ddrtablepartend');
+		
+		
+		
+		function _initHeadCellsWidths() {
+			$(headCells).each(function(index, cell) {
+				let width = Math.max($(cell).width(), $(cell)[0].offsetWidth, $(cell)[0].clientWidth, $(cell).outerWidth());
+				cellsWidths.push(width);
 			});
-		} else {
-			$(bodyRows).find('[ddrtabletd]').css('width', (100 / headCells.length)+'%');
 		}
+		
+		
+		function _buildBodyRows() {
+			if (cellsWidths) {
+				$(bodyRows).each(function(rIndex, row) {
+					$.each(cellsWidths, function(cIndex, width) {
+						$(row).find('[ddrtabletd]:eq('+cIndex+')').css('width', width+'px');
+					});
+					$(row).not('.ddrtable__tr_visible').addClass('ddrtable__tr_visible');
+					if (bodyRows.length == rIndex + 1) $(row).setAttrib('ddrtablepartend');
+				});
+			} else {
+				$(bodyRows).find('[ddrtabletd]').css('width', (100 / headCells.length)+'%');
+			}
+		}	
 	}
 }

@@ -5944,7 +5944,7 @@ $.fn.ddrWatch = function () {
   var callback = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
   if (_.isNull(method)) throw Error('Ошибка! watch не указан метод!');
 
-  if (_.isNull(callback)) {
+  if (_.isNull(callback) && _.isFunction(opsOrCb)) {
     callback = opsOrCb;
     opsOrCb = {};
   }
@@ -5955,7 +5955,7 @@ $.fn.ddrWatch = function () {
   if (method == 'mutate') {
     var observer = new MutationObserver(callback);
 
-    var _$assign = _.assign(ops, {
+    var _$assign = _.assign(opsOrCb, {
       childList: true,
       subtree: true,
       attributes: true,
@@ -7932,24 +7932,48 @@ var BlockTable = /*#__PURE__*/function () {
     key: "buildTable",
     value: function buildTable(listSelector) {
       var selector = $(listSelector).closest('[ddrtable]'),
+          isScrolled = $(selector).find('[ddrtablebody]').hasClass('ddrtable__body_scrolled'),
           headCells = $(selector).find('[ddrtablehead]').find('[ddrtabletr]').find('[ddrtabletdmain]').length ? $(selector).find('[ddrtablehead]').find('[ddrtabletr]').find('[ddrtabletdmain]') : $(selector).find('[ddrtablehead]').find('[ddrtabletr]').find('[ddrtabletd]'),
-          bodyRows = $(selector).find('[ddrtablebody] [ddrtabletr]'),
+          bodyRows = $(selector).find('[ddrtablebody] [ddrtabletr]');
+      var cellsWidths = [];
+
+      _initHeadCellsWidths();
+
+      _buildBodyRows();
+
+      if (isScrolled) $(headCells).last().css('margin-right', '6px');
+      var stat = 2;
+      $(headCells).ddrWatch('resize', function (entries) {
+        if (stat > 0) {
           cellsWidths = [];
-      $(headCells).each(function (index, cell) {
-        var width = Math.max($(cell).width(), $(cell)[0].offsetWidth, $(cell)[0].clientWidth, $(cell).outerWidth());
-        cellsWidths.push(width);
+
+          _initHeadCellsWidths();
+
+          _buildBodyRows();
+
+          stat--;
+        }
       });
 
-      if (cellsWidths) {
-        $(bodyRows).each(function (rIndex, row) {
-          $.each(cellsWidths, function (cIndex, width) {
-            $(row).find('[ddrtabletd]:eq(' + cIndex + ')').css('width', width + 'px');
-          });
-          $(row).addClass('ddrtable__tr_visible');
-          if (bodyRows.length == rIndex + 1) $(row).setAttrib('ddrtablepartend');
+      function _initHeadCellsWidths() {
+        $(headCells).each(function (index, cell) {
+          var width = Math.max($(cell).width(), $(cell)[0].offsetWidth, $(cell)[0].clientWidth, $(cell).outerWidth());
+          cellsWidths.push(width);
         });
-      } else {
-        $(bodyRows).find('[ddrtabletd]').css('width', 100 / headCells.length + '%');
+      }
+
+      function _buildBodyRows() {
+        if (cellsWidths) {
+          $(bodyRows).each(function (rIndex, row) {
+            $.each(cellsWidths, function (cIndex, width) {
+              $(row).find('[ddrtabletd]:eq(' + cIndex + ')').css('width', width + 'px');
+            });
+            $(row).not('.ddrtable__tr_visible').addClass('ddrtable__tr_visible');
+            if (bodyRows.length == rIndex + 1) $(row).setAttrib('ddrtablepartend');
+          });
+        } else {
+          $(bodyRows).find('[ddrtabletd]').css('width', 100 / headCells.length + '%');
+        }
       }
     }
   }]);

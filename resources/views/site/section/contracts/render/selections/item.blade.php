@@ -1,5 +1,5 @@
-<tr class="h6rem">
-	<td>
+<x-table.tr class="h6rem">
+	<x-table.td>
 		@if($subscribed_read)
 			<p class="fz12px ml6px">{{$title}}</p>
 		@elseif(!$subscribed || $subscribed_write)
@@ -10,15 +10,15 @@
 				class="w100"
 				/>
 		@endif	
-	</td>
-	<td class="center">
+	</x-table.td>
+	<x-table.td class="h-center">
 		@if(isset($contracts_count) && $contracts_count)
 			<strong class="color-green fz14px">{{$contracts_count}}</strong>
 		@else
 			<p class="color-gray-500">-</p>
 		@endif
-	</td>
-	<td class="center">
+	</x-table.td>
+	<x-table.td class="h-center">
 		<x-buttons-group group="small" gx="5">
 			<x-button
 				variant="green"
@@ -37,8 +37,8 @@
 				title="Редактировать список подборки"
 				><i class="fa-solid fa-pen-to-square"></i></x-button> --}}
 		</x-buttons-group>
-	</td>
-	<td class="center">
+	</x-table.td>
+	<x-table.td class="h-center">
 		<x-button
 			group="verysmall"
 			variant="light"
@@ -48,8 +48,8 @@
 			>
 			<i class="fa-solid fa-comments"></i>
 		</x-button>
-	</td>
-	<td class="center">
+	</x-table.td>
+	<x-table.td class="h-center">
 		<x-button
 			group="verysmall"
 			variant="yellow"
@@ -58,10 +58,20 @@
 			>
 			<i class="fa-solid fa-share-nodes"></i>
 		</x-button>
-	</td>
-	<td class="center">
+	</x-table.td>
+	<x-table.td class="h-center">
+		<x-button
+			group="verysmall"
+			variant="purple"
+			action="selectionToArchive:{{$id}}"
+			title="Отправить подборку в архив"
+			>
+			<i class="fa-solid fa-box-archive"></i>
+		</x-button>
+	</x-table.td>
+	<x-table.td class="h-center">
 		<x-buttons-group group="verysmall" w="2rem-5px" gx="5">
-			<x-button variant="blue" action="selectionUpdate:{{$id}}" disabled update title="Обновить"><i class="fa-solid fa-save"></i></x-button>
+			<x-button variant="blue" action="selectionUpdate:{{$id}}" update disabled title="Обновить"><i class="fa-solid fa-save"></i></x-button>
 			
 			@if($subscribed)
 				<x-button variant="orange" action="selectionUnsubscribe:{{$id}}" remove title="Отписаться"><i class="fa-solid fa-link-slash"></i></x-button>
@@ -69,5 +79,5 @@
 				<x-button variant="red" action="selectionRemove:{{$id}}" remove title="Удалить"><i class="fa-solid fa-trash-can"></i></x-button>
 			@endif
 		</x-buttons-group>
-	</td>
-</tr>
+	</x-table.td>
+</x-table.tr>
