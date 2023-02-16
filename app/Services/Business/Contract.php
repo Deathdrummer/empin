@@ -403,15 +403,6 @@ class Contract {
 	
 	
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	/** Получить список договоров для экспорта из подборки
 	 * @param 
 	 * @return 
@@ -422,12 +413,6 @@ class Contract {
 			'colums' 		=> $colums,
 		]);
 	}
-	
-	
-	
-	
-	
-	
 	
 	
 	
@@ -492,7 +477,7 @@ class Contract {
 		foreach ($res as $k => $row) {
 			if (in_array('contractor', array_keys($row))) $res[$k]['contractor'] = $contractor[$row['contractor']] ?? 'Несуществующий исполнитель';
 			if (in_array('customer', array_keys($row))) $res[$k]['customer'] = $customer[$row['customer']] ?? 'Несуществующий заказчик';
-			if (in_array('type', array_keys($row))) $res[$k]['type'] = $customer[$row['type']] ?? 'Несуществующий тип договора';
+			if (in_array('type', array_keys($row))) $res[$k]['type'] = $type[$row['type']] ?? 'Несуществующий тип договора';
 			
 			
 			foreach ($row as $column => $value) {
