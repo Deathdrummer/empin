@@ -27,7 +27,14 @@
 				title="Сформировать список подборки"
 				>Сформировать</x-button>
 			
-			<x-button variant="blue" action="selectionExport:{{$id}}" title="Экспорт"><i class="fa-solid fa-download"></i></x-button>
+			<x-button
+				:enabled="$contracts_count ?? false"
+			 	variant="blue"
+			 	action="selectionExport:{{$id}}"
+			 	title="Экспорт"
+			 	>
+			 	<i class="fa-solid fa-download"></i>
+			 </x-button>
 			
 			{{-- <x-button
 				variant="neutral"

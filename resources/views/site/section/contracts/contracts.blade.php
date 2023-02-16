@@ -891,7 +891,27 @@
 						selection.value = id;
 						editSelection = null;
 						
-						let selectionTitle = $(btn).closest('tr').find('input[name="title"]').val() || $(btn).closest('tr').find('p').text();
+						let selectionTitle = $(btn).closest('[ddrtabletr]').find('input[name="title"]').val() || $(btn).closest('[ddrtabletr]').find('p').text();
+						
+						_clearCounts();
+						getList({
+							withCounts: true,
+							callback: function() {
+								$('#currentSelectionTitle').text(selectionTitle);
+								$('[selectionsbtn]').ddrInputs('enable');
+								$('#currentSelection').removeAttrib('hidden');
+							}
+						});
+					}
+					
+					
+					$.selectionBuildToEdit = (btn, id) => {
+						$('[selectionsbtn]').ddrInputs('disable');
+						close();
+						selection.value = id;
+						editSelection = true;
+						
+						let selectionTitle = $(btn).closest('[ddrtabletr]').find('input[name="title"]').val();
 						
 						_clearCounts();
 						getList({
@@ -906,13 +926,15 @@
 					
 					
 					
-					$.selectionBuildToEdit = (btn, id) => {
+					
+					
+					$.selectionToArchive = (btn, id) => {
 						$('[selectionsbtn]').ddrInputs('disable');
 						close();
 						selection.value = id;
-						editSelection = true;
+						editSelection = null;
 						
-						let selectionTitle = $(btn).closest('tr').find('input[name="title"]').val();
+						let selectionTitle = $(btn).closest('[ddrtabletr]').find('input[name="title"]').val() || $(btn).closest('[ddrtabletr]').find('p').text();
 						
 						_clearCounts();
 						getList({
@@ -2010,7 +2032,8 @@
 		lastChoosedRow,
 		canEditCell,
 		canCreateCheckbox,
-		canRemoveCheckbox);
+		canRemoveCheckbox,
+		getCounts);
 	
 	
 	

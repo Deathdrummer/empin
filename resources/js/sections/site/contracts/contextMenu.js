@@ -6,7 +6,8 @@ export function contextMenu(
 	lastChoosedRow,
 	canEditCell,
 	canCreateCheckbox,
-	canRemoveCheckbox) {
+	canRemoveCheckbox,
+	getCounts) {
 	
 	let commentsTooltip, cellEditTooltip;
 	$.contractContextMenu = (
