@@ -232,6 +232,9 @@ class Selections extends Controller {
      */
     public function update(Request $request, $id) {
 		
+		
+		logger($request->all());
+		
 		$validFields = $request->validate([
 			'title'	=> [
         		'string',
