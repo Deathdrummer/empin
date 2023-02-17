@@ -162,11 +162,6 @@ jQuery(function() {
 	
 	
 	
-	
-	
-	
-	
-	
 	//--------------------------------------------- Вверх страницы
 	var scrTop;
 	scrTop = $(window).scrollTop();

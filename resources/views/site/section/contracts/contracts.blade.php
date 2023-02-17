@@ -474,7 +474,7 @@
 				
 				$.ddrCRUD({
 					container: '#selectionsList',
-					itemToIndex: 'tr',
+					itemToIndex: '[ddrtabletr]',
 					route: 'site/selections',
 					//params: {
 					//	list: {department_id: deptId},
