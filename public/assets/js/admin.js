@@ -14220,11 +14220,16 @@ $.fn.ddrTooltip = function (params, callback) {
     minHeight: false,
     onCreate: null,
     onShow: null,
+    appendTo: function appendTo() {
+      return document.body;
+    },
+    // 'parent', element
     onDestroy: function onDestroy() {}
   }, params),
       cls = _$assign.cls,
       tag = _$assign.tag,
       placement = _$assign.placement,
+      appendTo = _$assign.appendTo,
       trigger = _$assign.trigger,
       offset = _$assign.offset,
       interactive = _$assign.interactive,
@@ -14249,6 +14254,7 @@ $.fn.ddrTooltip = function (params, callback) {
     hideOnClick: hideOnClick,
     maxWidth: maxWidth,
     offset: offset,
+    appendTo: appendTo,
     onCreate: function onCreate(instance) {
       var _waitStat;
 

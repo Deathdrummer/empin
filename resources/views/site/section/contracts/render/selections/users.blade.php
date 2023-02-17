@@ -1,7 +1,7 @@
 <h4 class="fz16px mb1rem text-center">Поделиться подборкой</h4>
 
 @if($depsUsers)
-	<div class="scrollblock minh20rem maxh30rem pr8px">
+	<div class="scrollblock minh20rem maxh25rem pr8px">
 		@foreach($depsUsers as $department => $users)
 			
 			<div class="d-flex align-items-center justify-content-between border-bottom border-gray-300">

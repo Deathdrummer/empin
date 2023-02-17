@@ -45,7 +45,7 @@
 		</x-table.tr>
 	</x-table.head>
 	<x-table.body
-		scrolled="calc(100vh - 200px)"
+		scrolled="calc(100vh - 260px)"
 		id="selectionsList"
 		>
 	</x-table.body>

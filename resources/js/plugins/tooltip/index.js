@@ -6,6 +6,7 @@ $.fn.ddrTooltip = function(params, callback) {
 		cls,
 		tag,
 		placement, // top top-start top-end right right-start right-end bottom bottom-start bottom-end left left-start left-end auto auto-start auto-end
+		appendTo, // selector body parent
 		trigger,
 		offset,
 		interactive,
@@ -33,6 +34,7 @@ $.fn.ddrTooltip = function(params, callback) {
 		minHeight: false,
 		onCreate: null,
 		onShow: null,
+		appendTo: () => document.body, // 'parent', element
 		onDestroy: () => {},
 	}, params);
 		
@@ -49,6 +51,7 @@ $.fn.ddrTooltip = function(params, callback) {
 		hideOnClick,
 		maxWidth,
 		offset,
+		appendTo,
 		onCreate(instance) { // {reference, popper, show, hide, destroy, setContent, setProps}
 			if (wait) {
 				waitStat = $(instance.popper).ddrWait(_.assign({
