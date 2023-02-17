@@ -1,6 +1,6 @@
 <x-table.tr
 	class="h6rem"
-	archive="{{$archive}}"
+	archive="{{$archive ?? '0'}}"
 	>
 	<x-table.td>
 		@if($subscribed_read)
@@ -70,7 +70,7 @@
 		</x-button>
 	</x-table.td>
 	<x-table.td class="h-center">
-		@if($archive)
+		@if(isset($archive) && $archive)
 			<x-button
 				group="verysmall"
 				variant="light"
