@@ -165,7 +165,7 @@
 								genPriceNds = calcSubData.genPriceNds;
 								genPrice = calcSubData.genPrice;
 								
-								genSelfPriceNds.calc();
+								if (e.type == 'change') genSelfPriceNds.calc();
 								
 								$('#contractingPercent').on('input.calc', function(e) {
 									contractingPercent.value = e.target.value;
@@ -182,6 +182,9 @@
 								genPrice.destroy();
 								
 								$('[genfields]').setAttrib('hidden');
+								
+								$('[genfields]').find('input[name^="price_"]').val('');
+								
 								if (!$('#gencontracting').is(':checked')) $('[contractingpercent]').setAttrib('hidden');
 								$('#calcForm').find('input').ddrInputs('state', 'clear');
 								$('#calcDates').find('[date]').ddrInputs('clear');
@@ -208,7 +211,7 @@
 								subPriceNds = calcGenData.subPriceNds;
 								subPrice = calcGenData.subPrice;
 								
-								subSelfPriceNds.calc();
+								if (e.type == 'change') subSelfPriceNds.calc();
 								
 								$('#contractingPercent').on('input.calc', function(e) {
 									contractingPercent.value = e.target.value;
@@ -225,6 +228,9 @@
 								subPrice.destroy();
 								
 								$('[subfields]').setAttrib('hidden');
+								
+								$('[subfields]').find('input[name^="price_"]').val('');
+								
 								if (!$('#subcontracting').is(':checked')) $('[contractingpercent]').setAttrib('hidden');
 								$('#calcForm').find('input').ddrInputs('state', 'clear');
 								$('#calcDates').find('[date]').ddrInputs('clear');
@@ -436,7 +442,7 @@
 									genPriceNds = calcSubData.genPriceNds;
 									genPrice = calcSubData.genPrice;
 									
-									genSelfPriceNds.calc();
+									if (e.type == 'change') genSelfPriceNds.calc();
 									
 									$('#contractingPercent').on('input.calc', function(e) {
 										contractingPercent.value = e.target.value;
@@ -456,6 +462,9 @@
 									
 									
 									$('[genfields]').setAttrib('hidden');
+									
+									$('[genfields]').find('input[name^="price_"]').val('');
+									
 									if (!$('#gencontracting').is(':checked')) $('[contractingpercent]').setAttrib('hidden');
 									$('#calcForm').find('input').ddrInputs('state', 'clear');
 									$('#calcDates').find('[date]').ddrInputs('clear');
@@ -484,7 +493,7 @@
 									subPriceNds = calcGenData.subPriceNds;
 									subPrice = calcGenData.subPrice;
 									
-									subSelfPriceNds.calc();
+									if (e.type == 'change') subSelfPriceNds.calc();
 									
 									$('#contractingPercent').on('input.calc', function(e) {
 										contractingPercent.value = e.target.value;
@@ -503,6 +512,9 @@
 									subPrice.destroy();
 									
 									$('[subfields]').setAttrib('hidden');
+									
+									$('[subfields]').find('input[name^="price_"]').val('');
+									
 									if (!$('#subcontracting').is(':checked')) $('[contractingpercent]').setAttrib('hidden');
 									$('#calcForm').find('input').ddrInputs('state', 'clear');
 									$('#calcDates').find('[date]').ddrInputs('clear');

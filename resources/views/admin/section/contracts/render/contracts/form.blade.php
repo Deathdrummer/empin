@@ -142,6 +142,8 @@
 								<div genfields{{!isset($subcontracting) || !$subcontracting ? ' hidden' : ''}}>
 									<label class="form__label color-dark">Стоимость генподрядного{{$guard == 'admin' ? ' (не нашего)' : ''}} договора без НДС</label>
 									<x-input
+										name="price_gen"
+										value="{{$price_gen ?? 0}}"
 										id="genPrice" {{-- :value="($price ?? 0) / ((100 - ($gen_percent ?? 0)) / 100)" --}}
 										icon="ruble-sign"
 										iconbg="yellow"
@@ -153,6 +155,8 @@
 								<div subfields{{!isset($gencontracting) || !$gencontracting ? ' hidden' : ''}}>
 									<label class="form__label color-dark">Стоимость субподрядного{{$guard == 'admin' ? ' (не нашего)' : ''}} договора без НДС</label>
 									<x-input
+										name="price_sub"
+										value="{{$price_sub ?? 0}}"
 										id="subPrice" {{-- :value="($price ?? 0) / ((100 - ($gen_percent ?? 0)) / 100)" --}}
 										icon="ruble-sign"
 										iconbg="yellow"
@@ -165,6 +169,8 @@
 								<div genfields{{!isset($subcontracting) || !$subcontracting ? ' hidden' : ''}}>
 									<label class="form__label color-dark">Стоимость генподрядного{{$guard == 'admin' ? ' (не нашего)' : ''}} договора с НДС</label>
 									<x-input
+										name="price_gen_nds"
+										value="{{$price_gen_nds ?? 0}}"
 										id="genPriceNds"{{--  :value="($price_nds ?? 0) / ((100 - ($gen_percent ?? 0)) / 100)" --}}
 										icon="ruble-sign"
 										iconbg="yellow"
@@ -176,6 +182,8 @@
 								<div subfields{{!isset($gencontracting) || !$gencontracting ? ' hidden' : ''}}>
 									<label class="form__label color-dark">Стоимость субподрядного{{$guard == 'admin' ? ' (не нашего)' : ''}} договора с НДС</label>
 									<x-input
+										name="price_sub_nds"
+										value="{{$price_sub_nds ?? 0}}"
 										id="subPriceNds"{{--  :value="($price_nds ?? 0) / ((100 - ($gen_percent ?? 0)) / 100)" --}}
 										icon="ruble-sign"
 										iconbg="yellow"

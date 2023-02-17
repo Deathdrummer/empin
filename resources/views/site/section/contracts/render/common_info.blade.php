@@ -168,7 +168,7 @@
 				</tr>
 			@endcando
 			
-			@cando('contract-col-price:site')
+			@cando('contract-col-price_gen:site')
 			@if($contract['subcontracting'])
 				<tr>
 					<td>
@@ -176,8 +176,8 @@
 					</td>
 					<td>
 						<p class="breakword select-text" tripleselect>
-							@if(isset($contract['price']) && $contract['price'])
-								@number($contract['price'] / ((100 - $contract['gen_percent']) / 100)) @symbal(money)
+							@if(isset($contract['price_gen']) && $contract['price_gen'])
+								@number($contract['price_gen']) @symbal(money)
 							@else
 								-
 							@endif
@@ -187,7 +187,7 @@
 			@endif
 			@endcando
 			
-			@cando('contract-col-price_nds:site')
+			@cando('contract-col-price_gen_nds:site')
 			@if($contract['subcontracting'])
 				<tr>
 					<td>
@@ -195,8 +195,47 @@
 					</td>
 					<td>
 						<p class="breakword select-text" tripleselect>
-							@if(isset($contract['price_nds']) && $contract['price_nds'])
-								@number($contract['price_nds'] / ((100 - $contract['gen_percent']) / 100)) @symbal(money)
+							@if(isset($contract['price_gen_nds']) && $contract['price_gen_nds'])
+								@number($contract['price_gen_nds']) @symbal(money)
+							@else
+								-
+							@endif
+						</p>
+					</td>
+				</tr>
+			@endif
+			@endcando
+			
+			
+			@cando('contract-col-price_sub:site')
+			@if($contract['gencontracting'])
+				<tr>
+					<td>
+						<p class="color-gray-500 format" noselect="Стоимость генподрядного договора без НДС:"></p>
+					</td>
+					<td>
+						<p class="breakword select-text" tripleselect>
+							@if(isset($contract['price_sub']) && $contract['price_sub'])
+								@number($contract['price_sub']) @symbal(money)
+							@else
+								-
+							@endif
+						</p>
+					</td>
+				</tr>
+			@endif
+			@endcando
+			
+			@cando('contract-col-price_sub_nds:site')
+			@if($contract['gencontracting'])
+				<tr>
+					<td>
+						<p class="color-gray-500 format" noselect="Стоимость генподрядного договора с НДС:"></p>
+					</td>
+					<td>
+						<p class="breakword select-text" tripleselect>
+							@if(isset($contract['price_sub_nds']) && $contract['price_sub_nds'])
+								@number($contract['price_sub_nds']) @symbal(money)
 							@else
 								-
 							@endif

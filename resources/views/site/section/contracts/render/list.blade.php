@@ -123,6 +123,17 @@
 									</x-table.td>
 								@endif
 								
+								@if($column == 'price' && auth('site')->user()->can('contract-col-price:site'))
+									<x-table.td
+										style="width:{{isset($listWidth['price']) ? $listWidth['price'] : '110'}}px;"
+										class="sort{{$sortField == 'price' ? ' sort-'.$sortOrder : ''}}"
+										onclick="$.sorting(this, 'price')"
+										noscroll
+										ddrtabletdmain
+										><strong class="fz10px lh90 d-block text-center wodrbreak">Стоимость договора без НДС</strong>
+									</x-table.td>
+								@endif
+								
 								@if($column == 'price_nds' && auth('site')->user()->can('contract-col-price_nds:site'))
 									<x-table.td
 										style="width:{{isset($listWidth['price_nds']) ? $listWidth['price_nds'] : '110'}}px;"
@@ -134,14 +145,47 @@
 									</x-table.td>
 								@endif
 								
-								@if($column == 'price' && auth('site')->user()->can('contract-col-price:site'))
+								@if($column == 'price_gen' && auth('site')->user()->can('contract-col-price_gen:site'))
 									<x-table.td
-										style="width:{{isset($listWidth['price']) ? $listWidth['price'] : '110'}}px;"
-										class="sort{{$sortField == 'price' ? ' sort-'.$sortOrder : ''}}"
-										onclick="$.sorting(this, 'price')"
+										style="width:{{isset($listWidth['price_gen']) ? $listWidth['price_gen'] : '110'}}px;"
+										class="sort{{$sortField == 'price_gen' ? ' sort-'.$sortOrder : ''}}"
+										onclick="$.sorting(this, 'price_gen')"
 										noscroll
 										ddrtabletdmain
-										><strong class="fz10px lh90 d-block text-center wodrbreak">Стоимость договора без НДС</strong>
+										><strong class="fz10px lh90 d-block text-center wodrbreak">Стоимость генподрядного договора без НДС</strong>
+									</x-table.td>
+								@endif
+								
+								@if($column == 'price_gen_nds' && auth('site')->user()->can('contract-col-price_gen_nds:site'))
+									<x-table.td
+										style="width:{{isset($listWidth['price_gen_nds']) ? $listWidth['price_gen_nds'] : '110'}}px;"
+										class="sort{{$sortField == 'price_gen_nds' ? ' sort-'.$sortOrder : ''}}"
+										onclick="$.sorting(this, 'price_gen_nds')"
+										noscroll
+										ddrtabletdmain
+										><strong class="fz10px lh90 d-block text-center wodrbreak">Стоимость генподрядного договора с НДС</strong>
+									</x-table.td>
+								@endif
+								
+								@if($column == 'price_sub' && auth('site')->user()->can('contract-col-price_sub:site'))
+									<x-table.td
+										style="width:{{isset($listWidth['price_sub']) ? $listWidth['price_sub'] : '110'}}px;"
+										class="sort{{$sortField == 'price_sub' ? ' sort-'.$sortOrder : ''}}"
+										onclick="$.sorting(this, 'price_sub')"
+										noscroll
+										ddrtabletdmain
+										><strong class="fz10px lh90 d-block text-center wodrbreak">Стоимость субподрядного договора без НДС</strong>
+									</x-table.td>
+								@endif
+								
+								@if($column == 'price_sub_nds' && auth('site')->user()->can('contract-col-price_sub_nds:site'))
+									<x-table.td
+										style="width:{{isset($listWidth['price_sub_nds']) ? $listWidth['price_sub_nds'] : '110'}}px;"
+										class="sort{{$sortField == 'price_sub_nds' ? ' sort-'.$sortOrder : ''}}"
+										onclick="$.sorting(this, 'price_sub_nds')"
+										noscroll
+										ddrtabletdmain
+										><strong class="fz10px lh90 d-block text-center wodrbreak">Стоимость субподрядного договора с НДС</strong>
 									</x-table.td>
 								@endif
 								

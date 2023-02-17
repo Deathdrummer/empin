@@ -84,7 +84,7 @@
 						<div class="h3rem"></div>
 						
 						
-						<p class="color-gray mb1rem">Ширина полейсписка договоров</p>
+						<p class="color-gray mb1rem">Ширина полей списка договоров</p>
 						
 						
 						<div class="row gx-15 gy-20">
@@ -159,7 +159,17 @@
 									/>
 							</div>
 							<div class="col-auto w14rem">
-								<p class="fz10px mb4px">Стоим. дог. С НДС</p>
+								<p class="fz10px mb4px">Стоим. без НДС</p>
+								<x-input
+									class="w100"
+									type="number"
+									showrows
+									group="small"
+									setting="contract-list-widths.price"
+									/>
+							</div>
+							<div class="col-auto w14rem">
+								<p class="fz10px mb4px">Стоим. С НДС</p>
 								<x-input
 									class="w100"
 									type="number"
@@ -169,13 +179,43 @@
 									/>
 							</div>
 							<div class="col-auto w14rem">
-								<p class="fz10px mb4px">Стоим. дог. без НДС</p>
+								<p class="fz10px mb4px">Стоим. ген без НДС</p>
 								<x-input
 									class="w100"
 									type="number"
 									showrows
 									group="small"
-									setting="contract-list-widths.price"
+									setting="contract-list-widths.price_gen"
+									/>
+							</div>
+							<div class="col-auto w14rem">
+								<p class="fz10px mb4px">Стоим. ген с НДС</p>
+								<x-input
+									class="w100"
+									type="number"
+									showrows
+									group="small"
+									setting="contract-list-widths.price_gen_nds"
+									/>
+							</div>
+							<div class="col-auto w14rem">
+								<p class="fz10px mb4px">Стоим. суб без НДС</p>
+								<x-input
+									class="w100"
+									type="number"
+									showrows
+									group="small"
+									setting="contract-list-widths.price_sub"
+									/>
+							</div>
+							<div class="col-auto w14rem">
+								<p class="fz10px mb4px">Стоим. суб с НДС</p>
+								<x-input
+									class="w100"
+									type="number"
+									showrows
+									group="small"
+									setting="contract-list-widths.price_sub_nds"
 									/>
 							</div>
 							<div class="col-auto w14rem">

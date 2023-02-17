@@ -28,7 +28,12 @@ return new class extends Migration {
 	public function down() {
 		Schema::table('contracts', function (Blueprint $table) {
 			$table->dropColumn('date_close');
+			$table->dropColumn('price');
 			$table->dropColumn('price_nds');
+			$table->dropColumn('price_gen');
+			$table->dropColumn('price_gen_nds');
+			$table->dropColumn('price_sub');
+			$table->dropColumn('price_sub_nds');
 			$table->dropColumn('date_buy');
 			$table->dropColumn('buy_number');
 			$table->dropColumn('archive_dir');
