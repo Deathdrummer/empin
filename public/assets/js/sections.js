@@ -531,11 +531,11 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
     function unEditCell() {
       var cell = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
       if (_.isNull(cell)) return;
-
-      if ($(cell).find('#edittedCellData').tagName() == 'input') {
-        $(cell).find('[edittedplace]').number(true, 2, '.', ' ');
-        $(cell).find('[hiddenplace]').removeAttrib('hidden');
-      }
+      /*if ($(cell).find('#edittedCellData').tagName()?.toLowerCase() == 'input') {
+      	console.log('input');
+      	$(cell).find('[edittedplace]').number(true, 2, '.', ' ');
+      	$(cell).find('[hiddenplace]').removeAttrib('hidden');
+      }*/
 
       $(cell).removeClass('editted');
       $(cell).find('[edittedwait]').remove();

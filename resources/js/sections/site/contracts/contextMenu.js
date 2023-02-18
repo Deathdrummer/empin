@@ -109,10 +109,11 @@ export function contextMenu(
 		
 		function unEditCell(cell = null) {
 			if (_.isNull(cell)) return;
-			if ($(cell).find('#edittedCellData').tagName() == 'input') {
+			/*if ($(cell).find('#edittedCellData').tagName()?.toLowerCase() == 'input') {
+				console.log('input');
 				$(cell).find('[edittedplace]').number(true, 2, '.', ' ');
 				$(cell).find('[hiddenplace]').removeAttrib('hidden');
-			}
+			}*/
 			$(cell).removeClass('editted');
 			$(cell).find('[edittedwait]').remove();
 			$(cell).find('[edittedplacer]').remove();
