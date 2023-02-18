@@ -17727,6 +17727,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
+
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -17738,12 +17744,6 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"]; if (_i == null) return; var _arr = []; var _n = true; var _d = false; var _s, _e; try { for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
 
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
-
-
-
-function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
-
-function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
 function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sendMessStat, lastChoosedRow, canEditCell, canCreateCheckbox, canRemoveCheckbox, getCounts) {
   var commentsTooltip, cellEditTooltip;
@@ -17777,6 +17777,20 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
       setStyle({
         mainMinHeight: '30px'
       });
+    }
+
+    var edittedCellData = pregSplit($(target.pointer).closest('[ddrtabletd]').attr('contextedit')),
+        _pregSplit = pregSplit($(target.pointer).closest('[ddrtabletd]').find('[calcprice]').attr('calcprice')),
+        _pregSplit2 = _slicedToArray(_pregSplit, 4),
+        subContracting = _pregSplit2[2],
+        genContracting = _pregSplit2[3];
+
+    var enableEditPriceCell = true;
+
+    if (['price_gen', 'price_gen_nds'].indexOf(edittedCellData[1]) !== -1 && genContracting) {
+      enableEditPriceCell = false;
+    } else if (['price_sub', 'price_sub_nds'].indexOf(edittedCellData[1]) !== -1 && subContracting) {
+      enableEditPriceCell = false;
     }
 
     onContextMenu(function () {
@@ -18448,7 +18462,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
       sort: 1,
       onClick: function onClick() {
         return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee2() {
-          var cell, edited, attrData, _pregSplit, _pregSplit2, _pregSplit2$, contractId, _pregSplit2$2, departmentId, _pregSplit2$3, stepId, waitCell, _yield$axiosQuery2, data, error, status, headers, randId, editedCheckbox;
+          var cell, edited, attrData, _pregSplit3, _pregSplit4, _pregSplit4$, contractId, _pregSplit4$2, departmentId, _pregSplit4$3, stepId, waitCell, _yield$axiosQuery2, data, error, status, headers, randId, editedCheckbox;
 
           return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee2$(_context2) {
             while (1) {
@@ -18457,7 +18471,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                   cell = $(target.pointer).closest('[ddrtabletd]');
                   edited = !!$(cell).attr('edited');
                   attrData = $(cell).attr('deptcheck');
-                  _pregSplit = pregSplit(attrData), _pregSplit2 = _slicedToArray(_pregSplit, 3), _pregSplit2$ = _pregSplit2[0], contractId = _pregSplit2$ === void 0 ? null : _pregSplit2$, _pregSplit2$2 = _pregSplit2[1], departmentId = _pregSplit2$2 === void 0 ? null : _pregSplit2$2, _pregSplit2$3 = _pregSplit2[2], stepId = _pregSplit2$3 === void 0 ? null : _pregSplit2$3;
+                  _pregSplit3 = pregSplit(attrData), _pregSplit4 = _slicedToArray(_pregSplit3, 3), _pregSplit4$ = _pregSplit4[0], contractId = _pregSplit4$ === void 0 ? null : _pregSplit4$, _pregSplit4$2 = _pregSplit4[1], departmentId = _pregSplit4$2 === void 0 ? null : _pregSplit4$2, _pregSplit4$3 = _pregSplit4[2], stepId = _pregSplit4$3 === void 0 ? null : _pregSplit4$3;
                   waitCell = $(cell).ddrWait({
                     iconHeight: '30px',
                     bgColor: '#efe9f9'
@@ -18522,7 +18536,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
       sort: 2,
       onClick: function onClick() {
         return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee5() {
-          var cell, attrData, _pregSplit3, _pregSplit4, _pregSplit4$, contractId, _pregSplit4$2, departmentId, _pregSplit4$3, stepId;
+          var cell, attrData, _pregSplit5, _pregSplit6, _pregSplit6$, contractId, _pregSplit6$2, departmentId, _pregSplit6$3, stepId;
 
           return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee5$(_context5) {
             while (1) {
@@ -18530,7 +18544,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                 case 0:
                   cell = $(target.pointer).closest('[ddrtabletd]');
                   attrData = $(cell).attr('deptcheck');
-                  _pregSplit3 = pregSplit(attrData), _pregSplit4 = _slicedToArray(_pregSplit3, 3), _pregSplit4$ = _pregSplit4[0], contractId = _pregSplit4$ === void 0 ? null : _pregSplit4$, _pregSplit4$2 = _pregSplit4[1], departmentId = _pregSplit4$2 === void 0 ? null : _pregSplit4$2, _pregSplit4$3 = _pregSplit4[2], stepId = _pregSplit4$3 === void 0 ? null : _pregSplit4$3;
+                  _pregSplit5 = pregSplit(attrData), _pregSplit6 = _slicedToArray(_pregSplit5, 3), _pregSplit6$ = _pregSplit6[0], contractId = _pregSplit6$ === void 0 ? null : _pregSplit6$, _pregSplit6$2 = _pregSplit6[1], departmentId = _pregSplit6$2 === void 0 ? null : _pregSplit6$2, _pregSplit6$3 = _pregSplit6[2], stepId = _pregSplit6$3 === void 0 ? null : _pregSplit6$3;
                   commentsTooltip = $(cell).ddrTooltip({
                     //cls: 'w44rem',
                     placement: 'bottom',
@@ -18662,11 +18676,11 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
 
       /* && !isArchive*/
       // добавить !isArchive - если не нужно редактировать в архиве 
-      disabled: $(target.pointer).closest('[ddrtabletd]').hasAttr('editted') || disableEditCell,
+      disabled: $(target.pointer).closest('[ddrtabletd]').hasAttr('editted') || disableEditCell || !enableEditPriceCell,
       sort: 7,
       onClick: function onClick() {
         return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee11() {
-          var cell, attrData, _pregSplit5, _pregSplit6, _pregSplit6$, contractId, _pregSplit6$2, column, _pregSplit6$3, type, cellWait, _yield$axiosQuery5, data, error, status, headers, percentNds, edittedBlock, primarySelector, row, _pregSplit7, _pregSplit8, contractingPercent, subContracting, genContracting, _setValueToSelector;
+          var cell, attrData, _pregSplit7, _pregSplit8, _pregSplit8$, contractId, _pregSplit8$2, column, _pregSplit8$3, type, cellWait, _yield$axiosQuery5, data, error, status, headers, percentNds, edittedBlock, primarySelector, row, _pregSplit9, _pregSplit10, contractingPercent, _subContracting, _genContracting, _setValueToSelector;
 
           return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee11$(_context11) {
             while (1) {
@@ -18674,7 +18688,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                 case 0:
                   cell = $(target.pointer).closest('[ddrtabletd]');
                   attrData = $(cell).attr('contextedit');
-                  _pregSplit5 = pregSplit(attrData), _pregSplit6 = _slicedToArray(_pregSplit5, 3), _pregSplit6$ = _pregSplit6[0], contractId = _pregSplit6$ === void 0 ? null : _pregSplit6$, _pregSplit6$2 = _pregSplit6[1], column = _pregSplit6$2 === void 0 ? null : _pregSplit6$2, _pregSplit6$3 = _pregSplit6[2], type = _pregSplit6$3 === void 0 ? null : _pregSplit6$3;
+                  _pregSplit7 = pregSplit(attrData), _pregSplit8 = _slicedToArray(_pregSplit7, 3), _pregSplit8$ = _pregSplit8[0], contractId = _pregSplit8$ === void 0 ? null : _pregSplit8$, _pregSplit8$2 = _pregSplit8[1], column = _pregSplit8$2 === void 0 ? null : _pregSplit8$2, _pregSplit8$3 = _pregSplit8[2], type = _pregSplit8$3 === void 0 ? null : _pregSplit8$3;
                   $('#contractsList').find('[editted]').each(function (k, cell) {
                     unEditCell(cell);
                   });
@@ -18726,7 +18740,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                   edittedBlock = $(cell).find('#edittedCellData');
                   edittedBlock[0].selectionStart = edittedBlock[0].selectionEnd = edittedBlock[0].value.length; //------------------------------------------------------------- Калькулятор
 
-                  primarySelector = $(cell).find('#edittedCellData'), row = $(primarySelector).closest('[ddrtabletr]'), _pregSplit7 = pregSplit($(cell).find('[calcprice]').attr('calcprice')), _pregSplit8 = _slicedToArray(_pregSplit7, 4), contractingPercent = _pregSplit8[1], subContracting = _pregSplit8[2], genContracting = _pregSplit8[3];
+                  primarySelector = $(cell).find('#edittedCellData'), row = $(primarySelector).closest('[ddrtabletr]'), _pregSplit9 = pregSplit($(cell).find('[calcprice]').attr('calcprice')), _pregSplit10 = _slicedToArray(_pregSplit9, 4), contractingPercent = _pregSplit10[1], _subContracting = _pregSplit10[2], _genContracting = _pregSplit10[3];
 
                   _setValueToSelector = function _setValueToSelector() {
                     var field = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
@@ -18737,7 +18751,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                     $(replacer).siblings('strong:hidden').removeAttrib('hidden');
                   };
 
-                  if (!subContracting && !genContracting) {
+                  if (!_subContracting && !_genContracting) {
                     if (column == 'price') {
                       calcPrices = $(primarySelector).ddrCalc([{
                         selector: function selector(value) {
@@ -18758,7 +18772,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                         percent: percentNds
                       }]);
                     }
-                  } else if (subContracting) {
+                  } else if (_subContracting) {
                     if (column == 'price') {
                       calcPrices = $(primarySelector).ddrCalc([{
                         selector: function selector(value) {
@@ -18870,7 +18884,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                         numberFormat: [2, '.', ' ']
                       }]);
                     }
-                  } else if (genContracting) {
+                  } else if (_genContracting) {
                     if (column == 'price') {
                       calcPrices = $(primarySelector).ddrCalc([{
                         selector: function selector(value) {

@@ -54,6 +54,16 @@ export function contextMenu(
 		
 		
 		
+		const edittedCellData = pregSplit($(target.pointer).closest('[ddrtabletd]').attr('contextedit')),
+			[,, subContracting, genContracting] = pregSplit($(target.pointer).closest('[ddrtabletd]').find('[calcprice]').attr('calcprice'));
+		
+		let enableEditPriceCell = true;
+		if (['price_gen', 'price_gen_nds'].indexOf(edittedCellData[1]) !== -1 && genContracting) {
+			enableEditPriceCell = false;
+		} else if (['price_sub', 'price_sub_nds'].indexOf(edittedCellData[1]) !== -1 && subContracting) {
+			enableEditPriceCell = false;
+		}
+		
 		onContextMenu(() => {
 			haSContextMenu.value = true;
 			
@@ -728,7 +738,7 @@ export function contextMenu(
 			}, {
 				name: 'Редактировать',
 				visible: countSelected == 1 && isCommon && canEditCell && contextEdited && !selectedTextCell,/* && !isArchive*/ // добавить !isArchive - если не нужно редактировать в архиве 
-				disabled: $(target.pointer).closest('[ddrtabletd]').hasAttr('editted') || disableEditCell,
+				disabled: ($(target.pointer).closest('[ddrtabletd]').hasAttr('editted') || disableEditCell) || !enableEditPriceCell,
 				sort: 7,
 				async onClick() {	
 					const cell = $(target.pointer).closest('[ddrtabletd]');
