@@ -798,7 +798,25 @@ export function contextMenu(
 							$(replacer).siblings('strong:hidden').removeAttrib('hidden');
 						}
 						
-						if (subContracting) {
+						if (!subContracting && !genContracting) {
+							if (column == 'price') {
+								calcPrices = $(primarySelector).ddrCalc([{
+									selector: value => _setValueToSelector('price_nds', value),
+									method: 'nds',
+									numberFormat: [2, '.', ' '],
+									percent: percentNds,
+								}]);
+								
+							} else if (column == 'price_nds') {
+								calcPrices = $(primarySelector).ddrCalc([{
+									selector: value => _setValueToSelector('price', value),
+									method: 'nds',
+									reverse: true,
+									numberFormat: [2, '.', ' '],
+									percent: percentNds,
+								}]);
+							}
+						} else if (subContracting) {
 							if (column == 'price') {
 								calcPrices = $(primarySelector).ddrCalc([{
 									selector: value => _setValueToSelector('price_nds', value),
