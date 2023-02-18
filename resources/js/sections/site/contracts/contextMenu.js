@@ -57,11 +57,13 @@ export function contextMenu(
 		const edittedCellData = pregSplit($(target.pointer).closest('[ddrtabletd]').attr('contextedit')),
 			[,, subContracting, genContracting] = pregSplit($(target.pointer).closest('[ddrtabletd]').find('[calcprice]').attr('calcprice'));
 		
-		let enableEditPriceCell = true;
-		if (['price_gen', 'price_gen_nds'].indexOf(edittedCellData[1]) !== -1 && genContracting) {
-			enableEditPriceCell = false;
-		} else if (['price_sub', 'price_sub_nds'].indexOf(edittedCellData[1]) !== -1 && subContracting) {
-			enableEditPriceCell = false;
+		let enableEditPriceCell = false;
+		if (['price_gen', 'price_gen_nds'].indexOf(edittedCellData[1]) !== -1 && subContracting) {
+			enableEditPriceCell = true;
+		} else if (['price_sub', 'price_sub_nds'].indexOf(edittedCellData[1]) !== -1 && genContracting) {
+			enableEditPriceCell = true;
+		} else if (['price', 'price_nds'].indexOf(edittedCellData[1]) !== -1) {
+			enableEditPriceCell = true;
 		}
 		
 		onContextMenu(() => {

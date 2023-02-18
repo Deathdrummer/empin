@@ -14889,12 +14889,14 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
         subContracting = _pregSplit2[2],
         genContracting = _pregSplit2[3];
 
-    var enableEditPriceCell = true;
+    var enableEditPriceCell = false;
 
-    if (['price_gen', 'price_gen_nds'].indexOf(edittedCellData[1]) !== -1 && genContracting) {
-      enableEditPriceCell = false;
-    } else if (['price_sub', 'price_sub_nds'].indexOf(edittedCellData[1]) !== -1 && subContracting) {
-      enableEditPriceCell = false;
+    if (['price_gen', 'price_gen_nds'].indexOf(edittedCellData[1]) !== -1 && subContracting) {
+      enableEditPriceCell = true;
+    } else if (['price_sub', 'price_sub_nds'].indexOf(edittedCellData[1]) !== -1 && genContracting) {
+      enableEditPriceCell = true;
+    } else if (['price', 'price_nds'].indexOf(edittedCellData[1]) !== -1) {
+      enableEditPriceCell = true;
     }
 
     onContextMenu(function () {
