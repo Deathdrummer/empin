@@ -17827,7 +17827,6 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
       var cell = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
       if (_.isNull(cell)) return;
       /*if ($(cell).find('#edittedCellData').tagName()?.toLowerCase() == 'input') {
-      	console.log('input');
       	$(cell).find('[edittedplace]').number(true, 2, '.', ' ');
       	$(cell).find('[hiddenplace]').removeAttrib('hidden');
       }*/
@@ -19042,7 +19041,12 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                               $.notify('Сохранено!');
                               $(cell).find('[edittedplace]').text(cellData || emptyVal);
                               cellWait.destroy();
-                              if (type == 2) $(cell).find('[edittedplace]').number(true, 2, '.', ' ');
+
+                              if (type == 2) {
+                                $(cell).find('[edittedplace]').number(true, 2, '.', ' ');
+                                $(cell).find('[edittedplace]').siblings('strong:hidden').removeAttrib('hidden');
+                              }
+
                               unEditCell(cell);
                               if (((_calcPrices = calcPrices) === null || _calcPrices === void 0 ? void 0 : _calcPrices.destroy) != undefined) calcPrices.destroy();
                             }
