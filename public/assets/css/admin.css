@@ -214,6 +214,19 @@ p {
   font-size: 14px;
   color: #1e2a38;
 }
+p::before {
+  font-size: inherit !important;
+  color: inherit !important;
+}
+
+span {
+  font-size: inherit !important;
+  line-height: inherit !important;
+}
+span::before {
+  font-size: inherit;
+  color: inherit !important;
+}
 
 .uppercase {
   text-transform: uppercase;

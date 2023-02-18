@@ -890,11 +890,19 @@ class Contracts extends Controller {
 			'type' 			=> 'required|integer',
 		]);
 		
+		
+		
+		
+		$headers = [];
+		
 		$data = $this->contract->getCellData($contractId, $column);
 		
 		$data['list'] = null;
 		
-		if ($type == 4) {
+		if ($type == 2) {
+			$headers['price_nds'] = $this->getSettings('price-nds');
+			
+		} else if ($type == 4) {
 			$data['list'] = match ($column) {
 				'customer' 		=> $this->getSettings('contract-customers:customers'),
 				'type' 			=> $this->getSettings('contract-types:types'),
@@ -904,8 +912,9 @@ class Contracts extends Controller {
 		
 		$data['type'] = $type;
 		
-		return $this->render('cell_edit', $data);
+		return $this->render('cell_edit', $data, [], $headers);
 	}
+	
 	
 	public function set_cell_edit(Request $request) {
 		[
@@ -913,14 +922,16 @@ class Contracts extends Controller {
 			'column' 		=> $column,
 			'type' 			=> $type,
 			'data' 			=> $data,
+			'addict_colums'	=> $addictColums,
 		] = $request->validate([
 			'contract_id'	=> 'required|integer',
 			'type'			=> 'required|integer',
 			'column'		=> 'required|string',
 			'data' 			=> 'present|nullable',
+			'addict_colums'	=> 'present|array|nullable',
 		]);
 		
-		$stat = $this->contract->setCellData($contractId, $column, $type, $data);
+		$stat = $this->contract->setCellData($contractId, $column, $type, $data, $addictColums);
 		
 		if ($type == 4) {
 			$listData = match ($column) {

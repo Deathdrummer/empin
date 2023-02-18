@@ -992,10 +992,21 @@ class Contract {
 	 * @param 
 	 * @return 
 	 */
-	public function setCellData($contractId, $column, $type, $data): bool {
+	public function setCellData($contractId, $column, $type, $data, $addictColums = null): bool {
 		$contract = ContractModel::find($contractId);
 		$contract[$column] = $data;
-		return $contract->save();
+		
+		if ($addictColums) {
+			logger($addictColums);
+			foreach($addictColums as $addColumn => $val) {
+				
+				$contract[$addColumn] = $val;
+			}
+		}
+		
+		$stat = $contract->save();
+		
+		return $stat;
 	}
 	
 	

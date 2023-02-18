@@ -29,6 +29,28 @@
 	&-all
 		touch-callout: unset
 		user-select: all
+	
+
+[replacer]:not([replacer=""])
+	font-size: 0px
+	visibility: hidden
+	position: relative
+	
+	&::before
+		content: attr(replacer)
+		position: absolute
+		visibility: visible !important
+		display: inline
+		font-size: inherit !important
+		min-width: max-content
+		
+	&[r-center]::before
+		transform: translateX(50%)
+	
+	&[r-right]::before
+		right: 0
+
+
 
 .notouch, [notouch]
 	pointer-events: none

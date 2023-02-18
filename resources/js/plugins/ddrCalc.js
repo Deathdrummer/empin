@@ -8,6 +8,14 @@
 	if (reverse) return value / (1 + percent / 100);
 	return value * (1 + percent / 100);
 }
+
+
+
+
+middleware: [(value, calc) => {
+	return calc('nds', Number($(row).find('[calcprice^="price_gen|"]').text()), percentNds, true); // true - это если реверс
+}, false (это если двухсторонняя привязка)],
+
 */
 
 $.fn.ddrCalc = function(data = []) {
@@ -31,7 +39,7 @@ $.fn.ddrCalc = function(data = []) {
 		
 		delete(item['method']);
 		
-		if (['percent', 'nds'].indexOf(method) === -1) throw Error('ddrCalc ошибка! Такого метода не существует!');
+		if (['percent', 'nds'].indexOf(method) === -1) throw Error('ddrCalc ошибка! метода «'+method+'» не существует!');
 		
 		methods[method](item);
 	});
@@ -43,7 +51,7 @@ $.fn.ddrCalc = function(data = []) {
 		},
 		destroy() {
 			eventListeners.items.forEach(function(evt) {
-				$(evt.target).off('input.'+eventRandStr);
+				$(evt.target).off('input.'+eventRandStr+' '+'paste.'+eventRandStr);
 			});
 		}
 	};
@@ -62,26 +70,31 @@ class DdrCalc {
 	constructor(mainSelector, eventListeners, eventRandStr) {
 		this.mainSelector = mainSelector;
 		this.eventListeners = eventListeners;
-		this.inputEvent = 'input.'+eventRandStr;
+		this.inputEvent = 'input.'+eventRandStr+' '+'paste.'+eventRandStr;
 	}
 	
 	
 	
 	percent(data) {
 		let {
-			selector,
-			percent,
-			reverse,
-			twoWay,
-			middleware,
+			selector, // куда вставлять данные
+			replacer, // функция: самостоятельно  присвоить значение селектору. Пример: replacer: (selector, value) => $(selector).setAttrib('replacer', value),
+			percent, // процент для расчета
+			reverse, // в обратном направлении
+			twoWay, // двухсторонняя привязка
+			middleware, // промежуточный расчет значения. Пример: middleware: [(value, calc) => calc('nds', value, percentNds), false],
+			numberFormat, // фрматировать вставляемое значение. Эквивалент $.number: [2, '.', ' '],
 		} = $.extend({
 			selector: null,
+			replacer: false,
 			percent: 0,
 			reverse: false,
 			twoWay: false,
 			middleware: false,
+			numberFormat: false,
 		}, data),
 			thisCls = this;
+		
 			
 		$(thisCls.mainSelector).on(thisCls.inputEvent, function(e) {
 			let val = thisCls._valToNumber(e.target.value, 2);
@@ -90,7 +103,10 @@ class DdrCalc {
 			if (_.isFunction(middleware[0])) {
 				result = middleware[0](result, thisCls._calc.bind(thisCls));
 			}
-			$(selector).val(_.round(result, 2));
+
+			const calcValue = numberFormat ? $.number(_.round(result, 2), ...numberFormat) : _.round(result, 2);
+			
+			thisCls._insertValue(selector, calcValue);
 			
 			thisCls.eventListeners.items.push(e);
 		});	
@@ -108,7 +124,9 @@ class DdrCalc {
 					result = middleware[0](result, thisCls._calc.bind(thisCls));
 				}
 				
-				$(thisCls.mainSelector).val(_.round(result, 2));
+				const calcValue = numberFormat ? $.number(_.round(result, 2), ...numberFormat) : _.round(result, 2);
+				
+				thisCls._insertValue(selector, calcValue);
 				
 				thisCls.eventListeners.items.push(e);
 			});
@@ -126,20 +144,24 @@ class DdrCalc {
 	
 	nds(data) {
 		let {
-			selector,
-			percent,
-			reverse,
-			twoWay,
-			middleware,
+			selector, // куда вставлять данные
+			replacer, // функция: самостоятельно  присвоить значение селектору. Пример: replacer: (selector, value) => $(selector).setAttrib('replacer', value),
+			percent, // процент для расчета
+			reverse, // в обратном направлении
+			twoWay, // двухсторонняя привязка
+			middleware, // промежуточный расчет значения. Пример: middleware: [(value, calc) => calc('nds', value, percentNds), false],
+			numberFormat, // фрматировать вставляемое значение. Эквивалент $.number: [2, '.', ' '],
 		} = $.extend({
 			selector: null,
+			replacer: false,
 			percent: 0,
 			reverse: false,
 			twoWay: false,
 			middleware: false,
+			numberFormat: false,
 		}, data),
 			thisCls = this;
-			
+		
 		$(thisCls.mainSelector).on(thisCls.inputEvent, function(e) {
 			let val = thisCls._valToNumber(e.target.value, 2);
 			let result = _.round(thisCls._calc('nds', val, percent, reverse), 2);
@@ -148,11 +170,12 @@ class DdrCalc {
 				result = middleware[0](result, thisCls._calc.bind(thisCls));
 			}
 			
-			$(selector).val(_.round(result, 2));
+			const calcValue = numberFormat ? $.number(_.round(result, 2), ...numberFormat) : _.round(result, 2);
+			
+			thisCls._insertValue(selector, calcValue);
 			
 			thisCls.eventListeners.items.push(e);
-		});	
-		
+		});
 		
 		if (twoWay) {
 			$(selector).on(thisCls.inputEvent, function(e) {
@@ -165,14 +188,13 @@ class DdrCalc {
 					result = middleware[0](result, thisCls._calc.bind(thisCls));
 				}
 				
-				$(thisCls.mainSelector).val(_.round(result, 2));
+				const calcValue = numberFormat ? $.number(_.round(result, 2), ...numberFormat) : _.round(result, 2);
+				
+				thisCls._insertValue(selector, calcValue);
 				
 				thisCls.eventListeners.items.push(e);
 			});
 		}
-		
-		
-		
 		
 	}
 	
@@ -230,6 +252,21 @@ class DdrCalc {
 		if (_.isNull(value)) return false;
 		value = _.round(Number((''+value).replaceAll(/\s/g, '')), toFixed);
 		return value; 
+	}
+	
+	
+	
+	_insertValue(selector, calcValue = '') {
+		if (_.isFunction(selector)) {
+			selector(calcValue);
+		} else {
+			const selectorTag = $(selector).prop("tagName")?.toLowerCase() || null;
+			if (['input', 'select', 'textarea',].indexOf(selectorTag) !== -1) {
+				$(selector).val(calcValue);
+			} else {
+				$(selector).text(calcValue);
+			}
+		}
 	}
 	
 	

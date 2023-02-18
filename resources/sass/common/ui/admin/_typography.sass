@@ -5,6 +5,8 @@
 
 h1
 	+resp(font-size, (xs: 22px, sm: 24px, md: 28px, lg: 32px, xl: 36px, xxl: 40px), (line-height: 0))
+	
+	
 
 h2
 	+resp(font-size, (xs: 20px, sm: 22px, md: 24px, lg: 28px, xl: 30px, xxl: 32px), (line-height: 0))
@@ -25,7 +27,19 @@ h6
 p
 	font-size: 14px
 	color: #1e2a38
+	
+	&::before
+		font-size: inherit !important
+		color: inherit !important
 
+
+span
+	font-size: inherit !important
+	line-height: inherit !important
+	
+	&::before
+		font-size: inherit
+		color: inherit !important
 
 
 

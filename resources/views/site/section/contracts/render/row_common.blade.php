@@ -105,9 +105,9 @@
 	@if($column == 'price' && auth('site')->user()->can('contract-col-price:site'))
 		<x-table.td class="text-end" commonlist contextedit="{{$id}},{{$column}},2">
 			@isset($price)
-				<p class="fz12px lh90 nobreak"><span edittedplace="0.00">@number($price, 2)</span> <strong>@symbal(money)</strong></p>
+				<p class="fz12px lh90 nobreak"><span class="fz12px" edittedplace="0.00" replacer r-right calcprice="price|{{$gen_percent ?? 0}}|{{$subcontracting ?? 0}}|{{$gencontracting ?? 0}}">@number($price, 2)</span> <strong>@symbal(money)</strong></p>
 			@else
-				<p class="fz12px"><span edittedplace="0.00">-</span> <strong hidden>@symbal(money)</strong></p>
+				<p class="fz12px"><span class="fz12px" edittedplace="0.00" replacer r-right calcprice="price|{{$gen_percent ?? 0}}|{{$subcontracting ?? 0}}|{{$gencontracting ?? 0}}">-</span> <strong hidden>@symbal(money)</strong></p>
 			@endisset
 		</x-table.td>
 	@endif
@@ -115,9 +115,9 @@
 	@if($column == 'price_nds' && auth('site')->user()->can('contract-col-price_nds:site'))
 		<x-table.td class="text-end" commonlist contextedit="{{$id}},{{$column}},2">
 			@isset($price_nds)
-				<p class="fz12px lh90 nobreak"><span edittedplace="0.00">@number($price_nds, 2)</span> <strong>@symbal(money)</strong></p>
+				<p class="fz12px lh90 nobreak"><span class="fz12px" edittedplace="0.00" replacer r-right calcprice="price_nds|{{$gen_percent ?? 0}}|{{$subcontracting ?? 0}}|{{$gencontracting ?? 0}}">@number($price_nds, 2)</span> <strong>@symbal(money)</strong></p>
 			@else
-				<p class="fz12px"><span edittedplace="0.00">-</span> <strong hidden hiddenplace>@symbal(money)</strong></p>
+				<p class="fz12px"><span class="fz12px" edittedplace="0.00" replacer r-right calcprice="price_nds|{{$gen_percent ?? 0}}|{{$subcontracting ?? 0}}|{{$gencontracting ?? 0}}">-</span> <strong hidden hiddenplace>@symbal(money)</strong></p>
 			@endisset
 		</x-table.td>
 	@endif
@@ -125,9 +125,9 @@
 	@if($column == 'price_gen' && auth('site')->user()->can('contract-col-price_gen:site'))
 		<x-table.td class="text-end" commonlist contextedit="{{$id}},{{$column}},2">
 			@isset($price_gen)
-				<p class="fz12px lh90 nobreak"><span edittedplace="0.00">@number($price_gen, 2)</span> <strong>@symbal(money)</strong></p>
+				<p class="fz12px lh90 nobreak"><span class="fz12px" edittedplace="0.00" replacer r-right calcprice="price_gen|{{$gen_percent ?? 0}}|{{$subcontracting ?? 0}}|{{$gencontracting ?? 0}}">@number($price_gen, 2)</span> <strong>@symbal(money)</strong></p>
 			@else
-				<p class="fz12px"><span edittedplace="0.00">-</span> <strong hidden>@symbal(money)</strong></p>
+				<p class="fz12px"><span class="fz12px" edittedplace="0.00" replacer r-right calcprice="price_gen|{{$gen_percent ?? 0}}|{{$subcontracting ?? 0}}|{{$gencontracting ?? 0}}">-</span> <strong hidden>@symbal(money)</strong></p>
 			@endisset
 		</x-table.td>
 	@endif
@@ -135,9 +135,9 @@
 	@if($column == 'price_gen_nds' && auth('site')->user()->can('contract-col-price_gen_nds:site'))
 		<x-table.td class="text-end" commonlist contextedit="{{$id}},{{$column}},2">
 			@isset($price_gen_nds)
-				<p class="fz12px lh90 nobreak"><span edittedplace="0.00">@number($price_gen_nds, 2)</span> <strong>@symbal(money)</strong></p>
+				<p class="fz12px lh90 nobreak"><span class="fz12px" edittedplace="0.00" replacer r-right calcprice="price_gen_nds|{{$gen_percent ?? 0}}|{{$subcontracting ?? 0}}|{{$gencontracting ?? 0}}">@number($price_gen_nds, 2)</span> <strong>@symbal(money)</strong></p>
 			@else
-				<p class="fz12px"><span edittedplace="0.00">-</span> <strong hidden hiddenplace>@symbal(money)</strong></p>
+				<p class="fz12px"><span class="fz12px" edittedplace="0.00" replacer r-right calcprice="price_gen_nds|{{$gen_percent ?? 0}}|{{$subcontracting ?? 0}}|{{$gencontracting ?? 0}}">-</span> <strong hidden hiddenplace>@symbal(money)</strong></p>
 			@endisset
 		</x-table.td>
 	@endif
@@ -145,9 +145,9 @@
 	@if($column == 'price_sub' && auth('site')->user()->can('contract-col-price_sub:site'))
 		<x-table.td class="text-end" commonlist contextedit="{{$id}},{{$column}},2">
 			@isset($price_sub)
-				<p class="fz12px lh90 nobreak"><span edittedplace="0.00">@number($price_sub, 2)</span> <strong>@symbal(money)</strong></p>
+				<p class="fz12px lh90 nobreak"><span class="fz12px" edittedplace="0.00" replacer r-right calcprice="price_sub|{{$gen_percent ?? 0}}|{{$subcontracting ?? 0}}|{{$gencontracting ?? 0}}">@number($price_sub, 2)</span> <strong>@symbal(money)</strong></p>
 			@else
-				<p class="fz12px"><span edittedplace="0.00">-</span> <strong hidden>@symbal(money)</strong></p>
+				<p class="fz12px"><span class="fz12px" edittedplace="0.00" replacer r-right calcprice="price_sub|{{$gen_percent ?? 0}}|{{$subcontracting ?? 0}}|{{$gencontracting ?? 0}}">-</span> <strong hidden>@symbal(money)</strong></p>
 			@endisset
 		</x-table.td>
 	@endif
@@ -155,9 +155,9 @@
 	@if($column == 'price_sub_nds' && auth('site')->user()->can('contract-col-price_sub_nds:site'))
 		<x-table.td class="text-end" commonlist contextedit="{{$id}},{{$column}},2">
 			@isset($price_sub_nds)
-				<p class="fz12px lh90 nobreak"><span edittedplace="0.00">@number($price_sub_nds, 2)</span> <strong>@symbal(money)</strong></p>
+				<p class="fz12px lh90 nobreak"><span class="fz12px" edittedplace="0.00" replacer r-right calcprice="price_sub_nds|{{$gen_percent ?? 0}}|{{$subcontracting ?? 0}}|{{$gencontracting ?? 0}}">@number($price_sub_nds, 2)</span> <strong>@symbal(money)</strong></p>
 			@else
-				<p class="fz12px"><span edittedplace="0.00">-</span> <strong hidden hiddenplace>@symbal(money)</strong></p>
+				<p class="fz12px"><span class="fz12px" edittedplace="0.00" replacer r-right calcprice="price_sub_nds|{{$gen_percent ?? 0}}|{{$subcontracting ?? 0}}|{{$gencontracting ?? 0}}">-</span> <strong hidden hiddenplace>@symbal(money)</strong></p>
 			@endisset
 		</x-table.td>
 	@endif

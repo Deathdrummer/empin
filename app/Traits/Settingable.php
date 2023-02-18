@@ -1,6 +1,7 @@
 <?php namespace App\Traits;
 
 use App\Services\Settings;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
 trait Settingable {
@@ -134,20 +135,26 @@ trait Settingable {
 				return false;
 			} 
 			
-			if ($filter) $fromSettingsData = $this->_setFilter($fromSettingsData, $filter);
+			$isCollection = $this->_isCollection($fromSettingsData);
+			
+			if ($isCollection && $filter) $fromSettingsData = $this->_setFilter($fromSettingsData, $filter);
 			
 			if (!$fromSettingsData) {
 				$this->settingsData[$sRename ?? $sName] = false;
 				return false;
 			}
 			
-			$fromSettingsData->sortKeys(SORT_NUMERIC);
 			
-			$fromSettingsData = $this->_restructureData($fromSettingsData, $key, $value);
 			
-			$this->settingsData[$sRename ?? $sName] = match (gettype($fromSettingsData)) {
-				'object'	=> $fromSettingsData->toArray(),
-				default 	=> $fromSettingsData
+			if ($isCollection) {
+				$fromSettingsData->sortKeys(SORT_NUMERIC);
+				if ($key || $value) $fromSettingsData = $this->_restructureData($fromSettingsData, $key, $value);
+			} 
+			
+			
+			$this->settingsData[$sRename ?? $sName] = match ($isCollection) {
+				true	=> $fromSettingsData->toArray(),
+				default	=> $fromSettingsData,
 			};
 		}
 	}
@@ -163,6 +170,18 @@ trait Settingable {
 	
 	
 	
+	
+	
+	
+	
+	
+	/** Является ли данные объектом коллекции
+	 * @param 
+	 * @return 
+	 */
+	private function _isCollection($data = null) {
+		return $data instanceof Collection;
+	}
 	
 	
 	

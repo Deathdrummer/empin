@@ -45530,6 +45530,26 @@ template {
           user-select: all;
 }
 
+[replacer]:not([replacer=""]) {
+  font-size: 0px;
+  visibility: hidden;
+  position: relative;
+}
+[replacer]:not([replacer=""])::before {
+  content: attr(replacer);
+  position: absolute;
+  visibility: visible !important;
+  display: inline;
+  font-size: inherit !important;
+  min-width: max-content;
+}
+[replacer]:not([replacer=""])[r-center]::before {
+  transform: translateX(50%);
+}
+[replacer]:not([replacer=""])[r-right]::before {
+  right: 0;
+}
+
 .notouch, [notouch] {
   pointer-events: none;
 }
