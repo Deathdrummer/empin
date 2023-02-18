@@ -15795,7 +15795,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                   });
 
                   if (!([1, 2].indexOf(type) !== -1)) {
-                    _context11.next = 35;
+                    _context11.next = 34;
                     break;
                   }
 
@@ -15832,7 +15832,6 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                   edittedBlock[0].selectionStart = edittedBlock[0].selectionEnd = edittedBlock[0].value.length; //------------------------------------------------------------- Калькулятор
 
                   primarySelector = $(cell).find('#edittedCellData'), row = $(primarySelector).closest('[ddrtabletr]'), _pregSplit7 = pregSplit($(cell).find('[calcprice]').attr('calcprice')), _pregSplit8 = _slicedToArray(_pregSplit7, 4), contractingPercent = _pregSplit8[1], subContracting = _pregSplit8[2], genContracting = _pregSplit8[3];
-                  console.log(contractingPercent, subContracting, genContracting);
 
                   _setValueToSelector = function _setValueToSelector() {
                     var field = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
@@ -16138,10 +16137,10 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                       }
                     }, _callee6, this);
                   })));
-                  _context11.next = 36;
+                  _context11.next = 35;
                   break;
 
-                case 35:
+                case 34:
                   if ([3, 4].indexOf(type) !== -1) {
                     // 3 - дата 4 - вып. список
                     $(cell).addClass('editted');
@@ -16386,10 +16385,10 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                     });
                   }
 
-                case 36:
+                case 35:
                   cellWait.off();
 
-                case 37:
+                case 36:
                 case "end":
                   return _context11.stop();
               }

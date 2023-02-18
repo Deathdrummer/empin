@@ -791,8 +791,6 @@ export function contextMenu(
 							row = $(primarySelector).closest('[ddrtabletr]'),
 							[, contractingPercent, subContracting, genContracting] = pregSplit($(cell).find('[calcprice]').attr('calcprice'));
 						
-						console.log(contractingPercent, subContracting, genContracting);
-						
 						const _setValueToSelector = (field = null, value = '') => {
 							if (_.isNull(field)) return false;
 							const replacer = $(row).find('[calcprice^="'+field+'|"]');
