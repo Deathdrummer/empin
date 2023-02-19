@@ -813,6 +813,7 @@ export function contextMenu(
 								$(replacer).siblings('strong:hidden').removeAttrib('hidden');
 							}
 							
+							
 							if (!subContracting && !genContracting) {
 								if (column == 'price') {
 									calcPrices = $(primarySelector).ddrCalc([{
@@ -831,6 +832,7 @@ export function contextMenu(
 										percent: percentNds,
 									}]);
 								}
+								
 							} else if (subContracting) {
 								if (column == 'price') {
 									calcPrices = $(primarySelector).ddrCalc([{
@@ -914,7 +916,6 @@ export function contextMenu(
 										numberFormat: [2, '.', ' '],
 									}]);
 								}
-								
 								
 							} else if (genContracting) {
 								if (column == 'price') {

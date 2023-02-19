@@ -263,7 +263,7 @@
 	@endif
 	
 	@if($column == 'gen_percent' && auth('site')->user()->can('contract-col-gen_percent:site'))
-		<x-table.td class="h-center" commonlist contextedit="-">
+		<x-table.td class="h-center" commonlist>
 			@if(isset($gen_percent) && $gen_percent)
 				<p class="fz12px" edittedplace="-">{{$gen_percent ?? '-'}}</p>
 			@endif
