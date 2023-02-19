@@ -540,6 +540,8 @@ window.isHover = (selector = null) => {
 
 
 window.pregSplit = function(str = null, separator = null) {
+	if (!_.isString(str)) return;
+	
 	const splitData = str.split(/\s*[,|]\s*|\s*[;]\s*|\s+/);
 	
 	return splitData.map((item) => {

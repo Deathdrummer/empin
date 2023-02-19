@@ -52,19 +52,21 @@ export function contextMenu(
 		}
 		
 		
+		let enableEditPriceCell = true;
+		if ($(target.pointer).closest('[ddrtabletd]').find('[calcprice]').length) {
+			const edittedCellData = pregSplit($(target.pointer).closest('[ddrtabletd]').attr('contextedit')),
+				[,, subContracting, genContracting] = pregSplit($(target.pointer).closest('[ddrtabletd]').find('[calcprice]').attr('calcprice') || null);
 		
-		
-		const edittedCellData = pregSplit($(target.pointer).closest('[ddrtabletd]').attr('contextedit')),
-			[,, subContracting, genContracting] = pregSplit($(target.pointer).closest('[ddrtabletd]').find('[calcprice]').attr('calcprice'));
-		
-		let enableEditPriceCell = false;
-		if (['price_gen', 'price_gen_nds'].indexOf(edittedCellData[1]) !== -1 && subContracting) {
-			enableEditPriceCell = true;
-		} else if (['price_sub', 'price_sub_nds'].indexOf(edittedCellData[1]) !== -1 && genContracting) {
-			enableEditPriceCell = true;
-		} else if (['price', 'price_nds'].indexOf(edittedCellData[1]) !== -1) {
-			enableEditPriceCell = true;
+			if (['price_gen', 'price_gen_nds'].indexOf(edittedCellData[1]) !== -1 && genContracting) {
+				enableEditPriceCell = false;
+			} else if (['price_sub', 'price_sub_nds'].indexOf(edittedCellData[1]) !== -1 && subContracting) {
+				enableEditPriceCell = false;
+			} else if (['price', 'price_nds', 'gen_percent'].indexOf(edittedCellData[1]) === -1 && !subContracting && !genContracting) {
+				enableEditPriceCell = false;
+			}
 		}
+		
+		
 		
 		onContextMenu(() => {
 			haSContextMenu.value = true;
@@ -788,7 +790,7 @@ export function contextMenu(
 						
 						$(cell).append(data);
 						
-						if (type == 2) $(cell).find('#edittedCellData').number(true, 2, '.', ' ');
+						
 						
 						$(cell).find('#edittedCellData').focus();
 						
@@ -796,211 +798,209 @@ export function contextMenu(
 						
 						edittedBlock[0].selectionStart = edittedBlock[0].selectionEnd = edittedBlock[0].value.length;
 						
-						
-						
-						//------------------------------------------------------------- Калькулятор
-						const primarySelector = $(cell).find('#edittedCellData'),
-							row = $(primarySelector).closest('[ddrtabletr]'),
-							[, contractingPercent, subContracting, genContracting] = pregSplit($(cell).find('[calcprice]').attr('calcprice'));
-						
-						const _setValueToSelector = (field = null, value = '') => {
-							if (_.isNull(field)) return false;
-							const replacer = $(row).find('[calcprice^="'+field+'|"]');
-							$(replacer).setAttrib('replacer', value);
-							$(replacer).siblings('strong:hidden').removeAttrib('hidden');
-						}
-						
-						if (!subContracting && !genContracting) {
-							if (column == 'price') {
-								calcPrices = $(primarySelector).ddrCalc([{
-									selector: value => _setValueToSelector('price_nds', value),
-									method: 'nds',
-									numberFormat: [2, '.', ' '],
-									percent: percentNds,
-								}]);
-								
-							} else if (column == 'price_nds') {
-								calcPrices = $(primarySelector).ddrCalc([{
-									selector: value => _setValueToSelector('price', value),
-									method: 'nds',
-									reverse: true,
-									numberFormat: [2, '.', ' '],
-									percent: percentNds,
-								}]);
-							}
-						} else if (subContracting) {
-							if (column == 'price') {
-								calcPrices = $(primarySelector).ddrCalc([{
-									selector: value => _setValueToSelector('price_nds', value),
-									method: 'nds',
-									numberFormat: [2, '.', ' '],
-									percent: percentNds,
-								}, {
-									selector: value => _setValueToSelector('price_gen', value),
-									method: 'percent',
-									numberFormat: [2, '.', ' '],
-									percent: contractingPercent,
-								}, {
-									selector: value => _setValueToSelector('price_gen_nds', value),
-									method: 'percent',
-									percent: contractingPercent,
-									numberFormat: [2, '.', ' '],
-									middleware: [(value, calc) => calc('nds', value, percentNds), false],
-								}]);
-								
-							} else if (column == 'price_nds') {
-								calcPrices = $(primarySelector).ddrCalc([{
-									selector: value => _setValueToSelector('price', value),
-									method: 'nds',
-									reverse: true,
-									numberFormat: [2, '.', ' '],
-									percent: percentNds,
-								}, {
-									selector: value => _setValueToSelector('price_gen', value),
-									method: 'percent',
-									numberFormat: [2, '.', ' '],
-									percent: contractingPercent,
-									middleware: [(value, calc) => calc('nds', value, percentNds, true), false],
-								}, {
-									selector: value => _setValueToSelector('price_gen_nds', value),
-									method: 'percent',
-									percent: contractingPercent,
-									numberFormat: [2, '.', ' '],
-								}]);
-								
-							} else if (column == 'price_gen') {
-								calcPrices = $(primarySelector).ddrCalc([{
-									selector: value => _setValueToSelector('price', value),
-									method: 'percent',
-									reverse: true,
-									numberFormat: [2, '.', ' '],
-									percent: contractingPercent,
-								}, {
-									selector: value => _setValueToSelector('price_nds', value),
-									method: 'percent',
-									reverse: true,
-									numberFormat: [2, '.', ' '],
-									percent: contractingPercent,
-									middleware: [(value, calc) => calc('nds', value, percentNds), false],
-								}, {
-									selector: value => _setValueToSelector('price_gen_nds', value),
-									method: 'nds',
-									percent: percentNds,
-									numberFormat: [2, '.', ' '],
-								}]);
-								
-							} else if (column == 'price_gen_nds') {
-								calcPrices = $(primarySelector).ddrCalc([{
-									selector: value => _setValueToSelector('price', value),
-									method: 'percent',
-									reverse: true,
-									numberFormat: [2, '.', ' '],
-									percent: contractingPercent,
-									middleware: [(value, calc) => calc('nds', value, percentNds, true), false],
-								}, {
-									selector: value => _setValueToSelector('price_nds', value),
-									method: 'percent',
-									reverse: true,
-									numberFormat: [2, '.', ' '],
-									percent: contractingPercent,
-								}, {
-									selector: value => _setValueToSelector('price_gen', value),
-									method: 'nds',
-									reverse: true,
-									percent: percentNds,
-									numberFormat: [2, '.', ' '],
-								}]);
+						if (type == 2) {
+							$(cell).find('#edittedCellData').number(true, 2, '.', ' ');
+							
+							//------------------------------------------------------------- Калькулятор
+							const primarySelector = $(cell).find('#edittedCellData'),
+								row = $(primarySelector).closest('[ddrtabletr]'),
+								[, contractingPercent, subContracting, genContracting] = pregSplit($(cell).find('[calcprice]').attr('calcprice'));
+							
+							const _setValueToSelector = (field = null, value = '') => {
+								if (_.isNull(field)) return false;
+								const replacer = $(row).find('[calcprice^="'+field+'|"]');
+								$(replacer).setAttrib('replacer', value);
+								$(replacer).siblings('strong:hidden').removeAttrib('hidden');
 							}
 							
-							
-						} else if (genContracting) {
-							if (column == 'price') {
-								calcPrices = $(primarySelector).ddrCalc([{
-									selector: value => _setValueToSelector('price_nds', value),
-									method: 'nds',
-									numberFormat: [2, '.', ' '],
-									percent: percentNds,
-								}, {
-									selector: value => _setValueToSelector('price_sub', value),
-									method: 'percent',
-									reverse: true,
-									numberFormat: [2, '.', ' '],
-									percent: contractingPercent,
-								}, {
-									selector: value => _setValueToSelector('price_sub_nds', value),
-									method: 'percent',
-									reverse: true,
-									percent: contractingPercent,
-									numberFormat: [2, '.', ' '],
-									middleware: [(value, calc) => calc('nds', value, percentNds), false],
-								}]);
+							if (!subContracting && !genContracting) {
+								if (column == 'price') {
+									calcPrices = $(primarySelector).ddrCalc([{
+										selector: value => _setValueToSelector('price_nds', value),
+										method: 'nds',
+										numberFormat: [2, '.', ' '],
+										percent: percentNds,
+									}]);
+									
+								} else if (column == 'price_nds') {
+									calcPrices = $(primarySelector).ddrCalc([{
+										selector: value => _setValueToSelector('price', value),
+										method: 'nds',
+										reverse: true,
+										numberFormat: [2, '.', ' '],
+										percent: percentNds,
+									}]);
+								}
+							} else if (subContracting) {
+								if (column == 'price') {
+									calcPrices = $(primarySelector).ddrCalc([{
+										selector: value => _setValueToSelector('price_nds', value),
+										method: 'nds',
+										numberFormat: [2, '.', ' '],
+										percent: percentNds,
+									}, {
+										selector: value => _setValueToSelector('price_gen', value),
+										method: 'percent',
+										numberFormat: [2, '.', ' '],
+										percent: contractingPercent,
+									}, {
+										selector: value => _setValueToSelector('price_gen_nds', value),
+										method: 'percent',
+										percent: contractingPercent,
+										numberFormat: [2, '.', ' '],
+										middleware: [(value, calc) => calc('nds', value, percentNds), false],
+									}]);
+									
+								} else if (column == 'price_nds') {
+									calcPrices = $(primarySelector).ddrCalc([{
+										selector: value => _setValueToSelector('price', value),
+										method: 'nds',
+										reverse: true,
+										numberFormat: [2, '.', ' '],
+										percent: percentNds,
+									}, {
+										selector: value => _setValueToSelector('price_gen', value),
+										method: 'percent',
+										numberFormat: [2, '.', ' '],
+										percent: contractingPercent,
+										middleware: [(value, calc) => calc('nds', value, percentNds, true), false],
+									}, {
+										selector: value => _setValueToSelector('price_gen_nds', value),
+										method: 'percent',
+										percent: contractingPercent,
+										numberFormat: [2, '.', ' '],
+									}]);
+									
+								} else if (column == 'price_gen') {
+									calcPrices = $(primarySelector).ddrCalc([{
+										selector: value => _setValueToSelector('price', value),
+										method: 'percent',
+										reverse: true,
+										numberFormat: [2, '.', ' '],
+										percent: contractingPercent,
+									}, {
+										selector: value => _setValueToSelector('price_nds', value),
+										method: 'percent',
+										reverse: true,
+										numberFormat: [2, '.', ' '],
+										percent: contractingPercent,
+										middleware: [(value, calc) => calc('nds', value, percentNds), false],
+									}, {
+										selector: value => _setValueToSelector('price_gen_nds', value),
+										method: 'nds',
+										percent: percentNds,
+										numberFormat: [2, '.', ' '],
+									}]);
+									
+								} else if (column == 'price_gen_nds') {
+									calcPrices = $(primarySelector).ddrCalc([{
+										selector: value => _setValueToSelector('price', value),
+										method: 'percent',
+										reverse: true,
+										numberFormat: [2, '.', ' '],
+										percent: contractingPercent,
+										middleware: [(value, calc) => calc('nds', value, percentNds, true), false],
+									}, {
+										selector: value => _setValueToSelector('price_nds', value),
+										method: 'percent',
+										reverse: true,
+										numberFormat: [2, '.', ' '],
+										percent: contractingPercent,
+									}, {
+										selector: value => _setValueToSelector('price_gen', value),
+										method: 'nds',
+										reverse: true,
+										percent: percentNds,
+										numberFormat: [2, '.', ' '],
+									}]);
+								}
 								
-							} else if (column == 'price_nds') {
-								calcPrices = $(primarySelector).ddrCalc([{
-									selector: value => _setValueToSelector('price', value),
-									method: 'nds',
-									reverse: true,
-									numberFormat: [2, '.', ' '],
-									percent: percentNds,
-								}, {
-									selector: value => _setValueToSelector('price_sub', value),
-									method: 'percent',
-									reverse: true,
-									numberFormat: [2, '.', ' '],
-									percent: contractingPercent,
-									middleware: [(value, calc) => calc('nds', value, percentNds, true), false],
-								}, {
-									selector: value => _setValueToSelector('price_sub_nds', value),
-									method: 'percent',
-									reverse: true,
-									percent: contractingPercent,
-									numberFormat: [2, '.', ' '],
-								}]);
 								
-							} else if (column == 'price_sub') {
-								calcPrices = $(primarySelector).ddrCalc([{
-									selector: value => _setValueToSelector('price', value),
-									method: 'percent',
-									numberFormat: [2, '.', ' '],
-									percent: contractingPercent,
-								}, {
-									selector: value => _setValueToSelector('price_nds', value),
-									method: 'percent',
-									numberFormat: [2, '.', ' '],
-									percent: contractingPercent,
-									middleware: [(value, calc) => calc('nds', value, percentNds), false],
-								}, {
-									selector: value => _setValueToSelector('price_sub_nds', value),
-									method: 'nds',
-									percent: percentNds,
-									numberFormat: [2, '.', ' '],
-								}]);
-								
-							} else if (column == 'price_sub_nds') {
-								calcPrices = $(primarySelector).ddrCalc([{
-									selector: value => _setValueToSelector('price', value),
-									method: 'percent',
-									numberFormat: [2, '.', ' '],
-									percent: contractingPercent,
-									middleware: [(value, calc) => calc('nds', value, percentNds, true), false],
-								}, {
-									selector: value => _setValueToSelector('price_nds', value),
-									method: 'percent',
-									numberFormat: [2, '.', ' '],
-									percent: contractingPercent,
-								}, {
-									selector: value => _setValueToSelector('price_sub', value),
-									method: 'nds',
-									reverse: true,
-									percent: percentNds,
-									numberFormat: [2, '.', ' '],
-								}]);
+							} else if (genContracting) {
+								if (column == 'price') {
+									calcPrices = $(primarySelector).ddrCalc([{
+										selector: value => _setValueToSelector('price_nds', value),
+										method: 'nds',
+										numberFormat: [2, '.', ' '],
+										percent: percentNds,
+									}, {
+										selector: value => _setValueToSelector('price_sub', value),
+										method: 'percent',
+										reverse: true,
+										numberFormat: [2, '.', ' '],
+										percent: contractingPercent,
+									}, {
+										selector: value => _setValueToSelector('price_sub_nds', value),
+										method: 'percent',
+										reverse: true,
+										percent: contractingPercent,
+										numberFormat: [2, '.', ' '],
+										middleware: [(value, calc) => calc('nds', value, percentNds), false],
+									}]);
+									
+								} else if (column == 'price_nds') {
+									calcPrices = $(primarySelector).ddrCalc([{
+										selector: value => _setValueToSelector('price', value),
+										method: 'nds',
+										reverse: true,
+										numberFormat: [2, '.', ' '],
+										percent: percentNds,
+									}, {
+										selector: value => _setValueToSelector('price_sub', value),
+										method: 'percent',
+										reverse: true,
+										numberFormat: [2, '.', ' '],
+										percent: contractingPercent,
+										middleware: [(value, calc) => calc('nds', value, percentNds, true), false],
+									}, {
+										selector: value => _setValueToSelector('price_sub_nds', value),
+										method: 'percent',
+										reverse: true,
+										percent: contractingPercent,
+										numberFormat: [2, '.', ' '],
+									}]);
+									
+								} else if (column == 'price_sub') {
+									calcPrices = $(primarySelector).ddrCalc([{
+										selector: value => _setValueToSelector('price', value),
+										method: 'percent',
+										numberFormat: [2, '.', ' '],
+										percent: contractingPercent,
+									}, {
+										selector: value => _setValueToSelector('price_nds', value),
+										method: 'percent',
+										numberFormat: [2, '.', ' '],
+										percent: contractingPercent,
+										middleware: [(value, calc) => calc('nds', value, percentNds), false],
+									}, {
+										selector: value => _setValueToSelector('price_sub_nds', value),
+										method: 'nds',
+										percent: percentNds,
+										numberFormat: [2, '.', ' '],
+									}]);
+									
+								} else if (column == 'price_sub_nds') {
+									calcPrices = $(primarySelector).ddrCalc([{
+										selector: value => _setValueToSelector('price', value),
+										method: 'percent',
+										numberFormat: [2, '.', ' '],
+										percent: contractingPercent,
+										middleware: [(value, calc) => calc('nds', value, percentNds, true), false],
+									}, {
+										selector: value => _setValueToSelector('price_nds', value),
+										method: 'percent',
+										numberFormat: [2, '.', ' '],
+										percent: contractingPercent,
+									}, {
+										selector: value => _setValueToSelector('price_sub', value),
+										method: 'nds',
+										reverse: true,
+										percent: percentNds,
+										numberFormat: [2, '.', ' '],
+									}]);
+								}
 							}
-						}
-						
-							
-						
-						
+						} 
 						
 						
 						
@@ -1020,28 +1020,28 @@ export function contextMenu(
 							const row = $(cell).closest('[ddrtabletr]'),
 								prices = $(row).find('[calcprice]:not([replacer=""])'),
 								addictColums = {};
+							
+							if (prices.length) {
+								$.each(prices, (k, pr) => {
+									let cp = pregSplit($(pr).attr('calcprice'));
+									addictColums[cp[0]] = Number($(pr).attr('replacer').replace(' ', ''));
+									$(pr).siblings('strong:hidden').removeAttrib('hidden');
+								});
 								
-							$.each(prices, (k, pr) => {
-								let cp = pregSplit($(pr).attr('calcprice'));
-								addictColums[cp[0]] = Number($(pr).attr('replacer').replace(' ', ''));
-								$(pr).siblings('strong:hidden').removeAttrib('hidden');
-							});
-							
-							
-							$.each(addictColums, (col, price) => {
-								$(row).find('[calcprice^="'+col+'|"]').html($.number(price, 2, '.', ' '));
-							});
+								$.each(addictColums, (col, price) => {
+									$(row).find('[calcprice^="'+col+'|"]').html($.number(price, 2, '.', ' '));
+								});
+							}
 							
 							
 							$(this).hide();
 							
 							cellWait.on();
 							
-							
 							const priceRegex = new RegExp('price\_?');
 							const cellVal = $(cell).find('#edittedCellData').val();
 							
-							const cellData = priceRegex.test('price_nds') ? Number(cellVal) : cellVal;
+							const cellData = priceRegex.test(column) ? Number(cellVal) : cellVal;
 							const emptyVal = $(cell).find('[edittedplace]').attr('edittedplace');
 							
 							const {data, error, status, headers} = await axiosQuery('post', 'site/contracts/cell_edit', {
@@ -1051,8 +1051,6 @@ export function contextMenu(
 								data: cellData,
 								addict_colums: addictColums,
 							}, 'json');
-							
-							
 							
 							if (error) {
 								cellWait.off();
@@ -1073,6 +1071,8 @@ export function contextMenu(
 							}
 							
 						});
+						
+						
 						
 						
 											
