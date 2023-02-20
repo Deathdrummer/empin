@@ -127,7 +127,7 @@
 			@isset($price_gen)
 				<p class="fz12px lh90 nobreak"><span class="fz12px" edittedplace="0.00" replacer r-right calcprice="price_gen|{{$gen_percent ?? 0}}|{{$subcontracting ?? 0}}|{{$gencontracting ?? 0}}">@number($price_gen, 2)</span> <strong>@symbal(money)</strong></p>
 			@else
-				<p class="fz12px"><span class="fz12px" edittedplace="0.00" replacer r-right calcprice="price_gen|{{$gen_percent ?? 0}}|{{$subcontracting ?? 0}}|{{$gencontracting ?? 0}}">-</span> <strong hidden>@symbal(money)</strong></p>
+				<p class="fz12px"><span class="fz12px" edittedplace="0.00" replacer r-right calcprice="price_gen|{{$gen_percent ?? 0}}|{{$subcontracting ?? 0}}|{{$gencontracting ?? 0}}">{{!($subcontracting ?? 0) ? 'НЕТ' : '-'}}</span> <strong hidden>@symbal(money)</strong></p>
 			@endisset
 		</x-table.td>
 	@endif
@@ -137,7 +137,7 @@
 			@isset($price_gen_nds)
 				<p class="fz12px lh90 nobreak"><span class="fz12px" edittedplace="0.00" replacer r-right calcprice="price_gen_nds|{{$gen_percent ?? 0}}|{{$subcontracting ?? 0}}|{{$gencontracting ?? 0}}">@number($price_gen_nds, 2)</span> <strong>@symbal(money)</strong></p>
 			@else
-				<p class="fz12px"><span class="fz12px" edittedplace="0.00" replacer r-right calcprice="price_gen_nds|{{$gen_percent ?? 0}}|{{$subcontracting ?? 0}}|{{$gencontracting ?? 0}}">-</span> <strong hidden hiddenplace>@symbal(money)</strong></p>
+				<p class="fz12px"><span class="fz12px" edittedplace="0.00" replacer r-right calcprice="price_gen_nds|{{$gen_percent ?? 0}}|{{$subcontracting ?? 0}}|{{$gencontracting ?? 0}}">{{!($subcontracting ?? 0) ? 'НЕТ' : '-'}}</span> <strong hidden hiddenplace>@symbal(money)</strong></p>
 			@endisset
 		</x-table.td>
 	@endif
@@ -147,7 +147,7 @@
 			@isset($price_sub)
 				<p class="fz12px lh90 nobreak"><span class="fz12px" edittedplace="0.00" replacer r-right calcprice="price_sub|{{$gen_percent ?? 0}}|{{$subcontracting ?? 0}}|{{$gencontracting ?? 0}}">@number($price_sub, 2)</span> <strong>@symbal(money)</strong></p>
 			@else
-				<p class="fz12px"><span class="fz12px" edittedplace="0.00" replacer r-right calcprice="price_sub|{{$gen_percent ?? 0}}|{{$subcontracting ?? 0}}|{{$gencontracting ?? 0}}">-</span> <strong hidden>@symbal(money)</strong></p>
+				<p class="fz12px"><span class="fz12px" edittedplace="0.00" replacer r-right calcprice="price_sub|{{$gen_percent ?? 0}}|{{$subcontracting ?? 0}}|{{$gencontracting ?? 0}}">{{!($gencontracting ?? 0) ? 'НЕТ' : '-'}}</span> <strong hidden>@symbal(money)</strong></p>
 			@endisset
 		</x-table.td>
 	@endif
@@ -157,7 +157,7 @@
 			@isset($price_sub_nds)
 				<p class="fz12px lh90 nobreak"><span class="fz12px" edittedplace="0.00" replacer r-right calcprice="price_sub_nds|{{$gen_percent ?? 0}}|{{$subcontracting ?? 0}}|{{$gencontracting ?? 0}}">@number($price_sub_nds, 2)</span> <strong>@symbal(money)</strong></p>
 			@else
-				<p class="fz12px"><span class="fz12px" edittedplace="0.00" replacer r-right calcprice="price_sub_nds|{{$gen_percent ?? 0}}|{{$subcontracting ?? 0}}|{{$gencontracting ?? 0}}">-</span> <strong hidden hiddenplace>@symbal(money)</strong></p>
+				<p class="fz12px"><span class="fz12px" edittedplace="0.00" replacer r-right calcprice="price_sub_nds|{{$gen_percent ?? 0}}|{{$subcontracting ?? 0}}|{{$gencontracting ?? 0}}">{{!($gencontracting ?? 0) ? 'НЕТ' : '-'}}</span> <strong hidden hiddenplace>@symbal(money)</strong></p>
 			@endisset
 		</x-table.td>
 	@endif

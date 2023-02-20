@@ -1135,6 +1135,7 @@ export function contextMenu(
 												column,
 												type,
 												data: rawDate,
+												addict_colums: {},
 											}, 'json');
 											
 											if (error) {
@@ -1169,6 +1170,7 @@ export function contextMenu(
 											column,
 											type,
 											data: null,
+											addict_colums: {},
 										}, 'json');
 										
 										if (error) {
@@ -1196,6 +1198,7 @@ export function contextMenu(
 										contract_id: contractId, 
 										column,
 										type,
+										addict_colums: {},
 									}, 'json');
 									
 									await setData(data);

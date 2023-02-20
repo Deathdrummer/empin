@@ -19153,7 +19153,8 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                                   contract_id: contractId,
                                                   column: column,
                                                   type: type,
-                                                  data: rawDate
+                                                  data: rawDate,
+                                                  addict_colums: {}
                                                 }, 'json');
 
                                               case 7:
@@ -19208,7 +19209,8 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                               contract_id: contractId,
                                               column: column,
                                               type: type,
-                                              data: null
+                                              data: null,
+                                              addict_colums: {}
                                             }, 'json');
 
                                           case 4:
@@ -19247,7 +19249,8 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                   return axiosQuery('get', 'site/contracts/cell_edit', {
                                     contract_id: contractId,
                                     column: column,
-                                    type: type
+                                    type: type,
+                                    addict_colums: {}
                                   }, 'json');
 
                                 case 13:
