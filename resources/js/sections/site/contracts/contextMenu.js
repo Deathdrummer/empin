@@ -1222,6 +1222,7 @@ export function contextMenu(
 										column,
 										type,
 										data: value,
+										addict_colums: {},
 									}, 'json');
 									
 									if (savedErr) {

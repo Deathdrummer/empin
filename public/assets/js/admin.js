@@ -16389,7 +16389,8 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                               contract_id: contractId,
                                               column: column,
                                               type: type,
-                                              data: value
+                                              data: value,
+                                              addict_colums: {}
                                             }, 'json');
 
                                           case 5:
