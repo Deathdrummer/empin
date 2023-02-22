@@ -14,7 +14,7 @@
 					<div class="col">
 						<i
 							class="fa-regular fa-clone pointer color-gray-500 color-blue-hovered"
-							title="Отправить копию всем сотрудникам отдела"
+							title="Отправить копию&#013;всем сотрудникам отдела"
 							onclick="$.shareSelection('clone-user-department', {{$selectionId}}, {{$department ?: '-1'}})"
 							></i>
 					</div>
