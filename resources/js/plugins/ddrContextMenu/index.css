@@ -385,22 +385,22 @@
 					background-color: var(--cm-subBg);
 				}
 
-		.ddrcontextmenu__item-hovered:not(.ddrcontextmenu__item-disabled) {
+		.ddrcontextmenu__item-hovered:not(.ddrcontextmenu__item-disabled):not(.ddrcontextmenu__item-nohovercolor) {
 			background-color: var(--cm-mainItemHoverBg);
 			transition: background-color var(--cm-hoverTransition);
 		}
-			.ddrcontextmenu__item-hovered:not(.ddrcontextmenu__item-disabled) .text * {
+			.ddrcontextmenu__item-hovered:not(.ddrcontextmenu__item-disabled):not(.ddrcontextmenu__item-nohovercolor) .text * {
 				color: var(--cm-mainFontHoverColor);
 				font-weight: var(--cm-mainFontWeight);
 			}
 			
-			.ddrcontextmenu__item-hovered:not(.ddrcontextmenu__item-disabled) .count span {
+			.ddrcontextmenu__item-hovered:not(.ddrcontextmenu__item-disabled):not(.ddrcontextmenu__item-nohovercolor) .count span {
 				color: var(--cm-mainFontColor);
 				background-color: var(--cm-mainBg);
 			}
 		
 
-		.ddrcontextmenu__item-hovered:not(.ddrcontextmenu__item-disabled)~.ddrcontextmenu_sub {
+		.ddrcontextmenu__item-hovered:not(.ddrcontextmenu__item-disabled) ~ .ddrcontextmenu_sub {
 			opacity: 1;
 			pointer-events: auto;
 			transition: opacity var(--cm-showSubMenu);

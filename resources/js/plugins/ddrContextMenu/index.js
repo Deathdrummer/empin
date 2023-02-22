@@ -1,6 +1,6 @@
 import "./index.css";
 
-let functionsMap, loadedFuntionsMap, menuSelector, abortCtrl;
+let functionsMap, loadedFuntionsMap, menuSelector, abortCtrl, closeSubNavTOut = 200; // количество милисекунд, через которое закроется подменю
 const initStyles = {};
 
 $(document).on('contextmenu', '[contextmenu]', async function(e) {
@@ -108,6 +108,10 @@ $(document).on('contextmenu', '[contextmenu]', async function(e) {
 				initStyles[prop] = ddrCssVar('cm-'+prop);
 				ddrCssVar('cm-'+prop, value);
 			});
+		},
+		setCloseSubNavTOut(tOut = null) { // Установить количество милисекунд, через которое закроется подменю
+			if (_.isNull(tOut)) return;
+			closeSubNavTOut = tOut;
 		}
 	};
 	
@@ -163,13 +167,35 @@ $(document).on('contextmenu', '[contextmenu]', async function(e) {
 //--------------------------------------------------------------------------------------------------------------------------
 
 $(document).on('mouseenter', '.ddrcontextmenu .ddrcontextmenu__item_main:not(.ddrcontextmenu__item-disabled)', function() {
-	$(this).addClass('ddrcontextmenu__item-hovered');
+	$(this).addClass('ddrcontextmenu__item-hovered').removeClass('ddrcontextmenu__item-nohovercolor');
 });
 
 
-$(document).on('mouseleave', '.ddrcontextmenu > li', function() {
-	$(this).find('.ddrcontextmenu__item_main').removeClass('ddrcontextmenu__item-hovered');
+let ddrcontextmenuMouseLeaveTOut;
+$(document).on('mouseleave', '.ddrcontextmenu:not(.ddrcontextmenu_sub) > li', function() {
+	if ($(this).find('.ddrcontextmenu__item').hasClass('ddrcontextmenu__item_parent')) {
+		$(this).find('.ddrcontextmenu__item_main').addClass('ddrcontextmenu__item-nohovercolor');
+		clearTimeout(ddrcontextmenuMouseLeaveTOut);
+		ddrcontextmenuMouseLeaveTOut = setTimeout(() => {
+			if (!isHover($(this).find('.ddrcontextmenu__item_main').siblings('.ddrcontextmenu_sub'))) {
+				$(this).find('.ddrcontextmenu__item_main').removeClass('ddrcontextmenu__item-nohovercolor');
+				if (!isHover($(this))) {
+					$(this).find('.ddrcontextmenu__item_main').removeClass('ddrcontextmenu__item-hovered');
+				} 
+			}
+		}, closeSubNavTOut);
+	} else {
+		$(this).find('.ddrcontextmenu__item_main').removeClass('ddrcontextmenu__item-hovered');
+	}
 });
+
+
+$(document).on('mouseleave', '.ddrcontextmenu_sub', function() {
+	if (!isHover($(this).closest('.ddrcontextmenu_main'))) {
+		$(this).siblings('.ddrcontextmenu__item_parent').removeClass('ddrcontextmenu__item-hovered');
+	}
+});
+
 
 
 // наведение на пункт меню с подгрузкой

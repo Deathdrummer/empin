@@ -11,7 +11,7 @@ export function contextMenu(
 	
 	let commentsTooltip, cellEditTooltip;
 	$.contractContextMenu = (
-		{target, closeOnScroll, onContextMenu, onCloseContextMenu, changeAttrData, buildTitle, setStyle},
+		{target, closeOnScroll, onContextMenu, onCloseContextMenu, changeAttrData, buildTitle, setStyle, setCloseSubNavTOut},
 		contractId,
 		departmentId,
 		selectionId,

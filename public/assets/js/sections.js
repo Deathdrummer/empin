@@ -469,7 +469,8 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
         onCloseContextMenu = _ref.onCloseContextMenu,
         changeAttrData = _ref.changeAttrData,
         buildTitle = _ref.buildTitle,
-        setStyle = _ref.setStyle;
+        setStyle = _ref.setStyle,
+        setCloseSubNavTOut = _ref.setCloseSubNavTOut;
     var isCommon = !!$(target.pointer).closest('[ddrtabletd]').hasAttr('commonlist') || false;
     var isDeptCheckbox = !!$(target.pointer).closest('[ddrtabletd]').hasAttr('deptcheck') || false;
     var hasCheckbox = !!$(target.pointer).closest('[ddrtabletd]').children().length;
