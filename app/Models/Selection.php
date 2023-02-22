@@ -107,9 +107,20 @@ class Selection extends Model {
      */
     public function scopeToChoose($query) {
 		$userId = auth('site')->user()->id;
-        $query->where('account_id', $userId)
+        /* $query->where('account_id', $userId)
 			->orWhereJsonContains('subscribed', ['write' => $userId])
-			->orderBy('_sort', 'ASC');
+			->orderBy('_sort', 'ASC'); */
+		
+		
+		$query->where(function ($q) use($userId) {
+			$q->where('account_id', $userId)
+				->orWhereJsonContains('subscribed', ['write' => $userId]);
+		})->where(function($q) {
+			$q->where('archive', 0);
+		})
+		->orderBy('_sort', 'ASC');;
+		
+		
     }
 	
 	
