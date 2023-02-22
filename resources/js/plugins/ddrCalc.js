@@ -51,7 +51,7 @@ $.fn.ddrCalc = function(data = []) {
 		},
 		destroy() {
 			eventListeners.items.forEach(function(evt) {
-				$(evt.target).off('input.'+eventRandStr+' '+'paste.'+eventRandStr);
+				$(evt.target).off('input.'+eventRandStr/*+' '+'paste.'+eventRandStr*/);
 			});
 		}
 	};
@@ -70,15 +70,14 @@ class DdrCalc {
 	constructor(mainSelector, eventListeners, eventRandStr) {
 		this.mainSelector = mainSelector;
 		this.eventListeners = eventListeners;
-		this.inputEvent = 'input.'+eventRandStr+' '+'paste.'+eventRandStr;
+		this.inputEvent = 'input.'+eventRandStr/*+' '+'paste.'+eventRandStr*/;
 	}
 	
 	
 	
 	percent(data) {
 		let {
-			selector, // куда вставлять данные
-			replacer, // функция: самостоятельно  присвоить значение селектору. Пример: replacer: (selector, value) => $(selector).setAttrib('replacer', value),
+			selector, // куда вставлять данные. Можно вызвать функцию: (selector, value) => $(selector).setAttrib('replacer', value)
 			percent, // процент для расчета
 			reverse, // в обратном направлении
 			twoWay, // двухсторонняя привязка
@@ -86,7 +85,6 @@ class DdrCalc {
 			numberFormat, // фрматировать вставляемое значение. Эквивалент $.number: [2, '.', ' '],
 		} = $.extend({
 			selector: null,
-			replacer: false,
 			percent: 0,
 			reverse: false,
 			twoWay: false,
@@ -113,7 +111,6 @@ class DdrCalc {
 		
 		if (twoWay) {
 			$(selector).on(thisCls.inputEvent, function(e) {
-				
 				let val = thisCls._valToNumber(e.target.value, 2);
 				
 				let result = _.round(thisCls._calc('percent', val, percent, !reverse), 2);
@@ -126,7 +123,7 @@ class DdrCalc {
 				
 				const calcValue = numberFormat ? $.number(_.round(result, 2), ...numberFormat) : _.round(result, 2);
 				
-				thisCls._insertValue(selector, calcValue);
+				thisCls._insertValue(thisCls.mainSelector, calcValue);
 				
 				thisCls.eventListeners.items.push(e);
 			});
@@ -144,8 +141,7 @@ class DdrCalc {
 	
 	nds(data) {
 		let {
-			selector, // куда вставлять данные
-			replacer, // функция: самостоятельно  присвоить значение селектору. Пример: replacer: (selector, value) => $(selector).setAttrib('replacer', value),
+			selector, // куда вставлять данные. Можно вызвать функцию: (selector, value) => $(selector).setAttrib('replacer', value)
 			percent, // процент для расчета
 			reverse, // в обратном направлении
 			twoWay, // двухсторонняя привязка
@@ -153,7 +149,6 @@ class DdrCalc {
 			numberFormat, // фрматировать вставляемое значение. Эквивалент $.number: [2, '.', ' '],
 		} = $.extend({
 			selector: null,
-			replacer: false,
 			percent: 0,
 			reverse: false,
 			twoWay: false,
@@ -178,7 +173,8 @@ class DdrCalc {
 		});
 		
 		if (twoWay) {
-			$(selector).on(thisCls.inputEvent, function(e) {
+			const twoWaySelector = _.isFunction(twoWay) || _.isString(twoWay) ? twoWay : selector;
+			$(twoWaySelector).on(thisCls.inputEvent, function(e) {
 				let val = thisCls._valToNumber(e.target.value, 2);
 				let result = _.round(thisCls._calc('nds', val, percent, !reverse), 2);
 				
@@ -190,7 +186,7 @@ class DdrCalc {
 				
 				const calcValue = numberFormat ? $.number(_.round(result, 2), ...numberFormat) : _.round(result, 2);
 				
-				thisCls._insertValue(selector, calcValue);
+				thisCls._insertValue(thisCls.mainSelector, calcValue);
 				
 				thisCls.eventListeners.items.push(e);
 			});

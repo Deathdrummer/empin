@@ -417,7 +417,7 @@
 								selector: '#selfPriceNds',
 								method: 'nds',
 								percent: percentNds,
-								twoWay: true
+								twoWay: true,
 							}]);
 							
 							//selfNds.calc(); // для админки (редактирование договора)
@@ -649,21 +649,22 @@
 						form = $('#contractForm');
 					
 					update(id, form, (data, container, {error}) => {
-						if (data) {
-							$.notify('Запись успешно обновлена!');
-							$(row).replaceWith(data);
-							close();
-						}
 						
 						if (error) {
 							wait(false);
 							$.notify(error.message, 'error');
+							if (error.errors) {
+								$.each(error.errors, function(field, errors) {
+									$(form).find('[name="'+field+'"]').ddrInputs('error', errors[0]);
+								});
+							}
+							return;
 						} 
 						
-						if (error.errors) {
-							$.each(error.errors, function(field, errors) {
-								$(form).find('[name="'+field+'"]').ddrInputs('error', errors[0]);
-							});
+						if (data) {
+							$.notify('Запись успешно обновлена!');
+							$(row).replaceWith(data);
+							close();
 						}
 					});
 				}

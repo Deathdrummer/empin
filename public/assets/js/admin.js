@@ -5858,7 +5858,37 @@ window.getOS = function () {
   }
 
   return os;
-};
+}; //window.getSelectorEvents = function(selector) {
+//	const s = $(selector)[0];
+//	return $._data(s, 'events');
+//}
+//
+//$.fn.getSelectorEvents = function() {
+//	//const s = $(this)[0];
+//	
+//	//console.log($._data(s, 'events'));
+//	
+//	
+//	return $._data($(this).get(0), "events")
+//	
+//	
+//	
+//	
+//	/*const s = $(this)[0];
+//	const eventsData = $._data(s, 'events');
+//	
+//	if (_.isNull(events)) return eventsData;
+//	
+//	events = !_.isArray(events) ? [events] : events;
+//	
+//	const eventsRes = {};
+//	$.each(events, function(k, event) {
+//		eventsRes[event] = eventsData[event];
+//	});
+//	return eventsRes;*/
+//	
+//}
+
 /*
 	Вызвать событие нативного копирование при отсутсвующем выделении
 */
@@ -8514,7 +8544,9 @@ $.fn.ddrCalc = function () {
     },
     destroy: function destroy() {
       eventListeners.items.forEach(function (evt) {
-        $(evt.target).off('input.' + eventRandStr + ' ' + 'paste.' + eventRandStr);
+        $(evt.target).off('input.' + eventRandStr
+        /*+' '+'paste.'+eventRandStr*/
+        );
       });
     }
   };
@@ -8532,7 +8564,9 @@ var DdrCalc = /*#__PURE__*/function () {
 
     this.mainSelector = mainSelector;
     this.eventListeners = eventListeners;
-    this.inputEvent = 'input.' + eventRandStr + ' ' + 'paste.' + eventRandStr;
+    this.inputEvent = 'input.' + eventRandStr
+    /*+' '+'paste.'+eventRandStr*/
+    ;
   }
 
   _createClass(DdrCalc, [{
@@ -8540,7 +8574,6 @@ var DdrCalc = /*#__PURE__*/function () {
     value: function percent(data) {
       var _$$extend = $.extend({
         selector: null,
-        replacer: false,
         percent: 0,
         reverse: false,
         twoWay: false,
@@ -8548,7 +8581,6 @@ var DdrCalc = /*#__PURE__*/function () {
         numberFormat: false
       }, data),
           selector = _$$extend.selector,
-          replacer = _$$extend.replacer,
           percent = _$$extend.percent,
           reverse = _$$extend.reverse,
           twoWay = _$$extend.twoWay,
@@ -8590,7 +8622,7 @@ var DdrCalc = /*#__PURE__*/function () {
 
           var calcValue = numberFormat ? (_$2 = $).number.apply(_$2, [_.round(result, 2)].concat(_toConsumableArray(numberFormat))) : _.round(result, 2);
 
-          thisCls._insertValue(selector, calcValue);
+          thisCls._insertValue(thisCls.mainSelector, calcValue);
 
           thisCls.eventListeners.items.push(e);
         });
@@ -8601,7 +8633,6 @@ var DdrCalc = /*#__PURE__*/function () {
     value: function nds(data) {
       var _$$extend2 = $.extend({
         selector: null,
-        replacer: false,
         percent: 0,
         reverse: false,
         twoWay: false,
@@ -8609,7 +8640,6 @@ var DdrCalc = /*#__PURE__*/function () {
         numberFormat: false
       }, data),
           selector = _$$extend2.selector,
-          replacer = _$$extend2.replacer,
           percent = _$$extend2.percent,
           reverse = _$$extend2.reverse,
           twoWay = _$$extend2.twoWay,
@@ -8636,7 +8666,8 @@ var DdrCalc = /*#__PURE__*/function () {
       });
 
       if (twoWay) {
-        $(selector).on(thisCls.inputEvent, function (e) {
+        var twoWaySelector = _.isFunction(twoWay) || _.isString(twoWay) ? twoWay : selector;
+        $(twoWaySelector).on(thisCls.inputEvent, function (e) {
           var _$4;
 
           var val = thisCls._valToNumber(e.target.value, 2);
@@ -8651,7 +8682,7 @@ var DdrCalc = /*#__PURE__*/function () {
 
           var calcValue = numberFormat ? (_$4 = $).number.apply(_$4, [_.round(result, 2)].concat(_toConsumableArray(numberFormat))) : _.round(result, 2);
 
-          thisCls._insertValue(selector, calcValue);
+          thisCls._insertValue(thisCls.mainSelector, calcValue);
 
           thisCls.eventListeners.items.push(e);
         });

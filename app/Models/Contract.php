@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+
 class Contract extends Model {
     use HasFactory, Filterable, Collectionable, Dateable;
 	
@@ -104,6 +105,24 @@ class Contract extends Model {
     	parent::boot();
 		self::creating(function ($model) {
 			$model->archive = 0;
+		});
+		
+		self::updating(function ($model) {
+			if (!$model['subcontracting'] && !$model['gencontracting']) {
+				$model->price_gen = null;
+				$model->price_gen_nds =null;
+				$model->price_sub = null;
+				$model->price_sub_nds = null;
+			
+			} else if (!$model['subcontracting'] && $model['gencontracting']) {
+				$model->price_gen = null;
+				$model->price_gen_nds = null;
+			
+			} else if ($model['subcontracting'] && !$model['gencontracting']) {
+				$model->price_sub = null;
+				$model->price_sub_nds = null;
+				
+			}
 		});
 	}
 	

@@ -39,6 +39,40 @@ window.getOS = function() {
 
 
 
+//window.getSelectorEvents = function(selector) {
+//	const s = $(selector)[0];
+//	return $._data(s, 'events');
+//}
+//
+//$.fn.getSelectorEvents = function() {
+//	//const s = $(this)[0];
+//	
+//	//console.log($._data(s, 'events'));
+//	
+//	
+//	return $._data($(this).get(0), "events")
+//	
+//	
+//	
+//	
+//	/*const s = $(this)[0];
+//	const eventsData = $._data(s, 'events');
+//	
+//	if (_.isNull(events)) return eventsData;
+//	
+//	events = !_.isArray(events) ? [events] : events;
+//	
+//	const eventsRes = {};
+//	$.each(events, function(k, event) {
+//		eventsRes[event] = eventsData[event];
+//	});
+//	return eventsRes;*/
+//	
+//}
+
+
+
+
 
 
 /*

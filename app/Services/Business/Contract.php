@@ -997,9 +997,7 @@ class Contract {
 		$contract[$column] = $data;
 		
 		if ($addictColums) {
-			logger($addictColums);
 			foreach($addictColums as $addColumn => $val) {
-				
 				$contract[$addColumn] = $val;
 			}
 		}
