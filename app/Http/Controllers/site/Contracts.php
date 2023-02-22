@@ -931,6 +931,8 @@ class Contracts extends Controller {
 			'addict_colums'	=> 'present|array|nullable',
 		]);
 		
+		logger($addictColums);
+		
 		$stat = $this->contract->setCellData($contractId, $column, $type, $data, $addictColums);
 		
 		if ($type == 4) {

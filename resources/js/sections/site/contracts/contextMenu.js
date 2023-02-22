@@ -1025,7 +1025,7 @@ export function contextMenu(
 							if (prices.length) {
 								$.each(prices, (k, pr) => {
 									let cp = pregSplit($(pr).attr('calcprice'));
-									addictColums[cp[0]] = Number($(pr).attr('replacer').replace(' ', ''));
+									addictColums[cp[0]] = Number($(pr).attr('replacer').replaceAll(' ', ''));
 									$(pr).siblings('strong:hidden').removeAttrib('hidden');
 								});
 								
