@@ -31,9 +31,36 @@
 						</div>
 					</div>
 					
+					
+					<div class="form__item">
+						<div class="row row-cols-2 g-10">
+							<div class="col">
+								<label class="form__label color-dark">Дата подписания договора</label>
+								<x-datepicker name="date_start" date="{{$date_start ?? null}}" calendarid="contractDate{{$data['rand_id']}}" class="w100" />
+							</div>
+							<div class="col">
+								<label class="form__label color-dark">Дата окончания работ по договору</label>
+								<x-datepicker name="date_end" date="{{$date_end ?? null}}" calendarid="contractDate{{$data['rand_id']}}" class="w100" />
+							</div>
+						</div>
+					</div>
+					
+					
+					
+					
+					
 					<div class="form__item">
 						<label class="form__label color-dark">Название / заявитель</label>
 						<x-input name="title" value="{{$title ?? null}}" class="w100" uppercase />
+					</div>
+					
+					<div class="form__item">
+						{{-- <label class="form__label color-dark">Населенный пункт</label>
+						<x-select :options="$data['locality']" name="locality" value="{{$locality ?? null}}" class="w100" /> --}}
+						
+						
+						<label class="form__label color-dark">Населенный пункт</label>
+						<x-input name="locality" value="{{$locality ?? null}}" class="w100" uppercase />
 					</div>
 					
 					<div class="form__item">
@@ -55,13 +82,23 @@
 							<div class="col-auto">
 								<x-checkbox name="without_buy" id="withoutBuyCheck" class="mb7px" :checked="$without_buy ?? false" label="Без закупки" />
 							</div>
-						</div>
-								
+						</div>	
 					</div>
+					
+					<div class="form__item">
+						<label class="form__label color-dark">Дата закупки</label>
+						<x-datepicker name="date_buy" date="{{$date_buy ?? null}}" id="dateBuyField" class="w100" disabled="{{$without_buy ?? null}}" />
+					</div>
+					
 					
 					<div class="form__item">
 						<label class="form__label color-dark">Архивная папка</label>
 						<x-input name="archive_dir" value="{{$archive_dir ?? null}}" class="w100" />
+					</div>
+					
+					<div class="form__item">
+						<label class="form__label color-dark">Дата закрытия договора</label>
+						<x-datepicker name="date_close" date="{{$date_close ?? null}}" class="w100" />	
 					</div>
 				</div>
 			</div>
@@ -69,45 +106,16 @@
 			
 			<div class="col-5">	
 				<div class="form">
-					<div class="form__item">
-						<div class="row row-cols-2 g-10">
-							<div class="col">
-								<label class="form__label color-dark">Дата подписания договора</label>
-								<x-datepicker name="date_start" date="{{$date_start ?? null}}" calendarid="contractDate{{$data['rand_id']}}" class="w100" />
-							</div>
-							<div class="col">
-								<label class="form__label color-dark">Дата окончания работ по договору</label>
-								<x-datepicker name="date_end" date="{{$date_end ?? null}}" calendarid="contractDate{{$data['rand_id']}}" class="w100" />
-							</div>
-						</div>
-					</div>
 					
-					<div class="form__item">
-						<div class="row row-cols-2 g-10">
-							<div class="col">
-								<label class="form__label color-dark">Дата закрытия договора</label>
-								<x-datepicker name="date_close" date="{{$date_close ?? null}}" class="w100" />
-							</div>
-							<div class="col">
-								<label class="form__label color-dark">Дата закупки</label>
-								<x-datepicker name="date_buy" date="{{$date_buy ?? null}}" id="dateBuyField" class="w100" disabled="{{$without_buy ?? null}}" />
-							</div>
-						</div>	
-					</div>
+					
+					
 					
 					<div class="form__item">
 						<label class="form__label color-dark">Заказчик</label>
 						<x-select id="contractCustomer" :options="$data['customers']" name="customer" value="{{$customer ?? null}}" class="w100" />
 					</div>
 					
-					<div class="form__item">
-						{{-- <label class="form__label color-dark">Населенный пункт</label>
-						<x-select :options="$data['locality']" name="locality" value="{{$locality ?? null}}" class="w100" /> --}}
-						
-						
-						<label class="form__label color-dark">Населенный пункт</label>
-						<x-input name="locality" value="{{$locality ?? null}}" class="w100" uppercase />
-					</div>
+					
 					
 					<div class="form__item">
 						<label class="form__label color-dark">Исполнтель</label>

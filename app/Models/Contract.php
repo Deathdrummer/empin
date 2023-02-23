@@ -97,12 +97,22 @@ class Contract extends Model {
 	
 		
 	/**
-     * Установка значений в момент создания модели
-     *
+     * Переопределение 
+     *	- retrieved  полученное событие
+     *	- saving  событие сохранения
+     *	- saved  сохраненное событие
+     *	- updating  событие обновления
+     *	- updated  событие обновленной
+     *	- creating  событие создания
+     *	- created  созданное событие
+     *	- replicating  реплицирующее событие
+     *	- deleting  событие удаления модели
+     *	- deleted  удаленное событие
      * @var array
      */
 	public static function boot() {
     	parent::boot();
+		
 		self::creating(function ($model) {
 			$model->archive = 0;
 		});

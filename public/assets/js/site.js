@@ -9057,22 +9057,43 @@ $(document).on('contextmenu', '[contextmenu]', /*#__PURE__*/function () {
   };
 }()); //--------------------------------------------------------------------------------------------------------------------------
 
-$(document).on('mouseenter', '.ddrcontextmenu .ddrcontextmenu__item_main:not(.ddrcontextmenu__item-disabled)', function () {
-  $(this).addClass('ddrcontextmenu__item-hovered').removeClass('ddrcontextmenu__item-nohovercolor');
-});
+var ddrcontextmenuMouseEnterTOut;
 var ddrcontextmenuMouseLeaveTOut;
-$(document).on('mouseleave', '.ddrcontextmenu:not(.ddrcontextmenu_sub) > li', function () {
+$(document).on('mouseenter', '.ddrcontextmenu .ddrcontextmenu__item_main:not(.ddrcontextmenu__item-disabled)', function () {
   var _this = this;
+
+  if ($(this).hasClass('ddrcontextmenu__item_parent')) {
+    if ($(this).closest('.ddrcontextmenu_main').find('.ddrcontextmenu__item_parent.ddrcontextmenu__item-hovered').length) {
+      clearTimeout(ddrcontextmenuMouseEnterTOut);
+      ddrcontextmenuMouseEnterTOut = setTimeout(function () {
+        if (isHover($(_this))) {
+          $(_this).closest('.ddrcontextmenu_main').find('.ddrcontextmenu__item_parent.ddrcontextmenu__item-hovered').removeClass('ddrcontextmenu__item-hovered');
+          $(_this).addClass('ddrcontextmenu__item-hovered').removeClass('ddrcontextmenu__item-nohovercolor');
+        } else {
+          if (!isHover($('.ddrcontextmenu_sub'))) {
+            $(_this).closest('.ddrcontextmenu_main').find('.ddrcontextmenu__item_parent.ddrcontextmenu__item-hovered').removeClass('ddrcontextmenu__item-hovered');
+          }
+        }
+      }, closeSubNavTOut);
+    } else {
+      $(this).addClass('ddrcontextmenu__item-hovered').removeClass('ddrcontextmenu__item-nohovercolor');
+    }
+  } else {
+    $(this).addClass('ddrcontextmenu__item-hovered').removeClass('ddrcontextmenu__item-nohovercolor');
+  }
+});
+$(document).on('mouseleave', '.ddrcontextmenu:not(.ddrcontextmenu_sub) > li', function () {
+  var _this2 = this;
 
   if ($(this).find('.ddrcontextmenu__item').hasClass('ddrcontextmenu__item_parent')) {
     $(this).find('.ddrcontextmenu__item_main').addClass('ddrcontextmenu__item-nohovercolor');
     clearTimeout(ddrcontextmenuMouseLeaveTOut);
     ddrcontextmenuMouseLeaveTOut = setTimeout(function () {
-      if (!isHover($(_this).find('.ddrcontextmenu__item_main').siblings('.ddrcontextmenu_sub'))) {
-        $(_this).find('.ddrcontextmenu__item_main').removeClass('ddrcontextmenu__item-nohovercolor');
+      if (!isHover($(_this2).find('.ddrcontextmenu__item_main').siblings('.ddrcontextmenu_sub'))) {
+        $(_this2).find('.ddrcontextmenu__item_main').removeClass('ddrcontextmenu__item-nohovercolor');
 
-        if (!isHover($(_this))) {
-          $(_this).find('.ddrcontextmenu__item_main').removeClass('ddrcontextmenu__item-hovered');
+        if (!isHover($(_this2))) {
+          $(_this2).find('.ddrcontextmenu__item_main').removeClass('ddrcontextmenu__item-hovered');
         }
       }
     }, closeSubNavTOut);
