@@ -172,6 +172,8 @@ let ddrcontextmenuMouseLeaveTOut;
 
 $(document).on('mouseenter', '.ddrcontextmenu .ddrcontextmenu__item_main:not(.ddrcontextmenu__item-disabled)', function() {
 	if ($(this).hasClass('ddrcontextmenu__item_parent')) {
+		$(this).addClass('ddrcontextmenu__item-hovercolor');
+		
 		if ($(this).closest('.ddrcontextmenu_main').find('.ddrcontextmenu__item_parent.ddrcontextmenu__item-hovered').length) {
 			clearTimeout(ddrcontextmenuMouseEnterTOut);
 			ddrcontextmenuMouseEnterTOut = setTimeout(() => {
@@ -188,6 +190,7 @@ $(document).on('mouseenter', '.ddrcontextmenu .ddrcontextmenu__item_main:not(.dd
 			$(this).addClass('ddrcontextmenu__item-hovered').removeClass('ddrcontextmenu__item-nohovercolor');
 		}
 	} else {
+		$(this).removeClass('ddrcontextmenu__item-hovercolor');
 		$(this).addClass('ddrcontextmenu__item-hovered').removeClass('ddrcontextmenu__item-nohovercolor');
 	}
 });
@@ -196,6 +199,7 @@ $(document).on('mouseenter', '.ddrcontextmenu .ddrcontextmenu__item_main:not(.dd
 
 $(document).on('mouseleave', '.ddrcontextmenu:not(.ddrcontextmenu_sub) > li', function() {
 	if ($(this).find('.ddrcontextmenu__item').hasClass('ddrcontextmenu__item_parent')) {
+		$(this).find('.ddrcontextmenu__item').removeClass('ddrcontextmenu__item-hovercolor');
 		$(this).find('.ddrcontextmenu__item_main').addClass('ddrcontextmenu__item-nohovercolor');
 		clearTimeout(ddrcontextmenuMouseLeaveTOut);
 		ddrcontextmenuMouseLeaveTOut = setTimeout(() => {
