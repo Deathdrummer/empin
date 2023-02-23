@@ -48,14 +48,18 @@ $(document).on('contextmenu', '[contextmenu]', async function(e) {
 			});
 		},
 		changeAttrData(argIndex = null, newData = null) {
+			
+			
+			
+			
 			if (_.isNull(argIndex) || _.isNull(newData)) throw new Error('Ошибка! contextmenu changeAttrData -> неверно переданы аргументы!');
 			
 			const [chFn, chArgs] = _parseAttribString($(target.selector).attr('contextmenu'));
 			
 			let buildAttrString = chFn+':',
 				i = argIndex - 1;
-			
-			if (!chArgs[i]) throw new Error('Ошибка! contextmenu changeAttrData -> аргумента с таким порядковым номером не существует!');
+				
+			if (chArgs[i] === undefined) throw new Error('Ошибка! contextmenu changeAttrData -> аргумента с таким порядковым номером не существует!');
 			
 			chArgs[i] = newData;
 			

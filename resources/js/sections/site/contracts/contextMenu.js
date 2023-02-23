@@ -30,7 +30,8 @@ export function contextMenu(
 		canHiding, // скрыть договор
 		canChat, // просмотр чата
 		canChatSending, // возможность отправлять сообщения в чате
-		canReturnToWork // вернуть договор в работу из архива
+		canReturnToWork, // вернуть договор в работу из архива
+		isPinned // закреплен ли договор
 		) => {
 		
 		
@@ -82,7 +83,6 @@ export function contextMenu(
 				$('#contractsList').find('[ddrtabletd].selected').removeClass('selected');
 				
 			}
-				
 			
 			// если кликнуть на НЕвыделенном договоре - то все выделенния отменятся и выделится текущий кликнутый договор
 			if (isCommon && $(target.selector).hasAttr('contractselected') == false) {
@@ -1386,6 +1386,48 @@ export function contextMenu(
 					
 					//$('#contractsTable').find('[edittedplace].select-text').removeClass('select-text');	
 					//$('#contractsList').find('[ddrtabletd].selected').removeClass('selected');
+				}
+			}, {
+				name: isPinned ? 'Открепить договор' : 'Закрепить договор',
+				//visible: countSelected,
+				hidden: countSelected > 1,
+				sort: 3,
+				async onClick() {
+					
+					let titlePin = isPinned ? 'Открепление' : 'Закрепление';
+					let titleUnpin = isPinned ? 'открепления ' : 'закрепления ';
+					
+					let pinProcNotif = processNotify(buildTitle(countSelected, titlePin+' # %...', ['договора', 'договоров', 'договоров']));
+					
+					const {data, error, status, headers} = await axiosQuery('put', 'site/contracts/pin', {contract_id: contractId, stat: !isPinned}, 'json')
+					
+					if (error) {
+						//$.notify('Ошибка закрепления договора!', 'error');
+						console.log(error?.message, error.errors);
+						pinProcNotif.error({message: 'Ошибка '+titleUnpin+buildTitle(countSelected, titlePin+' # %...', ['договора', 'договоров', 'договоров'])});
+					}
+					
+					if (data) {
+						//$.notify('Договор успешно закреплен!');
+						pinProcNotif.done({message: 'Готово!'});
+					
+						
+						changeAttrData(18, isPinned == 1 ? '0' : '1');
+						
+						if (isPinned) {
+							$(target.selector).find('[pinnedicon]').empty();
+						
+						} else {
+							const pinnedIconHtml = '<i '+
+									'class="fz10px fa-solid fa-thumbtack fa-rotate-by icon icon-left icon-top color-gray-600" '+
+									'style="--fa-rotate-angle: -40deg;" '+
+									'noscroll '+
+									'title="Закрепить договор"> '+
+								'</i>';
+							
+							$(target.selector).find('[pinnedicon]').append(pinnedIconHtml);
+						}
+					}
 				}
 			}
 		];

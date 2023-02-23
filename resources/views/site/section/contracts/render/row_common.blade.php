@@ -1,7 +1,7 @@
 @forelse($userColums as $column)
 	@if($column == 'period' && !$isArchive && auth('site')->user()->can('contract-col-period:site'))
 		<x-table.td class="h-center" commonlist>
-				<i
+				{{-- <i
 					onclick="$.pinContract(this, {{$id}});"
 					pinned="{{$pinned ? 0 : 1}}"
 					@class([
@@ -23,7 +23,7 @@
 					style="--fa-rotate-angle: -40deg;"
 					noscroll
 					title="{{$pinned ? 'Открепить договор' : 'Закрепить договор'}}"
-					></i>
+					></i> --}}
 				<div
 					@class([
 						'circle',

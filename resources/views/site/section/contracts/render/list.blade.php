@@ -6,9 +6,21 @@
 				ondblclick="$.openContractInfo(this, '{{$contract['id']}}');"
 				isnew="{{$contract['is_new'] ? 1 : 0}}"
 				contractid="{{$contract['id']}}"
-				contextmenu="contractContextMenu:{{$contract['id'] ?? ''}},{{$departmentId ?: '0'}},{{$selectionId ?: '0'}},{{$contract['object_number'] ?? ''}},{{$contract['title'] ?? ''}},{{$contract['has_deps_to_send'] ? '1' : '0'}},{{$contract['messages_count'] ?? '0'}},{{$rules}}"
+				contextmenu="contractContextMenu:{{$contract['id'] ?? ''}},{{$departmentId ?: '0'}},{{$selectionId ?: '0'}},{{$contract['object_number'] ?? ''}},{{$contract['title'] ?? ''}},{{$contract['has_deps_to_send'] ? '1' : '0'}},{{$contract['messages_count'] ?? '0'}},{{$rules ?? ''}},{{!!$contract['pinned'] ?: 0}}"
 				:contractselected="$contract['selected']"
 				>
+				
+				<div class="icon icon-left ml1px" pinnedicon>
+					@if($contract['pinned'])
+						<i
+							class="fz10px fa-solid fa-thumbtack fa-rotate-by icon icon-left icon-top color-gray-600"
+							style="--fa-rotate-angle: -40deg;"
+							noscroll
+							title="Закрепить договор">
+						</i>
+					@endif
+				</div>
+				
 				@include('site.section/contracts.render.row_common', $contract)
 				@include('site.section/contracts.render.row_departments', compact('contract', 'alldeps'))
 			</x-table.tr>
@@ -521,8 +533,18 @@
 								ondblclick="$.openContractInfo(this, '{{$contract['id']}}');"
 								isnew="{{$contract['is_new'] ? 1 : 0}}"
 								contractid="{{$contract['id']}}"
-								contextmenu="contractContextMenu:{{$contract['id'] ?? ''}},{{$departmentId ?: '0'}},{{$selectionId ?: '0'}},{{$contract['object_number'] ?? ''}},{{$contract['title'] ?? ''}},{{$contract['has_deps_to_send'] ? '1' : '0'}},{{$contract['messages_count'] ?? '0'}},{{$rules}}"
+								contextmenu="contractContextMenu:{{$contract['id'] ?? ''}},{{$departmentId ?: '0'}},{{$selectionId ?: '0'}},{{$contract['object_number'] ?? ''}},{{$contract['title'] ?? ''}},{{$contract['has_deps_to_send'] ? '1' : '0'}},{{$contract['messages_count'] ?? '0'}},{{$rules ?? ''}},{{!!$contract['pinned'] ?: 0}}"
 								>
+								<div class="icon icon-left ml1px" pinnedicon>
+									@if($contract['pinned'])
+										<i
+											class="fz10px fa-solid fa-thumbtack fa-rotate-by color-gray-600"
+											style="--fa-rotate-angle: -40deg;"
+											noscroll
+											title="Закрепить договор">
+										</i>
+									@endif
+								</div>
 								@include('site.section/contracts.render.row_common', $contract)
 								@include('site.section/contracts.render.row_departments', compact('contract', 'alldeps'))
 							</x-table.tr>

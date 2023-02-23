@@ -14890,7 +14890,8 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
   canHiding, // скрыть договор
   canChat, // просмотр чата
   canChatSending, // возможность отправлять сообщения в чате
-  canReturnToWork // вернуть договор в работу из архива
+  canReturnToWork, // вернуть договор в работу из архива
+  isPinned // закреплен ли договор
   ) {
     var _selectedContracts$it;
 
@@ -16684,6 +16685,66 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
               }
             }
           }, _callee14);
+        }))();
+      }
+    }, {
+      name: isPinned ? 'Открепить договор' : 'Закрепить договор',
+      //visible: countSelected,
+      hidden: countSelected > 1,
+      sort: 3,
+      onClick: function onClick() {
+        return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee15() {
+          var titlePin, titleUnpin, pinProcNotif, _yield$axiosQuery13, data, error, status, headers, pinnedIconHtml;
+
+          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee15$(_context15) {
+            while (1) {
+              switch (_context15.prev = _context15.next) {
+                case 0:
+                  titlePin = isPinned ? 'Открепление' : 'Закрепление';
+                  titleUnpin = isPinned ? 'открепления ' : 'закрепления ';
+                  pinProcNotif = processNotify(buildTitle(countSelected, titlePin + ' # %...', ['договора', 'договоров', 'договоров']));
+                  _context15.next = 5;
+                  return axiosQuery('put', 'site/contracts/pin', {
+                    contract_id: contractId,
+                    stat: !isPinned
+                  }, 'json');
+
+                case 5:
+                  _yield$axiosQuery13 = _context15.sent;
+                  data = _yield$axiosQuery13.data;
+                  error = _yield$axiosQuery13.error;
+                  status = _yield$axiosQuery13.status;
+                  headers = _yield$axiosQuery13.headers;
+
+                  if (error) {
+                    //$.notify('Ошибка закрепления договора!', 'error');
+                    console.log(error === null || error === void 0 ? void 0 : error.message, error.errors);
+                    pinProcNotif.error({
+                      message: 'Ошибка ' + titleUnpin + buildTitle(countSelected, titlePin + ' # %...', ['договора', 'договоров', 'договоров'])
+                    });
+                  }
+
+                  if (data) {
+                    //$.notify('Договор успешно закреплен!');
+                    pinProcNotif.done({
+                      message: 'Готово!'
+                    });
+                    changeAttrData(18, isPinned == 1 ? '0' : '1');
+
+                    if (isPinned) {
+                      $(target.selector).find('[pinnedicon]').empty();
+                    } else {
+                      pinnedIconHtml = '<i ' + 'class="fz10px fa-solid fa-thumbtack fa-rotate-by icon icon-left icon-top color-gray-600" ' + 'style="--fa-rotate-angle: -40deg;" ' + 'noscroll ' + 'title="Закрепить договор"> ' + '</i>';
+                      $(target.selector).find('[pinnedicon]').append(pinnedIconHtml);
+                    }
+                  }
+
+                case 12:
+                case "end":
+                  return _context15.stop();
+              }
+            }
+          }, _callee15);
         }))();
       }
     }];
