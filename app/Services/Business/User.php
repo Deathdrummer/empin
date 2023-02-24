@@ -105,10 +105,31 @@ class User {
 	 * @return 
 	 */
 	public function pinContract(Request $request) {
-		if (!$contractId = $request->input('contract_id')) return false;
-		$pinStat = (int)$request->input('stat', 1);
-		$userContracts = Usermodel::find(auth('site')->user()->id)->contracts();
-		$stat = $userContracts->sync([$contractId => ['pinned' => $pinStat]], false);
+		$stat = $request->input('stat');
+		$contractsIds = $request->input('contracts_ids');
+		
+		$contractsIds = match($stat) {
+			-1	=> array_keys($contractsIds),
+			0	=> array_keys(array_filter($contractsIds, fn($v) => $v === false)),
+			1	=> array_keys($contractsIds),
+		};
+		
+		$pinStat = match($stat) {
+			-1	=> 1,
+			0	=> 1,
+			1	=> 0,
+		};
+		
+		if (!$contractsIds) return false;
+		
+		$syncData = [];
+		foreach ($contractsIds as $contractId) {
+			$syncData[$contractId] = ['pinned' => $pinStat];
+		}
+		
+		$userId = auth('site')->user()->id;
+		$userContracts = Usermodel::find($userId)->contracts();
+		$stat = $userContracts->sync($syncData, false);
 		return $stat;
 	}
 	

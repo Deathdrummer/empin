@@ -14909,7 +14909,9 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
     var contextEdited = !!$(target.pointer).closest('[ddrtabletd]').hasAttr('contextedit');
     var disableEditCell = !$(target.pointer).closest('[ddrtabletd]').attr('contextedit');
     var selectedTextCell = !!$(target.pointer).closest('[ddrtabletd]').find('[edittedplace]').hasClass('select-text') || !!$(target.pointer).closest('[ddrtabletd]').find('[edittedblock]').length || !!$('#contractsTable').find('[ddrtabletd].selected').length && $(target.pointer).closest('[ddrtabletd]').hasClass('selected');
-    var calcPrices; // Если это оин пункт "копировать"
+    var calcPrices;
+    var allPinned;
+    var pinnedInSelected = {}; // Если это оин пункт "копировать"
 
     if (selectedTextCell || $(target.pointer).closest('[ddrtabletd]').hasClass('selected') || !!$(target.pointer).closest('[ddrtabletd]').find('[edittedplace]').hasClass('select-text')) {
       setStyle({
@@ -14968,8 +14970,22 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
       if (!selectedTextCell) {
         removeSelection();
         $('#contractsTable').find('[edittedplace].select-text').removeClass('select-text');
+      } // Закрепленные договоры среди выделенных [ID: true/false]
+
+
+      if ($('#contractsTable').find('[contractselected]').length) {
+        $('#contractsTable').find('[contractselected]').each(function (k, item) {
+          pinnedInSelected[$(item).attr('contractid')] = !!$(item).find('[pinnedicon]').children('i').length;
+        });
+      } else {
+        pinnedInSelected[$(target.selector).attr('contractid')] = !!$(target.selector).find('[pinnedicon]').children('i').length;
       }
 
+      allPinned = Object.values(pinnedInSelected).every(function (elem) {
+        return elem === true;
+      }) ? 1 : Object.values(pinnedInSelected).every(function (elem) {
+        return elem === false;
+      }) ? -1 : 0;
       console.log('onContextMenu', selectedContracts.items);
       if (((_commentsTooltip = commentsTooltip) === null || _commentsTooltip === void 0 ? void 0 : _commentsTooltip.destroy) != undefined) commentsTooltip.destroy();
       if (((_cellEditTooltip = cellEditTooltip) === null || _cellEditTooltip === void 0 ? void 0 : _cellEditTooltip.destroy) != undefined) cellEditTooltip.destroy();
@@ -16688,28 +16704,32 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
         }))();
       }
     }, {
-      name: isPinned ? 'Открепить договор' : 'Закрепить договор',
+      name: function name() {
+        if (countSelected == 1) return isPinned ? 'Открепить договор' : 'Закрепить договор';
+        return [-1, 0].indexOf(allPinned) !== -1 ? 'Закрепить договоры' : 'Открепить договоры';
+      },
       //visible: countSelected,
-      hidden: countSelected > 1,
+      //hidden: countSelected > 1,
       sort: 3,
       onClick: function onClick() {
         return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee15() {
-          var titlePin, titleUnpin, pinProcNotif, _yield$axiosQuery13, data, error, status, headers, pinnedIconHtml;
+          var titlePin, titlePinDone, pinProcNotif, _yield$axiosQuery13, data, error, status, headers, pinnedIconHtml;
 
           return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee15$(_context15) {
             while (1) {
               switch (_context15.prev = _context15.next) {
                 case 0:
                   titlePin = isPinned ? 'Открепление' : 'Закрепление';
-                  titleUnpin = isPinned ? 'открепления ' : 'закрепления ';
+                  titlePinDone = isPinned ? 'открепления ' : 'закрепления ';
                   pinProcNotif = processNotify(buildTitle(countSelected, titlePin + ' # %...', ['договора', 'договоров', 'договоров']));
-                  _context15.next = 5;
+                  console.log(pinnedInSelected, allPinned);
+                  _context15.next = 6;
                   return axiosQuery('put', 'site/contracts/pin', {
-                    contract_id: contractId,
-                    stat: !isPinned
+                    contracts_ids: pinnedInSelected,
+                    stat: allPinned
                   }, 'json');
 
-                case 5:
+                case 6:
                   _yield$axiosQuery13 = _context15.sent;
                   data = _yield$axiosQuery13.data;
                   error = _yield$axiosQuery13.error;
@@ -16720,26 +16740,30 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                     //$.notify('Ошибка закрепления договора!', 'error');
                     console.log(error === null || error === void 0 ? void 0 : error.message, error.errors);
                     pinProcNotif.error({
-                      message: 'Ошибка ' + titleUnpin + buildTitle(countSelected, titlePin + ' # %...', ['договора', 'договоров', 'договоров'])
+                      message: 'Ошибка ' + titlePinDone + buildTitle(countSelected, titlePin + ' # %...', ['договора', 'договоров', 'договоров'])
                     });
                   }
 
                   if (data) {
-                    //$.notify('Договор успешно закреплен!');
+                    pinnedIconHtml = '<i ' + 'class="fz10px fa-solid fa-thumbtack fa-rotate-by color-gray-600" ' + 'style="--fa-rotate-angle: -40deg;" ' + 'noscroll ' + 'title="Закрепить договор"> ' + '</i>';
+
+                    if (countSelected > 1) {
+                      $.each(Object.keys(pinnedInSelected), function (k, item) {
+                        var contractRow = $('#contractsTable').find('[contractid="' + item + '"]');
+                        if (isPinned) $(contractRow).find('[pinnedicon]').empty();else $(contractRow).find('[pinnedicon]').html(pinnedIconHtml);
+                        changeAttrData(contractRow, 18, isPinned == 1 ? '0' : '1');
+                      });
+                    } else {
+                      if (isPinned) $(target.selector).find('[pinnedicon]').empty();else $(target.selector).find('[pinnedicon]').html(pinnedIconHtml);
+                      changeAttrData(18, isPinned == 1 ? '0' : '1');
+                    }
+
                     pinProcNotif.done({
                       message: 'Готово!'
                     });
-                    changeAttrData(18, isPinned == 1 ? '0' : '1');
-
-                    if (isPinned) {
-                      $(target.selector).find('[pinnedicon]').empty();
-                    } else {
-                      pinnedIconHtml = '<i ' + 'class="fz10px fa-solid fa-thumbtack fa-rotate-by icon icon-left icon-top color-gray-600" ' + 'style="--fa-rotate-angle: -40deg;" ' + 'noscroll ' + 'title="Закрепить договор"> ' + '</i>';
-                      $(target.selector).find('[pinnedicon]').append(pinnedIconHtml);
-                    }
                   }
 
-                case 12:
+                case 13:
                 case "end":
                   return _context15.stop();
               }

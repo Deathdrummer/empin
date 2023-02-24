@@ -47,14 +47,18 @@ $(document).on('contextmenu', '[contextmenu]', async function(e) {
 				if (!_.isNull(callback) && _.isFunction(callback)) callback(e);
 			});
 		},
-		changeAttrData(argIndex = null, newData = null) {
+		changeAttrData(selector = null, argIndex = null, newData = null) {
 			
-			
+			if (_.isNull(newData)) {
+				newData = argIndex;
+				argIndex = selector;
+				selector = target.selector;
+			}
 			
 			
 			if (_.isNull(argIndex) || _.isNull(newData)) throw new Error('Ошибка! contextmenu changeAttrData -> неверно переданы аргументы!');
 			
-			const [chFn, chArgs] = _parseAttribString($(target.selector).attr('contextmenu'));
+			const [chFn, chArgs] = _parseAttribString($(selector).attr('contextmenu'));
 			
 			let buildAttrString = chFn+':',
 				i = argIndex - 1;
@@ -65,7 +69,7 @@ $(document).on('contextmenu', '[contextmenu]', async function(e) {
 			
 			buildAttrString += chArgs.join(',');
 			
-			$(target.selector).setAttrib('contextmenu', buildAttrString);
+			$(selector).setAttrib('contextmenu', buildAttrString);
 		},
 		buildTitle(count = null, one = null, many = null, wordVariants = null) { // сформировать заголовок исходя из кол-ва выбранных элементов
 			if (_.isNull(one) || (_.isNull(many) && _.isNull(wordVariants))) return;
@@ -341,7 +345,7 @@ function _buildMenuHtml(menuData = null, maxHeight = null) {
 			menuHtml += '</div>'; // metablock
 		}
 		
-		menuHtml += '<div class="text"><p>'+strPad(item.name, 110, '...')+'</p></div>';
+		menuHtml += '<div class="text"><p>'+strPad(_.isFunction(item.name) ? item.name() : item.name, 110, '...')+'</p></div>';
 		
 		if (hasChilds || hasCountsRight) {
 			menuHtml += '<div class="metablock metablock_right">'; // metablock
@@ -395,7 +399,7 @@ function _buildMenuHtml(menuData = null, maxHeight = null) {
 					menuHtml += '</div>'; // metablock
 				}
 				
-				menuHtml += 	'<div class="text"><p>'+strPad(childItem.name, 110, '...')+'</p></div>';
+				menuHtml += 	'<div class="text"><p>'+strPad(_.isFunction(childItem.name) ? childItem.name() : childItem.name, 110, '...')+'</p></div>';
 				
 				if (hasCountsChildRight) {
 					menuHtml += '<div class="metablock metablock_right">'; // metablock
@@ -505,7 +509,7 @@ function _loadSubmenu(menuItem = null) {
 					menuHtml += '</div>'; // metablock
 				}
 				
-				subMenuHtml += 		'<div class="text"><p>'+strPad(childItem.name, 110, '...')+'</p></div>';
+				subMenuHtml += 		'<div class="text"><p>'+strPad(_.isFunction(childItem.name) ? childItem.name() : childItem.name, 110, '...')+'</p></div>';
 				
 				if (hasCountsSubRight) {
 					menuHtml += '<div class="metablock metablock_right">'; // metablock

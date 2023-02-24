@@ -172,6 +172,7 @@ class Contract {
 		
 		$userContractsSettings = $this->user->getSettings('contracts');
 		
+		['pinned' => $pinned, 'viewed' => $viewed] = $this->user->getContractsData();
 		
 		$data = ContractModel::filter($filter)
 			->withCount(['departments as has_deps_to_send' => function (Builder $query) {
@@ -239,10 +240,11 @@ class Contract {
 				}
 				
 			})
-			->where(function ($query) use($userContractsSettings) {
+			->where(function ($query) use($userContractsSettings, $pinned) {
 				if (isset($userContractsSettings['gencontracting']) && $userContractsSettings['gencontracting']) {
 					$query->whereNot('gencontracting', 1);
 				}
+				$query->whereNotIn('id', $pinned);
 			})
 			->orderBy('id', 'asc')
 			->groupBy('id')
@@ -253,13 +255,10 @@ class Contract {
 		
 		if ($data->isEmpty()) return false;
 		
-		
 		// Список подборок для каждого договора, в которых он уже добавлен
 		//$contractsSelections = [];
 		//foreach ($data as $item) $contractsSelections[$item['id']] = $item->selections->pluck('id')->toArray();
 		
-		
-		['pinned' => $pinned, 'viewed' => $viewed] = $this->user->getContractsData();
 		
 		$userCellComments = $this->user->getCellComments([
 			'contract_id' 	=> $data->pluck('id')->toArray(),
@@ -269,8 +268,12 @@ class Contract {
 		$deadlinesContracts = $this->getSettings('contracts-deadlines');
 		$deadlinesSteps = $this->getSettings('steps-deadlines');
 		
+		if ($offset == 0) {
+			$pinnedContracts = $this->_getPinned($pinned, $sortStep, $sortField, $sortOrder, $userContractsSettings, $filter, $userId);
+			$data = $pinnedContracts->union($data);
+		}
 		
-		$buildedData = $data->mapWithKeysMany(function($item) use($deadlinesContracts, $deadlinesSteps, $viewed, $pinned, $selectedContracts, $userCellComments) {
+		return $data->mapWithKeysMany(function($item) use($deadlinesContracts, $deadlinesSteps, $viewed, $pinned, $selectedContracts, $userCellComments) {
 			if (!is_null($item['deadline_color_key'] )) {
 				$forcedColor = $deadlinesContracts[$item['deadline_color_key']]['color']?? null;
 				$forcedName = $deadlinesContracts[$item['deadline_color_key']]['name'] ?? '';
@@ -373,20 +376,97 @@ class Contract {
 				'departments' 		=> $departments
 			]];
 		});
-		
-		$pinnedItems = $buildedData->filter(function ($item) {
-			return $item['pinned'] < 0;
-		});
-		
-		if ($pinnedItems->isEmpty()) return $buildedData;
-		
-		// Если нужно зафиксировать сортировку закрепленных договоров
-		/* $pinnedItems = $pinnedItems->sortBy(function ($item) {
-			return $item['pinned'] < 0 ? -$item['pinned'] : false;
-		}); */
-		
-		return $pinnedItems->union($buildedData);
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	/**
+	 * @param 
+	 * @return 
+	 */
+	private function _getPinned($pinned = null, $sortStep, $sortField, $sortOrder, $userContractsSettings, $filter, $userId) {
+		if (!$pinned) return false;
+		return ContractModel::filter($filter)
+			->withCount(['departments as has_deps_to_send' => function (Builder $query) {
+				$query->where(['show' => 0, 'hide' => 0]);
+			}, 'departments as hide_count' => function (Builder $query) {
+				$query->where('hide', 1);
+			}])
+			->withCount('messages')
+			->with('departments')
+			->with(['selections' => function ($query) use($userId) {
+				$query->where('account_id', $userId)
+					->orWhereJsonContains('subscribed', $userId)
+					->orderBy('_sort', 'ASC');
+			}])
+			->when($sortStep, function ($query) use($sortStep, $sortOrder) {
+				$query->orderBy(
+					ContractData::select('data')
+					->whereColumn('contract_data.contract_id', 'contracts.id')
+					->where('contract_data.step_id', $sortStep),
+					$sortOrder 
+				);
+				
+				$query->orderBy(
+					ContractDepartment::select('show')
+					->whereColumn('contract_department.contract_id', 'contracts.id')
+					->whereJsonContains('steps', ['step_id' => (int)$sortStep]),
+					$sortOrder 
+				);
+				
+			}, function($query) use($sortField, $sortOrder) {
+				
+				// что тут происходит: производится сортировка по подставным данным. Перечисляются ID сортируемого поля в том порядке, в котором нужно нам.
+				
+				$settingData = match ($sortField) {
+					'type' 			=> array_column($this->getSettings('contract-types'), 'id', 'title'),
+					'contractor' 	=> array_column($this->getSettings('contract-contractors'), 'id', 'name'),
+					'customer' 		=> array_column($this->getSettings('contract-customers'), 'id', 'name'),
+					default => false,
+				};
+				
+				if ($settingData) {
+					if ($sortOrder == 'asc') ksort($settingData, SORT_NATURAL);
+					elseif ($sortOrder == 'desc') krsort($settingData, SORT_NATURAL);
+					
+					$ids = array_values($settingData);
+					
+					// первый вариант
+					//$placeholders = implode(',', array_fill(0, count($ids), '?'));
+					//$query->orderByRaw("field({$sortField},{$placeholders})", $ids);
+					
+					// второй вариант
+					$implodeIds = implode(',', $ids);
+					$query->orderByRaw("FIND_IN_SET($sortField, '$implodeIds')");
+				
+				} else {
+					$query->orderBy($sortField, $sortOrder);
+				}
+				
+			})
+			->whereIn('id', $pinned)
+			->where(function ($query) use($userContractsSettings, $pinned) {
+				if (isset($userContractsSettings['gencontracting']) && $userContractsSettings['gencontracting']) {
+					$query->whereNot('gencontracting', 1);
+				}
+			})
+			->orderBy('id', 'asc')
+			->groupBy('id')
+			->get();
+	}
+	
+	
+	
+	
+	
 	
 	
 	

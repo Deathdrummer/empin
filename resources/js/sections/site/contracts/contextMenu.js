@@ -44,6 +44,10 @@ export function contextMenu(
 		const selectedTextCell = !!$(target.pointer).closest('[ddrtabletd]').find('[edittedplace]').hasClass('select-text') || !!$(target.pointer).closest('[ddrtabletd]').find('[edittedblock]').length || (!!$('#contractsTable').find('[ddrtabletd].selected').length && $(target.pointer).closest('[ddrtabletd]').hasClass('selected'));
 		
 		let calcPrices;
+		let allPinned;
+		let pinnedInSelected = {};
+		
+		
 		
 		// Если это оин пункт "копировать"
 		if ((selectedTextCell || $(target.pointer).closest('[ddrtabletd]').hasClass('selected')) || !!$(target.pointer).closest('[ddrtabletd]').find('[edittedplace]').hasClass('select-text')) {
@@ -106,6 +110,18 @@ export function contextMenu(
 				$('#contractsTable').find('[edittedplace].select-text').removeClass('select-text');	
 			}
 			
+			
+			// Закрепленные договоры среди выделенных [ID: true/false]
+			if ($('#contractsTable').find('[contractselected]').length) {
+				$('#contractsTable').find('[contractselected]').each((k, item) => {
+					pinnedInSelected[$(item).attr('contractid')] = !!$(item).find('[pinnedicon]').children('i').length;
+				});
+				
+			} else {
+				pinnedInSelected[$(target.selector).attr('contractid')] = !!$(target.selector).find('[pinnedicon]').children('i').length;
+			}
+			
+			allPinned = Object.values(pinnedInSelected).every(elem => elem === true) ? 1 : (Object.values(pinnedInSelected).every(elem => elem === false) ? -1 : 0);
 			
 			console.log('onContextMenu', selectedContracts.items);
 			
@@ -1388,45 +1404,55 @@ export function contextMenu(
 					//$('#contractsList').find('[ddrtabletd].selected').removeClass('selected');
 				}
 			}, {
-				name: isPinned ? 'Открепить договор' : 'Закрепить договор',
+				name() {
+					if (countSelected == 1) return isPinned ? 'Открепить договор' : 'Закрепить договор';
+					return [-1, 0].indexOf(allPinned) !== -1 ? 'Закрепить договоры' : 'Открепить договоры';
+				},
 				//visible: countSelected,
-				hidden: countSelected > 1,
+				//hidden: countSelected > 1,
 				sort: 3,
 				async onClick() {
-					
 					let titlePin = isPinned ? 'Открепление' : 'Закрепление';
-					let titleUnpin = isPinned ? 'открепления ' : 'закрепления ';
+					let titlePinDone = isPinned ? 'открепления ' : 'закрепления ';
 					
 					let pinProcNotif = processNotify(buildTitle(countSelected, titlePin+' # %...', ['договора', 'договоров', 'договоров']));
 					
-					const {data, error, status, headers} = await axiosQuery('put', 'site/contracts/pin', {contract_id: contractId, stat: !isPinned}, 'json')
+					console.log(pinnedInSelected, allPinned);
+					
+					const {data, error, status, headers} = await axiosQuery('put', 'site/contracts/pin', {contracts_ids: pinnedInSelected, stat: allPinned}, 'json')
 					
 					if (error) {
 						//$.notify('Ошибка закрепления договора!', 'error');
 						console.log(error?.message, error.errors);
-						pinProcNotif.error({message: 'Ошибка '+titleUnpin+buildTitle(countSelected, titlePin+' # %...', ['договора', 'договоров', 'договоров'])});
+						pinProcNotif.error({message: 'Ошибка '+titlePinDone+buildTitle(countSelected, titlePin+' # %...', ['договора', 'договоров', 'договоров'])});
 					}
 					
 					if (data) {
-						//$.notify('Договор успешно закреплен!');
-						pinProcNotif.done({message: 'Готово!'});
-					
+						const pinnedIconHtml = '<i '+
+								'class="fz10px fa-solid fa-thumbtack fa-rotate-by color-gray-600" '+
+								'style="--fa-rotate-angle: -40deg;" '+
+								'noscroll '+
+								'title="Закрепить договор"> '+
+							'</i>';
 						
-						changeAttrData(18, isPinned == 1 ? '0' : '1');
-						
-						if (isPinned) {
-							$(target.selector).find('[pinnedicon]').empty();
-						
-						} else {
-							const pinnedIconHtml = '<i '+
-									'class="fz10px fa-solid fa-thumbtack fa-rotate-by icon icon-left icon-top color-gray-600" '+
-									'style="--fa-rotate-angle: -40deg;" '+
-									'noscroll '+
-									'title="Закрепить договор"> '+
-								'</i>';
+						if (countSelected > 1) {
+							$.each(Object.keys(pinnedInSelected), (k, item) => {
+								let contractRow = $('#contractsTable').find('[contractid="'+item+'"]');
+								
+								if (isPinned) $(contractRow).find('[pinnedicon]').empty();
+								else $(contractRow).find('[pinnedicon]').html(pinnedIconHtml);
+								
+								
+								changeAttrData(contractRow, 18, isPinned == 1 ? '0' : '1');
+							});
 							
-							$(target.selector).find('[pinnedicon]').append(pinnedIconHtml);
+						} else {
+							if (isPinned) $(target.selector).find('[pinnedicon]').empty();
+							else $(target.selector).find('[pinnedicon]').html(pinnedIconHtml);
+							changeAttrData(18, isPinned == 1 ? '0' : '1');
 						}
+						
+						pinProcNotif.done({message: 'Готово!'});		
 					}
 				}
 			}

@@ -13,7 +13,7 @@
 				<div class="icon icon-left ml1px" pinnedicon>
 					@if($contract['pinned'])
 						<i
-							class="fz10px fa-solid fa-thumbtack fa-rotate-by icon icon-left icon-top color-gray-600"
+							class="fz10px fa-solid fa-thumbtack fa-rotate-by color-gray-600"
 							style="--fa-rotate-angle: -40deg;"
 							noscroll
 							title="Закрепить договор">
