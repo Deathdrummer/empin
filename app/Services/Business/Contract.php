@@ -269,8 +269,7 @@ class Contract {
 		$deadlinesSteps = $this->getSettings('steps-deadlines');
 		
 		if ($offset == 0) {
-			$pinnedContracts = $this->_getPinned($pinned, $sortStep, $sortField, $sortOrder, $userContractsSettings, $filter, $userId);
-			if ($pinnedContracts->count()) {
+			if ($pinnedContracts = $this->_getPinned($pinned, $sortStep, $sortField, $sortOrder, $userContractsSettings, $filter, $userId)) {
 				$data = $pinnedContracts->union($data);
 			}
 		}
