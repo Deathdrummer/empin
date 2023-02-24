@@ -72,50 +72,16 @@
 						<label class="form__label color-dark">Титул</label>
 						<x-textarea name="titul" value="{{$titul ?? null}}" class="w100" rows="5" />
 					</div>
-					
-					<div class="form__item">
-						<div class="row g-10 align-items-end justify-content-between">
-							<div class="col">
-								<label class="form__label color-dark">Номер закупки</label>
-								<x-input name="buy_number" value="{{$buy_number ?? null}}" class="w100" disabled="{{$without_buy ?? null}}" />
-							</div>
-							<div class="col-auto">
-								<x-checkbox name="without_buy" id="withoutBuyCheck" class="mb7px" :checked="$without_buy ?? false" label="Без закупки" />
-							</div>
-						</div>	
-					</div>
-					
-					<div class="form__item">
-						<label class="form__label color-dark">Дата закупки</label>
-						<x-datepicker name="date_buy" date="{{$date_buy ?? null}}" id="dateBuyField" class="w100" disabled="{{$without_buy ?? null}}" />
-					</div>
-					
-					
-					<div class="form__item">
-						<label class="form__label color-dark">Архивная папка</label>
-						<x-input name="archive_dir" value="{{$archive_dir ?? null}}" class="w100" />
-					</div>
-					
-					<div class="form__item">
-						<label class="form__label color-dark">Дата закрытия договора</label>
-						<x-datepicker name="date_close" date="{{$date_close ?? null}}" class="w100" />	
-					</div>
 				</div>
 			</div>
 			
 			
 			<div class="col-5">	
 				<div class="form">
-					
-					
-					
-					
 					<div class="form__item">
 						<label class="form__label color-dark">Заказчик</label>
 						<x-select id="contractCustomer" :options="$data['customers']" name="customer" value="{{$customer ?? null}}" class="w100" />
 					</div>
-					
-					
 					
 					<div class="form__item">
 						<label class="form__label color-dark">Исполнтель</label>
@@ -141,8 +107,6 @@
 							</div>
 						</div>	
 					</div>
-					
-					
 					
 					<div class="form__item" id="calcForm">
 						<div class="row row-cols-3 g-10 align-items-end">
@@ -244,6 +208,7 @@
 							</div>
 						</div>
 					</div>
+					
 				</div>
 			</div>
 			
@@ -262,8 +227,6 @@
 						<x-checkbox name="hoz_method" :checked="$hoz_method ?? null" label="Хоз способ" />
 					</div>
 					
-					
-					
 					{{-- <div class="form__item">
 						<x-radio label="Субподряд" value="1" name="subcontracting" :checked="$subcontracting ?? false" fieldset="contractingType" />
 						<div></div>
@@ -272,6 +235,41 @@
 					
 				</div>
 			</div>
+			
+			
+			
+			<div class="col-5 mt-n1">
+				<div class="form__item">
+					<div class="row g-10 align-items-end justify-content-between">
+						<div class="col">
+							<label class="form__label color-dark">Номер закупки</label>
+							<x-input name="buy_number" value="{{$buy_number ?? null}}" class="w100" disabled="{{$without_buy ?? null}}" />
+						</div>
+						<div class="col-auto">
+							<x-checkbox name="without_buy" id="withoutBuyCheck" class="mb7px" :checked="$without_buy ?? false" label="Без закупки" />
+						</div>
+					</div>	
+				</div>
+				
+				<div class="form__item">
+					<label class="form__label color-dark">Дата закупки</label>
+					<x-datepicker name="date_buy" date="{{$date_buy ?? null}}" id="dateBuyField" class="w100" disabled="{{$without_buy ?? null}}" />
+				</div>
+			</div>
+			
+			<div class="col-5 mt-n1">
+				<div class="form__item">
+					<label class="form__label color-dark">Архивная папка</label>
+					<x-input name="archive_dir" value="{{$archive_dir ?? null}}" class="w100" />
+				</div>
+				
+				<div class="form__item">
+					<label class="form__label color-dark">Дата закрытия договора</label>
+					<x-datepicker name="date_close" date="{{$date_close ?? null}}" class="w100" />	
+				</div>
+			</div>
+			
+			<div class="col-2 mt-n1"></div>
 		</div>
 		
 		
