@@ -1,6 +1,6 @@
-@forelse($userColums as $column)
+@forelse($userColums as $k => $column)
 	@if($column == 'period' && !$isArchive && auth('site')->user()->can('contract-col-period:site'))
-		<x-table.td class="h-center" commonlist>
+		<x-table.td class="h-center" commonlist="{{$k}}">
 				{{-- <i
 					onclick="$.pinContract(this, {{$id}});"
 					pinned="{{$pinned ? 0 : 1}}"

@@ -1269,6 +1269,7 @@ export function contextMenu(
 			}, {
 				name: 'Экспорт в Excel',
 				visible: countSelected && !selectedTextCell,
+				countLeft: countSelected > 1 ? countSelected : null,
 				sort: 8,
 				async onClick() {
 					let contractsIds = selectedContracts.items;
@@ -1408,6 +1409,7 @@ export function contextMenu(
 					if (countSelected == 1) return isPinned ? 'Открепить договор' : 'Закрепить договор';
 					return [-1, 0].indexOf(allPinned) !== -1 ? 'Закрепить договоры' : 'Открепить договоры';
 				},
+				countLeft: countSelected > 1 ? countSelected : null,
 				//visible: countSelected,
 				//hidden: countSelected > 1,
 				sort: 3,
@@ -1416,8 +1418,6 @@ export function contextMenu(
 					let titlePinDone = isPinned ? 'открепления ' : 'закрепления ';
 					
 					let pinProcNotif = processNotify(buildTitle(countSelected, titlePin+' # %...', ['договора', 'договоров', 'договоров']));
-					
-					console.log(pinnedInSelected, allPinned);
 					
 					const {data, error, status, headers} = await axiosQuery('put', 'site/contracts/pin', {contracts_ids: pinnedInSelected, stat: allPinned}, 'json')
 					
@@ -1455,7 +1455,60 @@ export function contextMenu(
 						pinProcNotif.done({message: 'Готово!'});		
 					}
 				}
-			}
+			}, {
+				name: 'Выделить цветом',
+				countLeft: countSelected > 1 ? countSelected : null,
+				//visible: countSelected,
+				//hidden: countSelected > 1,
+				sort: 4,
+				load: {
+					url: 'site/contracts/departments',
+					params: {contractId: selectedContracts.items.length == 1 ? selectedContracts.items[0] : null},
+					method: 'get',
+					map: (item) => {
+						return {
+							name: item.name,
+							//faIcon: 'fa-solid fa-angles-right',
+							visible: true,
+							onClick(selector) {
+								let departmentName = selector.text(),
+									itemsCount = selector.items().length;
+								
+								let procNotif = processNotify('Отправка договора в другой отдел...');
+								
+								axiosQuery('post', 'site/contracts/send', {contractIds: selectedContracts.items, departmentId: item.id}, 'json')
+								.then(({data, error, status, headers}) => {
+									if (data) {
+										//$.notify('Договор успешно отправлен в '+departmentName+'!');
+										
+										if (selectionId || searched) {
+											let params = {};
+											getCounts(() => {
+												//if (currentList > 0) removeContractsRows(target);
+											});
+										} else {
+											//if (currentList > 0) removeContractsRows(target);
+										}
+										
+										if (data.length) {
+											let contractTitle = countSelected == 1 ? ' '+objectNumber+' '+title : '';
+											let mess = buildTitle(data.length, '# %'+contractTitle+' успешно отправлен в '+departmentName+'!', '# % успешно отправлены в '+departmentName+'!', ['договор', 'договора', 'договоров']);
+											procNotif.done({message: mess});
+										} else {
+											procNotif.error({message: 'Ни один договор не был отправлен!'});
+										} 
+										
+										if (countSelected == 1 && itemsCount == 0) changeAttrData(6, '0');
+									} else {
+										//$.notify('Ошибка! Договор не был отправлен!', 'error');
+										procNotif.error({message: 'Ошибка! Договор не был отправлен!'});
+									}
+								});
+							}
+						};
+					}
+				},
+			},
 		];
 		
 	}

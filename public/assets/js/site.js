@@ -17598,7 +17598,8 @@ function contentSelection() {
       selectedColStart,
       selectedColEnd,
       isActiveSelecting = false,
-      cells = [];
+      cells = [],
+      otherItemsCount;
   $('#contractsTable').on('mousedown', function (e) {
     var _metaKeys = metaKeys(e),
         isShiftKey = _metaKeys.isShiftKey,
@@ -17616,23 +17617,24 @@ function contentSelection() {
 
     var cell = $(e.target).closest('[ddrtabletd]');
     var row = $(e.target).closest('[ddrtabletr]');
+    otherItemsCount = $(cell).siblings(':not([ddrtabletd])').length;
 
     if (isLeftClick) {
       if (isAltKey) {
         isActiveSelecting = true;
-        selectedColEnd = $(cell).index();
+        selectedColEnd = getColIndex(cell);
         selectedRowEnd = $(row).index();
 
         if (!selectedColStart || !selectedRowStart) {
-          selectedColStart = $(cell).index();
+          selectedColStart = getColIndex(cell);
           selectedRowStart = $(row).index();
           $(cell).find('[edittedplace]:not(.select-text)').addClass('select-text'); //selectionAction();
         } else {
           $(cell).find('[edittedplace].select-text').removeClass('select-text');
           removeSelection();
 
-          if ($(cell).index() !== -1 || $(row).index() !== -1) {
-            if (selectedColEnd !== $(cell).index()) selectedColEnd = $(cell).index();
+          if (getColIndex(cell) !== -1 || $(row).index() !== -1) {
+            if (selectedColEnd !== getColIndex(cell)) selectedColEnd = getColIndex(cell);
             if (selectedRowEnd !== $(row).index()) selectedRowEnd = $(row).index();
             selectionAction();
           }
@@ -17669,8 +17671,8 @@ function contentSelection() {
       var selectedCol = $(e.target).closest('[ddrtabletd]'),
           selectedRow = $(e.target).closest('[ddrtabletr]');
 
-      if (isAltKey && ($(selectedCol).index() !== -1 && selectedColEnd !== $(selectedCol).index() || $(selectedRow).index() !== -1 && selectedRowEnd !== $(selectedRow).index())) {
-        if (selectedColEnd !== $(selectedCol).index()) selectedColEnd = $(selectedCol).index();
+      if (isAltKey && (getColIndex(selectedCol) !== -1 && selectedColEnd !== getColIndex(selectedCol) || $(selectedRow).index() !== -1 && selectedRowEnd !== $(selectedRow).index())) {
+        if (selectedColEnd !== getColIndex(selectedCol)) selectedColEnd = getColIndex(selectedCol);
         if (selectedRowEnd !== $(selectedRow).index()) selectedRowEnd = $(selectedRow).index();
         selectionAction();
       }
@@ -17720,6 +17722,12 @@ function contentSelection() {
     }
 
     select(cells);
+  }
+
+  function getColIndex(selector) {
+    var i = $(selector).index();
+    if ([0, -1].indexOf(i) !== -1) return i;
+    return i - otherItemsCount > 0 ? i - otherItemsCount : 0;
   }
 
   function select(cells) {
@@ -19465,6 +19473,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
     }, {
       name: 'Экспорт в Excel',
       visible: countSelected && !selectedTextCell,
+      countLeft: countSelected > 1 ? countSelected : null,
       sort: 8,
       onClick: function onClick() {
         return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee13() {
@@ -19670,6 +19679,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
         if (countSelected == 1) return isPinned ? 'Открепить договор' : 'Закрепить договор';
         return [-1, 0].indexOf(allPinned) !== -1 ? 'Закрепить договоры' : 'Открепить договоры';
       },
+      countLeft: countSelected > 1 ? countSelected : null,
       //visible: countSelected,
       //hidden: countSelected > 1,
       sort: 3,
@@ -19684,14 +19694,13 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                   titlePin = isPinned ? 'Открепление' : 'Закрепление';
                   titlePinDone = isPinned ? 'открепления ' : 'закрепления ';
                   pinProcNotif = processNotify(buildTitle(countSelected, titlePin + ' # %...', ['договора', 'договоров', 'договоров']));
-                  console.log(pinnedInSelected, allPinned);
-                  _context15.next = 6;
+                  _context15.next = 5;
                   return axiosQuery('put', 'site/contracts/pin', {
                     contracts_ids: pinnedInSelected,
                     stat: allPinned
                   }, 'json');
 
-                case 6:
+                case 5:
                   _yield$axiosQuery13 = _context15.sent;
                   data = _yield$axiosQuery13.data;
                   error = _yield$axiosQuery13.error;
@@ -19725,13 +19734,76 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                     });
                   }
 
-                case 13:
+                case 12:
                 case "end":
                   return _context15.stop();
               }
             }
           }, _callee15);
         }))();
+      }
+    }, {
+      name: 'Выделить цветом',
+      countLeft: countSelected > 1 ? countSelected : null,
+      //visible: countSelected,
+      //hidden: countSelected > 1,
+      sort: 4,
+      load: {
+        url: 'site/contracts/departments',
+        params: {
+          contractId: selectedContracts.items.length == 1 ? selectedContracts.items[0] : null
+        },
+        method: 'get',
+        map: function map(item) {
+          return {
+            name: item.name,
+            //faIcon: 'fa-solid fa-angles-right',
+            visible: true,
+            onClick: function onClick(selector) {
+              var departmentName = selector.text(),
+                  itemsCount = selector.items().length;
+              var procNotif = processNotify('Отправка договора в другой отдел...');
+              axiosQuery('post', 'site/contracts/send', {
+                contractIds: selectedContracts.items,
+                departmentId: item.id
+              }, 'json').then(function (_ref24) {
+                var data = _ref24.data,
+                    error = _ref24.error,
+                    status = _ref24.status,
+                    headers = _ref24.headers;
+
+                if (data) {
+                  //$.notify('Договор успешно отправлен в '+departmentName+'!');
+                  if (selectionId || searched) {
+                    var params = {};
+                    getCounts(function () {//if (currentList > 0) removeContractsRows(target);
+                    });
+                  } else {//if (currentList > 0) removeContractsRows(target);
+                  }
+
+                  if (data.length) {
+                    var contractTitle = countSelected == 1 ? ' ' + objectNumber + ' ' + title : '';
+                    var mess = buildTitle(data.length, '# %' + contractTitle + ' успешно отправлен в ' + departmentName + '!', '# % успешно отправлены в ' + departmentName + '!', ['договор', 'договора', 'договоров']);
+                    procNotif.done({
+                      message: mess
+                    });
+                  } else {
+                    procNotif.error({
+                      message: 'Ни один договор не был отправлен!'
+                    });
+                  }
+
+                  if (countSelected == 1 && itemsCount == 0) changeAttrData(6, '0');
+                } else {
+                  //$.notify('Ошибка! Договор не был отправлен!', 'error');
+                  procNotif.error({
+                    message: 'Ошибка! Договор не был отправлен!'
+                  });
+                }
+              });
+            }
+          };
+        }
       }
     }];
   };

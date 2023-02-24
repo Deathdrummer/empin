@@ -1,6 +1,6 @@
 export function contentSelection() {
 	
-	let selectedRowStart, selectedRowEnd, selectedColStart, selectedColEnd, isActiveSelecting = false, cells = [];
+	let selectedRowStart, selectedRowEnd, selectedColStart, selectedColEnd, isActiveSelecting = false, cells = [], otherItemsCount;
 	
 	$('#contractsTable').on('mousedown', function(e) {
 		const {isShiftKey, isCtrlKey, isCommandKey, isAltKey, isOptionKey, noKeys, isActiveKey} = metaKeys(e);
@@ -8,15 +8,17 @@ export function contentSelection() {
 		const cell = $(e.target).closest('[ddrtabletd]');
 		const row = $(e.target).closest('[ddrtabletr]');
 		
+		otherItemsCount = $(cell).siblings(':not([ddrtabletd])').length;
+		
 		if (isLeftClick) {
 			if (isAltKey) {
 				isActiveSelecting = true;
 				
-				selectedColEnd = $(cell).index();
+				selectedColEnd = getColIndex(cell);
 				selectedRowEnd = $(row).index();
 				
 				if (!selectedColStart || !selectedRowStart) {
-					selectedColStart = $(cell).index();
+					selectedColStart = getColIndex(cell);
 					selectedRowStart = $(row).index();
 					
 					$(cell).find('[edittedplace]:not(.select-text)').addClass('select-text');
@@ -27,8 +29,8 @@ export function contentSelection() {
 					$(cell).find('[edittedplace].select-text').removeClass('select-text');
 					removeSelection();
 					
-					if ($(cell).index() !== -1 || $(row).index() !== -1) {
-						if (selectedColEnd !== $(cell).index()) selectedColEnd = $(cell).index();
+					if (getColIndex(cell) !== -1 || $(row).index() !== -1) {
+						if (selectedColEnd !== getColIndex(cell)) selectedColEnd = getColIndex(cell);
 						if (selectedRowEnd !== $(row).index()) selectedRowEnd = $(row).index();
 						selectionAction();
 					}
@@ -60,8 +62,8 @@ export function contentSelection() {
 			let selectedCol = $(e.target).closest('[ddrtabletd]'),
 				selectedRow = $(e.target).closest('[ddrtabletr]');
 			
-			if (isAltKey && (($(selectedCol).index() !== -1 && selectedColEnd !== $(selectedCol).index() ) || ($(selectedRow).index() !== -1 && selectedRowEnd !== $(selectedRow).index()))) {
-				if (selectedColEnd !== $(selectedCol).index()) selectedColEnd = $(selectedCol).index();
+			if (isAltKey && ((getColIndex(selectedCol) !== -1 && selectedColEnd !== getColIndex(selectedCol)) || ($(selectedRow).index() !== -1 && selectedRowEnd !== $(selectedRow).index()))) {
+				if (selectedColEnd !== getColIndex(selectedCol)) selectedColEnd = getColIndex(selectedCol);
 				if (selectedRowEnd !== $(selectedRow).index()) selectedRowEnd = $(selectedRow).index();
 				selectionAction();
 			}
@@ -118,6 +120,12 @@ export function contentSelection() {
 	}
 	
 	
+	
+	function getColIndex(selector) {
+		const i = $(selector).index() ;
+		if ([0, -1].indexOf(i) !== -1) return i;
+		return i - otherItemsCount > 0 ? i - otherItemsCount : 0;
+	}
 	
 	
 	

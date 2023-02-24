@@ -45,10 +45,6 @@
 						</div>
 					</div>
 					
-					
-					
-					
-					
 					<div class="form__item">
 						<label class="form__label color-dark">Название / заявитель</label>
 						<x-input name="title" value="{{$title ?? null}}" class="w100" uppercase />
@@ -112,7 +108,7 @@
 						<div class="row row-cols-3 g-10 align-items-end">
 							<div class="col-5">
 								<div genfields{{!isset($subcontracting) || !$subcontracting ? ' hidden' : ''}}>
-									<label class="form__label color-dark">Стоимость генподрядного{{$guard == 'admin' ? ' (не нашего)' : ''}} договора без НДС</label>
+									<label class="form__label color-dark">Стоимость генподрядного (не нашего) договора без НДС</label>
 									<x-input
 										name="price_gen"
 										value="{{$price_gen ?? 0}}"
@@ -125,7 +121,7 @@
 								</div>
 								
 								<div subfields{{!isset($gencontracting) || !$gencontracting ? ' hidden' : ''}}>
-									<label class="form__label color-dark">Стоимость субподрядного{{$guard == 'admin' ? ' (не нашего)' : ''}} договора без НДС</label>
+									<label class="form__label color-dark">Стоимость субподрядного (не нашего) договора без НДС</label>
 									<x-input
 										name="price_sub"
 										value="{{$price_sub ?? 0}}"
@@ -139,7 +135,7 @@
 							</div>
 							<div class="col-5">
 								<div genfields{{!isset($subcontracting) || !$subcontracting ? ' hidden' : ''}}>
-									<label class="form__label color-dark">Стоимость генподрядного{{$guard == 'admin' ? ' (не нашего)' : ''}} договора с НДС</label>
+									<label class="form__label color-dark">Стоимость генподрядного (не нашего) договора с НДС</label>
 									<x-input
 										name="price_gen_nds"
 										value="{{$price_gen_nds ?? 0}}"
@@ -152,7 +148,7 @@
 								</div>
 									
 								<div subfields{{!isset($gencontracting) || !$gencontracting ? ' hidden' : ''}}>
-									<label class="form__label color-dark">Стоимость субподрядного{{$guard == 'admin' ? ' (не нашего)' : ''}} договора с НДС</label>
+									<label class="form__label color-dark">Стоимость субподрядного (не нашего) договора с НДС</label>
 									<x-input
 										name="price_sub_nds"
 										value="{{$price_sub_nds ?? 0}}"
