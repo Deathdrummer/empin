@@ -425,7 +425,6 @@ class Contract {
 			}, function($query) use($sortField, $sortOrder) {
 				
 				// что тут происходит: производится сортировка по подставным данным. Перечисляются ID сортируемого поля в том порядке, в котором нужно нам.
-				
 				$settingData = match ($sortField) {
 					'type' 			=> array_column($this->getSettings('contract-types'), 'id', 'title'),
 					'contractor' 	=> array_column($this->getSettings('contract-contractors'), 'id', 'name'),
