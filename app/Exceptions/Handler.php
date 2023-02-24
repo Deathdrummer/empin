@@ -13,7 +13,7 @@ class Handler extends ExceptionHandler {
      * @var array
      */
 	protected $dontReport = [
-		TokenMismatchException::class,
+		//TokenMismatchException::class,
 	];
 
     /**
@@ -32,8 +32,7 @@ class Handler extends ExceptionHandler {
      *
      * @return void
      */
-    public function register()
-    {
+    public function register() {
         /* $this->reportable(function (Throwable $e) {
             Log::error('['.$e->getCode().'] "'.$e->getMessage().'" on line '.$e->getLine().' of file '.$e->getFile());
         });*/
