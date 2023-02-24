@@ -270,7 +270,9 @@ class Contract {
 		
 		if ($offset == 0) {
 			$pinnedContracts = $this->_getPinned($pinned, $sortStep, $sortField, $sortOrder, $userContractsSettings, $filter, $userId);
-			$data = $pinnedContracts->union($data);
+			if ($pinnedContracts->count()) {
+				$data = $pinnedContracts->union($data);
+			}
 		}
 		
 		return $data->mapWithKeysMany(function($item) use($deadlinesContracts, $deadlinesSteps, $viewed, $pinned, $selectedContracts, $userCellComments) {
