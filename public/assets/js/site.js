@@ -17617,7 +17617,7 @@ function contentSelection() {
 
     var cell = $(e.target).closest('[ddrtabletd]');
     var row = $(e.target).closest('[ddrtabletr]');
-    otherItemsCount = $(cell).siblings(':not([ddrtabletd])').length;
+    otherItemsCount = $(cell).prevAll(':not([ddrtabletd])').length;
 
     if (isLeftClick) {
       if (isAltKey) {

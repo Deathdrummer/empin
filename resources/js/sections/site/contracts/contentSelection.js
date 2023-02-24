@@ -8,7 +8,7 @@ export function contentSelection() {
 		const cell = $(e.target).closest('[ddrtabletd]');
 		const row = $(e.target).closest('[ddrtabletr]');
 		
-		otherItemsCount = $(cell).siblings(':not([ddrtabletd])').length;
+		otherItemsCount = $(cell).prevAll(':not([ddrtabletd])').length;
 		
 		if (isLeftClick) {
 			if (isAltKey) {
