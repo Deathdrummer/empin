@@ -14709,7 +14709,7 @@ function contentSelection() {
       var selectedCol = $(e.target).closest('[ddrtabletd]'),
           selectedRow = $(e.target).closest('[ddrtabletr]');
 
-      if (isAltKey && (getColIndex(selectedCol) !== -1 && selectedColEnd !== getColIndex(selectedCol) || $(selectedRow).index() !== -1 && selectedRowEnd !== $(selectedRow).index())) {
+      if (isAltKey && getColIndex(selectedCol) !== -1 && $(selectedRow).index() !== -1 && (getColIndex(selectedCol) !== -1 && selectedColEnd !== getColIndex(selectedCol) || $(selectedRow).index() !== -1 && selectedRowEnd !== $(selectedRow).index())) {
         if (selectedColEnd !== getColIndex(selectedCol)) selectedColEnd = getColIndex(selectedCol);
         if (selectedRowEnd !== $(selectedRow).index()) selectedRowEnd = $(selectedRow).index();
         selectionAction();
