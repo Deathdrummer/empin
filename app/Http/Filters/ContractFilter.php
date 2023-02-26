@@ -78,31 +78,37 @@ class ContractFilter extends AbstractFilter {
 			]
 		]);
 		
-		$customersMatch = $this->_subSearch($settings['customers'], $value);
-		$typesMatch = $this->_subSearch($settings['types'], $value);
-		$contractorsMatch = $this->_subSearch($settings['contractors'], $value);
+		$searchItems = array_filter(preg_split("/\s*\+\s*/", $value));
 		
-		$builder->where(function (Builder $query) use($value, $customersMatch, $typesMatch, $contractorsMatch) {
-			$query->orWhere('object_number', 'like', '%'.$value.'%');
-			$query->orWhere('title', 'like', '%'.$value.'%');
-			$query->orWhere('applicant', 'like', '%'.$value.'%');
-			$query->orWhere('titul', 'like', '%'.$value.'%');
-			$query->orWhere('contract', 'like', '%'.$value.'%');
-			$query->orWhere('locality', 'like', '%'.$value.'%');
-			$query->orWhere('buy_number', 'like', '%'.$value.'%');
-			$query->orWhere('archive_dir', 'like', '%'.$value.'%');
+		if ($searchItems) {
+			foreach ($searchItems as $search) {
+				$customersMatch = $this->_subSearch($settings['customers'], $search);
+				$typesMatch = $this->_subSearch($settings['types'], $search);
+				$contractorsMatch = $this->_subSearch($settings['contractors'], $search);
+			}
 			
-			// Поиск по JSON полю из relation таблицы
-			$query->orWhereHas('info', function ($query) use ($value) {
-				$query->where('data', 'like', '%'.$value.'%');
+			$builder->where(function (Builder $query) use($searchItems, $customersMatch, $typesMatch, $contractorsMatch) {
+				foreach ($searchItems as $search) {
+					$query->orWhere('object_number', 'like', '%'.$search.'%');
+					$query->orWhere('title', 'like', '%'.$search.'%');
+					$query->orWhere('applicant', 'like', '%'.$search.'%');
+					$query->orWhere('titul', 'like', '%'.$search.'%');
+					$query->orWhere('contract', 'like', '%'.$search.'%');
+					$query->orWhere('locality', 'like', '%'.$search.'%');
+					$query->orWhere('buy_number', 'like', '%'.$search.'%');
+					$query->orWhere('archive_dir', 'like', '%'.$search.'%');
+					
+					// Поиск по JSON полю из relation таблицы
+					$query->orWhereHas('info', function ($query) use ($search) {
+						$query->where('data', 'like', '%'.$search.'%');
+					});
+					
+					if ($customersMatch) $query->orWhereIn('customer', $customersMatch);
+					if ($typesMatch) $query->orWhereIn('type', $typesMatch);
+					if ($contractorsMatch) $query->orWhereIn('contractor', $contractorsMatch);
+				}
 			});
-			
-			
-			
-			if ($customersMatch) $query->orWhereIn('customer', $customersMatch);
-			if ($typesMatch) $query->orWhereIn('type', $typesMatch);
-			if ($contractorsMatch) $query->orWhereIn('contractor', $contractorsMatch);
-		});
+		}
     }
 	
 	

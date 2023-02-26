@@ -2086,12 +2086,19 @@
 			if (abort && listWait) listWait.destroy();
 			
 			if (search && currentCount) {
-				let findSubStr = $('#contractsTable').find('p:icontains("'+search+'")');
-				if (findSubStr) {
-					$.each(findSubStr, function(k, item) {
-						$(item).html($(item).text().replace(new RegExp("(" + preg_quote(search) + ")", 'gi'), '<span class="highlight">$1</span>'));
+				let s = ddrSplit(search, '+');
+				if (s) {
+					if (!_.isArray(s)) s = [s];
+					$.each(s, function(k, searchItem) {
+						if (searchItem === '' || searchItem === null) return true;
+						let findSubStr = $('#contractsTable').find('p:icontains("'+searchItem+'"), strong:icontains("'+searchItem+'")');
+						if (findSubStr) {
+							$.each(findSubStr, function(k, item) {
+								$(item).html($(item).text().replace(new RegExp("(" + preg_quote(searchItem) + ")", 'gi'), '<span class="highlight">$1</span>'));
+							});
+						}
 					});
-				}
+				}	
 			}	
 			
 			if (currentCount) $('[stepprice]').number(true, 2, '.', ' ');
