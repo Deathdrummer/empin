@@ -555,6 +555,11 @@ class Contracts extends Controller {
 	 */
 	public function colorselections() {
 		$colorsList = $this->getSettings('contract-selection-colors');
+		
+		usort($colorsList, function($a, $b) {
+			return $a['sort'] <=> $b['sort'];
+		});
+		
 		array_push($colorsList, [
 			'id' 	=> null,
 			'name' 	=> 'Нет цвета',
