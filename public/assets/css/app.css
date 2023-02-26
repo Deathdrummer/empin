@@ -143548,7 +143548,7 @@ template {
   background-color: #fdfdfd;
 }
 .ddrtable__body .ddrtable__tr-selected {
-  background-color: #e5ddf3;
+  background-color: #e5ddf3 !important;
 }
 .ddrtable__body:empty {
   height: 60px;
@@ -143705,7 +143705,7 @@ template {
   align-items: end;
 }
 .ddrtable__td.selected {
-  background-color: #e5ddf3;
+  background-color: #e5ddf3 !important;
 }
 .ddrtable__td.sort, .ddrtable__td [ddrtabletdmain].sort {
   position: relative;

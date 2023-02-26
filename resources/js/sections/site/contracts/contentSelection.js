@@ -43,7 +43,6 @@ export function contentSelection() {
 			}
 		} 
 		
-		
 		$(this).one('mouseup', function() {
 			isActiveSelecting = false;
 		});
@@ -62,7 +61,6 @@ export function contentSelection() {
 			let selectedCol = $(e.target).closest('[ddrtabletd]'),
 				selectedRow = $(e.target).closest('[ddrtabletr]');
 			
-
 			if (isAltKey
 				&& getColIndex(selectedCol) !== -1
 				&& $(selectedRow).index() !== -1
@@ -104,6 +102,18 @@ export function contentSelection() {
 	
 	
 	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	//-----------------------------------------------------------------------------------
+	
 	function selectionAction() {
 		unSelect($('#contractsTable').find('[ddrtabletd][commonlist]'));
 		
@@ -125,13 +135,11 @@ export function contentSelection() {
 	}
 	
 	
-	
 	function getColIndex(selector) {
 		const i = $(selector).index() ;
 		if ([0, -1].indexOf(i) !== -1) return i;
 		return i - otherItemsCount > 0 ? i - otherItemsCount : 0;
 	}
-	
 	
 	
 	function select(cells) {
@@ -149,113 +157,4 @@ export function contentSelection() {
 		$(selector).removeAttrib('copied');
 		$(selector).removeClass('selected');
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	/*$('#contractsTable').on('mousemove', '[ddrtabletd]', function(e) {
-		console.log('mousemove');
-		mouseMoveEvent = e;
-		const {isLeftClick, isRightClick, isCenterClick} = mouseClick(e);
-		
-		if (isLeftClick) {
-			let movedCell = $(e.target).closest('[ddrtabletd]')[0];
-			
-			//removeSelection();
-			$('#contractsTable').find('[edittedplace].select-text').removeClass('select-text');	
-			if (isAltKey && initialCell === movedCell) {
-				$(e.target).addClass('select-text');
-			}
-			
-			
-			if (initialCell !== movedCell) {
-				console.log('cross');
-				initialCell = movedCell;
-			}
-		}
-	});*/
-		
-		
-		
-	
-	
-	
-	// Выделение текста в ячейках
-	/*$('#contractsTable').on('mousedown', '[edittedplace]', function(e) {
-		const block = this;
-		const {isLeftClick, isRightClick, isCenterClick} = mouseClick(e);
-		const {isShiftKey, isCtrlKey, isCommandKey, isAltKey, isOptionKey, noKeys, isActiveKey} = metaKeys(e);
-		
-		if (isLeftClick) {
-			removeSelection();
-			$('#contractsTable').find('[edittedplace].select-text').removeClass('select-text');	
-			if (isAltKey) {
-				$(block).addClass('select-text');
-			}
-		}
-	});*/
-	
-	
-	
-	/*$('#contractsTable').on('mousemove', '[ddrtabletr]', function(e) {
-		const {isLeftClick, isRightClick, isCenterClick} = mouseClick(e);
-		const {isShiftKey, isCtrlKey, isCommandKey, isAltKey, isOptionKey, noKeys, isActiveKey} = metaKeys(e);
-		
-		if (isAltKey && isShiftKey && isLeftClick) {
-			let edittedText = $(e.currentTarget).find('[edittedplace]');
-			$(edittedText).not('.select-text').addClass('select-text');
-		}
-	});
-	
-	
-	
-	$('#contractsTable').on('mousemove', '[ddrtabletd]', function(e) {
-		const {isLeftClick, isRightClick, isCenterClick} = mouseClick(e);
-		const {isShiftKey, isCtrlKey, isCommandKey, isAltKey, isOptionKey, noKeys, isActiveKey} = metaKeys(e);
-		
-		if (isAltKey && isLeftClick) {
-			let edittedText = $(e.target).find('[edittedplace]');
-			$(edittedText).not('.select-text').addClass('select-text');
-		}
-	});*/
-	
-	
-	
-	
-	
-	
-	// Снятие выделения
-	/*$('#contractsTable').on(tapEvent, function(e) {
-		const {isLeftClick, isRightClick, isCenterClick} = mouseClick(e);
-		const {isShiftKey, isCtrlKey, isCommandKey, isAltKey, isOptionKey, noKeys, isActiveKey} = metaKeys(e);
-		
-		let isEdittedBlock = !!$(e.target).closest('[ddrtabletd]').find('[edittedblock]').length;
-		
-		if (isLeftClick && noKeys && !isEdittedBlock) {
-			removeSelection();
-			$('#contractsTable').find('[edittedplace].select-text').removeClass('select-text');
-		} 
-	});*/
 }

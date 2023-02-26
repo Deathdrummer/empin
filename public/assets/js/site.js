@@ -9122,6 +9122,9 @@ $(document).on('mouseleave', '.ddrcontextmenu_sub', function () {
 $(document).on('mouseenter touchstart', '.ddrcontextmenu [ddrcontextmenuitemload]:not([ddrcmloaded])', function (e) {
   _loadSubmenu(this);
 
+  $(this).closest('.ddrcontextmenu.ddrcontextmenu_main').find('[ddrcmloaded]').each(function () {
+    $(this).removeAttrib('ddrcmloaded');
+  });
   $(this).setAttrib('ddrcmloaded');
 }); //--------------------------------------------------------------------------------------------------------------------------
 // Спарсить данные, переданные через атрибут contextmenu в теге.
@@ -17703,7 +17706,7 @@ function contentSelection() {
     }
   }, function () {
     return !!$('#contractsTable').find('[ddrtabletd].selected').length;
-  });
+  }); //-----------------------------------------------------------------------------------
 
   function selectionAction() {
     unSelect($('#contractsTable').find('[ddrtabletd][commonlist]'));
@@ -17744,78 +17747,6 @@ function contentSelection() {
     $(selector).removeAttrib('copied');
     $(selector).removeClass('selected');
   }
-  /*$('#contractsTable').on('mousemove', '[ddrtabletd]', function(e) {
-  	console.log('mousemove');
-  	mouseMoveEvent = e;
-  	const {isLeftClick, isRightClick, isCenterClick} = mouseClick(e);
-  	
-  	if (isLeftClick) {
-  		let movedCell = $(e.target).closest('[ddrtabletd]')[0];
-  		
-  		//removeSelection();
-  		$('#contractsTable').find('[edittedplace].select-text').removeClass('select-text');	
-  		if (isAltKey && initialCell === movedCell) {
-  			$(e.target).addClass('select-text');
-  		}
-  		
-  		
-  		if (initialCell !== movedCell) {
-  			console.log('cross');
-  			initialCell = movedCell;
-  		}
-  	}
-  });*/
-  // Выделение текста в ячейках
-
-  /*$('#contractsTable').on('mousedown', '[edittedplace]', function(e) {
-  	const block = this;
-  	const {isLeftClick, isRightClick, isCenterClick} = mouseClick(e);
-  	const {isShiftKey, isCtrlKey, isCommandKey, isAltKey, isOptionKey, noKeys, isActiveKey} = metaKeys(e);
-  	
-  	if (isLeftClick) {
-  		removeSelection();
-  		$('#contractsTable').find('[edittedplace].select-text').removeClass('select-text');	
-  		if (isAltKey) {
-  			$(block).addClass('select-text');
-  		}
-  	}
-  });*/
-
-  /*$('#contractsTable').on('mousemove', '[ddrtabletr]', function(e) {
-  	const {isLeftClick, isRightClick, isCenterClick} = mouseClick(e);
-  	const {isShiftKey, isCtrlKey, isCommandKey, isAltKey, isOptionKey, noKeys, isActiveKey} = metaKeys(e);
-  	
-  	if (isAltKey && isShiftKey && isLeftClick) {
-  		let edittedText = $(e.currentTarget).find('[edittedplace]');
-  		$(edittedText).not('.select-text').addClass('select-text');
-  	}
-  });
-  
-  
-  
-  $('#contractsTable').on('mousemove', '[ddrtabletd]', function(e) {
-  	const {isLeftClick, isRightClick, isCenterClick} = mouseClick(e);
-  	const {isShiftKey, isCtrlKey, isCommandKey, isAltKey, isOptionKey, noKeys, isActiveKey} = metaKeys(e);
-  	
-  	if (isAltKey && isLeftClick) {
-  		let edittedText = $(e.target).find('[edittedplace]');
-  		$(edittedText).not('.select-text').addClass('select-text');
-  	}
-  });*/
-  // Снятие выделения
-
-  /*$('#contractsTable').on(tapEvent, function(e) {
-  	const {isLeftClick, isRightClick, isCenterClick} = mouseClick(e);
-  	const {isShiftKey, isCtrlKey, isCommandKey, isAltKey, isOptionKey, noKeys, isActiveKey} = metaKeys(e);
-  	
-  	let isEdittedBlock = !!$(e.target).closest('[ddrtabletd]').find('[edittedblock]').length;
-  	
-  	if (isLeftClick && noKeys && !isEdittedBlock) {
-  		removeSelection();
-  		$('#contractsTable').find('[edittedplace].select-text').removeClass('select-text');
-  	} 
-  });*/
-
 }
 
 /***/ }),
@@ -19745,14 +19676,9 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
     }, {
       name: 'Выделить цветом',
       countLeft: countSelected > 1 ? countSelected : null,
-      //visible: countSelected,
-      //hidden: countSelected > 1,
       sort: 4,
       load: {
-        url: 'site/contracts/departments',
-        params: {
-          contractId: selectedContracts.items.length == 1 ? selectedContracts.items[0] : null
-        },
+        url: 'site/contracts/colorselections',
         method: 'get',
         map: function map(item) {
           return {
@@ -19760,47 +19686,51 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
             //faIcon: 'fa-solid fa-angles-right',
             visible: true,
             onClick: function onClick(selector) {
-              var departmentName = selector.text(),
-                  itemsCount = selector.items().length;
-              var procNotif = processNotify('Отправка договора в другой отдел...');
-              axiosQuery('post', 'site/contracts/send', {
-                contractIds: selectedContracts.items,
-                departmentId: item.id
-              }, 'json').then(function (_ref24) {
-                var data = _ref24.data,
-                    error = _ref24.error,
-                    status = _ref24.status,
-                    headers = _ref24.headers;
+              return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee16() {
+                var _yield$axiosQuery14, data, error, status, headers;
 
-                if (data) {
-                  //$.notify('Договор успешно отправлен в '+departmentName+'!');
-                  if (selectionId || searched) {
-                    var params = {};
-                    getCounts(function () {//if (currentList > 0) removeContractsRows(target);
-                    });
-                  } else {//if (currentList > 0) removeContractsRows(target);
+                return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee16$(_context16) {
+                  while (1) {
+                    switch (_context16.prev = _context16.next) {
+                      case 0:
+                        _context16.next = 2;
+                        return axiosQuery('post', 'site/contracts/colorselections', {
+                          contractIds: selectedContracts.items,
+                          colorId: item.id
+                        }, 'json');
+
+                      case 2:
+                        _yield$axiosQuery14 = _context16.sent;
+                        data = _yield$axiosQuery14.data;
+                        error = _yield$axiosQuery14.error;
+                        status = _yield$axiosQuery14.status;
+                        headers = _yield$axiosQuery14.headers;
+
+                        if (error) {
+                          $.notify('Ошибка применеия цвета!', 'error');
+                          console.log(error === null || error === void 0 ? void 0 : error.message, error.errors);
+                        }
+
+                        if (data) {
+                          if (countSelected > 1) {
+                            $.each(selectedContracts.items, function (k, item) {
+                              $('#contractsTable').find('[contractid="' + item + '"]').find('[ddrtabletd][commonlist]').css('background-color', data.color || '');
+                              ;
+                            });
+                            $.notify('Цвет выделенных договоров успешно применен!');
+                          } else {
+                            $(target.selector).find('[ddrtabletd][commonlist]').css('background-color', data.color || '');
+                            $.notify('Цвет договора успешно применен!');
+                          }
+                        }
+
+                      case 9:
+                      case "end":
+                        return _context16.stop();
+                    }
                   }
-
-                  if (data.length) {
-                    var contractTitle = countSelected == 1 ? ' ' + objectNumber + ' ' + title : '';
-                    var mess = buildTitle(data.length, '# %' + contractTitle + ' успешно отправлен в ' + departmentName + '!', '# % успешно отправлены в ' + departmentName + '!', ['договор', 'договора', 'договоров']);
-                    procNotif.done({
-                      message: mess
-                    });
-                  } else {
-                    procNotif.error({
-                      message: 'Ни один договор не был отправлен!'
-                    });
-                  }
-
-                  if (countSelected == 1 && itemsCount == 0) changeAttrData(6, '0');
-                } else {
-                  //$.notify('Ошибка! Договор не был отправлен!', 'error');
-                  procNotif.error({
-                    message: 'Ошибка! Договор не был отправлен!'
-                  });
-                }
-              });
+                }, _callee16);
+              }))();
             }
           };
         }

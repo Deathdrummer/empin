@@ -13,7 +13,7 @@ class Settings {
 	 * @param string  $key
 	 * @return Collection|string|bool
 	 */
-	public function get(?string $key = null, ?string $default = null): Collection|string|bool {
+	public function get(?string $key = null, $default = null): Collection|string|bool {
 		if (!$key) return false;
 		['key' => $keyToFind, 'path' => $path] = $this->parseKey($key);
 		

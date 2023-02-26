@@ -261,9 +261,11 @@ class Contract {
 		
 		
 		$userCellComments = $this->user->getCellComments([
-			'contract_id' 	=> $data->pluck('id')->toArray(),
+			'contract_id' 	=> $data?->pluck('id')->toArray(),
 			'department_id' => $request->get('department_id', null)
 		]);
+		
+		$userContractsColors = $this->user->getContractsColors($data?->pluck('id')->toArray());
 		
 		$deadlinesContracts = $this->getSettings('contracts-deadlines');
 		$deadlinesSteps = $this->getSettings('steps-deadlines');
@@ -274,7 +276,7 @@ class Contract {
 			}
 		}
 		
-		return $data->mapWithKeysMany(function($item) use($deadlinesContracts, $deadlinesSteps, $viewed, $pinned, $selectedContracts, $userCellComments) {
+		return $data->mapWithKeysMany(function($item) use($deadlinesContracts, $deadlinesSteps, $viewed, $pinned, $selectedContracts, $userCellComments, $userContractsColors) {
 			if (!is_null($item['deadline_color_key'] )) {
 				$forcedColor = $deadlinesContracts[$item['deadline_color_key']]['color']?? null;
 				$forcedName = $deadlinesContracts[$item['deadline_color_key']]['name'] ?? '';
@@ -374,7 +376,8 @@ class Contract {
 				'messages_count'	=> $item['messages_count'] ?? 0,
 				'selected'			=> in_array($item['id'], $selectedContracts),
 				'selections'		=> $item->selections->pluck('id')->toArray() ?? [],
-				'departments' 		=> $departments
+				'departments' 		=> $departments,
+				'selected_color'	=> $userContractsColors[$item['id'] ?? null] ?? null,
 			]];
 		});
 	}

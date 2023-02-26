@@ -122,6 +122,7 @@ class User extends Authenticatable implements MustVerifyEmail {
 	
 	
 	
+	
 	/**
 	 * @param 
 	 * @return 

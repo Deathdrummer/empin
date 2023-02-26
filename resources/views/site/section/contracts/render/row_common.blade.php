@@ -1,6 +1,6 @@
 @forelse($userColums as $column)
 	@if($column == 'period' && !$isArchive && auth('site')->user()->can('contract-col-period:site'))
-		<x-table.td class="h-center" commonlist>
+		<x-table.td class="h-center" commonlist style="background-color: {{$selected_color.'75' ?? ''}};">
 				{{-- <i
 					onclick="$.pinContract(this, {{$id}});"
 					pinned="{{$pinned ? 0 : 1}}"
@@ -49,13 +49,13 @@
 	@endif
 
 	@if($column == 'object_number' && auth('site')->user()->can('contract-col-object_number:site'))
-		<x-table.td class="h-center" commonlist onmouseenter="$.showselections('{{$id}}');">
+		<x-table.td class="h-center" commonlist onmouseenter="$.showselections('{{$id}}');" style="background-color: {{$selected_color.'75' ?? ''}};">
 			<strong class="fz16px">{{$object_number ?? '-'}}</strong>
 		</x-table.td>
 	@endif
 
 	@if($column == 'title' && auth('site')->user()->can('contract-col-title:site'))
-		<x-table.td class="breakword h-start" commonlist contextedit="{{$id}},{{$column}},1">
+		<x-table.td class="breakword h-start" commonlist contextedit="{{$id}},{{$column}},1" style="background-color: {{$selected_color.'75' ?? ''}};">
 			<div class="scrollblock-hidden maxh4rem-6px pr3px">
 				<p class="fz12px lh100 mt2px mb2px" edittedplace="-">{{Str::of($title ?? '-')->limit(60, '...')}}</p>
 			</div>
@@ -63,7 +63,7 @@
 	@endif
 
 	@if($column == 'applicant' && auth('site')->user()->can('contract-col-applicant:site'))
-		<x-table.td class="breakword h-start" commonlist contextedit="{{$id}},{{$column}},1">
+		<x-table.td class="breakword h-start" commonlist contextedit="{{$id}},{{$column}},1" style="background-color: {{$selected_color.'75' ?? ''}};">
 			<div class="scrollblock-hidden maxh4rem-6px pr3px">
 				<p class="fz12px lh100 mt2px mb2px" edittedplace="-">{{$applicant ?? '-'}}</p>
 			</div>
@@ -71,7 +71,7 @@
 	@endif
 
 	@if($column == 'titul' && auth('site')->user()->can('contract-col-titul:site'))
-		<x-table.td class="pr2px breakword" commonlist contextedit="{{$id}},{{$column}},1">
+		<x-table.td class="pr2px breakword" commonlist contextedit="{{$id}},{{$column}},1" style="background-color: {{$selected_color.'75' ?? ''}};">
 			<div class="scrollblock-hidden maxh4rem-6px pr3px">
 				<p class="format fz12px lh100 mt2px mb2px text-justify" edittedplace="-">{{$titul ?? '-'}}</p>
 			</div>
@@ -79,13 +79,13 @@
 	@endif
 
 	@if($column == 'contract' && auth('site')->user()->can('contract-col-contract:site'))
-		<x-table.td class="breakword" commonlist contextedit="{{$id}},{{$column}},1">
+		<x-table.td class="breakword" commonlist contextedit="{{$id}},{{$column}},1" style="background-color: {{$selected_color.'75' ?? ''}};">
 			<p class="fz12px lh110" edittedplace="-">{{$contract ?? '-'}}</p>
 		</x-table.td>
 	@endif
 
 	@if($column == 'customer' && auth('site')->user()->can('contract-col-customer:site'))
-		<x-table.td class="breakword" commonlist contextedit="{{$id}},{{$column}},4">
+		<x-table.td class="breakword" commonlist contextedit="{{$id}},{{$column}},4" style="background-color: {{$selected_color.'75' ?? ''}};">
 			@if(isset($customer) && isset($customers[$customer]))
 				<p class="fz12px lh90" edittedplace>{{Str::of($customers[$customer])->limit(60, '...')}}</p>
 			@else
@@ -95,7 +95,7 @@
 	@endif
 
 	@if($column == 'locality' && auth('site')->user()->can('contract-col-locality:site'))
-		<x-table.td class="breakword h-center" commonlist contextedit="{{$id}},{{$column}},1">
+		<x-table.td class="breakword h-center" commonlist contextedit="{{$id}},{{$column}},1" style="background-color: {{$selected_color.'75' ?? ''}};">
 			<div class="scrollblock-hidden maxh4rem-6px pr3px">
 				<p class="fz12px lh100 mt2px mb2px" edittedplace="-">{{$locality ?? '-'}}</p>
 			</div>
@@ -103,7 +103,7 @@
 	@endif
 	
 	@if($column == 'price' && auth('site')->user()->can('contract-col-price:site'))
-		<x-table.td class="text-end" commonlist contextedit="{{$id}},{{$column}},2">
+		<x-table.td class="text-end" commonlist contextedit="{{$id}},{{$column}},2" style="background-color: {{$selected_color.'75' ?? ''}};">
 			@isset($price)
 				<p class="fz12px lh90 nobreak"><span class="fz12px" edittedplace="0.00" replacer r-right calcprice="price|{{$gen_percent ?? 0}}|{{$subcontracting ?? 0}}|{{$gencontracting ?? 0}}">@number($price, 2)</span> <strong>@symbal(money)</strong></p>
 			@else
@@ -113,7 +113,7 @@
 	@endif
 	
 	@if($column == 'price_nds' && auth('site')->user()->can('contract-col-price_nds:site'))
-		<x-table.td class="text-end" commonlist contextedit="{{$id}},{{$column}},2">
+		<x-table.td class="text-end" commonlist contextedit="{{$id}},{{$column}},2" style="background-color: {{$selected_color.'75' ?? ''}};">
 			@isset($price_nds)
 				<p class="fz12px lh90 nobreak"><span class="fz12px" edittedplace="0.00" replacer r-right calcprice="price_nds|{{$gen_percent ?? 0}}|{{$subcontracting ?? 0}}|{{$gencontracting ?? 0}}">@number($price_nds, 2)</span> <strong>@symbal(money)</strong></p>
 			@else
@@ -123,7 +123,7 @@
 	@endif
 
 	@if($column == 'price_gen' && auth('site')->user()->can('contract-col-price_gen:site'))
-		<x-table.td class="text-end" commonlist contextedit="{{$id}},{{$column}},2">
+		<x-table.td class="text-end" commonlist contextedit="{{$id}},{{$column}},2" style="background-color: {{$selected_color.'75' ?? ''}};">
 			@isset($price_gen)
 				<p class="fz12px lh90 nobreak"><span class="fz12px" edittedplace="0.00" replacer r-right calcprice="price_gen|{{$gen_percent ?? 0}}|{{$subcontracting ?? 0}}|{{$gencontracting ?? 0}}">@number($price_gen, 2)</span> <strong>@symbal(money)</strong></p>
 			@else
@@ -133,7 +133,7 @@
 	@endif
 	
 	@if($column == 'price_gen_nds' && auth('site')->user()->can('contract-col-price_gen_nds:site'))
-		<x-table.td class="text-end" commonlist contextedit="{{$id}},{{$column}},2">
+		<x-table.td class="text-end" commonlist contextedit="{{$id}},{{$column}},2" style="background-color: {{$selected_color.'75' ?? ''}};">
 			@isset($price_gen_nds)
 				<p class="fz12px lh90 nobreak"><span class="fz12px" edittedplace="0.00" replacer r-right calcprice="price_gen_nds|{{$gen_percent ?? 0}}|{{$subcontracting ?? 0}}|{{$gencontracting ?? 0}}">@number($price_gen_nds, 2)</span> <strong>@symbal(money)</strong></p>
 			@else
@@ -143,7 +143,7 @@
 	@endif
 	
 	@if($column == 'price_sub' && auth('site')->user()->can('contract-col-price_sub:site'))
-		<x-table.td class="text-end" commonlist contextedit="{{$id}},{{$column}},2">
+		<x-table.td class="text-end" commonlist contextedit="{{$id}},{{$column}},2" style="background-color: {{$selected_color.'75' ?? ''}};">
 			@isset($price_sub)
 				<p class="fz12px lh90 nobreak"><span class="fz12px" edittedplace="0.00" replacer r-right calcprice="price_sub|{{$gen_percent ?? 0}}|{{$subcontracting ?? 0}}|{{$gencontracting ?? 0}}">@number($price_sub, 2)</span> <strong>@symbal(money)</strong></p>
 			@else
@@ -153,7 +153,7 @@
 	@endif
 	
 	@if($column == 'price_sub_nds' && auth('site')->user()->can('contract-col-price_sub_nds:site'))
-		<x-table.td class="text-end" commonlist contextedit="{{$id}},{{$column}},2">
+		<x-table.td class="text-end" commonlist contextedit="{{$id}},{{$column}},2" style="background-color: {{$selected_color.'75' ?? ''}};">
 			@isset($price_sub_nds)
 				<p class="fz12px lh90 nobreak"><span class="fz12px" edittedplace="0.00" replacer r-right calcprice="price_sub_nds|{{$gen_percent ?? 0}}|{{$subcontracting ?? 0}}|{{$gencontracting ?? 0}}">@number($price_sub_nds, 2)</span> <strong>@symbal(money)</strong></p>
 			@else
@@ -163,7 +163,7 @@
 	@endif
 
 	@if($column == 'date_start' && auth('site')->user()->can('contract-col-date_start:site'))
-		<x-table.td commonlist contextedit="{{$id}},{{$column}},3">
+		<x-table.td commonlist contextedit="{{$id}},{{$column}},3" style="background-color: {{$selected_color.'75' ?? ''}};">
 			@if(isset($date_start) && $date_start)
 				<p class="fz12px lh90" edittedplace="-" date="{{$date_start}}">{{dateFormatter($date_start, 'd.m.y')}}</p>
 			@else
@@ -173,7 +173,7 @@
 	@endif
 
 	@if($column == 'date_end' && auth('site')->user()->can('contract-col-date_end:site'))
-		<x-table.td commonlist contextedit="{{$id}},{{$column}},3">
+		<x-table.td commonlist contextedit="{{$id}},{{$column}},3" style="background-color: {{$selected_color.'75' ?? ''}};">
 			@if(isset($date_end) && $date_end)
 				<p class="fz12px lh90" edittedplace="-" date="{{$date_end}}">{{dateFormatter($date_end, 'd.m.y')}}</p>
 			@else
@@ -183,7 +183,7 @@
 	@endif
 	
 	@if($column == 'date_gen_start' && auth('site')->user()->can('contract-col-date_gen_start:site'))
-		<x-table.td commonlist contextedit="{{!isset($date_gen_start) && !$subcontracting ? '' : $id.','.$column.','.'3'}}">
+		<x-table.td commonlist contextedit="{{!isset($date_gen_start) && !$subcontracting ? '' : $id.','.$column.','.'3'}}" style="background-color: {{$selected_color.'75' ?? ''}};">
 			@if(isset($date_gen_start) && $date_gen_start)
 				<p class="fz12px lh90" edittedplace="-" date="{{$date_gen_start}}">{{dateFormatter($date_gen_start, 'd.m.y')}}</p>
 			@else
@@ -197,7 +197,7 @@
 	@endif
 
 	@if($column == 'date_gen_end' && auth('site')->user()->can('contract-col-date_gen_end:site'))
-		<x-table.td commonlist contextedit="{{!isset($date_gen_end) && !$subcontracting ? '' : $id.','.$column.','.'3'}}">
+		<x-table.td commonlist contextedit="{{!isset($date_gen_end) && !$subcontracting ? '' : $id.','.$column.','.'3'}}" style="background-color: {{$selected_color.'75' ?? ''}};">
 			@if(isset($date_gen_end) && $date_gen_end)
 				<p class="fz12px lh90" edittedplace="-" date="{{$date_gen_end}}">{{dateFormatter($date_gen_end, 'd.m.y')}}</p>
 			@else
@@ -211,7 +211,7 @@
 	@endif
 	
 	@if($column == 'date_sub_start' && auth('site')->user()->can('contract-col-date_sub_start:site'))
-		<x-table.td commonlist contextedit="{{!isset($date_sub_start) && !$gencontracting ? '' : $id.','.$column.','.'3'}}">
+		<x-table.td commonlist contextedit="{{!isset($date_sub_start) && !$gencontracting ? '' : $id.','.$column.','.'3'}}" style="background-color: {{$selected_color.'75' ?? ''}};">
 			@if(isset($date_sub_start) && $date_sub_start)
 				<p class="fz12px lh90" edittedplace="-" date="{{$date_sub_start}}">{{dateFormatter($date_sub_start, 'd.m.y')}}</p>
 			@else
@@ -225,7 +225,7 @@
 	@endif
 
 	@if($column == 'date_sub_end' && auth('site')->user()->can('contract-col-date_sub_end:site'))
-		<x-table.td commonlist contextedit="{{!isset($date_sub_end) && !$gencontracting ? '' : $id.','.$column.','.'3'}}">
+		<x-table.td commonlist contextedit="{{!isset($date_sub_end) && !$gencontracting ? '' : $id.','.$column.','.'3'}}" style="background-color: {{$selected_color.'75' ?? ''}};">
 			@if(isset($date_sub_end) && $date_sub_end)
 				<p class="fz12px lh90" edittedplace="-" date="{{$date_sub_end}}">{{dateFormatter($date_sub_end, 'd.m.y')}}</p>
 			@else
@@ -239,7 +239,7 @@
 	@endif
 
 	@if($column == 'hoz_method' && auth('site')->user()->can('contract-col-hoz_method:site'))
-		<x-table.td class="h-center" commonlist>
+		<x-table.td class="h-center" commonlist style="background-color: {{$selected_color.'75' ?? ''}};">
 			@if($hoz_method)
 				<i class="fa-solid fa-circle-check color-green fz16px"></i>
 			@endif
@@ -247,7 +247,7 @@
 	@endif
 
 	@if($column == 'subcontracting' && auth('site')->user()->can('contract-col-subcontracting:site'))
-		<x-table.td class="h-center" commonlist>
+		<x-table.td class="h-center" commonlist style="background-color: {{$selected_color.'75' ?? ''}};">
 			@if(isset($subcontracting) && $subcontracting)
 				<i class="fa-solid fa-circle-check color-green fz16px"></i>
 			@endif
@@ -255,7 +255,7 @@
 	@endif
 	
 	@if($column == 'gencontracting' && auth('site')->user()->can('contract-col-gencontracting:site'))
-		<x-table.td class="h-center" commonlist>
+		<x-table.td class="h-center" commonlist style="background-color: {{$selected_color.'75' ?? ''}};">
 			@if(isset($gencontracting) && $gencontracting)
 				<i class="fa-solid fa-circle-check color-green fz16px"></i>
 			@endif
@@ -263,7 +263,7 @@
 	@endif
 	
 	@if($column == 'gen_percent' && auth('site')->user()->can('contract-col-gen_percent:site'))
-		<x-table.td class="h-center" commonlist>
+		<x-table.td class="h-center" commonlist style="background-color: {{$selected_color.'75' ?? ''}};">
 			@if(isset($gen_percent) && $gen_percent)
 				<p class="fz12px" edittedplace="-">{{$gen_percent ?? '-'}}</p>
 			@endif
@@ -271,7 +271,7 @@
 	@endif
 
 	@if($column == 'type' && auth('site')->user()->can('contract-col-type:site'))
-		<x-table.td class="h-center breakword" commonlist contextedit="{{$id}},{{$column}},4">
+		<x-table.td class="h-center breakword" commonlist contextedit="{{$id}},{{$column}},4" style="background-color: {{$selected_color.'75' ?? ''}};">
 			@if(isset($type) && isset($types[$type]))
 				<p class="fz12px lh110" edittedplace="-">{{$types[$type]}}</p>
 			@else
@@ -281,7 +281,7 @@
 	@endif
 
 	@if($column == 'contractor' && auth('site')->user()->can('contract-col-contractor:site'))
-		<x-table.td class="h-center breakword" commonlist contextedit="{{$id}},{{$column}},4">
+		<x-table.td class="h-center breakword" commonlist contextedit="{{$id}},{{$column}},4" style="background-color: {{$selected_color.'75' ?? ''}};">
 			@if(isset($contractor) && isset($contractors[$contractor]))
 				<p class="fz12px lh90" edittedplace="-">{{$contractors[$contractor]}}</p>
 			@else
@@ -291,13 +291,13 @@
 	@endif
 
 	@if($column == 'buy_number' && auth('site')->user()->can('contract-col-buy_number:site'))
-		<x-table.td class="breakword h-center" commonlist contextedit="{{$buy_number == 'БЕЗ ЗАКУПКИ' ? '' : $id.','.$column.','.'1'}}">
+		<x-table.td class="breakword h-center" commonlist contextedit="{{$buy_number == 'БЕЗ ЗАКУПКИ' ? '' : $id.','.$column.','.'1'}}" style="background-color: {{$selected_color.'75' ?? ''}};">
 			<p class="fz12px" edittedplace="-">{{$buy_number ?? '-'}}</p>
 		</x-table.td>
 	@endif
 
 	@if($column == 'date_buy' && auth('site')->user()->can('contract-col-date_buy:site'))
-		<x-table.td commonlist contextedit="{{!isset($date_buy) && $without_buy ? '' : $id.','.$column.','.'3'}}">
+		<x-table.td commonlist contextedit="{{!isset($date_buy) && $without_buy ? '' : $id.','.$column.','.'3'}}" style="background-color: {{$selected_color.'75' ?? ''}};">
 			@if(isset($date_buy) && $date_buy)
 				<p class="fz12px lh90" edittedplace="-" date="{{$date_buy}}">{{dateFormatter($date_buy, 'd.m.y')}}</p>
 			@else
@@ -311,7 +311,7 @@
 	@endif
 
 	@if($column == 'date_close' && auth('site')->user()->can('contract-col-date_close:site'))
-		<x-table.td commonlist contextedit="{{$id}},{{$column}},3">
+		<x-table.td commonlist contextedit="{{$id}},{{$column}},3" style="background-color: {{$selected_color.'75' ?? ''}};">
 			@if(isset($date_close) && $date_close)
 				<p class="fz12px lh90" edittedplace="-" date="{{$date_close}}">{{dateFormatter($date_close, 'd.m.y')}}</p>
 			@else
@@ -321,7 +321,7 @@
 	@endif
 
 	@if($column == 'archive_dir' && auth('site')->user()->can('contract-col-archive_dir:site'))
-		<x-table.td class="breakword h-center" commonlist contextedit="{{$id}},{{$column}},1">
+		<x-table.td class="breakword h-center" commonlist contextedit="{{$id}},{{$column}},1" style="background-color: {{$selected_color.'75' ?? ''}};">
 			<div class="scrollblock-hidden maxh4rem-6px pr3px">
 				<p class="fz12px lh100 mt2px mb2px" edittedplace="-">{{$archive_dir ?? '-'}}</p>
 			</div>

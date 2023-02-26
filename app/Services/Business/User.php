@@ -3,6 +3,9 @@
 
 use App\Models\User as Usermodel;
 use App\Models\ContractCellComment as ContractCellCommentModel;
+use App\Models\Contract as Contractmodel;
+use App\Models\ContractSelectedColor;
+use App\Services\Settings;
 use Illuminate\Http\Request;
 
 
@@ -233,6 +236,82 @@ class User {
 		
 		return $row->save();
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	/**
+	 * @param 
+	 * @return 
+	 */
+	public function getContractsColors($contractsIds = null) {
+		$accountId = auth('site')->user()->id;
+		
+		$contractsColors = ContractSelectedColor::where('account_id', $accountId)
+			->when($contractsIds, function($query) use($contractsIds) {
+				if (!is_array($contractsIds)) $query->where('contract_id', $contractsIds);
+				else $query->whereIn('contract_id', $contractsIds);
+			})
+			->get();
+		
+		if ($contractsColors->isEmpty()) return false;
+		
+		$userContractColors = $contractsColors?->pluck('color_id', 'contract_id')?->toArray();
+		
+		$settings = app()->make(Settings::class);
+		$contractSelectionColors = $settings->get('contract-selection-colors')?->pluck('color', 'id')?->toArray();
+		
+		$resData = [];
+		foreach ($userContractColors as $contractId => $colorId) {
+			$resData[$contractId] = $contractSelectionColors[$colorId] ?? null;
+		}
+		
+		return $resData;
+	}
+	
+	
+	/**
+	 * @param 
+	 * @return 
+	 */
+	public function setContractColor($contractIds = [], $colorId = null) {
+		$accountId = auth('site')->user()->id;
+		
+		if (is_null($colorId)) {
+			ContractSelectedColor::whereIn('contract_id', $contractIds)->where('account_id', $accountId)->delete();
+			return null;
+		} else {
+			foreach ($contractIds as $contractId) {
+				$contractSelectedColor = ContractSelectedColor::firstOrCreate([
+					'contract_id' => $contractId,
+					'account_id' => $accountId,
+				], [
+					'contract_id' => $contractId,
+					'account_id' => $accountId,
+				]);
+				
+				$contractSelectedColor->color_id = $colorId;
+				$stat = $contractSelectedColor->save();
+				if (!$stat) return false;
+			}
+			
+			$settings = app()->make(Settings::class);
+			$contractSelectionColors = $settings->get('contract-selection-colors')?->pluck('color', 'id')?->toArray();
+			
+			return $contractSelectionColors[$colorId] ?? null;
+		}
+	}
+	
+	
+	
+	
 	
 	
 	

@@ -308,6 +308,11 @@ Route::prefix('site')->middleware(['lang', 'isajax:site'])->group(function() {
 	Route::put('/contracts/check_new', [Contracts::class, 'check_new']);
 	Route::put('/contracts/pin', [Contracts::class, 'pin']);
 	
+	Route::get('/contracts/colorselections', [Contracts::class, 'colorselections']);
+	Route::post('/contracts/colorselections', [Contracts::class, 'set_colorselection']);
+	
+	
+	
 	Route::get('/contracts/common_info', [Contracts::class, 'get_common_info']);
 	Route::put('/contracts/common_info', [Contracts::class, 'set_common_info']);
 	Route::delete('/contracts/common_info', [Contracts::class, 'clear_common_info']);

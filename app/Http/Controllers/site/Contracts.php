@@ -549,6 +549,46 @@ class Contracts extends Controller {
 	
 	
 	
+	/**
+	 * @param 
+	 * @return 
+	 */
+	public function colorselections() {
+		$colorsList = $this->getSettings('contract-selection-colors');
+		array_push($colorsList, [
+			'id' 	=> null,
+			'name' 	=> 'Нет цвета',
+			'color'	=> null,
+		]);
+		return response()->json($colorsList);
+	}
+	
+	
+	/**
+	 * @param 
+	 * @return 
+	 */
+	public function set_colorselection(Request $request) {
+		[
+			'contractIds' 	=> $contractIds,
+			'colorId' 		=> $colorId,
+		] = $request->validate([
+			'contractIds' 	=> 'required|array',
+			'colorId' 		=> 'numeric|nullable',
+		]);
+		
+		$color = $this->user->setContractColor($contractIds, $colorId);
+		return response()->json(['color' => !is_null($color) ? $color.'75' : null]);
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	/** Общая информация
 	 * @param 
 	 * @return 

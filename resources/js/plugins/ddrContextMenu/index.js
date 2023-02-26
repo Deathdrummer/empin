@@ -235,6 +235,9 @@ $(document).on('mouseleave', '.ddrcontextmenu_sub', function() {
 // наведение на пункт меню с подгрузкой
 $(document).on('mouseenter touchstart', '.ddrcontextmenu [ddrcontextmenuitemload]:not([ddrcmloaded])', function(e) {
 	_loadSubmenu(this);
+	$(this).closest('.ddrcontextmenu.ddrcontextmenu_main').find('[ddrcmloaded]').each(function() {
+		$(this).removeAttrib('ddrcmloaded');
+	});
 	$(this).setAttrib('ddrcmloaded');
 });
 

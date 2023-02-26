@@ -205,8 +205,6 @@ class Contract extends Model {
 	
 	
 	
-	
-	
 	/**
 	 * @param 
 	 * @return 
@@ -214,6 +212,13 @@ class Contract extends Model {
 	public function messages() {
 		return $this->hasMany(ContractChat::class, 'contract_id', 'id');
 	}
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	

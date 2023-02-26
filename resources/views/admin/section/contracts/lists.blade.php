@@ -10,7 +10,7 @@
 					>
 					<x-simplelist
 						setting="contract-customers"
-						fieldset="ID:w7rem|number|id,Имя:w30rem|text|name,Сорт:w7rem|number|sort"
+						fieldset="ID:w7rem|number|id|1,Имя:w30rem|text|name,Сорт:w7rem|number|sort"
 						{{-- options="name_type;foo:fooval,bar:barval|name_radio;foo:rool,bar:tool" --}}
 						onRemove="removeCustomerAction"
 						group="small"
@@ -27,7 +27,7 @@
 					>
 					<x-simplelist
 						setting="contract-types"
-						fieldset="ID:w7rem|number|id,Название:w30rem|input|title"
+						fieldset="ID:w7rem|number|id|1,Название:w30rem|input|title"
 						group="small"
 					 />
 				</x-card>
@@ -42,7 +42,23 @@
 					>
 					<x-simplelist
 						setting="contract-contractors"
-						fieldset="ID:w7rem|number|id,Имя:w22rem|input|name,По-умолчанию|checkbox|active,Сорт:w7rem|number|sort"
+						fieldset="ID:w7rem|number|id|1,Имя:w22rem|input|name,По-умолчанию|checkbox|active,Сорт:w7rem|number|sort"
+						group="small"
+					 />
+				</x-card>
+			</div>
+			
+			
+			<div class="col">
+				<x-card
+					loading
+					ready
+					title="Цвета для выделения договоров"
+					desc="Список цветов"
+					>
+					<x-simplelist
+						setting="contract-selection-colors"
+						fieldset="ID:w7rem|number|id|1,Название:w22rem|input|name,Цвет:w4rem|color|color,Сорт:w7rem|number|sort"
 						group="small"
 					 />
 				</x-card>

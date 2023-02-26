@@ -1458,52 +1458,35 @@ export function contextMenu(
 			}, {
 				name: 'Выделить цветом',
 				countLeft: countSelected > 1 ? countSelected : null,
-				//visible: countSelected,
-				//hidden: countSelected > 1,
 				sort: 4,
 				load: {
-					url: 'site/contracts/departments',
-					params: {contractId: selectedContracts.items.length == 1 ? selectedContracts.items[0] : null},
+					url: 'site/contracts/colorselections',
 					method: 'get',
 					map: (item) => {
 						return {
 							name: item.name,
 							//faIcon: 'fa-solid fa-angles-right',
 							visible: true,
-							onClick(selector) {
-								let departmentName = selector.text(),
-									itemsCount = selector.items().length;
+							async onClick(selector) {
+								const {data, error, status, headers} = await axiosQuery('post', 'site/contracts/colorselections', {contractIds: selectedContracts.items, colorId: item.id}, 'json');
 								
-								let procNotif = processNotify('Отправка договора в другой отдел...');
+								if (error) {
+									$.notify('Ошибка применеия цвета!', 'error');
+									console.log(error?.message, error.errors);
+								}
 								
-								axiosQuery('post', 'site/contracts/send', {contractIds: selectedContracts.items, departmentId: item.id}, 'json')
-								.then(({data, error, status, headers}) => {
-									if (data) {
-										//$.notify('Договор успешно отправлен в '+departmentName+'!');
-										
-										if (selectionId || searched) {
-											let params = {};
-											getCounts(() => {
-												//if (currentList > 0) removeContractsRows(target);
-											});
-										} else {
-											//if (currentList > 0) removeContractsRows(target);
-										}
-										
-										if (data.length) {
-											let contractTitle = countSelected == 1 ? ' '+objectNumber+' '+title : '';
-											let mess = buildTitle(data.length, '# %'+contractTitle+' успешно отправлен в '+departmentName+'!', '# % успешно отправлены в '+departmentName+'!', ['договор', 'договора', 'договоров']);
-											procNotif.done({message: mess});
-										} else {
-											procNotif.error({message: 'Ни один договор не был отправлен!'});
-										} 
-										
-										if (countSelected == 1 && itemsCount == 0) changeAttrData(6, '0');
+								if (data) {
+									if (countSelected > 1) {
+										$.each(selectedContracts.items, (k, item) => {
+											$('#contractsTable').find('[contractid="'+item+'"]').find('[ddrtabletd][commonlist]').css('background-color', data.color || '');;
+										});
+										$.notify('Цвет выделенных договоров успешно применен!');
+									
 									} else {
-										//$.notify('Ошибка! Договор не был отправлен!', 'error');
-										procNotif.error({message: 'Ошибка! Договор не был отправлен!'});
-									}
-								});
+										$(target.selector).find('[ddrtabletd][commonlist]').css('background-color', data.color || '');
+										$.notify('Цвет договора успешно применен!');
+									}	
+								}
 							}
 						};
 					}
