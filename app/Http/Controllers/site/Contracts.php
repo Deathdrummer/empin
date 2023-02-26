@@ -562,7 +562,7 @@ class Contracts extends Controller {
 		
 		array_push($colorsList, [
 			'id' 	=> null,
-			'name' 	=> 'Нет цвета',
+			'name' 	=> 'Снять выделение',
 			'color'	=> null,
 		]);
 		return response()->json($colorsList);
