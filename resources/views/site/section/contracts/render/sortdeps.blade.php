@@ -2,7 +2,7 @@
 	<x-table.head noborder>
 		<x-table.tr noborder class="h3rem">
 			<x-table.td class="w4rem" noborder></x-table.td>
-			<x-table.td class="w100" noborder><strong class="fz14px">Название отдела</strong></x-table.td>
+			<x-table.td class="w100" noborder><strong class="fz14px">Настройка отображения отделов слева направо</strong></x-table.td>
 		</x-table.tr>
 	</x-table.head>
 	<x-table.body id="contractDepsList">	

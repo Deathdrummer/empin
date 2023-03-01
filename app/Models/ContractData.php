@@ -9,8 +9,6 @@ class ContractData extends Model {
     use HasFactory, Collectionable, Dateable;
 	
 	
-	
-	
 	/**
      * Таблица
 	 *
@@ -45,4 +43,37 @@ class ContractData extends Model {
 		'data',
 		'from_id',
 	];
+	
+	
+	
+	
+	
+	/**
+     * Переопределение 
+     *	- retrieved  полученное событие
+     *	- saving  событие сохранения
+     *	- saved  сохраненное событие
+     *	- updating  событие обновления
+     *	- updated  событие обновленной
+     *	- creating  событие создания
+     *	- created  созданное событие
+     *	- replicating  реплицирующее событие
+     *	- deleting  событие удаления модели
+     *	- deleted  удаленное событие
+     * @var array
+     */
+	public static function boot() {
+    	parent::boot();
+		
+		self::creating(function ($model) {
+			$userId = auth('site')->user()->id;
+			//logger('creating '.$userId);
+			//logger($model->toArray());
+		});
+		
+		self::updating(function ($model) {
+			//logger('updating '.$userId);
+			//logger($model->toArray());
+		});
+	}
 }

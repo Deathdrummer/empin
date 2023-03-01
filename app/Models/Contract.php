@@ -115,6 +115,7 @@ class Contract extends Model {
 		
 		self::creating(function ($model) {
 			$model->archive = 0;
+			//logger($model->toArray());
 		});
 		
 		self::updating(function ($model) {
