@@ -24,6 +24,7 @@
 				background-color: #1a202c;
 			}
 			
+			
 			.header {
 				position: fixed;
 				top: 0;
