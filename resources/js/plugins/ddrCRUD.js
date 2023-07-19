@@ -90,7 +90,7 @@ $.ddrCRUD = function(settings = false) {
 		changeInputs(rules = {}) {
 			if (!rules || !_.isObject(rules)) throw new Error('ddrCRUD -> changeInputs ошибка: не переданы или переданые неверно условия rules!');
 			
-			$(container).on('input', 'input, textarea, select', function() {
+			$(container).on('input datepicker', 'input, textarea, select', function() {
 				let thisItem = this,
 					row = $(thisItem).closest(itemToIndex);
 				

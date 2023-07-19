@@ -12,7 +12,6 @@
 
 		{{-- <script src="{{mix('assets/js/manifest.js')}}"></script> --}}
 		{{--<script src="{{mix('assets/js/vendor.js')}}"></script>--}}
-		
 		<style>
 			@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100;200&display=swap');
 			
