@@ -1,0 +1,44 @@
+name: Публикация на events.vendorteam.ru
+
+on:
+  push
+
+env:
+  SERVER_HOST: 185.4.75.200
+  SERVER_USER: empin_pro_usr
+  SERVER_PATH: /var/www/empin_pro_usr/data/www/empin-pro.ru
+
+jobs:
+
+  deploy:
+    runs-on: ubuntu-latest
+    if: "contains(github.event.head_commit.message, '--D')"
+    steps:
+      - uses: actions/checkout@v3
+
+      # Install ssh key 
+      - name: Install SSH Key
+        uses: shimataro/ssh-key-action@v2.3.1
+        with:
+          key: "${{ secrets.KEY }}" # так должен называться секретный ключ в настройках гитхаб
+          known_hosts: "just-a-placeholder-so-we-dont-get-errors"
+          
+      - name: Generate auth hosts
+        run: ssh-keyscan -H ${{ env.SERVER_HOST }} >> ~/.ssh/known_hosts
+      
+      # Deploy
+      - run: |
+          rsync \
+          --exclude=/node_modules/ \
+          --exclude=/vendor/ \
+          --exclude=/.env \
+          --exclude=/.env.example \
+          --exclude=/.editorconfig \
+          --exclude=/.git \
+          --exclude=/.github \
+          --exclude=/public/build \
+          --exclude=/public/hot \
+          --exclude=/storage \
+          -rc \
+          --delete \
+          . ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }}:${{ env.SERVER_PATH }}
