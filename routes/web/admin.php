@@ -47,7 +47,6 @@ Route::post('/email/verification-notification', function (Request $request) {
 
 
 
-
 // Сброс пароля
 Route::get('/forgot-password', function (Request $request, Settings $settingsService) {
 	$email = $request->input('email');
