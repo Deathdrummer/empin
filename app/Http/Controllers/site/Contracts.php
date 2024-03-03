@@ -487,14 +487,19 @@ class Contracts extends Controller {
 	public function sortdeps(Request $request) {
 		$alldeps = $this->department->get($request)->pluck('name', 'id');
 		
-		if ($sort = auth('site')->user()->contract_deps) {
-			$sortDeps = [];
-			foreach ($sort as $id) {
-				$sortDeps[$id] = $alldeps[$id];
-			}
-		} else {
+		if (!$userSortDeps = auth('site')?->user()?->contract_deps) {
 			$sortDeps = $alldeps;
+			return $this->render('sortdeps', compact('sortDeps'));
 		}
+		
+		$sortDeps = [];
+		foreach ($userSortDeps as $id) {
+			$sortDeps[$id] = $alldeps[$id];
+		}
+
+		$nonSortedDeps = array_diff_key($alldeps->toArray(), $sortDeps);
+		
+		$sortDeps = array_replace($sortDeps, $nonSortedDeps);
 		
 		return $this->render('sortdeps', compact('sortDeps'));
 	}

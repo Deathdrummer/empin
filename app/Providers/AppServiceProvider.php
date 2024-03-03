@@ -16,11 +16,9 @@ use App\View\Components\Inputs\Select;
 use App\View\Components\Settings;
 use App\View\Components\Simplelist;
 use App\View\Components\Tabs;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
@@ -204,34 +202,34 @@ class AppServiceProvider extends ServiceProvider
 		
 		
 		
-		/* Blade::directive('permission', function($params) {
-			logger('params');
-			logger((array)$params);
-			if (!$params) return "<?php if (false) : ?>";
-			
-			
-			return "<?php if (false) : ?>";
-			
-			//[$gate, $guard] = explode(":", $params);
-			
-			//if (!isset($guard)) 
-			
-			//logger($gate);
-			//logger($guard);
-			
-			
-			//if (!$gate) return "<?php if (false) : ? >";
-			
-			 if ($guard) {
-				return "<?php if (Auth::guard('{$guard}')->user()->can('{$gate}')) : ? >";
-			} else {
-				return "<?php if (Auth::user()->can('{$gate}')) : ? >";
-			} 
-        });
-		
-		Blade::directive('endpermissiom', function() {
-			return "<?php endif; ? >";
-        }); */
+		//  Blade::directive('permission', function($params) {
+		// 	logger('params');
+		// 	logger((array)$params);
+		// 	if (!$params) return "<?php if (false) : ? >";
+		// 	
+		// 	
+		// 	return "<?php if (false) : ? >";
+		// 	
+		// 	[$gate, $guard] = explode(":", $params);
+		// 	
+		// 	if (!isset($guard)) 
+		// 	
+		// 	logger($gate);
+		// 	logger($guard);
+		// 	
+		// 	
+		// 	if (!$gate) return "<?php if (false) : ? >";
+		// 	
+		// 	 if ($guard) {
+		// 		return "<?php if (Auth::guard('{$guard}')->user()->can('{$gate}')) : ? >";
+		// 	} else {
+		// 		return "<?php if (Auth::user()->can('{$gate}')) : ? >";
+		// 	} 
+        // });
+		// 
+		// Blade::directive('endpermissiom', function() {
+		// 	return "<?php endif; ? >";
+        // }); 
 		
 		
 		
@@ -277,7 +275,7 @@ class AppServiceProvider extends ServiceProvider
 		
 		
 		//Blade::directive('setting', function ($key) {
-        //    return "<?php echo ($expression)->format('m/d/Y H:i'); ? >";
+        //    return "< ?php echo ($expression)->format('m/d/Y H:i'); ? >";
         //});e
 		
 		

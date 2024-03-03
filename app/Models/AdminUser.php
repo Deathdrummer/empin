@@ -11,7 +11,6 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Notifications\Notifiable;
-use Symfony\Component\Mime\Encoder\IdnAddressEncoder;
 
 class AdminUser extends Authenticatable implements MustVerifyEmail {
 	use HasFactory, Notifiable, HasRoles, Collectionable, Dateable;

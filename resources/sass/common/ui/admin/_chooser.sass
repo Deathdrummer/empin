@@ -9,8 +9,13 @@
 				border-radius: 3px 0 0 3px
 			
 		&:last-of-type
-			.chooser__item
-				border-radius: 0 3px 3px 0
+			&:first-of-type
+				.chooser__item
+					border-radius: 3px
+			
+			&:not(:first-of-type)
+				.chooser__item
+					border-radius: 0 3px 3px 0
 		
 		&:not(:last-of-type)
 			border-right: 1px solid #e8e8f1
