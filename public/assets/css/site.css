@@ -6763,7 +6763,10 @@ span::before {
 .chooser__col:first-of-type .chooser__item {
   border-radius: 3px 0 0 3px;
 }
-.chooser__col:last-of-type .chooser__item {
+.chooser__col:last-of-type:first-of-type .chooser__item {
+  border-radius: 3px;
+}
+.chooser__col:last-of-type:not(:first-of-type) .chooser__item {
   border-radius: 0 3px 3px 0;
 }
 .chooser__col:not(:last-of-type) {

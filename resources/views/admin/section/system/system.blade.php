@@ -248,6 +248,17 @@
 									setting="contract-list-widths.archive_dir"
 									/>
 							</div>
+							<div class="col-auto w14rem">
+								<p class="fz10px mb4px">Количество актов КС-2</p>
+								<x-input
+									class="w100"
+									type="number"
+									showrows
+									group="small"
+									setting="contract-list-widths.count_ks_2"
+									/>
+							</div>
+							
 						</div>
 						
 						<div class="h3rem"></div>

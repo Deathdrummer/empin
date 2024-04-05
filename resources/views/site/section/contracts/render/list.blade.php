@@ -136,6 +136,42 @@
 									</x-table.td>
 								@endif
 								
+								
+								@if($column == 'date_send_action' && auth('site')->user()->can('contract-col-date_send_action:site'))
+									<x-table.td
+										class="w6rem sort{{$sortField == 'date_send_action' ? ' sort-'.$sortOrder : ''}}"
+										onclick="$.sorting(this, 'date_send_action')"
+										noscroll
+										ddrtabletdmain
+										><strong class="fz10px lh90 d-block text-center wodrbreak">Дата подачи выполнения</strong>
+									</x-table.td>
+								@endif
+								
+								
+								@if($column == 'count_ks_2' && auth('site')->user()->can('contract-col-count_ks_2:site'))
+									<x-table.td
+										style="width:{{isset($listWidth['count_ks_2']) ? $listWidth['count_ks_2'] : '150'}}px;"
+										class="sort{{$sortField == 'count_ks_2' ? ' sort-'.$sortOrder : ''}}"
+										onclick="$.sorting(this, 'count_ks_2')"
+										noscroll
+										ddrtabletdmain
+										><strong class="fz10px lh90 d-block text-center wodrbreak">Количество актов КС-2</strong>
+									</x-table.td>
+								@endif
+								
+								
+								@if($column == 'act_pir' && auth('site')->user()->can('contract-col-act_pir:site'))
+									<x-table.td
+										class="w3rem-4px sort{{$sortField == 'act_pir' ? ' sort-'.$sortOrder : ''}}"
+										onclick="$.sorting(this, 'act_pir')"
+										noscroll
+										ddrtabletdmain
+										><strong class="fz10px lh90 d-block text-center wodrbreak">Акт на ПИР</strong>
+									</x-table.td>
+								@endif
+								
+								
+								
 								@if($column == 'price' && auth('site')->user()->can('contract-col-price:site'))
 									<x-table.td
 										style="width:{{isset($listWidth['price']) ? $listWidth['price'] : '110'}}px;"

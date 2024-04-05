@@ -8135,7 +8135,7 @@ $.ddrCRUD = function () {
     changeInputs: function changeInputs() {
       var rules = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
       if (!rules || !_.isObject(rules)) throw new Error('ddrCRUD -> changeInputs ошибка: не переданы или переданые неверно условия rules!');
-      $(container).on('input', 'input, textarea, select', function () {
+      $(container).on('input datepicker', 'input, textarea, select', function () {
         var thisItem = this,
             row = $(thisItem).closest(itemToIndex);
         $.each(rules, function (selector, comand) {
@@ -8874,7 +8874,8 @@ $(document).on('contextmenu', '[contextmenu]', /*#__PURE__*/function () {
             uniqueBlockId = 'ddrContextMenu';
             maxMenuHeight = null; // Получить название функции-построителя меню и ее аргументы
 
-            _parseAttribString2 = _parseAttribString($(target.selector).attr('contextmenu')), _parseAttribString3 = _slicedToArray(_parseAttribString2, 2), func = _parseAttribString3[0], args = _parseAttribString3[1]; // Методы для основной функции
+            _parseAttribString2 = _parseAttribString($(target.selector).attr('contextmenu')), _parseAttribString3 = _slicedToArray(_parseAttribString2, 2), func = _parseAttribString3[0], args = _parseAttribString3[1];
+            console.log(func, args); // Методы для основной функции
 
             methods = {
               target: target,
@@ -9013,20 +9014,20 @@ $(document).on('contextmenu', '[contextmenu]', /*#__PURE__*/function () {
               }
             }; // Вызвать функцию построения меню
 
-            _context.next = 10;
+            _context.next = 11;
             return _callBuildMenuFunc.apply(void 0, [func, methods].concat(_toConsumableArray(args)));
 
-          case 10:
+          case 11:
             menuData = _context.sent;
 
             if (!$(target.pointer).closest('[nocontext]').length) {
-              _context.next = 13;
+              _context.next = 14;
               break;
             }
 
             return _context.abrupt("return");
 
-          case 13:
+          case 14:
             // Сформировать из данных HTML меню, карту функций и связать клик на пукнт меню с вызовом сооответствующей функции
             _buildMenuHtml4 = _buildMenuHtml(menuData, maxMenuHeight), _buildMenuHtml5 = _slicedToArray(_buildMenuHtml4, 2), menuHtml = _buildMenuHtml5[0], funcMap = _buildMenuHtml5[1];
             menuSelector = menuHtml;
@@ -9052,7 +9053,7 @@ $(document).on('contextmenu', '[contextmenu]', /*#__PURE__*/function () {
 
             _clickToHideEvent(menuHtml, uniqueBlockId);
 
-          case 22:
+          case 23:
           case "end":
             return _context.stop();
         }
@@ -17883,8 +17884,8 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
         return elem === true;
       }) ? 1 : Object.values(pinnedInSelected).every(function (elem) {
         return elem === false;
-      }) ? -1 : 0;
-      console.log('onContextMenu', selectedContracts.items);
+      }) ? -1 : 0; //console.log('onContextMenu', selectedContracts.items);
+
       if (((_commentsTooltip = commentsTooltip) === null || _commentsTooltip === void 0 ? void 0 : _commentsTooltip.destroy) != undefined) commentsTooltip.destroy();
       if (((_cellEditTooltip = cellEditTooltip) === null || _cellEditTooltip === void 0 ? void 0 : _cellEditTooltip.destroy) != undefined) cellEditTooltip.destroy();
     });
@@ -19322,7 +19323,9 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                     if (((_cellEditTooltip4 = cellEditTooltip) === null || _cellEditTooltip4 === void 0 ? void 0 : _cellEditTooltip4.destroy) != undefined) cellEditTooltip.destroy();
                                   });
                                   $(popper).find('[edittedlistvalue]').one(tapEvent, /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee9() {
-                                    var value, emptyVal, _yield$axiosQuery10, savedRes, savedErr, _cellEditTooltip5;
+                                    var _cellEditTooltip5;
+
+                                    var value, emptyVal, _yield$axiosQuery10, savedRes, savedErr;
 
                                     return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee9$(_context9) {
                                       while (1) {
@@ -19351,15 +19354,13 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                               console.log(savedErr === null || savedErr === void 0 ? void 0 : savedErr.message, savedErr.errors);
                                             }
 
-                                            if (savedRes) {
-                                              $.notify('Сохранено!');
-                                              $(cell).find('[edittedplace]').text(savedRes || emptyVal);
-                                              cellWait.destroy();
-                                              unEditCell(cell);
-                                              (_cellEditTooltip5 = cellEditTooltip) === null || _cellEditTooltip5 === void 0 ? void 0 : _cellEditTooltip5.destroy();
-                                            }
+                                            $.notify('Сохранено!');
+                                            if (savedRes && /<\w+/.test(savedRes)) $(cell).find('[edittedplace]').html(savedRes || emptyVal);else $(cell).find('[edittedplace]').text(savedRes || emptyVal);
+                                            cellWait.destroy();
+                                            unEditCell(cell);
+                                            (_cellEditTooltip5 = cellEditTooltip) === null || _cellEditTooltip5 === void 0 ? void 0 : _cellEditTooltip5.destroy();
 
-                                          case 10:
+                                          case 14:
                                           case "end":
                                             return _context9.stop();
                                         }

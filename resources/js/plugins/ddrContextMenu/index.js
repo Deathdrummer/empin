@@ -14,6 +14,8 @@ $(document).on('contextmenu', '[contextmenu]', async function(e) {
 	// Получить название функции-построителя меню и ее аргументы
 	const [func, args] = _parseAttribString($(target.selector).attr('contextmenu'));
 	
+	console.log(func, args);
+	
 	// Методы для основной функции
 	const methods = {
 		target,

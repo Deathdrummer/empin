@@ -490,8 +490,8 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
         return elem === true;
       }) ? 1 : Object.values(pinnedInSelected).every(function (elem) {
         return elem === false;
-      }) ? -1 : 0;
-      console.log('onContextMenu', selectedContracts.items);
+      }) ? -1 : 0; //console.log('onContextMenu', selectedContracts.items);
+
       if (((_commentsTooltip = commentsTooltip) === null || _commentsTooltip === void 0 ? void 0 : _commentsTooltip.destroy) != undefined) commentsTooltip.destroy();
       if (((_cellEditTooltip = cellEditTooltip) === null || _cellEditTooltip === void 0 ? void 0 : _cellEditTooltip.destroy) != undefined) cellEditTooltip.destroy();
     });
@@ -1929,7 +1929,9 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                     if (((_cellEditTooltip4 = cellEditTooltip) === null || _cellEditTooltip4 === void 0 ? void 0 : _cellEditTooltip4.destroy) != undefined) cellEditTooltip.destroy();
                                   });
                                   $(popper).find('[edittedlistvalue]').one(tapEvent, /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee9() {
-                                    var value, emptyVal, _yield$axiosQuery10, savedRes, savedErr, _cellEditTooltip5;
+                                    var _cellEditTooltip5;
+
+                                    var value, emptyVal, _yield$axiosQuery10, savedRes, savedErr;
 
                                     return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee9$(_context9) {
                                       while (1) {
@@ -1958,15 +1960,13 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                               console.log(savedErr === null || savedErr === void 0 ? void 0 : savedErr.message, savedErr.errors);
                                             }
 
-                                            if (savedRes) {
-                                              $.notify('Сохранено!');
-                                              $(cell).find('[edittedplace]').text(savedRes || emptyVal);
-                                              cellWait.destroy();
-                                              unEditCell(cell);
-                                              (_cellEditTooltip5 = cellEditTooltip) === null || _cellEditTooltip5 === void 0 ? void 0 : _cellEditTooltip5.destroy();
-                                            }
+                                            $.notify('Сохранено!');
+                                            if (savedRes && /<\w+/.test(savedRes)) $(cell).find('[edittedplace]').html(savedRes || emptyVal);else $(cell).find('[edittedplace]').text(savedRes || emptyVal);
+                                            cellWait.destroy();
+                                            unEditCell(cell);
+                                            (_cellEditTooltip5 = cellEditTooltip) === null || _cellEditTooltip5 === void 0 ? void 0 : _cellEditTooltip5.destroy();
 
-                                          case 10:
+                                          case 14:
                                           case "end":
                                             return _context9.stop();
                                         }

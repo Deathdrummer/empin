@@ -957,6 +957,7 @@ class Contracts extends Controller {
 				'customer' 		=> $this->getSettings('contract-customers:customers'),
 				'type' 			=> $this->getSettings('contract-types:types'),
 				'contractor'	=> $this->getSettings('contract-contractors:contractors'),
+				'act_pir'		=> [['id' => 1, 'name' => 'Да'], ['id' => 0, 'name' => 'Нет']],
 			};
 		}
 		
@@ -988,6 +989,7 @@ class Contracts extends Controller {
 				'type' 			=> array_column($this->getSettings('contract-types'), 'title', 'id'),
 				'contractor' 	=> array_column($this->getSettings('contract-contractors'), 'name', 'id'),
 				'customer' 		=> array_column($this->getSettings('contract-customers'), 'name', 'id'),
+				'act_pir'		=> [1 => '<i class="fa-solid fa-circle-check color-green fz16px"></i>', 0 => ''],
 			};
 			
 			return $listData[$data] ?? null;

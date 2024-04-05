@@ -21,7 +21,7 @@
 			<table>
 				<thead>
 					<tr>
-						<td class="w8rem"><strong class="lh90 d-block">Номер объекта</strong></td>
+						<td class="w7rem"><strong class="lh90 d-block">Номер объекта</strong></td>
 						<td class="w18rem"><strong>Название / заявитель</strong></td>
 						<td><strong>Титул</strong></td>
 						<td><strong>Заявитель</strong></td>

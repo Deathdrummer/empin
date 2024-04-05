@@ -123,7 +123,7 @@ export function contextMenu(
 			
 			allPinned = Object.values(pinnedInSelected).every(elem => elem === true) ? 1 : (Object.values(pinnedInSelected).every(elem => elem === false) ? -1 : 0);
 			
-			console.log('onContextMenu', selectedContracts.items);
+			//console.log('onContextMenu', selectedContracts.items);
 			
 			if (commentsTooltip?.destroy != undefined) commentsTooltip.destroy();
 			if (cellEditTooltip?.destroy != undefined) cellEditTooltip.destroy();
@@ -1247,13 +1247,16 @@ export function contextMenu(
 										console.log(savedErr?.message, savedErr.errors);
 									}
 									
-									if (savedRes) {
+									
 										$.notify('Сохранено!');
-										$(cell).find('[edittedplace]').text(savedRes || emptyVal);
+										
+										if (savedRes && /<\w+/.test(savedRes)) $(cell).find('[edittedplace]').html(savedRes || emptyVal);
+										else $(cell).find('[edittedplace]').text(savedRes || emptyVal);
+										
 										cellWait.destroy();
 										unEditCell(cell);
 										cellEditTooltip?.destroy();
-									}
+									
 								});
 								
 							},

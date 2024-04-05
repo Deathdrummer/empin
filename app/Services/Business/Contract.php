@@ -1,5 +1,6 @@
 <?php namespace App\Services\Business;
 
+use App\Enums\ContractColums;
 use App\Http\Filters\ContractFilter;
 use App\Models\Contract as ContractModel;
 use App\Models\ContractData;
@@ -21,50 +22,14 @@ class Contract {
 	private $department;
 	private $user;
 	
-	private $allColumsMap = [
-		'object_number' 	=> 'Номер объекта',
-		'title' 			=> 'Название',
-		'titul' 			=> 'Титул',
-		'customer' 			=> 'Заказчик',
-		'contractor' 		=> 'Исполнтель',
-		'type' 				=> 'Тип договора',
-		'contract' 			=> 'Номер договора',
-		'applicant' 		=> 'Заявитель',
-		'locality' 			=> 'Населенный пункт',
-		'date_start' 		=> 'Дата подписания договора',
-		'date_end' 			=> 'Дата окончания работ по договору',
-		'date_gen_start'	=> 'Дата подписания генподрядного договора',
-		'date_gen_end' 		=> 'Дата окончания работ по генподрядному договору',
-		'date_sub_start'	=> 'Дата подписания субподрядного договора',
-		'date_sub_end' 		=> 'Дата окончания работ по субподрядному договору',
-		'price' 			=> 'Стоимость договора без НДС',
-		'price_nds' 		=> 'Стоимость договора с НДС',
-		'price_gen' 		=> 'Стоимость генподрядного договора без НДС',
-		'price_gen_nds' 	=> 'Стоимость генподрядного договора с НДС',
-		'price_sub' 		=> 'Стоимость субподрядного договора без НДС',
-		'price_sub_nds' 	=> 'Стоимость субподрядного договора с НДС',
-		'buy_number' 		=> 'Номер закупки',
-		'date_buy' 	 		=> 'Дата закупки',
-		'hoz_method' 		=> 'Хоз способ',
-		'subcontracting' 	=> 'Субподряд',
-		'gencontracting' 	=> 'Генподряд',
-		'gen_percent' 		=> 'Генподрядный процент',
-		'date_close' 	 	=> 'Дата закрытия договора',
-		'archive_dir' 		=> 'Архивная папка',
-		'period' 			=> 'Срок исполнения договора',
-		'archive' 			=> 'В архиве',
-	];
-	
-	
-
-	
-	
+	private $allColumsMap;
 	
 	
 	public function __construct(DateTime $datetime, DepartmentService $department, UserService $user) {
 		$this->datetime = $datetime;
 		$this->department = $department;
 		$this->user = $user;
+		$this->allColumsMap = ContractColums::asArray();
 	}
 	
 	
@@ -102,6 +67,9 @@ class Contract {
 				'gencontracting' 	=> $item['gencontracting'] ?? null,
 				'customer' 			=> $item['customer'] ?? null,
 				'locality' 			=> $item['locality'] ?? null,
+				'date_send_action'	=> $item['date_send_action'] ?? null,
+				'count_ks_2' 		=> $item['count_ks_2'] ?? null,
+				'act_pir' 			=> $item['act_pir'] ?? null,
 				'price' 			=> $item['price'] ?? null,
 				'price_nds' 		=> $item['price_nds'] ?? null,
 				'price_gen' 		=> $item['price_gen'] ?? null,
@@ -342,6 +310,9 @@ class Contract {
 				'gencontracting' 	=> $item['gencontracting'] ?? null,
 				'customer' 			=> $item['customer'] ?? null,
 				'locality' 			=> $item['locality'] ?? null,
+				'date_send_action'	=> $item['date_send_action'] ?? null,
+				'count_ks_2' 		=> $item['count_ks_2'] ?? null,
+				'act_pir' 			=> $item['act_pir'] ?? null,
 				'price' 			=> $item['price'] ?? null,
 				'price_nds' 		=> $item['price_nds'] ?? null,
 				'price_gen' 		=> $item['price_gen'] ?? null,

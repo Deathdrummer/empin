@@ -102,6 +102,41 @@
 		</x-table.td>
 	@endif
 	
+	
+	@if($column == 'date_send_action' && auth('site')->user()->can('contract-col-date_send_action:site'))
+		<x-table.td commonlist contextedit="{{!isset($date_send_action) && !$subcontracting ? '' : $id.','.$column.','.'3'}}" style="background-color: {{$selected_color.'75' ?? ''}};">
+			@if(isset($date_send_action) && $date_send_action)
+				<p class="fz12px lh90" edittedplace="-" date="{{$date_send_action}}">{{dateFormatter($date_send_action, 'd.m.y')}}</p>
+			@else
+				@if($subcontracting)
+					<p class="fz12px" edittedplace="-">-</p>
+				@else
+					<p class="fz12px text-center" edittedplace="-">НЕТ</p>
+				@endif
+			@endif
+		</x-table.td>
+	@endif
+	
+	
+	@if($column == 'count_ks_2' && auth('site')->user()->can('contract-col-count_ks_2:site'))
+		<x-table.td class="breakword h-center" commonlist contextedit="{{$id.','.$column.','.'1'}}" style="background-color: {{$selected_color.'75' ?? ''}};">
+			<p class="fz12px" edittedplace="-" val="{{$count_ks_2 ?? '-'}}">{{$count_ks_2 ?? '-'}}</p>
+		</x-table.td>
+	@endif
+	
+	
+	@if($column == 'act_pir' && auth('site')->user()->can('contract-col-act_pir:site'))
+		<x-table.td class="h-center" commonlist contextedit="{{$id}},{{$column}},4" style="background-color: {{$selected_color.'75' ?? ''}};">
+			<div edittedplace="">
+				@if($act_pir)
+					<i class="fa-solid fa-circle-check color-green fz16px"></i>
+				@endif
+			</div>
+		</x-table.td>
+	@endif
+	
+	
+	
 	@if($column == 'price' && auth('site')->user()->can('contract-col-price:site'))
 		<x-table.td class="text-end" commonlist contextedit="{{$id}},{{$column}},2" style="background-color: {{$selected_color.'75' ?? ''}};">
 			@isset($price)

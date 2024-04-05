@@ -1,7 +1,78 @@
 <?php
 
+use App\Helpers\DdrDateTime;
+use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Symfony\Component\Mime\Encoder\IdnAddressEncoder;
+
+
+
+if (! function_exists('toLog')) {
+	/**
+	* DDR Логгер
+	*
+	* @param  mixed  $message
+	* @param  array  $context
+	* @return mixed
+	*/
+	function toLog($message = null, $params = []):mixed {
+		if (is_null($message)) {
+			return app('log');
+		}
+		
+		$humanDate = $params['humandate'] ?? false;
+		
+		if (is_array($message)) {
+			
+			
+			arrayWalkRecursive($message, $humanDate);
+		} else {
+			if ($message instanceof Carbon) {
+				if ($humanDate) {
+					$message = DdrDateTime::date($message, ['shift' => '-']).' в '.DdrDateTime::time($message, ['shift' => '-']).' [Carbon]';
+				} else {
+					$message = DdrDateTime::shift($message, 'UTC').' [Carbon]';
+				}
+			} elseif ($message instanceof Illuminate\Support\Collection) {
+				$message = $message->toArray();
+				$message = arrayWalkRecursive($message, $humanDate);
+			} elseif (is_numeric($message)) {
+				//$message = strpos($message, '.') !== false ? (float)$message : (int)$message;
+			}
+		}
+		
+		return app('log')->debug($message, $params['context'] ?? []);
+	}
+}
+
+
+if (!function_exists('arrayWalkRecursive')) {
+		function arrayWalkRecursive(&$mess, $humanDate) {
+		array_walk_recursive($mess, function (&$item, $key) use($humanDate) {
+			if ($item instanceof Carbon) {
+				if ($humanDate) {
+					$item = DdrDateTime::date($item, ['shift' => '-']).' в '.DdrDateTime::time($item, ['shift' => '-']).' [Carbon]';
+				} else {
+					$item = DdrDateTime::shift($item, 'UTC').' [Carbon]';
+				}
+			} elseif ($item instanceof Illuminate\Support\Collection) {
+				$item = $item->toArray();
+				$item = arrayWalkRecursive($item, $humanDate);
+			} elseif (is_numeric($item)) {
+				//$item = strpos($item, '.') !== false ? (float)$item : (int)$item;
+			}
+		});
+		return $mess;
+	}
+}
+
+
+
+
+
+
+
+
 
 if (! function_exists('translit')) {
     /**
