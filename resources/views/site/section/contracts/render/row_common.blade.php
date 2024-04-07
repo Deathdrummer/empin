@@ -104,15 +104,11 @@
 	
 	
 	@if($column == 'date_send_action' && auth('site')->user()->can('contract-col-date_send_action:site'))
-		<x-table.td commonlist contextedit="{{!isset($date_send_action) && !$subcontracting ? '' : $id.','.$column.','.'3'}}" style="background-color: {{$selected_color.'75' ?? ''}};">
+		<x-table.td commonlist contextedit="{{$id}},{{$column}},3" style="background-color: {{$selected_color.'75' ?? ''}};">
 			@if(isset($date_send_action) && $date_send_action)
 				<p class="fz12px lh90" edittedplace="-" date="{{$date_send_action}}">{{dateFormatter($date_send_action, 'd.m.y')}}</p>
 			@else
-				@if($subcontracting)
-					<p class="fz12px" edittedplace="-">-</p>
-				@else
-					<p class="fz12px text-center" edittedplace="-">НЕТ</p>
-				@endif
+				<p class="fz12px" edittedplace="-">-</p>
 			@endif
 		</x-table.td>
 	@endif

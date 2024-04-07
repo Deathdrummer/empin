@@ -14827,6 +14827,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
   canChat, // просмотр чата
   canChatSending, // возможность отправлять сообщения в чате
   canReturnToWork, // вернуть договор в работу из архива
+  canEditActs, // редактирование актов
   isPinned // закреплен ли договор
   ) {
     var _selectedContracts$it;
@@ -16389,13 +16390,15 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                               cellWait.off();
                                               $.notify('Ошибка сохранения ячейки!', 'error');
                                               console.log(savedErr === null || savedErr === void 0 ? void 0 : savedErr.message, savedErr.errors);
-                                            }
+                                            } // тут закомментировал, потому что удачное добавление может вызвращать null например поле "Акт на ПИР""
+                                            //if (savedRes) {
+
 
                                             $.notify('Сохранено!');
                                             if (savedRes && /<\w+/.test(savedRes)) $(cell).find('[edittedplace]').html(savedRes || emptyVal);else $(cell).find('[edittedplace]').text(savedRes || emptyVal);
                                             cellWait.destroy();
                                             unEditCell(cell);
-                                            (_cellEditTooltip5 = cellEditTooltip) === null || _cellEditTooltip5 === void 0 ? void 0 : _cellEditTooltip5.destroy();
+                                            (_cellEditTooltip5 = cellEditTooltip) === null || _cellEditTooltip5 === void 0 ? void 0 : _cellEditTooltip5.destroy(); //}
 
                                           case 14:
                                           case "end":
@@ -16770,6 +16773,86 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
             }
           };
         }
+      }
+    }, {
+      name: 'Редактирование Актов',
+      visible: isCommon && $(target.selector).hasAttr('contractselected') && countSelected && !selectedTextCell,
+      //disabled: $(target.selector).hasAttr('contractselected') == false || !canEditActs,
+      countRight: countSelected,
+      countOnArrow: true,
+      sort: 9,
+      onClick: function onClick() {
+        return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee17() {
+          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee17$(_context17) {
+            while (1) {
+              switch (_context17.prev = _context17.next) {
+                case 0:
+                  ddrPopup({
+                    title: 'Редактирование Актов',
+                    width: 600,
+                    buttons: ['Закрыть']
+                  }).then(function (_ref24) {
+                    var state = _ref24.state,
+                        wait = _ref24.wait,
+                        setTitle = _ref24.setTitle,
+                        setButtons = _ref24.setButtons,
+                        loadData = _ref24.loadData,
+                        setHtml = _ref24.setHtml,
+                        setLHtml = _ref24.setLHtml,
+                        dialog = _ref24.dialog,
+                        close = _ref24.close,
+                        onScroll = _ref24.onScroll,
+                        disableButtons = _ref24.disableButtons,
+                        enableButtons = _ref24.enableButtons,
+                        setWidth = _ref24.setWidth;
+                    wait();
+                    /*axiosQuery('get', 'site/contracts/chat', {contract_id: contractId}).then(({data, error, status, headers}) => {
+                    		
+                    	if (error) {
+                    		$.notify('Не удалось загрузить чат!', 'error');
+                    		console.log(error?.message, error?.errors);
+                    		return;
+                    	}
+                    	
+                    	setHtml(data, () => {
+                    		sendMessStat.value = false;
+                    		wait(false);
+                    		
+                    		$('.chat__message').tripleTap((elem) => {
+                    			selectText(elem);
+                    		});
+                    		
+                    		let chatVisibleHeight = $('#chatMessageList').outerHeight(),
+                    			chatScrollHeight = $('#chatMessageList')[0].scrollHeight;
+                    		$('#chatMessageList').scrollTop(chatScrollHeight - chatVisibleHeight);
+                    		
+                    		$('#chatMessageBlock').focus();
+                    								
+                    		$('#chatMessageBlock').ddrInputs('change', () => {
+                    			let mess = getContenteditable('#chatMessageBlock');
+                    			
+                    			if (mess && !sendMessStat.value) {
+                    				sendMessStat.value = true;
+                    				$('#chatSendMesageBtn').ddrInputs('enable');
+                    			} else if (!mess && sendMessStat.value) {
+                    				sendMessStat.value = false;
+                    				$('#chatSendMesageBtn').ddrInputs('disable');
+                    			}
+                    		});
+                    	});
+                    	
+                    }).catch((e) => {
+                    	console.log(e);
+                    });*/
+                  });
+
+                case 1:
+                case "end":
+                  return _context17.stop();
+              }
+            }
+          }, _callee17);
+        }))();
       }
     }];
   };

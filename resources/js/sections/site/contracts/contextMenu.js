@@ -31,6 +31,7 @@ export function contextMenu(
 		canChat, // просмотр чата
 		canChatSending, // возможность отправлять сообщения в чате
 		canReturnToWork, // вернуть договор в работу из архива
+		canEditActs, // редактирование актов
 		isPinned // закреплен ли договор
 		) => {
 		
@@ -1247,16 +1248,17 @@ export function contextMenu(
 										console.log(savedErr?.message, savedErr.errors);
 									}
 									
+									// тут закомментировал, потому что удачное добавление может вызвращать null например поле "Акт на ПИР""
+									//if (savedRes) {
+									$.notify('Сохранено!');
 									
-										$.notify('Сохранено!');
-										
-										if (savedRes && /<\w+/.test(savedRes)) $(cell).find('[edittedplace]').html(savedRes || emptyVal);
-										else $(cell).find('[edittedplace]').text(savedRes || emptyVal);
-										
-										cellWait.destroy();
-										unEditCell(cell);
-										cellEditTooltip?.destroy();
+									if (savedRes && /<\w+/.test(savedRes)) $(cell).find('[edittedplace]').html(savedRes || emptyVal);
+									else $(cell).find('[edittedplace]').text(savedRes || emptyVal);
 									
+									cellWait.destroy();
+									unEditCell(cell);
+									cellEditTooltip?.destroy();
+									//}
 								});
 								
 							},
@@ -1495,7 +1497,67 @@ export function contextMenu(
 						};
 					}
 				},
-			},
+			}, {
+				name: 'Редактирование Актов',
+				visible: isCommon && $(target.selector).hasAttr('contractselected') && countSelected && !selectedTextCell,
+				//disabled: $(target.selector).hasAttr('contractselected') == false || !canEditActs,
+				countRight: countSelected,
+				countOnArrow: true,
+				sort: 9,
+				async onClick() {
+					ddrPopup({
+						title: 'Редактирование Актов',
+						width: 600,
+						buttons: ['Закрыть'],
+					}).then(({state/* isClosed */, wait, setTitle, setButtons, loadData, setHtml, setLHtml, dialog, close, onScroll, disableButtons, enableButtons, setWidth}) => {
+						wait();
+						
+						
+						/*axiosQuery('get', 'site/contracts/chat', {contract_id: contractId}).then(({data, error, status, headers}) => {
+								
+							if (error) {
+								$.notify('Не удалось загрузить чат!', 'error');
+								console.log(error?.message, error?.errors);
+								return;
+							}
+							
+							setHtml(data, () => {
+								sendMessStat.value = false;
+								wait(false);
+								
+								$('.chat__message').tripleTap((elem) => {
+									selectText(elem);
+								});
+								
+								let chatVisibleHeight = $('#chatMessageList').outerHeight(),
+									chatScrollHeight = $('#chatMessageList')[0].scrollHeight;
+								$('#chatMessageList').scrollTop(chatScrollHeight - chatVisibleHeight);
+								
+								$('#chatMessageBlock').focus();
+														
+								$('#chatMessageBlock').ddrInputs('change', () => {
+									let mess = getContenteditable('#chatMessageBlock');
+									
+									if (mess && !sendMessStat.value) {
+										sendMessStat.value = true;
+										$('#chatSendMesageBtn').ddrInputs('enable');
+									} else if (!mess && sendMessStat.value) {
+										sendMessStat.value = false;
+										$('#chatSendMesageBtn').ddrInputs('disable');
+									}
+								});
+							});
+							
+						}).catch((e) => {
+							console.log(e);
+						});*/
+						
+						
+						
+						
+					});
+				}
+			}
 		];
 		
 	}
