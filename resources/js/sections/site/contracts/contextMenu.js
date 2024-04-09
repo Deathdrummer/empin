@@ -1553,9 +1553,9 @@ export function contextMenu(
 									$.each(selectedContracts.items, (k, item) => {
 										const row = $('#contractsTable').find(`[contractid="${item}"]`);
 										
-										$(row).find(`[editacts="date_send_action"]`).find('[edittedplace]').text(form?.date_send_action ? form?.date_send_action.replace(/(\d{4})/, (match) => match.slice(2)).replaceAll('-', '.') : '');
+										$(row).find(`[editacts="date_send_action"]`).find('[edittedplace]').text(form?.date_send_action ? form?.date_send_action.replace(/(\d{4})/, (match) => match.slice(2)).replaceAll('-', '.') : '-');
 										$(row).find(`[editacts="count_ks_2"]`).find('[edittedplace]').text(form?.count_ks_2);
-										$(row).find(`[editacts="act_pir"]`).find('[edittedplace]').html(form?.act_pir ? '<i class="fa-solid fa-circle-check color-green fz16px"></i>' : '');
+										$(row).find(`[editacts="act_pir"]`).find('[edittedplace]').html(form?.act_pir ? '<i class="fa-solid fa-circle-check color-green fz16px"></i>' : '-');
 									});
 									$.notify(buildTitle(countSelected, ' %', ['Акт успешно отредактирован', 'Акты успешно отредактированы']));
 								}
