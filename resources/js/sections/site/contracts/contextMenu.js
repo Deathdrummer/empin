@@ -1506,51 +1506,83 @@ export function contextMenu(
 				sort: 9,
 				async onClick() {
 					ddrPopup({
-						title: 'Редактирование Актов',
+						title: 'Редактирование '+buildTitle(countSelected, ' # %', ['акта', 'актов', 'актов']),
 						width: 600,
-						buttons: ['Закрыть'],
+						buttons: ['Закрыть', {title: 'Применить', action: 'setEditActs', disabled: 1}],
 					}).then(({state/* isClosed */, wait, setTitle, setButtons, loadData, setHtml, setLHtml, dialog, close, onScroll, disableButtons, enableButtons, setWidth}) => {
 						wait();
 						
 						
-						/*axiosQuery('get', 'site/contracts/chat', {contract_id: contractId}).then(({data, error, status, headers}) => {
+						axiosQuery('get', 'site/contracts/edit_acts').then(({data, error, status, headers}) => {
 								
 							if (error) {
-								$.notify('Не удалось загрузить чат!', 'error');
+								$.notify('Не удалось загрузить форму!', 'error');
 								console.log(error?.message, error?.errors);
 								return;
 							}
 							
+							enableButtons(true);
+							
 							setHtml(data, () => {
-								sendMessStat.value = false;
 								wait(false);
-								
-								$('.chat__message').tripleTap((elem) => {
-									selectText(elem);
-								});
-								
-								let chatVisibleHeight = $('#chatMessageList').outerHeight(),
-									chatScrollHeight = $('#chatMessageList')[0].scrollHeight;
-								$('#chatMessageList').scrollTop(chatScrollHeight - chatVisibleHeight);
-								
-								$('#chatMessageBlock').focus();
-														
-								$('#chatMessageBlock').ddrInputs('change', () => {
-									let mess = getContenteditable('#chatMessageBlock');
-									
-									if (mess && !sendMessStat.value) {
-										sendMessStat.value = true;
-										$('#chatSendMesageBtn').ddrInputs('enable');
-									} else if (!mess && sendMessStat.value) {
-										sendMessStat.value = false;
-										$('#chatSendMesageBtn').ddrInputs('disable');
-									}
-								});
 							});
 							
 						}).catch((e) => {
 							console.log(e);
-						});*/
+						});
+						
+						
+						
+						
+						
+						$.setEditActs = () => {
+							wait();
+							const form = $('#editActsForm').ddrForm();
+							axiosQuery('post', 'site/contracts/edit_acts', {contracts_ids: selectedContracts.items, ...form}).then(({data, error, status, headers}) => {
+								
+								if (error) {
+									$.notify('Не удалось сохранить данные!', 'error');
+									console.log(error?.message, error?.errors);
+									wait(false);
+									return;
+								}
+								
+								if (data) {
+									$.notify('Данные успешно сохранены!');
+									close();
+								}
+								
+								if (countSelected > 1) {
+									$.each(selectedContracts.items, (k, item) => {
+										
+										const row = $('#contractsTable').find(`[contractid="${item}"]`);
+										
+										
+										$(row).find(`[editacts="date_send_action"]`).find('[edittedplace]').text(form?.date_send_action ? form?.date_send_action.replace(/(\d{4})/, (match) => match.slice(2)).replaceAll('-', '.') : '');
+										$(row).find(`[editacts="count_ks_2"]`).find('[edittedplace]').text(form?.count_ks_2);
+										
+										console.log(form?.act_pir);
+										
+										
+										$(row).find(`[editacts="act_pir"]`).find('[edittedplace]').html(form?.act_pir ? '<i class="fa-solid fa-circle-check color-green fz16px"></i>' : '');
+										
+										
+										
+										
+										
+										$('#contractsTable').find('[contractid="'+item+'"]').find('[ddrtabletd][commonlist]').css('background-color', data.color || '');;
+									});
+									$.notify('Цвет выделенных договоров успешно применен!');
+								
+								} else {
+									$(target.selector).find('[ddrtabletd][commonlist]').css('background-color', data.color || '');
+									$.notify('Цвет договора успешно применен!');
+								}	
+								
+							}).catch((e) => {
+								console.log(e);
+							});
+						}
 						
 						
 						

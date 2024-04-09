@@ -368,6 +368,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 
 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
@@ -2357,9 +2363,13 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
               switch (_context17.prev = _context17.next) {
                 case 0:
                   ddrPopup({
-                    title: 'Редактирование Актов',
+                    title: 'Редактирование ' + buildTitle(countSelected, ' # %', ['акта', 'актов', 'актов']),
                     width: 600,
-                    buttons: ['Закрыть']
+                    buttons: ['Закрыть', {
+                      title: 'Применить',
+                      action: 'setEditActs',
+                      disabled: 1
+                    }]
                   }).then(function (_ref24) {
                     var state = _ref24.state,
                         wait = _ref24.wait,
@@ -2375,44 +2385,70 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                         enableButtons = _ref24.enableButtons,
                         setWidth = _ref24.setWidth;
                     wait();
-                    /*axiosQuery('get', 'site/contracts/chat', {contract_id: contractId}).then(({data, error, status, headers}) => {
-                    		
-                    	if (error) {
-                    		$.notify('Не удалось загрузить чат!', 'error');
-                    		console.log(error?.message, error?.errors);
-                    		return;
-                    	}
-                    	
-                    	setHtml(data, () => {
-                    		sendMessStat.value = false;
-                    		wait(false);
-                    		
-                    		$('.chat__message').tripleTap((elem) => {
-                    			selectText(elem);
-                    		});
-                    		
-                    		let chatVisibleHeight = $('#chatMessageList').outerHeight(),
-                    			chatScrollHeight = $('#chatMessageList')[0].scrollHeight;
-                    		$('#chatMessageList').scrollTop(chatScrollHeight - chatVisibleHeight);
-                    		
-                    		$('#chatMessageBlock').focus();
-                    								
-                    		$('#chatMessageBlock').ddrInputs('change', () => {
-                    			let mess = getContenteditable('#chatMessageBlock');
-                    			
-                    			if (mess && !sendMessStat.value) {
-                    				sendMessStat.value = true;
-                    				$('#chatSendMesageBtn').ddrInputs('enable');
-                    			} else if (!mess && sendMessStat.value) {
-                    				sendMessStat.value = false;
-                    				$('#chatSendMesageBtn').ddrInputs('disable');
-                    			}
-                    		});
-                    	});
-                    	
-                    }).catch((e) => {
-                    	console.log(e);
-                    });*/
+                    axiosQuery('get', 'site/contracts/edit_acts').then(function (_ref25) {
+                      var data = _ref25.data,
+                          error = _ref25.error,
+                          status = _ref25.status,
+                          headers = _ref25.headers;
+
+                      if (error) {
+                        $.notify('Не удалось загрузить форму!', 'error');
+                        console.log(error === null || error === void 0 ? void 0 : error.message, error === null || error === void 0 ? void 0 : error.errors);
+                        return;
+                      }
+
+                      enableButtons(true);
+                      setHtml(data, function () {
+                        wait(false);
+                      });
+                    })["catch"](function (e) {
+                      console.log(e);
+                    });
+
+                    $.setEditActs = function () {
+                      wait();
+                      var form = $('#editActsForm').ddrForm();
+                      axiosQuery('post', 'site/contracts/edit_acts', _objectSpread({
+                        contracts_ids: selectedContracts.items
+                      }, form)).then(function (_ref26) {
+                        var data = _ref26.data,
+                            error = _ref26.error,
+                            status = _ref26.status,
+                            headers = _ref26.headers;
+
+                        if (error) {
+                          $.notify('Не удалось сохранить данные!', 'error');
+                          console.log(error === null || error === void 0 ? void 0 : error.message, error === null || error === void 0 ? void 0 : error.errors);
+                          wait(false);
+                          return;
+                        }
+
+                        if (data) {
+                          $.notify('Данные успешно сохранены!');
+                          close();
+                        }
+
+                        if (countSelected > 1) {
+                          $.each(selectedContracts.items, function (k, item) {
+                            var row = $('#contractsTable').find("[contractid=\"".concat(item, "\"]"));
+                            $(row).find("[editacts=\"date_send_action\"]").find('[edittedplace]').text(form !== null && form !== void 0 && form.date_send_action ? form === null || form === void 0 ? void 0 : form.date_send_action.replace(/(\d{4})/, function (match) {
+                              return match.slice(2);
+                            }).replaceAll('-', '.') : '');
+                            $(row).find("[editacts=\"count_ks_2\"]").find('[edittedplace]').text(form === null || form === void 0 ? void 0 : form.count_ks_2);
+                            console.log(form === null || form === void 0 ? void 0 : form.act_pir);
+                            $(row).find("[editacts=\"act_pir\"]").find('[edittedplace]').html(form !== null && form !== void 0 && form.act_pir ? '<i class="fa-solid fa-circle-check color-green fz16px"></i>' : '');
+                            $('#contractsTable').find('[contractid="' + item + '"]').find('[ddrtabletd][commonlist]').css('background-color', data.color || '');
+                            ;
+                          });
+                          $.notify('Цвет выделенных договоров успешно применен!');
+                        } else {
+                          $(target.selector).find('[ddrtabletd][commonlist]').css('background-color', data.color || '');
+                          $.notify('Цвет договора успешно применен!');
+                        }
+                      })["catch"](function (e) {
+                        console.log(e);
+                      });
+                    };
                   });
 
                 case 1:

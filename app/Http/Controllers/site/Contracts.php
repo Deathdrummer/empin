@@ -1,6 +1,7 @@
 <?php namespace App\Http\Controllers\site;
 
 use App\Exports\ContractsExport;
+use App\Helpers\DdrDateTime;
 use App\Http\Controllers\Controller;
 use App\Models\Contract;
 use App\Models\ContractChat;
@@ -1039,8 +1040,56 @@ class Contracts extends Controller {
 	}
 	
 	
+	
+	
+	
+	
+	
+	
+	
+	/**
+	* 
+	* @param 
+	* @return 
+	*/
+	public function get_edit_acts_form() {
+		return $this->render('edit_acts/form');
+	}
+	
+	/**
+	* 
+	* @param 
+	* @return 
+	*/
+	public function set_edit_acts(Request $request) {
+		[
+			'contracts_ids'		=> $contractsIds,
+			'act_pir' 			=> $actPir,
+			'date_send_action'	=> $dateSendAction,
+			'count_ks_2'		=> $countKs2,
+		] = $request->validate([
+			'contracts_ids'		=> 'required|array',
+			'act_pir' 			=> 'nullable|boolean',
+			'date_send_action'	=> 'nullable|date',
+			'count_ks_2'		=> 'nullable|integer',
+		]);
+		
+		$stat = Contract::whereIn('id', $contractsIds)->update([
+			'act_pir' 			=> $actPir,
+			'date_send_action'	=> DdrDateTime::buildTimestamp($dateSendAction),
+			'count_ks_2'		=> $countKs2,
+		]);
+		
+		return response()->json($stat > 0);
+	}
+	
 
 	
+
+
+
+
+
 
 
 
