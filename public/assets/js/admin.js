@@ -16862,8 +16862,8 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                             $(row).find("[editacts=\"date_send_action\"]").find('[edittedplace]').text(form !== null && form !== void 0 && form.date_send_action ? form === null || form === void 0 ? void 0 : form.date_send_action.replace(/(\d{4})/, function (match) {
                               return match.slice(2);
                             }).replaceAll('-', '.') : '-');
-                            $(row).find("[editacts=\"count_ks_2\"]").find('[edittedplace]').text(form === null || form === void 0 ? void 0 : form.count_ks_2);
-                            $(row).find("[editacts=\"act_pir\"]").find('[edittedplace]').html(form !== null && form !== void 0 && form.act_pir ? '<i class="fa-solid fa-circle-check color-green fz16px"></i>' : '-');
+                            $(row).find("[editacts=\"count_ks_2\"]").find('[edittedplace]').text((form === null || form === void 0 ? void 0 : form.count_ks_2) || '-');
+                            $(row).find("[editacts=\"act_pir\"]").find('[edittedplace]').html(form !== null && form !== void 0 && form.act_pir ? '<i class="fa-solid fa-circle-check color-green fz16px"></i>' : '');
                           });
                           $.notify(buildTitle(countSelected, ' %', ['Акт успешно отредактирован', 'Акты успешно отредактированы']));
                         }
