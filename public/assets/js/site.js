@@ -19817,27 +19817,18 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                           return;
                         }
 
-                        if (data) {
-                          $.notify('Данные успешно сохранены!');
-                          close();
-                        }
+                        if (data) close();
 
-                        if (countSelected > 1) {
+                        if (countSelected) {
                           $.each(selectedContracts.items, function (k, item) {
                             var row = $('#contractsTable').find("[contractid=\"".concat(item, "\"]"));
                             $(row).find("[editacts=\"date_send_action\"]").find('[edittedplace]').text(form !== null && form !== void 0 && form.date_send_action ? form === null || form === void 0 ? void 0 : form.date_send_action.replace(/(\d{4})/, function (match) {
                               return match.slice(2);
                             }).replaceAll('-', '.') : '');
                             $(row).find("[editacts=\"count_ks_2\"]").find('[edittedplace]').text(form === null || form === void 0 ? void 0 : form.count_ks_2);
-                            console.log(form === null || form === void 0 ? void 0 : form.act_pir);
                             $(row).find("[editacts=\"act_pir\"]").find('[edittedplace]').html(form !== null && form !== void 0 && form.act_pir ? '<i class="fa-solid fa-circle-check color-green fz16px"></i>' : '');
-                            $('#contractsTable').find('[contractid="' + item + '"]').find('[ddrtabletd][commonlist]').css('background-color', data.color || '');
-                            ;
                           });
-                          $.notify('Цвет выделенных договоров успешно применен!');
-                        } else {
-                          $(target.selector).find('[ddrtabletd][commonlist]').css('background-color', data.color || '');
-                          $.notify('Цвет договора успешно применен!');
+                          $.notify(buildTitle(countSelected, ' %', ['Акт успешно отредактирован', 'Акты успешно отредактированы']));
                         }
                       })["catch"](function (e) {
                         console.log(e);
