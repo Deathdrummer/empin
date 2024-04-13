@@ -1501,7 +1501,7 @@ export function contextMenu(
 				name: 'Редактирование Актов',
 				visible: isCommon && $(target.selector).hasAttr('contractselected') && countSelected && !selectedTextCell,
 				//disabled: $(target.selector).hasAttr('contractselected') == false || !canEditActs,
-				countRight: countSelected,
+				countLeft: countSelected,
 				countOnArrow: true,
 				sort: 9,
 				async onClick() {
