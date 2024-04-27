@@ -20608,7 +20608,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
 
                                         case 10:
                                           if (!(_iteratorAbruptCompletion = !(_step = _context18.sent).done)) {
-                                            _context18.next = 25;
+                                            _context18.next = 26;
                                             break;
                                           }
 
@@ -20625,15 +20625,21 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                           _error2 = _yield$axiosQuery16.error;
                                           _status2 = _yield$axiosQuery16.status;
                                           _headers2 = _yield$axiosQuery16.headers;
+                                          console.log({
+                                            data: _data2,
+                                            error: _error2,
+                                            status: _status2,
+                                            headers: _headers2
+                                          });
 
                                           if (!(_error2 || !_data2)) {
-                                            _context18.next = 21;
+                                            _context18.next = 22;
                                             break;
                                           }
 
                                           return _context18.abrupt("return");
 
-                                        case 21:
+                                        case 22:
                                           $.ddrExport({
                                             data: _data2,
                                             headers: _headers2
@@ -20641,58 +20647,58 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                             destroy();
                                           });
 
-                                        case 22:
+                                        case 23:
                                           _iteratorAbruptCompletion = false;
                                           _context18.next = 8;
                                           break;
 
-                                        case 25:
-                                          _context18.next = 31;
+                                        case 26:
+                                          _context18.next = 32;
                                           break;
 
-                                        case 27:
-                                          _context18.prev = 27;
+                                        case 28:
+                                          _context18.prev = 28;
                                           _context18.t0 = _context18["catch"](6);
                                           _didIteratorError = true;
                                           _iteratorError = _context18.t0;
 
-                                        case 31:
-                                          _context18.prev = 31;
+                                        case 32:
                                           _context18.prev = 32;
+                                          _context18.prev = 33;
 
                                           if (!(_iteratorAbruptCompletion && _iterator["return"] != null)) {
-                                            _context18.next = 36;
+                                            _context18.next = 37;
                                             break;
                                           }
 
-                                          _context18.next = 36;
+                                          _context18.next = 37;
                                           return _iterator["return"]();
 
-                                        case 36:
-                                          _context18.prev = 36;
+                                        case 37:
+                                          _context18.prev = 37;
 
                                           if (!_didIteratorError) {
-                                            _context18.next = 39;
+                                            _context18.next = 40;
                                             break;
                                           }
 
                                           throw _iteratorError;
 
-                                        case 39:
-                                          return _context18.finish(36);
-
                                         case 40:
-                                          return _context18.finish(31);
+                                          return _context18.finish(37);
 
                                         case 41:
-                                          close();
+                                          return _context18.finish(32);
 
                                         case 42:
+                                          close();
+
+                                        case 43:
                                         case "end":
                                           return _context18.stop();
                                       }
                                     }
-                                  }, _callee18, null, [[6, 27, 31, 41], [32,, 36, 40]]);
+                                  }, _callee18, null, [[6, 28, 32, 42], [33,, 37, 41]]);
                                 }));
 
                                 return function (_x6) {
