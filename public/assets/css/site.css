@@ -7925,3 +7925,28 @@ section {
   font-family: Helvetica, sans-serif, sans-serif;
   font-weight: bold;
 }
+
+.buttonslist__item {
+  display: flex;
+  align-items: center;
+  padding-left: 15px;
+  padding-right: 15px;
+  height: 4rem;
+  margin-bottom: 1rem;
+  border-radius: 5px;
+  background-color: #f1f7f9;
+  color: #638591;
+  cursor: pointer;
+}
+.buttonslist__item:hover {
+  background-color: #e9f2f5;
+  transition: background-color 0.16s;
+}
+.buttonslist__item:active, .buttonslist__item-choosed {
+  background-color: #d1e5eb;
+  transition: background-color 0s;
+  color: #1b4a5a;
+}
+.buttonslist__item:last-of-type {
+  margin-bottom: 0;
+}

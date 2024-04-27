@@ -1499,9 +1499,9 @@ export function contextMenu(
 				},
 			}, {
 				name: 'Редактирование Актов',
-				visible: isCommon && $(target.selector).hasAttr('contractselected') && countSelected && !selectedTextCell,
+				visible: isCommon && canEditActs && $(target.selector).hasAttr('contractselected') && countSelected && !selectedTextCell,
 				//disabled: $(target.selector).hasAttr('contractselected') == false || !canEditActs,
-				countLeft: countSelected,
+				countLeft: countSelected > 1 ? countSelected : null,
 				countOnArrow: true,
 				sort: 9,
 				async onClick() {
@@ -1569,6 +1569,76 @@ export function contextMenu(
 						
 						
 					});
+				}
+			}, {
+				name: 'Выгрузка по шаблону',
+				visible: isCommon && canEditActs && $(target.selector).hasAttr('contractselected') && countSelected && !selectedTextCell,
+				//disabled: $(target.selector).hasAttr('contractselected') == false || !canEditActs,
+				countLeft: countSelected > 1 ? countSelected : null,
+				countOnArrow: true,
+				sort: 10,
+				async onClick() {
+					
+					
+					
+					ddrPopup({
+						title: 'Шаблоны для выгрузки',
+						width: 500,
+						buttons: ['Отмена', {action: 'downloadTemplate', title: 'Выгрузить'}],
+					}).then(async ({state, wait, setTitle, setButtons, loadData, setHtml, setLHtml, dialog, close, onScroll, disableButtons, enableButtons, setWidth}) => { //isClosed
+						wait();
+						
+						
+						const {data, error, status, headers} = await axiosQuery('get', 'site/contracts/export_act', {contract_id: contractId});
+						
+						if (error) {
+							$.notify('Не загрузить данные!', 'error');
+							console.log(error?.message, error?.errors);
+							wait(false);
+							return;
+						}
+						
+						await setHtml(data);
+						
+						enableButtons(true);
+						
+						
+						$('[choosetemplatepath]').on(tapEvent, async (e) => {
+							const path = $(e.currentTarget).attr('choosetemplatepath'),
+								{destroy} = $('#contractsCard').ddrWait({
+									bgColor: '#ffffffe6',
+									iconHeight: '50px',
+								});
+							
+							if (!path) return;
+							
+							wait();
+							
+							for await (const contractId of selectedContracts.items) {
+								const {data, error, status, headers} = await axiosQuery('post', 'site/contracts/export_act', {contract_id: contractId, path}, 'blob');
+								
+								if (error || !data) return;
+								
+								$.ddrExport({
+									data,
+									headers,
+								}, () => {
+									destroy();
+								});
+							}
+							
+							close();
+						});
+					
+					
+						
+					
+					});
+								
+					
+					
+					
+							
 				}
 			}
 		];

@@ -20,6 +20,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Maatwebsite\Excel\Facades\Excel;
+use PhpOffice\PhpWord\TemplateProcessor;
 
 class Contracts extends Controller {
 	use Renderable, Settingable;
@@ -1083,11 +1084,61 @@ class Contracts extends Controller {
 		return response()->json($stat > 0);
 	}
 	
-
 	
-
-
-
+	
+	
+	
+	
+	
+	
+	/**
+	* 
+	* @param 
+	* @return 
+	*/
+	public function export_act_form() {
+		$templates = $this->getSettingsCollect('templates-to-export')->where('show', 1);
+		return $this->render('export_acts/form', compact('templates'));
+	}
+	
+	/**
+	* 
+	* @param 
+	* @return 
+	*/
+	public function export_act(Request $request) {
+		[
+			'contract_id'	=> $contractId,
+			'path'			=> $path,
+		] = $request->validate([
+			'contract_id'	=> 'required|numeric',
+			'path'			=> 'required|string',
+		]);
+		
+		$contractData = Contract::find($contractId);
+		
+		$templateProcessor = new TemplateProcessor('storage/'.$path);
+		
+		$tempVars = $templateProcessor->getVariables();
+		foreach ($tempVars as $variabe) {
+			if (!isset($contractData[$variabe])) continue;
+			$templateProcessor->setValue($variabe, $contractData[$variabe]);
+		}
+		
+		$exportFileName = "storage/{$contractData->object_number}.docx";
+		
+		$templateProcessor->saveAs($exportFileName);
+		return response()->download($exportFileName)->deleteFileAfterSend(true);
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
 
 
 

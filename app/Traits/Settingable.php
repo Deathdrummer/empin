@@ -44,7 +44,7 @@ trait Settingable {
 	 * @param string $filter
 	 * @return mixed
 	 */
-	public function getSettings($setting = null, ?string $key = null, ?string $value = null, $filter = null): mixed {
+	public function getSettings($setting = null, ?string $key = null, ?string $value = null, $filter = null):mixed {
 		$this->_getSettings($setting, $key, $value, $filter);
 		
 		if (isset($key)) {
@@ -64,6 +64,18 @@ trait Settingable {
 		return $this->settingsData;
 	}
 	
+	
+	
+	
+	
+	/**
+	* 
+	* @param 
+	* @return 
+	*/
+	public function getSettingsCollect(...$params):mixed {
+		return collect($this->getSettings(...$params));
+	}
 	
 	
 	

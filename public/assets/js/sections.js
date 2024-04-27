@@ -392,6 +392,10 @@ function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Sy
 
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
+function _asyncIterator(iterable) { var method, async, sync, retry = 2; for ("undefined" != typeof Symbol && (async = Symbol.asyncIterator, sync = Symbol.iterator); retry--;) { if (async && null != (method = iterable[async])) return method.call(iterable); if (sync && null != (method = iterable[sync])) return new AsyncFromSyncIterator(method.call(iterable)); async = "@@asyncIterator", sync = "@@iterator"; } throw new TypeError("Object is not async iterable"); }
+
+function AsyncFromSyncIterator(s) { function AsyncFromSyncIteratorContinuation(r) { if (Object(r) !== r) return Promise.reject(new TypeError(r + " is not an object.")); var done = r.done; return Promise.resolve(r.value).then(function (value) { return { value: value, done: done }; }); } return AsyncFromSyncIterator = function AsyncFromSyncIterator(s) { this.s = s, this.n = s.next; }, AsyncFromSyncIterator.prototype = { s: null, n: null, next: function next() { return AsyncFromSyncIteratorContinuation(this.n.apply(this.s, arguments)); }, "return": function _return(value) { var ret = this.s["return"]; return void 0 === ret ? Promise.resolve({ value: value, done: !0 }) : AsyncFromSyncIteratorContinuation(ret.apply(this.s, arguments)); }, "throw": function _throw(value) { var thr = this.s["return"]; return void 0 === thr ? Promise.reject(value) : AsyncFromSyncIteratorContinuation(thr.apply(this.s, arguments)); } }, new AsyncFromSyncIterator(s); }
+
 function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sendMessStat, lastChoosedRow, canEditCell, canCreateCheckbox, canRemoveCheckbox, getCounts) {
   var commentsTooltip, cellEditTooltip;
 
@@ -2351,9 +2355,9 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
       }
     }, {
       name: 'Редактирование Актов',
-      visible: isCommon && $(target.selector).hasAttr('contractselected') && countSelected && !selectedTextCell,
+      visible: isCommon && canEditActs && $(target.selector).hasAttr('contractselected') && countSelected && !selectedTextCell,
       //disabled: $(target.selector).hasAttr('contractselected') == false || !canEditActs,
-      countLeft: countSelected,
+      countLeft: countSelected > 1 ? countSelected : null,
       countOnArrow: true,
       sort: 9,
       onClick: function onClick() {
@@ -2448,6 +2452,211 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
               }
             }
           }, _callee17);
+        }))();
+      }
+    }, {
+      name: 'Выгрузка по шаблону',
+      visible: isCommon && canEditActs && $(target.selector).hasAttr('contractselected') && countSelected && !selectedTextCell,
+      //disabled: $(target.selector).hasAttr('contractselected') == false || !canEditActs,
+      countLeft: countSelected > 1 ? countSelected : null,
+      countOnArrow: true,
+      sort: 10,
+      onClick: function onClick() {
+        return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee20() {
+          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee20$(_context20) {
+            while (1) {
+              switch (_context20.prev = _context20.next) {
+                case 0:
+                  ddrPopup({
+                    title: 'Шаблоны для выгрузки',
+                    width: 500,
+                    buttons: ['Отмена', {
+                      action: 'downloadTemplate',
+                      title: 'Выгрузить'
+                    }]
+                  }).then( /*#__PURE__*/function () {
+                    var _ref28 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee19(_ref27) {
+                      var state, wait, setTitle, setButtons, loadData, setHtml, setLHtml, dialog, close, onScroll, disableButtons, enableButtons, setWidth, _yield$axiosQuery15, data, error, status, headers;
+
+                      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee19$(_context19) {
+                        while (1) {
+                          switch (_context19.prev = _context19.next) {
+                            case 0:
+                              state = _ref27.state, wait = _ref27.wait, setTitle = _ref27.setTitle, setButtons = _ref27.setButtons, loadData = _ref27.loadData, setHtml = _ref27.setHtml, setLHtml = _ref27.setLHtml, dialog = _ref27.dialog, close = _ref27.close, onScroll = _ref27.onScroll, disableButtons = _ref27.disableButtons, enableButtons = _ref27.enableButtons, setWidth = _ref27.setWidth;
+                              //isClosed
+                              wait();
+                              _context19.next = 4;
+                              return axiosQuery('get', 'site/contracts/export_act', {
+                                contract_id: contractId
+                              });
+
+                            case 4:
+                              _yield$axiosQuery15 = _context19.sent;
+                              data = _yield$axiosQuery15.data;
+                              error = _yield$axiosQuery15.error;
+                              status = _yield$axiosQuery15.status;
+                              headers = _yield$axiosQuery15.headers;
+
+                              if (!error) {
+                                _context19.next = 14;
+                                break;
+                              }
+
+                              $.notify('Не загрузить данные!', 'error');
+                              console.log(error === null || error === void 0 ? void 0 : error.message, error === null || error === void 0 ? void 0 : error.errors);
+                              wait(false);
+                              return _context19.abrupt("return");
+
+                            case 14:
+                              _context19.next = 16;
+                              return setHtml(data);
+
+                            case 16:
+                              enableButtons(true);
+                              $('[choosetemplatepath]').on(tapEvent, /*#__PURE__*/function () {
+                                var _ref29 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee18(e) {
+                                  var path, _$$ddrWait, destroy, _iteratorAbruptCompletion, _didIteratorError, _iteratorError, _iterator, _step, _contractId, _yield$axiosQuery16, _data2, _error2, _status2, _headers2;
+
+                                  return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee18$(_context18) {
+                                    while (1) {
+                                      switch (_context18.prev = _context18.next) {
+                                        case 0:
+                                          path = $(e.currentTarget).attr('choosetemplatepath'), _$$ddrWait = $('#contractsCard').ddrWait({
+                                            bgColor: '#ffffffe6',
+                                            iconHeight: '50px'
+                                          }), destroy = _$$ddrWait.destroy;
+
+                                          if (path) {
+                                            _context18.next = 3;
+                                            break;
+                                          }
+
+                                          return _context18.abrupt("return");
+
+                                        case 3:
+                                          wait();
+                                          _iteratorAbruptCompletion = false;
+                                          _didIteratorError = false;
+                                          _context18.prev = 6;
+                                          _iterator = _asyncIterator(selectedContracts.items);
+
+                                        case 8:
+                                          _context18.next = 10;
+                                          return _iterator.next();
+
+                                        case 10:
+                                          if (!(_iteratorAbruptCompletion = !(_step = _context18.sent).done)) {
+                                            _context18.next = 25;
+                                            break;
+                                          }
+
+                                          _contractId = _step.value;
+                                          _context18.next = 14;
+                                          return axiosQuery('post', 'site/contracts/export_act', {
+                                            contract_id: _contractId,
+                                            path: path
+                                          }, 'blob');
+
+                                        case 14:
+                                          _yield$axiosQuery16 = _context18.sent;
+                                          _data2 = _yield$axiosQuery16.data;
+                                          _error2 = _yield$axiosQuery16.error;
+                                          _status2 = _yield$axiosQuery16.status;
+                                          _headers2 = _yield$axiosQuery16.headers;
+
+                                          if (!(_error2 || !_data2)) {
+                                            _context18.next = 21;
+                                            break;
+                                          }
+
+                                          return _context18.abrupt("return");
+
+                                        case 21:
+                                          $.ddrExport({
+                                            data: _data2,
+                                            headers: _headers2
+                                          }, function () {
+                                            destroy();
+                                          });
+
+                                        case 22:
+                                          _iteratorAbruptCompletion = false;
+                                          _context18.next = 8;
+                                          break;
+
+                                        case 25:
+                                          _context18.next = 31;
+                                          break;
+
+                                        case 27:
+                                          _context18.prev = 27;
+                                          _context18.t0 = _context18["catch"](6);
+                                          _didIteratorError = true;
+                                          _iteratorError = _context18.t0;
+
+                                        case 31:
+                                          _context18.prev = 31;
+                                          _context18.prev = 32;
+
+                                          if (!(_iteratorAbruptCompletion && _iterator["return"] != null)) {
+                                            _context18.next = 36;
+                                            break;
+                                          }
+
+                                          _context18.next = 36;
+                                          return _iterator["return"]();
+
+                                        case 36:
+                                          _context18.prev = 36;
+
+                                          if (!_didIteratorError) {
+                                            _context18.next = 39;
+                                            break;
+                                          }
+
+                                          throw _iteratorError;
+
+                                        case 39:
+                                          return _context18.finish(36);
+
+                                        case 40:
+                                          return _context18.finish(31);
+
+                                        case 41:
+                                          close();
+
+                                        case 42:
+                                        case "end":
+                                          return _context18.stop();
+                                      }
+                                    }
+                                  }, _callee18, null, [[6, 27, 31, 41], [32,, 36, 40]]);
+                                }));
+
+                                return function (_x6) {
+                                  return _ref29.apply(this, arguments);
+                                };
+                              }());
+
+                            case 18:
+                            case "end":
+                              return _context19.stop();
+                          }
+                        }
+                      }, _callee19);
+                    }));
+
+                    return function (_x5) {
+                      return _ref28.apply(this, arguments);
+                    };
+                  }());
+
+                case 1:
+                case "end":
+                  return _context20.stop();
+              }
+            }
+          }, _callee20);
         }))();
       }
     }];

@@ -1,6 +1,5 @@
 <?php
 
-use App\Enums\Period;
 use App\Http\Controllers\site\Contracts;
 use App\Http\Controllers\site\Selections;
 use App\Http\Controllers\UserController;
@@ -338,7 +337,8 @@ Route::prefix('site')->middleware(['lang', 'isajax:site'])->group(function() {
 	Route::get('/contracts/edit_acts', [Contracts::class, 'get_edit_acts_form']);
 	Route::post('/contracts/edit_acts', [Contracts::class, 'set_edit_acts']);
 	
-	
+	Route::get('/contracts/export_act', [Contracts::class, 'export_act_form']);
+	Route::post('/contracts/export_act', [Contracts::class, 'export_act']);
 	
 	Route::get('/contracts/contract_selections', [Contracts::class, 'contract_selections']);
 	Route::get('/contracts/selections_to_choose', [Contracts::class, 'selections_to_choose']);

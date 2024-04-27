@@ -4,6 +4,7 @@ require('tapjs');
 
 
 window.strtr = require('locutus/php/strings/strtr');
+
  
 _.mixin({
 	'takeFromObject': function(obj, item) {

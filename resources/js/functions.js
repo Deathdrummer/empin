@@ -12,6 +12,21 @@ $.fn.tripleTap = function(callback) {
 	
 
 
+
+	
+	
+window.callFunc = function(func, ...params) {
+	if (!_.isFunction(func)) {
+		if (isDev) console.log(`callFunc -> ${func} не является функцией!`);
+		return;
+	}
+	if (_.isFunction(func)) return func(...params);
+}
+	
+	
+	
+
+
 window.getOS = function() {
 	let userAgent = window.navigator.userAgent,
 		platform = window.navigator?.userAgentData?.platform || window.navigator.platform,
@@ -100,6 +115,38 @@ window.ddrCopy = (callback = false, rule = false) => {
 
 
 
+
+/*
+	Разделяет название файла на само название и расширение.
+	возвращает:
+		- 1: название
+		- 2: расширение
+	Третий аргумент: обрезает название до заданного количества символов
+*/
+window.getFileName = function(fileName, nameOrExt = null, nameLimit) {
+	let fn = typeof fileName === 'object' ? fileName.name.split('.') : fileName.split('.');
+	
+	if (fn.length == 1) return nameOrExt == null ? [null, null] : null;
+	
+	let e = fn.pop(),
+		n = fn.join('.');
+	
+	if (!nameOrExt) return [n, e];
+	else if (nameOrExt == 1) return (nameLimit != undefined && isInt(nameLimit) && n.length > nameLimit) ? n.substr(0, nameLimit) : n;
+	else if (nameOrExt == 2) return e;
+}
+
+
+
+
+window.isFile = function(file = null) {
+	let ext = getFileName(file, 2);
+	return !(_.isNull(ext) && file.type == '');
+}
+
+
+
+window.isDev = getFileName(location.host, 2) == 'loc';
 
 
 
@@ -2290,3 +2337,170 @@ window.processNotify = function(message = null) {
 	
 	return waitNotifyDOM;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+window.isNumeric = function(num) {
+	return !_.isNaN(num) && !_.isBoolean(num) && !_.isString(num) && !_.isNull(num);
+}
+
+
+
+
+window.isHover = (selector = null) => {
+	if (!selector) return false;
+	if (_.isArray(selector)) selector = selector.join(', ')
+	return !!$(selector).filter(function() {
+		return $(this).is(":hover"); 
+	}).length;
+}
+
+
+
+
+/*
+	Является ли строка null
+	- строка
+*/
+window.isNull = function(str) {
+	return str === null;
+}
+
+
+/*
+	Является ли строка json
+	- строка
+*/
+window.isJson = function(str = null) {
+	if (_.isNull(str) || typeof str == 'undefined') return false;
+	try {
+		return !!JSON.parse(str);
+	} catch (e) {
+		return false;
+	}
+	return true;
+}
+
+
+/*
+	Является ли строка целым числом
+*/
+window.isInt = function(n) {
+	if (n == undefined || typeof n == 'undefined') return false;
+	if (typeof n != 'string') return Number(n) === n && n % 1 === 0;
+	return Number(n)+'' === n;
+}
+
+
+/*
+	Является ли строка числом с плавающей точкой
+*/
+window.isFloat = function(n) {
+	if (n == undefined || typeof n == 'undefined') return false;
+	if (typeof n != 'string') return Number(n) === n && n % 1 !== 0;
+	return Number(n)+'' === n && Number(n) % 1 !== 0;
+}
+
+
+/*
+	проверить наличие элемента в массиве или объекте
+		- массив или объект
+		- искомый элемент
+		- является ли ключем искомый элемент
+
+	ВНИМАНИЕ!!! Может возвращать 0 - это найденный индекс
+*/
+window.hasIn = function(data, elem, isKey) {
+	if (elem == undefined || data == undefined || data.length == 0) return false;
+	var findKey;
+	if (isKey != undefined && isKey == true) {
+		var keysData = Object.keys(data);
+		findKey = keysData.indexOf(elem);
+
+		if (findKey != -1) {
+			return data[keysData[findKey]];
+		}
+		return false;
+	}
+
+	findKey = data.indexOf(elem);
+	return (findKey != -1 ? findKey : false);
+}
+
+
+
+
+
+
+
+/*
+	Проверка существования файла
+		- путь до файла
+*/
+window.urlExists = function(url) {
+	var http = new XMLHttpRequest();
+	http.open('HEAD', url, false);
+	http.send();
+	return http.status != 404;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

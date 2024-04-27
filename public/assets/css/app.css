@@ -44081,7 +44081,7 @@ progress {
   vertical-align: baseline;
 }
 
-[hidden] {
+[hidden], .hidden {
   display: none !important;
 }
 
@@ -45548,6 +45548,12 @@ template {
 }
 [replacer]:not([replacer=""])[r-right]::before {
   right: 0;
+}
+
+[emptytext]:empty::after {
+  content: attr(emptytext);
+  font-size: inherit !important;
+  color: #cfcfcf !important;
 }
 
 .notouch, [notouch] {

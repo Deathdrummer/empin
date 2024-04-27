@@ -98,7 +98,6 @@ $(document).on('contextmenu', '[contextmenu]', async function(e) {
 			return one.replaceAll(/%/ig, word).replaceAll(/\s*#\s*/ig, oneWithoutNum ? ' ' : count+' ');
 		},
 		preload(params = null) {
-			
 			const {
 				iconSize
 			} = $.extend({

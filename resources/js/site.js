@@ -20,6 +20,7 @@ require('@plugins/blockTable');
 require('@plugins/ddrContextMenu');
 require('@plugins/jquery.ui');
 require('@plugins/ddrCalc');
+require('@plugins/ddrFiles');
 
 
 

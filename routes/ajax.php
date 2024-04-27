@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\admin\Acts;
 use App\Http\Controllers\crud\Admins;
 use App\Http\Controllers\crud\Contracts;
 use App\Http\Controllers\crud\Departments;
@@ -9,6 +10,7 @@ use App\Http\Controllers\crud\Staff;
 use App\Http\Controllers\crud\Steps;
 use App\Http\Controllers\crud\StepsPatterns;
 use App\Http\Controllers\TabsController;
+use App\Http\Controllers\UploadFilesController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -163,6 +165,13 @@ Route::post('/steps_patterns/steps', [StepsPatterns::class, 'steps_save']);
 Route::delete('/steps_patterns/steps', [StepsPatterns::class, 'steps_remove']);
 Route::post('/steps_patterns/store_show', [StepsPatterns::class, 'store_show']);
 Route::resource('steps_patterns', StepsPatterns::class);
+
+
+
+
+
+Route::post('/upload_file', [UploadFilesController::class, 'upload']);
+Route::delete('/upload_file', [UploadFilesController::class, 'remove']);
 
 
 

@@ -4,11 +4,14 @@
 
 
 @props([
-	'id'        => 'simplist'.rand(0,9999999),
-	'group'     => 'normal',
-	'setting'   => false,
-	'onRemove'	=> false,
-	'onСreate'	=> false,
+	'id'        	=> 'simplist'.rand(0,9999999),
+	'group'     	=> 'normal',
+	'setting'   	=> false,
+	'onRemove'		=> false,
+	'onCreate'		=> false,
+	'storage'		=> '/',
+	'maxfilesize'	=> null,
+	'filetypes'		=> null,
 ])
 
 
@@ -46,9 +49,12 @@
 									@class([
 										'top',
 										'pt2rem' => $field['readonly'],
-										'pt15px' => !$field['readonly'],
-									])
-									>
+										'pt12px pb12px' => $field['type'] == 'file',
+										/*'pt10px pb10px' => in_array($field['type'], ['checkbox', 'radio']),*/
+										'pt10px pb10px' => in_array($field['type'], ['checkbox', 'radio', 'select', 'text', 'textarea', 'password', 'number' , 'search', 'date', 'tel', 'url', 'color']),
+										
+										/*'pt15px' => !$field['readonly'],*/
+									])>
 									@if($field['type'] == 'select' && isset($options[$field['name']]))
 										@if($field['readonly'])
 											<p
@@ -103,6 +109,44 @@
 												class="w100"
 												tag="field:{{$field['name']}}"
 												/>
+										@endif
+									@elseif($field['type'] == 'file')
+										@if($field['readonly'])
+											<p emptytext="Нет файла">{{$value[$field['name']]['name'] ?? null}}</p>
+											<input type="hidden" value="{{$value[$field['name']]['path'] ?? null}}">
+										@else
+											<div class="row align-items-center" fileblock>
+												<div class="col">
+													<p
+														class="fz12px color-black"
+														filetitle
+														emptytext="Файл не выбран">{{$value[$field['name']]['name'] ?? null}}{{isset($value[$field['name']]['ext']) ? '.'.$value[$field['name']]['ext'] : null}}</p>
+													<input
+														type="hidden"
+														field="{{$field['name']}}"
+														filedata
+														value="{{json_encode($value[$field['name']] ?? null)}}"
+														onchange="$.setSetting(this, '{{$setting}}.{{$row}}.{{$field['name']}}')">
+												</div>
+												<div class="col-auto">
+													<x-buttons-group group="small" gx="3">
+														<x-button
+															variant="blue"
+															visible="{{!isset($value[$field['name']]['path']) ? 1 : 0}}"
+															tag="addfile"
+															>
+															<i class="fa-solid fa-plus"></i>
+														</x-button>
+														<x-button
+															variant="red"
+															visible="{{isset($value[$field['name']]['path']) ? 1 : 0}}"
+															tag="removefile"
+															>
+															<i class="fa-solid fa-trash-can"></i>
+														</x-button>
+													</x-buttons-group>
+												</div>
+											</div>
 										@endif
 									@else
 										@if($field['readonly'])
@@ -161,7 +205,10 @@
 		addRowAction = '{{$id}}AddRow',
 		removeRowAction = '{{$id}}RemoveRow',
 		onRemoveFunc = '{{$onRemove}}',
-		onCreateFunc = '{{$onСreate}}';
+		onCreateFunc = '{{$onCreate}}',
+		storage = '{{$storage}}',
+		maxFileSize = '{{$maxfilesize}}',
+		fileTypes = '{{$filetypes}}';
 	
 	
 	$(listId).ddrInputs('change', (input) => {
@@ -193,6 +240,13 @@
 			
 			if (data) $(listSelector).append(data);
 			
+			const tr = $(listSelector).find('tr[new]');
+			
+			if ($(tr).find('input[field="id"]').length) {
+				$(tr).find('input[field="id"]').val(Number($(tr).attr('index')) + 1).triggerHandler('input');
+				$(tr).find('button[new]').removeAttrib('new');
+			}
+			
 			$(listSelector).find('tr[new]').ddrInputs('change', (input) => {
 				$(input).closest('tr').find('button[new]').removeAttrib('new');
 			});
@@ -201,8 +255,8 @@
 			
 			simplelistAddBtnWait.destroy();
 			
-			if (onCreateFunc) {
-				$[onCreateFunc]($(btn).closest('tr'), btn, listSelector, fields, options, setting, group);
+			if (onCreateFunc && $[onCreateFunc]) {
+				$[onCreateFunc]({tr, btn, listSelector, fields, options, setting, group});
 			}
 		});
 	}
@@ -217,9 +271,9 @@
 		if ($(btn).hasAttr('new')) {
 			if (hasRows) $(btn).closest('tr').remove();
 			else $(btn).closest('tbody').empty();
+			removeFile(btn);
 			//$.notify('Запись успешно удалена!');
 		} else {
-			
 			ddrPopup({
 				width: 400,
 				html: '<p class="color-red fz16px">Вы действительно хотите удалить запись</p>',
@@ -231,12 +285,12 @@
 				topClose: false
 			}).then(({state, wait, setTitle, setButtons, loadData, setHtml, setLHtml, dialog, close, onScroll, disableButtons, enableButtons, setWidth}) => { //isClosed
 				$.simplelistRemoveRowAction = () => {
-					close();
+					wait();
 					$(btn).closest('tr').find('input, textarea, select, button').ddrInputs('disable');
 					
 					axiosQuery('delete', 'api/settings', {
 						path: setting,
-					}, 'json').then(({data, error, status, headers}) => {
+					}, 'json').then(async ({data, error, status, headers}) => {
 						if (error) {
 							console.log(error);
 							$.notify(error?.message, 'error');
@@ -246,15 +300,21 @@
 									$(btn).closest('tr').find('[name="'+field+'"]').ddrInputs('error', errors[0]);
 								});
 							}
+							
+							wait(false);
+							return;
 						}
 						
 						if (data) {
-							if (onRemoveFunc) {
+							await removeFile(btn);
+							
+							if (onRemoveFunc && $[onRemoveFunc]) {
 								$[onRemoveFunc]($(btn).closest('tr'), () => {
 									if (hasRows) $(btn).closest('tr').remove();
 									else $(btn).closest('tbody').empty();
 									$.notify('Запись успешно удалена!');
 								});
+								
 								//if (!callback || typeof callback !== 'function') return;
 								//callback();
 								
@@ -263,6 +323,8 @@
 								else $(btn).closest('tbody').empty();
 								$.notify('Запись успешно удалена!');
 							}
+							
+							close();
 						}
 						
 						//$(btn).closest('tr').find('input, textarea, select, button').ddrInputs('enable');
@@ -271,6 +333,144 @@
 			});		
 		}	
 	}
+	
+	
+	
+	
+	
+
+	$(listId).on(tapEvent, '[addfile]', (e) => {
+		const fileBlock = $(e.target).closest('[fileblock]'),
+			td = $(e.target).closest('td'),
+			fileDataInp = $(fileBlock).find('[filedata]'),
+			fileTitle = $(fileBlock).find('[filetitle]'),
+			addFileBtn = e.currentTarget,
+			removeFileBtn = $(fileBlock).find('[removefile]');
+		
+		let waitObj;
+			
+		$.ddrChooseFiles({
+			//multiple,
+			init(...data) {
+				waitObj = $(td).ddrWait({
+					iconHeight: '26px',
+					bgColor: '#ffffffc7'
+				});
+			},
+			//preload,
+			async callback({file, name, ext, size, type, isImage, key}) {
+				let success = true,
+					fileSize = (size / 1024 / 1024).toFixed(2);
+				
+				if (maxFileSize && fileSize > maxFileSize) {
+					$.notify('Размер файла превышает максимально допустимый!', 'error');
+					success = false;
+				}
+				
+				if (fileTypes && !fileTypes.split('|').includes(ext)) {
+					$.notify('Недопустимый формат файла!', 'error');
+					success = false;
+				}
+				
+				if (!success) return;
+				
+				const {path} = await uploadFile({
+					file: file,
+					storage: storage,
+				});
+				
+				$(fileDataInp).val(JSON.stringify({name, ext, path})).triggerHandler('change');
+				$(fileTitle).text(`${name}.${ext}`);
+				
+				$(removeFileBtn).closest('.col-auto.hidden').removeClass('hidden');
+				$(addFileBtn).closest('.col-auto:not(.hidden)').addClass('hidden');
+			},
+			done() {
+				waitObj.destroy();
+			},
+			fail() {
+				waitObj.destroy();
+				console.log('fail');
+			}
+		});
+
+	});
+	
+	
+	
+	
+	$(listId).on(tapEvent, '[removefile]', async (e) => {
+		
+		const fileBlock = $(e.target).closest('[fileblock]'),
+			td = $(e.target).closest('td'),
+			fileDataInp = $(fileBlock).find('[filedata]'),
+			{path} = JSON.parse(fileDataInp.val()),
+			fileTitle = $(fileBlock).find('[filetitle]'),
+			addFileBtn = $(fileBlock).find('[addfile]'),
+			removeFileBtn = e.currentTarget,
+			formData = new FormData();
+		
+		const {destroy} = $(td).ddrWait({
+			iconHeight: '26px',
+			bgColor: '#ffffffc7'
+		});
+		
+		formData.append('path', path);
+		formData.append('_method', 'delete');
+		const {data} = await axios.post('/ajax/upload_file', formData);
+		
+		
+		$(fileDataInp).val('').triggerHandler('change');
+		$(fileTitle).empty();
+		
+		$(removeFileBtn).closest('.col-auto:not(.hidden)').addClass('hidden');
+		$(addFileBtn).closest('.col-auto.hidden').removeClass('hidden');
+		
+		destroy();
+		
+		//console.log($(addFileBtn).closest('.col-auto:not(.hidden)').length, data?.is_deleted);
+		return data;
+	});
+	
+	
+	
+	
+	
+	
+	async function uploadFile({file = null, storage = null}) {
+		const formData = new FormData();
+		
+		formData.append('file', file);
+		formData.append('storage', storage);
+		
+		try {
+			const {data} = await axios.post('/ajax/upload_file', formData, {headers: {'Content-Type': 'multipart/form-data'}});
+			return data;
+		} catch(err) {
+			console.log(err);
+			$.notify('Ошибка загрузки файла!', 'error');
+			return false;
+		}
+	}
+	
+	
+	
+	async function removeFile(btn = null) {
+		const tr = $(btn).closest('tr'),
+			fileBlock = $(tr).find('[fileblock]'),
+			fileDataInp = $(fileBlock).find('[filedata]'),
+			fileData = fileDataInp?.val(),
+			{path} = isJson(fileData) ? JSON.parse(fileData) : {};
+		
+		if (!path) return;
+		
+		const formData = new FormData();
+		
+		formData.append('path', path);
+		formData.append('_method', 'delete');
+		const {data} = await axios.post('/ajax/upload_file', formData);
+	}
+	
 	
 	
 	

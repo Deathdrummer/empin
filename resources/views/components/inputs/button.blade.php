@@ -11,6 +11,7 @@
     'id' 		=> null,
     'disabled' 	=> $groupDisabled,
     'enabled' 	=> true,
+    'visible' 	=> true,
     'group'		=> $groupWrap,
     'variant'	=> $groupVariant,
     'rounded'	=> $groupRounded,
@@ -21,13 +22,14 @@
     'animationDuration'	=> '1s',
 ])
 
-@if($groupWrap)<div class="col-auto">@endif
+@if($groupWrap)<div class="col-auto{{!$visible ? ' hidden' : ''}}">@endif
 <div {{$attributes->filter(fn ($value, $key) => $key == 'class')->class([
 		'button',
 		$group.'-button' => $group,
 		'button-'.$variant => $variant,
 		($group ? $group.'-' : '').'button_rounded' => $rounded,
 		($group ? $group.'-' : '').'button_disabled' => $group && ($disabled || !$enabled),
+		'hidden' => !$groupWrap && !$visible,
 	])}}
 	>
 	<button

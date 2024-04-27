@@ -6,7 +6,15 @@
 		>
 		@if($fields)
 			@foreach($fields as $field)
-				<td class="top pt15px">
+				<td
+					@class([
+						'top',
+						'pt12px pb12px' => $field['type'] == 'file',
+						/*'pt10px pb10px' => in_array($field['type'], ['checkbox', 'radio']),*/
+						'pt10px pb10px' => in_array($field['type'], ['checkbox', 'radio', 'select', 'text', 'textarea', 'password', 'number' , 'search', 'date', 'tel', 'url', 'color']),
+						
+						/*'pt15px' => !$field['readonly'],*/
+					])>
 					@if($field['type'] == 'select' && isset($options[$field['name']]))
 						<x-dynamic-component
 							:component="$field['type']"
@@ -41,6 +49,37 @@
 							showrows="{{$field['type'] == 'number'}}"
 							tag="field:{{$field['name']}}"
 							/>
+					@elseif($field['type'] == 'file')
+						<div class="row align-items-center" fileblock>
+							<div class="col">
+								<p class="fz12px color-black" filetitle emptytext="Файл не выбран"></p>
+								
+								<input
+									type="hidden"
+									field="{{$field['name']}}"
+									filedata
+									value=""
+									onchange="$.setSetting(this, '{{$setting}}.{{$row}}.{{$field['name']}}')">
+							</div>
+							<div class="col-auto">
+								<x-buttons-group group="small" gx="5">
+									<x-button
+										variant="blue"
+										tag="addfile"
+										visible="{{!isset($value[$field['name']]['path']) ? 1 : 0}}"
+										>
+										<i class="fa-solid fa-plus"></i>
+									</x-button>
+									<x-button
+										variant="red"
+										visible="{{isset($value[$field['name']]['path']) ? 1 : 0}}"
+										tag="removefile"
+										>
+										<i class="fa-solid fa-trash-can"></i>
+									</x-button>
+								</x-buttons-group>
+							</div>
+						</div>
 					@else
 						<x-dynamic-component
 							:component="$field['type']"

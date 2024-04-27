@@ -21,7 +21,7 @@ class SettingsController extends Controller {
 	 * @param Request $request
 	 * @return mixed 
 	 */
-	public function get(Request $request): mixed {
+	public function get(Request $request):mixed {
 		['key' => $key] = $request->validate([
 			'key'	=> 'required|string'
 		]);
@@ -39,7 +39,7 @@ class SettingsController extends Controller {
 	 * @param Request $request
 	 * @return mixed
 	 */
-	public function set(Request $request): mixed {
+	public function set(Request $request):mixed {
 		['group' => $group, 'key' => $key, 'value' => $value] = $request->validate([
 			'group'	=> 'required|string',
 			'key'	=> 'required|string',
@@ -59,7 +59,7 @@ class SettingsController extends Controller {
 	 * @param Request $request
 	 * @return mixed
 	 */
-	public function remove(Request $request): mixed {
+	public function remove(Request $request):mixed {
 		['path' => $path] = $request->validate([
 			'path'	=> 'required|string'
 		]);

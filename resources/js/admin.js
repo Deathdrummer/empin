@@ -16,6 +16,7 @@ require('@plugins/ddrScrollX');
 require('@plugins/ddrFloatingBlock');
 require('@plugins/tooltip');
 require('@plugins/ddrCalc');
+require('@plugins/ddrFiles');
 
 
 
@@ -44,7 +45,6 @@ $.event.special.scrollstop.latency = 650;
 
 
 $(function() {
-	
 	let changeInputTOut, prevSetting;
 		//settingController = new AbortController();
 	$.setSetting = function(item = false, setting = false, saveTOut = 0, callback = false) {
@@ -72,14 +72,15 @@ $(function() {
 					wrapperClass = findWrapByInputType.indexOf(type) !== -1 ? group+type : group+tag,
 					wrapperSelector = $(item).closest('.'+wrapperClass).length ? $(item).closest('.'+wrapperClass) : false;
 				
-				if (type == 'checkbox') {
+				if (['checkbox', 'radio'].includes(type)) {
 					value = $(item).is(':checked') ? 1 : 0;
 				} else if (type == 'color') {
 					value = $(item).attr('color') || $(item).val() || null;
 				} else {
-					value = $(item).val() || null;
+					const itemVal = $(item).val() || null;
+					value = itemVal !== null ? (isJson(itemVal) ? JSON.parse(itemVal) : itemVal) : null;
 				}
-			
+				
 			} else {
 				value = setting || null;
 				setting = item;

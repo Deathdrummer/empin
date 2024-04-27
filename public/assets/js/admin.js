@@ -5371,6 +5371,8 @@ __webpack_require__(/*! @plugins/tooltip */ "./resources/js/plugins/tooltip/inde
 
 __webpack_require__(/*! @plugins/ddrCalc */ "./resources/js/plugins/ddrCalc.js");
 
+__webpack_require__(/*! @plugins/ddrFiles */ "./resources/js/plugins/ddrFiles/index.js");
+
 $.notify.defaults({
   clickToHide: true,
   autoHide: true,
@@ -5427,12 +5429,13 @@ $(function () {
             wrapperClass = findWrapByInputType.indexOf(type) !== -1 ? _group + type : _group + tag,
             wrapperSelector = $(item).closest('.' + wrapperClass).length ? $(item).closest('.' + wrapperClass) : false;
 
-        if (type == 'checkbox') {
+        if (['checkbox', 'radio'].includes(type)) {
           value = $(item).is(':checked') ? 1 : 0;
         } else if (type == 'color') {
           value = $(item).attr('color') || $(item).val() || null;
         } else {
-          value = $(item).val() || null;
+          var itemVal = $(item).val() || null;
+          value = itemVal !== null ? isJson(itemVal) ? JSON.parse(itemVal) : itemVal : null;
         }
       } else {
         value = setting || null;
@@ -5835,6 +5838,19 @@ $.fn.tripleTap = function (callback) {
   });
 };
 
+window.callFunc = function (func) {
+  if (!_.isFunction(func)) {
+    if (isDev) console.log("callFunc -> ".concat(func, " \u043D\u0435 \u044F\u0432\u043B\u044F\u0435\u0442\u0441\u044F \u0444\u0443\u043D\u043A\u0446\u0438\u0435\u0439!"));
+    return;
+  }
+
+  for (var _len = arguments.length, params = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+    params[_key - 1] = arguments[_key];
+  }
+
+  if (_.isFunction(func)) return func.apply(void 0, params);
+};
+
 window.getOS = function () {
   var _window$navigator, _window$navigator$use;
 
@@ -5911,6 +5927,32 @@ window.ddrCopy = function () {
     }
   });
 };
+/*
+	Разделяет название файла на само название и расширение.
+	возвращает:
+		- 1: название
+		- 2: расширение
+	Третий аргумент: обрезает название до заданного количества символов
+*/
+
+
+window.getFileName = function (fileName) {
+  var nameOrExt = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+  var nameLimit = arguments.length > 2 ? arguments[2] : undefined;
+  var fn = _typeof(fileName) === 'object' ? fileName.name.split('.') : fileName.split('.');
+  if (fn.length == 1) return nameOrExt == null ? [null, null] : null;
+  var e = fn.pop(),
+      n = fn.join('.');
+  if (!nameOrExt) return [n, e];else if (nameOrExt == 1) return nameLimit != undefined && isInt(nameLimit) && n.length > nameLimit ? n.substr(0, nameLimit) : n;else if (nameOrExt == 2) return e;
+};
+
+window.isFile = function () {
+  var file = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+  var ext = getFileName(file, 2);
+  return !(_.isNull(ext) && file.type == '');
+};
+
+window.isDev = getFileName(location.host, 2) == 'loc';
 
 window.isNumeric = function (num) {
   return !_.isNaN(num) && !_.isBoolean(num) && !_.isString(num) && !_.isNull(num);
@@ -6344,8 +6386,8 @@ window.ddrSplit = function () {
   if (_.isNull(string)) throw new Error('ddrSplit ошибка! Не передана строка!');
   if (!_.isString(string)) throw new Error('ddrSplit ошибка! Первый аргумент не является строкой!');
 
-  for (var _len = arguments.length, separators = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-    separators[_key - 1] = arguments[_key];
+  for (var _len2 = arguments.length, separators = new Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+    separators[_key2 - 1] = arguments[_key2];
   }
 
   var seps = [].concat(separators);
@@ -7863,6 +7905,106 @@ window.processNotify = function () {
     }
   });
   return waitNotifyDOM;
+};
+
+window.isNumeric = function (num) {
+  return !_.isNaN(num) && !_.isBoolean(num) && !_.isString(num) && !_.isNull(num);
+};
+
+window.isHover = function () {
+  var selector = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+  if (!selector) return false;
+  if (_.isArray(selector)) selector = selector.join(', ');
+  return !!$(selector).filter(function () {
+    return $(this).is(":hover");
+  }).length;
+};
+/*
+	Является ли строка null
+	- строка
+*/
+
+
+window.isNull = function (str) {
+  return str === null;
+};
+/*
+	Является ли строка json
+	- строка
+*/
+
+
+window.isJson = function () {
+  var str = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+  if (_.isNull(str) || typeof str == 'undefined') return false;
+
+  try {
+    return !!JSON.parse(str);
+  } catch (e) {
+    return false;
+  }
+
+  return true;
+};
+/*
+	Является ли строка целым числом
+*/
+
+
+window.isInt = function (n) {
+  if (n == undefined || typeof n == 'undefined') return false;
+  if (typeof n != 'string') return Number(n) === n && n % 1 === 0;
+  return Number(n) + '' === n;
+};
+/*
+	Является ли строка числом с плавающей точкой
+*/
+
+
+window.isFloat = function (n) {
+  if (n == undefined || typeof n == 'undefined') return false;
+  if (typeof n != 'string') return Number(n) === n && n % 1 !== 0;
+  return Number(n) + '' === n && Number(n) % 1 !== 0;
+};
+/*
+	проверить наличие элемента в массиве или объекте
+		- массив или объект
+		- искомый элемент
+		- является ли ключем искомый элемент
+
+	ВНИМАНИЕ!!! Может возвращать 0 - это найденный индекс
+*/
+
+
+window.hasIn = function (data, elem, isKey) {
+  if (elem == undefined || data == undefined || data.length == 0) return false;
+  var findKey;
+
+  if (isKey != undefined && isKey == true) {
+    var keysData = Object.keys(data);
+    findKey = keysData.indexOf(elem);
+
+    if (findKey != -1) {
+      return data[keysData[findKey]];
+    }
+
+    return false;
+  }
+
+  findKey = data.indexOf(elem);
+  return findKey != -1 ? findKey : false;
+};
+/*
+	Проверка существования файла
+		- путь до файла
+*/
+
+
+window.urlExists = function (url) {
+  var http = new XMLHttpRequest();
+  http.open('HEAD', url, false);
+  http.send();
+  return http.status != 404;
 };
 
 /***/ }),
@@ -10366,6 +10508,553 @@ __webpack_require__.r(__webpack_exports__);
 var datepicker = __webpack_require__(/*! ./datepicker */ "./resources/js/plugins/ddrDatepicker/datepicker.js");
 
 window.ddrDatepicker = datepicker["default"];
+
+/***/ }),
+
+/***/ "./resources/js/plugins/ddrFiles/ddrFiles.js":
+/*!***************************************************!*\
+  !*** ./resources/js/plugins/ddrFiles/ddrFiles.js ***!
+  \***************************************************/
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": function() { return /* binding */ DdrFiles; }
+/* harmony export */ });
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"]; if (_i == null) return; var _arr = []; var _n = true; var _d = false; var _s, _e; try { for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+var DdrFiles = /*#__PURE__*/function () {
+  // 29.07.23
+  function DdrFiles() {
+    var selector = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+    var files = arguments.length > 1 ? arguments[1] : undefined;
+
+    _classCallCheck(this, DdrFiles);
+
+    _defineProperty(this, "selector", void 0);
+
+    _defineProperty(this, "files", void 0);
+
+    if (!selector) throw new Error('DdrFiles -> Не передан селектор');
+    this.selector = selector || null;
+    this.files = files;
+  }
+  /*	Открытие диалога загрузки файлов (навесить на любой селектор)
+  		- multiple: множественный выбор
+  		- init: перед инициализацией загрузки файлов
+  		- preload: маркировка ключем key блоков под миниатюры картинок или иконки файлов
+  		- callback: файл загружен 
+  */
+
+
+  _createClass(DdrFiles, [{
+    key: "choose",
+    value: function choose() {
+      var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+      var getAddedFiles = this.getAddedFiles;
+      var loadFiles = this.loadFiles.bind(this); // bind потому что в функции loadFiles идет обращение к контексту, но он там потерян, так как вызов идет отсюда, то есть уже 3 вложенности функций
+
+      var loadFilesParams = _.omit(params, ['multiple']);
+
+      var input = document.createElement('input');
+      input.type = 'file';
+      input.multiple = (params === null || params === void 0 ? void 0 : params.multiple) || false;
+
+      input.oninput = function (e) {
+        var files = getAddedFiles(e);
+        loadFiles(files, loadFilesParams);
+      };
+
+      input.click();
+    }
+    /*	Cобытие бросания файлов в область drop (навесить на любой селектор)
+    		- dragover: событие при наведении на область drop
+    		- dragleave: событие при уходе из области drop
+    		- drop: событие бросания файлов в область drop
+    		- init: перед инициализацией загрузки файлов
+    		- preload: маркировка ключем key блоков под миниатюры картинок или иконки файлов
+    		- callback: файл загружен 
+    */
+
+  }, {
+    key: "drop",
+    value: function drop() {
+      var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+      var selector = this.selector;
+      var getAddedFiles = this.getAddedFiles;
+      var loadFiles = this.loadFiles.bind(this); // bind потому что в функции loadFiles идет обращение к контексту, но он там потерян, так как вызов идет отсюда, то есть уже 3 вложенности функций
+
+      var dragFuncsArr = ['dragover', 'dragleave', 'drop'];
+
+      var dragFuncs = _.pick(params, dragFuncsArr);
+
+      var loadFilesFuncs = _.omit(params, dragFuncsArr);
+
+      var _$assign = _.assign({
+        dragover: null,
+        // 
+        dragleave: null,
+        // 
+        drop: null //
+
+      }, dragFuncs),
+          dragover = _$assign.dragover,
+          dragleave = _$assign.dragleave,
+          drop = _$assign.drop;
+
+      $(selector).on('drop', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        callFunc(drop || dragleave, this);
+        var files = getAddedFiles(e);
+        loadFiles(files, loadFilesFuncs);
+        return false;
+      });
+      var dragstat = false; // при наведении
+
+      $(selector).on('dragover', function (e) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (!dragstat) {
+          callFunc(dragover, this);
+          dragstat = true;
+        }
+
+        return false;
+      }); // при уходе
+
+      $(selector).on('dragleave', function (e) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (dragstat) {
+          callFunc(dragleave, this);
+          dragstat = false;
+        }
+
+        return false;
+      });
+    }
+    /*	Экспорт файлов полученных через AJAX (доработать)
+    		- опции
+    			- data: приходящие данные
+    			- headers: заголовки
+    			- filename: имя файла
+    		- коллбэк
+    */
+
+  }, {
+    key: "export",
+    value: function _export() {
+      var ops = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+      var cb = arguments.length > 1 ? arguments[1] : undefined;
+      var data = ops.data,
+          headers = ops.headers,
+          _ops$filename = ops.filename,
+          filename = _ops$filename === void 0 ? 'noname' : _ops$filename;
+      var headerContentDisp = headers["content-disposition"] || null;
+      var fName = headerContentDisp && headerContentDisp.split("filename=")[1].replace(/["']/g, "");
+      var fExt = getFileName(fName, 2);
+      var finalFileName = filename ? filename + '.' + fExt : fName;
+      var contentType = headers["content-type"];
+      var blob = new Blob([data], {
+        contentType: contentType
+      });
+      var href = window.URL.createObjectURL(blob);
+      var el = document.createElement("a");
+      el.setAttribute("href", href);
+      el.setAttribute("download", finalFileName);
+      el.click();
+      window.URL.revokeObjectURL(blob);
+      callFunc(cb);
+    } //--------------------------------------------------------------------------------------------------------------------------------------------
+
+    /*	Получить список добавленных файлов
+    		- объект event
+    		- вернуть как простой массив
+    */
+
+  }, {
+    key: "getAddedFiles",
+    value: function getAddedFiles() {
+      var _event$originalEvent, _event$currentTarget;
+
+      var event = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+
+      if (!event) {
+        if (isDev) console.error('getAddedFiles -> не передан event!');
+        return false;
+      }
+
+      var files = null;
+      if ((event === null || event === void 0 ? void 0 : (_event$originalEvent = event.originalEvent) === null || _event$originalEvent === void 0 ? void 0 : _event$originalEvent.dataTransfer) != undefined) files = event.originalEvent.dataTransfer.files;else if ((event === null || event === void 0 ? void 0 : event.dataTransfer) != undefined) files = event.dataTransfer.files;else if ((event === null || event === void 0 ? void 0 : (_event$currentTarget = event.currentTarget) === null || _event$currentTarget === void 0 ? void 0 : _event$currentTarget.files) != undefined) files = event.currentTarget.files;
+      var filesArr = Object.values(files);
+      return filesArr.filter(function (file) {
+        return isFile(file);
+      });
+    }
+    /* Загрузка файлов и обработка их
+    		-  массив файлов
+    		- параметры
+    			- init: null, // перед инициализацией загрузки файлов
+    			- preload: null, // маркировка ключем key блоков под миниатюры картинок или иконки файлов
+    			- callback: null, // файл загружен 
+    			- done: null, // все файлы загружены
+    		
+    		Возвращает данные файла:
+    			
+    			- объект файла
+    				- имя
+    				- расширение
+    				- ключ
+    				- тип
+    				- размер
+    				- функция preview - обработка изображения для вывода превью
+    				- error - если ошибка загрузки файла
+    			- done: все файлы обработаны
+    			- index: индекс файла
+    */
+
+  }, {
+    key: "loadFiles",
+    value: function loadFiles() {
+      var files = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+      var params = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+      if (!files) {
+        if (isDev) console.error('buildFiles -> не переданы файлы!');
+        return false;
+      }
+
+      var compress = this.compressImage;
+      var returnedFiles = this.files;
+
+      var _$assign2 = _.assign({
+        extensions: null,
+        // Разешенные расширения файлов
+        init: null,
+        // перед инициализацией загрузки файлов
+        preload: null,
+        // маркировка ключем key блоков под миниатюры картинок или иконки файлов
+        error: null,
+        // вызывается в случае ошибки
+        callback: null,
+        // файл загружен 
+        done: null // все файлы загружены
+
+      }, params),
+          extensions = _$assign2.extensions,
+          init = _$assign2.init,
+          preload = _$assign2.preload,
+          error = _$assign2.error,
+          callback = _$assign2.callback,
+          done = _$assign2.done;
+
+      callFunc(init, {
+        count: files.length
+      });
+      var allFiles = {};
+      var reader;
+      var cbIters = 0;
+      var complete;
+      $.each(files, function (iter, rawFile) {
+        var isImage = isImgFile(rawFile);
+
+        var _getFileName = getFileName(rawFile),
+            _getFileName2 = _slicedToArray(_getFileName, 2),
+            name = _getFileName2[0],
+            ext = _getFileName2[1];
+
+        if (extensions && !extensions.includes(ext)) {
+          callFunc(error, {
+            text: 'forbidden_extension',
+            extensions: extensions,
+            file: rawFile
+          });
+          return true;
+        }
+
+        rawFile.key = ddrHash(rawFile.name + rawFile.lastModified + rawFile.size, 2);
+        callFunc(preload, {
+          key: rawFile.key,
+          iter: iter,
+          error: rawFile.error
+        });
+        reader = new FileReader();
+
+        reader.onerror = function () {
+          callFunc(error, {
+            text: 'loading_error',
+            file: rawFile
+          });
+          return true;
+        };
+
+        reader.onload = function (e) {
+          if (e.target.error) {
+            callFunc(error, {
+              text: 'loading_error',
+              file: rawFile
+            });
+            return true;
+          }
+
+          if (rawFile.size == 0 && !ext) {
+            callFunc(error, {
+              text: 'not_file',
+              file: rawFile
+            });
+            return true;
+          }
+
+          var fileData = {
+            file: rawFile,
+            name: name,
+            ext: ext,
+            size: rawFile.size,
+            type: rawFile.type,
+            isImage: isImage,
+            key: rawFile.key,
+            preview: isImage ? function (compressParams) {
+              return compress(rawFile, compressParams);
+            } : null
+          };
+          complete = files.length === ++cbIters;
+          callFunc(callback, fileData, {
+            done: complete,
+            index: cbIters
+          });
+          allFiles[rawFile.key] = fileData;
+
+          if (complete) {
+            returnedFiles.value = allFiles;
+            callFunc(done, {
+              files: allFiles
+            });
+          }
+        };
+
+        reader.readAsDataURL(rawFile); // когда мы хотим использовать данные в src для img или другого тега
+      });
+    }
+    /*	Уменьшить размер изображения для превью 
+    		- width: ширина
+    		- height: высота
+    		- quality: качество от 0 до 1
+    */
+
+  }, {
+    key: "compressImage",
+    value: function compressImage() {
+      var file = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+      var params = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+      if (!file) return false;
+
+      var _$assign3 = _.assign({
+        width: null,
+        height: null,
+        quality: 0.9
+      }, params),
+          width = _$assign3.width,
+          height = _$assign3.height,
+          quality = _$assign3.quality;
+
+      var image = new Image();
+      image.src = URL.createObjectURL(file);
+      return new Promise(function (resolve, reject) {
+        try {
+          image.onload = function (_) {
+            var imageWidth = image.width;
+            var imageHeight = image.height;
+            var canvas = document.createElement('canvas'); // resize the canvas and draw the image data into it
+
+            if (width && height) {
+              canvas.width = width;
+              canvas.height = height;
+            } else if (width) {
+              canvas.width = width;
+              canvas.height = Math.floor(imageHeight * width / imageWidth);
+            } else if (height) {
+              canvas.width = Math.floor(imageWidth * height / imageHeight);
+              canvas.height = height;
+            } else {
+              canvas.width = imageWidth;
+              canvas.height = imageHeight;
+            }
+
+            var ctx = canvas.getContext("2d");
+            ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+            var dataUrl = canvas.toDataURL(file.type, quality);
+            resolve(dataUrl);
+          };
+        } catch (e) {
+          reject(e);
+        }
+      });
+    }
+  }]);
+
+  return DdrFiles;
+}();
+
+
+
+/***/ }),
+
+/***/ "./resources/js/plugins/ddrFiles/index.js":
+/*!************************************************!*\
+  !*** ./resources/js/plugins/ddrFiles/index.js ***!
+  \************************************************/
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _ddrFiles__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ddrFiles */ "./resources/js/plugins/ddrFiles/ddrFiles.js");
+
+
+$.ddrChooseFiles = function () {
+  var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+  var chooseParams = _.pick(params, ['multiple', 'init', 'preload', 'callback', 'done', 'fail']);
+
+  var files = ref({});
+  new _ddrFiles__WEBPACK_IMPORTED_MODULE_0__["default"](true, files).choose(chooseParams);
+  return methodsObj(files);
+};
+
+$.fn.ddrFiles = function () {
+  var method = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+
+  if (!method) {
+    if (isDev) console.error('ddrFiles -> не указан метод!');
+    return false;
+  }
+
+  var hasMethod = ['choose', 'drop', 'export'].includes(method);
+  if (!hasMethod) throw new Error("ddrFiles -> \u0442\u0430\u043A\u043E\u0433\u043E \u043C\u0435\u0442\u043E\u0434\u0430 \xAB".concat(method, "\xBB \u043D\u0435\u0442!"));
+  var files = ref({});
+  var methods = new _ddrFiles__WEBPACK_IMPORTED_MODULE_0__["default"](this, files);
+  if (method.includes(':')) method = method.replace(':', '_');
+
+  for (var _len = arguments.length, params = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+    params[_key - 1] = arguments[_key];
+  }
+
+  methods[method].apply(methods, params);
+  return methodsObj(files);
+};
+/*	Комбинирование методов choose и drop
+		- params
+			- method: метод choose или drop (если не указать - будет и то и то)
+			- chooseSelector: селектор открытия кна диалога
+			- dropSelector: селектор drop - области бросания файлов 
+			- multiple: множественный выбор
+			- dragover: событие при наведении на область drop
+			- dragleave: событие при уходе из области drop
+			- drop: событие бросания файлов в область drop
+			- init: перед инициализацией загрузки файлов
+			- preload: маркировка ключем key блоков под миниатюры картинок или иконки файлов
+			- callback: файл загружен 
+			- fail: ошибка загрузки
+*/
+
+
+$.ddrFiles = function () {
+  var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+  if (!params) {
+    if (isDev) console.error('$.ddrFiles -> не переданы параметры!');
+    return false;
+  }
+
+  var _$pick = _.pick(params, ['chooseSelector', 'dropSelector']),
+      chooseSelector = _$pick.chooseSelector,
+      dropSelector = _$pick.dropSelector;
+
+  var chooseParams = _.pick(params, ['multiple', 'init', 'preload', 'callback', 'done', 'fail']);
+
+  var dropParams = _.pick(params, ['dragover', 'dragleave', 'drop', 'init', 'preload', 'callback', 'done', 'fail']);
+
+  var files = ref({});
+
+  if (params !== null && params !== void 0 && params.method) {
+    if (params.method == 'choose') new _ddrFiles__WEBPACK_IMPORTED_MODULE_0__["default"](document.querySelector(chooseSelector), files).choose(chooseParams);
+    if (params.method == 'drop') new _ddrFiles__WEBPACK_IMPORTED_MODULE_0__["default"](document.querySelector(dropSelector), files).drop(dropParams);
+  } else {
+    new _ddrFiles__WEBPACK_IMPORTED_MODULE_0__["default"](document.querySelector(chooseSelector), files).choose(chooseParams);
+    new _ddrFiles__WEBPACK_IMPORTED_MODULE_0__["default"](document.querySelector(dropSelector), files).drop(dropParams);
+  }
+
+  return methodsObj(files);
+};
+/* Это временное решение */
+
+
+$.ddrExport = function () {
+  var ops = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  var cb = arguments.length > 1 ? arguments[1] : undefined;
+  var data = ops.data,
+      headers = ops.headers,
+      filename = ops.filename;
+  var headerContentDisp = headers["content-disposition"] || null;
+  console.log(headers);
+  var fName = headerContentDisp && headerContentDisp.split("filename=")[1].replace(/["']/g, "");
+  var fExt = getFileName(fName, 2);
+  var finalFileName = filename ? filename + '.' + fExt : fName;
+  var contentType = headers["content-type"];
+  var blob = new Blob([data], {
+    contentType: contentType
+  });
+  var href = window.URL.createObjectURL(blob);
+  var el = document.createElement("a");
+  el.setAttribute("href", href);
+  el.setAttribute("download", finalFileName);
+  el.click();
+  window.URL.revokeObjectURL(blob);
+  callFunc(cb);
+};
+/* методы
+	- getFiles: получить все выбранне файлы
+	- removeFile: удалить файл(ы) по ключу
+*/
+
+
+var methodsObj = function methodsObj(files) {
+  return {
+    getFiles: function getFiles() {
+      return files.value;
+    },
+    getFile: function getFile() {
+      return Object.values(files.value)[0]['file'];
+    },
+    removeFile: function removeFile() {
+      var key = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+      var count = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
+      if (_.isNull(key)) return false;
+      if (files.value[key] !== undefined) delete files.value[key];
+    }
+  };
+};
 
 /***/ }),
 
@@ -14823,6 +15512,10 @@ function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Sy
 
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
+function _asyncIterator(iterable) { var method, async, sync, retry = 2; for ("undefined" != typeof Symbol && (async = Symbol.asyncIterator, sync = Symbol.iterator); retry--;) { if (async && null != (method = iterable[async])) return method.call(iterable); if (sync && null != (method = iterable[sync])) return new AsyncFromSyncIterator(method.call(iterable)); async = "@@asyncIterator", sync = "@@iterator"; } throw new TypeError("Object is not async iterable"); }
+
+function AsyncFromSyncIterator(s) { function AsyncFromSyncIteratorContinuation(r) { if (Object(r) !== r) return Promise.reject(new TypeError(r + " is not an object.")); var done = r.done; return Promise.resolve(r.value).then(function (value) { return { value: value, done: done }; }); } return AsyncFromSyncIterator = function AsyncFromSyncIterator(s) { this.s = s, this.n = s.next; }, AsyncFromSyncIterator.prototype = { s: null, n: null, next: function next() { return AsyncFromSyncIteratorContinuation(this.n.apply(this.s, arguments)); }, "return": function _return(value) { var ret = this.s["return"]; return void 0 === ret ? Promise.resolve({ value: value, done: !0 }) : AsyncFromSyncIteratorContinuation(ret.apply(this.s, arguments)); }, "throw": function _throw(value) { var thr = this.s["return"]; return void 0 === thr ? Promise.reject(value) : AsyncFromSyncIteratorContinuation(thr.apply(this.s, arguments)); } }, new AsyncFromSyncIterator(s); }
+
 function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sendMessStat, lastChoosedRow, canEditCell, canCreateCheckbox, canRemoveCheckbox, getCounts) {
   var commentsTooltip, cellEditTooltip;
 
@@ -16782,9 +17475,9 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
       }
     }, {
       name: 'Редактирование Актов',
-      visible: isCommon && $(target.selector).hasAttr('contractselected') && countSelected && !selectedTextCell,
+      visible: isCommon && canEditActs && $(target.selector).hasAttr('contractselected') && countSelected && !selectedTextCell,
       //disabled: $(target.selector).hasAttr('contractselected') == false || !canEditActs,
-      countLeft: countSelected,
+      countLeft: countSelected > 1 ? countSelected : null,
       countOnArrow: true,
       sort: 9,
       onClick: function onClick() {
@@ -16879,6 +17572,211 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
               }
             }
           }, _callee17);
+        }))();
+      }
+    }, {
+      name: 'Выгрузка по шаблону',
+      visible: isCommon && canEditActs && $(target.selector).hasAttr('contractselected') && countSelected && !selectedTextCell,
+      //disabled: $(target.selector).hasAttr('contractselected') == false || !canEditActs,
+      countLeft: countSelected > 1 ? countSelected : null,
+      countOnArrow: true,
+      sort: 10,
+      onClick: function onClick() {
+        return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee20() {
+          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee20$(_context20) {
+            while (1) {
+              switch (_context20.prev = _context20.next) {
+                case 0:
+                  ddrPopup({
+                    title: 'Шаблоны для выгрузки',
+                    width: 500,
+                    buttons: ['Отмена', {
+                      action: 'downloadTemplate',
+                      title: 'Выгрузить'
+                    }]
+                  }).then( /*#__PURE__*/function () {
+                    var _ref28 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee19(_ref27) {
+                      var state, wait, setTitle, setButtons, loadData, setHtml, setLHtml, dialog, close, onScroll, disableButtons, enableButtons, setWidth, _yield$axiosQuery15, data, error, status, headers;
+
+                      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee19$(_context19) {
+                        while (1) {
+                          switch (_context19.prev = _context19.next) {
+                            case 0:
+                              state = _ref27.state, wait = _ref27.wait, setTitle = _ref27.setTitle, setButtons = _ref27.setButtons, loadData = _ref27.loadData, setHtml = _ref27.setHtml, setLHtml = _ref27.setLHtml, dialog = _ref27.dialog, close = _ref27.close, onScroll = _ref27.onScroll, disableButtons = _ref27.disableButtons, enableButtons = _ref27.enableButtons, setWidth = _ref27.setWidth;
+                              //isClosed
+                              wait();
+                              _context19.next = 4;
+                              return axiosQuery('get', 'site/contracts/export_act', {
+                                contract_id: contractId
+                              });
+
+                            case 4:
+                              _yield$axiosQuery15 = _context19.sent;
+                              data = _yield$axiosQuery15.data;
+                              error = _yield$axiosQuery15.error;
+                              status = _yield$axiosQuery15.status;
+                              headers = _yield$axiosQuery15.headers;
+
+                              if (!error) {
+                                _context19.next = 14;
+                                break;
+                              }
+
+                              $.notify('Не загрузить данные!', 'error');
+                              console.log(error === null || error === void 0 ? void 0 : error.message, error === null || error === void 0 ? void 0 : error.errors);
+                              wait(false);
+                              return _context19.abrupt("return");
+
+                            case 14:
+                              _context19.next = 16;
+                              return setHtml(data);
+
+                            case 16:
+                              enableButtons(true);
+                              $('[choosetemplatepath]').on(tapEvent, /*#__PURE__*/function () {
+                                var _ref29 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee18(e) {
+                                  var path, _$$ddrWait, destroy, _iteratorAbruptCompletion, _didIteratorError, _iteratorError, _iterator, _step, _contractId, _yield$axiosQuery16, _data2, _error2, _status2, _headers2;
+
+                                  return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee18$(_context18) {
+                                    while (1) {
+                                      switch (_context18.prev = _context18.next) {
+                                        case 0:
+                                          path = $(e.currentTarget).attr('choosetemplatepath'), _$$ddrWait = $('#contractsCard').ddrWait({
+                                            bgColor: '#ffffffe6',
+                                            iconHeight: '50px'
+                                          }), destroy = _$$ddrWait.destroy;
+
+                                          if (path) {
+                                            _context18.next = 3;
+                                            break;
+                                          }
+
+                                          return _context18.abrupt("return");
+
+                                        case 3:
+                                          wait();
+                                          _iteratorAbruptCompletion = false;
+                                          _didIteratorError = false;
+                                          _context18.prev = 6;
+                                          _iterator = _asyncIterator(selectedContracts.items);
+
+                                        case 8:
+                                          _context18.next = 10;
+                                          return _iterator.next();
+
+                                        case 10:
+                                          if (!(_iteratorAbruptCompletion = !(_step = _context18.sent).done)) {
+                                            _context18.next = 25;
+                                            break;
+                                          }
+
+                                          _contractId = _step.value;
+                                          _context18.next = 14;
+                                          return axiosQuery('post', 'site/contracts/export_act', {
+                                            contract_id: _contractId,
+                                            path: path
+                                          }, 'blob');
+
+                                        case 14:
+                                          _yield$axiosQuery16 = _context18.sent;
+                                          _data2 = _yield$axiosQuery16.data;
+                                          _error2 = _yield$axiosQuery16.error;
+                                          _status2 = _yield$axiosQuery16.status;
+                                          _headers2 = _yield$axiosQuery16.headers;
+
+                                          if (!(_error2 || !_data2)) {
+                                            _context18.next = 21;
+                                            break;
+                                          }
+
+                                          return _context18.abrupt("return");
+
+                                        case 21:
+                                          $.ddrExport({
+                                            data: _data2,
+                                            headers: _headers2
+                                          }, function () {
+                                            destroy();
+                                          });
+
+                                        case 22:
+                                          _iteratorAbruptCompletion = false;
+                                          _context18.next = 8;
+                                          break;
+
+                                        case 25:
+                                          _context18.next = 31;
+                                          break;
+
+                                        case 27:
+                                          _context18.prev = 27;
+                                          _context18.t0 = _context18["catch"](6);
+                                          _didIteratorError = true;
+                                          _iteratorError = _context18.t0;
+
+                                        case 31:
+                                          _context18.prev = 31;
+                                          _context18.prev = 32;
+
+                                          if (!(_iteratorAbruptCompletion && _iterator["return"] != null)) {
+                                            _context18.next = 36;
+                                            break;
+                                          }
+
+                                          _context18.next = 36;
+                                          return _iterator["return"]();
+
+                                        case 36:
+                                          _context18.prev = 36;
+
+                                          if (!_didIteratorError) {
+                                            _context18.next = 39;
+                                            break;
+                                          }
+
+                                          throw _iteratorError;
+
+                                        case 39:
+                                          return _context18.finish(36);
+
+                                        case 40:
+                                          return _context18.finish(31);
+
+                                        case 41:
+                                          close();
+
+                                        case 42:
+                                        case "end":
+                                          return _context18.stop();
+                                      }
+                                    }
+                                  }, _callee18, null, [[6, 27, 31, 41], [32,, 36, 40]]);
+                                }));
+
+                                return function (_x6) {
+                                  return _ref29.apply(this, arguments);
+                                };
+                              }());
+
+                            case 18:
+                            case "end":
+                              return _context19.stop();
+                          }
+                        }
+                      }, _callee19);
+                    }));
+
+                    return function (_x5) {
+                      return _ref28.apply(this, arguments);
+                    };
+                  }());
+
+                case 1:
+                case "end":
+                  return _context20.stop();
+              }
+            }
+          }, _callee20);
         }))();
       }
     }];
