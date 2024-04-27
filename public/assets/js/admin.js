@@ -5837,6 +5837,23 @@ $.fn.tripleTap = function (callback) {
     }
   });
 };
+/*
+	Разделяет название файла на само название и расширение.
+	возвращает:
+		- 1: название
+		- 2: расширение
+	Третий аргумент: обрезает название до заданного количества символов
+*/
+
+
+window.getFileName = function (fileName) {
+  var nameOrExt = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+  var nameLimit = arguments.length > 2 ? arguments[2] : undefined;
+  var fn = _typeof(fileName) === 'object' ? fileName === null || fileName === void 0 ? void 0 : fileName.name.split('.') : fileName.split('.'),
+      e = fn.pop(),
+      n = fn.join('.');
+  if (!nameOrExt) return [n, e];else if (nameOrExt == 1) return nameLimit != undefined && isInt(nameLimit) && n.length > nameLimit ? n.substr(0, nameLimit) : n;else if (nameOrExt == 2) return e;
+};
 
 window.callFunc = function (func) {
   if (!_.isFunction(func)) {
@@ -5926,24 +5943,6 @@ window.ddrCopy = function () {
       }
     }
   });
-};
-/*
-	Разделяет название файла на само название и расширение.
-	возвращает:
-		- 1: название
-		- 2: расширение
-	Третий аргумент: обрезает название до заданного количества символов
-*/
-
-
-window.getFileName = function (fileName) {
-  var nameOrExt = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-  var nameLimit = arguments.length > 2 ? arguments[2] : undefined;
-  var fn = _typeof(fileName) === 'object' ? fileName.name.split('.') : fileName.split('.');
-  if (fn.length == 1) return nameOrExt == null ? [null, null] : null;
-  var e = fn.pop(),
-      n = fn.join('.');
-  if (!nameOrExt) return [n, e];else if (nameOrExt == 1) return nameLimit != undefined && isInt(nameLimit) && n.length > nameLimit ? n.substr(0, nameLimit) : n;else if (nameOrExt == 2) return e;
 };
 
 window.isFile = function () {
@@ -6806,23 +6805,6 @@ window.hasIn = function (data, elem, isKey) {
 
   findKey = data.indexOf(elem);
   return findKey != -1 ? findKey : false;
-};
-/*
-	Разделяет название файла на само название и расширение.
-	возвращает:
-		- 1: название
-		- 2: расширение
-	Третий аргумент: обрезает название до заданного количества символов
-*/
-
-
-window.getFileName = function (fileName) {
-  var nameOrExt = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-  var nameLimit = arguments.length > 2 ? arguments[2] : undefined;
-  var fn = _typeof(fileName) === 'object' ? fileName.name.split('.') : fileName.split('.'),
-      e = fn.pop(),
-      n = fn.join('.');
-  if (!nameOrExt) return [n, e];else if (nameOrExt == 1) return nameLimit != undefined && isInt(nameLimit) && n.length > nameLimit ? n.substr(0, nameLimit) : n;else if (nameOrExt == 2) return e;
 };
 
 window.isImgFile = function (fileName) {
