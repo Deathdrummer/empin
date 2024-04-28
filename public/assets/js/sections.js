@@ -2590,7 +2590,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                           $.ddrExport({
                                             data: _data2,
                                             headers: _headers2,
-                                            filename: _headers2['x-export-filename']
+                                            filename: _headers2['x-export-filename'] || _headers2['export-filename']
                                           }, function () {
                                             destroy();
                                           });

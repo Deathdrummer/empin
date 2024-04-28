@@ -1640,7 +1640,7 @@ export function contextMenu(
 								$.ddrExport({
 									data,
 									headers,
-									filename: headers['x-export-filename']
+									filename: headers['x-export-filename'] || headers['export-filename']
 								}, () => {
 									destroy();
 								});

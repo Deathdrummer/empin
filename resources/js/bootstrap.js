@@ -40,33 +40,6 @@ jQuery.fn.tagName = function() {
 window.axios = require('axios');
 window.axios.defaults.baseURL = process.env.APP_URL;
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-window.axios.defaults.headers.common['Access-Control-Allow-Headers'] = '*';
-window.axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
-window.axios.defaults.headers.common['Access-Control-Allow-Methods'] = 'GET, PUT, POST, DELETE, OPTIONS, post, get';
-
-
-// глобальная обработка AJAX ответаов
-axios.interceptors.request.use(function (request) {
-	const {data, headers} = request;
-	console.log('request', data, headers);
-	return request;
-}, function (error) {
-	return Promise.reject(error);
-});
-
-
-
-
-// глобальная обработка AJAX ответаов
-axios.interceptors.response.use(function (response) {
-	const {data, headers} = response;
-	console.log('response', data, headers);
-	return response;
-}, function (error) {
-	return Promise.reject(error);
-});
-
-
 
 window.axiosQuery = require('@plugins/axiosQuery').default;
 

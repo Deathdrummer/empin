@@ -5521,27 +5521,6 @@ jQuery.fn.tagName = function () {
 window.axios = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
 window.axios.defaults.baseURL = process.env.APP_URL;
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-window.axios.defaults.headers.common['Access-Control-Allow-Headers'] = '*';
-window.axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
-window.axios.defaults.headers.common['Access-Control-Allow-Methods'] = 'GET, PUT, POST, DELETE, OPTIONS, post, get'; // глобальная обработка AJAX ответаов
-
-axios.interceptors.request.use(function (request) {
-  var data = request.data,
-      headers = request.headers;
-  console.log('request', data, headers);
-  return request;
-}, function (error) {
-  return Promise.reject(error);
-}); // глобальная обработка AJAX ответаов
-
-axios.interceptors.response.use(function (response) {
-  var data = response.data,
-      headers = response.headers;
-  console.log('response', data, headers);
-  return response;
-}, function (error) {
-  return Promise.reject(error);
-});
 window.axiosQuery = (__webpack_require__(/*! @plugins/axiosQuery */ "./resources/js/plugins/axiosQuery.js")["default"]);
 /**
  * Echo exposes an expressive API for subscribing to channels and listening
@@ -17724,7 +17703,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                           $.ddrExport({
                                             data: _data2,
                                             headers: _headers2,
-                                            filename: _headers2['x-export-filename']
+                                            filename: _headers2['x-export-filename'] || _headers2['export-filename']
                                           }, function () {
                                             destroy();
                                           });
