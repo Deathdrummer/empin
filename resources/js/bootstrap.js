@@ -44,6 +44,18 @@ window.axios.defaults.headers.common['Access-Control-Allow-Headers'] = '*';
 window.axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
 window.axios.defaults.headers.common['Access-Control-Allow-Methods'] = 'GET, PUT, POST, DELETE, OPTIONS, post, get';
 
+
+// глобальная обработка AJAX ответаов
+axios.interceptors.response.use(function (response) {
+	const {data, headers} = response;
+	console.log('response', data, headers);
+	return response;
+}, function (error) {
+	return Promise.reject(error);
+});
+
+
+
 window.axiosQuery = require('@plugins/axiosQuery').default;
 
 /**
