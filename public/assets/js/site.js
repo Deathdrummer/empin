@@ -11825,11 +11825,11 @@ $.ddrExport = function () {
       fName = headerContentDisp.split("filename=")[1].replace(/["']/g, "");
     }
 
-    fName = decodeURI(fName).replace(/\+|%20/, ' ');
+    fName = decodeURI(fName).replace(/\+|%20/g, ' ');
     fExt = getFileName(fName, 2);
   }
 
-  var finalFileName = filename ? decodeURI(filename).replaceAll(/\+|%20/, ' ') : fName;
+  var finalFileName = filename ? decodeURI(filename).replace(/\+|%20/g, ' ') : fName;
   var contentType = headers["content-type"];
   var blob = new Blob([data], {
     contentType: contentType
