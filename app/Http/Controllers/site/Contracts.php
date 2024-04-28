@@ -1142,7 +1142,7 @@ class Contracts extends Controller {
 		$exportFileName = "storage/{$buildedExportFileName}.{$templateData['file']['ext']}";
 		
 		$templateProcessor->saveAs($exportFileName);
-		return response()->download($exportFileName)->deleteFileAfterSend(true);
+		return response()->download($exportFileName, null, ['Access-Control-Expose-Headers' => 'Content-Disposition'])->deleteFileAfterSend(true);
 	}
 	
 	
