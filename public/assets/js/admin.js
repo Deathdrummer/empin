@@ -5521,6 +5521,7 @@ jQuery.fn.tagName = function () {
 window.axios = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
 window.axios.defaults.baseURL = process.env.APP_URL;
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+window.axios.defaults.headers.common['Access-Control-Allow-Headers'] = '*';
 window.axiosQuery = (__webpack_require__(/*! @plugins/axiosQuery */ "./resources/js/plugins/axiosQuery.js")["default"]);
 /**
  * Echo exposes an expressive API for subscribing to channels and listening
