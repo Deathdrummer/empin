@@ -6,6 +6,8 @@
 	'desc' 			=> null,
 	'button'		=> null,
 	'buttonId'		=> null,
+	'buttonVariant'	=> null,
+	'buttonGroup'	=> null,
 	'disableBtn'	=> null,
 	'action'		=> null,
 	'cando'			=> null
@@ -28,8 +30,8 @@
 				@cando($cando)
 					<x-button
 						id="{{$buttonId}}"
-						variant="green"
-						group="normal"
+						variant="{{$buttonVariant ?? 'green'}}"
+						group="{{$buttonGroup ?? 'normal'}}"
 						px="10"
 						action="{{$action}}"
 						disabled="{{isset($disableBtn)}}"
@@ -39,8 +41,8 @@
 			@else
 				<x-button
 					id="{{$buttonId}}"
-					variant="green"
-					group="normal"
+					variant="{{$buttonVariant ?? 'green'}}"
+					group="{{$buttonGroup ?? 'normal'}}"
 					px="10"
 					action="{{$action}}"
 					disabled="{{isset($disableBtn)}}"

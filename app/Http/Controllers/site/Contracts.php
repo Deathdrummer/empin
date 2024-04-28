@@ -1,5 +1,6 @@
 <?php namespace App\Http\Controllers\site;
 
+use App\Enums\ContractColums;
 use App\Exports\ContractsExport;
 use App\Helpers\DdrDateTime;
 use App\Http\Controllers\Controller;
@@ -21,6 +22,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Maatwebsite\Excel\Facades\Excel;
 use PhpOffice\PhpWord\TemplateProcessor;
+use Illuminate\Support\Str;
 
 class Contracts extends Controller {
 	use Renderable, Settingable;
@@ -1109,15 +1111,26 @@ class Contracts extends Controller {
 	public function export_act(Request $request) {
 		[
 			'contract_id'	=> $contractId,
-			'path'			=> $path,
+			'template_id'	=> $templateId,
 		] = $request->validate([
 			'contract_id'	=> 'required|numeric',
-			'path'			=> 'required|string',
+			'template_id'	=> 'required|numeric',
 		]);
+		
+		
+		
+		
 		
 		$contractData = Contract::find($contractId);
 		
-		$templateProcessor = new TemplateProcessor('storage/'.$path);
+		$templateData = $this->getSettingsCollect('templates-to-export')->firstWhere('id', $templateId);
+		
+		
+
+		
+		if (!isset($templateData['file']['path'])) return response()->json(false);
+		
+		$templateProcessor = new TemplateProcessor('storage/'.$templateData['file']['path']);
 		
 		$tempVars = $templateProcessor->getVariables();
 		foreach ($tempVars as $variabe) {
@@ -1125,7 +1138,21 @@ class Contracts extends Controller {
 			$templateProcessor->setValue($variabe, $contractData[$variabe]);
 		}
 		
-		$exportFileName = "storage/{$contractData->object_number}.docx";
+		
+		
+		$colums = ContractColums::getKeys();
+		$varsMap = [];
+		foreach ($colums as $column) {
+			$varsMap['{'.$column.'}'] = $contractData[$column] ?? '-';
+		}
+
+		
+		$buildedExportFileName = Str::swap($varsMap, $templateData['export_name'] ?? $contractData?->id);
+		
+		$exportFileName = "storage/{$buildedExportFileName}.{$templateData['file']['ext']}";
+		
+		toLog($exportFileName);
+		
 		
 		$templateProcessor->saveAs($exportFileName);
 		return response()->download($exportFileName)->deleteFileAfterSend(true);

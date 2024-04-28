@@ -2513,71 +2513,69 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
 
                             case 16:
                               enableButtons(true);
-                              $('[choosetemplatepath]').on(tapEvent, /*#__PURE__*/function () {
+                              $('[choosetemplateid]').on(tapEvent, /*#__PURE__*/function () {
                                 var _ref29 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee18(e) {
-                                  var path, _$$ddrWait, destroy, _iteratorAbruptCompletion, _didIteratorError, _iteratorError, _iterator, _step, _contractId, _yield$axiosQuery16, _data2, _error2, _status2, _headers2;
+                                  var templateId, _$$ddrWait, destroy, _iteratorAbruptCompletion, _didIteratorError, _iteratorError, _iterator, _step, _contractId, _yield$axiosQuery16, _data2, _error2, _status2, _headers2;
 
                                   return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee18$(_context18) {
                                     while (1) {
                                       switch (_context18.prev = _context18.next) {
                                         case 0:
-                                          path = $(e.currentTarget).attr('choosetemplatepath'), _$$ddrWait = $('#contractsCard').ddrWait({
+                                          templateId = $(e.currentTarget).attr('choosetemplateid'), _$$ddrWait = $('#contractsCard').ddrWait({
                                             bgColor: '#ffffffe6',
                                             iconHeight: '50px'
                                           }), destroy = _$$ddrWait.destroy;
 
-                                          if (path) {
-                                            _context18.next = 3;
+                                          if (templateId) {
+                                            _context18.next = 4;
                                             break;
                                           }
 
+                                          $.notify('Ошибка выгрузки! Шаблон не найден', 'error');
                                           return _context18.abrupt("return");
 
-                                        case 3:
+                                        case 4:
                                           wait();
                                           _iteratorAbruptCompletion = false;
                                           _didIteratorError = false;
-                                          _context18.prev = 6;
+                                          _context18.prev = 7;
                                           _iterator = _asyncIterator(selectedContracts.items);
 
-                                        case 8:
-                                          _context18.next = 10;
+                                        case 9:
+                                          _context18.next = 11;
                                           return _iterator.next();
 
-                                        case 10:
+                                        case 11:
                                           if (!(_iteratorAbruptCompletion = !(_step = _context18.sent).done)) {
-                                            _context18.next = 26;
+                                            _context18.next = 29;
                                             break;
                                           }
 
                                           _contractId = _step.value;
-                                          _context18.next = 14;
+                                          _context18.next = 15;
                                           return axiosQuery('post', 'site/contracts/export_act', {
                                             contract_id: _contractId,
-                                            path: path
+                                            template_id: templateId
                                           }, 'blob');
 
-                                        case 14:
+                                        case 15:
                                           _yield$axiosQuery16 = _context18.sent;
                                           _data2 = _yield$axiosQuery16.data;
                                           _error2 = _yield$axiosQuery16.error;
                                           _status2 = _yield$axiosQuery16.status;
                                           _headers2 = _yield$axiosQuery16.headers;
-                                          console.log({
-                                            data: _data2,
-                                            error: _error2,
-                                            status: _status2,
-                                            headers: _headers2
-                                          });
 
-                                          if (!(_error2 || !_data2)) {
-                                            _context18.next = 22;
+                                          if (!_error2) {
+                                            _context18.next = 25;
                                             break;
                                           }
 
+                                          $.notify('Не загрузить данные!', 'error');
+                                          console.log(_error2 === null || _error2 === void 0 ? void 0 : _error2.message, _error2 === null || _error2 === void 0 ? void 0 : _error2.errors);
+                                          wait(false);
                                           return _context18.abrupt("return");
 
-                                        case 22:
+                                        case 25:
                                           $.ddrExport({
                                             data: _data2,
                                             headers: _headers2
@@ -2585,58 +2583,58 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                             destroy();
                                           });
 
-                                        case 23:
-                                          _iteratorAbruptCompletion = false;
-                                          _context18.next = 8;
-                                          break;
-
                                         case 26:
-                                          _context18.next = 32;
+                                          _iteratorAbruptCompletion = false;
+                                          _context18.next = 9;
                                           break;
 
-                                        case 28:
-                                          _context18.prev = 28;
-                                          _context18.t0 = _context18["catch"](6);
+                                        case 29:
+                                          _context18.next = 35;
+                                          break;
+
+                                        case 31:
+                                          _context18.prev = 31;
+                                          _context18.t0 = _context18["catch"](7);
                                           _didIteratorError = true;
                                           _iteratorError = _context18.t0;
 
-                                        case 32:
-                                          _context18.prev = 32;
-                                          _context18.prev = 33;
+                                        case 35:
+                                          _context18.prev = 35;
+                                          _context18.prev = 36;
 
                                           if (!(_iteratorAbruptCompletion && _iterator["return"] != null)) {
-                                            _context18.next = 37;
+                                            _context18.next = 40;
                                             break;
                                           }
 
-                                          _context18.next = 37;
+                                          _context18.next = 40;
                                           return _iterator["return"]();
 
-                                        case 37:
-                                          _context18.prev = 37;
+                                        case 40:
+                                          _context18.prev = 40;
 
                                           if (!_didIteratorError) {
-                                            _context18.next = 40;
+                                            _context18.next = 43;
                                             break;
                                           }
 
                                           throw _iteratorError;
 
-                                        case 40:
-                                          return _context18.finish(37);
+                                        case 43:
+                                          return _context18.finish(40);
 
-                                        case 41:
-                                          return _context18.finish(32);
+                                        case 44:
+                                          return _context18.finish(35);
 
-                                        case 42:
+                                        case 45:
                                           close();
 
-                                        case 43:
+                                        case 46:
                                         case "end":
                                           return _context18.stop();
                                       }
                                     }
-                                  }, _callee18, null, [[6, 28, 32, 42], [33,, 37, 41]]);
+                                  }, _callee18, null, [[7, 31, 35, 45], [36,, 40, 44]]);
                                 }));
 
                                 return function (_x6) {

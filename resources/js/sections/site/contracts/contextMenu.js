@@ -1603,24 +1603,29 @@ export function contextMenu(
 						enableButtons(true);
 						
 						
-						$('[choosetemplatepath]').on(tapEvent, async (e) => {
-							const path = $(e.currentTarget).attr('choosetemplatepath'),
+						$('[choosetemplateid]').on(tapEvent, async (e) => {
+							const templateId = $(e.currentTarget).attr('choosetemplateid'),
 								{destroy} = $('#contractsCard').ddrWait({
 									bgColor: '#ffffffe6',
 									iconHeight: '50px',
 								});
 							
-							if (!path) return;
+							if (!templateId) {
+								$.notify('Ошибка выгрузки! Шаблон не найден', 'error');
+								return;
+							}
 							
 							wait();
 							
 							for await (const contractId of selectedContracts.items) {
-								const {data, error, status, headers} = await axiosQuery('post', 'site/contracts/export_act', {contract_id: contractId, path}, 'blob');
+								const {data, error, status, headers} = await axiosQuery('post', 'site/contracts/export_act', {contract_id: contractId, template_id: templateId}, 'blob');
 								
-								
-								console.log({data, error, status, headers});
-								
-								if (error || !data) return;
+								if (error) {
+									$.notify('Не загрузить данные!', 'error');
+									console.log(error?.message, error?.errors);
+									wait(false);
+									return;
+								}
 								
 								$.ddrExport({
 									data,

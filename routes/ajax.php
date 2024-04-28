@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\ContractColums;
 use App\Http\Controllers\admin\Acts;
 use App\Http\Controllers\crud\Admins;
 use App\Http\Controllers\crud\Contracts;
@@ -173,6 +174,11 @@ Route::resource('steps_patterns', StepsPatterns::class);
 Route::post('/upload_file', [UploadFilesController::class, 'upload']);
 Route::delete('/upload_file', [UploadFilesController::class, 'remove']);
 
+
+Route::get('/get_export_cheatsheet', function (Request $request) {
+	$data = ContractColums::asArray();
+	return response()->json($data);
+});
 
 
 

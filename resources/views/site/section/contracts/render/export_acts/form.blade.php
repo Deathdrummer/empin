@@ -2,7 +2,7 @@
 
 <ul class="buttonslist" >
 	@forelse($templates as $template)
-		<li class="buttonslist__item" choosetemplatepath="{{$template['file']['path'] ?? null}}">
+		<li class="buttonslist__item" choosetemplateid="{{$template['id'] ?? null}}">
 			{{$template['name'] ?? 'Нет названия'}}
 		</li>
 	@empty
