@@ -1117,16 +1117,9 @@ class Contracts extends Controller {
 			'template_id'	=> 'required|numeric',
 		]);
 		
-		
-		
-		
-		
 		$contractData = Contract::find($contractId);
 		
 		$templateData = $this->getSettingsCollect('templates-to-export')->firstWhere('id', $templateId);
-		
-		
-
 		
 		if (!isset($templateData['file']['path'])) return response()->json(false);
 		
@@ -1138,21 +1131,15 @@ class Contracts extends Controller {
 			$templateProcessor->setValue($variabe, $contractData[$variabe]);
 		}
 		
-		
-		
 		$colums = ContractColums::getKeys();
 		$varsMap = [];
 		foreach ($colums as $column) {
-			$varsMap['{'.$column.'}'] = $contractData[$column] ?? '-';
+			$varsMap['{'.$column.'}'] = $contractData[$column] ?? '';
 		}
 
-		
-		$buildedExportFileName = Str::swap($varsMap, $templateData['export_name'] ?? $contractData?->id);
+		$buildedExportFileName = trim(Str::swap($varsMap, $templateData['export_name'] ?? $contractData?->id));
 		
 		$exportFileName = "storage/{$buildedExportFileName}.{$templateData['file']['ext']}";
-		
-		toLog($exportFileName);
-		
 		
 		$templateProcessor->saveAs($exportFileName);
 		return response()->download($exportFileName)->deleteFileAfterSend(true);
