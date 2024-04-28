@@ -46,6 +46,18 @@ window.axios.defaults.headers.common['Access-Control-Allow-Methods'] = 'GET, PUT
 
 
 // глобальная обработка AJAX ответаов
+axios.interceptors.request.use(function (request) {
+	const {data, headers} = request;
+	console.log('request', data, headers);
+	return request;
+}, function (error) {
+	return Promise.reject(error);
+});
+
+
+
+
+// глобальная обработка AJAX ответаов
 axios.interceptors.response.use(function (response) {
 	const {data, headers} = response;
 	console.log('response', data, headers);

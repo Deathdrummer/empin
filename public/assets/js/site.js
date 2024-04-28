@@ -5378,6 +5378,15 @@ window.axios.defaults.headers.common['Access-Control-Allow-Headers'] = '*';
 window.axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
 window.axios.defaults.headers.common['Access-Control-Allow-Methods'] = 'GET, PUT, POST, DELETE, OPTIONS, post, get'; // глобальная обработка AJAX ответаов
 
+axios.interceptors.request.use(function (request) {
+  var data = request.data,
+      headers = request.headers;
+  console.log('request', data, headers);
+  return request;
+}, function (error) {
+  return Promise.reject(error);
+}); // глобальная обработка AJAX ответаов
+
 axios.interceptors.response.use(function (response) {
   var data = response.data,
       headers = response.headers;

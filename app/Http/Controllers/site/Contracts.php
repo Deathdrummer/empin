@@ -1140,10 +1140,9 @@ class Contracts extends Controller {
 		$buildedExportFileName = trim(Str::swap($varsMap, $templateData['export_name'] ?? $contractData?->id));
 		
 		$exportFilePath = "storage/{$buildedExportFileName}.{$templateData['file']['ext']}";
-		$exportFileName = urlencode("{$buildedExportFileName}.{$templateData['file']['ext']}");
 		
 		$templateProcessor->saveAs($exportFilePath);
-		return response()->download($exportFilePath, null, ['Access-Control-Allow-Origin' => '*', 'X-Export-Filename' => $exportFileName])->deleteFileAfterSend(true);
+		return response()->download($exportFilePath)->deleteFileAfterSend(true);
 	}
 	
 	
