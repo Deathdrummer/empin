@@ -11013,6 +11013,9 @@ $.ddrExport = function () {
   }
 
   var finalFileName = filename ? filename + '.' + fExt : fName;
+  console.log({
+    finalFileName: finalFileName
+  });
   var contentType = headers["content-type"];
   var blob = new Blob([data], {
     contentType: contentType
