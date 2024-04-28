@@ -11013,6 +11013,7 @@ $.ddrExport = function () {
   }
 
   var finalFileName = filename ? decodeURI(filename).replace(/\+|%20/, ' ') : fName;
+  console.log(finalFileName);
   var contentType = headers["content-type"];
   var blob = new Blob([data], {
     contentType: contentType

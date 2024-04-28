@@ -105,6 +105,9 @@ $.ddrExport = function(ops = {}, cb) {
 	
 	const finalFileName = filename ? decodeURI(filename).replace(/\+|%20/, ' ') : fName;
 	
+	
+	console.log(finalFileName);
+	
 	const contentType = headers["content-type"];
 	const blob = new Blob([data], {contentType});
 	const href = window.URL.createObjectURL(blob);
