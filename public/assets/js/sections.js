@@ -2526,7 +2526,6 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                             iconHeight: '50px'
                                           }), destroy = _$$ddrWait.destroy;
                                           onClose(function () {
-                                            console.log(123123);
                                             destroy();
                                           });
 

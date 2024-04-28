@@ -1579,8 +1579,6 @@ export function contextMenu(
 				sort: 10,
 				async onClick() {
 					
-					
-					
 					ddrPopup({
 						title: 'Шаблоны для выгрузки',
 						width: 500,
@@ -1610,7 +1608,6 @@ export function contextMenu(
 								});
 								
 								onClose(() => {
-									console.log(123123);
 									destroy();
 								});
 							

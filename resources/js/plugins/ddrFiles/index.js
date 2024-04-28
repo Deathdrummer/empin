@@ -90,9 +90,6 @@ $.ddrExport = function(ops = {}, cb) {
 	const {data, headers, filename} = ops;
 	const headerContentDisp = headers["content-disposition"] || null;
 	
-	
-	console.log(filename);
-	
 	let fName, fExt;
 	
 	if (headerContentDisp) {
@@ -107,9 +104,6 @@ $.ddrExport = function(ops = {}, cb) {
 	}
 	
 	const finalFileName = filename ? decodeURI(filename).replace(/\+|%20/g, ' ') : fName;
-	
-	
-	
 	
 	const contentType = headers["content-type"];
 	const blob = new Blob([data], {contentType});

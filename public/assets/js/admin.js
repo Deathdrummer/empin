@@ -10999,7 +10999,6 @@ $.ddrExport = function () {
       headers = ops.headers,
       filename = ops.filename;
   var headerContentDisp = headers["content-disposition"] || null;
-  console.log(filename);
   var fName, fExt;
 
   if (headerContentDisp) {
@@ -17639,7 +17638,6 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                             iconHeight: '50px'
                                           }), destroy = _$$ddrWait.destroy;
                                           onClose(function () {
-                                            console.log(123123);
                                             destroy();
                                           });
 
