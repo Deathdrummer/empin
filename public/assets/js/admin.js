@@ -11002,17 +11002,28 @@ $.ddrExport = function () {
   var fName, fExt;
 
   if (headerContentDisp) {
+    console.log('headerContentDisp', headerContentDisp);
+
     if (headerContentDisp.includes('filename*=utf-8')) {
+      console.log('includes filename*=utf-8');
       fName = headerContentDisp.split("filename*=utf-8")[1].replace(/["']/g, "");
     } else if (headerContentDisp.includes('filename=')) {
+      console.log('includes filename=');
       fName = headerContentDisp.split("filename=")[1].replace(/["']/g, "");
     }
 
     fName = decodeURI(fName);
     fExt = getFileName(fName, 2);
+    console.log({
+      fName: fName,
+      fExt: fExt
+    });
   }
 
   var finalFileName = filename ? filename + '.' + fExt : fName;
+  console.log({
+    filename: filename
+  });
   console.log({
     finalFileName: finalFileName
   });
