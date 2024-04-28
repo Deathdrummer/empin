@@ -1625,8 +1625,14 @@ export function contextMenu(
 								console.log(headers);
 								
 								if (error) {
-									$.notify('Не загрузить данные!', 'error');
+									$.notify('Не удалось загрузить данные!', 'error');
 									console.log(error?.message, error?.errors);
+									wait(false);
+									return;
+								}
+								
+								if (!headers['x-export-filename']) {
+									$.notify('Не удалось загрузить данные!', 'error');
 									wait(false);
 									return;
 								}
