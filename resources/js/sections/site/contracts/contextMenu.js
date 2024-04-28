@@ -1620,6 +1620,8 @@ export function contextMenu(
 							for await (const contractId of selectedContracts.items) {
 								const {data, error, status, headers} = await axiosQuery('post', 'site/contracts/export_act', {contract_id: contractId, template_id: templateId}, 'blob');
 								
+								
+								
 								console.log(headers);
 								
 								if (error) {
@@ -1631,7 +1633,8 @@ export function contextMenu(
 								
 								$.ddrExport({
 									data,
-									headers
+									headers,
+									filename: headers['export_filename']
 								}, () => {
 									destroy();
 								});

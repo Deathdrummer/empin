@@ -11008,11 +11008,11 @@ $.ddrExport = function () {
       fName = headerContentDisp.split("filename=")[1].replace(/["']/g, "");
     }
 
-    fName = decodeURI(fName);
+    fName = decodeURI(fName).replace(/\+|%20/, ' ');
     fExt = getFileName(fName, 2);
   }
 
-  var finalFileName = filename ? decodeURI(filename) : fName;
+  var finalFileName = filename ? decodeURI(filename).replace(/\+|%20/, ' ') : fName;
   var contentType = headers["content-type"];
   var blob = new Blob([data], {
     contentType: contentType
@@ -17691,7 +17691,8 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                         case 26:
                                           $.ddrExport({
                                             data: _data2,
-                                            headers: _headers2
+                                            headers: _headers2,
+                                            filename: _headers2['export_filename']
                                           }, function () {
                                             destroy();
                                           });

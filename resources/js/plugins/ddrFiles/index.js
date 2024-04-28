@@ -99,11 +99,11 @@ $.ddrExport = function(ops = {}, cb) {
 		  fName = headerContentDisp.split("filename=")[1].replace(/["']/g, "");
 		}
 		
-		fName = decodeURI(fName);
+		fName = decodeURI(fName).replace(/\+|%20/, ' ');
 		fExt = getFileName(fName, 2);
 	}
 	
-	const finalFileName = filename ? decodeURI(filename) : fName;
+	const finalFileName = filename ? decodeURI(filename).replace(/\+|%20/, ' ') : fName;
 	
 	const contentType = headers["content-type"];
 	const blob = new Blob([data], {contentType});
