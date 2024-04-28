@@ -1585,9 +1585,8 @@ export function contextMenu(
 						title: 'Шаблоны для выгрузки',
 						width: 500,
 						buttons: ['Отмена', {action: 'downloadTemplate', title: 'Выгрузить'}],
-					}).then(async ({state, wait, setTitle, setButtons, loadData, setHtml, setLHtml, dialog, close, onScroll, disableButtons, enableButtons, setWidth}) => { //isClosed
+					}).then(async ({state, wait, setTitle, setButtons, loadData, setHtml, setLHtml, dialog, close, onClose, onScroll, disableButtons, enableButtons, setWidth}) => { //isClosed
 						wait();
-						
 						
 						const {data, error, status, headers} = await axiosQuery('get', 'site/contracts/export_act', {contract_id: contractId});
 						
@@ -1609,6 +1608,11 @@ export function contextMenu(
 									bgColor: '#ffffffe6',
 									iconHeight: '50px',
 								});
+								
+								onClose(() => {
+									console.log(123123);
+									destroy();
+								});
 							
 							if (!templateId) {
 								$.notify('Ошибка выгрузки! Шаблон не найден', 'error');
@@ -1621,15 +1625,17 @@ export function contextMenu(
 								const {data, error, status, headers} = await axiosQuery('post', 'site/contracts/export_act', {contract_id: contractId, template_id: templateId}, 'blob');
 								
 								if (error) {
-									$.notify('Не удалось загрузить данные!', 'error');
+									$.notify('Не удалось загрузить данные! Возможно, не загружен файл шаблона.', 'error');
 									console.log(error?.message, error?.errors);
 									wait(false);
+									destroy();
 									return;
 								}
 								
 								if (!headers['x-export-filename']) {
-									$.notify('Не удалось загрузить данные!', 'error');
+									$.notify('Не удалось загрузить данные! Возможно, не загружен файл шаблона.', 'error');
 									wait(false);
+									destroy();
 									return;
 								}
 								

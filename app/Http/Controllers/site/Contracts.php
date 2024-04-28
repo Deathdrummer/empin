@@ -1125,6 +1125,23 @@ class Contracts extends Controller {
 		
 		$templateProcessor = new TemplateProcessor('storage/'.$templateData['file']['path']);
 		
+		
+		
+		['contractor' => $contractor, 'customer' => $customer, 'type' => $type] = $this->getSettings([[
+				'setting'	=> 'contract-customers:customer',
+				'key'		=> 'id',
+				'value'		=> 'name'
+			], [
+				'setting'	=> 'contract-types:type',
+				'key'		=> 'id',
+				'value'		=> 'title'
+			], [
+				'setting'	=> 'contract-contractors:contractor',
+				'key'		=> 'id',
+				'value'		=> 'name'
+			]
+		]);
+		
 		$tempVars = $templateProcessor->getVariables();
 		foreach ($tempVars as $variabe) {
 			if (!isset($contractData[$variabe])) continue;
@@ -1134,9 +1151,14 @@ class Contracts extends Controller {
 		$colums = ContractColums::getKeys();
 		$varsMap = [];
 		foreach ($colums as $column) {
-			$varsMap['{'.$column.'}'] = $contractData[$column] ?? '';
+			$varsMap['{'.$column.'}'] = match($column) {
+				'contractor'	=> $contractor[$contractData[$column]] ?? '',
+				'customer'		=> $customer[$contractData[$column]] ?? '',
+				'type'			=> $type[$contractData[$column]] ?? '',
+				default			=> $contractData[$column] ?? '',
+			};
 		}
-
+		
 		$buildedExportFileName = trim(Str::swap($varsMap, $templateData['export_name'] ?? $contractData?->id));
 		
 		$exportFilePath = "storage/{$buildedExportFileName}.{$templateData['file']['ext']}";
@@ -1144,7 +1166,7 @@ class Contracts extends Controller {
 		
 		$templateProcessor->saveAs($exportFilePath);
 		
-		return response()->download($exportFilePath, null, ['x-export-filename' => $exportFileName])->deleteFileAfterSend();
+		return response()->download($exportFilePath, null, ['x-export-filename' => urlencode($exportFileName)])->deleteFileAfterSend();
 	}
 	
 	

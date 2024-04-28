@@ -17589,13 +17589,13 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                     }]
                   }).then( /*#__PURE__*/function () {
                     var _ref28 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee19(_ref27) {
-                      var state, wait, setTitle, setButtons, loadData, setHtml, setLHtml, dialog, close, onScroll, disableButtons, enableButtons, setWidth, _yield$axiosQuery15, data, error, status, headers;
+                      var state, wait, setTitle, setButtons, loadData, setHtml, setLHtml, dialog, close, onClose, onScroll, disableButtons, enableButtons, setWidth, _yield$axiosQuery15, data, error, status, headers;
 
                       return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee19$(_context19) {
                         while (1) {
                           switch (_context19.prev = _context19.next) {
                             case 0:
-                              state = _ref27.state, wait = _ref27.wait, setTitle = _ref27.setTitle, setButtons = _ref27.setButtons, loadData = _ref27.loadData, setHtml = _ref27.setHtml, setLHtml = _ref27.setLHtml, dialog = _ref27.dialog, close = _ref27.close, onScroll = _ref27.onScroll, disableButtons = _ref27.disableButtons, enableButtons = _ref27.enableButtons, setWidth = _ref27.setWidth;
+                              state = _ref27.state, wait = _ref27.wait, setTitle = _ref27.setTitle, setButtons = _ref27.setButtons, loadData = _ref27.loadData, setHtml = _ref27.setHtml, setLHtml = _ref27.setLHtml, dialog = _ref27.dialog, close = _ref27.close, onClose = _ref27.onClose, onScroll = _ref27.onScroll, disableButtons = _ref27.disableButtons, enableButtons = _ref27.enableButtons, setWidth = _ref27.setWidth;
                               //isClosed
                               wait();
                               _context19.next = 4;
@@ -17638,40 +17638,44 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                             bgColor: '#ffffffe6',
                                             iconHeight: '50px'
                                           }), destroy = _$$ddrWait.destroy;
+                                          onClose(function () {
+                                            console.log(123123);
+                                            destroy();
+                                          });
 
                                           if (templateId) {
-                                            _context18.next = 4;
+                                            _context18.next = 5;
                                             break;
                                           }
 
                                           $.notify('Ошибка выгрузки! Шаблон не найден', 'error');
                                           return _context18.abrupt("return");
 
-                                        case 4:
+                                        case 5:
                                           wait();
                                           _iteratorAbruptCompletion = false;
                                           _didIteratorError = false;
-                                          _context18.prev = 7;
+                                          _context18.prev = 8;
                                           _iterator = _asyncIterator(selectedContracts.items);
 
-                                        case 9:
-                                          _context18.next = 11;
+                                        case 10:
+                                          _context18.next = 12;
                                           return _iterator.next();
 
-                                        case 11:
+                                        case 12:
                                           if (!(_iteratorAbruptCompletion = !(_step = _context18.sent).done)) {
-                                            _context18.next = 33;
+                                            _context18.next = 36;
                                             break;
                                           }
 
                                           _contractId = _step.value;
-                                          _context18.next = 15;
+                                          _context18.next = 16;
                                           return axiosQuery('post', 'site/contracts/export_act', {
                                             contract_id: _contractId,
                                             template_id: templateId
                                           }, 'blob');
 
-                                        case 15:
+                                        case 16:
                                           _yield$axiosQuery16 = _context18.sent;
                                           _data2 = _yield$axiosQuery16.data;
                                           _error2 = _yield$axiosQuery16.error;
@@ -17679,26 +17683,28 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                           _headers2 = _yield$axiosQuery16.headers;
 
                                           if (!_error2) {
-                                            _context18.next = 25;
+                                            _context18.next = 27;
                                             break;
                                           }
 
-                                          $.notify('Не удалось загрузить данные!', 'error');
+                                          $.notify('Не удалось загрузить данные! Возможно, не загружен файл шаблона.', 'error');
                                           console.log(_error2 === null || _error2 === void 0 ? void 0 : _error2.message, _error2 === null || _error2 === void 0 ? void 0 : _error2.errors);
                                           wait(false);
+                                          destroy();
                                           return _context18.abrupt("return");
 
-                                        case 25:
+                                        case 27:
                                           if (_headers2['x-export-filename']) {
-                                            _context18.next = 29;
+                                            _context18.next = 32;
                                             break;
                                           }
 
-                                          $.notify('Не удалось загрузить данные!', 'error');
+                                          $.notify('Не удалось загрузить данные! Возможно, не загружен файл шаблона.', 'error');
                                           wait(false);
+                                          destroy();
                                           return _context18.abrupt("return");
 
-                                        case 29:
+                                        case 32:
                                           $.ddrExport({
                                             data: _data2,
                                             headers: _headers2,
@@ -17707,58 +17713,58 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                             destroy();
                                           });
 
-                                        case 30:
-                                          _iteratorAbruptCompletion = false;
-                                          _context18.next = 9;
-                                          break;
-
                                         case 33:
-                                          _context18.next = 39;
+                                          _iteratorAbruptCompletion = false;
+                                          _context18.next = 10;
                                           break;
 
-                                        case 35:
-                                          _context18.prev = 35;
-                                          _context18.t0 = _context18["catch"](7);
+                                        case 36:
+                                          _context18.next = 42;
+                                          break;
+
+                                        case 38:
+                                          _context18.prev = 38;
+                                          _context18.t0 = _context18["catch"](8);
                                           _didIteratorError = true;
                                           _iteratorError = _context18.t0;
 
-                                        case 39:
-                                          _context18.prev = 39;
-                                          _context18.prev = 40;
+                                        case 42:
+                                          _context18.prev = 42;
+                                          _context18.prev = 43;
 
                                           if (!(_iteratorAbruptCompletion && _iterator["return"] != null)) {
-                                            _context18.next = 44;
+                                            _context18.next = 47;
                                             break;
                                           }
 
-                                          _context18.next = 44;
+                                          _context18.next = 47;
                                           return _iterator["return"]();
 
-                                        case 44:
-                                          _context18.prev = 44;
+                                        case 47:
+                                          _context18.prev = 47;
 
                                           if (!_didIteratorError) {
-                                            _context18.next = 47;
+                                            _context18.next = 50;
                                             break;
                                           }
 
                                           throw _iteratorError;
 
-                                        case 47:
-                                          return _context18.finish(44);
+                                        case 50:
+                                          return _context18.finish(47);
 
-                                        case 48:
-                                          return _context18.finish(39);
+                                        case 51:
+                                          return _context18.finish(42);
 
-                                        case 49:
+                                        case 52:
                                           close();
 
-                                        case 50:
+                                        case 53:
                                         case "end":
                                           return _context18.stop();
                                       }
                                     }
-                                  }, _callee18, null, [[7, 35, 39, 49], [40,, 44, 48]]);
+                                  }, _callee18, null, [[8, 38, 42, 52], [43,, 47, 51]]);
                                 }));
 
                                 return function (_x6) {
