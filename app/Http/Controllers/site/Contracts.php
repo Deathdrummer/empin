@@ -1144,7 +1144,7 @@ class Contracts extends Controller {
 		
 		
 		$templateProcessor->saveAs($exportFilePath);
-		return response()->download($exportFilePath, null, ['X-Export-Filename' => $exportFileName])->deleteFileAfterSend(true);
+		return response()->download($exportFilePath, null, ['Access-Control-Allow-Origin' => '*', 'X-Export-Filename' => $exportFileName])->deleteFileAfterSend(true);
 	}
 	
 	
