@@ -90,17 +90,17 @@ $.ddrExport = function(ops = {}, cb) {
 	const {data, headers, filename} = ops;
 	const headerContentDisp = headers["content-disposition"] || null;
 	
-	let fName;
-
-	if (headerContentDisp.includes('filename*=utf-8')) {
-	  fName = headerContentDisp.split("filename*=utf-8")[1].replace(/["']/g, "");
-	} else if (headerContentDisp.includes('filename=')) {
-	  fName = headerContentDisp.split("filename=")[1].replace(/["']/g, "");
+	let fName, fExt;
+	
+	if (headerContentDisp) {
+		if (headerContentDisp.includes('filename*=utf-8')) {
+		  fName = headerContentDisp.split("filename*=utf-8")[1].replace(/["']/g, "");
+		} else if (headerContentDisp.includes('filename=')) {
+		  fName = headerContentDisp.split("filename=")[1].replace(/["']/g, "");
+		}
+		fName = decodeURI(fName);
+		fExt = getFileName(fName, 2);
 	}
-	
-	fName = decodeURI(fName);
-	
-	const fExt = getFileName(fName, 2);
 	
 	const finalFileName = filename ? filename+'.'+fExt : fName;
 	

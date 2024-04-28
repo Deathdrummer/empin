@@ -11815,16 +11815,19 @@ $.ddrExport = function () {
       headers = ops.headers,
       filename = ops.filename;
   var headerContentDisp = headers["content-disposition"] || null;
-  var fName;
+  var fName, fExt;
 
-  if (headerContentDisp.includes('filename*=utf-8')) {
-    fName = headerContentDisp.split("filename*=utf-8")[1].replace(/["']/g, "");
-  } else if (headerContentDisp.includes('filename=')) {
-    fName = headerContentDisp.split("filename=")[1].replace(/["']/g, "");
+  if (headerContentDisp) {
+    if (headerContentDisp.includes('filename*=utf-8')) {
+      fName = headerContentDisp.split("filename*=utf-8")[1].replace(/["']/g, "");
+    } else if (headerContentDisp.includes('filename=')) {
+      fName = headerContentDisp.split("filename=")[1].replace(/["']/g, "");
+    }
+
+    fName = decodeURI(fName);
+    fExt = getFileName(fName, 2);
   }
 
-  fName = decodeURI(fName);
-  var fExt = getFileName(fName, 2);
   var finalFileName = filename ? filename + '.' + fExt : fName;
   var contentType = headers["content-type"];
   var blob = new Blob([data], {
