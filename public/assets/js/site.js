@@ -11815,6 +11815,7 @@ $.ddrExport = function () {
       headers = ops.headers,
       filename = ops.filename;
   var headerContentDisp = headers["content-disposition"] || null;
+  console.log(filename);
   var fName, fExt;
 
   if (headerContentDisp) {
@@ -11829,7 +11830,6 @@ $.ddrExport = function () {
   }
 
   var finalFileName = filename ? decodeURI(filename).replace(/\+|%20/, ' ') : fName;
-  console.log(finalFileName);
   var contentType = headers["content-type"];
   var blob = new Blob([data], {
     contentType: contentType
@@ -20653,7 +20653,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                           $.ddrExport({
                                             data: _data2,
                                             headers: _headers2,
-                                            filename: _headers2['export_filename']
+                                            filename: _headers2['x-export-filename']
                                           }, function () {
                                             destroy();
                                           });

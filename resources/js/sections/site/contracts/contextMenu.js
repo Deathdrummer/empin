@@ -1634,7 +1634,7 @@ export function contextMenu(
 								$.ddrExport({
 									data,
 									headers,
-									filename: headers['export_filename']
+									filename: headers['x-export-filename']
 								}, () => {
 									destroy();
 								});
