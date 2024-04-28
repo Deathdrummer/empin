@@ -17677,7 +17677,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                           _error2 = _yield$axiosQuery16.error;
                                           _status2 = _yield$axiosQuery16.status;
                                           _headers2 = _yield$axiosQuery16.headers;
-                                          console.log(_headers2);
+                                          console.log(_data2, _error2, _status2, _headers2);
 
                                           if (!_error2) {
                                             _context18.next = 26;

@@ -1622,7 +1622,7 @@ export function contextMenu(
 								
 								
 								
-								console.log(headers);
+								console.log(data, error, status, headers);
 								
 								if (error) {
 									$.notify('Не удалось загрузить данные!', 'error');
