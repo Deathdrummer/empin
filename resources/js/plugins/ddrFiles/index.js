@@ -106,7 +106,7 @@ $.ddrExport = function(ops = {}, cb) {
 		fExt = getFileName(fName, 2);
 	}
 	
-	const finalFileName = filename ? decodeURI(filename).replace(/\+|%20/, ' ') : fName;
+	const finalFileName = filename ? decodeURI(filename).replaceAll(/\+|%20/, ' ') : fName;
 	
 	
 	
