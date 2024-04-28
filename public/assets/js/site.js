@@ -20620,7 +20620,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
 
                                         case 11:
                                           if (!(_iteratorAbruptCompletion = !(_step = _context18.sent).done)) {
-                                            _context18.next = 34;
+                                            _context18.next = 33;
                                             break;
                                           }
 
@@ -20637,10 +20637,9 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                           _error2 = _yield$axiosQuery16.error;
                                           _status2 = _yield$axiosQuery16.status;
                                           _headers2 = _yield$axiosQuery16.headers;
-                                          console.log(_data2, _error2, _status2, _headers2);
 
                                           if (!_error2) {
-                                            _context18.next = 26;
+                                            _context18.next = 25;
                                             break;
                                           }
 
@@ -20649,9 +20648,9 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                           wait(false);
                                           return _context18.abrupt("return");
 
-                                        case 26:
+                                        case 25:
                                           if (_headers2['x-export-filename']) {
-                                            _context18.next = 30;
+                                            _context18.next = 29;
                                             break;
                                           }
 
@@ -20659,7 +20658,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                           wait(false);
                                           return _context18.abrupt("return");
 
-                                        case 30:
+                                        case 29:
                                           $.ddrExport({
                                             data: _data2,
                                             headers: _headers2,
@@ -20668,58 +20667,58 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                             destroy();
                                           });
 
-                                        case 31:
+                                        case 30:
                                           _iteratorAbruptCompletion = false;
                                           _context18.next = 9;
                                           break;
 
-                                        case 34:
-                                          _context18.next = 40;
+                                        case 33:
+                                          _context18.next = 39;
                                           break;
 
-                                        case 36:
-                                          _context18.prev = 36;
+                                        case 35:
+                                          _context18.prev = 35;
                                           _context18.t0 = _context18["catch"](7);
                                           _didIteratorError = true;
                                           _iteratorError = _context18.t0;
 
-                                        case 40:
+                                        case 39:
+                                          _context18.prev = 39;
                                           _context18.prev = 40;
-                                          _context18.prev = 41;
 
                                           if (!(_iteratorAbruptCompletion && _iterator["return"] != null)) {
-                                            _context18.next = 45;
+                                            _context18.next = 44;
                                             break;
                                           }
 
-                                          _context18.next = 45;
+                                          _context18.next = 44;
                                           return _iterator["return"]();
 
-                                        case 45:
-                                          _context18.prev = 45;
+                                        case 44:
+                                          _context18.prev = 44;
 
                                           if (!_didIteratorError) {
-                                            _context18.next = 48;
+                                            _context18.next = 47;
                                             break;
                                           }
 
                                           throw _iteratorError;
 
+                                        case 47:
+                                          return _context18.finish(44);
+
                                         case 48:
-                                          return _context18.finish(45);
+                                          return _context18.finish(39);
 
                                         case 49:
-                                          return _context18.finish(40);
-
-                                        case 50:
                                           close();
 
-                                        case 51:
+                                        case 50:
                                         case "end":
                                           return _context18.stop();
                                       }
                                     }
-                                  }, _callee18, null, [[7, 36, 40, 50], [41,, 45, 49]]);
+                                  }, _callee18, null, [[7, 35, 39, 49], [40,, 44, 48]]);
                                 }));
 
                                 return function (_x6) {
