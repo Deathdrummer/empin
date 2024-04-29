@@ -166,8 +166,6 @@ class ContractsExport extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBinder i
     		->getStartColor()->setRGB('FEFFF1'); */
 		
 		
-		
-		
 		// column
 		foreach ($colsInfo as $field => ['width' => $width, 'type' => $type, 'column' => $column]) {
 			
@@ -268,6 +266,9 @@ class ContractsExport extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBinder i
 			'gencontracting' 	=> ['width' => 10, 'type' => 'bool'],
 			'customer' 			=> ['width' => 20, 'type' => 'text'],
 			'locality' 			=> ['width' => 25, 'type' => 'text'],
+			'date_send_action'	=> ['width' => 15, 'type' => 'date'],
+			'count_ks_2'		=> ['width' => 10, 'type' => 'number'],
+			'act_pir' 			=> ['width' => 10, 'type' => 'bool'],
 			'price' 			=> ['width' => 15, 'type' => 'price'],
 			'price_nds' 		=> ['width' => 15, 'type' => 'price'],
 			'price_gen' 		=> ['width' => 15, 'type' => 'price'],

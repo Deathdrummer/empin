@@ -90,7 +90,7 @@ class Department {
 		$implodeDepsIds = $contractDeps ? implode(',', $contractDeps) : false;
 		
 		return DepartmentModel::filter($filter)->with(['steps' => function($query) {
-				$query->orderBy('_sort', 'ASC');
+				$query->orderBy('sort', 'ASC');
 			}])
 			->when($implodeDepsIds, function ($query) use($implodeDepsIds) {
 				$query->orderByRaw("FIND_IN_SET(id, '$implodeDepsIds')");

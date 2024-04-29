@@ -43,6 +43,7 @@ export function contextMenu(
 		const contextEdited = !!$(target.pointer).closest('[ddrtabletd]').hasAttr('contextedit');
 		const disableEditCell = !$(target.pointer).closest('[ddrtabletd]').attr('contextedit');
 		const selectedTextCell = !!$(target.pointer).closest('[ddrtabletd]').find('[edittedplace]').hasClass('select-text') || !!$(target.pointer).closest('[ddrtabletd]').find('[edittedblock]').length || (!!$('#contractsTable').find('[ddrtabletd].selected').length && $(target.pointer).closest('[ddrtabletd]').hasClass('selected'));
+		const isActsCol = !!$(target.pointer).closest('[ddrtabletd]').hasAttr('editacts') || false;
 		
 		let calcPrices;
 		let allPinned;
@@ -758,7 +759,7 @@ export function contextMenu(
 				}
 			}, {
 				name: 'Редактировать',
-				visible: countSelected == 1 && isCommon && canEditCell && contextEdited && !selectedTextCell,/* && !isArchive*/ // добавить !isArchive - если не нужно редактировать в архиве 
+				visible: countSelected == 1 && isCommon && (canEditCell || (isActsCol && canEditActs)) && contextEdited && !selectedTextCell,/* && !isArchive*/ // добавить !isArchive - если не нужно редактировать в архиве 
 				disabled: ($(target.pointer).closest('[ddrtabletd]').hasAttr('editted') || disableEditCell) || !enableEditPriceCell,
 				sort: 7,
 				async onClick() {	

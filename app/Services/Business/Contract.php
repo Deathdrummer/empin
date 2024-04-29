@@ -494,8 +494,8 @@ class Contract {
 			'contracts_ids' => $contractsIds,
 			'selection_id' 	=> $selectionId,
 			'colums' 		=> $colums,
-			'sort'			=> $sort,
-			'order'			=> $order,
+			'sort'			=> $sortField,
+			'order'			=> $sortOrder,
 		] = array_replace_recursive([
 			'contracts_ids' => null,
 			'selection_id' 	=> null,
@@ -504,16 +504,57 @@ class Contract {
 			'order'			=> null,
 		], $params);
 		
+		$sortStep = strpos($sortField, ':') !== false ? (substr($sortField, strpos($sortField, ':') - strlen($sortField) + 1)) : null;
+		
 		if ($selectionId) {
 			$selectionContracts = SelectionModel::where('id', $selectionId)->with('contracts:id')->first();
 			if (!$contractsIds = $selectionContracts->contracts->pluck('id')) return false;
 		}
 		
-		
-		
 		$res = ContractModel::select([...$colums, 'without_buy', 'subcontracting', 'gencontracting'])->whereIn('id', $contractsIds)
-			->when($sort && $order, function($query) use($sort, $order) {
-				$query->orderBy($sort, $order);
+			->when($sortStep, function ($query) use($sortStep, $sortOrder) {
+				$query->orderBy(
+					ContractData::select('data')
+					->whereColumn('contract_data.contract_id', 'contracts.id')
+					->where('contract_data.step_id', $sortStep),
+					$sortOrder 
+				);
+				
+				$query->orderBy(
+					ContractDepartment::select('show')
+					->whereColumn('contract_department.contract_id', 'contracts.id')
+					->whereJsonContains('steps', ['step_id' => (int)$sortStep]),
+					$sortOrder 
+				);
+				
+			}, function($query) use($sortField, $sortOrder) {
+				
+				// что тут происходит: производится сортировка по подставным данным. Перечисляются ID сортируемого поля в том порядке, в котором нужно нам.
+				
+				$settingData = match ($sortField) {
+					'type' 			=> array_column($this->getSettings('contract-types'), 'id', 'title'),
+					'contractor' 	=> array_column($this->getSettings('contract-contractors'), 'id', 'name'),
+					'customer' 		=> array_column($this->getSettings('contract-customers'), 'id', 'name'),
+					default => false,
+				};
+				
+				if ($settingData) {
+					if ($sortOrder == 'asc') ksort($settingData, SORT_NATURAL);
+					elseif ($sortOrder == 'desc') krsort($settingData, SORT_NATURAL);
+					
+					$ids = array_values($settingData);
+					
+					// первый вариант
+					//$placeholders = implode(',', array_fill(0, count($ids), '?'));
+					//$query->orderByRaw("field({$sortField},{$placeholders})", $ids);
+					
+					// второй вариант
+					$implodeIds = implode(',', $ids);
+					$query->orderByRaw("FIND_IN_SET($sortField, '$implodeIds')");
+				
+				} else {
+					$query->orderBy($sortField, $sortOrder);
+				}
 			})
 			->get()
 			->toArray();
@@ -565,7 +606,7 @@ class Contract {
 					$res[$k][$column] = $date;
 				}
 				
-				if (in_array($column, ['subcontracting', 'gencontracting', 'hoz_method'])) {
+				if (in_array($column, ['subcontracting', 'gencontracting', 'hoz_method', 'act_pir'])) {
 					//$res[$k][$column] = Carbon::parse($value)->locale('ru')->isoFormat('DD MMMM YYYY', 'Do MMMM');
 					$res[$k][$column] = $value ? 'P' : null;
 				}

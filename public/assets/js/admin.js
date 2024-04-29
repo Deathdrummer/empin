@@ -15537,6 +15537,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
     var contextEdited = !!$(target.pointer).closest('[ddrtabletd]').hasAttr('contextedit');
     var disableEditCell = !$(target.pointer).closest('[ddrtabletd]').attr('contextedit');
     var selectedTextCell = !!$(target.pointer).closest('[ddrtabletd]').find('[edittedplace]').hasClass('select-text') || !!$(target.pointer).closest('[ddrtabletd]').find('[edittedblock]').length || !!$('#contractsTable').find('[ddrtabletd].selected').length && $(target.pointer).closest('[ddrtabletd]').hasClass('selected');
+    var isActsCol = !!$(target.pointer).closest('[ddrtabletd]').hasAttr('editacts') || false;
     var calcPrices;
     var allPinned;
     var pinnedInSelected = {}; // Если это оин пункт "копировать"
@@ -16458,7 +16459,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
       }
     }, {
       name: 'Редактировать',
-      visible: countSelected == 1 && isCommon && canEditCell && contextEdited && !selectedTextCell,
+      visible: countSelected == 1 && isCommon && (canEditCell || isActsCol && canEditActs) && contextEdited && !selectedTextCell,
 
       /* && !isArchive*/
       // добавить !isArchive - если не нужно редактировать в архиве 
