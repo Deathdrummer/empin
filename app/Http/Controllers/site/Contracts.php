@@ -1099,7 +1099,10 @@ class Contracts extends Controller {
 	* @return 
 	*/
 	public function export_act_form() {
-		$templates = $this->getSettingsCollect('templates-to-export')->where('show', 1);
+		$templates = $this->getSettingsCollect('templates-to-export')->filter(function (array $value, int $key) {
+			return $value['show'] == 1 && (!isset($value['rule']) || auth('site')->user()->can($value['rule']));
+		});
+		
 		return $this->render('export_acts/form', compact('templates'));
 	}
 	

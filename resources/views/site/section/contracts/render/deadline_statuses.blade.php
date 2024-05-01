@@ -3,7 +3,7 @@
 	<div class="row row-cols-4">
 		@foreach($deadlineStatuses as $key => $status)
 			<div class="col">
-				<div class="pointer d-block" onclick="$.setColorStatus({{$key}}, '{{$status['color']}}', '{{$status['name']}}')">
+				<div class="pointer d-block text-center" onclick="$.setColorStatus({{$key}}, '{{$status['color']}}', '{{$status['name']}}')">
 					<div
 						@class([
 							'h5rem',
@@ -21,7 +21,7 @@
 		@endforeach
 		
 		<div class="col">
-			<div class="pointer" onclick="$.setColorStatus(null)">
+			<div class="pointer text-center" onclick="$.setColorStatus(null)">
 				<div
 					@class([
 						'h5rem',
