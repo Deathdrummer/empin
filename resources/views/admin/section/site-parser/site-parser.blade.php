@@ -19,7 +19,7 @@
 			
 			<div class="col-auto"><p>Тематика:</p></div>
 			<div class="col-auto">
-				<x-button variant="red" group="small" action="clearSubjects" id="clearSubjectsBtn" title="Очистить"><i class="fa-solid fa-fw fa-ban"></i></x-button>
+				<x-button variant="red" group="small" action="clearSubjects" id="clearSubjectsBtn" disabled title="Очистить"><i class="fa-solid fa-fw fa-ban"></i></x-button>
 				<x-button variant="blue" group="small" action="chooseSubject" title="Выбрать"><i class="fa-solid fa-fw fa-plus"></i></x-button>
 			</div>
 			<div class="col-auto fz12px" subjectstitles emptytext="Не выбрано"></div>
@@ -336,7 +336,7 @@
 				
 				
 				const {data, error, status, headers} = await axiosQuery('post', 'ajax/siteparser/import_form', formData, 'text', null, {'Content-Type': 'multipart/form-data'});
-				
+				console.log({data, error, status, headers});
 				if (error) {
 					$.notify('Ошибка импорта данных!', 'error');
 					console.log(error);
