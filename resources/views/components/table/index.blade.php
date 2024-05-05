@@ -96,13 +96,10 @@
 	});
 	
 	
-	if (scrollstartObserver) {
-		$(selector).find('[ddrtablebody]').one('scrollstop', {latency: 20}, function() {
-			observer.observe(document.querySelector('#intersectionTop'));
-		});
-	} 
-	
-	if (scrollendObserver) observer.observe(document.querySelector('#intersectionBottom'));
-	if (scrollpartObserver) observer.observe(document.querySelector('[ddrtablepartend]'));
+	$(selector).find('[ddrtablebody]').one('scrollstop', {latency: 20}, function() {
+		if (scrollstartObserver) observer.observe(document.querySelector('#intersectionTop'));
+		if (scrollendObserver) observer.observe(document.querySelector('#intersectionBottom'));
+		if (scrollpartObserver) observer.observe(document.querySelector('[ddrtablepartend]'));
+	});
 	
 </script>

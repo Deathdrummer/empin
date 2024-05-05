@@ -4,6 +4,7 @@ use App\Models\Traits\Collectionable;
 use App\Models\Traits\Filterable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 
 class Department extends Model {
     use HasFactory, Filterable, Collectionable;
@@ -88,7 +89,7 @@ class Department extends Model {
 			'id',
 			'id')
 			->using(ContractDepartment::class)
-			->withPivot('show');
+			->withPivot('show', 'hide');
     }
 	
 	
@@ -103,6 +104,7 @@ class Department extends Model {
 	public function info() {
 		return $this->hasOne(ContractDepartment::class, 'department_id', 'id');
 	}
+	
 	
 	
 	

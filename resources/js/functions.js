@@ -1,6 +1,17 @@
 window.isIos = /iPhone|iPad|iPod/i.test(navigator.userAgent);
 window.tapEvent = (('ontouchstart' in window) && !isIos) ? 'tap' : 'click';
 
+
+$.fn.doubleTap = function(callback) {
+	$(this).on(tapEvent, function (e) {
+		e.preventDefault();
+		if (e.detail >= 2) {
+			if (callback && typeof callback == 'function') callback(this);
+		}
+	});
+}
+
+
 $.fn.tripleTap = function(callback) {
 	$(this).on(tapEvent, function (e) {
 		e.preventDefault();
@@ -170,6 +181,112 @@ window.ref = function (data) {
 	proxy.value = data;
 	return proxy;
 }
+
+
+
+
+
+
+
+
+
+window.ddrRef = function (data = null, watchFuncs = null) {
+	let dataToWath;
+	
+	if (watchFuncs) return ddrWatcher(data, watchFuncs);
+	
+	return new Proxy(_.isPlainObject(data) ? data : {value: data}, {
+		get(target, prop, receiver) {
+			if (prop in target) {
+				if (_.isNumber(target[prop])) return Number(target[prop]);
+				return Reflect.get(target, prop, receiver); // (1)
+			} else {
+				return null;
+			}
+		}
+	});
+}
+
+
+
+
+
+
+
+
+let getHandlers = Symbol('handlers'),
+	setHandlers = Symbol('handlers');
+window.ddrWatcher = function(proxedObj, watcherFuncName = null) {
+	// тут если из ref передается скаляр - то оборачиваем его в объект
+	proxedObj = _.isPlainObject(proxedObj) ? proxedObj : {proxedObj};
+	
+	// 1. Создадим хранилище обработчиков
+	proxedObj[getHandlers] = [];
+	proxedObj[setHandlers] = [];
+
+	// положим туда функции-обработчики для вызовов в будущем
+	proxedObj.observe = function(funcsObj) {
+		let outerGetFunc, outerSetFunc, outerMixFunc;
+		if (_.isFunction(funcsObj)) {
+			outerMixFunc = funcsObj;
+		/*} else if (_.isString(funcsObj)) {
+			window[funcsObj] = callback => outerMixFunc = callback;
+		*/} else if (_.isPlainObject(funcsObj)) {
+			if (_.isString(funcsObj?.get)) {
+				window[funcsObj?.get] = callback => outerGetFunc = callback;
+			} else {
+				outerGetFunc = funcsObj?.get;
+			}
+			
+			if (_.isString(funcsObj?.set)) {
+				window[funcsObj?.set] = callback => outerSetFunc = callback;
+			} else {
+				outerSetFunc = funcsObj?.set;
+			}
+		}
+		
+		//console.log(outerMixFunc);
+		if (outerMixFunc) {
+			this[getHandlers].push(outerMixFunc);
+			this[setHandlers].push(outerMixFunc);
+		}
+		
+		if (outerGetFunc) this[getHandlers].push(outerGetFunc);
+		if (outerSetFunc) this[setHandlers].push(outerSetFunc);
+	};
+	
+	if (_.isString(watcherFuncName)) window[watcherFuncName] = (data) => proxedObj.observe(data);
+	else proxedObj.observe(watcherFuncName);
+
+	// 2. Создадим прокси для реакции на изменения
+	return new Proxy(proxedObj, {
+		get(target, property, receiver) {
+			if (target[getHandlers]) target[getHandlers].forEach(handler => handler({type: 'get', target, prop: property, value: target[property]}));
+			return Reflect.get(...arguments);
+		},
+		set(target, property, value, receiver) {
+			let success = Reflect.set(...arguments); // перенаправим операцию к оригинальному объекту
+			if (success) { // если не произошло ошибки при записи свойства
+				// вызовем обработчики
+				if (target[setHandlers]) target[setHandlers].forEach(handler => handler({type: 'set', target, prop: property, value}));
+			}
+			return success;
+		}
+	});
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

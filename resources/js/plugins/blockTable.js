@@ -17,6 +17,23 @@ $.fn.blockTable = function(method = null, ...params) {
 
 class BlockTable {
 	
+	insertData(selector = false, data = false) {
+		if (!selector || !data) return false;
+		
+		if ($(selector).find('[ddrtabletr]').length) {
+			$(selector).find('[ddrtabletr]').remove();
+		}
+		
+
+		if ($(selector).find('#intersectionTop').length) {
+			$(selector).find('#intersectionTop').after(data);
+		} else {
+			$(selector).prepend(data);
+		}
+		
+		this.buildTable(selector);
+	}
+	
 	prependData(selector = false, data = false, coutItems = 1) {
 		if (!selector || !data) return false;
 		$(selector).find('[ddrtabletr]:first').before(data);
@@ -54,6 +71,16 @@ class BlockTable {
 		
 		if ($(selector).find('[ddrtabletr]').length >= enableRemoveCount) {
 			$(selector).find('[ddrtabletr]').slice(-count, $(selector).find('[ddrtabletr]').length).remove();
+		}
+	}
+	
+	
+	
+	empty(selector = false) {
+		if (!selector) return false;
+		
+		if ($(selector).find('[ddrtabletr]').length) {
+			$(selector).find('[ddrtabletr]').remove();
 		}
 	}
 	

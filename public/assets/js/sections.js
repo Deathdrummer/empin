@@ -1028,8 +1028,10 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
         },
         method: 'get',
         map: function map(item) {
+          var _item$info;
+
           return {
-            name: item.name,
+            name: (item === null || item === void 0 ? void 0 : (_item$info = item.info) === null || _item$info === void 0 ? void 0 : _item$info.hide) == 1 ? "".concat(item === null || item === void 0 ? void 0 : item.name, " <small style=\"color: #c9c9c9;\">(\u0441\u043A\u0440\u044B\u0442)</small>") : item === null || item === void 0 ? void 0 : item.name,
             //faIcon: 'fa-solid fa-angles-right',
             visible: true,
             onClick: function onClick(selector) {
@@ -2471,10 +2473,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                   ddrPopup({
                     title: 'Шаблоны для выгрузки',
                     width: 500,
-                    buttons: ['Отмена', {
-                      action: 'downloadTemplate',
-                      title: 'Выгрузить'
-                    }]
+                    buttons: ['Закрыть']
                   }).then( /*#__PURE__*/function () {
                     var _ref28 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee19(_ref27) {
                       var state, wait, setTitle, setButtons, loadData, setHtml, setLHtml, dialog, close, onClose, onScroll, disableButtons, enableButtons, setWidth, _yield$axiosQuery15, data, error, status, headers;

@@ -5681,6 +5681,16 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
 window.isIos = /iPhone|iPad|iPod/i.test(navigator.userAgent);
 window.tapEvent = 'ontouchstart' in window && !isIos ? 'tap' : 'click';
 
+$.fn.doubleTap = function (callback) {
+  $(this).on(tapEvent, function (e) {
+    e.preventDefault();
+
+    if (e.detail >= 2) {
+      if (callback && typeof callback == 'function') callback(this);
+    }
+  });
+};
+
 $.fn.tripleTap = function (callback) {
   $(this).on(tapEvent, function (e) {
     e.preventDefault();
@@ -5824,6 +5834,111 @@ window.ref = function (data) {
   });
   proxy.value = data;
   return proxy;
+};
+
+window.ddrRef = function () {
+  var data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+  var watchFuncs = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+  var dataToWath;
+  if (watchFuncs) return ddrWatcher(data, watchFuncs);
+  return new Proxy(_.isPlainObject(data) ? data : {
+    value: data
+  }, {
+    get: function get(target, prop, receiver) {
+      if (prop in target) {
+        if (_.isNumber(target[prop])) return Number(target[prop]);
+        return Reflect.get(target, prop, receiver); // (1)
+      } else {
+        return null;
+      }
+    }
+  });
+};
+
+var getHandlers = Symbol('handlers'),
+    setHandlers = Symbol('handlers');
+
+window.ddrWatcher = function (proxedObj) {
+  var watcherFuncName = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+  // тут если из ref передается скаляр - то оборачиваем его в объект
+  proxedObj = _.isPlainObject(proxedObj) ? proxedObj : {
+    proxedObj: proxedObj
+  }; // 1. Создадим хранилище обработчиков
+
+  proxedObj[getHandlers] = [];
+  proxedObj[setHandlers] = []; // положим туда функции-обработчики для вызовов в будущем
+
+  proxedObj.observe = function (funcsObj) {
+    var outerGetFunc, outerSetFunc, outerMixFunc;
+
+    if (_.isFunction(funcsObj)) {
+      outerMixFunc = funcsObj;
+      /*} else if (_.isString(funcsObj)) {
+      	window[funcsObj] = callback => outerMixFunc = callback;
+      */
+    } else if (_.isPlainObject(funcsObj)) {
+      if (_.isString(funcsObj === null || funcsObj === void 0 ? void 0 : funcsObj.get)) {
+        window[funcsObj === null || funcsObj === void 0 ? void 0 : funcsObj.get] = function (callback) {
+          return outerGetFunc = callback;
+        };
+      } else {
+        outerGetFunc = funcsObj === null || funcsObj === void 0 ? void 0 : funcsObj.get;
+      }
+
+      if (_.isString(funcsObj === null || funcsObj === void 0 ? void 0 : funcsObj.set)) {
+        window[funcsObj === null || funcsObj === void 0 ? void 0 : funcsObj.set] = function (callback) {
+          return outerSetFunc = callback;
+        };
+      } else {
+        outerSetFunc = funcsObj === null || funcsObj === void 0 ? void 0 : funcsObj.set;
+      }
+    } //console.log(outerMixFunc);
+
+
+    if (outerMixFunc) {
+      this[getHandlers].push(outerMixFunc);
+      this[setHandlers].push(outerMixFunc);
+    }
+
+    if (outerGetFunc) this[getHandlers].push(outerGetFunc);
+    if (outerSetFunc) this[setHandlers].push(outerSetFunc);
+  };
+
+  if (_.isString(watcherFuncName)) window[watcherFuncName] = function (data) {
+    return proxedObj.observe(data);
+  };else proxedObj.observe(watcherFuncName); // 2. Создадим прокси для реакции на изменения
+
+  return new Proxy(proxedObj, {
+    get: function get(target, property, receiver) {
+      if (target[getHandlers]) target[getHandlers].forEach(function (handler) {
+        return handler({
+          type: 'get',
+          target: target,
+          prop: property,
+          value: target[property]
+        });
+      });
+      return Reflect.get.apply(Reflect, arguments);
+    },
+    set: function set(target, property, value, receiver) {
+      var success = Reflect.set.apply(Reflect, arguments); // перенаправим операцию к оригинальному объекту
+
+      if (success) {
+        // если не произошло ошибки при записи свойства
+        // вызовем обработчики
+        if (target[setHandlers]) target[setHandlers].forEach(function (handler) {
+          return handler({
+            type: 'set',
+            target: target,
+            prop: property,
+            value: value
+          });
+        });
+      }
+
+      return success;
+    }
+  });
 };
 /*
 	shift  		shift 	shiftKey
@@ -7863,6 +7978,7 @@ function axiosQuery() {
   var data = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
   var responseType = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'text';
   var abortContr = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
+  var headers = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : {};
   if (!method || !url) throw new Error('axiosQuery: не указан метод или URL!');
   if (_typeof(data) != 'object' || isNull(data)) data = {};
   var hasData = !!data;
@@ -7877,7 +7993,8 @@ function axiosQuery() {
   var params = {
     method: method,
     url: url,
-    responseType: responseType
+    responseType: responseType,
+    headers: headers
   };
 
   if (hasData) {
@@ -7982,6 +8099,25 @@ var BlockTable = /*#__PURE__*/function () {
   }
 
   _createClass(BlockTable, [{
+    key: "insertData",
+    value: function insertData() {
+      var selector = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+      var data = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+      if (!selector || !data) return false;
+
+      if ($(selector).find('[ddrtabletr]').length) {
+        $(selector).find('[ddrtabletr]').remove();
+      }
+
+      if ($(selector).find('#intersectionTop').length) {
+        $(selector).find('#intersectionTop').after(data);
+      } else {
+        $(selector).prepend(data);
+      }
+
+      this.buildTable(selector);
+    }
+  }, {
     key: "prependData",
     value: function prependData() {
       var selector = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
@@ -8036,6 +8172,16 @@ var BlockTable = /*#__PURE__*/function () {
 
       if ($(selector).find('[ddrtabletr]').length >= enableRemoveCount) {
         $(selector).find('[ddrtabletr]').slice(-count, $(selector).find('[ddrtabletr]').length).remove();
+      }
+    }
+  }, {
+    key: "empty",
+    value: function empty() {
+      var selector = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+      if (!selector) return false;
+
+      if ($(selector).find('[ddrtabletr]').length) {
+        $(selector).find('[ddrtabletr]').remove();
       }
     }
     /*
@@ -11991,19 +12137,26 @@ function buildAddictData() {
   }
 
   if (files) {
+    console.log(1);
+
     if (files.name !== undefined && files.items !== undefined) {
+      console.log(2);
+
       if (files.items.length > 1) {
+        console.log(3);
         $.each(files.items, function (k, file) {
           //console.log(files.name+'['+file.key+']', file);
           //formData.append(files.name+'['+file.key+']', file);
           _.set(formData, files.name + '[' + file.key + ']', file);
         });
       } else {
-        console.log(files); //formData.append(files.name, files.items[0]);
+        console.log(4);
+        console.log(files.items[0] || files.items); //formData.append(files.name, files.items[0]);
 
-        _.set(formData, files.name, files.items[0]);
+        _.set(formData, files.name, files.items[0] || files.items);
       }
     } else {
+      console.log(5);
       $.each(files, function (fieldName, file) {
         //console.log(fieldName, file);
         //formData.append(fieldName, file);
@@ -12766,6 +12919,7 @@ var DdrInput = /*#__PURE__*/function () {
     key: "clear",
     value: function clear() {
       var callback = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+      console.log(12312312);
       if (!this.inputs) return false;
       this.inputs.forEach(function (_ref12) {
         var item = _ref12.item,
@@ -19100,8 +19254,10 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
         },
         method: 'get',
         map: function map(item) {
+          var _item$info;
+
           return {
-            name: item.name,
+            name: (item === null || item === void 0 ? void 0 : (_item$info = item.info) === null || _item$info === void 0 ? void 0 : _item$info.hide) == 1 ? "".concat(item === null || item === void 0 ? void 0 : item.name, " <small style=\"color: #c9c9c9;\">(\u0441\u043A\u0440\u044B\u0442)</small>") : item === null || item === void 0 ? void 0 : item.name,
             //faIcon: 'fa-solid fa-angles-right',
             visible: true,
             onClick: function onClick(selector) {
@@ -20543,10 +20699,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                   ddrPopup({
                     title: 'Шаблоны для выгрузки',
                     width: 500,
-                    buttons: ['Отмена', {
-                      action: 'downloadTemplate',
-                      title: 'Выгрузить'
-                    }]
+                    buttons: ['Закрыть']
                   }).then( /*#__PURE__*/function () {
                     var _ref28 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee19(_ref27) {
                       var state, wait, setTitle, setButtons, loadData, setHtml, setLHtml, dialog, close, onClose, onScroll, disableButtons, enableButtons, setWidth, _yield$axiosQuery15, data, error, status, headers;

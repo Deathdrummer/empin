@@ -7,15 +7,23 @@ window.blockTable = function(method = null, ...params) {
 
 
 $.fn.blockTable = function(method = null, ...params) {
-	const blockTableCls = new BlockTable;
+	const blockTableCls = new BlockTable,
+		bodySelector = $(this).hasAttr('ddrtablebody') ? this : $(this).find('[ddrtablebody]');
 	
-	blockTableCls[method](this, ...params);
+	blockTableCls[method](bodySelector, ...params);
 }
 
 
 
 
 class BlockTable {
+	
+	insertData(selector = false, data = false) {
+		if (!selector || !data) return false;
+		$(selector).find('[ddrtabletr]:first').after(data);
+		this.buildTable(selector);
+	}
+	
 	
 	prependData(selector = false, data = false, coutItems = 1) {
 		if (!selector || !data) return false;
@@ -54,6 +62,16 @@ class BlockTable {
 		
 		if ($(selector).find('[ddrtabletr]').length >= enableRemoveCount) {
 			$(selector).find('[ddrtabletr]').slice(-count, $(selector).find('[ddrtabletr]').length).remove();
+		}
+	}
+	
+	
+	
+	empty(selector = false) {
+		if (!selector) return false;
+		
+		if ($(selector).find('[ddrtabletr]').length) {
+			$(selector).find('[ddrtabletr]').remove();
 		}
 	}
 	

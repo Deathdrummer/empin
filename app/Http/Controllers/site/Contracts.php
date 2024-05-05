@@ -396,12 +396,18 @@ class Contracts extends Controller {
 		]);
 		
 		$dept = Department::find($departmentId);
-		$hasDepsContractIds = $dept->contracts()->wherePivotNotNull('steps')->wherePivot('show', 0)->get()->pluck('id');
+		$hasDepsContractIds = $dept->contracts()->wherePivotNotNull('steps')->where(function($query) {
+				$query->where('contract_department.show', 0);
+				$query->orWhere(function($q) {
+					$q->where('contract_department.show', 1);
+					$q->where('contract_department.hide', 1);
+				});
+			})->get()->pluck('id');
 		
 		$dataToUpdate = [];
 		foreach ($contractIds as $countractId) {
 			if (!$hasDepsContractIds->contains($countractId)) continue;
-			$dataToUpdate[$countractId] = ['show' => 1, 'updated_show' => now()->setTime(0, 0, 0)];
+			$dataToUpdate[$countractId] = ['show' => 1, 'hide' => 0, 'updated_show' => now()->setTime(0, 0, 0)];
 		}
 		
 		$statData = $dept->contracts()->syncWithoutDetaching($dataToUpdate);

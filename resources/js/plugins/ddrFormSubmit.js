@@ -82,20 +82,25 @@ function buildAddictData(params = {}) {
 	}
 	
 	if (files) {
+		console.log(1);
 		if (files.name !== undefined && files.items !== undefined) {
+			console.log(2);
 			if (files.items.length > 1) {
+				console.log(3);
 				$.each(files.items, (k, file) => {
 					//console.log(files.name+'['+file.key+']', file);
 					//formData.append(files.name+'['+file.key+']', file);
 					_.set(formData, files.name+'['+file.key+']', file);
 				});
 			} else {
-				console.log(files);
+				console.log(4);
+				console.log(files.items[0] || files.items);
 				//formData.append(files.name, files.items[0]);
-				_.set(formData, files.name, files.items[0]);
+				_.set(formData, files.name, files.items[0] || files.items);
 			}
 				
 		} else {
+			console.log(5);
 			$.each(files, (fieldName, file) => {
 				//console.log(fieldName, file);
 				//formData.append(fieldName, file);

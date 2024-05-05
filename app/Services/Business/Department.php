@@ -33,10 +33,21 @@ class Department {
 		
 		if (!$contractId) return DepartmentModel::all();
 
-		return DepartmentModel::whereHas('contracts', function (Builder $query) use($contractId) {
+		$departments = DepartmentModel::whereHas('contracts', function (Builder $query) use($contractId) {
 			$query->where('contract_id', $contractId);
-			$query->where('show', 0);
-		})->get();
+			$query->where(function($q) {
+				$q->where('show', 0);
+				$q->orWhere(function($sq) {
+					$sq->where('show', 1);
+					$sq->where('hide', 1);
+				});
+			});
+		})->with(['info' => function($q) use($contractId) {
+			$q->select('department_id', 'hide')->where('contract_id', $contractId);
+		}])->get();
+		
+		return $departments;
+		
 		
 		
 		/* return DepartmentModel::whereRelation('contracts', function (Builder $query) use($contractId) {

@@ -10,6 +10,7 @@ use App\Http\Controllers\crud\Roles;
 use App\Http\Controllers\crud\Staff;
 use App\Http\Controllers\crud\Steps;
 use App\Http\Controllers\crud\StepsPatterns;
+use App\Http\Controllers\SiteParserController;
 use App\Http\Controllers\TabsController;
 use App\Http\Controllers\UploadFilesController;
 use Illuminate\Http\Request;
@@ -190,3 +191,17 @@ Route::get('/contracts/get_deps_hidden_statuses', [Contracts::class, 'get_deps_h
 Route::put('/contracts/set_dept_hidden_status', [Contracts::class, 'set_dept_hidden_status']);
 Route::post('/contracts/store_show', [Contracts::class, 'store_show']);
 Route::resource('contracts', Contracts::class);
+
+
+
+
+
+
+
+
+// Парсер сайтовы
+Route::get('/siteparser/list', [SiteParserController::class, 'list']);
+Route::get('/siteparser/get_subjects', [SiteParserController::class, 'get_subjects']);
+Route::get('/siteparser/import_form', [SiteParserController::class, 'import_form']);
+Route::post('/siteparser/import_form', [SiteParserController::class, 'import_data']);
+Route::post('/siteparser/set_stat', [SiteParserController::class, 'set_stat']);

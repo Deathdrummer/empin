@@ -1,4 +1,4 @@
-export default function axiosQuery(method = null, url = false, data = {}, responseType = 'text', abortContr = null) {
+export default function axiosQuery(method = null, url = false, data = {}, responseType = 'text', abortContr = null, headers = {}) {
 	if (!method || !url) throw new Error('axiosQuery: не указан метод или URL!');
 	if (typeof data != 'object' || isNull(data)) data = {};
 	
@@ -17,7 +17,8 @@ export default function axiosQuery(method = null, url = false, data = {}, respon
 	let params = {
 		method,
 		url,
-		responseType
+		responseType,
+		headers,
 	};
 	
 	if (hasData) {

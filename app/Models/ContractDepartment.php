@@ -77,4 +77,16 @@ class ContractDepartment extends Pivot {
 	}
 	
 	
+	
+	
+	/**
+	* 
+	* @param 
+	* @return 
+	*/
+	public function scopeGetByConmtractId($query, $contractId = null) {
+		return $query->select('show', 'hide')->where('contract_id', $contractId);
+	}
+	
+	
 }

@@ -110614,6 +110614,14 @@ template {
   padding: 0 !important;
 }
 
+.ml-auto {
+  margin-left: auto !important;
+}
+
+.mr-auto {
+  margin-right: auto !important;
+}
+
 .m0px, .m-0px {
   margin: 0px !important;
 }
@@ -143553,8 +143561,20 @@ template {
 .ddrtable__body .ddrtable__tr:nth-child(even):not(.clear):not(.ddrtable__tr-selected) {
   background-color: #fdfdfd;
 }
-.ddrtable__body .ddrtable__tr-selected {
-  background-color: #e5ddf3 !important;
+.ddrtable__body .ddrtable__tr-selected, .ddrtable__body .ddrtable__tr[selected] {
+  background-color: #d9d0e9 !important;
+  cursor: pointer;
+  transition: background-color 0s;
+  box-shadow: 0 0 0 0.5px #fff inset;
+}
+.ddrtable__body .ddrtable__tr-hovered:not(.ddrtable__tr-selected):not([selected]):hover, .ddrtable__body .ddrtable__tr[hovered]:not(.ddrtable__tr-selected):not([selected]):hover {
+  background-color: #efecf6 !important;
+  cursor: pointer;
+  transition: background-color 0.16s;
+}
+.ddrtable__body .ddrtable__tr-hovered.ddrtable__tr-selected:hover, .ddrtable__body .ddrtable__tr-hovered[selected]:hover, .ddrtable__body .ddrtable__tr[hovered].ddrtable__tr-selected:hover, .ddrtable__body .ddrtable__tr[hovered][selected]:hover {
+  background-color: #d1c6e4 !important;
+  transition: background-color 0.16s;
 }
 .ddrtable__body:empty {
   height: 60px;
@@ -143691,6 +143711,16 @@ template {
 .ddrtable__td.w-auto {
   flex: 1 1 auto;
   word-break: break-word;
+}
+.ddrtable__td.w-max {
+  flex: 1 1 auto;
+  word-break: break-word;
+  width: max-content;
+}
+.ddrtable__td.w-spacer {
+  flex: 0 1 0px;
+  word-break: break-word;
+  width: max-content;
 }
 .ddrtable__td.h-start {
   justify-content: start;

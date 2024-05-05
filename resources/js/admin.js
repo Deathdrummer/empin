@@ -17,6 +17,7 @@ require('@plugins/ddrFloatingBlock');
 require('@plugins/tooltip');
 require('@plugins/ddrCalc');
 require('@plugins/ddrFiles');
+require('@plugins/blockTable');
 
 
 

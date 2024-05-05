@@ -469,6 +469,9 @@ class DdrInput {
 	
 	
 	clear(callback = null) {
+		
+		console.log(12312312);
+		
 		if (!this.inputs) return false;
 		
 		this.inputs.forEach(({item, tag, type, group, wrapperClass, wrapperSelector}) => {

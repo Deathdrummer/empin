@@ -543,7 +543,7 @@ export function contextMenu(
 					method: 'get',
 					map: (item) => {
 						return {
-							name: item.name,
+							name: item?.info?.hide == 1 ? `${item?.name} <small style="color: #c9c9c9;">(скрыт)</small>` : item?.name,
 							//faIcon: 'fa-solid fa-angles-right',
 							visible: true,
 							onClick(selector) {
@@ -1583,7 +1583,7 @@ export function contextMenu(
 					ddrPopup({
 						title: 'Шаблоны для выгрузки',
 						width: 500,
-						buttons: ['Отмена', {action: 'downloadTemplate', title: 'Выгрузить'}],
+						buttons: ['Закрыть'],
 					}).then(async ({state, wait, setTitle, setButtons, loadData, setHtml, setLHtml, dialog, close, onClose, onScroll, disableButtons, enableButtons, setWidth}) => { //isClosed
 						wait();
 						

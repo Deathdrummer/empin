@@ -876,6 +876,12 @@ $bPoints: map-remove($grid-breakpoints, xs)
 .p0, .p-0
 	padding: 0 !important
 
+.ml-auto
+	margin-left: auto !important
+	
+.mr-auto
+	margin-right: auto !important
+
 
 
 
@@ -1233,9 +1239,22 @@ $tableColor: #efefef
 			&:nth-child(even):not(.clear):not(.ddrtable__tr-selected)
 				background-color: #fdfdfd
 		
-			&-selected
-				background-color: #e5ddf3!important
+			&-selected, &[selected]
+				background-color: #d9d0e9 !important
+				cursor: pointer
+				transition: background-color 0s
+				box-shadow: 0 0 0 0.5px #fff inset
+				
 		
+			&-hovered:not(.ddrtable__tr-selected):not([selected]):hover, &[hovered]:not(.ddrtable__tr-selected):not([selected]):hover
+				background-color: lighten(#d9d0e9, 8%) !important
+				cursor: pointer
+				transition: background-color 0.16s
+			
+			&-hovered.ddrtable__tr-selected:hover, &-hovered[selected]:hover, &[hovered].ddrtable__tr-selected:hover, &[hovered][selected]:hover
+				background-color: darken(#d9d0e9, 3%) !important
+				transition: background-color 0.16s
+			
 		&:empty
 			height: 60px
 			
@@ -1288,7 +1307,6 @@ $tableColor: #efefef
 				width: 100%
 				height: 100%
 				background-color: #ffffffcf
-		
 		
 		.icon
 			position: absolute
@@ -1346,6 +1364,17 @@ $tableColor: #efefef
 			//min-width: max-content
 			flex: 1 1 auto
 			word-break: break-word
+		
+		&.w-max
+			//min-width: max-content
+			flex: 1 1 auto
+			word-break: break-word
+			width: max-content
+		
+		&.w-spacer
+			flex: 0 1 0px
+			word-break: break-word
+			width: max-content
 		
 		&.h-start
 			justify-content: start
