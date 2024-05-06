@@ -7617,3 +7617,10 @@ section {
 .ddrtabscontent__item_visible {
   display: block;
 }
+
+[subjectlettersblock] [subjectletter][selected] {
+  background-color: #00b8d3;
+}
+[subjectlettersblock] [subjectletter][selected] * {
+  color: #fff !important;
+}

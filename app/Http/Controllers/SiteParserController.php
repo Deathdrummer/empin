@@ -54,7 +54,7 @@ class SiteParserController extends Controller {
 			->orderBy($sortField, $sortOrder)
 			->get();
 		
-		return $this->render('list', compact('list'), headers: ['x-count-rows' => $list->count()]);
+		return $this->render('list', compact('list', 'stat'), headers: ['x-count-rows' => $list->count()]);
 	}
 	
 	
@@ -69,8 +69,14 @@ class SiteParserController extends Controller {
 	public function get_subjects(Request $request) {
 		$choosed = $request->input('choosedSubjects');
 		$offset = $request->input('offset', 0);
+		$letter = $request->input('letter', null);
+		
+		toLog($letter);
 		
 		$subjects = SiteParserSubject::orderBy('subject', 'asc')
+			->when($letter, function($query) use($letter) {
+				$query->where('subject', 'LIKE', "$letter%");
+			})
 			->limit($this->subjectsLimit)
 			->offset($offset * $this->subjectsLimit)
 			->get()
@@ -80,7 +86,9 @@ class SiteParserController extends Controller {
 				return $item;
 			});
 		
-		return $this->render('subjects', compact('subjects'));
+		$part = $this->subjectsLimit;
+		
+		return $this->render('subjects', compact('subjects', 'offset', 'part', 'letter'));
 	}
 	
 	
@@ -151,6 +159,8 @@ class SiteParserController extends Controller {
 		
 		
 		$row = SiteParser::find($id);
+		$row->banned = null;
+		$row->valid = null;
 		$row->{$stat} = true;
 		
 		$res = $row->save();

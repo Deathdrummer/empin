@@ -23,6 +23,7 @@
 
 <script type="module">
 	const selector = $('#{{$id}}'),
+		bodyList = $(selector).find('[ddrtablebody]'),
 		headCells = $(selector).find('[ddrtablehead]').find('[ddrtabletr]').find('[ddrtabletdmain]').length
 			? $(selector).find('[ddrtablehead]').find('[ddrtabletr]').find('[ddrtabletdmain]')
 			: $(selector).find('[ddrtablehead]').find('[ddrtabletr]').find('[ddrtabletd]'),
@@ -30,7 +31,11 @@
 		scrollstartObserver = '{{$scrollstart}}',
 		scrollendObserver = '{{$scrollend}}',
 		scrollpartObserver = '{{$scrollpart}}',
+		intersectionTopSelector = $(selector).find('#intersectionTop')[0],
+		intersectionBottomSelector = $(selector).find('#intersectionBottom')[0],
+		intersectionPartSelector = $(selector).find('[ddrtablepartend]')[0],
 		cellsWidths = [];
+	
 	
 	$(headCells).each(function(index, cell) {
 		let width = Math.max($(cell).width(), $(cell)[0].offsetWidth, $(cell)[0].clientWidth, $(cell).outerWidth());
@@ -91,15 +96,15 @@
 		
 	}, {
 		threshold: 0.5,
-		root: document.getElementById('contractsList'),
+		root: $(bodyList)[0],
 		rootMargin: '50px',
 	});
 	
 	
 	$(selector).find('[ddrtablebody]').one('scrollstop', {latency: 20}, function() {
-		if (scrollstartObserver) observer.observe(document.querySelector('#intersectionTop'));
-		if (scrollendObserver) observer.observe(document.querySelector('#intersectionBottom'));
-		if (scrollpartObserver) observer.observe(document.querySelector('[ddrtablepartend]'));
+		if (scrollstartObserver) observer.observe(intersectionTopSelector);
+		if (scrollendObserver) observer.observe(intersectionBottomSelector);
+		if (scrollpartObserver) observer.observe(intersectionPartSelector);
 	});
 	
 </script>

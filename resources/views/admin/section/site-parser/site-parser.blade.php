@@ -33,7 +33,7 @@
 		
 		<x-horisontal space="2rem" scroll="false" hidescroll="1" ignore="[noscroll], select, input, textarea" ignoremovekeys="alt, ctrl, shift">
 			<x-horisontal.item class="h100">
-				<x-table style="min-width: calc(100vw - 310px);" id="parsedListTable" noborder scrolled="{{'calc(100vh - 302px)'}}" scrollend="loadPart">
+				<x-table style="min-width: calc(100vw - 310px);" id="parsedListTable" noborder scrolled="{{'calc(100vh - 306px)'}}" scrollend="loadPart">
 					<x-table.head noborder>
 						<x-table.tr class="h4rem" scrollfix noborder>
 							<x-table.td class="w-auto minw15rem" noborder><strong class="fz12px">Название компании</strong></x-table.td>
@@ -60,8 +60,9 @@
 <script type="module">
 	
 	
-	const subjectsOffset = ddrRef(0);
-	const countPerLoad = 50,
+	const subjectsOffset = ddrRef(''),
+		subjectsLetter = ddrRef(null),
+		countPerLoad = 50,
 		loadListParams = ddrRef({
 			stat: 0,
 			subjectsIds: [],
@@ -100,7 +101,7 @@
 					
 					let titlesHtml = '';
 					
-					titlesHtml += '<ul class="scrollblock minh1rem maxh3rem-8px fz12px color-gray">';
+					titlesHtml += '<ul class="scrollblock scrollblock-hidescroll minh1rem maxh2rem-3px fz12px color-gray">';
 					choosedSubjectsTitles.value.forEach((title) => {
 						titlesHtml += `<li class="fz12px">${title}</li>`;
 					});
@@ -128,18 +129,18 @@
 			buttons: ['Закрыть', {action: 'unchooseSubjectAction', title: 'Снять выделение', disabled: 1, variant: 'yellow'}, {action: 'chooseSubjectAction', title: 'Выбрать', disabled: 1}],
 			winClass: 'ddrpopup_white',
 			closeByButton: true,
-		}).then(async ({state, wait, setTitle, setButtons, loadData, setHtml, setLHtml, dialog, close, onScroll, disableButtons, enableButtons, setWidth}) => {
+		}).then(async ({state, wait, setTitle, setButtons, loadData, setHtml, setLHtml, dialog, close, onClose, onScroll, disableButtons, enableButtons, setWidth}) => {
 			wait();
 			
-			const subjects = await getSubjects(loadListParams.subjectsIds);
+			const subjects = await getSubjects(loadListParams.subjectsIds, );
 			
 			if (subjects) {
-				setLHtml(subjects, () => {
+				setHtml(subjects, () => {
 					$('#subjectsTable').blockTable('buildTable');
 					enableButtons(true);
 				});
 			} else {
-				setLHtml('<p class="color-gray fz14px text-center">Нет данных</p>');
+				setHtml('<p class="color-gray fz14px text-center">Нет данных</p>');
 				wait(false);
 			}
 			
@@ -163,24 +164,55 @@
 			$.unchooseSubjectAction = () => {
 				$('#subjectsTable').find('[subject][selected]').removeAttrib('selected');
 			}
+			
+			
+			$.clearSubjects = () => {
+				choosedSubjectsTitles.value = [];
+				loadListParams.subjectsIds = [];
+			}
+			
+			
+			
+			$.chooseSubjectLetter = async (item) => {
+				disableButtons();
+				$(item).closest('[subjectlettersblock]').find('[subjectletter][selected]').removeAttrib('selected');
+				item.toggleAttribute('selected');
+				const attr = $(item).attr('subjectletter');
+				
+				subjectsLetter.value = attr;
+				subjectsOffset.value = 0;
+				const subjects = await getSubjects(loadListParams.subjectsIds);
+				
+				if (subjects) {
+					setHtml(subjects, () => {
+						$('#subjectsTable').blockTable('buildTable');
+						enableButtons(true);
+					});
+				} else {
+					setHtml('<p class="color-gray fz14px text-center">Нет данных</p>');
+					wait(false);
+				}
+			}
+			
+			
+			
+			$.scrollSubjects = async () => {
+				subjectsOffset.value += 1;
+				const subjects = await getSubjects(loadListParams.subjectsIds);
+				$('#subjectsTable').blockTable('appendData', subjects);
+			}
+			
+			
+			onClose(() => {
+				subjectsOffset.value = 0;
+			});
+			
 		});
 	}
 	
 	
 	
-	$.clearSubjects = () => {
-		choosedSubjectsTitles.value = [];
-		loadListParams.subjectsIds = [];
-	}
 	
-	
-	
-	
-	$.scrollSubjects = async () => {
-		console.log(123123123);
-		subjectsOffset.value += 1;
-		await getSubjects(loadListParams.v);
-	}
 	
 	
 	$.getListAction = async (item, isActive, stat) => {
@@ -225,14 +257,16 @@
 		}),
 			siteUrl = site.split('|')[0],
 			{outerWidth: winW, outerHeight: winH} = window,
-				posLeft = (winW - 1600) / 2,
-				posTop = (winH - 900) / 2,
+				winWidth = winW - 200,
+				winHeight = winH - 100,
+				posLeft = winWidth < 700 ? 0 : 100,
+				posTop = winHeight < 600 ? 0 : 50,
 				win = window.open(siteUrl, 'name', 'location=no,menubar=no,toolbar=no');
 		
 		$('#parsedList').find('[ddrtabletr].ddrtable__tr-selected').removeClass('ddrtable__tr-selected');	
 		$(item).closest('[ddrtabletr]').addClass('ddrtable__tr-selected');
 		
-		win.resizeBy(1600, 900);
+		win.resizeBy(winWidth < 700 ? winW : winWidth, winHeight < 600 ? winH : winHeight);
 		//win.moveBy(posLeft < 0 ? 0 : posLeft, posTop < 0 ? 0 : posTop);
 		win.moveBy(posLeft < 0 ? 0 : posLeft, posTop < 0 ? 0 : posTop);
 		
@@ -554,7 +588,11 @@
 	
 	
 	async function getSubjects(choosedSubjects = null) {
-		const {data, error, status, headers} = await axiosQuery('get', 'ajax/siteparser/get_subjects', {choosedSubjects, offset: subjectsOffset.value});
+		const {data, error, status, headers} = await axiosQuery('get', 'ajax/siteparser/get_subjects', {
+			choosedSubjects,
+			offset: subjectsOffset.value,
+			letter: subjectsLetter.value,
+		});
 		
 		if (error) {
 			$.notify('Ошибка загрузки тематик!', 'error');

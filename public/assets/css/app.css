@@ -45634,24 +45634,24 @@ template {
   display: none !important;
 }
 
-.scrollblock:not(.scrollblock-hidden):not(.scrollblock-light)::-webkit-scrollbar {
+.scrollblock:not(.scrollblock-hidden):not(.scrollblock-hidescroll):not(.scrollblock-light)::-webkit-scrollbar {
   width: 4px;
   height: 4px;
 }
-.scrollblock:not(.scrollblock-hidden):not(.scrollblock-light)::-webkit-scrollbar-track {
+.scrollblock:not(.scrollblock-hidden):not(.scrollblock-hidescroll):not(.scrollblock-light)::-webkit-scrollbar-track {
   background-color: #e6eaed;
   border-radius: 1px;
 }
-.scrollblock:not(.scrollblock-hidden):not(.scrollblock-light)::-webkit-scrollbar-thumb {
+.scrollblock:not(.scrollblock-hidden):not(.scrollblock-hidescroll):not(.scrollblock-light)::-webkit-scrollbar-thumb {
   background-color: #bfcfdb;
   width: 13px;
   height: 13px;
   border-radius: 0;
 }
-.scrollblock:not(.scrollblock-hidden):not(.scrollblock-light)::-webkit-scrollbar-thumb:hover {
+.scrollblock:not(.scrollblock-hidden):not(.scrollblock-hidescroll):not(.scrollblock-light)::-webkit-scrollbar-thumb:hover {
   background-color: #9eb7c9;
 }
-.scrollblock:not(.scrollblock-hidden):not(.scrollblock-light)::-webkit-resizer {
+.scrollblock:not(.scrollblock-hidden):not(.scrollblock-hidescroll):not(.scrollblock-light)::-webkit-resizer {
   display: none;
   width: 0px;
   height: 0px;
@@ -45660,6 +45660,33 @@ template {
 }
 .scrollblock:not(.scrollblock-auto) {
   overflow-y: scroll;
+}
+.scrollblock-hidescroll {
+  overflow-y: scroll;
+}
+.scrollblock-hidescroll::-webkit-scrollbar {
+  width: 2px;
+  height: 2px;
+}
+.scrollblock-hidescroll::-webkit-scrollbar-track {
+  background-color: transparent;
+  border-radius: 1px;
+}
+.scrollblock-hidescroll::-webkit-scrollbar-thumb {
+  background-color: transparent;
+  width: 13px;
+  height: 13px;
+  border-radius: 0;
+}
+.scrollblock-hidescroll::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0);
+}
+.scrollblock-hidescroll::-webkit-resizer {
+  display: none;
+  width: 0px;
+  height: 0px;
+  background: transparent;
+  border-radius: 1px;
 }
 .scrollblock-hidden {
   overflow-y: scroll;

@@ -130,10 +130,14 @@
 
 
 .scrollblock
-	&:not(.scrollblock-hidden):not(.scrollblock-light)
+	&:not(.scrollblock-hidden):not(.scrollblock-hidescroll):not(.scrollblock-light)
 		+scrollbar(#e6eaed, #bfcfdb, 4px, 1px)
 	
 	&:not(.scrollblock-auto)
+		overflow-y: scroll
+	
+	&-hidescroll
+		+scrollbar(transparent, transparent, 2px, 1px)
 		overflow-y: scroll
 	
 	&-hidden
