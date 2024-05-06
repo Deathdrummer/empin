@@ -36,14 +36,14 @@
 				<x-table style="min-width: calc(100vw - 310px);" id="parsedListTable" noborder scrolled="{{'calc(100vh - 306px)'}}" scrollend="loadPart">
 					<x-table.head noborder>
 						<x-table.tr class="h4rem" scrollfix noborder>
-							<x-table.td class="w-auto minw15rem" noborder><strong class="fz12px">Название компании</strong></x-table.td>
-							<x-table.td class="w20rem" noborder><strong class="fz12px">Сайт</strong></x-table.td>
-							<x-table.td class="w20rem" noborder><strong class="fz12px">Тематика</strong></x-table.td>
-							<x-table.td class="w20rem" noborder><strong class="fz12px">Whatsapp</strong></x-table.td>
-							<x-table.td class="w20rem" noborder><strong class="fz12px">Telegram</strong></x-table.td>
-							<x-table.td class="w20rem" noborder><strong class="fz12px">Телефон</strong></x-table.td>
-							<x-table.td class="w-auto" noborder><strong class="fz12px">E-mail</strong></x-table.td>
-							<x-table.td class="w12rem" noborder><strong class="fz12px">Действия</strong></x-table.td>
+							<x-table.td class="w-auto minw15rem sort" onclick="$.sortListByField(this, 'company')" noborder><strong class="fz12px">Название компании</strong></x-table.td>
+							<x-table.td class="w20rem sort" onclick="$.sortListByField(this, 'site')" noborder><strong class="fz12px">Сайт</strong></x-table.td>
+							<x-table.td class="w20rem sort" onclick="$.sortListByField(this, 'subject_id')" noborder><strong class="fz12px">Тематика</strong></x-table.td>
+							<x-table.td class="w20rem sort" onclick="$.sortListByField(this, 'whatsapp')" noborder><strong class="fz12px">Whatsapp</strong></x-table.td>
+							<x-table.td class="w20rem sort" onclick="$.sortListByField(this, 'telegram')" noborder><strong class="fz12px">Telegram</strong></x-table.td>
+							<x-table.td class="w20rem sort" onclick="$.sortListByField(this, 'phone')" noborder><strong class="fz12px">Телефон</strong></x-table.td>
+							<x-table.td class="w-auto sort" onclick="$.sortListByField(this, 'email')" noborder><strong class="fz12px">E-mail</strong></x-table.td>
+							<x-table.td class="w12rem sort" noborder><strong class="fz12px">Действия</strong></x-table.td>
 						</x-table.tr>
 					</x-table.head>
 					<x-table.body id="parsedList"></x-table.body>
@@ -77,7 +77,7 @@
 					loadListData();
 				}
 				
-				if (['stat', 'subjectsIds', 'sortField', 'sortOrder', 'reload'].includes(prop)) {
+				if (['stat', 'subjectsIds', 'sortField', 'reload'].includes(prop)) {
 					if (prop == 'reload' && value == true) {
 						loadListParams.reload = false;
 					}
@@ -117,9 +117,24 @@
 	loadListData();
 	
 	
-	$.loadPart = async (observer) => {
+	$.loadPart = (observer) => {
 		loadListParams.offset += 1;
 	}
+	
+	
+	
+	$.sortListByField = (item, field) => {
+		const order = loadListParams.sortOrder == 'asc' ? 'desc' : 'asc';
+		
+		$(item).closest('[ddrtablehead]').find('[class*=sort-]').removeClass('sort-asc sort-desc');
+		
+		
+		item.classList.add(`sort-${order}`);
+		loadListParams.sortField = field;
+		loadListParams.sortOrder = order;
+	}
+	
+	
 	
 	
 	$.chooseSubject = () => {
@@ -555,7 +570,7 @@
 		const {data, error, status, headers} = await axiosQuery('get', 'ajax/siteparser/list', {offset, subjectsIds, sortField, sortOrder, stat});
 		
 		if (error) {
-			$.notify('Ошибка загрузки данных!');
+			$.notify('Ошибка загрузки данных!', 'error');
 			console.log(error);
 			destroy();
 			return;

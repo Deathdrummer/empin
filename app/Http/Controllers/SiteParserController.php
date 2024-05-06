@@ -37,6 +37,8 @@ class SiteParserController extends Controller {
 		
 		$subjectsIds = $request->input('subjectsIds');
 		
+		toLog($sortField);
+		toLog($sortOrder);
 		
 		
 		$list = SiteParser::with('subject')
@@ -70,8 +72,6 @@ class SiteParserController extends Controller {
 		$choosed = $request->input('choosedSubjects');
 		$offset = $request->input('offset', 0);
 		$letter = $request->input('letter', null);
-		
-		toLog($letter);
 		
 		$subjects = SiteParserSubject::orderBy('subject', 'asc')
 			->when($letter, function($query) use($letter) {
