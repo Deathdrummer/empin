@@ -91,6 +91,9 @@
 					loadListParams.offset = 0;
 					loadListParams.endOfList = false;
 					
+					
+					console.log({...loadListParams});
+					
 					loadListData();
 				}
 			}

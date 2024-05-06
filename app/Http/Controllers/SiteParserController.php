@@ -6,6 +6,8 @@ use App\Models\SiteParserSubject;
 use App\Traits\Renderable;
 use App\Traits\Settingable;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+
 
 class SiteParserController extends Controller {
 	use Renderable, Settingable;
@@ -37,8 +39,7 @@ class SiteParserController extends Controller {
 		
 		$subjectsIds = $request->input('subjectsIds');
 		
-		toLog($sortField);
-		toLog($sortOrder);
+		//SiteParser::where('email', '')->update(['email' => null]);
 		
 		
 		$list = SiteParser::with('subject')
@@ -53,7 +54,7 @@ class SiteParserController extends Controller {
 				$query->whereNull('banned');
 				$query->whereNull('valid');
 			})
-			->orderBy($sortField, $sortOrder)
+			->orderByRaw("case when {$sortField} IS null then 2 else 1 end, {$sortField} {$sortOrder}")
 			->get();
 		
 		return $this->render('list', compact('list', 'stat'), headers: ['x-count-rows' => $list->count()]);
@@ -239,7 +240,7 @@ class SiteParserController extends Controller {
 						$buildedRow['subject_id'] = $savedSubjectId;
 					}
 				} else {
-					$buildedRow[$col] = $row[$pos] ?? null;
+					$buildedRow[$col] = isset($row[$pos]) && !empty($row[$pos]) ? $row[$pos] : null;
 				}
 			}
 			
