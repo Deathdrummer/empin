@@ -114,7 +114,7 @@
 	loadListData();
 	
 	
-	$('#clearSubjectsBtn').ddrInputs(ddrStore('site-parser-subjects-ids').length ? 'enable' : 'disable');
+	$('#clearSubjectsBtn').ddrInputs(ddrStore('site-parser-subjects-ids')?.length ? 'enable' : 'disable');
 	
 	
 	$.loadPart = (observer) => {
