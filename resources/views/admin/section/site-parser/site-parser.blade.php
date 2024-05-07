@@ -58,14 +58,12 @@
 
 
 <script type="module">
-	
-	
 	const subjectsOffset = ddrRef(''),
 		subjectsLetter = ddrRef(null),
 		countPerLoad = 50,
 		loadListParams = ddrRef({
 			stat: 0,
-			subjectsIds: [],
+			subjectsIds: ddrStore('site-parser-subjects-ids') || [],
 			sortField: 'id',
 			sortOrder: 'desc',
 			offset: 0,
@@ -83,16 +81,12 @@
 					}
 					
 					if (prop == 'subjectsIds') {
-						console.log(value.length);
 						$('#clearSubjectsBtn').ddrInputs(value.length ? 'enable' : 'disable');
+						ddrStore('site-parser-subjects-ids', value);
 					}
-						
 					
 					loadListParams.offset = 0;
 					loadListParams.endOfList = false;
-					
-					
-					console.log({...loadListParams});
 					
 					loadListData();
 				}
@@ -118,6 +112,9 @@
 		});
 	
 	loadListData();
+	
+	
+	$('#clearSubjectsBtn').ddrInputs(ddrStore('site-parser-subjects-ids').length ? 'enable' : 'disable');
 	
 	
 	$.loadPart = (observer) => {
@@ -163,7 +160,6 @@
 			}
 			
 			
-			
 			$.chooseSubjectAction = () => {
 				wait();
 				const choosedSubjects = [],
@@ -178,54 +174,58 @@
 				close();
 			}
 			
-			
-			$.unchooseSubjectAction = () => {
-				$('#subjectsTable').find('[subject][selected]').removeAttrib('selected');
-			}
-			
-			
-			$.clearSubjects = () => {
-				choosedSubjectsTitles.value = [];
-				loadListParams.subjectsIds = [];
-			}
-			
-			
-			
-			$.chooseSubjectLetter = async (item) => {
-				disableButtons();
-				$(item).closest('[subjectlettersblock]').find('[subjectletter][selected]').removeAttrib('selected');
-				item.toggleAttribute('selected');
-				const attr = $(item).attr('subjectletter');
-				
-				subjectsLetter.value = attr;
-				subjectsOffset.value = 0;
-				const subjects = await getSubjects(loadListParams.subjectsIds);
-				
-				if (subjects) {
-					setHtml(subjects, () => {
-						$('#subjectsTable').blockTable('buildTable');
-						enableButtons(true);
-					});
-				} else {
-					setHtml('<p class="color-gray fz14px text-center">Нет данных</p>');
-					wait(false);
-				}
-			}
-			
-			
-			
-			$.scrollSubjects = async () => {
-				subjectsOffset.value += 1;
-				const subjects = await getSubjects(loadListParams.subjectsIds);
-				$('#subjectsTable').blockTable('appendData', subjects);
-			}
-			
-			
 			onClose(() => {
 				subjectsOffset.value = 0;
 			});
 			
 		});
+	}
+	
+	
+	
+	
+	
+	
+	
+	$.unchooseSubjectAction = () => {
+		$('#subjectsTable').find('[subject][selected]').removeAttrib('selected');
+	}
+	
+	
+	$.clearSubjects = () => {
+		choosedSubjectsTitles.value = [];
+		loadListParams.subjectsIds = [];
+	}
+	
+	
+	
+	$.chooseSubjectLetter = async (item) => {
+		disableButtons();
+		$(item).closest('[subjectlettersblock]').find('[subjectletter][selected]').removeAttrib('selected');
+		item.toggleAttribute('selected');
+		const attr = $(item).attr('subjectletter');
+		
+		subjectsLetter.value = attr;
+		subjectsOffset.value = 0;
+		const subjects = await getSubjects(loadListParams.subjectsIds);
+		
+		if (subjects) {
+			setHtml(subjects, () => {
+				$('#subjectsTable').blockTable('buildTable');
+				enableButtons(true);
+			});
+		} else {
+			setHtml('<p class="color-gray fz14px text-center">Нет данных</p>');
+			wait(false);
+		}
+	}
+	
+	
+	
+	$.scrollSubjects = async () => {
+		subjectsOffset.value += 1;
+		const subjects = await getSubjects(loadListParams.subjectsIds);
+		$('#subjectsTable').blockTable('appendData', subjects);
 	}
 	
 	
