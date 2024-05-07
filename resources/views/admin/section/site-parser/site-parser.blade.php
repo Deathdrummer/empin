@@ -116,6 +116,12 @@
 	
 	$('#clearSubjectsBtn').ddrInputs(ddrStore('site-parser-subjects-ids')?.length ? 'enable' : 'disable');
 	
+	const sTitles = ddrStore('site-parser-subjects-titles');
+	if (sTitles) {
+		choosedSubjectsTitles.value = sTitles;
+	}
+	
+	
 	
 	$.loadPart = (observer) => {
 		loadListParams.offset += 1;
@@ -171,6 +177,7 @@
 				
 				loadListParams.subjectsIds = choosedSubjects;
 				choosedSubjectsTitles.value = choosedSubjectsTitlesData;
+				ddrStore('site-parser-subjects-titles', choosedSubjectsTitlesData);
 				close();
 			}
 			
@@ -195,6 +202,7 @@
 	$.clearSubjects = () => {
 		choosedSubjectsTitles.value = [];
 		loadListParams.subjectsIds = [];
+		ddrStore('site-parser-subjects-titles', false);
 	}
 	
 	
