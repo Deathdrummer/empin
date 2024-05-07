@@ -102,9 +102,9 @@
 	
 	
 	$(selector).find('[ddrtablebody]').one('scrollstop', {latency: 20}, function() {
-		if (scrollstartObserver) observer.observe(intersectionTopSelector);
-		if (scrollendObserver) observer.observe(intersectionBottomSelector);
-		if (scrollpartObserver) observer.observe(intersectionPartSelector);
+		if (scrollstartObserver && intersectionTopSelector) observer.observe(intersectionTopSelector);
+		if (scrollendObserver && intersectionBottomSelector) observer.observe(intersectionBottomSelector);
+		if (scrollpartObserver && intersectionPartSelector) observer.observe(intersectionPartSelector);
 	});
 	
 </script>
