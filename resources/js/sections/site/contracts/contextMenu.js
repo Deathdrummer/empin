@@ -1416,7 +1416,7 @@ export function contextMenu(
 					return [-1, 0].indexOf(allPinned) !== -1 ? 'Закрепить договоры' : 'Открепить договоры';
 				},
 				countLeft: countSelected > 1 ? countSelected : null,
-				visible: isCommon,
+				visible: isCommon && !selectedTextCell,
 				//hidden: countSelected > 1,
 				sort: 3,
 				async onClick() {
@@ -1463,7 +1463,7 @@ export function contextMenu(
 				}
 			}, {
 				name: 'Выделить цветом',
-				visible: isCommon,
+				visible: isCommon && !selectedTextCell,
 				countLeft: countSelected > 1 ? countSelected : null,
 				sort: 4,
 				load: {
