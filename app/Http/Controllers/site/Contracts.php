@@ -4,6 +4,7 @@ use App\Enums\ContractColums;
 use App\Exports\ContractsExport;
 use App\Helpers\DdrDateTime;
 use App\Http\Controllers\Controller;
+use App\Imports\TemplatesImport;
 use App\Models\Contract;
 use App\Models\ContractChat;
 use App\Models\ContractData;
@@ -18,11 +19,19 @@ use App\Services\Business\User as UserService;
 use App\Traits\Renderable;
 use App\Traits\Settingable;
 use Carbon\Carbon;
+use Error;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Maatwebsite\Excel\Facades\Excel;
 use PhpOffice\PhpWord\TemplateProcessor;
 use Illuminate\Support\Str;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Style;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class Contracts extends Controller {
 	use Renderable, Settingable;
@@ -1112,6 +1121,7 @@ class Contracts extends Controller {
 		return $this->render('export_acts/form', compact('templates'));
 	}
 	
+	
 	/**
 	* 
 	* @param 
@@ -1130,11 +1140,157 @@ class Contracts extends Controller {
 		
 		$templateData = $this->getSettingsCollect('templates-to-export')->firstWhere('id', $templateId);
 		
-		if (!isset($templateData['file']['path'])) return response()->json(false);
+		if (!isset($templateData['file']['path']) || !isset($templateData['file']['ext'])) return response()->json(false);
+		
+		
+		[$exportFileName, $exportFilePath] = match($templateData['file']['ext']) {
+			'docx'	=> $this->_buildByDocxTemplate($contractData, $templateData),
+			'xlsx'	=> $this->_buildByXlsxTemplate($contractData, $templateData),
+			default	=> [null, null],
+		};
+		
+		if (!$exportFileName || !$exportFilePath) {
+			throw new Error('Ошибка export_act!');
+			return false;
+		}
+		
+		return response()->download($exportFilePath, null, ['x-export-filename' => urlencode($exportFileName)])->deleteFileAfterSend();
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	#------------------------------------------------------ Формирование шаблонов для экспорта
+	
+	/**
+	* 
+	* @param 
+	* @return 
+	*/
+	private function _buildByDocxTemplate($contractData = null, $templateData = null) {
+		if (!$contractData || !$templateData) return false;
 		
 		$templateProcessor = new TemplateProcessor('storage/'.$templateData['file']['path']);
 		
+		$buildContractdata = $this->_buildContractdata($contractData);
 		
+		$tempVars = $templateProcessor->getVariables();
+		foreach ($tempVars as $variabe) {
+			if (!isset($buildContractdata[$variabe])) continue;
+			$templateProcessor->setValue($variabe, $buildContractdata[$variabe]);
+		}
+		
+		$colums = ContractColums::getKeys();
+		$varsMap = [];
+		foreach ($colums as $column) {
+			$varsMap['{'.$column.'}'] = $buildContractdata[$column] ?? '';
+		}
+		
+		$buildedExportFileName = trim(Str::swap($varsMap, $templateData['export_name'] ?? $contractData?->id));
+		$exportFilePath = "storage/{$buildedExportFileName}.{$templateData['file']['ext']}";
+		$exportFileName = "{$buildedExportFileName}.{$templateData['file']['ext']}";
+		
+		$templateProcessor->saveAs($exportFilePath);
+		
+		return [$exportFileName, $exportFilePath];
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	/**
+	* 
+	* @param 
+	* @return 
+	*/
+	private function _buildByXlsxTemplate($contractData, $templateData) {
+		$spreadsheet = IOFactory::load('storage/'.$templateData['file']['path']);
+		
+		$sheetCount = $spreadsheet->getSheetCount();
+		
+		for ($i = 0; $i < $sheetCount; $i++) {
+			$sheet = $spreadsheet->getSheet($i);
+			$highestRow = $sheet->getHighestRow();
+			$highestColumn = $sheet->getHighestColumn();
+			$highestColumnIndex = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::columnIndexFromString($highestColumn);
+			$buildContractdata = $this->_buildContractdata($contractData);
+			
+			$colums = ContractColums::getKeys();
+			$varsMap = []; $varsTitlesMap = [];
+			foreach ($colums as $column) {
+				$varsMap['${'.$column.'}'] = $buildContractdata[$column] ?? '';
+				$varsTitlesMap['{'.$column.'}'] = $buildContractdata[$column] ?? '';
+			}
+			
+			for ($row = 1; $row <= $highestRow; $row++) {
+				for ($col = 1; $col <= $highestColumnIndex; $col++) {
+					$cell = $sheet->getCell(\PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($col) . $row);
+					$cellValue = $cell->getValue();
+					$newVal = trim(Str::swap($varsMap, $cellValue));
+					$cellAddress = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($col) . $row;
+					$sheet->setCellValue($cellAddress, $newVal);
+				}
+			}
+		}
+		
+		$buildedExportFileName = trim(Str::swap($varsTitlesMap, $templateData['export_name'] ?? $contractData?->id));
+		$exportFilePath = "storage/{$buildedExportFileName}.{$templateData['file']['ext']}";
+		$exportFileName = "{$buildedExportFileName}.{$templateData['file']['ext']}";
+		
+		$writer = new Xlsx($spreadsheet);
+		$writer->save($exportFilePath);
+		
+		return [$exportFileName, $exportFilePath];
+	}
+	
+	
+	
+	
+	
+	
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	/**
+	* 
+	* @param 
+	* @return 
+	*/
+	private function _buildContractdata($contractData = null) {
+		if (!$contractData?->exists()) return false;
 		
 		['contractor' => $contractor, 'customer' => $customer, 'type' => $type] = $this->getSettings([[
 				'setting'	=> 'contract-customers:customer',
@@ -1151,59 +1307,19 @@ class Contracts extends Controller {
 			]
 		]);
 		
-		$tempVars = $templateProcessor->getVariables();
-		foreach ($tempVars as $variabe) {
-			if (!isset($contractData[$variabe])) continue;
-			$templateProcessor->setValue($variabe, $contractData[$variabe]);
-		}
 		
-		$colums = ContractColums::getKeys();
-		$varsMap = [];
-		foreach ($colums as $column) {
-			$varsMap['{'.$column.'}'] = match($column) {
-				'contractor'	=> $contractor[$contractData[$column]] ?? '',
-				'customer'		=> $customer[$contractData[$column]] ?? '',
-				'type'			=> $type[$contractData[$column]] ?? '',
-				default			=> $contractData[$column] ?? '',
+		$buildedContractData = [];
+		foreach ($contractData?->toArray() as $column => $value) {
+			$buildedContractData[$column] = match($column) {
+				'contractor'	=> $contractor[$value] ?? '',
+				'customer'		=> $customer[$value] ?? '',
+				'type'			=> $type[$value] ?? '',
+				default			=> $value ?? '',
 			};
 		}
+		return $buildedContractData;
 		
-		$buildedExportFileName = trim(Str::swap($varsMap, $templateData['export_name'] ?? $contractData?->id));
-		
-		$exportFilePath = "storage/{$buildedExportFileName}.{$templateData['file']['ext']}";
-		$exportFileName = "{$buildedExportFileName}.{$templateData['file']['ext']}";
-		
-		$templateProcessor->saveAs($exportFilePath);
-		
-		return response()->download($exportFilePath, null, ['x-export-filename' => urlencode($exportFileName)])->deleteFileAfterSend();
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-
-
-
-
-
-
-
-
-
-
-
-
-	
-	
-	
-	
-	
-	
 	
 	
 	
