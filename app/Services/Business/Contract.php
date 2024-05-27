@@ -456,7 +456,7 @@ class Contract {
 	 * @param 
 	 * @return 
 	 */
-	public function getToExport($contractsIds = [], $colums = [], $sort = 'id' , $order = 'ASC'): array {
+	public function getToExport($contractsIds = [], $colums = [], $sort = 'id' , $order = 'ASC'):array {
 		return $this->_buildDataToExport([
 			'contracts_ids'	=> $contractsIds,
 			'colums' 		=> $colums,
@@ -473,10 +473,12 @@ class Contract {
 	 * @param 
 	 * @return 
 	 */
-	public function getSelectionToExport($selectionId = [], $colums = []) {
+	public function getSelectionToExport($selectionId = [], $colums = [], $sort = 'id' , $order = 'ASC') {
 		return $this->_buildDataToExport([
 			'selection_id' 	=> $selectionId,
 			'colums' 		=> $colums,
+			'sort' 			=> $sort,
+			'order' 		=> $order
 		]);
 	}
 	

@@ -49,7 +49,6 @@ class ContractsExport extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBinder i
 		$this->contract = app()->make(Contract::class);
 		
 		$this->colums = $colums;
-        
 		
 		if ($contractsIds) $this->contractsList = $this->contract->getToExport($contractsIds, $colums, $sort, $order);
 		elseif($selectionId) $this->contractsList = $this->contract->getSelectionToExport($selectionId, $colums);

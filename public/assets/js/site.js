@@ -21433,7 +21433,7 @@ function selectionsList(selection, editSelection, _clearCounts, getList) {
                                   },
                                   'Экспорт|blue': function () {
                                     var _ЭкспортBlue = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee(_ref20) {
-                                      var closeDialog, selectionExportWinWait, colums, _yield$axiosQuery2, data, error, status, headers, d;
+                                      var closeDialog, selectionExportWinWait, colums, sort, order, _yield$axiosQuery2, data, error, status, headers, d;
 
                                       return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
                                         while (1) {
@@ -21449,13 +21449,16 @@ function selectionsList(selection, editSelection, _clearCounts, getList) {
                                                 var field = $(item).attr('columtoxeport');
                                                 colums.push(field);
                                               });
-                                              _context.next = 6;
+                                              sort = ddrStore('site-contracts-sortfield') || 'id', order = ddrStore('site-contracts-sortorder') || 'ASC';
+                                              _context.next = 7;
                                               return axiosQuery('post', 'site/contracts/to_export', {
                                                 selection_id: selectionId,
-                                                colums: colums
+                                                colums: colums,
+                                                sort: sort,
+                                                order: order
                                               }, 'blob');
 
-                                            case 6:
+                                            case 7:
                                               _yield$axiosQuery2 = _context.sent;
                                               data = _yield$axiosQuery2.data;
                                               error = _yield$axiosQuery2.error;
@@ -21463,7 +21466,7 @@ function selectionsList(selection, editSelection, _clearCounts, getList) {
                                               headers = _yield$axiosQuery2.headers;
 
                                               if (!(headers['content-type'] != 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')) {
-                                                _context.next = 15;
+                                                _context.next = 16;
                                                 break;
                                               }
 
@@ -21471,7 +21474,7 @@ function selectionsList(selection, editSelection, _clearCounts, getList) {
                                               selectionExportWinWait.off();
                                               return _context.abrupt("return");
 
-                                            case 15:
+                                            case 16:
                                               d = ddrDateBuilder();
                                               exportFile({
                                                 data: data,
@@ -21482,7 +21485,7 @@ function selectionsList(selection, editSelection, _clearCounts, getList) {
                                                 selectionExportBtnWait.destroy();
                                               });
 
-                                            case 17:
+                                            case 18:
                                             case "end":
                                               return _context.stop();
                                           }

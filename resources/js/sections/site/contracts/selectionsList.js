@@ -445,9 +445,14 @@ export function selectionsList(selection, editSelection, _clearCounts, getList) 
 									colums.push(field);
 								});
 								
+								const sort = ddrStore('site-contracts-sortfield') || 'id',
+									order =  ddrStore('site-contracts-sortorder') || 'ASC';
+								
 								const {data, error, status, headers} = await axiosQuery('post', 'site/contracts/to_export', {
 									selection_id: selectionId,
 									colums,
+									sort,
+									order
 								}, 'blob');
 								
 								
