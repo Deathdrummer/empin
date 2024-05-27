@@ -64,6 +64,14 @@
 							<div class="col-auto">
 								<x-buttons-group group="small" gx="5">
 									<x-button
+										variant="green"
+										visible="{{isset($value[$field['name']]['path']) ? 1 : 0}}"
+										tag="downloadfile"
+										title="Выгрузить файл"
+										>
+										<i class="fa-solid fa-download"></i>
+									</x-button>
+									<x-button
 										variant="blue"
 										tag="addfile"
 										visible="{{!isset($value[$field['name']]['path']) ? 1 : 0}}"

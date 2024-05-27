@@ -131,9 +131,18 @@
 												<div class="col-auto">
 													<x-buttons-group group="small" gx="3">
 														<x-button
+															variant="green"
+															visible="{{isset($value[$field['name']]['path']) ? 1 : 0}}"
+															tag="downloadfile"
+															title="Выгрузить файл"
+															>
+															<i class="fa-solid fa-download"></i>
+														</x-button>
+														<x-button
 															variant="blue"
 															visible="{{!isset($value[$field['name']]['path']) ? 1 : 0}}"
 															tag="addfile"
+															title="Выбрать файл"
 															>
 															<i class="fa-solid fa-plus"></i>
 														</x-button>
@@ -141,6 +150,7 @@
 															variant="red"
 															visible="{{isset($value[$field['name']]['path']) ? 1 : 0}}"
 															tag="removefile"
+															title="Удалить файл"
 															>
 															<i class="fa-solid fa-trash-can"></i>
 														</x-button>
@@ -345,6 +355,7 @@
 			fileDataInp = $(fileBlock).find('[filedata]'),
 			fileTitle = $(fileBlock).find('[filetitle]'),
 			addFileBtn = e.currentTarget,
+			downloadFileBtn = $(fileBlock).find('[downloadfile]'),
 			removeFileBtn = $(fileBlock).find('[removefile]');
 		
 		let waitObj;
@@ -384,6 +395,7 @@
 				
 				$(removeFileBtn).closest('.col-auto.hidden').removeClass('hidden');
 				$(addFileBtn).closest('.col-auto:not(.hidden)').addClass('hidden');
+				$(downloadFileBtn).closest('.col-auto.hidden').removeClass('hidden');
 			},
 			done() {
 				waitObj.destroy();
@@ -399,6 +411,45 @@
 	
 	
 	
+	
+	
+	
+	
+	$(listId).on(tapEvent, '[downloadfile]', async (e) => {
+		const fileBlock = $(e.target).closest('[fileblock]'),
+			td = $(e.target).closest('td'),
+			fileDataInp = $(fileBlock).find('[filedata]'),
+			fileTitle = $(fileBlock).find('[filetitle]'),
+			addFileBtn = $(fileBlock).find('[addfile]'),
+			downloadFileBtn = e.currentTarget,
+			removeFileBtn = $(fileBlock).find('[removefile]');
+		
+		
+		
+		const fileData = JSON.parse($(fileDataInp).val());
+		
+		
+		$(downloadFileBtn).ddrInputs('disable');
+		const {data, error, status, headers} = await axiosQuery('post', 'site/contracts/export_act_template', {path: fileData['path'], 'name': fileData['name']}, 'blob');
+								
+		if (error) {
+			$.notify('Не удалось скачать файл!', 'error');
+			console.log(error?.message, error?.errors);
+			return;
+		}
+		
+		exportFile({data, headers, filename: fileData['name']}, () => {
+			$(downloadFileBtn).ddrInputs('enable');
+		});
+		
+	});
+	
+	
+	
+	
+	
+	
+	
 	$(listId).on(tapEvent, '[removefile]', async (e) => {
 		
 		const fileBlock = $(e.target).closest('[fileblock]'),
@@ -407,6 +458,7 @@
 			{path} = JSON.parse(fileDataInp.val()),
 			fileTitle = $(fileBlock).find('[filetitle]'),
 			addFileBtn = $(fileBlock).find('[addfile]'),
+			downloadFileBtn = $(fileBlock).find('[downloadfile]'),
 			removeFileBtn = e.currentTarget,
 			formData = new FormData();
 		
@@ -425,6 +477,7 @@
 		
 		$(removeFileBtn).closest('.col-auto:not(.hidden)').addClass('hidden');
 		$(addFileBtn).closest('.col-auto.hidden').removeClass('hidden');
+		$(downloadFileBtn).closest('.col-auto:not(.hidden)').addClass('hidden');
 		
 		destroy();
 		

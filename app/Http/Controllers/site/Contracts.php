@@ -1161,6 +1161,30 @@ class Contracts extends Controller {
 	
 	
 	
+	/**
+	* 
+	* @param 
+	* @return 
+	*/
+	public function export_act_template(Request $request) {
+		[
+			'path'	=> $path,
+			'name'	=> $name,
+		] = $request->validate([
+			'path'	=> 'required|string',
+			'name'	=> 'required|string',
+		]);
+		
+		return response()->download("storage/{$path}", null, ['x-export-filename' => urlencode($name)]);
+	}
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	

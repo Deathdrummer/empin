@@ -339,6 +339,7 @@ Route::prefix('site')->middleware(['lang', 'isajax:site'])->group(function() {
 	
 	Route::get('/contracts/export_act', [Contracts::class, 'export_act_form']);
 	Route::post('/contracts/export_act', [Contracts::class, 'export_act']);
+	Route::post('/contracts/export_act_template', [Contracts::class, 'export_act_template']);
 	
 	Route::get('/contracts/contract_selections', [Contracts::class, 'contract_selections']);
 	Route::get('/contracts/selections_to_choose', [Contracts::class, 'selections_to_choose']);

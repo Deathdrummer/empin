@@ -88,7 +88,7 @@
 			
 			$.copyVariable = (data) => {
 				copyStringToClipboard(data);
-				close();
+				//close();
 			}
 			
 			
