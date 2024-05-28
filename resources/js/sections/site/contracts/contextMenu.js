@@ -1573,12 +1573,15 @@ export function contextMenu(
 				}
 			}, {
 				name: 'Выгрузка по шаблону',
-				visible: isCommon && canEditActs && $(target.selector).hasAttr('contractselected') && countSelected && !selectedTextCell,
+				//visible: isCommon && canEditActs && $(target.selector).hasAttr('contractselected') && countSelected && !selectedTextCell,
+				visible: countSelected && !selectedTextCell,
 				//disabled: $(target.selector).hasAttr('contractselected') == false || !canEditActs,
 				countLeft: countSelected > 1 ? countSelected : null,
 				countOnArrow: true,
 				sort: 10,
 				async onClick() {
+					
+					console.log(selectedContracts.items);
 					
 					ddrPopup({
 						title: 'Шаблоны для выгрузки',

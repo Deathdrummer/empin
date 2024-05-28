@@ -309,7 +309,7 @@
 		add(items = null) {
 			if (_.isNull(items)) return;
 			items = !_.isArray(items) ? [parseInt(items)] : items;
-			selectedContracts.items = items;
+			selectedContracts.items = items.filter((value, index, self) => self.indexOf(value) === index);
 		},
 		remove(item = null) {
 			if (_.isNull(item)) return;
@@ -1420,6 +1420,10 @@
 		} 
 			
 		if (isCtrlKey) {
+			if ($('#contractsTable').find('[contractselected]').length == 0) {
+				selectedContracts.clear();
+			}
+			
 			if ($(row).hasAttr('contractselected')) {
 				$(row).removeClass('ddrtable__tr-selected').removeAttrib('contractselected');
 				let lastSelected = selectedContracts.remove($(row).attr('contractid'));
@@ -1465,7 +1469,7 @@
 			selectedContracts.clear();
 		}
 		
-		console.log('Выделенные договоры:', selectedContracts.items);
+		//console.log('Выделенные договоры:', selectedContracts.items);
 		//console.log(type, target, currentTarget, ctrlKey, shiftKey, detail, which);
 	});
 	

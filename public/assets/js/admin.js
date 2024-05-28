@@ -17920,7 +17920,8 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
       }
     }, {
       name: 'Выгрузка по шаблону',
-      visible: isCommon && canEditActs && $(target.selector).hasAttr('contractselected') && countSelected && !selectedTextCell,
+      //visible: isCommon && canEditActs && $(target.selector).hasAttr('contractselected') && countSelected && !selectedTextCell,
+      visible: countSelected && !selectedTextCell,
       //disabled: $(target.selector).hasAttr('contractselected') == false || !canEditActs,
       countLeft: countSelected > 1 ? countSelected : null,
       countOnArrow: true,
@@ -17931,6 +17932,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
             while (1) {
               switch (_context20.prev = _context20.next) {
                 case 0:
+                  console.log(selectedContracts.items);
                   ddrPopup({
                     title: 'Шаблоны для выгрузки',
                     width: 500,
@@ -18132,7 +18134,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                     };
                   }());
 
-                case 1:
+                case 2:
                 case "end":
                   return _context20.stop();
               }
