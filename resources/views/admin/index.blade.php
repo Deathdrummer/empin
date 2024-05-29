@@ -25,6 +25,8 @@
 		{{--<script src="{{mix('assets/js/vendor.js')}}"></script>--}}
 		
 		{{-- <script defer src="{{mix('assets/js/app.js')}}"></script> --}}
+		
+		
 	
 		<link rel="shortcut icon" href="{{asset('favicon.png')}}" />
 		

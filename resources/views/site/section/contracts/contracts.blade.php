@@ -242,7 +242,7 @@
 
 <script type="module">
 	
-	const {calcSubcontracting, calcGencontracting, showSelections, contextMenu, contentSelection, selectionsList} = loadSectionScripts({section: 'contracts'});
+	const {calcSubcontracting, calcGencontracting, showSelections, contextMenu, contentSelection, selectionsList, getLastnameFromApplicant} = loadSectionScripts({section: 'contracts'});
 	
 	
 	let abortCtrl,
@@ -1066,7 +1066,7 @@
 		ddrPopup({
 			title: 'Новый договор',
 			width: 1300,
-			buttons: ['Отмена', {action: 'contractStore', title: 'Создать', id: 'contractStoreBtn'}],
+			buttons: [{action: 'setFolders', title: 'Выгрузить папку', id: 'contractFoldersBtn', variant: 'purple'}, 'Отмена', {action: 'contractStore', title: 'Создать', id: 'contractStoreBtn'}],
 			disabledButtons: true, // при старте все кнопки кроме закрытия будут disabled
 			closeByBackdrop: false, // Закрывать окно по фону либо только по [ddrpopupclose]
 			winClass: 'ddrpopup_white'
@@ -1336,6 +1336,34 @@
 					$(showindepartment).ddrInputs('checked', false);
 				}
 			}
+			
+			
+			
+			
+			
+			
+			
+			$.setFolders = (btn) => {
+				let formSelector = $('#contractForm'),
+					objectNumber = $(formSelector).find('[name="object_number"]').val() || '',
+					localy = $(formSelector).find('[name="locality"]').val() || '',
+					applicant = getLastnameFromApplicant($(formSelector).find('[name="applicant"]').val() || '');
+				
+				const fileName = (`[${objectNumber}] ${capitalFirstLetter(localy)} ${applicant.toUpperCase()}`).trim().replace(/\s+/g, ' '),
+					folders = {[fileName]: [
+						'1 Договор',
+						'2 РП + ТУ',
+						'3 ССР',
+						'4 Выполнение',
+						'5 Счета на материалы',
+						'6 Фотоотчет',
+						'7 Исполнительная докуентация',
+					]};
+				
+				buildFolders(folders, fileName);
+			}
+			
+			
 			
 			
 			

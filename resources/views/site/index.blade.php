@@ -25,6 +25,9 @@
 		{{--<script src="{{mix('assets/js/vendor.js')}}"></script>--}}
 		
 		{{-- <script defer src="{{mix('assets/js/app.js')}}"></script> --}}
+		
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js" defer></script>
+    	<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js" defer></script>
 	
 		<link rel="shortcut icon" href="{{asset('favicon.png')}}" />
 		

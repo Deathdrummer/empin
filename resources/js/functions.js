@@ -2592,12 +2592,35 @@ window.urlExists = function(url) {
 
 
 
+window.buildFolders = function(folders = null, fileName = null) {
+	if (!folders || !fileName) return false;
+	
+	const zip = new JSZip();
+	createFolders(zip, folders);
+	
+	zip.generateAsync({ type: "blob" })
+        .then(function(content) {
+            saveAs(content, fileName);
+        });
+       
+	function createFolders(zip, folders) {
+        for (const [key, value] of Object.entries(folders)) {
+            const subFolder = zip.folder(key);
+            if (Array.isArray(value)) {
+                value.forEach(subValue => subFolder.folder(subValue));
+            } else if (typeof value === 'object') {
+                createFolders(subFolder, value);
+            }
+        }
+    }
+}
 
 
 
 
 
-
-
-
-
+window.capitalFirstLetter = function(str = null) {
+	if (!str) return str;
+	str = str.toLowerCase();
+	return str.charAt(0).toUpperCase() + str.slice(1);
+}

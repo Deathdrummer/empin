@@ -5825,6 +5825,18 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "random": function() { return /* binding */ random; }
 /* harmony export */ });
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"]; if (_i == null) return; var _arr = []; var _n = true; var _d = false; var _s, _e; try { for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 
 window.isIos = /iPhone|iPad|iPod/i.test(navigator.userAgent);
@@ -8104,6 +8116,48 @@ window.urlExists = function (url) {
   http.open('HEAD', url, false);
   http.send();
   return http.status != 404;
+};
+
+window.buildFolders = function () {
+  var folders = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+  var fileName = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+  if (!folders || !fileName) return false;
+  var zip = new JSZip();
+  createFolders(zip, folders);
+  zip.generateAsync({
+    type: "blob"
+  }).then(function (content) {
+    saveAs(content, fileName);
+  });
+
+  function createFolders(zip, folders) {
+    var _loop = function _loop() {
+      var _Object$entries$_i = _slicedToArray(_Object$entries[_i2], 2),
+          key = _Object$entries$_i[0],
+          value = _Object$entries$_i[1];
+
+      var subFolder = zip.folder(key);
+
+      if (Array.isArray(value)) {
+        value.forEach(function (subValue) {
+          return subFolder.folder(subValue);
+        });
+      } else if (_typeof(value) === 'object') {
+        createFolders(subFolder, value);
+      }
+    };
+
+    for (var _i2 = 0, _Object$entries = Object.entries(folders); _i2 < _Object$entries.length; _i2++) {
+      _loop();
+    }
+  }
+};
+
+window.capitalFirstLetter = function () {
+  var str = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+  if (!str) return str;
+  str = str.toLowerCase();
+  return str.charAt(0).toUpperCase() + str.slice(1);
 };
 
 /***/ }),
@@ -18161,6 +18215,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "calcSubcontracting": function() { return /* reexport safe */ _calcSubcontracting_js__WEBPACK_IMPORTED_MODULE_0__.calcSubcontracting; },
 /* harmony export */   "contentSelection": function() { return /* reexport safe */ _contentSelection_js__WEBPACK_IMPORTED_MODULE_4__.contentSelection; },
 /* harmony export */   "contextMenu": function() { return /* reexport safe */ _contextMenu_js__WEBPACK_IMPORTED_MODULE_3__.contextMenu; },
+/* harmony export */   "getLastnameFromApplicant": function() { return /* reexport safe */ _utils_js__WEBPACK_IMPORTED_MODULE_6__.getLastnameFromApplicant; },
 /* harmony export */   "selectionsList": function() { return /* reexport safe */ _selectionsList_js__WEBPACK_IMPORTED_MODULE_5__.selectionsList; },
 /* harmony export */   "showSelections": function() { return /* reexport safe */ _showSelections_js__WEBPACK_IMPORTED_MODULE_2__.showSelections; }
 /* harmony export */ });
@@ -18170,6 +18225,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _contextMenu_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./contextMenu.js */ "./resources/js/sections/site/contracts/contextMenu.js");
 /* harmony import */ var _contentSelection_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./contentSelection.js */ "./resources/js/sections/site/contracts/contentSelection.js");
 /* harmony import */ var _selectionsList_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./selectionsList.js */ "./resources/js/sections/site/contracts/selectionsList.js");
+/* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./utils.js */ "./resources/js/sections/site/contracts/utils.js");
+
 
 
 
@@ -19028,6 +19085,27 @@ function showSelections(cell) {
     }
   });
   return selectionsTooltip;
+}
+
+/***/ }),
+
+/***/ "./resources/js/sections/site/contracts/utils.js":
+/*!*******************************************************!*\
+  !*** ./resources/js/sections/site/contracts/utils.js ***!
+  \*******************************************************/
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "getLastnameFromApplicant": function() { return /* binding */ getLastnameFromApplicant; }
+/* harmony export */ });
+function getLastnameFromApplicant() {
+  var applicant = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+  if (!applicant) return null;
+  var res = applicant.replace(/ООО|ИП|ЗАО|МБУ|АО Торговый дом|АО|МКУ|ГБУ|СНТ|Глава|КФХ/g, '').replace(/"/g, '').trim().replace(/\s+/g, ' ');
+  var words = res.split(' ');
+  return words[0] || null;
 }
 
 /***/ }),

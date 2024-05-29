@@ -42,8 +42,6 @@
 
 <script type="module">
 	
-	
-	
 	$.openCheatSheet = () => {
 		ddrPopup({
 			title: 'Переменные для интерполяции',

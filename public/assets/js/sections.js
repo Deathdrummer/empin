@@ -2700,6 +2700,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "calcSubcontracting": function() { return /* reexport safe */ _calcSubcontracting_js__WEBPACK_IMPORTED_MODULE_0__.calcSubcontracting; },
 /* harmony export */   "contentSelection": function() { return /* reexport safe */ _contentSelection_js__WEBPACK_IMPORTED_MODULE_4__.contentSelection; },
 /* harmony export */   "contextMenu": function() { return /* reexport safe */ _contextMenu_js__WEBPACK_IMPORTED_MODULE_3__.contextMenu; },
+/* harmony export */   "getLastnameFromApplicant": function() { return /* reexport safe */ _utils_js__WEBPACK_IMPORTED_MODULE_6__.getLastnameFromApplicant; },
 /* harmony export */   "selectionsList": function() { return /* reexport safe */ _selectionsList_js__WEBPACK_IMPORTED_MODULE_5__.selectionsList; },
 /* harmony export */   "showSelections": function() { return /* reexport safe */ _showSelections_js__WEBPACK_IMPORTED_MODULE_2__.showSelections; }
 /* harmony export */ });
@@ -2709,6 +2710,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _contextMenu_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./contextMenu.js */ "./resources/js/sections/site/contracts/contextMenu.js");
 /* harmony import */ var _contentSelection_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./contentSelection.js */ "./resources/js/sections/site/contracts/contentSelection.js");
 /* harmony import */ var _selectionsList_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./selectionsList.js */ "./resources/js/sections/site/contracts/selectionsList.js");
+/* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./utils.js */ "./resources/js/sections/site/contracts/utils.js");
+
 
 
 
@@ -3567,6 +3570,27 @@ function showSelections(cell) {
     }
   });
   return selectionsTooltip;
+}
+
+/***/ }),
+
+/***/ "./resources/js/sections/site/contracts/utils.js":
+/*!*******************************************************!*\
+  !*** ./resources/js/sections/site/contracts/utils.js ***!
+  \*******************************************************/
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "getLastnameFromApplicant": function() { return /* binding */ getLastnameFromApplicant; }
+/* harmony export */ });
+function getLastnameFromApplicant() {
+  var applicant = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+  if (!applicant) return null;
+  var res = applicant.replace(/ООО|ИП|ЗАО|МБУ|АО Торговый дом|АО|МКУ|ГБУ|СНТ|Глава|КФХ/g, '').replace(/"/g, '').trim().replace(/\s+/g, ' ');
+  var words = res.split(' ');
+  return words[0] || null;
 }
 
 /***/ }),
