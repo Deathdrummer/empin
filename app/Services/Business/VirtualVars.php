@@ -120,8 +120,7 @@ class VirtualVars {
 	* @return 
 	*/
 	public function invoiceNumber($buildContractData) {
-		$id = $buildContractData['id'];
-		return substr($id, -2);
+		return ((int)substr($buildContractData['id'], -2) + 1) ?: 99;
 	}
 	
 	
