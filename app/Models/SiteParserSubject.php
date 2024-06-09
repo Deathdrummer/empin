@@ -40,4 +40,18 @@ class SiteParserSubject extends Model {
 	public $timestamps = false;
 	
 	
+	
+	
+	
+	
+	/**
+	* 
+	* @param 
+	* @return 
+	*/
+	public function contacts() {
+		return $this->hasMany(SiteParser::class, 'subject_id', 'id');
+	}
+	
+	
 }

@@ -46,6 +46,7 @@ export function contextMenu(
 		const isActsCol = !!$(target.pointer).closest('[ddrtabletd]').hasAttr('editacts') || false;
 		
 		let calcPrices;
+		let calcDates;
 		let allPinned;
 		let pinnedInSelected = {};
 		
@@ -60,19 +61,21 @@ export function contextMenu(
 		
 		
 		let enableEditPriceCell = true;
-		if ($(target.pointer).closest('[ddrtabletd]').find('[calcprice]').length) {
-			const edittedCellData = pregSplit($(target.pointer).closest('[ddrtabletd]').attr('contextedit')),
-				[,, subContracting, genContracting] = pregSplit($(target.pointer).closest('[ddrtabletd]').find('[calcprice]').attr('calcprice') || null);
+		const edittedCellData = pregSplit($(target.pointer).closest('[ddrtabletd]').attr('contextedit'));
 		
+		if ($(target.pointer).closest('[ddrtabletd]').find('[calcprice]').length) {
+			const [,, subContracting, genContracting] = pregSplit($(target.pointer).closest('[ddrtabletd]').find('[calcprice]').attr('calcprice') || null);
+			
 			if (['price_gen', 'price_gen_nds'].indexOf(edittedCellData[1]) !== -1 && genContracting) {
 				enableEditPriceCell = false;
 			} else if (['price_sub', 'price_sub_nds'].indexOf(edittedCellData[1]) !== -1 && subContracting) {
 				enableEditPriceCell = false;
-			} else if (['price', 'price_nds', 'gen_percent'].indexOf(edittedCellData[1]) === -1 && !subContracting && !genContracting) {
+			} else if (['price', 'price_nds', 'gen_percent', 'price_avvr', 'price_avvr_nds', 'price_pir', 'price_pir_nds', 'price_smr', 'price_pnr'].indexOf(edittedCellData[1]) === -1 && !subContracting && !genContracting) {
 				enableEditPriceCell = false;
 			}
-		}
-		
+		} else if (['date_report_from'].indexOf(edittedCellData[1]) !== -1) {
+			enableEditPriceCell = false;
+		} 
 		
 		
 		onContextMenu(() => {
@@ -766,6 +769,13 @@ export function contextMenu(
 					const cell = $(target.pointer).closest('[ddrtabletd]');
 					const attrData = $(cell).attr('contextedit');
 					const [contractId = null, column = null, type = null] = pregSplit(attrData);
+					/*
+						type (типы данных)
+							1. текст
+							2. цифры
+							3. дата
+							4. вып. список
+					*/
 					
 					
 					$('#contractsList').find('[editted]').each(function(k, cell) {
@@ -823,13 +833,14 @@ export function contextMenu(
 							const primarySelector = $(cell).find('#edittedCellData'),
 								row = $(primarySelector).closest('[ddrtabletr]'),
 								[, contractingPercent, subContracting, genContracting] = pregSplit($(cell).find('[calcprice]').attr('calcprice'));
-							
+								
 							const _setValueToSelector = (field = null, value = '') => {
 								if (_.isNull(field)) return false;
-								const replacer = $(row).find('[calcprice^="'+field+'|"]');
+								const replacer = $(row).find('[calcprice^="'+field+'|"], [calcprice="'+field+'"]');
 								$(replacer).setAttrib('replacer', value);
 								$(replacer).siblings('strong:hidden').removeAttrib('hidden');
 							}
+							
 							
 							
 							if (!subContracting && !genContracting) {
@@ -849,7 +860,60 @@ export function contextMenu(
 										numberFormat: [2, '.', ' '],
 										percent: percentNds,
 									}]);
+								} else if (column == 'price_avvr') {
+									calcPrices = $(primarySelector).ddrCalc([{
+										selector: value => _setValueToSelector('price_avvr_nds', value),
+										method: 'nds',
+										numberFormat: [2, '.', ' '],
+										percent: percentNds,
+									}, {
+										selector: value => _setValueToSelector('avvr_nds_only', value),
+										method: 'percent_only',
+										numberFormat: [2, '.', ' '],
+										percent: 20,
+									}]);
+								} else if (column == 'price_avvr_nds') {
+									calcPrices = $(primarySelector).ddrCalc([{
+										selector: value => _setValueToSelector('price_avvr', value),
+										method: 'nds',
+										reverse: true,
+										numberFormat: [2, '.', ' '],
+										percent: percentNds,
+									}, {
+										selector: value => _setValueToSelector('avvr_nds_only', value),
+										method: 'percent_only',
+										numberFormat: [2, '.', ' '],
+										percent: 20,
+										reverse: true,
+									}]);
+								} else if (column == 'price_pir') {
+									calcPrices = $(primarySelector).ddrCalc([{
+										selector: value => _setValueToSelector('price_pir_nds', value),
+										method: 'nds',
+										numberFormat: [2, '.', ' '],
+										percent: percentNds,
+									}, {
+										selector: value => _setValueToSelector('pir_nds_only', value),
+										method: 'percent_only',
+										numberFormat: [2, '.', ' '],
+										percent: 20,
+									}]);
+								} else if (column == 'price_pir_nds') {
+									calcPrices = $(primarySelector).ddrCalc([{
+										selector: value => _setValueToSelector('price_pir', value),
+										method: 'nds',
+										reverse: true,
+										numberFormat: [2, '.', ' '],
+										percent: percentNds,
+									}, {
+										selector: value => _setValueToSelector('pir_nds_only', value),
+										method: 'percent_only',
+										numberFormat: [2, '.', ' '],
+										percent: 20,
+										reverse: true,
+									}]);
 								}
+								
 								
 							} else if (subContracting) {
 								if (column == 'price') {
@@ -1019,7 +1083,9 @@ export function contextMenu(
 									}]);
 								}
 							}
-						} 
+							
+						}
+						
 						
 						
 						
@@ -1048,7 +1114,7 @@ export function contextMenu(
 								});
 								
 								$.each(addictColums, (col, price) => {
-									$(row).find('[calcprice^="'+col+'|"]').html($.number(price, 2, '.', ' '));
+									$(row).find('[calcprice^="'+col+'|"], [calcprice="'+col+'"]').html($.number(price, 2, '.', ' '));
 								});
 							}
 							
@@ -1113,6 +1179,54 @@ export function contextMenu(
 							},
 							onShow: async function({reference, popper, show, hide, destroy, waitDetroy, setContent, setData, setProps}) {
 								
+								const _setValueToSelector = (toCellText) => {
+									const attrdata = $(reference).attr('contextedit'),
+										slaveCellName = attrdata.includes('date_start') ? 'date_send_action' : 'date_start',
+										row = $(reference).closest('[ddrtabletr]'),
+										selector = $(row).find('[contextedit*=",date_report_from,"]').children('p'),
+										replacer = $(selector).attr('edittedplace'),
+										secondCell = $(row).find('[contextedit*=",'+slaveCellName+',"]');
+									
+									
+									const dateStart = attrdata.includes('date_start') ? toCellText : $(secondCell).text().trim().replace('-', ''),
+										dateSendAction = attrdata.includes('date_send_action') ? toCellText : $(secondCell).text().trim().replace('-', '');
+									
+
+									const dateReportFrom = _getDateReportFrom(dateSendAction, dateStart);
+									
+									if (dateReportFrom) {
+										$(selector).setAttrib('date', dateReportFrom);
+										$(selector).text(dateReportFrom);
+									} else {
+										$(selector).removeAttrib('date');
+										$(selector).text(replacer);
+									}
+								},
+									isFilledSlaveCell = () => {
+										const attrdata = $(reference).attr('contextedit'),
+											slaveCellName = attrdata.includes('date_start') ? 'date_send_action' : 'date_start',
+											row = $(reference).closest('[ddrtabletr]');
+										return $(row).find('[contextedit*=",'+slaveCellName+',"]').children('p').hasAttr('date');
+									}
+								
+								
+								
+								
+								function _getDateReportFrom(dateSendAction, dateStart) {
+									if (!dateSendAction || !dateStart) return null;
+									const [daD, daM, daY] = dateSendAction.split('.');
+									const [dsD, dsM, dsY] = dateStart.split('.');
+									
+									if (daM > dsM) {
+										return `01.${daM}.${dsY}`;
+									} else if (daM == dsM && dsD <= daD) {
+										return `${dsD}.${daM}.${daY}`;
+									}
+									
+									return null;
+								}
+								
+								
 								if (type == 3) {
 									const calendarBlock = 	'<div ondblclick="event.stopPropagation();">'+
 																'<div><div id="editCellCalendar"></div></div>'+
@@ -1138,6 +1252,7 @@ export function contextMenu(
 										onSelect: async ({el, destroy}, date) => {
 											const rawDate = date.getFullYear()+'-'+addZero(date.getMonth() + 1)+'-'+addZero(date.getDate())+' 00:00:00';
 											const toCellText = addZero(date.getDate())+'.'+addZero(date.getMonth() + 1)+'.'+date.getFullYear().toString().substr(-2);
+											const dateToSave = date.getFullYear().toString().substr(-2)+'.'+addZero(date.getMonth() + 1)+'.'+addZero(date.getDate());
 											
 											const emptyVal = $(cell).find('[edittedplace]').attr('edittedplace');
 											
@@ -1147,13 +1262,19 @@ export function contextMenu(
 											});
 											
 											
+											const addict_colums = {};
+											
+											
+											if (['date_send_action', 'date_start'].includes(column) && isFilledSlaveCell()) {
+												addict_colums['date_report_from'] = dateToSave;
+											}
 											
 											const {data, error} = await axiosQuery('post', 'site/contracts/cell_edit', {
 												contract_id: contractId,
 												column,
 												type,
 												data: rawDate,
-												addict_colums: {},
+												addict_colums,
 											}, 'json');
 											
 											if (error) {
@@ -1166,9 +1287,15 @@ export function contextMenu(
 												$.notify('Сохранено!');
 												$(cell).find('[edittedplace]').setAttrib('date', rawDate);
 												$(cell).find('[edittedplace]').text(toCellText || emptyVal);
+												
+												if (['date_send_action', 'date_start'].includes(column) && isFilledSlaveCell()) {
+													_setValueToSelector(toCellText);
+												}
+												
 												cellDateWait.destroy();
 												unEditCell(cell);
 												cellEditTooltip?.destroy();
+												if (calcDates?.destroy != undefined) calcDates.destroy();
 											}
 										},
 									});
@@ -1179,7 +1306,13 @@ export function contextMenu(
 										const cellDateWait = $(reference).ddrWait({
 											iconHeight: '30px',
 											tag: 'noscroll noopen edittedwait'
-										});
+										}),
+											addict_colums = {};
+										
+										if (['date_send_action', 'date_start'].includes(column)) {
+											addict_colums['date_report_from'] = null;
+											_setValueToSelector(null);
+										}
 										
 										const emptyVal = $(cell).find('[edittedplace]').attr('edittedplace');
 										
@@ -1188,7 +1321,7 @@ export function contextMenu(
 											column,
 											type,
 											data: null,
-											addict_colums: {},
+											addict_colums,
 										}, 'json');
 										
 										if (error) {

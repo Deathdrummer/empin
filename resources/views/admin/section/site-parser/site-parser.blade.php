@@ -38,12 +38,12 @@
 						<x-table.tr class="h4rem" scrollfix noborder>
 							<x-table.td class="w-auto minw15rem sort" onclick="$.sortListByField(this, 'company')" noborder><strong class="fz12px">Название компании</strong></x-table.td>
 							<x-table.td class="w20rem sort" onclick="$.sortListByField(this, 'site')" noborder><strong class="fz12px">Сайт</strong></x-table.td>
-							<x-table.td class="w20rem sort" onclick="$.sortListByField(this, 'subject_id')" noborder><strong class="fz12px">Тематика</strong></x-table.td>
+							<x-table.td class="w20rem sort" onclick="$.sortListByField(this, 'subject.subject')" noborder><strong class="fz12px">Тематика</strong></x-table.td>
 							<x-table.td class="w20rem sort" onclick="$.sortListByField(this, 'whatsapp')" noborder><strong class="fz12px">Whatsapp</strong></x-table.td>
 							<x-table.td class="w20rem sort" onclick="$.sortListByField(this, 'telegram')" noborder><strong class="fz12px">Telegram</strong></x-table.td>
 							<x-table.td class="w20rem sort" onclick="$.sortListByField(this, 'phone')" noborder><strong class="fz12px">Телефон</strong></x-table.td>
 							<x-table.td class="w-auto sort" onclick="$.sortListByField(this, 'email')" noborder><strong class="fz12px">E-mail</strong></x-table.td>
-							<x-table.td class="w12rem sort" noborder><strong class="fz12px">Действия</strong></x-table.td>
+							<x-table.td class="w12rem" noborder><strong class="fz12px">Действия</strong></x-table.td>
 						</x-table.tr>
 					</x-table.head>
 					<x-table.body id="parsedList"></x-table.body>
@@ -58,8 +58,11 @@
 
 
 <script type="module">
-	const subjectsOffset = ddrRef(''),
+	const subjectsOffset = ddrRef(0),
 		subjectsLetter = ddrRef(null),
+		subjectsSortField = ddrRef('subject'),
+		subjectsSortOrder = ddrRef('asc'),
+		subjectsLSearch = ddrRef(null),
 		countPerLoad = 50,
 		loadListParams = ddrRef({
 			stat: 0,
@@ -153,7 +156,7 @@
 		}).then(async ({state, wait, setTitle, setButtons, loadData, setHtml, setLHtml, dialog, close, onClose, onScroll, disableButtons, enableButtons, setWidth}) => {
 			wait();
 			
-			const subjects = await getSubjects(loadListParams.subjectsIds, );
+			const subjects = await getSubjects(true);
 			
 			if (subjects) {
 				setHtml(subjects, () => {
@@ -181,8 +184,96 @@
 				close();
 			}
 			
+			
+			
+			$.unchooseSubjectAction = () => {
+				$('#subjectsTable').find('[subject][selected]').removeAttrib('selected');
+			}
+			
+			
+			$.clearSubjects = () => {
+				choosedSubjectsTitles.value = [];
+				loadListParams.subjectsIds = [];
+				ddrStore('site-parser-subjects-titles', false);
+			}
+			
+			
+			
+			$.chooseSubjectLetter = async (item) => {
+				disableButtons();
+				
+				item.toggleAttribute('selected');
+				
+				$('[subjectlettersblock]').find('[subjectletter][selected]').not(item).removeAttrib('selected');
+
+				const attr = $(item).attr('subjectletter');
+				
+				subjectsLetter.value = $(item).hasAttr('selected') ? attr : null;
+				subjectsOffset.value = 0;
+				const subjects = await getSubjects();
+				
+				if (subjects) {
+					$('#subjectsList').blockTable('insertData', subjects);
+					enableButtons(true);
+				} else {
+					$('#subjectsList').blockTable('removeAllRows');
+					wait(false);
+				}
+			}
+			
+			
+			
+			$.sortSubjects = async (sort) => {
+				disableButtons();
+				
+				subjectsSortField.value = sort;
+				subjectsSortOrder.value = subjectsSortOrder.value == 'asc' ? 'desc' : 'asc';
+				subjectsOffset.value = 0;
+				const subjects = await getSubjects();
+				
+				if (subjects) {
+					$('#subjectsList').blockTable('insertData', subjects);
+					enableButtons(true);
+				} else {
+					$('#subjectsList').blockTable('removeAllRows');
+					wait(false);
+				}
+			}
+			
+			
+			
+			
+			let searchTOut;
+			$.searchSubject = (event) => {
+				disableButtons();
+				clearTimeout(searchTOut);
+				searchTOut = setTimeout(async () => {
+					subjectsLSearch.value = event.target.value;
+					subjectsOffset.value = 0;
+					const subjects = await getSubjects();
+					
+					if (subjects) {
+						$('#subjectsList').blockTable('insertData', subjects);
+						enableButtons(true);
+					} else {
+						$('#subjectsList').blockTable('removeAllRows');
+						wait(false);
+					}
+				}, 500);
+			}
+			
+			
+			
+			$.scrollSubjects = async () => {
+				subjectsOffset.value += 1;
+				const subjects = await getSubjects();
+				$('#subjectsTable').blockTable('appendData', subjects);
+			}
+			
+			
 			onClose(() => {
 				subjectsOffset.value = 0;
+				subjectsLSearch.value = null;
 			});
 			
 		});
@@ -194,47 +285,7 @@
 	
 	
 	
-	$.unchooseSubjectAction = () => {
-		$('#subjectsTable').find('[subject][selected]').removeAttrib('selected');
-	}
-	
-	
-	$.clearSubjects = () => {
-		choosedSubjectsTitles.value = [];
-		loadListParams.subjectsIds = [];
-		ddrStore('site-parser-subjects-titles', false);
-	}
-	
-	
-	
-	$.chooseSubjectLetter = async (item) => {
-		disableButtons();
-		$(item).closest('[subjectlettersblock]').find('[subjectletter][selected]').removeAttrib('selected');
-		item.toggleAttribute('selected');
-		const attr = $(item).attr('subjectletter');
-		
-		subjectsLetter.value = attr;
-		subjectsOffset.value = 0;
-		const subjects = await getSubjects(loadListParams.subjectsIds);
-		
-		if (subjects) {
-			setHtml(subjects, () => {
-				$('#subjectsTable').blockTable('buildTable');
-				enableButtons(true);
-			});
-		} else {
-			setHtml('<p class="color-gray fz14px text-center">Нет данных</p>');
-			wait(false);
-		}
-	}
-	
-	
-	
-	$.scrollSubjects = async () => {
-		subjectsOffset.value += 1;
-		const subjects = await getSubjects(loadListParams.subjectsIds);
-		$('#subjectsTable').blockTable('appendData', subjects);
-	}
+			
 	
 	
 	
@@ -613,11 +664,15 @@
 	
 	
 	
-	async function getSubjects(choosedSubjects = null) {
+	async function getSubjects(init = false) {
 		const {data, error, status, headers} = await axiosQuery('get', 'ajax/siteparser/get_subjects', {
-			choosedSubjects,
+			choosedSubjects: loadListParams.subjectsIds,
 			offset: subjectsOffset.value,
+			sortField: subjectsSortField.value,
+			sortOrder: subjectsSortOrder.value,
 			letter: subjectsLetter.value,
+			search: subjectsLSearch.value,
+			init: init ? 1 : 0,
 		});
 		
 		if (error) {
@@ -625,6 +680,8 @@
 			console.log(error);
 			return false;
 		}
+		
+		if (subjectsOffset.value == 0) $('#subjectsList').scrollTop(0);
 		
 		return data;
 	}

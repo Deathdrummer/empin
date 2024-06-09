@@ -36,7 +36,6 @@ class SiteParserController extends Controller {
 			'stat'		=> 'nullable|string'
 		]);
 		
-		
 		$subjectsIds = $request->input('subjectsIds');
 		
 		//SiteParser::where('email', '')->update(['email' => null]);
@@ -73,11 +72,19 @@ class SiteParserController extends Controller {
 		$choosed = $request->input('choosedSubjects');
 		$offset = $request->input('offset', 0);
 		$letter = $request->input('letter', null);
+		$search = $request->input('search', null);
+		$sortField = $request->input('sortField', 'subject');
+		$sortOrder = $request->input('sortOrder', 'asc');
+		$init = $request->input('init', false);
 		
-		$subjects = SiteParserSubject::orderBy('subject', 'asc')
+		$subjects = SiteParserSubject::withCount('contacts as contacts_count')
 			->when($letter, function($query) use($letter) {
 				$query->where('subject', 'LIKE', "$letter%");
 			})
+			->when($search, function($query) use($search) {
+				$query->where('subject', 'LIKE', "%$search%");
+			})
+			->orderBy($sortField, $sortOrder)
 			->limit($this->subjectsLimit)
 			->offset($offset * $this->subjectsLimit)
 			->get()
@@ -89,7 +96,7 @@ class SiteParserController extends Controller {
 		
 		$part = $this->subjectsLimit;
 		
-		return $this->render('subjects', compact('subjects', 'offset', 'part', 'letter'));
+		return $this->render('subjects', compact('subjects', 'offset', 'part', 'letter', 'init'));
 	}
 	
 	

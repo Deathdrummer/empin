@@ -39,7 +39,7 @@ $.fn.ddrCalc = function(data = []) {
 		
 		delete(item['method']);
 		
-		if (['percent', 'nds'].indexOf(method) === -1) throw Error('ddrCalc ошибка! метода «'+method+'» не существует!');
+		if (['percent', 'nds', 'percent_only'].indexOf(method) === -1) throw Error('ddrCalc ошибка! метода «'+method+'» не существует!');
 		
 		methods[method](item);
 	});
@@ -139,6 +139,72 @@ class DdrCalc {
 	
 	
 	
+	
+	percent_only(data) {
+		let {
+			selector, // куда вставлять данные. Можно вызвать функцию: (selector, value) => $(selector).setAttrib('replacer', value)
+			percent, // процент для расчета
+			reverse, // в обратном направлении
+			twoWay, // двухсторонняя привязка
+			middleware, // промежуточный расчет значения. Пример: middleware: [(value, calc) => calc('nds', value, percentNds), false],
+			numberFormat, // фрматировать вставляемое значение. Эквивалент $.number: [2, '.', ' '],
+		} = $.extend({
+			selector: null,
+			percent: 0,
+			reverse: false,
+			twoWay: false,
+			middleware: false,
+			numberFormat: false,
+		}, data),
+			thisCls = this;
+		
+			
+		$(thisCls.mainSelector).on(thisCls.inputEvent, function(e) {
+			let val = thisCls._valToNumber(e.target.value, 2);
+			let result = _.round(thisCls._calc('percent_only', val, percent, reverse), 2);
+			
+			if (_.isFunction(middleware[0])) {
+				result = middleware[0](result, thisCls._calc.bind(thisCls));
+			}
+
+			const calcValue = numberFormat ? $.number(_.round(result, 2), ...numberFormat) : _.round(result, 2);
+			
+			thisCls._insertValue(selector, calcValue);
+			
+			thisCls.eventListeners.items.push(e);
+		});	
+		
+		if (twoWay) {
+			$(selector).on(thisCls.inputEvent, function(e) {
+				let val = thisCls._valToNumber(e.target.value, 2);
+				
+				let result = _.round(thisCls._calc('percent_only', val, percent, !reverse), 2);
+				
+				if (middleware[1] !== undefined && middleware[1] !== false && _.isFunction(middleware[1])) {
+					result = middleware[1](result, thisCls._calc.bind(thisCls));
+				} else if (middleware[1] !== false && _.isFunction(middleware[0])) {
+					result = middleware[0](result, thisCls._calc.bind(thisCls));
+				}
+				
+				const calcValue = numberFormat ? $.number(_.round(result, 2), ...numberFormat) : _.round(result, 2);
+				
+				thisCls._insertValue(thisCls.mainSelector, calcValue);
+				
+				thisCls.eventListeners.items.push(e);
+			});
+		}
+		
+		
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	nds(data) {
 		let {
 			selector, // куда вставлять данные. Можно вызвать функцию: (selector, value) => $(selector).setAttrib('replacer', value)
@@ -220,6 +286,18 @@ class DdrCalc {
 				
 				if (!reverse) return percent < 100 ? _.round(value / ((100 - percent) / 100), 2) : 0;
 				return percent < 100 ? _.round(value * ((100 - percent) / 100), 2) : 0;
+				break;
+			
+			case 'percent_only':
+				let [valueOnly, percentOnly, reverseOnly = false] = args;
+				
+				valueOnly = this._valToNumber(valueOnly, 2);
+				
+				percentOnly = _.isPlainObject(percentOnly) ? percent.value : percentOnly;
+				percentOnly = Number(percentOnly);
+				
+				if (!reverseOnly) return percentOnly < 100 ? _.round((valueOnly / 100) * percentOnly, 2) : 0;
+				return percentOnly < 100 ? _.round(valueOnly - (valueOnly / (1 + percentOnly / 100)), 2) : 0;
 				break;
 			
 			case 'nds':

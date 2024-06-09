@@ -1,6 +1,7 @@
 <?php namespace App\Http\Controllers\site;
 
 use App\Enums\ContractColums;
+use App\Enums\VirtualVars;
 use App\Exports\ContractsExport;
 use App\Helpers\DdrDateTime;
 use App\Http\Controllers\Controller;
@@ -16,6 +17,7 @@ use App\Models\Step;
 use App\Services\Business\Department as DepartmentService;
 use App\Services\Business\Contract as ContractService;
 use App\Services\Business\User as UserService;
+use App\Services\Business\VirtualVars as BusinessVirtualVars;
 use App\Traits\Renderable;
 use App\Traits\Settingable;
 use Carbon\Carbon;
@@ -1212,10 +1214,17 @@ class Contracts extends Controller {
 		}
 		
 		$colums = ContractColums::getKeys();
+		$virtVars = VirtualVars::getKeys();
 		$varsMap = [];
+		
 		foreach ($colums as $column) {
 			$varsMap['{'.$column.'}'] = $buildContractdata[$column] ?? '';
 		}
+		
+		foreach ($virtVars as $virtVar) {
+			$varsMap['{'.$virtVar.'}'] = BusinessVirtualVars::run($virtVar, $buildContractdata);
+		}
+		
 		
 		$buildedExportFileName = trim(Str::swap($varsMap, $templateData['export_name'] ?? $contractData?->id));
 		$exportFilePath = "storage/{$buildedExportFileName}.{$templateData['file']['ext']}";
@@ -1225,6 +1234,11 @@ class Contracts extends Controller {
 		
 		return [$exportFileName, $exportFilePath];
 	}
+	
+	
+	
+	
+	
 	
 	
 	
@@ -1252,11 +1266,21 @@ class Contracts extends Controller {
 			$buildContractdata = $this->_buildContractdata($contractData);
 			
 			$colums = ContractColums::getKeys();
+			$virtVars = VirtualVars::getKeys();
+			
 			$varsMap = []; $varsTitlesMap = [];
 			foreach ($colums as $column) {
 				$varsMap['${'.$column.'}'] = $buildContractdata[$column] ?? '';
 				$varsTitlesMap['{'.$column.'}'] = $buildContractdata[$column] ?? '';
 			}
+			
+			foreach ($virtVars as $virtVar) {
+				$virtVarValue = BusinessVirtualVars::run($virtVar, $buildContractdata) ?? '';
+				$varsMap['${'.$virtVar.'}'] = $virtVarValue;
+				$varsTitlesMap['{'.$virtVar.'}'] = $virtVarValue;
+			}
+			
+			
 			
 			for ($row = 1; $row <= $highestRow; $row++) {
 				for ($col = 1; $col <= $highestColumnIndex; $col++) {
@@ -1316,6 +1340,8 @@ class Contracts extends Controller {
 	private function _buildContractdata($contractData = null) {
 		if (!$contractData?->exists()) return false;
 		
+		$virtVars = VirtualVars::getKeys();
+		
 		['contractor' => $contractor, 'customer' => $customer, 'type' => $type] = $this->getSettings([[
 				'setting'	=> 'contract-customers:customer',
 				'key'		=> 'id',
@@ -1341,8 +1367,13 @@ class Contracts extends Controller {
 				default			=> $value ?? '',
 			};
 		}
-		return $buildedContractData;
 		
+		
+		foreach ($virtVars as $virtVar) {
+			$buildedContractData[$virtVar] = BusinessVirtualVars::run($virtVar, $buildedContractData);
+		}
+		
+		return $buildedContractData;
 	}
 	
 	

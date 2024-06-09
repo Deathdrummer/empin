@@ -187,6 +187,96 @@
 			@endisset
 		</x-table.td>
 	@endif
+	
+	@if($column == 'price_avvr' && auth('site')->user()->can('contract-col-price_avvr:site'))
+		<x-table.td class="text-end" commonlist contextedit="{{$id}},{{$column}},2" style="background-color: {{$selected_color.'75' ?? ''}};">
+			@isset($price_avvr)
+				<p class="fz12px lh90 nobreak"><span class="fz12px" edittedplace="0.00" replacer r-right calcprice="price_avvr">@number($price_avvr, 2)</span> <strong>@symbal(money)</strong></p>
+			@else
+				<p class="fz12px"><span class="fz12px" edittedplace="0.00" replacer r-right calcprice="price_avvr">-</span> <strong hidden hiddenplace>@symbal(money)</strong></p>
+			@endisset
+		</x-table.td>
+	@endif
+	
+	@if($column == 'price_avvr_nds' && auth('site')->user()->can('contract-col-price_avvr_nds:site'))
+		<x-table.td class="text-end" commonlist contextedit="{{$id}},{{$column}},2" style="background-color: {{$selected_color.'75' ?? ''}};">
+			@isset($price_avvr_nds)
+				<p class="fz12px lh90 nobreak"><span class="fz12px" edittedplace="0.00" replacer r-right calcprice="price_avvr_nds">@number($price_avvr_nds, 2)</span> <strong>@symbal(money)</strong></p>
+			@else
+				<p class="fz12px"><span class="fz12px" edittedplace="0.00" replacer r-right calcprice="price_avvr_nds">-</span> <strong hidden hiddenplace>@symbal(money)</strong></p>
+			@endisset
+		</x-table.td>
+	@endif
+	
+	@if($column == 'avvr_nds_only' && auth('site')->user()->can('contract-col-avvr_nds_only:site'))
+		<x-table.td class="text-end" commonlist contextedit="{{$id}},{{$column}},2" style="background-color: {{$selected_color.'75' ?? ''}};">
+			@isset($avvr_nds_only)
+				<p class="fz12px lh90 nobreak"><span class="fz12px" edittedplace="0.00" replacer r-right calcprice="avvr_nds_only">@number($avvr_nds_only, 2)</span> <strong>@symbal(money)</strong></p>
+			@else
+				<p class="fz12px"><span class="fz12px" edittedplace="0.00" replacer r-right calcprice="avvr_nds_only">-</span> <strong hidden hiddenplace>@symbal(money)</strong></p>
+			@endisset
+		</x-table.td>
+	@endif
+	
+	@if($column == 'price_pir' && auth('site')->user()->can('contract-col-price_pir:site'))
+		<x-table.td class="text-end" commonlist contextedit="{{$id}},{{$column}},2" style="background-color: {{$selected_color.'75' ?? ''}};">
+			@isset($price_pir)
+				<p class="fz12px lh90 nobreak"><span class="fz12px" edittedplace="0.00" replacer r-right calcprice="price_pir">@number($price_pir, 2)</span> <strong>@symbal(money)</strong></p>
+			@else
+				<p class="fz12px"><span class="fz12px" edittedplace="0.00" replacer r-right calcprice="price_pir">-</span> <strong hidden hiddenplace>@symbal(money)</strong></p>
+			@endisset
+		</x-table.td>
+	@endif
+	
+	@if($column == 'price_pir_nds' && auth('site')->user()->can('contract-col-price_pir_nds:site'))
+		<x-table.td class="text-end" commonlist contextedit="{{$id}},{{$column}},2" style="background-color: {{$selected_color.'75' ?? ''}};">
+			@isset($price_pir_nds)
+				<p class="fz12px lh90 nobreak"><span class="fz12px" edittedplace="0.00" replacer r-right calcprice="price_pir_nds">@number($price_pir_nds, 2)</span> <strong>@symbal(money)</strong></p>
+			@else
+				<p class="fz12px"><span class="fz12px" edittedplace="0.00" replacer r-right calcprice="price_pir_nds">-</span> <strong hidden hiddenplace>@symbal(money)</strong></p>
+			@endisset
+		</x-table.td>
+	@endif
+	
+	@if($column == 'pir_nds_only' && auth('site')->user()->can('contract-col-pir_nds_only:site'))
+		<x-table.td class="text-end" commonlist contextedit="{{$id}},{{$column}},2" style="background-color: {{$selected_color.'75' ?? ''}};">
+			@isset($pir_nds_only)
+				<p class="fz12px lh90 nobreak"><span class="fz12px" edittedplace="0.00" replacer r-right calcprice="pir_nds_only">@number($pir_nds_only, 2)</span> <strong>@symbal(money)</strong></p>
+			@else
+				<p class="fz12px"><span class="fz12px" edittedplace="0.00" replacer r-right calcprice="pir_nds_only">-</span> <strong hidden hiddenplace>@symbal(money)</strong></p>
+			@endisset
+		</x-table.td>
+	@endif
+	
+	@if($column == 'price_smr' && auth('site')->user()->can('contract-col-price_smr:site'))
+		<x-table.td class="text-end" commonlist contextedit="{{$id}},{{$column}},2" style="background-color: {{$selected_color.'75' ?? ''}};">
+			@isset($price_smr)
+				<p class="fz12px lh90 nobreak"><span class="fz12px" edittedplace="0.00" replacer r-right calcprice="price_smr">@number($price_smr, 2)</span> <strong>@symbal(money)</strong></p>
+			@else
+				<p class="fz12px"><span class="fz12px" edittedplace="0.00" replacer r-right calcprice="price_smr">-</span> <strong hidden hiddenplace>@symbal(money)</strong></p>
+			@endisset
+		</x-table.td>
+	@endif
+	
+	@if($column == 'price_pnr' && auth('site')->user()->can('contract-col-price_pnr:site'))
+		<x-table.td class="text-end" commonlist contextedit="{{$id}},{{$column}},2" style="background-color: {{$selected_color.'75' ?? ''}};">
+			@isset($price_pnr)
+				<p class="fz12px lh90 nobreak"><span class="fz12px" edittedplace="0.00" replacer r-right calcprice="price_pnr">@number($price_pnr, 2)</span> <strong>@symbal(money)</strong></p>
+			@else
+				<p class="fz12px"><span class="fz12px" edittedplace="0.00" replacer r-right calcprice="price_pnr">-</span> <strong hidden hiddenplace>@symbal(money)</strong></p>
+			@endisset
+		</x-table.td>
+	@endif
+	
+	@if($column == 'date_report_from' && auth('site')->user()->can('contract-col-date_report_from:site'))
+		<x-table.td commonlist contextedit="{{$id}},{{$column}},3" style="background-color: {{$selected_color.'75' ?? ''}};">
+			@if(isset($date_report_from) && $date_report_from)
+				<p class="fz12px lh90" edittedplace="-" date="{{$date_report_from}}">{{dateFormatter($date_report_from, 'd.m.y')}}</p>
+			@else
+				<p class="fz12px lh90" edittedplace="-">-</p>
+			@endif
+		</x-table.td>
+	@endif
 
 	@if($column == 'date_start' && auth('site')->user()->can('contract-col-date_start:site'))
 		<x-table.td commonlist contextedit="{{$id}},{{$column}},3" style="background-color: {{$selected_color.'75' ?? ''}};">

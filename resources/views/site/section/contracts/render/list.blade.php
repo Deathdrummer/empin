@@ -238,6 +238,104 @@
 									</x-table.td>
 								@endif
 								
+								@if($column == 'price_avvr' && auth('site')->user()->can('contract-col-price_avvr:site'))
+									<x-table.td
+										style="width:{{isset($listWidth['price_avvr']) ? $listWidth['price_avvr'] : '110'}}px;"
+										class="sort{{$sortField == 'price_avvr' ? ' sort-'.$sortOrder : ''}}"
+										onclick="$.sorting(this, 'price_avvr')"
+										noscroll
+										ddrtabletdmain
+										><strong class="fz10px lh90 d-block text-center wodrbreak">Сумма АВВР без НДС</strong>
+									</x-table.td>
+								@endif
+								
+								@if($column == 'price_avvr_nds' && auth('site')->user()->can('contract-col-price_avvr:site'))
+									<x-table.td
+										style="width:{{isset($listWidth['price_avvr_nds']) ? $listWidth['price_avvr_nds'] : '110'}}px;"
+										class="sort{{$sortField == 'price_avvr_nds' ? ' sort-'.$sortOrder : ''}}"
+										onclick="$.sorting(this, 'price_avvr_nds')"
+										noscroll
+										ddrtabletdmain
+										><strong class="fz10px lh90 d-block text-center wodrbreak">Сумма АВВР с НДС</strong>
+									</x-table.td>
+								@endif
+								
+								@if($column == 'avvr_nds_only' && auth('site')->user()->can('contract-col-avvr_nds_only:site'))
+									<x-table.td
+										style="width:{{isset($listWidth['avvr_nds_only']) ? $listWidth['avvr_nds_only'] : '110'}}px;"
+										class="sort{{$sortField == 'avvr_nds_only' ? ' sort-'.$sortOrder : ''}}"
+										onclick="$.sorting(this, 'avvr_nds_only')"
+										noscroll
+										ddrtabletdmain
+										><strong class="fz10px lh90 d-block text-center wodrbreak">Сумма АВВР процента НДС</strong>
+									</x-table.td>
+								@endif
+								
+								@if($column == 'price_pir' && auth('site')->user()->can('contract-col-price_pir:site'))
+									<x-table.td
+										style="width:{{isset($listWidth['price_pir']) ? $listWidth['price_pir'] : '110'}}px;"
+										class="sort{{$sortField == 'price_pir' ? ' sort-'.$sortOrder : ''}}"
+										onclick="$.sorting(this, 'price_pir')"
+										noscroll
+										ddrtabletdmain
+										><strong class="fz10px lh90 d-block text-center wodrbreak">Сумма ПИР без НДС</strong>
+									</x-table.td>
+								@endif
+								
+								@if($column == 'price_pir_nds' && auth('site')->user()->can('contract-col-price_pir_nds:site'))
+									<x-table.td
+										style="width:{{isset($listWidth['price_pir_nds']) ? $listWidth['price_pir_nds'] : '110'}}px;"
+										class="sort{{$sortField == 'price_pir_nds' ? ' sort-'.$sortOrder : ''}}"
+										onclick="$.sorting(this, 'price_pir_nds')"
+										noscroll
+										ddrtabletdmain
+										><strong class="fz10px lh90 d-block text-center wodrbreak">Сумма ПИР с НДС</strong>
+									</x-table.td>
+								@endif
+								
+								@if($column == 'pir_nds_only' && auth('site')->user()->can('contract-col-pir_nds_only:site'))
+									<x-table.td
+										style="width:{{isset($listWidth['pir_nds_only']) ? $listWidth['pir_nds_only'] : '110'}}px;"
+										class="sort{{$sortField == 'pir_nds_only' ? ' sort-'.$sortOrder : ''}}"
+										onclick="$.sorting(this, 'pir_nds_only')"
+										noscroll
+										ddrtabletdmain
+										><strong class="fz10px lh90 d-block text-center wodrbreak">Сумма ПИР процента НДС</strong>
+									</x-table.td>
+								@endif
+								
+								@if($column == 'price_smr' && auth('site')->user()->can('contract-col-price_smr:site'))
+									<x-table.td
+										style="width:{{isset($listWidth['price_smr']) ? $listWidth['price_smr'] : '110'}}px;"
+										class="sort{{$sortField == 'price_smr' ? ' sort-'.$sortOrder : ''}}"
+										onclick="$.sorting(this, 'price_smr')"
+										noscroll
+										ddrtabletdmain
+										><strong class="fz10px lh90 d-block text-center wodrbreak">Сумма СМР без НДС</strong>
+									</x-table.td>
+								@endif
+								
+								@if($column == 'price_pnr' && auth('site')->user()->can('contract-col-price_pnr:site'))
+									<x-table.td
+										style="width:{{isset($listWidth['price_pnr']) ? $listWidth['price_pnr'] : '110'}}px;"
+										class="sort{{$sortField == 'price_pnr' ? ' sort-'.$sortOrder : ''}}"
+										onclick="$.sorting(this, 'price_pnr')"
+										noscroll
+										ddrtabletdmain
+										><strong class="fz10px lh90 d-block text-center wodrbreak">Сумма ПНР без НДС</strong>
+									</x-table.td>
+								@endif
+								
+								@if($column == 'date_report_from' && auth('site')->user()->can('contract-col-date_report_from:site'))
+									<x-table.td
+										class="w6rem sort{{$sortField == 'date_report_from' ? ' sort-'.$sortOrder : ''}}"
+										onclick="$.sorting(this, 'date_report_from')"
+										noscroll
+										ddrtabletdmain
+										><strong class="fz10px lh90 d-block text-center wodrbreak">Отчет-ный период с</strong>
+									</x-table.td>
+								@endif
+								
 								@if($column == 'date_start' && auth('site')->user()->can('contract-col-date_start:site'))
 									<x-table.td
 										class="w6rem sort{{$sortField == 'date_start' ? ' sort-'.$sortOrder : ''}}"

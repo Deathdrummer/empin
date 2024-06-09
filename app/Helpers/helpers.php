@@ -1,7 +1,9 @@
 <?php
 
 use App\Helpers\DdrDateTime;
+use App\Services\Settings;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
 use Symfony\Component\Mime\Encoder\IdnAddressEncoder;
 
@@ -63,6 +65,41 @@ if (!function_exists('arrayWalkRecursive')) {
 			}
 		});
 		return $mess;
+	}
+}
+
+
+
+
+if (! function_exists('getDeclension')) {
+	/**
+     * @param string  $value
+     * @param bool  $slug
+     * @param bool  $glue
+     * @return string
+     */
+	function getDeclension($number, $titles = []) {
+		if (!$titles|| count($titles) < 3) return report('getRublesDeclension неверно переданы аргументы!');
+		$cases = [2, 0, 1, 1, 1, 2];
+		$case = ($number % 100 > 4 && $number % 100 < 20) ? 2 : $cases[min($number % 10, 5)];
+		return $titles[$case] ?? null;
+	}
+}
+	
+
+
+if (! function_exists('numberToWords')) {
+	/**
+     * @param string  $value
+     * @param bool  $slug
+     * @param bool  $glue
+     * @return string
+     */
+	function numberToWords($number, $titles = []) {
+		$spelloutFormatter = new \NumberFormatter('ru_RU', \NumberFormatter::SPELLOUT);
+		$spelloutString = $spelloutFormatter->format($number);
+		
+		return $spelloutString.' '.getDeclension($number, $titles);
 	}
 }
 
@@ -398,6 +435,23 @@ if (! function_exists('dateFormatter')) {
 	function dateFormatter(?string $date = null, ?string $format = null) {
 		if (!$date || !$format) return '';
 		echo now()->parse($date)->format($format);
+	}
+}
+
+
+
+
+
+if (! function_exists('setting')) {
+	/**
+	 * Получить значение настройки
+	 * @param string|null  $setting настройка
+	 * @return string|null
+	*/
+	function setting(?string $setting = null) {
+		if (!$setting) return null;
+		$settingsService = App::make(Settings::class);
+		return $settingsService->get($setting);
 	}
 }
 

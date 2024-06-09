@@ -54,45 +54,7 @@ class Contract {
 		$filter = app()->make(ContractFilter::class, compact('queryParams'));
 		$data = ContractModel::filter($filter)->get();
 		$result = $data->mapWithKeysMany(function($item) {
-			return [$item['id'] => [
-				'id'				=> $item['id'] ?? null,
-				'object_number'		=> $item['object_number'] ?? null,
-				'buy_number'		=> $item['buy_number'] ?? null,
-				'without_buy'		=> $item['without_buy'] ?? null,
-				'title'				=> $item['title'] ?? null,
-				'applicant'			=> $item['applicant'] ?? null,
-				'titul' 			=> $item['titul'] ?? null,
-				'contract' 			=> $item['contract'] ?? null,
-				'subcontracting' 	=> $item['subcontracting'] ?? null,
-				'gencontracting' 	=> $item['gencontracting'] ?? null,
-				'customer' 			=> $item['customer'] ?? null,
-				'locality' 			=> $item['locality'] ?? null,
-				'date_send_action'	=> $item['date_send_action'] ?? null,
-				'count_ks_2' 		=> $item['count_ks_2'] ?? null,
-				'act_pir' 			=> $item['act_pir'] ?? null,
-				'price' 			=> $item['price'] ?? null,
-				'price_nds' 		=> $item['price_nds'] ?? null,
-				'price_gen' 		=> $item['price_gen'] ?? null,
-				'price_gen_nds' 	=> $item['price_gen_nds'] ?? null,
-				'price_sub' 		=> $item['price_sub'] ?? null,
-				'price_sub_nds' 	=> $item['price_sub_nds'] ?? null,
-				'gen_percent' 		=> $item['gen_percent'] ?? null,
-				'date_start' 		=> $item['date_start'] ?? null,
-				'date_end' 			=> $item['date_end'] ?? null,
-				'date_gen_start' 	=> $item['date_gen_start'] ?? null,
-				'date_gen_end' 		=> $item['date_gen_end'] ?? null,
-				'date_sub_start' 	=> $item['date_sub_start'] ?? null,
-				'date_sub_end' 		=> $item['date_sub_end'] ?? null,
-				'date_close' 		=> $item['date_close'] ?? null,
-				'date_buy' 			=> $item['date_buy'] ?? null,
-				'hoz_method' 		=> $item['hoz_method'] ?? null,
-				'type' 				=> $item['type'] ?? null,
-				'contractor' 		=> $item['contractor'] ?? null,
-				'archive' 			=> $item['archive'] ?? null,
-				'archive_dir' 		=> $item['archive_dir'] ?? null,
-				'created_at' 		=> $item['created_at'] ?? null,
-				'updated_at' 		=> $item['updated_at'] ?? null
-			]];
+			return [$item['id'] => $item];
 		});
 		
 		if ($one) return $result[$contractId];
@@ -297,44 +259,7 @@ class Contract {
 			});
 			
 			
-			return [$item['id'] => [
-				'id'				=> $item['id'] ?? null,
-				'object_number'		=> $item['object_number'] ?? null,
-				'buy_number'		=> $item['buy_number'] ?? null,
-				'without_buy'		=> $item['without_buy'] ?? null,
-				'title'				=> $item['title'] ?? null,
-				'applicant'			=> $item['applicant'] ?? null,
-				'titul' 			=> $item['titul'] ?? null,
-				'contract' 			=> $item['contract'] ?? null,
-				'subcontracting' 	=> $item['subcontracting'] ?? null,
-				'gencontracting' 	=> $item['gencontracting'] ?? null,
-				'customer' 			=> $item['customer'] ?? null,
-				'locality' 			=> $item['locality'] ?? null,
-				'date_send_action'	=> $item['date_send_action'] ?? null,
-				'count_ks_2' 		=> $item['count_ks_2'] ?? null,
-				'act_pir' 			=> $item['act_pir'] ?? null,
-				'price' 			=> $item['price'] ?? null,
-				'price_nds' 		=> $item['price_nds'] ?? null,
-				'price_gen' 		=> $item['price_gen'] ?? null,
-				'price_gen_nds' 	=> $item['price_gen_nds'] ?? null,
-				'price_sub' 		=> $item['price_sub'] ?? null,
-				'price_sub_nds' 	=> $item['price_sub_nds'] ?? null,
-				'gen_percent' 		=> $item['gen_percent'] ?? null,
-				'date_start' 		=> $item['date_start'] ?? null,
-				'date_end' 			=> $item['date_end'] ?? null,
-				'date_gen_start' 	=> $item['date_gen_start'] ?? null,
-				'date_gen_end' 		=> $item['date_gen_end'] ?? null,
-				'date_sub_start' 	=> $item['date_sub_start'] ?? null,
-				'date_sub_end' 		=> $item['date_sub_end'] ?? null,
-				'date_close' 		=> $item['date_close'] ?? null,
-				'date_buy' 			=> $item['date_buy'] ?? null,
-				'hoz_method' 		=> $item['hoz_method'] ?? null,
-				'type' 				=> $item['type'] ?? null,
-				'contractor' 		=> $item['contractor'] ?? null,
-				'archive' 			=> $item['archive'] ?? null,
-				'archive_dir' 		=> $item['archive_dir'] ?? null,
-				'created_at' 		=> $item['created_at'] ?? null,
-				'updated_at' 		=> $item['updated_at'] ?? null,
+			return [$item['id'] => array_merge($item->toArray(), [
 				'color' 			=> $color ?? null,
 				'name' 				=> $name ?? '',
 				'color_forced' 		=> $forcedColor ?? null,
@@ -349,7 +274,7 @@ class Contract {
 				'selections'		=> $item->selections->pluck('id')->toArray() ?? [],
 				'departments' 		=> $departments,
 				'selected_color'	=> $userContractsColors[$item['id'] ?? null] ?? null,
-			]];
+			])];
 		});
 	}
 	

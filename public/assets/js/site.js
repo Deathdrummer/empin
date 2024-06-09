@@ -8192,6 +8192,13 @@ var BlockTable = /*#__PURE__*/function () {
       this.buildTable(selector);
     }
   }, {
+    key: "removeAllRows",
+    value: function removeAllRows() {
+      var selector = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+      if (!selector) return false;
+      $(selector).find('[ddrtabletr]').remove();
+    }
+  }, {
     key: "removeRows",
     value: function removeRows() {
       var selector = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
@@ -8905,7 +8912,7 @@ $.fn.ddrCalc = function () {
   data.forEach(function (item) {
     var method = item.method;
     delete item['method'];
-    if (['percent', 'nds'].indexOf(method) === -1) throw Error('ddrCalc ошибка! метода «' + method + '» не существует!');
+    if (['percent', 'nds', 'percent_only'].indexOf(method) === -1) throw Error('ddrCalc ошибка! метода «' + method + '» не существует!');
     methods[method](item);
   });
   return {
@@ -8999,8 +9006,8 @@ var DdrCalc = /*#__PURE__*/function () {
       }
     }
   }, {
-    key: "nds",
-    value: function nds(data) {
+    key: "percent_only",
+    value: function percent_only(data) {
       var _$$extend2 = $.extend({
         selector: null,
         percent: 0,
@@ -9022,7 +9029,7 @@ var DdrCalc = /*#__PURE__*/function () {
 
         var val = thisCls._valToNumber(e.target.value, 2);
 
-        var result = _.round(thisCls._calc('nds', val, percent, reverse), 2);
+        var result = _.round(thisCls._calc('percent_only', val, percent, reverse), 2);
 
         if (_.isFunction(middleware[0])) {
           result = middleware[0](result, thisCls._calc.bind(thisCls));
@@ -9036,9 +9043,68 @@ var DdrCalc = /*#__PURE__*/function () {
       });
 
       if (twoWay) {
+        $(selector).on(thisCls.inputEvent, function (e) {
+          var _$4;
+
+          var val = thisCls._valToNumber(e.target.value, 2);
+
+          var result = _.round(thisCls._calc('percent_only', val, percent, !reverse), 2);
+
+          if (middleware[1] !== undefined && middleware[1] !== false && _.isFunction(middleware[1])) {
+            result = middleware[1](result, thisCls._calc.bind(thisCls));
+          } else if (middleware[1] !== false && _.isFunction(middleware[0])) {
+            result = middleware[0](result, thisCls._calc.bind(thisCls));
+          }
+
+          var calcValue = numberFormat ? (_$4 = $).number.apply(_$4, [_.round(result, 2)].concat(_toConsumableArray(numberFormat))) : _.round(result, 2);
+
+          thisCls._insertValue(thisCls.mainSelector, calcValue);
+
+          thisCls.eventListeners.items.push(e);
+        });
+      }
+    }
+  }, {
+    key: "nds",
+    value: function nds(data) {
+      var _$$extend3 = $.extend({
+        selector: null,
+        percent: 0,
+        reverse: false,
+        twoWay: false,
+        middleware: false,
+        numberFormat: false
+      }, data),
+          selector = _$$extend3.selector,
+          percent = _$$extend3.percent,
+          reverse = _$$extend3.reverse,
+          twoWay = _$$extend3.twoWay,
+          middleware = _$$extend3.middleware,
+          numberFormat = _$$extend3.numberFormat,
+          thisCls = this;
+
+      $(thisCls.mainSelector).on(thisCls.inputEvent, function (e) {
+        var _$5;
+
+        var val = thisCls._valToNumber(e.target.value, 2);
+
+        var result = _.round(thisCls._calc('nds', val, percent, reverse), 2);
+
+        if (_.isFunction(middleware[0])) {
+          result = middleware[0](result, thisCls._calc.bind(thisCls));
+        }
+
+        var calcValue = numberFormat ? (_$5 = $).number.apply(_$5, [_.round(result, 2)].concat(_toConsumableArray(numberFormat))) : _.round(result, 2);
+
+        thisCls._insertValue(selector, calcValue);
+
+        thisCls.eventListeners.items.push(e);
+      });
+
+      if (twoWay) {
         var twoWaySelector = _.isFunction(twoWay) || _.isString(twoWay) ? twoWay : selector;
         $(twoWaySelector).on(thisCls.inputEvent, function (e) {
-          var _$4;
+          var _$6;
 
           var val = thisCls._valToNumber(e.target.value, 2);
 
@@ -9050,7 +9116,7 @@ var DdrCalc = /*#__PURE__*/function () {
             result = middleware[0](result, thisCls._calc.bind(thisCls));
           }
 
-          var calcValue = numberFormat ? (_$4 = $).number.apply(_$4, [_.round(result, 2)].concat(_toConsumableArray(numberFormat))) : _.round(result, 2);
+          var calcValue = numberFormat ? (_$6 = $).number.apply(_$6, [_.round(result, 2)].concat(_toConsumableArray(numberFormat))) : _.round(result, 2);
 
           thisCls._insertValue(thisCls.mainSelector, calcValue);
 
@@ -9082,11 +9148,23 @@ var DdrCalc = /*#__PURE__*/function () {
           return percent < 100 ? _.round(value * ((100 - percent) / 100), 2) : 0;
           break;
 
+        case 'percent_only':
+          var valueOnly = args[0],
+              percentOnly = args[1],
+              _args$2 = args[2],
+              reverseOnly = _args$2 === void 0 ? false : _args$2;
+          valueOnly = this._valToNumber(valueOnly, 2);
+          percentOnly = _.isPlainObject(percentOnly) ? percent.value : percentOnly;
+          percentOnly = Number(percentOnly);
+          if (!reverseOnly) return percentOnly < 100 ? _.round(valueOnly / 100 * percentOnly, 2) : 0;
+          return percentOnly < 100 ? _.round(valueOnly - valueOnly / (1 + percentOnly / 100), 2) : 0;
+          break;
+
         case 'nds':
           var valueLess = args[0],
               nds = args[1],
-              _args$2 = args[2],
-              reverseLess = _args$2 === void 0 ? false : _args$2;
+              _args$3 = args[2],
+              reverseLess = _args$3 === void 0 ? false : _args$3;
           valueLess = this._valToNumber(valueLess, 2);
           nds = _.isPlainObject(nds) ? nds.value : nds;
           nds = Number(nds);
@@ -18707,6 +18785,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
     var selectedTextCell = !!$(target.pointer).closest('[ddrtabletd]').find('[edittedplace]').hasClass('select-text') || !!$(target.pointer).closest('[ddrtabletd]').find('[edittedblock]').length || !!$('#contractsTable').find('[ddrtabletd].selected').length && $(target.pointer).closest('[ddrtabletd]').hasClass('selected');
     var isActsCol = !!$(target.pointer).closest('[ddrtabletd]').hasAttr('editacts') || false;
     var calcPrices;
+    var calcDates;
     var allPinned;
     var pinnedInSelected = {}; // Если это оин пункт "копировать"
 
@@ -18717,10 +18796,10 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
     }
 
     var enableEditPriceCell = true;
+    var edittedCellData = pregSplit($(target.pointer).closest('[ddrtabletd]').attr('contextedit'));
 
     if ($(target.pointer).closest('[ddrtabletd]').find('[calcprice]').length) {
-      var edittedCellData = pregSplit($(target.pointer).closest('[ddrtabletd]').attr('contextedit')),
-          _pregSplit = pregSplit($(target.pointer).closest('[ddrtabletd]').find('[calcprice]').attr('calcprice') || null),
+      var _pregSplit = pregSplit($(target.pointer).closest('[ddrtabletd]').find('[calcprice]').attr('calcprice') || null),
           _pregSplit2 = _slicedToArray(_pregSplit, 4),
           subContracting = _pregSplit2[2],
           genContracting = _pregSplit2[3];
@@ -18729,9 +18808,11 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
         enableEditPriceCell = false;
       } else if (['price_sub', 'price_sub_nds'].indexOf(edittedCellData[1]) !== -1 && subContracting) {
         enableEditPriceCell = false;
-      } else if (['price', 'price_nds', 'gen_percent'].indexOf(edittedCellData[1]) === -1 && !subContracting && !genContracting) {
+      } else if (['price', 'price_nds', 'gen_percent', 'price_avvr', 'price_avvr_nds', 'price_pir', 'price_pir_nds', 'price_smr', 'price_pnr'].indexOf(edittedCellData[1]) === -1 && !subContracting && !genContracting) {
         enableEditPriceCell = false;
       }
+    } else if (['date_report_from'].indexOf(edittedCellData[1]) !== -1) {
+      enableEditPriceCell = false;
     }
 
     onContextMenu(function () {
@@ -19646,6 +19727,14 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                   cell = $(target.pointer).closest('[ddrtabletd]');
                   attrData = $(cell).attr('contextedit');
                   _pregSplit7 = pregSplit(attrData), _pregSplit8 = _slicedToArray(_pregSplit7, 3), _pregSplit8$ = _pregSplit8[0], contractId = _pregSplit8$ === void 0 ? null : _pregSplit8$, _pregSplit8$2 = _pregSplit8[1], column = _pregSplit8$2 === void 0 ? null : _pregSplit8$2, _pregSplit8$3 = _pregSplit8[2], type = _pregSplit8$3 === void 0 ? null : _pregSplit8$3;
+                  /*
+                  	type (типы данных)
+                  		1. текст
+                  		2. цифры
+                  		3. дата
+                  		4. вып. список
+                  */
+
                   $('#contractsList').find('[editted]').each(function (k, cell) {
                     unEditCell(cell);
                   });
@@ -19705,7 +19794,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                       var field = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
                       var value = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
                       if (_.isNull(field)) return false;
-                      var replacer = $(row).find('[calcprice^="' + field + '|"]');
+                      var replacer = $(row).find('[calcprice^="' + field + '|"], [calcprice="' + field + '"]');
                       $(replacer).setAttrib('replacer', value);
                       $(replacer).siblings('strong:hidden').removeAttrib('hidden');
                     };
@@ -19729,6 +19818,74 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                           reverse: true,
                           numberFormat: [2, '.', ' '],
                           percent: percentNds
+                        }]);
+                      } else if (column == 'price_avvr') {
+                        calcPrices = $(primarySelector).ddrCalc([{
+                          selector: function selector(value) {
+                            return _setValueToSelector('price_avvr_nds', value);
+                          },
+                          method: 'nds',
+                          numberFormat: [2, '.', ' '],
+                          percent: percentNds
+                        }, {
+                          selector: function selector(value) {
+                            return _setValueToSelector('avvr_nds_only', value);
+                          },
+                          method: 'percent_only',
+                          numberFormat: [2, '.', ' '],
+                          percent: 20
+                        }]);
+                      } else if (column == 'price_avvr_nds') {
+                        calcPrices = $(primarySelector).ddrCalc([{
+                          selector: function selector(value) {
+                            return _setValueToSelector('price_avvr', value);
+                          },
+                          method: 'nds',
+                          reverse: true,
+                          numberFormat: [2, '.', ' '],
+                          percent: percentNds
+                        }, {
+                          selector: function selector(value) {
+                            return _setValueToSelector('avvr_nds_only', value);
+                          },
+                          method: 'percent_only',
+                          numberFormat: [2, '.', ' '],
+                          percent: 20,
+                          reverse: true
+                        }]);
+                      } else if (column == 'price_pir') {
+                        calcPrices = $(primarySelector).ddrCalc([{
+                          selector: function selector(value) {
+                            return _setValueToSelector('price_pir_nds', value);
+                          },
+                          method: 'nds',
+                          numberFormat: [2, '.', ' '],
+                          percent: percentNds
+                        }, {
+                          selector: function selector(value) {
+                            return _setValueToSelector('pir_nds_only', value);
+                          },
+                          method: 'percent_only',
+                          numberFormat: [2, '.', ' '],
+                          percent: 20
+                        }]);
+                      } else if (column == 'price_pir_nds') {
+                        calcPrices = $(primarySelector).ddrCalc([{
+                          selector: function selector(value) {
+                            return _setValueToSelector('price_pir', value);
+                          },
+                          method: 'nds',
+                          reverse: true,
+                          numberFormat: [2, '.', ' '],
+                          percent: percentNds
+                        }, {
+                          selector: function selector(value) {
+                            return _setValueToSelector('pir_nds_only', value);
+                          },
+                          method: 'percent_only',
+                          numberFormat: [2, '.', ' '],
+                          percent: 20,
+                          reverse: true
                         }]);
                       }
                     } else if (_subContracting) {
@@ -19983,7 +20140,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                 $(pr).siblings('strong:hidden').removeAttrib('hidden');
                               });
                               $.each(addictColums, function (col, price) {
-                                $(row).find('[calcprice^="' + col + '|"]').html($.number(price, 2, '.', ' '));
+                                $(row).find('[calcprice^="' + col + '|"], [calcprice="' + col + '"]').html($.number(price, 2, '.', ' '));
                               });
                             }
 
@@ -20057,24 +20214,73 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                       },
                       onShow: function () {
                         var _onShow2 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee10(_ref19) {
-                          var reference, popper, show, hide, destroy, waitDetroy, setContent, setData, setProps, calendarBlock, currentDate, datePicker, _yield$axiosQuery9, _data, _error, _status, _headers;
+                          var reference, popper, show, hide, destroy, waitDetroy, setContent, setData, setProps, _setValueToSelector, isFilledSlaveCell, _getDateReportFrom, calendarBlock, currentDate, datePicker, _yield$axiosQuery9, _data, _error, _status, _headers;
 
                           return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee10$(_context10) {
                             while (1) {
                               switch (_context10.prev = _context10.next) {
                                 case 0:
+                                  _getDateReportFrom = function _getDateReportFrom2(dateSendAction, dateStart) {
+                                    if (!dateSendAction || !dateStart) return null;
+
+                                    var _dateSendAction$split = dateSendAction.split('.'),
+                                        _dateSendAction$split2 = _slicedToArray(_dateSendAction$split, 3),
+                                        daD = _dateSendAction$split2[0],
+                                        daM = _dateSendAction$split2[1],
+                                        daY = _dateSendAction$split2[2];
+
+                                    var _dateStart$split = dateStart.split('.'),
+                                        _dateStart$split2 = _slicedToArray(_dateStart$split, 3),
+                                        dsD = _dateStart$split2[0],
+                                        dsM = _dateStart$split2[1],
+                                        dsY = _dateStart$split2[2];
+
+                                    if (daM > dsM) {
+                                      return "01.".concat(daM, ".").concat(dsY);
+                                    } else if (daM == dsM && dsD <= daD) {
+                                      return "".concat(dsD, ".").concat(daM, ".").concat(daY);
+                                    }
+
+                                    return null;
+                                  };
+
                                   reference = _ref19.reference, popper = _ref19.popper, show = _ref19.show, hide = _ref19.hide, destroy = _ref19.destroy, waitDetroy = _ref19.waitDetroy, setContent = _ref19.setContent, setData = _ref19.setData, setProps = _ref19.setProps;
+                                  _setValueToSelector = function _setValueToSelector(toCellText) {
+                                    var attrdata = $(reference).attr('contextedit'),
+                                        slaveCellName = attrdata.includes('date_start') ? 'date_send_action' : 'date_start',
+                                        row = $(reference).closest('[ddrtabletr]'),
+                                        selector = $(row).find('[contextedit*=",date_report_from,"]').children('p'),
+                                        replacer = $(selector).attr('edittedplace'),
+                                        secondCell = $(row).find('[contextedit*=",' + slaveCellName + ',"]');
+                                    var dateStart = attrdata.includes('date_start') ? toCellText : $(secondCell).text().trim().replace('-', ''),
+                                        dateSendAction = attrdata.includes('date_send_action') ? toCellText : $(secondCell).text().trim().replace('-', '');
+
+                                    var dateReportFrom = _getDateReportFrom(dateSendAction, dateStart);
+
+                                    if (dateReportFrom) {
+                                      $(selector).setAttrib('date', dateReportFrom);
+                                      $(selector).text(dateReportFrom);
+                                    } else {
+                                      $(selector).removeAttrib('date');
+                                      $(selector).text(replacer);
+                                    }
+                                  }, isFilledSlaveCell = function isFilledSlaveCell() {
+                                    var attrdata = $(reference).attr('contextedit'),
+                                        slaveCellName = attrdata.includes('date_start') ? 'date_send_action' : 'date_start',
+                                        row = $(reference).closest('[ddrtabletr]');
+                                    return $(row).find('[contextedit*=",' + slaveCellName + ',"]').children('p').hasAttr('date');
+                                  };
 
                                   if (!(type == 3)) {
-                                    _context10.next = 11;
+                                    _context10.next = 13;
                                     break;
                                   }
 
                                   calendarBlock = '<div ondblclick="event.stopPropagation();">' + '<div><div id="editCellCalendar"></div></div>' + '<div class="mt5px text-end">' + '<div class="button verysmall-button button-light">' + '<button title="Очистить" id="editCellCalendarClear">Очистить</button>' + '</div>' + '</div>' + '</div>';
-                                  _context10.next = 5;
+                                  _context10.next = 7;
                                   return setData(calendarBlock);
 
-                                case 5:
+                                case 7:
                                   currentDate = $(cell).find('[edittedplace]').attr('date') || false;
                                   datePicker = ddrDatepicker($(popper).find('#editCellCalendar')[0], {
                                     startDay: 1,
@@ -20086,7 +20292,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                     dateSelected: currentDate ? new Date(currentDate) : new Date(),
                                     onSelect: function () {
                                       var _onSelect = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee7(_ref20, date) {
-                                        var el, destroy, rawDate, toCellText, emptyVal, cellDateWait, _yield$axiosQuery7, data, error, _cellEditTooltip2;
+                                        var el, destroy, rawDate, toCellText, dateToSave, emptyVal, cellDateWait, addict_colums, _yield$axiosQuery7, data, error, _cellEditTooltip2;
 
                                         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee7$(_context7) {
                                           while (1) {
@@ -20095,21 +20301,28 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                                 el = _ref20.el, destroy = _ref20.destroy;
                                                 rawDate = date.getFullYear() + '-' + addZero(date.getMonth() + 1) + '-' + addZero(date.getDate()) + ' 00:00:00';
                                                 toCellText = addZero(date.getDate()) + '.' + addZero(date.getMonth() + 1) + '.' + date.getFullYear().toString().substr(-2);
+                                                dateToSave = date.getFullYear().toString().substr(-2) + '.' + addZero(date.getMonth() + 1) + '.' + addZero(date.getDate());
                                                 emptyVal = $(cell).find('[edittedplace]').attr('edittedplace');
                                                 cellDateWait = $(reference).ddrWait({
                                                   iconHeight: '30px',
                                                   tag: 'noscroll noopen edittedwait'
                                                 });
-                                                _context7.next = 7;
+                                                addict_colums = {};
+
+                                                if (['date_send_action', 'date_start'].includes(column) && isFilledSlaveCell()) {
+                                                  addict_colums['date_report_from'] = dateToSave;
+                                                }
+
+                                                _context7.next = 10;
                                                 return axiosQuery('post', 'site/contracts/cell_edit', {
                                                   contract_id: contractId,
                                                   column: column,
                                                   type: type,
                                                   data: rawDate,
-                                                  addict_colums: {}
+                                                  addict_colums: addict_colums
                                                 }, 'json');
 
-                                              case 7:
+                                              case 10:
                                                 _yield$axiosQuery7 = _context7.sent;
                                                 data = _yield$axiosQuery7.data;
                                                 error = _yield$axiosQuery7.error;
@@ -20124,12 +20337,18 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                                   $.notify('Сохранено!');
                                                   $(cell).find('[edittedplace]').setAttrib('date', rawDate);
                                                   $(cell).find('[edittedplace]').text(toCellText || emptyVal);
+
+                                                  if (['date_send_action', 'date_start'].includes(column) && isFilledSlaveCell()) {
+                                                    _setValueToSelector(toCellText);
+                                                  }
+
                                                   cellDateWait.destroy();
                                                   unEditCell(cell);
                                                   (_cellEditTooltip2 = cellEditTooltip) === null || _cellEditTooltip2 === void 0 ? void 0 : _cellEditTooltip2.destroy();
+                                                  if ((calcDates === null || calcDates === void 0 ? void 0 : calcDates.destroy) != undefined) calcDates.destroy();
                                                 }
 
-                                              case 12:
+                                              case 15:
                                               case "end":
                                                 return _context7.stop();
                                             }
@@ -20145,7 +20364,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                     }()
                                   });
                                   $('#editCellCalendarClear').one(tapEvent, /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee8() {
-                                    var cellDateWait, emptyVal, _yield$axiosQuery8, data, error, _cellEditTooltip3;
+                                    var cellDateWait, addict_colums, emptyVal, _yield$axiosQuery8, data, error, _cellEditTooltip3;
 
                                     return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee8$(_context8) {
                                       while (1) {
@@ -20154,18 +20373,25 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                             cellDateWait = $(reference).ddrWait({
                                               iconHeight: '30px',
                                               tag: 'noscroll noopen edittedwait'
-                                            });
+                                            }), addict_colums = {};
+
+                                            if (['date_send_action', 'date_start'].includes(column)) {
+                                              addict_colums['date_report_from'] = null;
+
+                                              _setValueToSelector(null);
+                                            }
+
                                             emptyVal = $(cell).find('[edittedplace]').attr('edittedplace');
-                                            _context8.next = 4;
+                                            _context8.next = 5;
                                             return axiosQuery('post', 'site/contracts/cell_edit', {
                                               contract_id: contractId,
                                               column: column,
                                               type: type,
                                               data: null,
-                                              addict_colums: {}
+                                              addict_colums: addict_colums
                                             }, 'json');
 
-                                          case 4:
+                                          case 5:
                                             _yield$axiosQuery8 = _context8.sent;
                                             data = _yield$axiosQuery8.data;
                                             error = _yield$axiosQuery8.error;
@@ -20185,7 +20411,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                               (_cellEditTooltip3 = cellEditTooltip) === null || _cellEditTooltip3 === void 0 ? void 0 : _cellEditTooltip3.destroy();
                                             }
 
-                                          case 9:
+                                          case 10:
                                           case "end":
                                             return _context8.stop();
                                         }
@@ -20193,11 +20419,11 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                     }, _callee8);
                                   })));
                                   $(datePicker.el).siblings('.qs-datepicker-container').addClass('qs-datepicker-container-noshadow qs-datepicker-container-relative ');
-                                  _context10.next = 20;
+                                  _context10.next = 22;
                                   break;
 
-                                case 11:
-                                  _context10.next = 13;
+                                case 13:
+                                  _context10.next = 15;
                                   return axiosQuery('get', 'site/contracts/cell_edit', {
                                     contract_id: contractId,
                                     column: column,
@@ -20205,16 +20431,16 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                     addict_colums: {}
                                   }, 'json');
 
-                                case 13:
+                                case 15:
                                   _yield$axiosQuery9 = _context10.sent;
                                   _data = _yield$axiosQuery9.data;
                                   _error = _yield$axiosQuery9.error;
                                   _status = _yield$axiosQuery9.status;
                                   _headers = _yield$axiosQuery9.headers;
-                                  _context10.next = 20;
+                                  _context10.next = 22;
                                   return setData(_data);
 
-                                case 20:
+                                case 22:
                                   waitDetroy();
                                   $('#contractsList').one('scroll', function () {
                                     var _cellEditTooltip4;
@@ -20270,7 +20496,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                     }, _callee9, this);
                                   })));
 
-                                case 23:
+                                case 25:
                                 case "end":
                                   return _context10.stop();
                               }

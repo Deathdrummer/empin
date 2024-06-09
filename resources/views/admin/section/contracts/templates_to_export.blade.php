@@ -70,7 +70,18 @@
 			html += 		'</tr>';
 			html += 	'</thead>';
 			html += 	'<tbody>';
-			for (const [key, value] of Object.entries(data)) {
+			for (const [key, value] of Object.entries(data?.cols)) {
+				html +=	'<tr>';
+				html +=		`<td class="pointer color-gray-500 color-gray-700-hovered color-blue-active" onclick="$.copyVariable('{${key}}')">{${key}}</td>`;
+				html +=		`<td>${value}</td>`;
+				html +=	'</tr>';
+			}
+			
+			html +=	'<tr class="h8rem">';
+			html +=		'<td class="w100" colspan="2"><strong class="mt-2rem d-block fz16px">Виртуальные переменные</strong></td>';
+			html +=	'</tr>';
+			
+			for (const [key, value] of Object.entries(data?.virtVars)) {
 				html +=	'<tr>';
 				html +=		`<td class="pointer color-gray-500 color-gray-700-hovered color-blue-active" onclick="$.copyVariable('{${key}}')">{${key}}</td>`;
 				html +=		`<td>${value}</td>`;
@@ -85,8 +96,8 @@
 			
 			
 			$.copyVariable = (data) => {
-				copyStringToClipboard(data);
-				//close();
+				if (event.detail == 1) copyStringToClipboard(data);
+				else if (event.detail == 2) close();
 			}
 			
 			

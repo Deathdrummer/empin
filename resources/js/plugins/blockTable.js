@@ -47,7 +47,11 @@ class BlockTable {
 		this.buildTable(selector);
 	}
 	
-	
+	removeAllRows(selector = false) {
+		if (!selector) return false;
+		
+		$(selector).find('[ddrtabletr]').remove();
+	}
 	
 	removeRows(selector = false, enableRemoveCount = false, start = false, count = false) {
 		if (!selector || enableRemoveCount === false || start === false || !count) return false;
