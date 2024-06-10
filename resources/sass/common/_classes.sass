@@ -1242,6 +1242,16 @@ $tableColor: #efefef
 			
 			&:nth-child(even):not(.clear):not(.ddrtable__tr-selected)
 				background-color: #fdfdfd
+			
+			&.removed
+				position: relative
+				
+				&::after
+					content: ""
+					position: absolute
+					inset: 1px
+					background-color: #ffffffdb
+					z-index: 100
 		
 			&-selected, &[selected]
 				background-color: #d9d0e9 !important

@@ -2306,10 +2306,14 @@
 	function removeContractsRows(target) {
 		if (selectedContracts.items.length > 1) {
 			$.each(selectedContracts.items, function(k, contractId) {
-				$('#contractsList').find('[contractid="'+contractId+'"]').remove();
+				$('#contractsList').find('[contractid="'+contractId+'"]').addClass('removed');
+				$('#contractsList').find('[contractid="'+contractId+'"]').removeAttrib('ondblclick');
+				$('#contractsList').find('[contractid="'+contractId+'"]').removeAttrib('contextmenu');
 			});
 		} else {
-			$(target.selector).remove();
+			$(target.selector).addClass('removed');
+			$(target.selector).removeAttrib('ondblclick');
+			$(target.selector).removeAttrib('contextmenu');
 		}
 	}
 	
@@ -2339,6 +2343,7 @@
 	$.doScrollEnd = (target) => {
 		if ($('#contractsList').children('[ddrtabletr]').length < limit) return;
 		offset += limit;
+		
 		getList({
 			append: 'append',
 			callback: function(currentCount) {

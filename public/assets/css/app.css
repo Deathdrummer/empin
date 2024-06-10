@@ -143588,6 +143588,16 @@ template {
 .ddrtable__body .ddrtable__tr:nth-child(even):not(.clear):not(.ddrtable__tr-selected) {
   background-color: #fdfdfd;
 }
+.ddrtable__body .ddrtable__tr.removed {
+  position: relative;
+}
+.ddrtable__body .ddrtable__tr.removed::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  background-color: rgba(255, 255, 255, 0.8588235294);
+  z-index: 100;
+}
 .ddrtable__body .ddrtable__tr-selected, .ddrtable__body .ddrtable__tr[selected] {
   background-color: #d9d0e9 !important;
   cursor: pointer;

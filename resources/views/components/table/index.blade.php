@@ -101,7 +101,7 @@
 	});
 	
 	
-	$(selector).find('[ddrtablebody]').one('scrollstop', {latency: 20}, function() {
+	$(selector).find('[ddrtablebody]').one('scrollstart', {latency: 20}, function() {
 		if (scrollstartObserver && intersectionTopSelector) observer.observe(intersectionTopSelector);
 		if (scrollendObserver && intersectionBottomSelector) observer.observe(intersectionBottomSelector);
 		if (scrollpartObserver && intersectionPartSelector) observer.observe(intersectionPartSelector);

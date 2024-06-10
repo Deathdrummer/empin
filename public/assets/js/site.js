@@ -18811,7 +18811,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
       } else if (['price', 'price_nds', 'gen_percent', 'price_avvr', 'price_avvr_nds', 'price_pir', 'price_pir_nds', 'price_smr', 'price_pnr'].indexOf(edittedCellData[1]) === -1 && !subContracting && !genContracting) {
         enableEditPriceCell = false;
       }
-    } else if (['date_report_from'].indexOf(edittedCellData[1]) !== -1) {
+    } else if (edittedCellData !== undefined && ['date_report_from'].indexOf(edittedCellData[1]) !== -1) {
       enableEditPriceCell = false;
     }
 
