@@ -9104,7 +9104,10 @@ var DdrCalc = /*#__PURE__*/function () {
         reverse: false,
         twoWay: false,
         middleware: false,
-        numberFormat: false
+        numberFormat: false,
+        stat: function stat() {
+          return true;
+        }
       }, data),
           selector = _$$extend.selector,
           percent = _$$extend.percent,
@@ -9112,10 +9115,13 @@ var DdrCalc = /*#__PURE__*/function () {
           twoWay = _$$extend.twoWay,
           middleware = _$$extend.middleware,
           numberFormat = _$$extend.numberFormat,
+          stat = _$$extend.stat,
           thisCls = this;
 
       $(thisCls.mainSelector).on(thisCls.inputEvent, function (e) {
         var _$;
+
+        if (!stat()) return;
 
         var val = thisCls._valToNumber(e.target.value, 2);
 
@@ -9135,6 +9141,8 @@ var DdrCalc = /*#__PURE__*/function () {
       if (twoWay) {
         $(selector).on(thisCls.inputEvent, function (e) {
           var _$2;
+
+          if (!stat()) return;
 
           var val = thisCls._valToNumber(e.target.value, 2);
 
@@ -9163,7 +9171,10 @@ var DdrCalc = /*#__PURE__*/function () {
         reverse: false,
         twoWay: false,
         middleware: false,
-        numberFormat: false
+        numberFormat: false,
+        stat: function stat() {
+          return true;
+        }
       }, data),
           selector = _$$extend2.selector,
           percent = _$$extend2.percent,
@@ -9171,10 +9182,13 @@ var DdrCalc = /*#__PURE__*/function () {
           twoWay = _$$extend2.twoWay,
           middleware = _$$extend2.middleware,
           numberFormat = _$$extend2.numberFormat,
+          stat = _$$extend2.stat,
           thisCls = this;
 
       $(thisCls.mainSelector).on(thisCls.inputEvent, function (e) {
         var _$3;
+
+        if (!stat()) return;
 
         var val = thisCls._valToNumber(e.target.value, 2);
 
@@ -9194,6 +9208,8 @@ var DdrCalc = /*#__PURE__*/function () {
       if (twoWay) {
         $(selector).on(thisCls.inputEvent, function (e) {
           var _$4;
+
+          if (!stat()) return;
 
           var val = thisCls._valToNumber(e.target.value, 2);
 
@@ -9222,7 +9238,10 @@ var DdrCalc = /*#__PURE__*/function () {
         reverse: false,
         twoWay: false,
         middleware: false,
-        numberFormat: false
+        numberFormat: false,
+        stat: function stat() {
+          return true;
+        }
       }, data),
           selector = _$$extend3.selector,
           percent = _$$extend3.percent,
@@ -9230,10 +9249,13 @@ var DdrCalc = /*#__PURE__*/function () {
           twoWay = _$$extend3.twoWay,
           middleware = _$$extend3.middleware,
           numberFormat = _$$extend3.numberFormat,
+          stat = _$$extend3.stat,
           thisCls = this;
 
       $(thisCls.mainSelector).on(thisCls.inputEvent, function (e) {
         var _$5;
+
+        if (!stat()) return;
 
         var val = thisCls._valToNumber(e.target.value, 2);
 
@@ -9254,6 +9276,8 @@ var DdrCalc = /*#__PURE__*/function () {
         var twoWaySelector = _.isFunction(twoWay) || _.isString(twoWay) ? twoWay : selector;
         $(twoWaySelector).on(thisCls.inputEvent, function (e) {
           var _$6;
+
+          if (!stat()) return;
 
           var val = thisCls._valToNumber(e.target.value, 2);
 
@@ -12604,7 +12628,6 @@ var DdrInput = /*#__PURE__*/function () {
     key: "clear",
     value: function clear() {
       var callback = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
-      console.log(12312312);
       if (!this.inputs) return false;
       this.inputs.forEach(function (_ref12) {
         var item = _ref12.item,
@@ -15620,11 +15643,17 @@ function calcGencontracting() {
   var ops = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
   var percentNds = ops.percentNds,
       contractingPercent = ops.contractingPercent;
+
+  var stat = function stat() {
+    return $('#autoCalcState').is(':checked') == false;
+  };
+
   var selfPriceNds = $('#selfPriceNds').ddrCalc([{
     selector: '#subPriceNds',
     method: 'percent',
     percent: contractingPercent,
-    reverse: true
+    reverse: true,
+    stat: stat
   }, {
     selector: '#subPrice',
     method: 'percent',
@@ -15632,13 +15661,15 @@ function calcGencontracting() {
     reverse: true,
     middleware: [function (value, calc) {
       return calc('nds', $('#subPriceNds').val(), percentNds, true);
-    }, false]
+    }, false],
+    stat: stat
   }]);
   var selfPrice = $('#selfPrice').ddrCalc([{
     selector: '#subPrice',
     method: 'percent',
     percent: contractingPercent,
-    reverse: true
+    reverse: true,
+    stat: stat
   }, {
     selector: '#subPriceNds',
     method: 'percent',
@@ -15646,18 +15677,21 @@ function calcGencontracting() {
     reverse: true,
     middleware: [function (value, calc) {
       return calc('nds', $('#subPrice').val(), percentNds);
-    }, false]
+    }, false],
+    stat: stat
   }]);
   var subPriceNds = $('#subPriceNds').ddrCalc([{
     selector: '#subPrice',
     method: 'nds',
     percent: percentNds,
-    reverse: true
+    reverse: true,
+    stat: stat
   }, {
     selector: '#selfPriceNds',
     method: 'percent',
-    percent: contractingPercent //reverse: true,
-
+    percent: contractingPercent,
+    //reverse: true,
+    stat: stat
   }, {
     selector: '#selfPrice',
     method: 'percent',
@@ -15665,17 +15699,20 @@ function calcGencontracting() {
     //reverse: true,
     middleware: [function (value, calc) {
       return calc('nds', $('#selfPriceNds').val(), percentNds, true);
-    }, false]
+    }, false],
+    stat: stat
   }]);
   var subPrice = $('#subPrice').ddrCalc([{
     selector: '#subPriceNds',
     method: 'nds',
-    percent: percentNds
+    percent: percentNds,
+    stat: stat
   }, {
     selector: '#selfPrice',
     method: 'percent',
-    percent: contractingPercent //reverse: true,
-
+    percent: contractingPercent,
+    //reverse: true,
+    stat: stat
   }, {
     selector: '#selfPriceNds',
     method: 'percent',
@@ -15683,7 +15720,8 @@ function calcGencontracting() {
     //reverse: true,
     middleware: [function (value, calc) {
       return calc('nds', $('#selfPrice').val(), percentNds);
-    }, false]
+    }, false],
+    stat: stat
   }]);
   return {
     selfPriceNds: selfPriceNds,
@@ -15710,40 +15748,51 @@ function calcSubcontracting() {
   var ops = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
   var percentNds = ops.percentNds,
       contractingPercent = ops.contractingPercent;
+
+  var stat = function stat() {
+    return $('#autoCalcState').is(':checked') == false;
+  };
+
   var selfPriceNds = $('#selfPriceNds').ddrCalc([{
     selector: '#genPriceNds',
     method: 'percent',
-    percent: contractingPercent
+    percent: contractingPercent,
+    stat: stat
   }, {
     selector: '#genPrice',
     method: 'percent',
     percent: contractingPercent,
     middleware: [function (value, calc) {
       return calc('nds', $('#genPriceNds').val(), percentNds, true);
-    }, false]
+    }, false],
+    stat: stat
   }]);
   var selfPrice = $('#selfPrice').ddrCalc([{
     selector: '#genPrice',
     method: 'percent',
-    percent: contractingPercent
+    percent: contractingPercent,
+    stat: stat
   }, {
     selector: '#genPriceNds',
     method: 'percent',
     percent: contractingPercent,
     middleware: [function (value, calc) {
       return calc('nds', $('#genPrice').val(), percentNds);
-    }, false]
+    }, false],
+    stat: stat
   }]);
   var genPriceNds = $('#genPriceNds').ddrCalc([{
     selector: '#genPrice',
     method: 'nds',
     percent: percentNds,
-    reverse: true
+    reverse: true,
+    stat: stat
   }, {
     selector: '#selfPriceNds',
     method: 'percent',
     percent: contractingPercent,
-    reverse: true
+    reverse: true,
+    stat: stat
   }, {
     selector: '#selfPrice',
     method: 'percent',
@@ -15751,17 +15800,20 @@ function calcSubcontracting() {
     reverse: true,
     middleware: [function (value, calc) {
       return calc('nds', $('#selfPriceNds').val(), percentNds, true);
-    }, false]
+    }, false],
+    stat: stat
   }]);
   var genPrice = $('#genPrice').ddrCalc([{
     selector: '#genPriceNds',
     method: 'nds',
-    percent: percentNds
+    percent: percentNds,
+    stat: stat
   }, {
     selector: '#selfPrice',
     method: 'percent',
     percent: contractingPercent,
-    reverse: true
+    reverse: true,
+    stat: stat
   }, {
     selector: '#selfPriceNds',
     method: 'percent',
@@ -15769,7 +15821,8 @@ function calcSubcontracting() {
     reverse: true,
     middleware: [function (value, calc) {
       return calc('nds', $('#selfPrice').val(), percentNds);
-    }, false]
+    }, false],
+    stat: stat
   }]);
   return {
     selfPriceNds: selfPriceNds,

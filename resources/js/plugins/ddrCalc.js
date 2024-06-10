@@ -83,6 +83,7 @@ class DdrCalc {
 			twoWay, // двухсторонняя привязка
 			middleware, // промежуточный расчет значения. Пример: middleware: [(value, calc) => calc('nds', value, percentNds), false],
 			numberFormat, // фрматировать вставляемое значение. Эквивалент $.number: [2, '.', ' '],
+			stat // производить расчет
 		} = $.extend({
 			selector: null,
 			percent: 0,
@@ -90,11 +91,13 @@ class DdrCalc {
 			twoWay: false,
 			middleware: false,
 			numberFormat: false,
+			stat: () => true
 		}, data),
 			thisCls = this;
 		
 			
 		$(thisCls.mainSelector).on(thisCls.inputEvent, function(e) {
+			if (!stat()) return;
 			let val = thisCls._valToNumber(e.target.value, 2);
 			let result = _.round(thisCls._calc('percent', val, percent, reverse), 2);
 			
@@ -111,6 +114,7 @@ class DdrCalc {
 		
 		if (twoWay) {
 			$(selector).on(thisCls.inputEvent, function(e) {
+				if (!stat()) return;
 				let val = thisCls._valToNumber(e.target.value, 2);
 				
 				let result = _.round(thisCls._calc('percent', val, percent, !reverse), 2);
@@ -148,6 +152,7 @@ class DdrCalc {
 			twoWay, // двухсторонняя привязка
 			middleware, // промежуточный расчет значения. Пример: middleware: [(value, calc) => calc('nds', value, percentNds), false],
 			numberFormat, // фрматировать вставляемое значение. Эквивалент $.number: [2, '.', ' '],
+			stat // производить расчет
 		} = $.extend({
 			selector: null,
 			percent: 0,
@@ -155,11 +160,13 @@ class DdrCalc {
 			twoWay: false,
 			middleware: false,
 			numberFormat: false,
+			stat: () => true
 		}, data),
 			thisCls = this;
 		
 			
 		$(thisCls.mainSelector).on(thisCls.inputEvent, function(e) {
+			if (!stat()) return;
 			let val = thisCls._valToNumber(e.target.value, 2);
 			let result = _.round(thisCls._calc('percent_only', val, percent, reverse), 2);
 			
@@ -176,6 +183,7 @@ class DdrCalc {
 		
 		if (twoWay) {
 			$(selector).on(thisCls.inputEvent, function(e) {
+				if (!stat()) return;
 				let val = thisCls._valToNumber(e.target.value, 2);
 				
 				let result = _.round(thisCls._calc('percent_only', val, percent, !reverse), 2);
@@ -213,6 +221,7 @@ class DdrCalc {
 			twoWay, // двухсторонняя привязка
 			middleware, // промежуточный расчет значения. Пример: middleware: [(value, calc) => calc('nds', value, percentNds), false],
 			numberFormat, // фрматировать вставляемое значение. Эквивалент $.number: [2, '.', ' '],
+			stat // производить расчет
 		} = $.extend({
 			selector: null,
 			percent: 0,
@@ -220,10 +229,12 @@ class DdrCalc {
 			twoWay: false,
 			middleware: false,
 			numberFormat: false,
+			stat: () => true
 		}, data),
 			thisCls = this;
 		
 		$(thisCls.mainSelector).on(thisCls.inputEvent, function(e) {
+			if (!stat()) return;
 			let val = thisCls._valToNumber(e.target.value, 2);
 			let result = _.round(thisCls._calc('nds', val, percent, reverse), 2);
 			
@@ -241,6 +252,7 @@ class DdrCalc {
 		if (twoWay) {
 			const twoWaySelector = _.isFunction(twoWay) || _.isString(twoWay) ? twoWay : selector;
 			$(twoWaySelector).on(thisCls.inputEvent, function(e) {
+				if (!stat()) return;
 				let val = thisCls._valToNumber(e.target.value, 2);
 				let result = _.round(thisCls._calc('nds', val, percent, !reverse), 2);
 				

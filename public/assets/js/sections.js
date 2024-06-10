@@ -27,11 +27,17 @@ function calcGencontracting() {
   var ops = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
   var percentNds = ops.percentNds,
       contractingPercent = ops.contractingPercent;
+
+  var stat = function stat() {
+    return $('#autoCalcState').is(':checked') == false;
+  };
+
   var selfPriceNds = $('#selfPriceNds').ddrCalc([{
     selector: '#subPriceNds',
     method: 'percent',
     percent: contractingPercent,
-    reverse: true
+    reverse: true,
+    stat: stat
   }, {
     selector: '#subPrice',
     method: 'percent',
@@ -39,13 +45,15 @@ function calcGencontracting() {
     reverse: true,
     middleware: [function (value, calc) {
       return calc('nds', $('#subPriceNds').val(), percentNds, true);
-    }, false]
+    }, false],
+    stat: stat
   }]);
   var selfPrice = $('#selfPrice').ddrCalc([{
     selector: '#subPrice',
     method: 'percent',
     percent: contractingPercent,
-    reverse: true
+    reverse: true,
+    stat: stat
   }, {
     selector: '#subPriceNds',
     method: 'percent',
@@ -53,18 +61,21 @@ function calcGencontracting() {
     reverse: true,
     middleware: [function (value, calc) {
       return calc('nds', $('#subPrice').val(), percentNds);
-    }, false]
+    }, false],
+    stat: stat
   }]);
   var subPriceNds = $('#subPriceNds').ddrCalc([{
     selector: '#subPrice',
     method: 'nds',
     percent: percentNds,
-    reverse: true
+    reverse: true,
+    stat: stat
   }, {
     selector: '#selfPriceNds',
     method: 'percent',
-    percent: contractingPercent //reverse: true,
-
+    percent: contractingPercent,
+    //reverse: true,
+    stat: stat
   }, {
     selector: '#selfPrice',
     method: 'percent',
@@ -72,17 +83,20 @@ function calcGencontracting() {
     //reverse: true,
     middleware: [function (value, calc) {
       return calc('nds', $('#selfPriceNds').val(), percentNds, true);
-    }, false]
+    }, false],
+    stat: stat
   }]);
   var subPrice = $('#subPrice').ddrCalc([{
     selector: '#subPriceNds',
     method: 'nds',
-    percent: percentNds
+    percent: percentNds,
+    stat: stat
   }, {
     selector: '#selfPrice',
     method: 'percent',
-    percent: contractingPercent //reverse: true,
-
+    percent: contractingPercent,
+    //reverse: true,
+    stat: stat
   }, {
     selector: '#selfPriceNds',
     method: 'percent',
@@ -90,7 +104,8 @@ function calcGencontracting() {
     //reverse: true,
     middleware: [function (value, calc) {
       return calc('nds', $('#selfPrice').val(), percentNds);
-    }, false]
+    }, false],
+    stat: stat
   }]);
   return {
     selfPriceNds: selfPriceNds,
@@ -117,40 +132,51 @@ function calcSubcontracting() {
   var ops = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
   var percentNds = ops.percentNds,
       contractingPercent = ops.contractingPercent;
+
+  var stat = function stat() {
+    return $('#autoCalcState').is(':checked') == false;
+  };
+
   var selfPriceNds = $('#selfPriceNds').ddrCalc([{
     selector: '#genPriceNds',
     method: 'percent',
-    percent: contractingPercent
+    percent: contractingPercent,
+    stat: stat
   }, {
     selector: '#genPrice',
     method: 'percent',
     percent: contractingPercent,
     middleware: [function (value, calc) {
       return calc('nds', $('#genPriceNds').val(), percentNds, true);
-    }, false]
+    }, false],
+    stat: stat
   }]);
   var selfPrice = $('#selfPrice').ddrCalc([{
     selector: '#genPrice',
     method: 'percent',
-    percent: contractingPercent
+    percent: contractingPercent,
+    stat: stat
   }, {
     selector: '#genPriceNds',
     method: 'percent',
     percent: contractingPercent,
     middleware: [function (value, calc) {
       return calc('nds', $('#genPrice').val(), percentNds);
-    }, false]
+    }, false],
+    stat: stat
   }]);
   var genPriceNds = $('#genPriceNds').ddrCalc([{
     selector: '#genPrice',
     method: 'nds',
     percent: percentNds,
-    reverse: true
+    reverse: true,
+    stat: stat
   }, {
     selector: '#selfPriceNds',
     method: 'percent',
     percent: contractingPercent,
-    reverse: true
+    reverse: true,
+    stat: stat
   }, {
     selector: '#selfPrice',
     method: 'percent',
@@ -158,17 +184,20 @@ function calcSubcontracting() {
     reverse: true,
     middleware: [function (value, calc) {
       return calc('nds', $('#selfPriceNds').val(), percentNds, true);
-    }, false]
+    }, false],
+    stat: stat
   }]);
   var genPrice = $('#genPrice').ddrCalc([{
     selector: '#genPriceNds',
     method: 'nds',
-    percent: percentNds
+    percent: percentNds,
+    stat: stat
   }, {
     selector: '#selfPrice',
     method: 'percent',
     percent: contractingPercent,
-    reverse: true
+    reverse: true,
+    stat: stat
   }, {
     selector: '#selfPriceNds',
     method: 'percent',
@@ -176,7 +205,8 @@ function calcSubcontracting() {
     reverse: true,
     middleware: [function (value, calc) {
       return calc('nds', $('#selfPrice').val(), percentNds);
-    }, false]
+    }, false],
+    stat: stat
   }]);
   return {
     selfPriceNds: selfPriceNds,

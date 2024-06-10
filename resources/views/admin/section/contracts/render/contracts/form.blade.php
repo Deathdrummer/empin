@@ -223,12 +223,24 @@
 						<x-checkbox name="hoz_method" :checked="$hoz_method ?? null" label="Хоз способ" />
 					</div>
 					
+					
+					
+					<div class="form__item mt-8rem">
+						<x-checkbox id="autoCalcState" label="Не применять авторасчет" />
+					</div>
+					
+					
+					
+					
+					
+					
+					
+					
 					{{-- <div class="form__item">
 						<x-radio label="Субподряд" value="1" name="subcontracting" :checked="$subcontracting ?? false" fieldset="contractingType" />
 						<div></div>
 						<x-radio label="Генподряд" value="1" name="gencontracting" :checked="$gencontracting ?? false" fieldset="contractingType" />
 					</div> --}}
-					
 				</div>
 			</div>
 			

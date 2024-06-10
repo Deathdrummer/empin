@@ -1103,7 +1103,8 @@
 							selector: '#selfPriceNds',
 							method: 'nds',
 							percent: percentNds,
-							twoWay: true
+							twoWay: true,
+							stat: () => $('#autoCalcState').is(':checked') == false
 						}]);
 						
 						
