@@ -45,7 +45,7 @@
 	$.openCheatSheet = () => {
 		ddrPopup({
 			title: 'Переменные для интерполяции',
-			width: 700,
+			width: 900,
 			buttons: ['Закрыть'],
 		}).then(async ({state, wait, setTitle, setButtons, loadData, setHtml, setLHtml, dialog, close, onScroll, disableButtons, enableButtons, setWidth}) => { //isClosed
 			wait();
