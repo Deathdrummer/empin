@@ -1,9 +1,11 @@
 <?php namespace App\Helpers;
 
 use Carbon\Carbon;
+use DateTime;
 use Illuminate\Support\Facades\App;
 
 class DdrDateTime {
+	
 	
 	/** Вывести дату в ЧПУ формате: 12 июля 2023 г.
 	 * @param timestamp $timestamp
@@ -167,6 +169,52 @@ class DdrDateTime {
 		return Carbon::now();
 	}
 	
+	
+	
+	
+	
+	
+	/** Конвертировать формат даты
+	 * @return String|null
+	 */
+	public static function convertDateFormat($dateTimeStr = null, $newFormat = 'd.m.y', $originalFormat = 'Y-m-d H:i:s'):String|null {
+		if (!$dateTimeStr) return null;
+		$dateTime = Carbon::createFromFormat($originalFormat, $dateTimeStr);
+		return $dateTime->format($newFormat);
+	}
+	
+	
+	
+	
+	/** Конвертировать формат даты
+	 * @return String|null
+	 */
+	public static function dateToHuman($dateTimeStr = null, $outputFormat = 'j F Y', $originalFormat = 'Y-m-d H:i:s'):String|null {
+		if (!$dateTimeStr) return null;
+        $dateTime = Carbon::createFromFormat($originalFormat, $dateTimeStr);
+        if ($dateTime === false || $dateTime->format($originalFormat) !== $dateTimeStr) {
+            return false;
+        }
+        $dateTime->locale('ru');
+        return $dateTime->translatedFormat($outputFormat);
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	/** Проверить, является строка датой в соответствии с форматом
+	 * @param timestamp $timestamp
+	 * @param array $shift, $locale, $isoFormat
+	 * @return string|null
+	 */
+	public static function isValidDateTime($dateTimeStr, $format = 'Y-m-d H:i:s'):bool {
+		$dateTime = DateTime::createFromFormat($format, $dateTimeStr);
+		return $dateTime && $dateTime->format($format) === $dateTimeStr;
+	}
 	
 	
 	

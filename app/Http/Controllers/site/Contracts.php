@@ -1218,8 +1218,12 @@ class Contracts extends Controller {
 		$varsMap = [];
 		
 		foreach ($colums as $column) {
-			$varsMap['{'.$column.'}'] = $buildContractdata[$column] ?? '';
+			$varsMap['{'.$column.'}'] = match(true) {
+				DdrDateTime::isValidDateTime($buildContractdata[$column] ?? '')	=> DdrDateTime::convertDateFormat($buildContractdata[$column]),
+				default	=> $buildContractdata[$column] ?? '',
+			};
 		}
+		
 		
 		foreach ($virtVars as $virtVar) {
 			$varsMap['{'.$virtVar.'}'] = BusinessVirtualVars::run($virtVar, $buildContractdata);

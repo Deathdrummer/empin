@@ -1,5 +1,6 @@
 <?php namespace App\Services\Business;
 
+use App\Helpers\DdrDateTime;
 use Illuminate\Support\Str;
 
 class VirtualVars {
@@ -127,9 +128,208 @@ class VirtualVars {
 	
 	
 	
+	/**
+	* 
+	* @param 
+	* @return 
+	*/
+	public function dateStartFyear($buildContractData) {
+		return DdrDateTime::convertDateFormat($buildContractData['date_start'] ?? null);
+	}
+	
+	
+	/**
+	* 
+	* @param 
+	* @return 
+	*/
+	public function dateEndFyear($buildContractData) {
+		return DdrDateTime::convertDateFormat($buildContractData['date_end'] ?? null);
+	}	
+	
+	
+	/**
+	* 
+	* @param 
+	* @return 
+	*/
+	public function dateGenStartFyear($buildContractData) {
+		return DdrDateTime::convertDateFormat($buildContractData['date_gen_start'] ?? null);
+	}
+	
+	
+	/**
+	* 
+	* @param 
+	* @return 
+	*/
+	public function dateGenEndFyear($buildContractData) {
+		return DdrDateTime::convertDateFormat($buildContractData['date_gen_end'] ?? null);
+	}
+	
+	
+	/**
+	* 
+	* @param 
+	* @return 
+	*/
+	public function dateSubStartFyear($buildContractData) {
+		return DdrDateTime::convertDateFormat($buildContractData['date_sub_start'] ?? null);
+	}
+	
+	
+	/**
+	* 
+	* @param 
+	* @return 
+	*/
+	public function dateSubEndFyear($buildContractData) {
+		return DdrDateTime::convertDateFormat($buildContractData['date_sub_end'] ?? null);
+	}
+	
+	
+	/**
+	* 
+	* @param 
+	* @return 
+	*/
+	public function dateReportFromFyear($buildContractData) {
+		return DdrDateTime::convertDateFormat($buildContractData['date_report_from'] ?? null);
+	}
+	
+	
+	/**
+	* 
+	* @param 
+	* @return 
+	*/
+	public function dateBuyFyear($buildContractData) {
+		return DdrDateTime::convertDateFormat($buildContractData['date_buy'] ?? null);
+	}
+	
+	
+	/**
+	* 
+	* @param 
+	* @return 
+	*/
+	public function dateCloseFyear($buildContractData) {
+		return DdrDateTime::convertDateFormat($buildContractData['date_close'] ?? null);
+	}
 	
 	
 	
+	
+	
+	
+	
+	
+	
+	/**
+	* 
+	* @param 
+	* @return 
+	*/
+	public function dateStartHuman($buildContractData) {
+		return DdrDateTime::dateToHuman($buildContractData['date_start'] ?? null, '«j» F Y');
+	}
+	
+	
+	/**
+	* 
+	* @param 
+	* @return 
+	*/
+	public function dateEndHuman($buildContractData) {
+		return DdrDateTime::dateToHuman($buildContractData['date_end'] ?? null, '«j» F Y');
+	}
+	
+	
+	/**
+	* 
+	* @param 
+	* @return 
+	*/
+	public function dateGenStartHuman($buildContractData) {
+		return DdrDateTime::dateToHuman($buildContractData['date_gen_start'] ?? null, '«j» F Y');
+	}
+	
+	
+	/**
+	* 
+	* @param 
+	* @return 
+	*/
+	public function dateGenEndHuman($buildContractData) {
+		return DdrDateTime::dateToHuman($buildContractData['date_gen_end'] ?? null, '«j» F Y');
+	}
+	
+	
+	/**
+	* 
+	* @param 
+	* @return 
+	*/
+	public function dateSubStartHuman($buildContractData) {
+		return DdrDateTime::dateToHuman($buildContractData['date_sub_start'] ?? null, '«j» F Y');
+	}
+	
+	
+	/**
+	* 
+	* @param 
+	* @return 
+	*/
+	public function dateSubEndHuman($buildContractData) {
+		return DdrDateTime::dateToHuman($buildContractData['date_sub_end'] ?? null, '«j» F Y');
+	}
+	
+	
+	/**
+	* 
+	* @param 
+	* @return 
+	*/
+	public function dateReportFromHuman($buildContractData) {
+		return DdrDateTime::dateToHuman($buildContractData['date_report_from'] ?? null, '«j» F Y');
+	}
+	
+	
+	/**
+	* 
+	* @param 
+	* @return 
+	*/
+	public function dateBuyHuman($buildContractData) {
+		return DdrDateTime::dateToHuman($buildContractData['date_buy'] ?? null, '«j» F Y');
+	}
+	
+	
+	/**
+	* 
+	* @param 
+	* @return 
+	*/
+	public function dateCloseHuman($buildContractData) {
+		return DdrDateTime::dateToHuman($buildContractData['date_close'] ?? null, '«j» F Y');
+	}
+	
+	
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	//------------------------------------------------------------------------------------------------------------------------------------
 	
 	
 	
