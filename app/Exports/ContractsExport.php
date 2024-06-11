@@ -272,10 +272,22 @@ class ContractsExport extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBinder i
 			'price_nds' 		=> ['width' => 15, 'type' => 'price'],
 			'price_gen' 		=> ['width' => 15, 'type' => 'price'],
 			'price_gen_nds' 	=> ['width' => 15, 'type' => 'price'],
+			
+			'price_avvr' 		=> ['width' => 15, 'type' => 'price'],
+			'price_avvr_nds' 	=> ['width' => 15, 'type' => 'price'],
+			'avvr_nds_only' 	=> ['width' => 15, 'type' => 'price'],
+			'price_pir' 		=> ['width' => 15, 'type' => 'price'],
+			'price_pir_nds' 	=> ['width' => 15, 'type' => 'price'],
+			'pir_nds_only' 		=> ['width' => 15, 'type' => 'price'],
+			'price_smr' 		=> ['width' => 15, 'type' => 'price'],
+			'price_pnr' 		=> ['width' => 15, 'type' => 'price'],
+			'date_report_from'	=> ['width' => 15, 'type' => 'date'],
+			
 			'price_sub' 		=> ['width' => 15, 'type' => 'price'],
 			'price_sub_nds' 	=> ['width' => 15, 'type' => 'price'],
 			'gen_percent' 		=> ['width' => 10, 'type' => 'percent'],
 			'date_start' 		=> ['width' => 15, 'type' => 'date'],
+			
 			'date_end' 			=> ['width' => 15, 'type' => 'date'],
 			'date_gen_start' 	=> ['width' => 15, 'type' => 'date'],
 			'date_gen_end' 		=> ['width' => 15, 'type' => 'date'],
