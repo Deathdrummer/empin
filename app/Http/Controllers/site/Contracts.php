@@ -1208,29 +1208,43 @@ class Contracts extends Controller {
 		$buildContractdata = $this->_buildContractdata($contractData);
 		
 		$tempVars = $templateProcessor->getVariables();
+		
 		foreach ($tempVars as $variabe) {
+			if (strpos($variabe, ':') !== false) {
+				preg_match('/([a-z_]+):(.+)/', $variabe, $matches);
+				[, $parsedVar, $formatStr] = $matches;
+				
+				if (!isset($buildContractdata[$parsedVar])) continue;
+				
+				$parsedData = match(true) {
+					DdrDateTime::isValidDateTime($buildContractdata[$parsedVar] ?? '')	=> DdrDateTime::convertDateFormat($buildContractdata[$parsedVar]),
+					default	=> $buildContractdata[$parsedVar] ?? '',
+				};
+				
+				$templateProcessor->setValue($variabe, sprintf($formatStr, $parsedData));
+			}
+			
 			if (!isset($buildContractdata[$variabe])) continue;
 			$templateProcessor->setValue($variabe, $buildContractdata[$variabe]);
 		}
 		
+		# для заголовков
 		$colums = ContractColums::getKeys();
 		$virtVars = VirtualVars::getKeys();
-		$varsMap = [];
+		$varsTitlesMap = [];
 		
 		foreach ($colums as $column) {
-			$varsMap['{'.$column.'}'] = match(true) {
+			$varsTitlesMap['{'.$column.'}'] = match(true) {
 				DdrDateTime::isValidDateTime($buildContractdata[$column] ?? '')	=> DdrDateTime::convertDateFormat($buildContractdata[$column]),
 				default	=> $buildContractdata[$column] ?? '',
 			};
 		}
 		
-		
 		foreach ($virtVars as $virtVar) {
-			$varsMap['{'.$virtVar.'}'] = BusinessVirtualVars::run($virtVar, $buildContractdata);
+			$varsTitlesMap['{'.$virtVar.'}'] = BusinessVirtualVars::run($virtVar, $buildContractdata);
 		}
 		
-		
-		$buildedExportFileName = trim(Str::swap($varsMap, $templateData['export_name'] ?? $contractData?->id));
+		$buildedExportFileName = trim(Str::swap($varsTitlesMap, $templateData['export_name'] ?? $contractData?->id));
 		$exportFilePath = "storage/{$buildedExportFileName}.{$templateData['file']['ext']}";
 		$exportFileName = "{$buildedExportFileName}.{$templateData['file']['ext']}";
 		
@@ -1262,28 +1276,38 @@ class Contracts extends Controller {
 		
 		$sheetCount = $spreadsheet->getSheetCount();
 		
+		$variables = $this->_getXlsxVariables($spreadsheet, $sheetCount);
+		$buildContractdata = $this->_buildContractdata($contractData);
+		
+		
 		for ($i = 0; $i < $sheetCount; $i++) {
 			$sheet = $spreadsheet->getSheet($i);
 			$highestRow = $sheet->getHighestRow();
 			$highestColumn = $sheet->getHighestColumn();
 			$highestColumnIndex = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::columnIndexFromString($highestColumn);
-			$buildContractdata = $this->_buildContractdata($contractData);
 			
-			$colums = ContractColums::getKeys();
-			$virtVars = VirtualVars::getKeys();
 			
-			$varsMap = []; $varsTitlesMap = [];
-			foreach ($colums as $column) {
-				$varsMap['${'.$column.'}'] = $buildContractdata[$column] ?? '';
-				$varsTitlesMap['{'.$column.'}'] = $buildContractdata[$column] ?? '';
+			$varsMap = [];
+			foreach ($variables as $variable) {
+				if (strpos($variable, ':') !== false) {
+					preg_match('/([a-z_]+):(.+)/', $variable, $matches);
+					[, $parsedVar, $formatStr] = $matches;
+					
+					if (!isset($buildContractdata[$parsedVar])) continue;
+					
+					$parsedData = match(true) {
+						DdrDateTime::isValidDateTime($buildContractdata[$parsedVar] ?? '')	=> DdrDateTime::convertDateFormat($buildContractdata[$parsedVar]),
+						default	=> $buildContractdata[$parsedVar] ?? '',
+					};
+					
+					$varsMap['${'.$variable.'}'] = sprintf($formatStr, $parsedData);
+					$varsTitlesMap['{'.$variable.'}'] = sprintf($formatStr, $parsedData);
+				}
+				
+				if (!isset($buildContractdata[$variable])) continue;
+				
+				$varsMap['${'.$variable.'}'] = $buildContractdata[$variable] ?? '';
 			}
-			
-			foreach ($virtVars as $virtVar) {
-				$virtVarValue = BusinessVirtualVars::run($virtVar, $buildContractdata) ?? '';
-				$varsMap['${'.$virtVar.'}'] = $virtVarValue;
-				$varsTitlesMap['{'.$virtVar.'}'] = $virtVarValue;
-			}
-			
 			
 			
 			for ($row = 1; $row <= $highestRow; $row++) {
@@ -1294,6 +1318,19 @@ class Contracts extends Controller {
 					$cellAddress = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($col) . $row;
 					$sheet->setCellValue($cellAddress, $newVal);
 				}
+			}
+			
+			
+			$colums = ContractColums::getKeys();
+			$virtVars = VirtualVars::getKeys();
+			$varsTitlesMap = [];
+			
+			foreach ($colums as $column) {
+				$varsTitlesMap['{'.$column.'}'] = $buildContractdata[$column] ?? '';
+			}
+			
+			foreach ($virtVars as $virtVar) {
+				$varsTitlesMap['{'.$virtVar.'}'] = BusinessVirtualVars::run($virtVar, $buildContractdata) ?? '';
 			}
 		}
 		
@@ -1325,7 +1362,32 @@ class Contracts extends Controller {
 
 
 
+	/**
+	* Получить переменные из Excel документа 
+	* @param 
+	* @return 
+	*/
+	private function _getXlsxVariables($spreadsheet, $sheetCount) {
+		$variables = [];
 
+		for ($i = 0; $i < $sheetCount; $i++) {
+			$sheet = $spreadsheet->getSheet($i);
+			$sheetContent = $sheet->toArray();
+
+			foreach ($sheetContent as $row) {
+				foreach ($row as $cell) {
+					if (preg_match_all('/\$\{([^\}]+)\}/', $cell, $matches)) {
+						foreach ($matches[1] as $variable) {
+							$variables[] = $variable;
+						}
+					}
+				}
+			}
+		}
+		
+		$variables = array_unique($variables);
+		return $variables;
+	}
 
 	
 	
