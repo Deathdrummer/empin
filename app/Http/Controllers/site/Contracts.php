@@ -1217,15 +1217,24 @@ class Contracts extends Controller {
 				if (!isset($buildContractdata[$parsedVar])) continue;
 				
 				$parsedData = match(true) {
-					DdrDateTime::isValidDateTime($buildContractdata[$parsedVar] ?? '')	=> DdrDateTime::convertDateFormat($buildContractdata[$parsedVar]),
+					DdrDateTime::isValidDateTime($buildContractdata[$parsedVar] ?? '') => DdrDateTime::convertDateFormat($buildContractdata[$parsedVar]),
 					default	=> $buildContractdata[$parsedVar] ?? '',
 				};
+				
+				
 				
 				$templateProcessor->setValue($variabe, sprintf($formatStr, $parsedData));
 			}
 			
 			if (!isset($buildContractdata[$variabe])) continue;
-			$templateProcessor->setValue($variabe, $buildContractdata[$variabe]);
+			
+			$parsedData = match(true) {
+				DdrDateTime::isValidDateTime($buildContractdata[$variabe] ?? '') => DdrDateTime::convertDateFormat($buildContractdata[$variabe]),
+				default	=> $buildContractdata[$variabe] ?? '',
+			};
+			
+			$templateProcessor->setValue($variabe, $parsedData);
+			
 		}
 		
 		# для заголовков
