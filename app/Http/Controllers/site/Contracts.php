@@ -1209,9 +1209,9 @@ class Contracts extends Controller {
 		
 		$tempVars = $templateProcessor->getVariables();
 		
-		foreach ($tempVars as $variabe) {
-			if (strpos($variabe, ':') !== false) {
-				preg_match('/([a-z_]+):(.+)/', $variabe, $matches);
+		foreach ($tempVars as $variable) {
+			if (strpos($variable, ':') !== false) {
+				preg_match('/([a-z_]+):(.+)/', $variable, $matches);
 				[, $parsedVar, $formatStr] = $matches;
 				
 				if (!isset($buildContractdata[$parsedVar])) continue;
@@ -1221,19 +1221,26 @@ class Contracts extends Controller {
 					default	=> $buildContractdata[$parsedVar] ?? '',
 				};
 				
-				
-				
-				$templateProcessor->setValue($variabe, sprintf($formatStr, $parsedData));
+				$templateProcessor->setValue($variable, sprintf($formatStr, $parsedData));
 			}
 			
-			if (!isset($buildContractdata[$variabe])) continue;
+			if (strpos($variable, '|') !== false) {
+				preg_match('/([a-z_]+)\|(.+)/', $variable, $matches);
+				[, $parsedVar, $formatStr] = $matches;
+				
+				$resVal = isset($buildContractdata[$parsedVar]) && $buildContractdata[$parsedVar] ? $formatStr : null;
+				
+				$templateProcessor->setValue($variable, $resVal);
+			}
+			
+			if (!isset($buildContractdata[$variable])) continue;
 			
 			$parsedData = match(true) {
-				DdrDateTime::isValidDateTime($buildContractdata[$variabe] ?? '') => DdrDateTime::convertDateFormat($buildContractdata[$variabe]),
-				default	=> $buildContractdata[$variabe] ?? '',
+				DdrDateTime::isValidDateTime($buildContractdata[$variable] ?? '') => DdrDateTime::convertDateFormat($buildContractdata[$variable]),
+				default	=> $buildContractdata[$variable] ?? '',
 			};
 			
-			$templateProcessor->setValue($variabe, $parsedData);
+			$templateProcessor->setValue($variable, $parsedData);
 			
 		}
 		
@@ -1311,6 +1318,16 @@ class Contracts extends Controller {
 					
 					$varsMap['${'.$variable.'}'] = sprintf($formatStr, $parsedData);
 					$varsTitlesMap['{'.$variable.'}'] = sprintf($formatStr, $parsedData);
+				}
+				
+				if (strpos($variable, '|') !== false) {
+					preg_match('/([a-z_]+)\|(.+)/', $variable, $matches);
+					[, $parsedVar, $formatStr] = $matches;
+					
+					$resVal = isset($buildContractdata[$parsedVar]) && $buildContractdata[$parsedVar] ? $formatStr : null;
+					
+					$varsMap['${'.$variable.'}'] = $resVal;
+					$varsTitlesMap['{'.$variable.'}'] = $resVal;
 				}
 				
 				if (!isset($buildContractdata[$variable])) continue;
