@@ -1417,7 +1417,31 @@
 	
 	
 	
-	
+	$('#contractsTable').on(tapEvent, '[buynumber]', function(event) {
+		event.preventDefault();
+		event.stopPropagation();
+		const {isShiftKey, isCtrlKey, isAltKey, noKeys} = metaKeys(event);
+		if (!isAltKey || event.detail < 2) return;
+		
+		const buyNum = $(event.target).attr('buynumber');
+		
+		if (/^[a-zA-Z0-9]+$/.test(buyNum) === false) {
+			$.notify('Некооректный номер закупки!', 'info');
+			return;
+		} 
+		
+		const siteUrl = `https://tender.lot-online.ru/etp/app/SearchLots/page#%7B%22query%22:%7B%22title%22:%22${buyNum}%22%7D,%20%22filter%22:%7B%22state%22:%5B%22ALL%22%5D%7D,%20%22sort%22:%7B%22placementDate%22:false%7D%7D`,
+			{outerWidth: winW, outerHeight: winH} = window,
+				winWidth = winW - 200,
+				winHeight = winH - 100,
+				posLeft = winWidth < 700 ? 0 : 100,
+				posTop = winHeight < 600 ? 0 : 50,
+				win = window.open(siteUrl, '_blank');
+		
+		win.resizeBy(winWidth < 700 ? winW : winWidth, winHeight < 600 ? winH : winHeight);
+		//win.moveBy(posLeft < 0 ? 0 : posLeft, posTop < 0 ? 0 : posTop);
+		win.moveBy(posLeft < 0 ? 0 : posLeft, posTop < 0 ? 0 : posTop);
+	});
 	
 	
 	

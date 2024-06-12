@@ -8,6 +8,8 @@ export function contentSelection() {
 		const cell = $(e.target).closest('[ddrtabletd]');
 		const row = $(e.target).closest('[ddrtabletr]');
 		
+		if (isAltKey && $(e.target).hasAttr('noselectcell')) return;
+		
 		otherItemsCount = $(cell).prevAll(':not([ddrtabletd])').length;
 		
 		if (isLeftClick) {
@@ -23,7 +25,7 @@ export function contentSelection() {
 					
 					$(cell).find('[edittedplace]:not(.select-text)').addClass('select-text');
 					
-					//selectionAction();
+					selectionAction();
 				
 				} else {
 					$(cell).find('[edittedplace].select-text').removeClass('select-text');

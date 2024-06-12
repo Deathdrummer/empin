@@ -18635,6 +18635,7 @@ function contentSelection() {
 
     var cell = $(e.target).closest('[ddrtabletd]');
     var row = $(e.target).closest('[ddrtabletr]');
+    if (isAltKey && $(e.target).hasAttr('noselectcell')) return;
     otherItemsCount = $(cell).prevAll(':not([ddrtabletd])').length;
 
     if (isLeftClick) {
@@ -18646,7 +18647,8 @@ function contentSelection() {
         if (!selectedColStart || !selectedRowStart) {
           selectedColStart = getColIndex(cell);
           selectedRowStart = $(row).index();
-          $(cell).find('[edittedplace]:not(.select-text)').addClass('select-text'); //selectionAction();
+          $(cell).find('[edittedplace]:not(.select-text)').addClass('select-text');
+          selectionAction();
         } else {
           $(cell).find('[edittedplace].select-text').removeClass('select-text');
           removeSelection();

@@ -408,7 +408,7 @@
 
 	@if($column == 'buy_number' && auth('site')->user()->can('contract-col-buy_number:site'))
 		<x-table.td class="breakword h-center" commonlist contextedit="{{$buy_number == 'БЕЗ ЗАКУПКИ' ? '' : $id.','.$column.','.'1'}}" style="background-color: {{$selected_color.'75' ?? ''}};">
-			<p class="fz12px" edittedplace="-">{{$buy_number ?? '-'}}</p>
+			<p class="fz12px" edittedplace="-" buynumber="{{$buy_number ?? null}}" noselectcell>{{$buy_number ?? '-'}}</p>
 		</x-table.td>
 	@endif
 
