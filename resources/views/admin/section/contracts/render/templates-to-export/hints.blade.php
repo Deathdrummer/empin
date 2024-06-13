@@ -21,7 +21,7 @@
 			<tr>
 				<td><pre>${date_start_fyear}</pre></td>
 				<td>дд.мм.гггг</td>
-				<td><p class="fz14px">С полной датой</p></td>
+				<td><p class="fz14px">С полным годом</p></td>
 			</tr>
 			<tr>
 				<td><pre>${date_start_human}</pre></td>
