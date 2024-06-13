@@ -3,7 +3,8 @@
 @import "@sass/common/mixins/scrollbar"
 @import "@sass/common/mixins/button"
 @import "@sass/common/mixins/font"
-
+@import "@sass/common/mixins/hr"
+	
 
 
 
@@ -1589,3 +1590,15 @@ $tableColor: #efefef
 			
 			&.ddrtable__tr:not(:first-of-type)
 				border-top: 1px solid #efefef !important
+
+
+
+
+
+.hr
+	&-light
+		+hr(10%, 90%, #d4dbe0)
+	
+	&-dark
+		+hr(10%, 90%, #8a9ba7)
+	

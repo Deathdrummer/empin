@@ -143953,3 +143953,16 @@ template {
 .ddrtable .ui-sortable-placeholder.ddrtable__tr:not(:first-of-type) {
   border-top: 1px solid #efefef !important;
 }
+
+.hr-light {
+  border: 0;
+  height: 1px;
+  background-color: #d4dbe0;
+  background-image: linear-gradient(to left, #fff 0%, #d4dbe0 10%, #d4dbe0 90%, #fff 100%);
+}
+.hr-dark {
+  border: 0;
+  height: 1px;
+  background-color: #8a9ba7;
+  background-image: linear-gradient(to left, #fff 0%, #8a9ba7 10%, #8a9ba7 90%, #fff 100%);
+}

@@ -184,6 +184,13 @@ Route::get('/get_export_cheatsheet', function (Request $request) {
 	return response()->json(['cols' => $data, 'virtVars' => $virtVars]);
 });
 
+Route::get('/get_export_hints', function (Request $request) {
+	return response()->view('admin/section/contracts/render/templates-to-export/hints');
+});
+
+
+
+
 
 
 

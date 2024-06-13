@@ -5,10 +5,7 @@
 			ready
 			title="Шаблоны"
 			desc="Список шаблонов для выгрузки"
-			button="Переменные для интерполяции"
-			buttonVariant="light"
-			buttonGroup="small"
-			action="openCheatSheet"
+			:buttons="[['title' => 'Подсказки', 'action' => 'openHints', 'group' => 'small', 'variant' => 'light'], ['title' => 'Переменные для интерполяции', 'action' => 'openCheatSheet', 'group' => 'small', 'variant' => 'light']]"
 			>
 			<x-simplelist
 				group="normal"
@@ -107,6 +104,30 @@
 	}
 	
 	
+	
+	
+	
+	$.openHints = () => {
+		ddrPopup({
+			title: 'Подсказки',
+			width: 1200,
+			buttons: ['Закрыть'],
+		}).then(async ({state, wait, setTitle, setButtons, loadData, setHtml, setLHtml, dialog, close, onScroll, disableButtons, enableButtons, setWidth}) => { //isClosed
+			wait();
+			
+			const {data, error, status, headers} = await axiosQuery('get', 'ajax/get_export_hints');
+			
+			if (error) {
+				$.notify(error.message, 'error');
+				wait(false);
+				return;
+			} 
+			
+			setHtml(data, () => {
+				wait(false);
+			});
+		});
+	}
 	
 	
 	

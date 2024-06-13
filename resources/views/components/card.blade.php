@@ -10,7 +10,8 @@
 	'buttonGroup'	=> null,
 	'disableBtn'	=> null,
 	'action'		=> null,
-	'cando'			=> null
+	'cando'			=> null,
+	'buttons'		=> []
 ])
 
 
@@ -18,6 +19,8 @@
 	{{$attributes->class(['card'])}}
 	@if($id)id="{{$id}}"@endif
 	>
+	
+	
 	@isset($title)
 	<div class="card__header">
 		<div class="mr20px">
@@ -25,31 +28,72 @@
 			<p class="card__desc color-gray">{{$desc}}</p>
 		</div>
 		
-		@if($button)
-			@if($cando)
-				@cando($cando)
-					<x-button
-						id="{{$buttonId}}"
-						variant="{{$buttonVariant ?? 'green'}}"
-						group="{{$buttonGroup ?? 'normal'}}"
-						px="10"
-						action="{{$action}}"
-						disabled="{{isset($disableBtn)}}"
-						tag="cardbutton"
-						>{{$button}}</x-button>
-				@endcando
-			@else
-				<x-button
-					id="{{$buttonId}}"
-					variant="{{$buttonVariant ?? 'green'}}"
-					group="{{$buttonGroup ?? 'normal'}}"
-					px="10"
-					action="{{$action}}"
-					disabled="{{isset($disableBtn)}}"
-					tag="cardbutton"
-					>{{$button}}</x-button>
+		<div class="row">
+			@if($button)
+				@if($cando)
+					@cando($cando)
+						<div class="col-auto">
+							<x-button
+								id="{{$buttonId}}"
+								variant="{{$buttonVariant ?? 'green'}}"
+								group="{{$buttonGroup ?? 'normal'}}"
+								px="10"
+								action="{{$action}}"
+								disabled="{{isset($disableBtn)}}"
+								tag="cardbutton"
+								>{{$button}}</x-button>
+						</div>
+					@endcando
+				@else
+					<div class="col-auto">
+						<x-button
+							id="{{$buttonId}}"
+							variant="{{$buttonVariant ?? 'green'}}"
+							group="{{$buttonGroup ?? 'normal'}}"
+							px="10"
+							action="{{$action}}"
+							disabled="{{isset($disableBtn)}}"
+							tag="cardbutton"
+							>{{$button}}</x-button>
+					</div>
+				@endif
 			@endif
-		@endif
+			
+			@forelse($buttons as $button)
+				@if($button['cando'] ?? false)
+					@cando($cando)
+						<div class="col-auto">
+							<x-button
+								id="{{$button['id'] ?? null}}"
+								variant="{{$button['variant'] ?? 'green'}}"
+								group="{{$button['group'] ?? 'normal'}}"
+								px="10"
+								action="{{$button['action']}}"
+								disabled="{{isset($button['disabled'])}}"
+								tag="cardbutton"
+								>{{$button['title'] ?? '-'}}</x-button>
+						</div>
+					@endcando
+				@else
+					<div class="col-auto">
+						<x-button
+							id="{{$button['id'] ?? null}}"
+							variant="{{$button['variant'] ?? 'green'}}"
+							group="{{$button['group'] ?? 'normal'}}"
+							px="10"
+							action="{{$button['action']}}"
+							disabled="{{isset($button['disabled'])}}"
+							tag="cardbutton"
+							>{{$button['title'] ?? '-'}}</x-button>
+					</div>
+				@endif
+			@empty
+			@endforelse
+		</div>
+		
+			
+		
+			
 	</div>
 	@endisset
 	{{$slot}}
