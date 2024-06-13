@@ -35,6 +35,7 @@ final class VirtualVars extends Enum {
 	const date_report_from_fyear	= 'Отчетный период с (чч.мм.гг)';
 	const date_buy_fyear 	 		= 'Дата закупки (чч.мм.гг)';
 	const date_close_fyear 	 		= 'Дата закрытия договора (чч.мм.гг)';
+	const date_send_action_fyear	= 'Дата подачи выполнения (чч.мм.гг)';
 	
 	
 	const date_start_human			= 'Дата подписания договора (чч месяц гггг)';
@@ -46,6 +47,7 @@ final class VirtualVars extends Enum {
 	const date_report_from_human	= 'Отчетный период с (чч месяц гггг)';
 	const date_buy_human 	 		= 'Дата закупки (чч месяц гггг)';
 	const date_close_human 	 		= 'Дата закрытия договора (чч месяц гггг)';
+	const date_send_action_human	= 'Дата подачи выполнения (чч месяц гггг)';
 		
 }
 

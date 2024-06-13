@@ -21,6 +21,7 @@ class DdrDateTime {
 		
 		$defaultFormat = match($locale) {
 			'ru'		=> 'D MMMM YYYY г.',
+			'ru_pure'	=> 'D MMMM YYYY',
 			'en'		=> ['MMMM DD YYYY', 'Do MMMM'],
 			default		=> 'D MMMM YYYY',
 		};
@@ -189,14 +190,17 @@ class DdrDateTime {
 	/** Конвертировать формат даты
 	 * @return String|null
 	 */
-	public static function dateToHuman($dateTimeStr = null, $outputFormat = 'j F Y', $originalFormat = 'Y-m-d H:i:s'):String|null {
-		if (!$dateTimeStr) return null;
+	public static function dateToHuman($dateTimeStr = null, $outputFormat = ['MMMM DD YYYY', 'Do MMMM'], $originalFormat = 'Y-m-d H:i:s'):String|null {
+		
+		return self::date($dateTimeStr, ['locale' => 'ru_pure']);
+		
+		/* if (!$dateTimeStr) return null;
         $dateTime = Carbon::createFromFormat($originalFormat, $dateTimeStr);
         if ($dateTime === false || $dateTime->format($originalFormat) !== $dateTimeStr) {
             return false;
         }
         $dateTime->locale('ru');
-        return $dateTime->translatedFormat($outputFormat);
+        return $dateTime->translatedFormat($outputFormat); */
 	}
 	
 	

@@ -134,7 +134,7 @@ class VirtualVars {
 	* @return 
 	*/
 	public function dateStartFyear($buildContractData) {
-		return DdrDateTime::convertDateFormat($buildContractData['date_start'] ?? null);
+		return DdrDateTime::convertDateFormat($buildContractData['date_start'] ?? null, 'd.m.Y');
 	}
 	
 	
@@ -144,7 +144,7 @@ class VirtualVars {
 	* @return 
 	*/
 	public function dateEndFyear($buildContractData) {
-		return DdrDateTime::convertDateFormat($buildContractData['date_end'] ?? null);
+		return DdrDateTime::convertDateFormat($buildContractData['date_end'] ?? null, 'd.m.Y');
 	}	
 	
 	
@@ -154,7 +154,7 @@ class VirtualVars {
 	* @return 
 	*/
 	public function dateGenStartFyear($buildContractData) {
-		return DdrDateTime::convertDateFormat($buildContractData['date_gen_start'] ?? null);
+		return DdrDateTime::convertDateFormat($buildContractData['date_gen_start'] ?? null, 'd.m.Y');
 	}
 	
 	
@@ -164,7 +164,7 @@ class VirtualVars {
 	* @return 
 	*/
 	public function dateGenEndFyear($buildContractData) {
-		return DdrDateTime::convertDateFormat($buildContractData['date_gen_end'] ?? null);
+		return DdrDateTime::convertDateFormat($buildContractData['date_gen_end'] ?? null, 'd.m.Y');
 	}
 	
 	
@@ -174,7 +174,7 @@ class VirtualVars {
 	* @return 
 	*/
 	public function dateSubStartFyear($buildContractData) {
-		return DdrDateTime::convertDateFormat($buildContractData['date_sub_start'] ?? null);
+		return DdrDateTime::convertDateFormat($buildContractData['date_sub_start'] ?? null, 'd.m.Y');
 	}
 	
 	
@@ -184,7 +184,7 @@ class VirtualVars {
 	* @return 
 	*/
 	public function dateSubEndFyear($buildContractData) {
-		return DdrDateTime::convertDateFormat($buildContractData['date_sub_end'] ?? null);
+		return DdrDateTime::convertDateFormat($buildContractData['date_sub_end'] ?? null, 'd.m.Y');
 	}
 	
 	
@@ -194,7 +194,7 @@ class VirtualVars {
 	* @return 
 	*/
 	public function dateReportFromFyear($buildContractData) {
-		return DdrDateTime::convertDateFormat($buildContractData['date_report_from'] ?? null);
+		return DdrDateTime::convertDateFormat($buildContractData['date_report_from'] ?? null, 'd.m.Y');
 	}
 	
 	
@@ -204,7 +204,7 @@ class VirtualVars {
 	* @return 
 	*/
 	public function dateBuyFyear($buildContractData) {
-		return DdrDateTime::convertDateFormat($buildContractData['date_buy'] ?? null);
+		return DdrDateTime::convertDateFormat($buildContractData['date_buy'] ?? null, 'd.m.Y');
 	}
 	
 	
@@ -214,7 +214,17 @@ class VirtualVars {
 	* @return 
 	*/
 	public function dateCloseFyear($buildContractData) {
-		return DdrDateTime::convertDateFormat($buildContractData['date_close'] ?? null);
+		return DdrDateTime::convertDateFormat($buildContractData['date_close'] ?? null, 'd.m.Y');
+	}
+	
+	
+	/**
+	* 
+	* @param 
+	* @return 
+	*/
+	public function dateSendActionFyear($buildContractData) {
+		return DdrDateTime::convertDateFormat($buildContractData['date_send_action'] ?? null, 'd.m.Y');
 	}
 	
 	
@@ -312,6 +322,16 @@ class VirtualVars {
 	*/
 	public function dateCloseHuman($buildContractData) {
 		return DdrDateTime::dateToHuman($buildContractData['date_close'] ?? null, '«j» F Y');
+	}
+	
+	
+	/**
+	* 
+	* @param 
+	* @return 
+	*/
+	public function dateSendActionHuman($buildContractData) {
+		return DdrDateTime::dateToHuman($buildContractData['date_send_action'] ?? null);
 	}
 	
 	
