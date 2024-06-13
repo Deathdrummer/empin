@@ -5,7 +5,7 @@
 			ready
 			title="Шаблоны"
 			desc="Список шаблонов для выгрузки"
-			:buttons="[['title' => 'Подсказки', 'action' => 'openHints', 'group' => 'small', 'variant' => 'light'], ['title' => 'Переменные для интерполяции', 'action' => 'openCheatSheet', 'group' => 'small', 'variant' => 'light']]"
+			:buttons="[['type' => 'icon', 'icon' => 'circle-info', 'action' => 'openHints', 'group' => 'small', 'variant' => 'light'], ['title' => 'Переменные для интерполяции', 'action' => 'openCheatSheet', 'group' => 'small', 'variant' => 'light']]"
 			>
 			<x-simplelist
 				group="normal"

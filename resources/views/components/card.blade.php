@@ -71,7 +71,7 @@
 								action="{{$button['action']}}"
 								disabled="{{isset($button['disabled'])}}"
 								tag="cardbutton"
-								>{{$button['title'] ?? '-'}}</x-button>
+								>{!!$button['icon'] ?? false ? '<i class="fa-solid fa-'.$button['icon'].'"></i>' : ''!!} {{$button['title'] ?? ''}}</x-button>
 						</div>
 					@endcando
 				@else
@@ -84,16 +84,12 @@
 							action="{{$button['action']}}"
 							disabled="{{isset($button['disabled'])}}"
 							tag="cardbutton"
-							>{{$button['title'] ?? '-'}}</x-button>
+							>{!!$button['icon'] ?? false ? '<i class="fa-solid fa-'.$button['icon'].'"></i>' : ''!!} {{$button['title'] ?? ''}}</x-button>
 					</div>
 				@endif
 			@empty
 			@endforelse
 		</div>
-		
-			
-		
-			
 	</div>
 	@endisset
 	{{$slot}}
