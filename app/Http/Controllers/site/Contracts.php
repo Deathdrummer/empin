@@ -1212,16 +1212,22 @@ class Contracts extends Controller {
 		
 		foreach ($tempVars as $variable) {
 			$buildedVariable = preg_replace_callback('/\[([a-z_]+)\]/', function($matches) use($buildContractdata) {
-				return $buildContractdata[$matches[1]] ?? null;
+				return match(true) {
+					DdrDateTime::isValidDateTime($buildContractdata[$matches[1]] ?? '') => DdrDateTime::convertDateFormat($buildContractdata[$matches[1]]),
+					default	=> $buildContractdata[$matches[1]] ?? null,
+				};
 			}, $variable);
 			
-			toLog($buildedVariable);
 			
-			if (strpos($buildedVariable, ':') !== false) {
-				preg_match('/([a-z_]+):(.+)/', $buildedVariable, $matches);
+			if (strpos($buildedVariable, '::') !== false) {
+				preg_match('/([a-z_]+)::(.+)/', $buildedVariable, $matches);
+				
 				[, $parsedVar, $formatStr] = $matches;
 				
-				if (!isset($buildContractdata[$parsedVar])) continue;
+				if (!isset($buildContractdata[$parsedVar])) {
+					 $templateProcessor->setValue($variable, '');
+					 continue;
+				} 
 				
 				$parsedData = match(true) {
 					DdrDateTime::isValidDateTime($buildContractdata[$parsedVar] ?? '') => DdrDateTime::convertDateFormat($buildContractdata[$parsedVar]),
@@ -1231,8 +1237,8 @@ class Contracts extends Controller {
 				$templateProcessor->setValue($variable, sprintf($formatStr, $parsedData));
 			}
 			
-			if (strpos($buildedVariable, '|') !== false) {
-				preg_match('/([a-z_]+)\|(.+)/', $buildedVariable, $matches);
+			if (strpos($buildedVariable, '||') !== false) {
+				preg_match('/([a-z_]+)\|\|(.+)/', $buildedVariable, $matches);
 				[, $parsedVar, $formatStr] = $matches;
 				
 				$resVal = isset($buildContractdata[$parsedVar]) && $buildContractdata[$parsedVar] ? $formatStr : null;
@@ -1240,7 +1246,10 @@ class Contracts extends Controller {
 				$templateProcessor->setValue($variable, $resVal);
 			}
 			
-			if (!isset($buildContractdata[$variable])) continue;
+			if (!isset($buildContractdata[$variable])) {
+				$templateProcessor->setValue($variable, '');
+				continue;
+			}
 			
 			$parsedData = match(true) {
 				DdrDateTime::isValidDateTime($buildContractdata[$variable] ?? '') => DdrDateTime::convertDateFormat($buildContractdata[$variable]),
@@ -1313,11 +1322,14 @@ class Contracts extends Controller {
 			$varsMap = [];
 			foreach ($variables as $variable) {
 				$buildedVariable = preg_replace_callback('/\[([a-z_]+)\]/', function($matches) use($buildContractdata) {
-					return $buildContractdata[$matches[1]] ?? null;
+					return match(true) {
+						DdrDateTime::isValidDateTime($buildContractdata[$matches[1]] ?? '') => DdrDateTime::convertDateFormat($buildContractdata[$matches[1]]),
+						default	=> $buildContractdata[$matches[1]] ?? null,
+					};
 				}, $variable);
 				
-				if (strpos($buildedVariable, ':') !== false) {
-					preg_match('/([a-z_]+):(.+)/', $buildedVariable, $matches);
+				if (strpos($buildedVariable, '::') !== false) {
+					preg_match('/([a-z_]+)::(.+)/', $buildedVariable, $matches);
 					[, $parsedVar, $formatStr] = $matches;
 					
 					if (!isset($buildContractdata[$parsedVar])) continue;
@@ -1330,8 +1342,8 @@ class Contracts extends Controller {
 					$varsMap['${'.$variable.'}'] = sprintf($formatStr, $parsedData);
 				}
 				
-				if (strpos($buildedVariable, '|') !== false) {
-					preg_match('/([a-z_]+)\|(.+)/', $buildedVariable, $matches);
+				if (strpos($buildedVariable, '||') !== false) {
+					preg_match('/([a-z_]+)\|\|(.+)/', $buildedVariable, $matches);
 					[, $parsedVar, $formatStr] = $matches;
 					
 					$resVal = isset($buildContractdata[$parsedVar]) && $buildContractdata[$parsedVar] ? $formatStr : null;
