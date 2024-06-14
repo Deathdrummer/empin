@@ -1209,9 +1209,16 @@ class Contracts extends Controller {
 		
 		$tempVars = $templateProcessor->getVariables();
 		
+		
 		foreach ($tempVars as $variable) {
-			if (strpos($variable, ':') !== false) {
-				preg_match('/([a-z_]+):(.+)/', $variable, $matches);
+			$buildedVariable = preg_replace_callback('/\[([a-z_]+)\]/', function($matches) use($buildContractdata) {
+				return $buildContractdata[$matches[1]] ?? null;
+			}, $variable);
+			
+			toLog($buildedVariable);
+			
+			if (strpos($buildedVariable, ':') !== false) {
+				preg_match('/([a-z_]+):(.+)/', $buildedVariable, $matches);
 				[, $parsedVar, $formatStr] = $matches;
 				
 				if (!isset($buildContractdata[$parsedVar])) continue;
@@ -1224,8 +1231,8 @@ class Contracts extends Controller {
 				$templateProcessor->setValue($variable, sprintf($formatStr, $parsedData));
 			}
 			
-			if (strpos($variable, '|') !== false) {
-				preg_match('/([a-z_]+)\|(.+)/', $variable, $matches);
+			if (strpos($buildedVariable, '|') !== false) {
+				preg_match('/([a-z_]+)\|(.+)/', $buildedVariable, $matches);
 				[, $parsedVar, $formatStr] = $matches;
 				
 				$resVal = isset($buildContractdata[$parsedVar]) && $buildContractdata[$parsedVar] ? $formatStr : null;
@@ -1305,8 +1312,12 @@ class Contracts extends Controller {
 			
 			$varsMap = [];
 			foreach ($variables as $variable) {
-				if (strpos($variable, ':') !== false) {
-					preg_match('/([a-z_]+):(.+)/', $variable, $matches);
+				$buildedVariable = preg_replace_callback('/\[([a-z_]+)\]/', function($matches) use($buildContractdata) {
+					return $buildContractdata[$matches[1]] ?? null;
+				}, $variable);
+				
+				if (strpos($buildedVariable, ':') !== false) {
+					preg_match('/([a-z_]+):(.+)/', $buildedVariable, $matches);
 					[, $parsedVar, $formatStr] = $matches;
 					
 					if (!isset($buildContractdata[$parsedVar])) continue;
@@ -1317,17 +1328,15 @@ class Contracts extends Controller {
 					};
 					
 					$varsMap['${'.$variable.'}'] = sprintf($formatStr, $parsedData);
-					$varsTitlesMap['{'.$variable.'}'] = sprintf($formatStr, $parsedData);
 				}
 				
-				if (strpos($variable, '|') !== false) {
-					preg_match('/([a-z_]+)\|(.+)/', $variable, $matches);
+				if (strpos($buildedVariable, '|') !== false) {
+					preg_match('/([a-z_]+)\|(.+)/', $buildedVariable, $matches);
 					[, $parsedVar, $formatStr] = $matches;
 					
 					$resVal = isset($buildContractdata[$parsedVar]) && $buildContractdata[$parsedVar] ? $formatStr : null;
 					
 					$varsMap['${'.$variable.'}'] = $resVal;
-					$varsTitlesMap['{'.$variable.'}'] = $resVal;
 				}
 				
 				if (!isset($buildContractdata[$variable])) continue;
