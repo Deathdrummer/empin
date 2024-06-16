@@ -1073,7 +1073,7 @@
 					if ($(cell).find('[lightsitem]').length) {
 						$(cell).find('[lightsitem]').removeClass('bg-green bg-red bg-yellow').addClass(`bg-${colors[value]}`);
 					} else {
-						$(cell).html(`<div class="border-color-gray border-radius-10px w4rem h4rem bg-${colors[value]}" lightsitem></div>`);
+						$(cell).html(`<div class="border-color-gray border-radius-10px w3rem h3rem bg-${colors[value]}" lightsitem></div>`);
 					}
 					
 					$(cell).setAttrib('color', value);
