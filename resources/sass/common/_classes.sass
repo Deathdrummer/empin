@@ -1602,3 +1602,22 @@ $tableColor: #efefef
 	&-dark
 		+hr(10%, 90%, #8a9ba7)
 	
+	
+
+
+.lightsitem
+	width: 30px
+	height: 30px
+	border-radius: 4px
+	cursor: pointer
+	transition: filter 0.16s
+	
+	&:hover:not(.lightsitem_active)
+		filter: brightness(1.1)
+		box-shadow: 0 0 0 1px #c1c1c1
+		
+
+	&_active
+		filter: brightness(1.1)
+		box-shadow: 0 0 0 1px #aaa
+		cursor: default

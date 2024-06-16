@@ -9,6 +9,7 @@
 				<li><x-radio name="type" value="2" fieldset="stepType{{$index}}" label="Текстовое поле"/></li>
 				<li><x-radio name="type" value="3" fieldset="stepType{{$index}}" label="Список сотрудников" /></li>
 				<li><x-radio name="type" value="4" fieldset="stepType{{$index}}" label="Денежный формат" /></li>
+				<li><x-radio name="type" value="5" fieldset="stepType{{$index}}" label="Светофор" /></li>
 			</ul>
 		</td>
 		<td>

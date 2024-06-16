@@ -949,6 +949,28 @@ class Contracts extends Controller {
 	
 	
 	
+	// Комментарии чекбокса
+	public function cell_lights(Request $request) {
+		[
+			'color' 		=> $color,
+			'contract_id' 	=> $contractId,
+			'department_id'	=> $departmentId,
+			'step_id' 		=> $stepId,
+		] = $request->validate([
+			'color'			=> 'nullable|integer',
+			'contract_id'	=> 'required|integer',
+			'department_id'	=> 'required|integer',
+			'step_id'		=> 'required|integer',
+		]);
+		
+		return $this->render('cell_lights', compact('color', 'contractId', 'departmentId', 'stepId'));
+	}
+	
+	
+	
+	
+	
+	
 	
 	// Редактировать ячейку
 	public function cell_edit(Request $request) {

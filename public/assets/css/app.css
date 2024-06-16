@@ -143966,3 +143966,20 @@ template {
   background-color: #8a9ba7;
   background-image: linear-gradient(to left, #fff 0%, #8a9ba7 10%, #8a9ba7 90%, #fff 100%);
 }
+
+.lightsitem {
+  width: 30px;
+  height: 30px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: filter 0.16s;
+}
+.lightsitem:hover:not(.lightsitem_active) {
+  filter: brightness(1.1);
+  box-shadow: 0 0 0 1px #c1c1c1;
+}
+.lightsitem_active {
+  filter: brightness(1.1);
+  box-shadow: 0 0 0 1px #aaa;
+  cursor: default;
+}

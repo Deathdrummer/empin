@@ -268,7 +268,8 @@
 		loadedContractsIds 		= {},
 		lastChoosedRow 			= ref(null),
 		totalCount 				= null,
-		sendMessStat 			= ref(false);
+		sendMessStat 			= ref(false),
+		hidelights				= ref(null);
 		
 	
 	
@@ -1005,12 +1006,26 @@
 	//---------------------------------------------------------------------------------  Заполнение данных договоров
 	let contractSetDataTOut, oldInputId = null;
 	$.contractSetData = (input, contractId, departmentId, stepId, type) => {
-		let cell = $(input).closest('td');
+		let cell = type == 5 ? $(`[deptlights^="${contractId},${departmentId},${stepId}"]`) : $(input).closest('[ddrtabletd]');
 		
 		$(input).ddrInputs('addClass', 'notouch');
 		let inputId = $(input).attr('id');
 		if (oldInputId == inputId) clearTimeout(contractSetDataTOut);
 		oldInputId = inputId;
+		
+		let cellWait;
+		if (type == 5) {
+			if ($(input).hasClass('lightsitem_active')) return;
+			
+			cellWait = $(cell).ddrWait({
+				iconHeight: '40px',
+				bgColor: '#ffffffbb',
+			});
+			
+			$(input).closest('.row').find('.lightsitem.lightsitem_active').removeClass('lightsitem_active');
+			$(input).addClass('lightsitem_active');
+		}
+		
 		
 		
 		contractSetDataTOut = setTimeout(function() {
@@ -1031,6 +1046,10 @@
 				case 4: // сумма.
 					value = parseFloat($(input).val());
 					break;
+				
+				case 5: // светофор.
+					value = parseFloat($(input).attr('color'));
+					break;
 
 				default:
 					break;
@@ -1048,6 +1067,19 @@
 					} else {
 						$(cell).css('background-color', $(cell).attr('deadlinecolor'));
 					}
+				} else if (type == 5) {
+					const colors = {1: 'yellow', 2: 'green', 3: 'red'};
+					
+					if ($(cell).find('[lightsitem]').length) {
+						$(cell).find('[lightsitem]').removeClass('bg-green bg-red bg-yellow').addClass(`bg-${colors[value]}`);
+					} else {
+						$(cell).html(`<div class="border-color-gray border-radius-10px w4rem h4rem bg-${colors[value]}" lightsitem></div>`);
+					}
+					
+					$(cell).setAttrib('color', value);
+					
+					cellWait.destroy();	
+					hidelights.value();
 				}
 				
 				$(input).ddrInputs('removeClass', 'notouch');
@@ -1842,6 +1874,82 @@
 			callback: function() {}
 		});
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	//----------------------------------------------------------------------------------------------------- Тултип "светофор"
+	let lightssTooltip;
+	$.lightsTooltip = (event) => {
+		const {target} = event;
+		const cell = $(target).closest('[ddrtabletd]');
+		
+		if ($(cell).hasAttr('tooltiped')) return;
+		
+		if (lightssTooltip?.destroy != undefined) lightssTooltip.destroy();
+		
+		$(cell).setAttrib('tooltiped');
+		const attrData = $(cell).attr('deptlights');
+		const color = $(cell).attr('color');
+		//console.log(attrData);
+		const [contractId = null, departmentId = null, stepId = null] = pregSplit(attrData);
+		
+		$('#contractsList').one('scroll', function() {
+			// При скролле списка скрыть тултип комментариев
+			if (lightssTooltip?.destroy != undefined) lightssTooltip.destroy();
+		});
+		
+		
+		lightssTooltip = $(cell).ddrTooltip({
+			//cls: 'w44rem',
+			placement: 'bottom',
+			tag: 'noscroll noopen',
+			offset: [0 -5],
+			minWidth: '100px',
+			minHeight: '30px',
+			duration: [200, 200],
+			trigger: 'click',
+			wait: {
+				iconHeight: '40px'
+			},
+			onShow: async function({reference, popper, show, hide, destroy, waitDetroy, setContent, setData, setProps}) {
+				
+				const {data, error, status, headers} = await axiosQuery('get', 'site/contracts/cell_lights', {
+					contract_id: contractId, 
+					department_id: departmentId,
+					step_id: stepId,
+					color,
+				}, 'json');
+				
+				await setData(data);
+				
+				
+				hidelights.value = destroy;
+				
+				waitDetroy();
+				
+			},
+			onDestroy: function() {
+				$(cell).removeAttrib('tooltiped');
+			}
+		});
+	}
+	
+	
+	
+	
+	
 	
 	
 	

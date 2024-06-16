@@ -108,6 +108,43 @@
 						</div>
 					@endif
 				</x-table.td>
+			@elseif($step['type'] == 5)
+				@if($edited)
+					<x-table.td
+						oncontextmenu="$.lightsTooltip(event);"
+						deptlights="{{$contract['id']}},{{$dept['id']}},{{$step['id']}}"
+						color="{{$contractdata[$contract['id']][$dept['id']][$step['id']]['data'] ?? null}}"
+						class="h-center"
+						>
+				  		@isset($contractdata[$contract['id']][$dept['id']][$step['id']]['data'])
+					  		<div
+					  			@class([
+					  				'border-color-gray border-radius-10px w3rem h3rem',
+					  				'bg-yellow' => $contractdata[$contract['id']][$dept['id']][$step['id']]['data'] == 1,
+					  				'bg-green' => $contractdata[$contract['id']][$dept['id']][$step['id']]['data'] == 2,
+					  				'bg-red' => $contractdata[$contract['id']][$dept['id']][$step['id']]['data'] == 3,
+					  			])
+					  			lightsitem
+					  			></div>
+				  		@endisset
+					</x-table.td>
+				@else
+					<x-table.td
+						class="h-center"
+						>
+				  		@isset($contractdata[$contract['id']][$dept['id']][$step['id']]['data'])
+					  		<div
+					  			@class([
+					  				'border-color-gray border-radius-10px w4rem h4rem',
+					  				'bg-yellow' => $contractdata[$contract['id']][$dept['id']][$step['id']]['data'] == 1,
+					  				'bg-green' => $contractdata[$contract['id']][$dept['id']][$step['id']]['data'] == 2,
+					  				'bg-red' => $contractdata[$contract['id']][$dept['id']][$step['id']]['data'] == 3,
+					  			])
+					  			lightsitem
+					  			></div>
+				  		@endisset
+					</x-table.td>
+				@endif
 			@endif
 		@else
 			@if($step['type'] == 1)
