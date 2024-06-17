@@ -134,7 +134,6 @@
 					  			style="background-color: {{$contractsSmeta[$contractdata[$contract['id']][$dept['id']][$step['id']]['data']]['color'] ?? '#fff'}};"
 					  			class="border-all border-gray-300 border-radius-10px w2rem-5px h2rem-5px",
 					  			lightsitem
-					  			{{$contractsSmeta[$contractdata[$contract['id']][$dept['id']][$step['id']]['data']]['color'] ?? '#fff'}}
 					  			></div>
 				  		@endisset
 					</x-table.td>
