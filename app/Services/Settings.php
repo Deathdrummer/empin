@@ -11,9 +11,9 @@ class Settings {
 	
 	/**
 	 * @param string  $key
-	 * @return Collection|string|bool
+	 * @return Collection|string|bool|null
 	 */
-	public function get(?string $key = null, $default = null): Collection|string|bool {
+	public function get(?string $key = null, $default = null): Collection|string|bool|null {
 		if (!$key) return false;
 		['key' => $keyToFind, 'path' => $path] = $this->parseKey($key);
 		
@@ -32,9 +32,9 @@ class Settings {
 	/**
 	 * @param array|string  $key
 	 * @param array|string ...$keys
-	 * @return Collection|array
+	 * @return Collection|array|null
 	 */
-	public function getMany(array|string $key, array|string ...$keys): Collection|array {
+	public function getMany(array|string $key, array|string ...$keys): Collection|array|null {
 		if (!$key) return false;
 		
 		$keys = collect([]);
