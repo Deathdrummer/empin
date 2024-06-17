@@ -9644,7 +9644,7 @@ function _buildMenuHtml() {
     menuHtml += '<div' + itemAttrs + '>'; //------- parent li
 
     if (item.faIcon) {
-      menuHtml += '<div class="icon"><i class="fa-fw ' + item.faIcon + '"></i></div>';
+      menuHtml += '<div class="icon"><i class="fa fa-fw ' + item.faIcon + '"></i></div>';
     }
 
     if (hasCountsLeft) {
@@ -9702,7 +9702,7 @@ function _buildMenuHtml() {
         });
         menuHtml += '<li>';
         menuHtml += '<div' + childItemAttrs + '>';
-        if (childItem.faIcon) menuHtml += '<div class="icon"><i class="fa-fw ' + childItem.faIcon + '"></i></div>';
+        if (childItem.faIcon) menuHtml += '<div class="icon"><i class="fa fa-fw ' + childItem.faIcon + '"></i></div>';
 
         if (hasCountsChildLeft) {
           menuHtml += '<div class="metablock metablock_left">'; // metablock
@@ -9805,6 +9805,8 @@ function _loadSubmenu() {
     var subMenuHtml = '',
         funcMap = {};
     $.each(subData, function (k, childItem) {
+      var _childItem$colorLeft, _childItem$colorLeft2, _childItem$colorLeft3, _childItem$colorLeft4, _childItem$colorRight, _childItem$colorRight2, _childItem$colorRight3, _childItem$colorRight4;
+
       var childFuncCode = childItem.onClick ? generateCode('nlLlLLnnlnnLnnn') : null;
 
       if (childFuncCode) {
@@ -9820,7 +9822,7 @@ function _loadSubmenu() {
       });
       subMenuHtml += '<li>';
       subMenuHtml += '<div' + childItemAttrs + '>';
-      if (childItem.faIcon) subMenuHtml += '<div class="icon"><i class="fa-fw ' + childItem.faIcon + '"></i></div>';
+      if (childItem.faIcon) subMenuHtml += '<div class="icon"><i class="fa fa-fw ' + childItem.faIcon + '"></i></div>';
 
       if (hasCountsSubLeft) {
         menuHtml += '<div class="metablock metablock_left">'; // metablock
@@ -9829,7 +9831,9 @@ function _loadSubmenu() {
         menuHtml += '</div>'; // metablock
       }
 
+      if (childItem !== null && childItem !== void 0 && childItem.colorLeft) subMenuHtml += '<div class="w' + (((_childItem$colorLeft = childItem.colorLeft) === null || _childItem$colorLeft === void 0 ? void 0 : _childItem$colorLeft.size) || '3rem') + ' h' + (((_childItem$colorLeft2 = childItem.colorLeft) === null || _childItem$colorLeft2 === void 0 ? void 0 : _childItem$colorLeft2.size) || '3rem') + ' mr1rem border-all border-gray-300 border-rounded-' + (((_childItem$colorLeft3 = childItem.colorLeft) === null || _childItem$colorLeft3 === void 0 ? void 0 : _childItem$colorLeft3.radius) || '1px') + '" style="background-color:' + (((_childItem$colorLeft4 = childItem.colorLeft) === null || _childItem$colorLeft4 === void 0 ? void 0 : _childItem$colorLeft4.color) || '#fff') + ';"></div>';
       subMenuHtml += '<div class="text"><p>' + strPad(_.isFunction(childItem.name) ? childItem.name() : childItem.name, 110, '...') + '</p></div>';
+      if (childItem !== null && childItem !== void 0 && childItem.colorRight) subMenuHtml += '<div class="w' + (((_childItem$colorRight = childItem.colorRight) === null || _childItem$colorRight === void 0 ? void 0 : _childItem$colorRight.size) || '3rem') + ' h' + (((_childItem$colorRight2 = childItem.colorRight) === null || _childItem$colorRight2 === void 0 ? void 0 : _childItem$colorRight2.size) || '3rem') + ' ml1rem border-all border-gray-300 border-rounded-' + (((_childItem$colorRight3 = childItem.colorRight) === null || _childItem$colorRight3 === void 0 ? void 0 : _childItem$colorRight3.radius) || '1px') + '" style="background-color:' + (((_childItem$colorRight4 = childItem.colorRight) === null || _childItem$colorRight4 === void 0 ? void 0 : _childItem$colorRight4.color) || '#fff') + ';"></div>';
 
       if (hasCountsSubRight) {
         menuHtml += '<div class="metablock metablock_right">'; // metablock
@@ -20865,6 +20869,12 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
         map: function map(item) {
           return {
             name: item.name,
+            //colorLeft: {color:'#f00', radius: 'circle', size: '2rem'},
+            colorRight: {
+              color: item.color,
+              radius: 'circle',
+              size: '2rem-5px'
+            },
             //faIcon: 'fa-solid fa-angles-right',
             visible: true,
             onClick: function onClick(selector) {

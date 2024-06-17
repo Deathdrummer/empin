@@ -64,6 +64,25 @@
 				</x-card>
 			</div>
 			
+			<div class="col">
+				<x-card
+					loading
+					ready
+					title="Недобор / перебор по смете"
+					desc="Список цветов"
+					>
+					<x-simplelist
+						setting="contracts-smeta"
+						fieldset="ID:w7rem|number|id|1,Цвет:w6rem|color|color,Название:w20rem|input|name"
+						group="small"
+					 />
+				</x-card>
+			</div>
+			
+			
+			
+			
+			
 		</div>
 	</x-settings>
 	

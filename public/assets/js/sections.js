@@ -2484,6 +2484,12 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
         map: function map(item) {
           return {
             name: item.name,
+            //colorLeft: {color:'#f00', radius: 'circle', size: '2rem'},
+            colorRight: {
+              color: item.color,
+              radius: 'circle',
+              size: '2rem-5px'
+            },
             //faIcon: 'fa-solid fa-angles-right',
             visible: true,
             onClick: function onClick(selector) {

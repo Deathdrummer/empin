@@ -337,7 +337,7 @@ function _buildMenuHtml(menuData = null, maxHeight = null) {
 		menuHtml += '<li>'; //------- parent li
 		menuHtml += 	'<div'+itemAttrs+'>'; //------- parent li
 		if (item.faIcon) {
-			menuHtml += '<div class="icon"><i class="fa-fw '+item.faIcon+'"></i></div>';
+			menuHtml += '<div class="icon"><i class="fa fa-fw '+item.faIcon+'"></i></div>';
 		}
 		
 		if (hasCountsLeft) {
@@ -375,6 +375,8 @@ function _buildMenuHtml(menuData = null, maxHeight = null) {
 			const hasCountsChildRight = item.children.some((child) => child.countRight);
 			
 			$.each(item.children, function(k, childItem) {
+				
+				
 				let childFuncCode = childItem.onClick ? generateCode('nlLlLLnnlnnLnnn') : null;
 				
 				if (childItem.onClick) {
@@ -392,7 +394,7 @@ function _buildMenuHtml(menuData = null, maxHeight = null) {
 				
 				menuHtml += '<li>';
 				menuHtml += 	'<div'+childItemAttrs+'>';
-				if (childItem.faIcon) menuHtml += 	'<div class="icon"><i class="fa-fw '+childItem.faIcon+'"></i></div>';
+				if (childItem.faIcon) menuHtml += 	'<div class="icon"><i class="fa fa-fw '+childItem.faIcon+'"></i></div>';
 				
 				if (hasCountsChildLeft) {
 					menuHtml += '<div class="metablock metablock_left">'; // metablock
@@ -502,7 +504,7 @@ function _loadSubmenu(menuItem = null) {
 				
 				subMenuHtml += '<li>';
 				subMenuHtml += 	'<div'+childItemAttrs+'>';
-				if (childItem.faIcon) subMenuHtml += 	'<div class="icon"><i class="fa-fw '+childItem.faIcon+'"></i></div>';
+				if (childItem.faIcon) subMenuHtml += 	'<div class="icon"><i class="fa fa-fw '+childItem.faIcon+'"></i></div>';
 				
 				if (hasCountsSubLeft) {
 					menuHtml += '<div class="metablock metablock_left">'; // metablock
@@ -510,7 +512,11 @@ function _loadSubmenu(menuItem = null) {
 					menuHtml += '</div>'; // metablock
 				}
 				
+				if (childItem?.colorLeft) subMenuHtml += '<div class="w'+(childItem.colorLeft?.size || '3rem')+' h'+(childItem.colorLeft?.size || '3rem')+' mr1rem border-all border-gray-300 border-rounded-'+(childItem.colorLeft?.radius || '1px')+'" style="background-color:'+(childItem.colorLeft?.color || '#fff')+';"></div>';
+				
 				subMenuHtml += 		'<div class="text"><p>'+strPad(_.isFunction(childItem.name) ? childItem.name() : childItem.name, 110, '...')+'</p></div>';
+				
+				if (childItem?.colorRight) subMenuHtml += '<div class="w'+(childItem.colorRight?.size || '3rem')+' h'+(childItem.colorRight?.size || '3rem')+' ml1rem border-all border-gray-300 border-rounded-'+(childItem.colorRight?.radius || '1px')+'" style="background-color:'+(childItem.colorRight?.color || '#fff')+';"></div>';
 				
 				if (hasCountsSubRight) {
 					menuHtml += '<div class="metablock metablock_right">'; // metablock
