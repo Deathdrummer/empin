@@ -11,7 +11,8 @@
 				<div class="ddrtabs__nav">
 					<ul class="ddrtabsnav" ddrtabsnav>
 						<li class="ddrtabsnav__item ddrtabsnav__item_active" ddrtabsitem="tabContracts">Договоры</li>
-						<li class="ddrtabsnav__item" ddrtabsitem="testSteps">Этапы</li>
+						<li class="ddrtabsnav__item" ddrtabsitem="tabSteps">Этапы</li>
+						<li class="ddrtabsnav__item" ddrtabsitem="tabSmeta">Недобор / перебор по смете</li>
 					</ul>
 				</div>
 				
@@ -24,7 +25,7 @@
 							group="small"
 						 />
 					</div>
-					<div class="ddrtabscontent__item" ddrtabscontentitem="testSteps">
+					<div class="ddrtabscontent__item" ddrtabscontentitem="tabSteps">
 						
 						<fieldset class="fieldset">
 							<legend>Цвета дедлайнов этапов</legend>
@@ -54,6 +55,13 @@
 							options="min_sign;>:больше,=:равно,>=:больше или равно|max_sign;<:меньше,<=:меньше или равно|max_datetype;h:часов,d:дней,w:недель,m:месяцев,y:лет|min_datetype;h:часов,d:дней,w:недель,m:месяцев,y:лет"
 							group="small"
 						 /> --}}
+					</div>
+					<div class="ddrtabscontent__item" ddrtabscontentitem="tabSmeta">
+						<x-simplelist
+							setting="contracts-smeta"
+							fieldset="ID:w7rem|number|id|1,Цвет:w6rem|color|color,Название:w20rem|input|name"
+							group="small"
+						 />
 					</div>
 				</div>
 			</div>

@@ -1013,7 +1013,7 @@
 		if (oldInputId == inputId) clearTimeout(contractSetDataTOut);
 		oldInputId = inputId;
 		
-		let cellWait;
+		let cellWait, color, colorName;
 		if (type == 5) {
 			if ($(input).hasClass('lightsitem_active')) return;
 			
@@ -1048,7 +1048,9 @@
 					break;
 				
 				case 5: // светофор.
-					value = parseFloat($(input).attr('color'));
+					value = parseFloat($(input).attr('colorid'));
+					color = $(input).attr('color');
+					colorName = $(input).attr('title');
 					break;
 
 				default:
@@ -1071,9 +1073,12 @@
 					const colors = {1: 'yellow', 2: 'green', 3: 'red'};
 					
 					if ($(cell).find('[lightsitem]').length) {
-						$(cell).find('[lightsitem]').removeClass('bg-green bg-red bg-yellow').addClass(`bg-${colors[value]}`);
-					} else {
-						$(cell).html(`<div class="border-color-gray border-radius-10px w3rem h3rem bg-${colors[value]}" lightsitem></div>`);
+						if (color) {
+							$(cell).find('[lightsitem]').css('background-color', color);
+							$(cell).find('[lightsitem]').attr('title', colorName);
+						} else $(cell).find('[lightsitem]').remove();
+					} else if (color) {
+						$(cell).html(`<div class="border-all border-gray-300 border-radius-10px w2rem-5px h2rem-5px" style="background-color:${color};" lightsitem title="${colorName}"></div>`);
 					}
 					
 					$(cell).setAttrib('color', value);

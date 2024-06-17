@@ -118,13 +118,10 @@
 						>
 				  		@isset($contractdata[$contract['id']][$dept['id']][$step['id']]['data'])
 					  		<div
-					  			@class([
-					  				'border-color-gray border-radius-10px w3rem h3rem',
-					  				'bg-yellow' => $contractdata[$contract['id']][$dept['id']][$step['id']]['data'] == 1,
-					  				'bg-green' => $contractdata[$contract['id']][$dept['id']][$step['id']]['data'] == 2,
-					  				'bg-red' => $contractdata[$contract['id']][$dept['id']][$step['id']]['data'] == 3,
-					  			])
+					  		 	style="background-color: {{$contractsSmeta[$contractdata[$contract['id']][$dept['id']][$step['id']]['data']]['color'] ?? '#fff'}};"
+					  			class="border-all border-gray-300 border-radius-10px w2rem-5px h2rem-5px",
 					  			lightsitem
+					  			title="{{$contractsSmeta[$contractdata[$contract['id']][$dept['id']][$step['id']]['data']]['name'] ?? '#fff'}}"
 					  			></div>
 				  		@endisset
 					</x-table.td>
@@ -134,13 +131,10 @@
 						>
 				  		@isset($contractdata[$contract['id']][$dept['id']][$step['id']]['data'])
 					  		<div
-					  			@class([
-					  				'border-color-gray border-radius-10px w4rem h4rem',
-					  				'bg-yellow' => $contractdata[$contract['id']][$dept['id']][$step['id']]['data'] == 1,
-					  				'bg-green' => $contractdata[$contract['id']][$dept['id']][$step['id']]['data'] == 2,
-					  				'bg-red' => $contractdata[$contract['id']][$dept['id']][$step['id']]['data'] == 3,
-					  			])
+					  			style="background-color: {{$contractsSmeta[$contractdata[$contract['id']][$dept['id']][$step['id']]['data']]['color'] ?? '#fff'}};"
+					  			class="border-all border-gray-300 border-radius-10px w2rem-5px h2rem-5px",
 					  			lightsitem
+					  			{{$contractsSmeta[$contractdata[$contract['id']][$dept['id']][$step['id']]['data']]['color'] ?? '#fff'}}
 					  			></div>
 				  		@endisset
 					</x-table.td>

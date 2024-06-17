@@ -165,6 +165,12 @@ class Contracts extends Controller {
 		$rules .= ','.($user->can('contract-col-can-edit-acts:site') ? '1' : '0'); // вернуть договор в работу из архива
 		
 		
+		$this->addSettingToGlobalData([[
+			'setting'	=> 'contracts-smeta:contractsSmeta',
+			'key'		=> 'id',
+		]]);
+
+		
 		return $this->renderWithHeaders(
 			'list',
 			compact(
@@ -949,7 +955,7 @@ class Contracts extends Controller {
 	
 	
 	
-	// Комментарии чекбокса
+	// Светофор по смете
 	public function cell_lights(Request $request) {
 		[
 			'color' 		=> $color,
@@ -962,6 +968,8 @@ class Contracts extends Controller {
 			'department_id'	=> 'required|integer',
 			'step_id'		=> 'required|integer',
 		]);
+		
+		$this->addSettingToGlobalData('contracts-smeta:contractsSmeta');
 		
 		return $this->render('cell_lights', compact('color', 'contractId', 'departmentId', 'stepId'));
 	}
