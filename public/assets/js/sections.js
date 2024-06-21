@@ -2485,7 +2485,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
           return {
             name: item.name,
             //colorLeft: {color:'#f00', radius: 'circle', size: '2rem'},
-            colorRight: {
+            colorLeft: {
               color: item.color,
               radius: 'circle',
               size: '2rem-5px'
@@ -2657,7 +2657,6 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
             while (1) {
               switch (_context20.prev = _context20.next) {
                 case 0:
-                  console.log(selectedContracts.items);
                   ddrPopup({
                     title: 'Шаблоны для выгрузки',
                     width: 500,
@@ -2703,13 +2702,13 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                               enableButtons(true);
                               $('[choosetemplateid]').on(tapEvent, /*#__PURE__*/function () {
                                 var _ref29 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee18(e) {
-                                  var templateId, _$$ddrWait, destroy, _iteratorAbruptCompletion, _didIteratorError, _iteratorError, _iterator, _step, _contractId, _yield$axiosQuery16, _data2, _error2, _status2, _headers2;
+                                  var templateId, ranged, _$$ddrWait, destroy, _yield$axiosQuery16, _data2, _error2, _status2, _headers2, _iteratorAbruptCompletion, _didIteratorError, _iteratorError, _iterator, _step, _contractId, _yield$axiosQuery17, _data3, _error3, _status3, _headers3;
 
                                   return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee18$(_context18) {
                                     while (1) {
                                       switch (_context18.prev = _context18.next) {
                                         case 0:
-                                          templateId = $(e.currentTarget).attr('choosetemplateid'), _$$ddrWait = $('#contractsCard').ddrWait({
+                                          templateId = $(e.currentTarget).attr('choosetemplateid'), ranged = $(e.currentTarget).hasAttr('ranged'), _$$ddrWait = $('#contractsCard').ddrWait({
                                             bgColor: '#ffffffe6',
                                             iconHeight: '50px'
                                           }), destroy = _$$ddrWait.destroy;
@@ -2727,29 +2726,20 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
 
                                         case 5:
                                           wait();
-                                          _iteratorAbruptCompletion = false;
-                                          _didIteratorError = false;
-                                          _context18.prev = 8;
-                                          _iterator = _asyncIterator(selectedContracts.items);
 
-                                        case 10:
-                                          _context18.next = 12;
-                                          return _iterator.next();
-
-                                        case 12:
-                                          if (!(_iteratorAbruptCompletion = !(_step = _context18.sent).done)) {
-                                            _context18.next = 36;
+                                          if (!ranged) {
+                                            _context18.next = 28;
                                             break;
                                           }
 
-                                          _contractId = _step.value;
-                                          _context18.next = 16;
+                                          _context18.next = 9;
                                           return axiosQuery('post', 'site/contracts/export_act', {
-                                            contract_id: _contractId,
-                                            template_id: templateId
+                                            contract_id: selectedContracts.items,
+                                            template_id: templateId,
+                                            ranged: ranged
                                           }, 'blob');
 
-                                        case 16:
+                                        case 9:
                                           _yield$axiosQuery16 = _context18.sent;
                                           _data2 = _yield$axiosQuery16.data;
                                           _error2 = _yield$axiosQuery16.error;
@@ -2757,7 +2747,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                           _headers2 = _yield$axiosQuery16.headers;
 
                                           if (!_error2) {
-                                            _context18.next = 27;
+                                            _context18.next = 20;
                                             break;
                                           }
 
@@ -2767,9 +2757,9 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                           destroy();
                                           return _context18.abrupt("return");
 
-                                        case 27:
+                                        case 20:
                                           if (_headers2['x-export-filename']) {
-                                            _context18.next = 32;
+                                            _context18.next = 25;
                                             break;
                                           }
 
@@ -2778,7 +2768,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                           destroy();
                                           return _context18.abrupt("return");
 
-                                        case 32:
+                                        case 25:
                                           $.ddrExport({
                                             data: _data2,
                                             headers: _headers2,
@@ -2786,59 +2776,122 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                           }, function () {
                                             destroy();
                                           });
+                                          _context18.next = 74;
+                                          break;
 
-                                        case 33:
+                                        case 28:
                                           _iteratorAbruptCompletion = false;
-                                          _context18.next = 10;
-                                          break;
+                                          _didIteratorError = false;
+                                          _context18.prev = 30;
+                                          _iterator = _asyncIterator(selectedContracts.items);
 
-                                        case 36:
-                                          _context18.next = 42;
-                                          break;
+                                        case 32:
+                                          _context18.next = 34;
+                                          return _iterator.next();
 
-                                        case 38:
-                                          _context18.prev = 38;
-                                          _context18.t0 = _context18["catch"](8);
-                                          _didIteratorError = true;
-                                          _iteratorError = _context18.t0;
-
-                                        case 42:
-                                          _context18.prev = 42;
-                                          _context18.prev = 43;
-
-                                          if (!(_iteratorAbruptCompletion && _iterator["return"] != null)) {
-                                            _context18.next = 47;
+                                        case 34:
+                                          if (!(_iteratorAbruptCompletion = !(_step = _context18.sent).done)) {
+                                            _context18.next = 58;
                                             break;
                                           }
 
-                                          _context18.next = 47;
+                                          _contractId = _step.value;
+                                          _context18.next = 38;
+                                          return axiosQuery('post', 'site/contracts/export_act', {
+                                            contract_id: [_contractId],
+                                            template_id: templateId
+                                          }, 'blob');
+
+                                        case 38:
+                                          _yield$axiosQuery17 = _context18.sent;
+                                          _data3 = _yield$axiosQuery17.data;
+                                          _error3 = _yield$axiosQuery17.error;
+                                          _status3 = _yield$axiosQuery17.status;
+                                          _headers3 = _yield$axiosQuery17.headers;
+
+                                          if (!_error3) {
+                                            _context18.next = 49;
+                                            break;
+                                          }
+
+                                          $.notify('Не удалось загрузить данные! Возможно, не загружен файл шаблона.', 'error');
+                                          console.log(_error3 === null || _error3 === void 0 ? void 0 : _error3.message, _error3 === null || _error3 === void 0 ? void 0 : _error3.errors);
+                                          wait(false);
+                                          destroy();
+                                          return _context18.abrupt("return");
+
+                                        case 49:
+                                          if (_headers3['x-export-filename']) {
+                                            _context18.next = 54;
+                                            break;
+                                          }
+
+                                          $.notify('Не удалось загрузить данные! Возможно, не загружен файл шаблона.', 'error');
+                                          wait(false);
+                                          destroy();
+                                          return _context18.abrupt("return");
+
+                                        case 54:
+                                          $.ddrExport({
+                                            data: _data3,
+                                            headers: _headers3,
+                                            filename: _headers3['x-export-filename'] || _headers3['export-filename']
+                                          }, function () {
+                                            destroy();
+                                          });
+
+                                        case 55:
+                                          _iteratorAbruptCompletion = false;
+                                          _context18.next = 32;
+                                          break;
+
+                                        case 58:
+                                          _context18.next = 64;
+                                          break;
+
+                                        case 60:
+                                          _context18.prev = 60;
+                                          _context18.t0 = _context18["catch"](30);
+                                          _didIteratorError = true;
+                                          _iteratorError = _context18.t0;
+
+                                        case 64:
+                                          _context18.prev = 64;
+                                          _context18.prev = 65;
+
+                                          if (!(_iteratorAbruptCompletion && _iterator["return"] != null)) {
+                                            _context18.next = 69;
+                                            break;
+                                          }
+
+                                          _context18.next = 69;
                                           return _iterator["return"]();
 
-                                        case 47:
-                                          _context18.prev = 47;
+                                        case 69:
+                                          _context18.prev = 69;
 
                                           if (!_didIteratorError) {
-                                            _context18.next = 50;
+                                            _context18.next = 72;
                                             break;
                                           }
 
                                           throw _iteratorError;
 
-                                        case 50:
-                                          return _context18.finish(47);
+                                        case 72:
+                                          return _context18.finish(69);
 
-                                        case 51:
-                                          return _context18.finish(42);
+                                        case 73:
+                                          return _context18.finish(64);
 
-                                        case 52:
+                                        case 74:
                                           close();
 
-                                        case 53:
+                                        case 75:
                                         case "end":
                                           return _context18.stop();
                                       }
                                     }
-                                  }, _callee18, null, [[8, 38, 42, 52], [43,, 47, 51]]);
+                                  }, _callee18, null, [[30, 60, 64, 74], [65,, 69, 73]]);
                                 }));
 
                                 return function (_x6) {
@@ -2859,7 +2912,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                     };
                   }());
 
-                case 2:
+                case 1:
                 case "end":
                   return _context20.stop();
               }

@@ -1146,12 +1146,20 @@ class Contracts extends Controller {
 	* @return 
 	*/
 	public function export_act_form() {
-		$templates = $this->getSettingsCollect('templates-to-export')->filter(function (array $value, int $key) {
-			return $value['show'] == 1 && (!isset($value['rule']) || auth('site')->user()->can($value['rule']));
+		
+		$allTemplates = $this->getSettingsCollect('templates-to-export');
+		
+		$templates = $allTemplates->filter(function (array $value, int $key) {
+			return !$value['ranged'] && $value['show'] == 1 && (!isset($value['rule']) || auth('site')->user()->can($value['rule']));
 		});
 		
-		return $this->render('export_acts/form', compact('templates'));
+		$rangeTemplates = $allTemplates->filter(function (array $value, int $key) {
+			return $value['ranged'] && $value['show'] == 1 && (!isset($value['rule']) || auth('site')->user()->can($value['rule']));
+		});
+		
+		return $this->render('export_acts/form', compact('templates', 'rangeTemplates'));
 	}
+	
 	
 	
 	/**
@@ -1164,11 +1172,13 @@ class Contracts extends Controller {
 			'contract_id'	=> $contractId,
 			'template_id'	=> $templateId,
 		] = $request->validate([
-			'contract_id'	=> 'required|numeric',
+			'contract_id'	=> 'required|array',
 			'template_id'	=> 'required|numeric',
 		]);
 		
-		$contractData = Contract::find($contractId);
+		$ranged = $request->input('ranged');
+		
+		$contractsData = Contract::find($contractId);
 		
 		$templateData = $this->getSettingsCollect('templates-to-export')->firstWhere('id', $templateId);
 		
@@ -1176,8 +1186,8 @@ class Contracts extends Controller {
 		
 		
 		[$exportFileName, $exportFilePath] = match($templateData['file']['ext']) {
-			'docx'	=> $this->_buildByDocxTemplate($contractData, $templateData),
-			'xlsx'	=> $this->_buildByXlsxTemplate($contractData, $templateData),
+			'docx'	=> $this->_buildByDocxTemplate($contractsData, $templateData, $ranged),
+			'xlsx'	=> $this->_buildByXlsxTemplate($contractsData, $templateData, $ranged),
 			default	=> [null, null],
 		};
 		
@@ -1188,6 +1198,10 @@ class Contracts extends Controller {
 		
 		return response()->download($exportFilePath, null, ['x-export-filename' => urlencode($exportFileName)])->deleteFileAfterSend();
 	}
+	
+	
+	
+	
 	
 	
 	
@@ -1230,65 +1244,78 @@ class Contracts extends Controller {
 	* @param 
 	* @return 
 	*/
-	private function _buildByDocxTemplate($contractData = null, $templateData = null) {
-		if (!$contractData || !$templateData) return false;
+	private function _buildByDocxTemplate($contractsData = null, $templateData = null, $ranged = false) {
+		if (!$contractsData || !$templateData) return false;
 		
 		$templateProcessor = new TemplateProcessor('storage/'.$templateData['file']['path']);
 		
-		$buildContractdata = $this->_buildContractdata($contractData);
+		$buildContractsdata = $this->_buildContractsdata($contractsData);
 		
 		$tempVars = $templateProcessor->getVariables();
 		
 		
+		$setValuesData = [];
 		foreach ($tempVars as $variable) {
-			$buildedVariable = preg_replace_callback('/\[([a-z_]+)\]/', function($matches) use($buildContractdata) {
-				return match(true) {
-					DdrDateTime::isValidDateTime($buildContractdata[$matches[1]] ?? '') => DdrDateTime::convertDateFormat($buildContractdata[$matches[1]]),
-					default	=> $buildContractdata[$matches[1]] ?? null,
-				};
-			}, $variable);
+			$removeSeparatorVariable = preg_replace('/#.+#/', '', $variable);
 			
-			
-			if (strpos($buildedVariable, '::') !== false) {
-				preg_match('/([a-z_]+)::(.+)/', $buildedVariable, $matches);
+			foreach($buildContractsdata as $k => $buildContractdata) {
+				 $buildedVariable = preg_replace_callback('/\[([a-z_]+)\]/', function($matches) use($buildContractdata) {
+					return match(true) {
+						DdrDateTime::isValidDateTime($buildContractdata[$matches[1]] ?? '') => DdrDateTime::convertDateFormat($buildContractdata[$matches[1]]),
+						default	=> $buildContractdata[$matches[1]] ?? null,
+					};
+				}, $removeSeparatorVariable);
 				
-				[, $parsedVar, $formatStr] = $matches;
 				
-				if (!isset($buildContractdata[$parsedVar])) {
-					 $templateProcessor->setValue($variable, '');
-					 continue;
-				} 
+				if (strpos($buildedVariable, '::') !== false) {
+					preg_match('/([a-z_]+)::(.+)/', $buildedVariable, $matches);
+					[, $parsedVar, $formatStr] = $matches;
+					
+					if (!isset($buildContractdata[$parsedVar])) {
+						$setValuesData[$variable][$k] = '';
+						continue;
+					} 
+					
+					$parsedData = match(true) {
+						DdrDateTime::isValidDateTime($buildContractdata[$parsedVar] ?? '') => DdrDateTime::convertDateFormat($buildContractdata[$parsedVar]),
+						default	=> $buildContractdata[$parsedVar] ?? '',
+					};
+					
+					$setValuesData[$variable][$k] = sprintf($formatStr, $parsedData);
+					continue;
+				}
+				
+				if (strpos($buildedVariable, '||') !== false) {
+					preg_match('/([a-z_]+)\|\|(.+)/', $buildedVariable, $matches);
+					[, $parsedVar, $formatStr] = $matches;
+					
+					$resVal = isset($buildContractdata[$parsedVar]) && $buildContractdata[$parsedVar] ? $formatStr : null;
+					
+					$setValuesData[$variable][$k] = $resVal;
+					continue;
+				}
+				
+				if (!isset($buildContractdata[$variable])) {
+					$setValuesData[$variable][$k] = '';
+					continue;
+				}
 				
 				$parsedData = match(true) {
-					DdrDateTime::isValidDateTime($buildContractdata[$parsedVar] ?? '') => DdrDateTime::convertDateFormat($buildContractdata[$parsedVar]),
-					default	=> $buildContractdata[$parsedVar] ?? '',
+					DdrDateTime::isValidDateTime($buildContractdata[$variable] ?? '') => DdrDateTime::convertDateFormat($buildContractdata[$variable]),
+					default	=> $buildContractdata[$variable] ?? '',
 				};
 				
-				$templateProcessor->setValue($variable, sprintf($formatStr, $parsedData));
+				$setValuesData[$variable][$k] = $parsedData;
+
 			}
-			
-			if (strpos($buildedVariable, '||') !== false) {
-				preg_match('/([a-z_]+)\|\|(.+)/', $buildedVariable, $matches);
-				[, $parsedVar, $formatStr] = $matches;
-				
-				$resVal = isset($buildContractdata[$parsedVar]) && $buildContractdata[$parsedVar] ? $formatStr : null;
-				
-				$templateProcessor->setValue($variable, $resVal);
-			}
-			
-			if (!isset($buildContractdata[$variable])) {
-				$templateProcessor->setValue($variable, '');
-				continue;
-			}
-			
-			$parsedData = match(true) {
-				DdrDateTime::isValidDateTime($buildContractdata[$variable] ?? '') => DdrDateTime::convertDateFormat($buildContractdata[$variable]),
-				default	=> $buildContractdata[$variable] ?? '',
-			};
-			
-			$templateProcessor->setValue($variable, $parsedData);
-			
 		}
+		
+		
+		foreach ($setValuesData as $variable => $dataItems) {
+			preg_match('/#(.+)#/', $variable, $matches);
+			$templateProcessor->setValue($variable, implode($matches[1] ?? ', ', $dataItems));
+		}
+		
 		
 		# для заголовков
 		$colums = ContractColums::getKeys();
@@ -1297,16 +1324,16 @@ class Contracts extends Controller {
 		
 		foreach ($colums as $column) {
 			$varsTitlesMap['{'.$column.'}'] = match(true) {
-				DdrDateTime::isValidDateTime($buildContractdata[$column] ?? '')	=> DdrDateTime::convertDateFormat($buildContractdata[$column]),
-				default	=> $buildContractdata[$column] ?? '',
+				DdrDateTime::isValidDateTime($buildContractsdata[0][$column] ?? '')	=> DdrDateTime::convertDateFormat($buildContractsdata[0][$column]),
+				default	=> $buildContractsdata[0][$column] ?? '',
 			};
 		}
 		
 		foreach ($virtVars as $virtVar) {
-			$varsTitlesMap['{'.$virtVar.'}'] = BusinessVirtualVars::run($virtVar, $buildContractdata);
+			$varsTitlesMap['{'.$virtVar.'}'] = BusinessVirtualVars::run($virtVar, $buildContractsdata[0]);
 		}
 		
-		$buildedExportFileName = trim(Str::swap($varsTitlesMap, $templateData['export_name'] ?? $contractData?->id));
+		$buildedExportFileName = trim(Str::swap($varsTitlesMap, $templateData['export_name'] ?? $contractsData[0]['id']));
 		$exportFilePath = "storage/{$buildedExportFileName}.{$templateData['file']['ext']}";
 		$exportFileName = "{$buildedExportFileName}.{$templateData['file']['ext']}";
 		
@@ -1333,14 +1360,16 @@ class Contracts extends Controller {
 	* @param 
 	* @return 
 	*/
-	private function _buildByXlsxTemplate($contractData, $templateData) {
+	private function _buildByXlsxTemplate($contractsData = null, $templateData = null, $ranged = false) {
+		if (!$contractsData || !$templateData) return false;
+		
 		$spreadsheet = IOFactory::load('storage/'.$templateData['file']['path']);
 		
 		$sheetCount = $spreadsheet->getSheetCount();
 		
 		$variables = $this->_getXlsxVariables($spreadsheet, $sheetCount);
-		$buildContractdata = $this->_buildContractdata($contractData);
 		
+		$buildContractsdata = $this->_buildContractsdata($contractsData, $ranged);
 		
 		for ($i = 0; $i < $sheetCount; $i++) {
 			$sheet = $spreadsheet->getSheet($i);
@@ -1350,42 +1379,54 @@ class Contracts extends Controller {
 			
 			
 			$varsMap = [];
+			
 			foreach ($variables as $variable) {
-				$buildedVariable = preg_replace_callback('/\[([a-z_]+)\]/', function($matches) use($buildContractdata) {
-					return match(true) {
-						DdrDateTime::isValidDateTime($buildContractdata[$matches[1]] ?? '') => DdrDateTime::convertDateFormat($buildContractdata[$matches[1]]),
-						default	=> $buildContractdata[$matches[1]] ?? null,
-					};
-				}, $variable);
+				$removeSeparatorVariable = preg_replace('/#.+#/', '', $variable);
 				
-				if (strpos($buildedVariable, '::') !== false) {
-					preg_match('/([a-z_]+)::(.+)/', $buildedVariable, $matches);
-					[, $parsedVar, $formatStr] = $matches;
+				foreach($buildContractsdata as $k => $buildContractdata) {
+					$buildedVariable = preg_replace_callback('/\[([a-z_]+)\]/', function($matches) use($buildContractdata) {
+						return match(true) {
+							DdrDateTime::isValidDateTime($buildContractdata[$matches[1]] ?? '') => DdrDateTime::convertDateFormat($buildContractdata[$matches[1]]),
+							default	=> $buildContractdata[$matches[1]] ?? null,
+						};
+					}, $removeSeparatorVariable);
 					
-					if (!isset($buildContractdata[$parsedVar])) continue;
+					if (strpos($buildedVariable, '::') !== false) {
+						preg_match('/([a-z_]+)::(.+)/', $buildedVariable, $matches);
+						[, $parsedVar, $formatStr] = $matches;
+						
+						if (!isset($buildContractdata[$parsedVar])) continue;
+						
+						$parsedData = match(true) {
+							DdrDateTime::isValidDateTime($buildContractdata[$parsedVar] ?? '')	=> DdrDateTime::convertDateFormat($buildContractdata[$parsedVar]),
+							default	=> $buildContractdata[$parsedVar] ?? '',
+						};
+						
+						$varsMap['${'.$variable.'}'][$k] = sprintf($formatStr, $parsedData);
+						continue;
+					}
 					
-					$parsedData = match(true) {
-						DdrDateTime::isValidDateTime($buildContractdata[$parsedVar] ?? '')	=> DdrDateTime::convertDateFormat($buildContractdata[$parsedVar]),
-						default	=> $buildContractdata[$parsedVar] ?? '',
-					};
+					if (strpos($buildedVariable, '||') !== false) {
+						preg_match('/([a-z_]+)\|\|(.+)/', $buildedVariable, $matches);
+						[, $parsedVar, $formatStr] = $matches;
+						
+						$resVal = isset($buildContractdata[$parsedVar]) && $buildContractdata[$parsedVar] ? $formatStr : null;
+						
+						$varsMap['${'.$variable.'}'][$k] = $resVal;
+						continue;
+					}
 					
-					$varsMap['${'.$variable.'}'] = sprintf($formatStr, $parsedData);
+					if (!isset($buildContractdata[$variable])) continue;
+					
+					$varsMap['${'.$variable.'}'][$k] = $buildContractdata[$variable] ?? '';
 				}
-				
-				if (strpos($buildedVariable, '||') !== false) {
-					preg_match('/([a-z_]+)\|\|(.+)/', $buildedVariable, $matches);
-					[, $parsedVar, $formatStr] = $matches;
-					
-					$resVal = isset($buildContractdata[$parsedVar]) && $buildContractdata[$parsedVar] ? $formatStr : null;
-					
-					$varsMap['${'.$variable.'}'] = $resVal;
-				}
-				
-				if (!isset($buildContractdata[$variable])) continue;
-				
-				$varsMap['${'.$variable.'}'] = $buildContractdata[$variable] ?? '';
 			}
 			
+			
+			foreach ($varsMap as $variable => $dataItems) {
+				preg_match('/#(.+)#/', $variable, $matches);
+				$varsMap[$variable] = implode($matches[1] ?? ', ', $dataItems);
+			}
 			
 			for ($row = 1; $row <= $highestRow; $row++) {
 				for ($col = 1; $col <= $highestColumnIndex; $col++) {
@@ -1398,20 +1439,21 @@ class Contracts extends Controller {
 			}
 			
 			
+			# для заголовков
 			$colums = ContractColums::getKeys();
 			$virtVars = VirtualVars::getKeys();
 			$varsTitlesMap = [];
 			
 			foreach ($colums as $column) {
-				$varsTitlesMap['{'.$column.'}'] = $buildContractdata[$column] ?? '';
+				$varsTitlesMap['{'.$column.'}'] = $buildContractsdata[0][$column] ?? '';
 			}
 			
 			foreach ($virtVars as $virtVar) {
-				$varsTitlesMap['{'.$virtVar.'}'] = BusinessVirtualVars::run($virtVar, $buildContractdata) ?? '';
+				$varsTitlesMap['{'.$virtVar.'}'] = BusinessVirtualVars::run($virtVar, $buildContractsdata[0]) ?? '';
 			}
 		}
 		
-		$buildedExportFileName = trim(Str::swap($varsTitlesMap, $templateData['export_name'] ?? $contractData?->id));
+		$buildedExportFileName = trim(Str::swap($varsTitlesMap, $templateData['export_name'] ?? $contractsData[0]['id']));
 		$exportFilePath = "storage/{$buildedExportFileName}.{$templateData['file']['ext']}";
 		$exportFileName = "{$buildedExportFileName}.{$templateData['file']['ext']}";
 		
@@ -1473,6 +1515,38 @@ class Contracts extends Controller {
 	
 	
 	
+	/**
+	* 
+	* @param 
+	* @return 
+	*/
+	private function _mergeContractsFields(array $inputArray, string $separator) {
+		$result = [];
+
+		foreach ($inputArray as $item) {
+			foreach ($item as $key => $value) {
+				$parsedValue = match(true) {
+					DdrDateTime::isValidDateTime($value ?? '')	=> DdrDateTime::convertDateFormat($value),
+					default	=> $value ?? '',
+				};
+				
+				if (array_key_exists($key, $result)) {
+					$result[$key] .= $separator.$parsedValue;
+				} else {
+					$result[$key] = $parsedValue;
+				}
+			}
+		}
+
+		return collect($result);
+	}
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	/**
@@ -1480,9 +1554,9 @@ class Contracts extends Controller {
 	* @param 
 	* @return 
 	*/
-	private function _buildContractdata($contractData = null) {
-		if (!$contractData?->exists()) return false;
-		
+	private function _buildContractsdata($contractsData = null, $ranged = false) {
+		if ($contractsData?->isEmpty()) return false;
+
 		$virtVars = VirtualVars::getKeys();
 		
 		['contractor' => $contractor, 'customer' => $customer, 'type' => $type] = $this->getSettings([[
@@ -1500,23 +1574,27 @@ class Contracts extends Controller {
 			]
 		]);
 		
-		
-		$buildedContractData = [];
-		foreach ($contractData?->toArray() as $column => $value) {
-			$buildedContractData[$column] = match($column) {
-				'contractor'	=> $contractor[$value] ?? '',
-				'customer'		=> $customer[$value] ?? '',
-				'type'			=> $type[$value] ?? '',
-				default			=> $value ?? '',
-			};
+		$buildedContractsData = [];
+		foreach ($contractsData as $k => $contractItem) {
+			foreach ($contractItem?->toArray() as $column => $value) {
+				$buildedContractsData[$k][$column] = match($column) {
+					'contractor'	=> $contractor[$value] ?? '',
+					'customer'		=> $customer[$value] ?? '',
+					'type'			=> $type[$value] ?? '',
+					default			=> $value ?? '',
+				};
+			}
 		}
 		
 		
 		foreach ($virtVars as $virtVar) {
-			$buildedContractData[$virtVar] = BusinessVirtualVars::run($virtVar, $buildedContractData);
+			foreach ($buildedContractsData as $k => $buildedContractData) {
+				$buildedContractsData[$k][$virtVar] = BusinessVirtualVars::run($virtVar, $buildedContractData);
+			}
+			
 		}
 		
-		return $buildedContractData;
+		return $buildedContractsData;
 	}
 	
 	

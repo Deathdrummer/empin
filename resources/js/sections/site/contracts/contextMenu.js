@@ -1606,7 +1606,7 @@ export function contextMenu(
 						return {
 							name: item.name,
 							//colorLeft: {color:'#f00', radius: 'circle', size: '2rem'},
-							colorRight: {color: item.color, radius: 'circle', size: '2rem-5px'},
+							colorLeft: {color: item.color, radius: 'circle', size: '2rem-5px'},
 							//faIcon: 'fa-solid fa-angles-right',
 							visible: true,
 							async onClick(selector) {
@@ -1715,9 +1715,6 @@ export function contextMenu(
 				countOnArrow: true,
 				sort: 10,
 				async onClick() {
-					
-					console.log(selectedContracts.items);
-					
 					ddrPopup({
 						title: 'Шаблоны для выгрузки',
 						width: 500,
@@ -1741,6 +1738,7 @@ export function contextMenu(
 						
 						$('[choosetemplateid]').on(tapEvent, async (e) => {
 							const templateId = $(e.currentTarget).attr('choosetemplateid'),
+								ranged = $(e.currentTarget).hasAttr('ranged'),
 								{destroy} = $('#contractsCard').ddrWait({
 									bgColor: '#ffffffe6',
 									iconHeight: '50px',
@@ -1757,9 +1755,9 @@ export function contextMenu(
 							
 							wait();
 							
-							for await (const contractId of selectedContracts.items) {
-								const {data, error, status, headers} = await axiosQuery('post', 'site/contracts/export_act', {contract_id: contractId, template_id: templateId}, 'blob');
-								
+							if (ranged) {
+								const {data, error, status, headers} = await axiosQuery('post', 'site/contracts/export_act', {contract_id: selectedContracts.items, template_id: templateId, ranged}, 'blob');
+									
 								if (error) {
 									$.notify('Не удалось загрузить данные! Возможно, не загружен файл шаблона.', 'error');
 									console.log(error?.message, error?.errors);
@@ -1782,20 +1780,41 @@ export function contextMenu(
 								}, () => {
 									destroy();
 								});
+								
+							} else {
+								for await (const contractId of selectedContracts.items) {
+									const {data, error, status, headers} = await axiosQuery('post', 'site/contracts/export_act', {contract_id: [contractId], template_id: templateId}, 'blob');
+									
+									if (error) {
+										$.notify('Не удалось загрузить данные! Возможно, не загружен файл шаблона.', 'error');
+										console.log(error?.message, error?.errors);
+										wait(false);
+										destroy();
+										return;
+									}
+									
+									if (!headers['x-export-filename']) {
+										$.notify('Не удалось загрузить данные! Возможно, не загружен файл шаблона.', 'error');
+										wait(false);
+										destroy();
+										return;
+									}
+									
+									$.ddrExport({
+										data,
+										headers,
+										filename: headers['x-export-filename'] || headers['export-filename']
+									}, () => {
+										destroy();
+									});
+								}
 							}
 							
 							close();
 						});
 					
-					
-						
-					
 					});
-								
-					
-					
-					
-							
+						
 				}
 			}
 		];

@@ -298,6 +298,41 @@ if (!function_exists('arrGetIndexFromField')) {
 
 
 
+if (!function_exists('arrMergeFields')) {
+	/**
+	 * Принимает ассоциативный массив и объединяет поля с использованием указанного разделителя
+	 * @param array $inputArray  массив
+	 * @param string $separator  разделитель
+	 * @return array|null  индекс
+	*/
+	function arrMergeFields(array $inputArray, string $separator):array|null {
+		if (!$inputArray) return null;
+		
+		$result = [];
+
+		foreach ($inputArray as $item) {
+			foreach ($item as $key => $value) {
+				if (array_key_exists($key, $result)) {
+					$result[$key] .= $separator . $value;
+				} else {
+					$result[$key] = $value;
+				}
+			}
+		}
+
+		return $result;
+	}
+
+}
+
+
+
+
+
+
+
+
+
 
 
 

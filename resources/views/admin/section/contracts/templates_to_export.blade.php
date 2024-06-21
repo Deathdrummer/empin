@@ -11,7 +11,7 @@
 				group="normal"
 				id="templatesToExportList"
 				setting="templates-to-export"
-				fieldset="ID:w7rem|number|id|1,Название шаблона:w30rem|text|name,Имя файла на выходе:w40rem|text|export_name,Шаблон:w30rem|file|file,По-умолчанию:w12rem|radio|default,Активен:w8rem|checkbox|show,Право:w-auto|text|rule"
+				fieldset="ID:w7rem|number|id|1,Название шаблона:w30rem|text|name,Имя файла на выходе:w40rem|text|export_name,Шаблон:w30rem|file|file,По-умолчанию:w12rem|radio|default,Активен:w8rem|checkbox|show,Для диапазонов:w8rem|checkbox|ranged,Право:w-auto|text|rule"
 				{{-- options="name_type;foo:fooval,bar:barval|name_radio;foo:rool,bar:tool" --}}
 				onRemove=""
 				onCreate=""
