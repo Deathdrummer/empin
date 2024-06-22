@@ -1284,11 +1284,11 @@
 								}
 								
 								if (data.length) {
-									
-									console.log(data);
 									const infoMap = {contract: 'номером договора', titul: 'титулом'};
 									
-									$.notify(`Договор(ы) ${data.join(', ')} с таким же ${infoMap[field]}!`, 'error');
+									//$.notify(`Договор(ы) ${data.join(', ')} с таким же ${infoMap[field]}!`, 'error');
+									
+									$(e.target).ddrInputs('error', `Договор(ы) <b class="color-red">${data.join(', ')}</b> с таким же ${infoMap[field]}!`);
 								}
 							}, 500);
 							
