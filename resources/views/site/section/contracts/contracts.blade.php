@@ -1283,7 +1283,9 @@
 									return;
 								}
 								
-								if (data) {
+								if (data.length) {
+									
+									console.log(data);
 									const infoMap = {contract: 'номером договора', titul: 'титулом'};
 									
 									$.notify(`Договор(ы) ${data.join(', ')} с таким же ${infoMap[field]}!`, 'error');
