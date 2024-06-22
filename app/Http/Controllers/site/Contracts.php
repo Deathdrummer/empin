@@ -1313,7 +1313,7 @@ class Contracts extends Controller {
 		
 		foreach ($setValuesData as $variable => $dataItems) {
 			preg_match('/#(.+)#/', $variable, $matches);
-			$templateProcessor->setValue($variable, implode($matches[1] ?? ', ', $dataItems));
+			$templateProcessor->setValue($variable, implode("\n", $dataItems));
 		}
 		
 		
@@ -1391,6 +1391,7 @@ class Contracts extends Controller {
 						};
 					}, $removeSeparatorVariable);
 					
+					
 					if (strpos($buildedVariable, '::') !== false) {
 						preg_match('/([a-z_]+)::(.+)/', $buildedVariable, $matches);
 						[, $parsedVar, $formatStr] = $matches;
@@ -1410,9 +1411,10 @@ class Contracts extends Controller {
 						preg_match('/([a-z_]+)\|\|(.+)/', $buildedVariable, $matches);
 						[, $parsedVar, $formatStr] = $matches;
 						
-						$resVal = isset($buildContractdata[$parsedVar]) && $buildContractdata[$parsedVar] ? $formatStr : null;
+						$resVal = isset($buildContractdata[$parsedVar]) && $buildContractdata[$parsedVar] ? $formatStr : '';
 						
 						$varsMap['${'.$variable.'}'][$k] = $resVal;
+						
 						continue;
 					}
 					
@@ -1423,20 +1425,49 @@ class Contracts extends Controller {
 			}
 			
 			
-			foreach ($varsMap as $variable => $dataItems) {
-				preg_match('/#(.+)#/', $variable, $matches);
-				$varsMap[$variable] = implode($matches[1] ?? ', ', $dataItems);
-			}
 			
-			for ($row = 1; $row <= $highestRow; $row++) {
-				for ($col = 1; $col <= $highestColumnIndex; $col++) {
-					$cell = $sheet->getCell(\PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($col) . $row);
-					$cellValue = $cell->getValue();
-					$newVal = trim(Str::swap($varsMap, $cellValue));
-					$cellAddress = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($col) . $row;
-					$sheet->setCellValue($cellAddress, $newVal);
+			if ($ranged) {
+				$varsMap = $this->_convertVarsToRange($varsMap);
+			} else {
+				foreach ($varsMap as $variable => $dataItems) {
+					$varsMap[$variable] = $dataItems[0];
 				}
 			}
+			
+			
+			
+			if ($ranged) {
+				$usedCells = [];
+				for ($row = 1; $row <= $highestRow; $row++) {
+					for ($col = 1; $col <= $highestColumnIndex; $col++) {
+						$cellAddress = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($col) . $row;
+						$cell = $sheet->getCell($cellAddress);
+						$cellValue = $cell->getValue();
+						if (!$cellValue || !preg_match('/\$\{.+\}/', $cellValue) || in_array($cellAddress, $usedCells)) continue;
+						
+						foreach ($varsMap as $k => $varsItems) {
+							$newVal = trim(Str::swap($varsItems, $cellValue));
+							$cellAddress = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($col) . $row+$k;
+							$usedCells[] = $cellAddress;
+							$sheet->setCellValue($cellAddress, $newVal);
+						}
+					}
+				}
+			} else {
+				for ($row = 1; $row <= $highestRow; $row++) {
+					for ($col = 1; $col <= $highestColumnIndex; $col++) {
+						$cell = $sheet->getCell(\PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($col) . $row);
+						$cellValue = $cell->getValue();
+						if (!$cellValue || !preg_match('/\$\{.+\}/', $cellValue)) continue;
+						$newVal = trim(Str::swap($varsMap, $cellValue));
+						if (!$newVal) continue;
+						$cellAddress = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($col) . $row;
+						$sheet->setCellValue($cellAddress, $newVal);
+					}
+				}
+			}
+			
+			
 			
 			
 			# для заголовков
@@ -1508,6 +1539,31 @@ class Contracts extends Controller {
 		return $variables;
 	}
 
+	
+	
+	
+	
+	
+	
+	
+	/**
+	* 
+	* @param 
+	* @return 
+	*/
+	private function _convertVarsToRange($varsMap = null) {
+		if (!$varsMap) return null;
+		
+		$resArr = [];
+		
+		foreach ($varsMap as $variable => $varsItems) {
+			foreach ($varsItems as $k => $var) {
+				$resArr[$k][$variable] = $var;
+			} 
+		}
+		
+		return $resArr;
+	}
 	
 	
 	
