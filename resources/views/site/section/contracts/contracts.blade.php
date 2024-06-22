@@ -1107,7 +1107,7 @@
 			disabledButtons: true, // при старте все кнопки кроме закрытия будут disabled
 			closeByBackdrop: false, // Закрывать окно по фону либо только по [ddrpopupclose]
 			winClass: 'ddrpopup_white'
-		}).then(({state, wait, setTitle, setButtons, loadData, setHtml, setLHtml, dialog, close, onScroll, disableButtons, enableButtons, setWidth}) => { //isClosed
+		}).then(({popper, state, wait, setTitle, setButtons, loadData, setHtml, setLHtml, dialog, close, onScroll, disableButtons, enableButtons, setWidth}) => { //isClosed
 			wait();
 			
 			axiosQuery('get', 'ajax/contracts/create', {views: 'admin.section.contracts.render.contracts', newItemIndex: 0, guard: 'site'})
@@ -1261,6 +1261,43 @@
 								$('#dateBuyField').ddrInputs('enable');
 							}
 						});
+						
+						
+						
+						
+						
+						// проверяем титул и номер договора. 
+						// При нахождении вывести: в таких-то номерах объектов уже используется такой номер договора или титул
+						let changeContractFieldTOut;
+						$(popper).find('[name="contract"], [name="titul"]').on('input', function(e) {
+							clearTimeout(changeContractFieldTOut);
+							
+							changeContractFieldTOut = setTimeout(async () => {
+								const value = e.target.value,
+									field = e.target.getAttribute('name');
+								
+								const {data, error, status, headers} = await axiosQuery('get', 'ajax/contracts/check_exists_contracts', {field, value}, 'json');
+								
+								if (error) {
+									$.notify(error.message, 'error');
+									return;
+								}
+								
+								if (data) {
+									const infoMap = {contract: 'номером договора', titul: 'титулом'};
+									
+									$.notify(`Договор(ы) ${data.join(', ')} с таким же ${infoMap[field]}!`, 'error');
+								}
+							}, 500);
+							
+						});
+						
+						
+						
+						
+						
+						
+						
 						
 						
 						

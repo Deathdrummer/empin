@@ -532,6 +532,30 @@ class Contracts extends Controller {
 	
 	
 	
+	/**
+	* 
+	* @param 
+	* @return 
+	*/
+	public function check_exists_contracts(Request $request) {
+		[
+			'field' => $field,
+			'value' => $value,
+		] = $request->validate([
+			'field' => 'required|string',
+			'value' => 'required|string'
+		]);
+		
+		$objectNumbers = Contract::select('object_number')->where($field, $value)->get()->pluck('object_number');
+		
+		return response()->json($objectNumbers);
+	}
+	
+	
+	
+	
+	
+	
 	//---------------------------------------------------------------------------------------
 	
 	
