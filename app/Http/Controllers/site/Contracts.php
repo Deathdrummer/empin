@@ -1150,11 +1150,11 @@ class Contracts extends Controller {
 		$allTemplates = $this->getSettingsCollect('templates-to-export');
 		
 		$templates = $allTemplates->filter(function (array $value, int $key) {
-			return !$value['ranged'] && $value['show'] == 1 && (!isset($value['rule']) || auth('site')->user()->can($value['rule']));
+			return !isset($value['ranged']) && $value['show'] == 1 && (!isset($value['rule']) || auth('site')->user()->can($value['rule']));
 		});
 		
 		$rangeTemplates = $allTemplates->filter(function (array $value, int $key) {
-			return $value['ranged'] && $value['show'] == 1 && (!isset($value['rule']) || auth('site')->user()->can($value['rule']));
+			return isset($value['ranged']) && $value['show'] == 1 && (!isset($value['rule']) || auth('site')->user()->can($value['rule']));
 		});
 		
 		return $this->render('export_acts/form', compact('templates', 'rangeTemplates'));
