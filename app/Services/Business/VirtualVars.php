@@ -361,7 +361,7 @@ class VirtualVars {
 	private function _buildPriceToWords($price = null) {
 		if (!$price) return false;
 		$price = str_replace(' ', '', $price);
-		[$rub, $kop] = explode('.', $price);
+		[$rub, $kop] = preg_split('/\s*[,|.]\s*/', $price);
 		
 		$kopsWords = getDeclension(($kop ?: '0'), ['копейка', 'копейки', 'копеек']);
 		

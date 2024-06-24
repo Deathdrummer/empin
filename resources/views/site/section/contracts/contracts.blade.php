@@ -1276,6 +1276,8 @@
 								const value = e.target.value,
 									field = e.target.getAttribute('name');
 								
+								if (field == 'contract' && value.length < 6) return;
+								
 								const {data, error, status, headers} = await axiosQuery('get', 'ajax/contracts/check_exists_contracts', {field, value}, 'json');
 								
 								if (error) {

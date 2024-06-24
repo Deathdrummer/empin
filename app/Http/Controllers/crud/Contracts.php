@@ -546,7 +546,7 @@ class Contracts extends Controller {
 			'value' => 'required|string'
 		]);
 		
-		$objectNumbers = Contract::select('object_number')->where($field, $value)->get()->pluck('object_number');
+		$objectNumbers = Contract::select('object_number')->where($field, 'LIKE', '%'.$value.'%')->get()->pluck('object_number');
 		
 		return response()->json($objectNumbers);
 	}

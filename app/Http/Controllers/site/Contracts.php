@@ -1305,6 +1305,7 @@ class Contracts extends Controller {
 					default	=> $buildContractdata[$variable] ?? '',
 				};
 				
+				
 				$setValuesData[$variable][$k] = $parsedData;
 
 			}
@@ -1637,10 +1638,26 @@ class Contracts extends Controller {
 					'contractor'	=> $contractor[$value] ?? '',
 					'customer'		=> $customer[$value] ?? '',
 					'type'			=> $type[$value] ?? '',
+					'price' 		=> str_replace('.', ',', $value),
+					'price_nds' 	=> str_replace('.', ',', $value),
+					'price_sub' 	=> str_replace('.', ',', $value),
+					'price_sub_nds' => str_replace('.', ',', $value),
+					'price_gen' 	=> str_replace('.', ',', $value),
+					'price_gen_nds' => str_replace('.', ',', $value),
+					'price_avvr' 	=> str_replace('.', ',', $value),
+					'price_avvr_nds'=> str_replace('.', ',', $value),
+					'avvr_nds_only' => str_replace('.', ',', $value),
+					'price_pir' 	=> str_replace('.', ',', $value),
+					'price_pir_nds' => str_replace('.', ',', $value),
+					'pir_nds_only' 	=> str_replace('.', ',', $value),
+					'price_smr' 	=> str_replace('.', ',', $value),
+					'price_pnr' 	=> str_replace('.', ',', $value),
 					default			=> $value ?? '',
 				};
 			}
 		}
+		
+		
 		
 		
 		foreach ($virtVars as $virtVar) {
