@@ -242,7 +242,7 @@
 		
 		axiosQuery('post', 'ajax/simplelist', {
 			id,
-			row,
+			row: maxId,
 			fields,
 			options,
 			setting,
