@@ -228,7 +228,12 @@
 	
 	$[addRowAction] = (btn, listSelector, fields, options, setting, group) => {
 		
-		let row = $(listSelector).children('tr').length ? (parseInt($(listSelector).children('tr:last').attr('index')) + 1) : 0;
+		//let row = $(listSelector).children('tr').length ? (parseInt($(listSelector).children('tr:last').attr('index')) + 1) : 0;
+		let maxId = 0;
+		$(listSelector).children('tr').each((k, row) => {
+			const currentId = Number($(row).find('[field="id"]').val() || $(row).find('[field="id"]').attr('value'));
+			if (currentId > maxId) maxId = currentId;
+		});
 		
 		let simplelistAddBtnWait = $(btn).ddrWait({
 			iconHeight: '20px',
