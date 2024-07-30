@@ -1334,7 +1334,7 @@ class Contracts extends Controller {
 			$varsTitlesMap['{'.$virtVar.'}'] = BusinessVirtualVars::run($virtVar, $buildContractsdata[0]);
 		}
 		
-		$buildedExportFileName = trim(Str::swap($varsTitlesMap, $templateData['export_name'] ?? $contractsData[0]['id']));
+		$buildedExportFileName = str_replace(['\\', '/', ':', '*', '?', '"', '<', '>', '|'], '_', trim(Str::swap($varsTitlesMap, $templateData['export_name'] ?? $contractsData[0]['id'])));
 		$exportFilePath = "storage/{$buildedExportFileName}.{$templateData['file']['ext']}";
 		$exportFileName = "{$buildedExportFileName}.{$templateData['file']['ext']}";
 		
@@ -1485,7 +1485,7 @@ class Contracts extends Controller {
 			}
 		}
 		
-		$buildedExportFileName = trim(Str::swap($varsTitlesMap, $templateData['export_name'] ?? $contractsData[0]['id']));
+		$buildedExportFileName = str_replace(['\\', '/', ':', '*', '?', '"', '<', '>', '|'], '_', trim(Str::swap($varsTitlesMap, $templateData['export_name'] ?? $contractsData[0]['id'])));
 		$exportFilePath = "storage/{$buildedExportFileName}.{$templateData['file']['ext']}";
 		$exportFileName = "{$buildedExportFileName}.{$templateData['file']['ext']}";
 		
