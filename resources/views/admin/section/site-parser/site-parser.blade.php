@@ -112,7 +112,29 @@
 					$('[subjectstitles]').empty();
 				}	
 			}
-		});
+		}),
+		wpStartMass = [
+			'Здравствуйте! \nНе могли бы вы уточнить, этот сайт Ваш: [site] ?',
+			'Приветствую! \nПодскажите, пожалуйста, ваш ли это сайт: [site] ?',
+			'Здравствуйте! \nХотелось бы уточнить, это ваш сайт: [site] ?',
+			'Приветствую! \nСкажите, пожалуйста, это ваш ресурс: [site] ?',
+			'Здравствуйте! \nНе могли бы вы уточнить, этот сайт принадлежит вам: [site] ?',
+			'Приветствую! \nНе могли бы вы уточнить, данный сайт Ваш: [site] ?',
+			'Здравствуйте! \nУточните, пожалуйста, ваш ли это сайт: [site] ?',
+			'Приветствую! \nСкажите, пожалуйста, это ваш проект: [site] ?',
+			'Здравствуйте! \nУточните, пожалуйста, это Вы являетесь владельцем сайта [site] ?',
+			'Здравствуйте! \nСкажите, пожалуйста, это ваш веб-сайт: [site] ?',
+			'Здравствуйте! \nПодскажите пожалуйста, это ваш сайт: [site], верно?',
+			'Приветствую! \nХотелось бы узнать, это ваш веб-ресурс: [site] ?',
+			'Приветствую! \nСкажите пожалуйста, это ваш сайт по адресу [site] ?',
+			'Здравствуйте! \nПодскажите, пожалуйста, этот сайт Ваш: [site] ?',
+			'Приветствую! \nУточните пожалуйста, ваш ли это проект: [site] ?',
+			'Здравствуйте! \nПодскажите пожалуйста, этот сайт находится под вашим управлением: [site] ?',
+			'Приветствую! \nИзвините за беспокойство. Хотелось бы узнать, это ваш веб-ресурс: [site] ?',
+			'Здравствуйте! \nСкажите, пожалуйста, вы владеете этим сайтом: [site] ?',
+			'Здравствуйте! \nИзвините, хотелось бы узнать, это ваш сайт: [site] ?',
+			'Здравствуйте! \nНе могли бы Вы уточнить, Вы являетесь владельцем сайта: [site] ?',
+		];
 	
 	loadListData();
 	
@@ -322,6 +344,10 @@
 			const siteUrl = $(item).closest('[ddrtabletr]').find('[siteurl]').val();
 			const message = `Здравствуйте! \nПодскажите пожалуйста, это Ваш сайт: ${siteUrl} ?`;
 			copyStringToClipboard(message);
+			
+			console.log(replacePlaceholders(getRandMessage(wpStartMass), {site: siteUrl}));
+			
+			
 			
 			$(item).closest('[ddrtabletr]').addClass('is_chating').removeClass('signed');
 			destroy();
@@ -729,5 +755,20 @@
 		$(event.target).closest('[ddrtablebody]').find('[ddrtabletr].signed').removeClass('signed');
 		$(event.target).closest('[ddrtabletr]').addClass('signed');
 	}
+	
+	
+	
+	function getRandMessage(massArr) {
+		if (!_.isArray(massArr) || massArr.length == 0) return false;
+		const index = random(0, massArr.length - 1)
+		return massArr[index] ?? false;
+	}
+	
+	function replacePlaceholders(str, values) {
+		return str.replace(/\[([^\]]+)\]/g, (match, key) => {
+			return key in values ? values[key] : match;
+		});
+	}
+	
 	
 </script>
