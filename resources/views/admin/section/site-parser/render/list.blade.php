@@ -4,7 +4,10 @@
 		<x-table.td>
 			<div class="d-flex align-items-center h3rem-2px">
 				<div class="scrollblock scrollblock-hidescroll minh-1rem-4px maxh3rem-2px w100">
-					@foreach(explode(',', $row['site']) as $link)
+					@foreach(explode(',', $row['site']) as $k => $link)
+						@if($k == 0)
+							<input type="hidden" value="{{trim($link)}}" siteurl>
+						@endif
 						<p noscroll class="fz12px lh90 breakword"><a href="{{trim($link)}}" target="_blnk">{{trim($link)}}</a></p>
 					@endforeach
 				</div>
@@ -53,7 +56,7 @@
 				@endif
 				
 				@if($stat == 'valid')
-					<x-button variant="purple" action="processContact:{{$row['id']}},chat" title="Чат"><i class="fa-solid fa-fw fa-thumbs-up"></i></x-button>
+					<x-button variant="purple" action="processContact:{{$row['id']}},chat" siteurl="sdfsdfsdf" title="Чат"><i class="fa-solid fa-fw fa-thumbs-up"></i></x-button>
 				@endif
 			</x-buttons-group>
 		</x-table.td>

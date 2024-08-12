@@ -319,6 +319,10 @@
 		}
 		
 		if (data && stat == 'chat') {
+			const siteUrl = $(item).closest('[ddrtabletr]').find('[siteurl]').val();
+			const message = `Здравствуйте! \nПодскажите пожалуйста, это Ваш сайт: ${siteUrl} ?`;
+			copyStringToClipboard(message);
+			
 			$.notify('Клиент помечен!');
 			$(item).closest('[ddrtabletr]').addClass('is_chating');
 			destroy();
@@ -703,6 +707,21 @@
 		}
 		poll();
 	}
+	
+	
+	
+	function copyStringToClipboard(str) {
+		let el = document.createElement('textarea');
+		el.value = str;
+		el.setAttribute('readonly', '');
+		el.style.position = 'absolute';
+		el.style.left = '-9999px';
+		document.body.appendChild(el);
+		el.select();
+		document.execCommand('copy');
+		document.body.removeChild(el);
+	}
+
 	
 	
 </script>
