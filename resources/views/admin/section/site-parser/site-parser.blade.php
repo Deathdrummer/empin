@@ -37,8 +37,8 @@
 					<x-table.head noborder>
 						<x-table.tr class="h4rem" scrollfix noborder>
 							<x-table.td class="w-auto minw15rem sort" onclick="$.sortListByField(this, 'company')" noborder><strong class="fz12px">Название компании</strong></x-table.td>
-							<x-table.td class="w20rem sort" onclick="$.sortListByField(this, 'site')" noborder><strong class="fz12px">Сайт</strong></x-table.td>
-							<x-table.td class="w20rem sort" onclick="$.sortListByField(this, 'subject_id')" noborder><strong class="fz12px">Тематика</strong></x-table.td>
+							<x-table.td class="w18rem sort" onclick="$.sortListByField(this, 'site')" noborder><strong class="fz12px">Сайт</strong></x-table.td>
+							<x-table.td class="w18rem sort" onclick="$.sortListByField(this, 'subject_id')" noborder><strong class="fz12px">Тематика</strong></x-table.td>
 							<x-table.td class="w15rem sort" onclick="$.sortListByField(this, 'whatsapp')" noborder><strong class="fz12px">Whatsapp</strong></x-table.td>
 							<x-table.td class="w15rem sort" onclick="$.sortListByField(this, 'telegram')" noborder><strong class="fz12px">Telegram</strong></x-table.td>
 							<x-table.td class="w15rem sort" onclick="$.sortListByField(this, 'phone')" noborder><strong class="fz12px">Телефон</strong></x-table.td>
@@ -323,7 +323,7 @@
 			const message = `Здравствуйте! \nПодскажите пожалуйста, это Ваш сайт: ${siteUrl} ?`;
 			copyStringToClipboard(message);
 			
-			$(item).closest('[ddrtabletr]').addClass('is_chating');
+			$(item).closest('[ddrtabletr]').addClass('is_chating').removeClass('signed');
 			destroy();
 		} else if (data) {
 			$(item).closest('[ddrtabletr]').remove();
@@ -709,6 +709,9 @@
 	
 	
 	
+	
+	
+	
 	function copyStringToClipboard(str) {
 		let el = document.createElement('textarea');
 		el.value = str;
@@ -721,6 +724,10 @@
 		document.body.removeChild(el);
 	}
 
-	
+	$.copyString = (str) => {
+		copyStringToClipboard(str);
+		$(event.target).closest('[ddrtablebody]').find('[ddrtabletr].signed').removeClass('signed');
+		$(event.target).closest('[ddrtabletr]').addClass('signed');
+	}
 	
 </script>

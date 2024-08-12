@@ -23,7 +23,7 @@
 		<x-table.td>
 			<div class="scrollblock scrollblock-hidescroll minh-1rem-4px maxh3rem-2px w100">
 				@foreach(explode(',', $row['whatsapp']) as $wp)
-					<p noscroll class="fz12px lh90 breakword">{{$wp}}</p>
+					<p noscroll class="fz12px lh90 breakword pointer color-blue-hovered" onclick="$.copyString('{{$wp}}')">{{$wp}}</p>
 				@endforeach
 			</div>
 		</x-table.td>
@@ -56,7 +56,7 @@
 				@endif
 				
 				@if($stat == 'valid')
-					<x-button variant="purple" action="processContact:{{$row['id']}},chat" siteurl="sdfsdfsdf" title="Чат"><i class="fa-solid fa-fw fa-comment"></i></x-button>
+					<x-button variant="purple" action="processContact:{{$row['id']}},chat" title="Чат"><i class="fa-solid fa-fw fa-comment"></i></x-button>
 				@endif
 			</x-buttons-group>
 		</x-table.td>
