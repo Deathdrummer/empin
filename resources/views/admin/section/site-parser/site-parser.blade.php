@@ -318,7 +318,11 @@
 			return;
 		}
 		
-		if (data) {
+		if (data && stat == 'chat') {
+			$.notify('Клиент помечен!');
+			$(item).closest('[ddrtabletr]').addClass('is_chating');
+			destroy();
+		} else if (data) {
 			$(item).closest('[ddrtabletr]').remove();
 			$.notify('Клиент успешно перемещен!');
 		}

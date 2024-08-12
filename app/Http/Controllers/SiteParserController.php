@@ -168,7 +168,7 @@ class SiteParserController extends Controller {
 		
 		$row = SiteParser::find($id);
 		$row->banned = null;
-		$row->valid = null;
+		if ($stat !== 'chat') $row->valid = null;
 		$row->{$stat} = true;
 		
 		$res = $row->save();

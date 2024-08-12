@@ -1,5 +1,5 @@
 @forelse($list as $row)
-	<x-table.tr class="h4rem">
+	<x-table.tr class="h4rem{{$row['chat'] ? ' is_chating' : ''}}">
 		<x-table.td><p noscroll class="fz12px">{{$row['company'] ?? '-'}}</p></x-table.td>
 		<x-table.td>
 			<div class="d-flex align-items-center h3rem-2px">
@@ -50,6 +50,10 @@
 				
 				@if($stat == 0 || $stat == 'valid')
 					<x-button variant="red" action="processContact:{{$row['id']}},banned" title="Отклонить"><i class="fa-solid fa-fw fa-ban"></i></x-button>
+				@endif
+				
+				@if($stat == 'valid')
+					<x-button variant="purple" action="processContact:{{$row['id']}},chat" title="Чат"><i class="fa-solid fa-fw fa-thumbs-up"></i></x-button>
 				@endif
 			</x-buttons-group>
 		</x-table.td>
