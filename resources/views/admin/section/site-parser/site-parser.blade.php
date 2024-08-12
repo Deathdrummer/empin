@@ -39,11 +39,11 @@
 							<x-table.td class="w-auto minw15rem sort" onclick="$.sortListByField(this, 'company')" noborder><strong class="fz12px">Название компании</strong></x-table.td>
 							<x-table.td class="w20rem sort" onclick="$.sortListByField(this, 'site')" noborder><strong class="fz12px">Сайт</strong></x-table.td>
 							<x-table.td class="w20rem sort" onclick="$.sortListByField(this, 'subject_id')" noborder><strong class="fz12px">Тематика</strong></x-table.td>
-							<x-table.td class="w20rem sort" onclick="$.sortListByField(this, 'whatsapp')" noborder><strong class="fz12px">Whatsapp</strong></x-table.td>
-							<x-table.td class="w20rem sort" onclick="$.sortListByField(this, 'telegram')" noborder><strong class="fz12px">Telegram</strong></x-table.td>
-							<x-table.td class="w20rem sort" onclick="$.sortListByField(this, 'phone')" noborder><strong class="fz12px">Телефон</strong></x-table.td>
-							<x-table.td class="w-auto sort" onclick="$.sortListByField(this, 'email')" noborder><strong class="fz12px">E-mail</strong></x-table.td>
-							<x-table.td class="w12rem" noborder><strong class="fz12px">Действия</strong></x-table.td>
+							<x-table.td class="w15rem sort" onclick="$.sortListByField(this, 'whatsapp')" noborder><strong class="fz12px">Whatsapp</strong></x-table.td>
+							<x-table.td class="w15rem sort" onclick="$.sortListByField(this, 'telegram')" noborder><strong class="fz12px">Telegram</strong></x-table.td>
+							<x-table.td class="w15rem sort" onclick="$.sortListByField(this, 'phone')" noborder><strong class="fz12px">Телефон</strong></x-table.td>
+							<x-table.td class="w15rem sort" onclick="$.sortListByField(this, 'email')" noborder><strong class="fz12px">E-mail</strong></x-table.td>
+							<x-table.td class="w11rem" noborder><strong class="fz12px">Действия</strong></x-table.td>
 						</x-table.tr>
 					</x-table.head>
 					<x-table.body id="parsedList"></x-table.body>
@@ -323,7 +323,6 @@
 			const message = `Здравствуйте! \nПодскажите пожалуйста, это Ваш сайт: ${siteUrl} ?`;
 			copyStringToClipboard(message);
 			
-			$.notify('Клиент помечен!');
 			$(item).closest('[ddrtabletr]').addClass('is_chating');
 			destroy();
 		} else if (data) {
