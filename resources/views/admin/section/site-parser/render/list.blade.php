@@ -56,7 +56,7 @@
 				@endif
 				
 				@if($stat == 'valid')
-					<x-button variant="purple" action="processContact:{{$row['id']}},chat" siteurl="sdfsdfsdf" title="Чат"><i class="fa-solid fa-fw fa-thumbs-up"></i></x-button>
+					<x-button variant="purple" action="processContact:{{$row['id']}},chat" siteurl="sdfsdfsdf" title="Чат"><i class="fa-solid fa-fw fa-comment"></i></x-button>
 				@endif
 			</x-buttons-group>
 		</x-table.td>
