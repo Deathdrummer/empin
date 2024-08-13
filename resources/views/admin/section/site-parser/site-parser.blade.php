@@ -342,13 +342,7 @@
 		
 		if (data && stat == 'chat') {
 			const siteUrl = $(item).closest('[ddrtabletr]').find('[siteurl]').val();
-			const message = `Здравствуйте! \nПодскажите пожалуйста, это Ваш сайт: ${siteUrl} ?`;
-			copyStringToClipboard(message);
-			
-			console.log(replacePlaceholders(getRandMessage(wpStartMass), {site: siteUrl}));
-			
-			
-			
+			copyStringToClipboard(replacePlaceholders(getRandMessage(wpStartMass), {site: siteUrl}));
 			$(item).closest('[ddrtabletr]').addClass('is_chating').removeClass('signed');
 			destroy();
 		} else if (data) {
