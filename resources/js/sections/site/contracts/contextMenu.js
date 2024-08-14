@@ -1810,7 +1810,8 @@ export function contextMenu(
 								}
 							}
 							
-							close();
+							wait(false);
+							//close();
 						});
 					
 					});

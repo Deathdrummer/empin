@@ -21269,7 +21269,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                           return _context18.finish(64);
 
                                         case 74:
-                                          close();
+                                          wait(false); //close();
 
                                         case 75:
                                         case "end":
