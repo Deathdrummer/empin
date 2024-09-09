@@ -190,6 +190,8 @@
 	
 	@if($column == 'price_avvr' && auth('site')->user()->can('contract-col-price_avvr:site'))
 		<x-table.td class="text-end" commonlist contextedit="{{$id}},{{$column}},2" style="background-color: {{$selected_color.'75' ?? ''}};">
+			<input type="hidden" replacer calcprice="price_avvr_nds">
+			<input type="hidden" replacer calcprice="avvr_nds_only">
 			@isset($price_avvr)
 				<p class="fz12px lh90 nobreak"><span class="fz12px" edittedplace="0.00" replacer r-right calcprice="price_avvr">@number($price_avvr, 2)</span> <strong>@symbal(money)</strong></p>
 			@else
@@ -200,6 +202,8 @@
 	
 	@if($column == 'price_avvr_nds' && auth('site')->user()->can('contract-col-price_avvr_nds:site'))
 		<x-table.td class="text-end" commonlist contextedit="{{$id}},{{$column}},2" style="background-color: {{$selected_color.'75' ?? ''}};">
+			<input type="hidden" replacer calcprice="price_avvr">
+			<input type="hidden" replacer calcprice="avvr_nds_only">
 			@isset($price_avvr_nds)
 				<p class="fz12px lh90 nobreak"><span class="fz12px" edittedplace="0.00" replacer r-right calcprice="price_avvr_nds">@number($price_avvr_nds, 2)</span> <strong>@symbal(money)</strong></p>
 			@else
