@@ -130,6 +130,7 @@
 	
 	@if($column == 'price' && auth('site')->user()->can('contract-col-price:site'))
 		<x-table.td class="text-end" commonlist contextedit="{{$id}},{{$column}},2" style="background-color: {{$selected_color.'75' ?? ''}};">
+			<input type="hidden" replacer calcprice="price_nds">
 			@isset($price)
 				<p class="fz12px lh90 nobreak"><span class="fz12px" edittedplace="0.00" replacer r-right calcprice="price|{{$gen_percent ?? 0}}|{{$subcontracting ?? 0}}|{{$gencontracting ?? 0}}">@number($price, 2)</span> <strong>@symbal(money)</strong></p>
 			@else
@@ -140,6 +141,7 @@
 	
 	@if($column == 'price_nds' && auth('site')->user()->can('contract-col-price_nds:site'))
 		<x-table.td class="text-end" commonlist contextedit="{{$id}},{{$column}},2" style="background-color: {{$selected_color.'75' ?? ''}};">
+			<input type="hidden" replacer calcprice="price">
 			@isset($price_nds)
 				<p class="fz12px lh90 nobreak"><span class="fz12px" edittedplace="0.00" replacer r-right calcprice="price_nds|{{$gen_percent ?? 0}}|{{$subcontracting ?? 0}}|{{$gencontracting ?? 0}}">@number($price_nds, 2)</span> <strong>@symbal(money)</strong></p>
 			@else
@@ -224,6 +226,8 @@
 	
 	@if($column == 'price_pir' && auth('site')->user()->can('contract-col-price_pir:site'))
 		<x-table.td class="text-end" commonlist contextedit="{{$id}},{{$column}},2" style="background-color: {{$selected_color.'75' ?? ''}};">
+			<input type="hidden" replacer calcprice="price_pir_nds">
+			<input type="hidden" replacer calcprice="pir_nds_only">
 			@isset($price_pir)
 				<p class="fz12px lh90 nobreak"><span class="fz12px" edittedplace="0.00" replacer r-right calcprice="price_pir">@number($price_pir, 2)</span> <strong>@symbal(money)</strong></p>
 			@else
@@ -234,6 +238,8 @@
 	
 	@if($column == 'price_pir_nds' && auth('site')->user()->can('contract-col-price_pir_nds:site'))
 		<x-table.td class="text-end" commonlist contextedit="{{$id}},{{$column}},2" style="background-color: {{$selected_color.'75' ?? ''}};">
+			<input type="hidden" replacer calcprice="price_pir">
+			<input type="hidden" replacer calcprice="pir_nds_only">
 			@isset($price_pir_nds)
 				<p class="fz12px lh90 nobreak"><span class="fz12px" edittedplace="0.00" replacer r-right calcprice="price_pir_nds">@number($price_pir_nds, 2)</span> <strong>@symbal(money)</strong></p>
 			@else
