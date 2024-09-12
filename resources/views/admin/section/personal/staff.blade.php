@@ -128,8 +128,8 @@
 			} else {
 				let removeStaffPopup = ddrPopup({
 					width: 400, // ширина окна
-					lhtml: 'dialog.delete', // контент
-					buttons: ['ui.cancel', {title: 'ui.delete', variant: 'red', action: 'staffRemoveAction:'+id}],
+					html: 'Вы действительно хотите уволить сотрудника?', // контент
+					buttons: ['ui.cancel', {title: 'Уволить', variant: 'red', action: 'staffRemoveAction:'+id}],
 					centerMode: true,
 					winClass: 'ddrpopup_dialog color-red'
 				});
@@ -140,9 +140,9 @@
 						destroy(id, function(stat) {
 							if (stat) {
 								remove(row);
-								$.notify('Запись успешно удалена!');
+								$.notify('Сотрудник уволен!');
 							} else {
-								$.notify('Ошибка удаления записи!', 'error');
+								$.notify('Ошибка увольнения сотрудника!', 'error');
 							} 
 							close();
 						});

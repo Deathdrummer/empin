@@ -75,6 +75,7 @@ class Staff extends Controller {
 		
 		$list = User::with('roles:id')
 			->withExists(['roles as hasRoles', 'permissions as hasPermissions'])
+			->where(['dismissed' => 0])
 			->orderBy('_sort', 'ASC')
 			->get();
 		
@@ -242,7 +243,8 @@ class Staff extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function destroy(?int $id = null) {
-		$stat = User::destroy($id);
+		$stat = User::where('id', $id)->update(['dismissed' => 1, 'password' => null, 'temporary_password' => null, 'remember_token' => null]);
+		//$stat = User::destroy($id);
 		return response()->json($stat);
     }
 	
