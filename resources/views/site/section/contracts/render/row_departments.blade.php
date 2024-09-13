@@ -72,6 +72,7 @@
 							group="small"
 							:options="$deps_users[$dept['id']] ?? null"
 							:value="$contractdata[$contract['id']][$dept['id']][$step['id']]['data'] ?? null"
+							:showactive="$contractdata[$contract['id']][$dept['id']][$step['id']]['data'] ?? null"
 							class="w100"
 							choose="Сотрудник не выбран"
 							empty-has-value

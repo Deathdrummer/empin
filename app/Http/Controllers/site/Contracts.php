@@ -1685,7 +1685,7 @@ class Contracts extends Controller {
 	private function _addDepsUsersToData($alldeps = null) {
 		$this->data['deps_users'] = [];
 		if (!$alldeps) return false;
-		$depsUsers = $this->department->getUsersToAssign($alldeps, 'pseudoname');
+		$depsUsers = $this->department->getUsersToAssign($alldeps, ['id:value', 'pseudoname:title', 'dismissed:disabled', 'dismissed:hidden']);
 		$this->data['deps_users'] = $depsUsers ?? [];
 	}
 	

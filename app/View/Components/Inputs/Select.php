@@ -2,6 +2,7 @@
 
 use App\Traits\HasComponent;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\View\Component;
 
 class Select extends Component {
@@ -30,6 +31,7 @@ class Select extends Component {
 		mixed $options = false,
 		mixed $optionsType = null,
 		array $exclude = [],
+		mixed $showactive = null,
 		string $choose = 'Выбрать...',
 		string $empty = null,
 		$chooseEmpty = null,
@@ -50,26 +52,34 @@ class Select extends Component {
 		
 		$ops = [];
 		
-		if ($options && is_array($options)) {
-			if (Arr::isAssoc($options) || $optionsType == 'assoc') {
-				foreach ($options as $value => $title) {
-					if (in_array($value, $exclude)) continue;
-					$ops[] = [
-						'value' => htmlspecialchars_decode($value, ENT_QUOTES|ENT_HTML5),
-						'title' => htmlspecialchars_decode($title, ENT_QUOTES|ENT_HTML5),
-					];
-				}
-			} elseif (gettype(reset($options)) === 'array') {
+		$options = $options instanceof Collection ? $options?->toArray() : $options;
+		
+		$firstItem = arrGetFirstItem($options);
+		
+		
+		if ($firstItem) {
+			if (is_array($firstItem)) {
 				foreach ($options as $item) {
 					$value = isset($item['value']) ? htmlspecialchars_decode($item['value'], ENT_QUOTES|ENT_HTML5) : null;
 					$title = isset($item['title']) ? htmlspecialchars_decode($item['title'], ENT_QUOTES|ENT_HTML5) : null;
 					
-					if (in_array($value, $exclude)) continue;
+					if (in_array($value, $exclude)) continue;	
+					
+					if (($value ?? $title) != $showactive && ($item['hidden'] ?? false)) continue;
+					
 					$ops[] = [
 						'value' 	=> $value ?? $title,
 						'title' 	=> $title ?? $value,
 						'active' 	=> $item['active'] ?? null,
 						'disabled' 	=> $item['disabled'] ?? null,
+					];
+				}
+			} elseif (Arr::isAssoc($options)) {
+				foreach ($options as $value => $title) {
+					if (in_array($value, $exclude)) continue;
+					$ops[] = [
+						'value' => htmlspecialchars_decode($value, ENT_QUOTES|ENT_HTML5),
+						'title' => htmlspecialchars_decode($title, ENT_QUOTES|ENT_HTML5),
 					];
 				}
 			} else {

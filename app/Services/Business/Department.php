@@ -174,13 +174,10 @@ class Department {
 		
 		$depsUsers = User::whereIn('department_id', $depsIds)
 			->get()
-			->mapWithKeysMany(function ($item, $key) use($userFields) {
-				return [$item['department_id'] => [
-						$item['id'] => $this->_buildUserArray($item, $userFields)
-					]
-				];
+			->mapToGroups(function ($item, $key) use($userFields) {
+				return [$item['department_id'] => $this->_buildUserArray($item, $userFields)];
 			});
-		
+		//toLog($depsUsers);
 		return $depsUsers;
 	}
 	
@@ -198,6 +195,11 @@ class Department {
 		
 		$data = [];
 		foreach($fields as $field) {
+			if (strpos($field, ':') !== false) {
+				$fd = explode(':', $field);
+				$data[$fd[1] ?? $fd[0]] = $row[$fd[0]];
+				continue;
+			}
 			$data[$field] = $row[$field];
 		}
 		return $data; 

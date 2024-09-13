@@ -3,6 +3,7 @@
 use App\Helpers\DdrDateTime;
 use App\Services\Settings;
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
 use Symfony\Component\Mime\Encoder\IdnAddressEncoder;
@@ -323,6 +324,21 @@ if (!function_exists('arrMergeFields')) {
 		return $result;
 	}
 
+}
+
+
+
+if (!function_exists('arrGetFirstItem')) {
+	/**
+	 * Вернет первый элемент любого массива
+	 * @param array $inputArray  массив
+	 * @return mixed  первое значение массива
+	*/
+	function arrGetFirstItem(array|Collection $inputArray):mixed {
+		if (!$inputArray) return null;
+		if ($inputArray instanceof Collection) return $inputArray?->first();
+ 		return reset($inputArray);
+	}
 }
 
 
