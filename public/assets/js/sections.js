@@ -439,6 +439,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
   canChatSending, // возможность отправлять сообщения в чате
   canReturnToWork, // вернуть договор в работу из архива
   canEditActs, // редактирование актов
+  canEditselectionContracts, // редактирование договоров из подборок
   isPinned // закреплен ли договор
   ) {
     var _selectedContracts$it;
@@ -919,6 +920,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
       }
     }, {
       name: 'Удалить из подборки',
+      enabled: canEditselectionContracts,
       visible: isCommon && selectionId && !selectedTextCell,
       countLeft: countSelected > 1 ? countSelected : null,
       sort: 4,
@@ -3378,6 +3380,7 @@ function selectionsList(selection, editSelection, _clearCounts, getList) {
 
 
                   $.selectionBuildList = function (btn, id) {
+                    var canEdit = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
                     $('[selectionsbtn]').ddrInputs('disable');
                     close();
                     selection.value = id;
@@ -3387,6 +3390,7 @@ function selectionsList(selection, editSelection, _clearCounts, getList) {
                     _clearCounts();
 
                     getList({
+                      canEditSelection: canEdit,
                       withCounts: true,
                       callback: function callback() {
                         $('#currentSelectionTitle').text(selectionTitle);

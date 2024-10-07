@@ -32,9 +32,9 @@ export function contextMenu(
 		canChatSending, // возможность отправлять сообщения в чате
 		canReturnToWork, // вернуть договор в работу из архива
 		canEditActs, // редактирование актов
+		canEditselectionContracts, // редактирование договоров из подборок
 		isPinned // закреплен ли договор
 		) => {
-		
 		
 		
 		const isCommon = !!$(target.pointer).closest('[ddrtabletd]').hasAttr('commonlist') || false;
@@ -426,6 +426,7 @@ export function contextMenu(
 				},
 			}, {
 				name: 'Удалить из подборки',
+				enabled: canEditselectionContracts,
 				visible: isCommon && selectionId && !selectedTextCell,
 				countLeft: countSelected > 1 ? countSelected : null,
 				sort: 4,

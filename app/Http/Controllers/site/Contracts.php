@@ -163,6 +163,7 @@ class Contracts extends Controller {
 		$rules .= ','.($user->can('contract-col-chat-can-sending:site') ? '1' : '0'); // возможность отправлять сообщения в чате
 		$rules .= ','.($user->can('contract-col-return-to-work:site') ? '1' : '0'); // вернуть договор в работу из архива
 		$rules .= ','.($user->can('contract-col-can-edit-acts:site') ? '1' : '0'); // вернуть договор в работу из архива
+		$rules .= ','.($request->get('can_edit_selection')  ? '1' : '0'); // Можно ли удалять (и другие операции) договоры подборки
 		
 		
 		$this->addSettingToGlobalData([[

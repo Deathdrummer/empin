@@ -25,7 +25,7 @@
 		<x-buttons-group group="small" gx="5">
 			<x-button
 				variant="green"
-				action="selectionBuildList:{{$id}}"
+				action="selectionBuildList:{{$id}},{{$subscribed_read ? 0 : 1}}"
 				:enabled="$contracts_count ?? false"
 				title="Сформировать список подборки"
 				>Сформировать</x-button>

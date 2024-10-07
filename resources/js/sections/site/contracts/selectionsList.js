@@ -360,7 +360,7 @@ export function selectionsList(selection, editSelection, _clearCounts, getList) 
 				
 				//--------------------------------- Действия со списками
 				
-				$.selectionBuildList = (btn, id) => {
+				$.selectionBuildList = (btn, id, canEdit = 0) => {
 					$('[selectionsbtn]').ddrInputs('disable');
 					close();
 					selection.value = id;
@@ -370,6 +370,7 @@ export function selectionsList(selection, editSelection, _clearCounts, getList) 
 					
 					_clearCounts();
 					getList({
+						canEditSelection: canEdit,
 						withCounts: true,
 						callback: function() {
 							$('#currentSelectionTitle').text(selectionTitle);

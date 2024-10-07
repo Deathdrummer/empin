@@ -2173,12 +2173,14 @@
 		let {
 			init,
 			withCounts,
+			canEditSelection,
 			append,
 			offset: localOffset,
 			callback
 		} = _.assign({
 			init: false,
 			withCounts: false,
+			canEditSelection: null,
 			append: false,
 			offset: null,
 			callback: false
@@ -2229,7 +2231,7 @@
 		params['selection'] = selection.value;
 		params['edit_selection'] = editSelection;
 		params['selected_contracts'] = selectedContracts.items;
-		
+		params['can_edit_selection'] = canEditSelection;
 		
 		//-----------------------------------
 		
