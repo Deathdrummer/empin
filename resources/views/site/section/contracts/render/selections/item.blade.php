@@ -74,6 +74,7 @@
 			<x-button
 				group="verysmall"
 				variant="light"
+				disabled="{{$subscribed_read}}"
 				action="selectionToArchive:{{$id}}"
 				title="Вернуть подборку в активные"
 				>
@@ -83,6 +84,7 @@
 			<x-button
 				group="verysmall"
 				variant="purple"
+				disabled="{{$subscribed_read}}"
 				action="selectionToArchive:{{$id}}"
 				title="Отправить подборку в архив"
 				>
