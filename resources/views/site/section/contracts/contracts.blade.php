@@ -1428,7 +1428,7 @@
 					localy = $(formSelector).find('[name="locality"]').val() || '',
 					applicant = getLastnameFromApplicant($(formSelector).find('[name="applicant"]').val() || '');
 				
-				const fileName = (`[${objectNumber}] ${capitalFirstLetter(localy)} ${applicant.toUpperCase()}`).trim().replace(/\s+/g, ' '),
+				const fileName = (`[${objectNumber}] ${capitalFirstLetter(localy)} ${applicant?.toUpperCase()}`).trim().replace(/\s+/g, ' '),
 					folders = {[fileName]: [
 						'1 Договор',
 						'2 РП + ТУ',
