@@ -4,6 +4,7 @@ use App\Http\Filters\Base\AbstractFilter;
 use App\Traits\Settingable;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
+use App\Services\Business\User as UserService;
 
 class ContractFilter extends AbstractFilter {
 	use Settingable;
@@ -81,13 +82,16 @@ class ContractFilter extends AbstractFilter {
 		$searchItems = array_filter(preg_split("/\s*\+\s*/", $value));
 		
 		if ($searchItems) {
+			$user = app()->make(UserService::class);
+			$dopsearch = $user->getSettings('contracts.dopsearch');
+			
 			foreach ($searchItems as $search) {
 				$customersMatch = $this->_subSearch($settings['customers'], $search);
 				$typesMatch = $this->_subSearch($settings['types'], $search);
 				$contractorsMatch = $this->_subSearch($settings['contractors'], $search);
 			}
 			
-			$builder->where(function (Builder $query) use($searchItems, $customersMatch, $typesMatch, $contractorsMatch) {
+			$builder->where(function (Builder $query) use($searchItems, $customersMatch, $typesMatch, $contractorsMatch, $dopsearch) {
 				foreach ($searchItems as $search) {
 					$query->orWhere('object_number', 'like', '%'.$search.'%');
 					$query->orWhere('title', 'like', '%'.$search.'%');
@@ -99,8 +103,10 @@ class ContractFilter extends AbstractFilter {
 					$query->orWhere('archive_dir', 'like', '%'.$search.'%');
 					
 					// Поиск по JSON полю из relation таблицы
-					$query->orWhereHas('info', function ($query) use ($search) {
-						$query->where('data', 'like', '%'.$search.'%');
+					$query->when($dopsearch, function ($query) use ($search) {
+						return $query->orWhereHas('info', function ($query) use ($search) {
+							$query->where('data', 'like', '%'.$search.'%');
+						});
 					});
 					
 					if ($customersMatch) $query->orWhereIn('customer', $customersMatch);
