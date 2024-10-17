@@ -507,7 +507,6 @@
 		
 		
 		
-		
 
 <div class="commoninfo__scrollblock" id="commonInfoBlock" commoninfo="files">
 	<div class="commoninfo__dropfiles" id="contractInfoDropFiles">
