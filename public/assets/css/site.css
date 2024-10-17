@@ -7663,6 +7663,12 @@ section {
   justify-content: center;
   border: 1px solid #fcc;
 }
+.commoninfofile__remove[disabled] {
+  pointer-events: none;
+}
+.commoninfofile__remove[disabled] i {
+  color: #eee;
+}
 .commoninfofile__remove i {
   color: #ff8585;
   transition: color 0.16s;

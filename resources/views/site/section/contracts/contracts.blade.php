@@ -870,10 +870,12 @@
 						return false;
 					}
 					
+					const fileContainer = $('#uploadedeFilesBlock').find(`[file-id="${key}"]`);
+					
 					let success = true,
 					fileSize = (size / 1024 / 1024).toFixed(1);
 				
-					if (fileSize > 999999999) {
+					if (fileSize > 500) {
 						$.notify('Размер файла превышает максимально допустимый!', 'error');
 						success = false;
 					}
@@ -883,7 +885,11 @@
 						success = false;
 					}*/
 					
-					if (!success) return;
+					if (!success) {
+						$(fileContainer).closest('.col').remove();
+						setEmptylabel();
+						return;
+					} 
 					
 					const {filename: filenameSys} = await uploadContractFile({
 						file,
@@ -891,6 +897,7 @@
 						is_image: isImage,
 						size,
 						contract_id: contractId,
+						fileContainer
 					});
 					
 					
@@ -898,8 +905,6 @@
 					if (isImage) imgSrc = await preview({width: 100});
 					else imgSrc = await loadImage(`assets/images/filetypes/${ext}.png`, 'assets/images/filetypes/untiped.png');
 					
-					
-					const fileContainer = $('#uploadedeFilesBlock').find(`[file-id="${key}"]`);
 					
 					$(fileContainer).find('[imgreplacer]').html(`<img src="${imgSrc}" />`);
 					$(fileContainer).find('[filenamereplacer]').text(`${name}.${ext}`);
@@ -920,9 +925,9 @@
 			
 			
 			// Скачать файл
-			$('#uploadedeFilesBlock').on(tapEvent, '[filecontainer]:not([filecontainer-blank])', function(e) {
+			$('#uploadedeFilesBlock').on(tapEvent, '[filecontainer]:not([filecontainer-blank]):not([disabled])', function(e) {
 				e.preventDefault();
-				if (e.detail < 2) return;
+				if (e.detail < 2 || e.detail > 2) return;
 				
 				const filenameSys = $(this).attr('filecontainer'),
 					filenameOrig = $(this).find('[filenamereplacer]').text();
@@ -931,12 +936,12 @@
 					filenameSys,
 					filenameOrig,
 					contractId
-				}, e);
+				}, e.currentTarget);
 			});
 			
 			
 			// Удалить файл
-			$('#uploadedeFilesBlock').on(tapEvent, '[filecontainer]:not([filecontainer-blank]) [commoninfofileremove]', function(e) {
+			$('#uploadedeFilesBlock').on(tapEvent, '[filecontainer]:not([filecontainer-blank]):not([disabled]) [commoninfofileremove]', function(e) {
 				const selector = this,
 					filename = 'Название файла';
 				dialog(`Удалить файл ${filename}?`, {
@@ -946,11 +951,7 @@
 						},
 						'Удалить|red': async ({closeDialog}) => {
 							await removeContractFile(selector, contractId);
-							
-							if ($('#uploadedeFilesBlock').find('[filecontainer]').length == 0) {
-								$('#contractInfoDropFiles').find('[commoninfoofiles]').removeAttrib('hidden');
-							}
-							
+							setEmptylabel();
 							closeDialog();
 						}
 					}
@@ -962,7 +963,7 @@
 			
 			
 			
-			async function uploadContractFile({file = null, filename = null, size = null, is_image = null, contract_id = null}) {
+			async function uploadContractFile({file = null, filename = null, size = null, is_image = null, contract_id = null, fileContainer}) {
 				const formData = new FormData();
 				
 				formData.append('file', file, filename);
@@ -976,6 +977,8 @@
 					return data;
 				} catch(err) {
 					console.log(err);
+					$(fileContainer).closest('.col').remove();
+					setEmptylabel();
 					$.notify('Ошибка загрузки файла!', 'error');
 					return false;
 				}
@@ -984,13 +987,16 @@
 			
 			
 			
-			async function downloadContractFile({filenameSys = null, filenameOrig = null, contractId = null}, event) {
+			async function downloadContractFile({filenameSys = null, filenameOrig = null, contractId = null}, target) {
 				if (!filenameSys || !contractId) return;
+				$(this).setAttrib('disabled');
 				
-				const {destroy} = $(event.target).ddrWait({
+				const {destroy} = $(target).ddrWait({
 					iconHeight: '30px',
 					bgColor: '#fff9',
 				});
+				
+				$(target).setAttrib('disabled');
 				
 				const {data, error, status, headers} = await axiosQuery('get', '/ajax/contracts_files', {filename: filenameSys, contract_id: contractId}, 'blob');
 				if (error) {
@@ -1013,9 +1019,11 @@
 					headers,
 					filename: filenameOrig /*headers['x-export-filename'] || headers['export-filename']*/
 				}, () => {
+					$(target).removeAttrib('disabled');
 					destroy();
 				});
 			}
+			
 			
 			
 			
@@ -1031,14 +1039,23 @@
 				formData.append('_method', 'delete');
 				
 				try {
+					$(selector).setAttrib('disabled');
 					const {data} = await axios.post('/ajax/contracts_files', formData);
 					$(fileCol).remove();
 					$.notify('Файл успешно удален!');
-					return data;
+					
 				} catch(err) {
 					console.log(err);
 					$.notify('Ошибка удаления файла!', 'error');
-					return false;
+				}
+				
+				$(selector).removeAttrib('disabled');
+			}
+			
+			
+			function setEmptylabel() {
+				if ($('#uploadedeFilesBlock').find('[filecontainer]').length == 0) {
+					$('#contractInfoDropFiles').find('[commoninfoofiles]').removeAttrib('hidden');
 				}
 			}
 			
