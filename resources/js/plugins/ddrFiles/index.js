@@ -47,7 +47,7 @@ $.fn.ddrFiles = function(method = null, ...params) {
 /*	Комбинирование методов choose и drop
 		- params
 			- method: метод choose или drop (если не указать - будет и то и то)
-			- chooseSelector: селектор открытия кна диалога
+			- chooseSelector: селектор открытия окна диалога
 			- dropSelector: селектор drop - области бросания файлов 
 			- multiple: множественный выбор
 			- dragover: событие при наведении на область drop
@@ -64,6 +64,10 @@ $.ddrFiles = function(params = {}) {
 		return false;
 	}
 	
+	const {chooseOnClick} = _.pick(params, ['chooseOnClick']);
+	_.unset(params, 'chooseOnClick');
+	
+	
 	const {chooseSelector, dropSelector} = _.pick(params, ['chooseSelector', 'dropSelector']);
 	const chooseParams = _.pick(params, ['multiple', 'init', 'preload', 'callback', 'done', 'fail']);
 	const dropParams = _.pick(params, ['dragover', 'dragleave', 'drop', 'init', 'preload', 'callback', 'done', 'fail']);
@@ -74,7 +78,8 @@ $.ddrFiles = function(params = {}) {
 		if (params.method == 'choose') new DdrFiles(document.querySelector(chooseSelector), files).choose(chooseParams);
 		if (params.method == 'drop') new DdrFiles(document.querySelector(dropSelector), files).drop(dropParams);
 	} else {
-		new DdrFiles(document.querySelector(chooseSelector), files).choose(chooseParams);
+		if (chooseOnClick) new DdrFiles(document.querySelector(chooseSelector), files).chooseOnClick(chooseParams);
+		else new DdrFiles(document.querySelector(chooseSelector), files).choose(chooseParams);
 		new DdrFiles(document.querySelector(dropSelector), files).drop(dropParams);
 	}
 	

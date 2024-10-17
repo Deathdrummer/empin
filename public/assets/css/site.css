@@ -7473,9 +7473,10 @@ section {
 }
 .commoninfo__scrollblock {
   overflow-y: scroll;
-  height: calc(100vh - 180px);
+  height: calc(100vh - 190px);
   min-height: 400px;
   padding-right: 1rem;
+  display: none;
 }
 .commoninfo__scrollblock::-webkit-scrollbar {
   width: 1px;
@@ -7500,6 +7501,9 @@ section {
   height: 0px;
   background: transparent;
   border-radius: 0;
+}
+.commoninfo__scrollblock-visible {
+  display: block;
 }
 .commoninfo__line {
   height: 1px;
@@ -7535,6 +7539,136 @@ section {
 }
 .commoninfo__table tr td input, .commoninfo__table tr td textarea {
   font-size: 18px;
+}
+.commoninfo__dropfiles {
+  height: calc(100% - 50px);
+  margin-top: 10px;
+  margin-bottom: 1rem;
+  padding-bottom: 40px;
+  border: 4px dashed transparent;
+  overflow-y: scroll;
+  min-height: 100px;
+  padding-right: 1rem;
+}
+.commoninfo__dropfiles::-webkit-scrollbar {
+  width: 1px;
+  height: 1px;
+}
+.commoninfo__dropfiles::-webkit-scrollbar-track {
+  background-color: transparent;
+  border-radius: 0;
+}
+.commoninfo__dropfiles::-webkit-scrollbar-thumb {
+  background-color: transparent;
+  width: 13px;
+  height: 13px;
+  border-radius: 0;
+}
+.commoninfo__dropfiles::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0);
+}
+.commoninfo__dropfiles::-webkit-resizer {
+  display: none;
+  width: 0px;
+  height: 0px;
+  background: transparent;
+  border-radius: 0;
+}
+.commoninfo__dropfiles-dragged {
+  border-color: #555;
+}
+
+.commoninfofile {
+  position: relative;
+  cursor: pointer;
+}
+.commoninfofile__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  border-radius: 3px;
+  overflow: hidden;
+  height: 70px;
+}
+.commoninfofile__icon::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.2666666667);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.16s;
+}
+.commoninfofile__icon img {
+  height: 70px;
+  width: 100%;
+  object-fit: contain;
+  transition: filter 0.16s;
+}
+.commoninfofile__title {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 0;
+  width: 100%;
+}
+.commoninfofile__title small {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding-top: 5px;
+  display: block;
+  text-align: center;
+  font-size: 12px;
+  word-break: break-word;
+}
+.commoninfofile:not(:hover) .commoninfofile__title small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  max-height: 50px;
+}
+.commoninfofile:hover .commoninfofile__buttons {
+  opacity: 1;
+}
+.commoninfofile:hover .commoninfofile__icon img {
+  filter: brightness(1.1);
+}
+.commoninfofile:hover .commoninfofile__title small {
+  z-index: 10;
+  background-color: rgba(255, 255, 255, 0.9176470588);
+}
+.commoninfofile__buttons {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  opacity: 0;
+  transition: opacity 0.16s;
+}
+.commoninfofile__remove {
+  cursor: pointer;
+  background-color: #fff;
+  border-radius: 50%;
+  padding: 3px;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #fcc;
+}
+.commoninfofile__remove i {
+  color: #ff8585;
+  transition: color 0.16s;
+}
+.commoninfofile__remove:hover i {
+  color: #ff1f1f;
 }
 
 .card {

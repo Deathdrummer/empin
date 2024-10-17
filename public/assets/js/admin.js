@@ -5513,6 +5513,12 @@ jQuery.fn.tagName = function () {
 
   return this === null || this === void 0 ? void 0 : (_this$prop = this.prop("tagName")) === null || _this$prop === void 0 ? void 0 : _this$prop.toLowerCase();
 };
+
+window.getImageUrl = function () {
+  var path = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+  if (!path) console.error('getImageUrl ошибка! Не передан URL');
+  return new URL(path, location.origin).href;
+};
 /**
  * We'll load the axios HTTP library which allows us to easily issue requests
  * to our Laravel back-end. This library automatically handles sending the
@@ -5825,6 +5831,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "random": function() { return /* binding */ random; }
 /* harmony export */ });
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -5836,6 +5844,12 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"]; if (_i == null) return; var _arr = []; var _n = true; var _d = false; var _s, _e; try { for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
 
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 
@@ -5878,6 +5892,74 @@ window.getFileName = function (fileName) {
       n = fn.join('.');
   if (!nameOrExt) return [n, e];else if (nameOrExt == 1) return nameLimit != undefined && isInt(nameLimit) && n.length > nameLimit ? n.substr(0, nameLimit) : n;else if (nameOrExt == 2) return e;
 };
+
+window.loadImage = /*#__PURE__*/function () {
+  var _ref = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee(fileName, fallbackImage) {
+    return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
+      while (1) {
+        switch (_context.prev = _context.next) {
+          case 0:
+            return _context.abrupt("return", new Promise(function (resolve) {
+              var img = new Image(); // Если изображение загрузилось, возвращаем его URL
+
+              // Если изображение загрузилось, возвращаем его URL
+              img.onload = function () {
+                return resolve(getImageUrl(fileName));
+              }; // Если произошла ошибка загрузки, возвращаем fallback-изображение
+
+
+              // Если произошла ошибка загрузки, возвращаем fallback-изображение
+              img.onerror = function () {
+                return resolve(getImageUrl(fallbackImage));
+              }; // Присваиваем путь изображению
+
+
+              // Присваиваем путь изображению
+              img.src = getImageUrl(fileName);
+            }));
+
+          case 1:
+          case "end":
+            return _context.stop();
+        }
+      }
+    }, _callee);
+  }));
+
+  return function (_x, _x2) {
+    return _ref.apply(this, arguments);
+  };
+}();
+
+$.errorLoadingImage = /*#__PURE__*/function () {
+  var _ref2 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee2(img) {
+    var src,
+        resource,
+        _args2 = arguments;
+    return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee2$(_context2) {
+      while (1) {
+        switch (_context2.prev = _context2.next) {
+          case 0:
+            src = _args2.length > 1 && _args2[1] !== undefined ? _args2[1] : 'none_img.png';
+            _context2.next = 3;
+            return loadImage(src);
+
+          case 3:
+            resource = _context2.sent;
+            img.src = resource;
+
+          case 5:
+          case "end":
+            return _context2.stop();
+        }
+      }
+    }, _callee2);
+  }));
+
+  return function (_x3) {
+    return _ref2.apply(this, arguments);
+  };
+}();
 
 window.callFunc = function (func) {
   if (!_.isFunction(func)) {
@@ -6382,13 +6464,13 @@ window.getCurrentBreakPoint = function () {
 */
 
 
-window.scroll = function (_ref) {
-  var _ref$top = _ref.top,
-      top = _ref$top === void 0 ? null : _ref$top,
-      _ref$bottom = _ref.bottom,
-      bottom = _ref$bottom === void 0 ? null : _ref$bottom,
-      _ref$both = _ref.both,
-      both = _ref$both === void 0 ? null : _ref$both;
+window.scroll = function (_ref3) {
+  var _ref3$top = _ref3.top,
+      top = _ref3$top === void 0 ? null : _ref3$top,
+      _ref3$bottom = _ref3.bottom,
+      bottom = _ref3$bottom === void 0 ? null : _ref3$bottom,
+      _ref3$both = _ref3.both,
+      both = _ref3$both === void 0 ? null : _ref3$both;
   $(window).scroll(function () {
     scrTop = $(window).scrollTop();
 
@@ -11065,6 +11147,38 @@ var DdrFiles = /*#__PURE__*/function () {
 
       input.click();
     }
+    /*	Открытие диалога загрузки файлов (навесить на любой селектор) взято slack-api
+    		- multiple: множественный выбор
+    		- init: перед инициализацией загрузки файлов
+    		- preload: маркировка ключем key блоков под миниатюры картинок или иконки файлов
+    		- callback: файл загружен 
+    */
+
+  }, {
+    key: "chooseOnClick",
+    value: function chooseOnClick() {
+      var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+      var forcedSelector = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+      var getAddedFiles = this.getAddedFiles;
+      var loadFiles = this.loadFiles.bind(this); // bind потому что в функции loadFiles идет обращение к контексту, но он там потерян, так как вызов идет отсюда, то есть уже 3 вложенности функций
+
+      var selector = this.selector || forcedSelector;
+
+      var loadFilesParams = _.omit(params, ['multiple']);
+
+      $(selector).on(tapEvent, function () {
+        var input = document.createElement('input');
+        input.type = 'file';
+        input.multiple = (params === null || params === void 0 ? void 0 : params.multiple) || false;
+
+        input.oninput = function (e) {
+          var files = getAddedFiles(e);
+          loadFiles(files, loadFilesParams);
+        };
+
+        input.click();
+      });
+    }
     /*	Cобытие бросания файлов в область drop (навесить на любой селектор)
     		- dragover: событие при наведении на область drop
     		- dragleave: событие при уходе из области drop
@@ -11100,15 +11214,17 @@ var DdrFiles = /*#__PURE__*/function () {
           dragleave = _$assign.dragleave,
           drop = _$assign.drop;
 
+      var dragstat = false; // при бросании файла
+
       $(selector).on('drop', function (e) {
         e.preventDefault();
         e.stopPropagation();
         callFunc(drop || dragleave, this);
+        dragstat = false;
         var files = getAddedFiles(e);
         loadFiles(files, loadFilesFuncs);
         return false;
-      });
-      var dragstat = false; // при наведении
+      }); // при наведении
 
       $(selector).on('dragover', function (e) {
         event.preventDefault();
@@ -11445,7 +11561,7 @@ $.fn.ddrFiles = function () {
 /*	Комбинирование методов choose и drop
 		- params
 			- method: метод choose или drop (если не указать - будет и то и то)
-			- chooseSelector: селектор открытия кна диалога
+			- chooseSelector: селектор открытия окна диалога
 			- dropSelector: селектор drop - области бросания файлов 
 			- multiple: множественный выбор
 			- dragover: событие при наведении на область drop
@@ -11466,9 +11582,14 @@ $.ddrFiles = function () {
     return false;
   }
 
-  var _$pick = _.pick(params, ['chooseSelector', 'dropSelector']),
-      chooseSelector = _$pick.chooseSelector,
-      dropSelector = _$pick.dropSelector;
+  var _$pick = _.pick(params, ['chooseOnClick']),
+      chooseOnClick = _$pick.chooseOnClick;
+
+  _.unset(params, 'chooseOnClick');
+
+  var _$pick2 = _.pick(params, ['chooseSelector', 'dropSelector']),
+      chooseSelector = _$pick2.chooseSelector,
+      dropSelector = _$pick2.dropSelector;
 
   var chooseParams = _.pick(params, ['multiple', 'init', 'preload', 'callback', 'done', 'fail']);
 
@@ -11480,7 +11601,7 @@ $.ddrFiles = function () {
     if (params.method == 'choose') new _ddrFiles__WEBPACK_IMPORTED_MODULE_0__["default"](document.querySelector(chooseSelector), files).choose(chooseParams);
     if (params.method == 'drop') new _ddrFiles__WEBPACK_IMPORTED_MODULE_0__["default"](document.querySelector(dropSelector), files).drop(dropParams);
   } else {
-    new _ddrFiles__WEBPACK_IMPORTED_MODULE_0__["default"](document.querySelector(chooseSelector), files).choose(chooseParams);
+    if (chooseOnClick) new _ddrFiles__WEBPACK_IMPORTED_MODULE_0__["default"](document.querySelector(chooseSelector), files).chooseOnClick(chooseParams);else new _ddrFiles__WEBPACK_IMPORTED_MODULE_0__["default"](document.querySelector(chooseSelector), files).choose(chooseParams);
     new _ddrFiles__WEBPACK_IMPORTED_MODULE_0__["default"](document.querySelector(dropSelector), files).drop(dropParams);
   }
 
@@ -13729,8 +13850,8 @@ $.fn.ddrWait = function () {
       ddrwaitIcon = _styleModule.ddrwaitIcon,
       ddrwaitText = _styleModule.ddrwaitText;
 
-  var labelHtml = text ? '<p class="' + ddrwaitText + '">' + text + '</p>' : '',
-      iconHtml = '<img src="/assets/images/loading.gif" ddrwaiticon class="' + ddrwaitIcon + '">';
+  var labelHtml = text ? '<p class="' + ddrwaitText + '" notouch>' + text + '</p>' : '',
+      iconHtml = '<img src="/assets/images/loading.gif" ddrwaiticon class="' + ddrwaitIcon + '" notouch />';
   $(block).addClass(ddrwaitwrapper);
   $(block).append('<div class="' + ddrwaitBlock + ' noselect" id="' + ddrwBId + '"' + (tag ? ' ' + tag : '') + '><div class="' + ddrwaitContent + '" ddrwaitindicator>' + iconHtml + labelHtml + '</div></div>');
   if (isBtn) $(block).ddrInputs('disable');

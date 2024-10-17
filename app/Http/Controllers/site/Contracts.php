@@ -10,6 +10,7 @@ use App\Models\Contract;
 use App\Models\ContractChat;
 use App\Models\ContractData;
 use App\Models\ContractDepartment;
+use App\Models\ContractFile;
 use App\Models\ContractInfo;
 use App\Models\Department;
 use App\Models\Selection;
@@ -24,6 +25,7 @@ use Carbon\Carbon;
 use Error;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 use PhpOffice\PhpWord\TemplateProcessor;
 use Illuminate\Support\Str;
@@ -34,6 +36,8 @@ use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Style;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Intervention\Image\Laravel\Facades\Image;
+use Illuminate\Support\Facades\File;
 
 class Contracts extends Controller {
 	use Renderable, Settingable;
@@ -663,7 +667,26 @@ class Contracts extends Controller {
 			}
 		}
 		
-		return $this->render('common_info', compact('fields', 'data', 'contract'));
+		$files = null;
+		if ($contractfiles = ContractFile::GetByConmtractId($contractId)->get()) {
+			$files = $contractfiles->filter(function($row) {
+				$path = 'contracts/'.$row['contract_id'].'/'.$row['filename_sys'];
+				if (!Storage::exists($path)) return false;
+				
+				if (!$row['is_image']) {
+					$extension = File::extension($path);
+					$row['thumb'] = "/assets/images/filetypes/{$extension}.png";
+					return true;
+				} 
+				
+				$image = Image::read('storage/'.$path);
+				$thumb = $image->scale(height: 70);
+				$row['thumb'] = $thumb->toGif()->toDataUri();
+				return true;
+			});
+		}
+		
+		return $this->render('common_info', compact('fields', 'data', 'contract', 'files'));
 	}
 	
 	

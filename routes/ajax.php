@@ -3,6 +3,7 @@
 use App\Enums\ContractColums;
 use App\Enums\VirtualVars;
 use App\Http\Controllers\admin\Acts;
+use App\Http\Controllers\ContractsFilesController;
 use App\Http\Controllers\crud\Admins;
 use App\Http\Controllers\crud\Contracts;
 use App\Http\Controllers\crud\Departments;
@@ -175,6 +176,15 @@ Route::resource('steps_patterns', StepsPatterns::class);
 
 Route::post('/upload_file', [UploadFilesController::class, 'upload']);
 Route::delete('/upload_file', [UploadFilesController::class, 'remove']);
+
+
+
+# Файлы договоров
+Route::post('/contracts_files', [ContractsFilesController::class, 'upload']);
+Route::get('/contracts_files', [ContractsFilesController::class, 'download']);
+Route::delete('/contracts_files', [ContractsFilesController::class, 'remove']);
+
+
 
 
 Route::get('/get_export_cheatsheet', function (Request $request) {

@@ -521,9 +521,13 @@ section
 	&__scrollblock
 		+scrollbar(transparent, transparent, 1px)
 		overflow-y: scroll 
-		height: calc(100vh - 180px)
+		height: calc(100vh - 190px)
 		min-height: 400px
 		padding-right: 1rem
+		display: none
+		
+		&-visible
+			display: block
 	
 	&__line
 		height: 1px
@@ -567,14 +571,135 @@ section
 				
 				
 				
+	&__dropfiles
+		height: calc(100% - 50px)
+		//background-color: #c3dfe7
+		margin-top: 10px
+		margin-bottom: 1rem
+		padding-bottom: 40px
+		border: 4px dashed transparent
+		+scrollbar(transparent, transparent, 1px)
+		overflow-y: scroll 
+		min-height: 100px
+		padding-right: 1rem
+		
+		&-dragged
+			border-color: #555
+			//background-color: #ff9393
+
+
+
+
+.commoninfofile
+	//border: 1px solid #777
+	position: relative
+	cursor: pointer
 	
+	&__icon
+		display: flex
+		align-items: center
+		justify-content: center
+		position: relative
+		border-radius: 3px
+		overflow: hidden
+		height: 70px
+		
+		&::after
+			content: ''
+			position: absolute
+			inset: 0
+			width: 100%
+			height: 100%
+			background-color: #0004
+			opacity: 0
+			pointer-events: none
+			transition: opacity 0.16s
+		
+		img
+			height: 70px
+			width: 100%
+			object-fit: contain
+			transition: filter 0.16s
+			
+		
+	&__title
+		position: absolute
+		bottom: 0
+		left: 0
+		height: 0
+		width: 100%
+		
+		small
+			position: absolute
+			top: 0
+			left: 0
+			width: 100%
+			padding-top: 5px
+			display: block
+			text-align: center
+			font-size: 12px
+			word-break: break-word
+			//background-color: #fff9
+			//z-index: 10
+			
+			
+	&:not(:hover) 
+		.commoninfofile__title small
+			//white-space: nowrap
+			overflow: hidden
+			text-overflow: ellipsis
+			display: -webkit-box
+			-webkit-box-orient: vertical
+			-webkit-line-clamp: 2
+			max-height: 50px
+		
+		
+		
+		
+		
 
 
-
-
-
-
-
+	&:hover
+		.commoninfofile__buttons
+			opacity: 1
+		
+		.commoninfofile__icon img
+			filter: brightness(1.1)
+		
+		.commoninfofile__title small
+			z-index: 10
+			background-color: #ffffffea
+	
+	&__buttons
+		position: absolute
+		top: 3px
+		right: 3px
+		opacity: 0
+		transition: opacity 0.16s
+	
+	
+	&__remove
+		cursor: pointer
+		background-color: #fff
+		border-radius: 50%
+		padding: 3px
+		width: 26px
+		height: 26px
+		display: flex
+		align-items: center
+		justify-content: center
+		border: 1px solid #fcc
+		
+		i
+			color: #ff8585
+			transition: color 0.16s
+			
+			
+		
+		&:hover
+			i
+				color: darken(#ff8585, 20%)
+		
 
 
 
@@ -1063,6 +1188,25 @@ section
 			margin-bottom: 0
 		
 		
+
+
+
+
+
+
+
+
+
+		
+		
+	
+
+
+
+
+
+
+
 
 
 

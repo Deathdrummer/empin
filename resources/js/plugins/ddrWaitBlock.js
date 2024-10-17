@@ -56,8 +56,8 @@ $.fn.ddrWait = function(params = null) {
 	
 	
 		
-	let labelHtml = text ?  '<p class="'+ddrwaitText+'">'+text+'</p>' : '',
-		iconHtml = '<img src="/assets/images/loading.gif" ddrwaiticon class="'+ddrwaitIcon+'">';
+	let labelHtml = text ?  '<p class="'+ddrwaitText+'" notouch>'+text+'</p>' : '',
+		iconHtml = '<img src="/assets/images/loading.gif" ddrwaiticon class="'+ddrwaitIcon+'" notouch />';
 	
 	$(block).addClass(ddrwaitwrapper);
 	$(block).append('<div class="'+ddrwaitBlock+' noselect" id="'+ddrwBId+'"'+(tag ? ' '+tag : '')+'><div class="'+ddrwaitContent+'" ddrwaitindicator>'+iconHtml+labelHtml+'</div></div>');

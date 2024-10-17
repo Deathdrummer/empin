@@ -31,6 +31,13 @@ jQuery.fn.tagName = function() {
 
 
 
+window.getImageUrl = function(path = null) {
+	if (!path) console.error('getImageUrl ошибка! Не передан URL');
+	return new URL(path, location.origin).href;
+}
+
+
+
 /**
  * We'll load the axios HTTP library which allows us to easily issue requests
  * to our Laravel back-end. This library automatically handles sending the

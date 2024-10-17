@@ -43,7 +43,26 @@ window.getFileName = function(fileName, nameOrExt = null, nameLimit) {
 
 
 
+window.loadImage = async (fileName, fallbackImage) => {
+    return new Promise((resolve) => {
+        const img = new Image();
 
+        // Если изображение загрузилось, возвращаем его URL
+        img.onload = () => resolve(getImageUrl(fileName));
+
+        // Если произошла ошибка загрузки, возвращаем fallback-изображение
+        img.onerror = () => resolve(getImageUrl(fallbackImage));
+
+        // Присваиваем путь изображению
+        img.src = getImageUrl(fileName);
+    });
+}
+
+
+$.errorLoadingImage = async (img, src = 'none_img.png') => {
+	const resource = await loadImage(src);
+	img.src = resource;
+}
 
 	
 	

@@ -3,8 +3,8 @@ export default class DdrFiles { // 29.07.23
 	selector;
 	files;
 	
-	constructor(selector = null, files) {
-		if (!selector) throw new Error('DdrFiles -> Не передан селектор');
+	constructor(selector = null, files = null) {
+		if (_.isNull(selector)) throw new Error('DdrFiles -> Не передан селектор');
 		this.selector = selector || null;
 		this.files = files;
 	}
@@ -20,34 +20,7 @@ export default class DdrFiles { // 29.07.23
 			- preload: маркировка ключем key блоков под миниатюры картинок или иконки файлов
 			- callback: файл загружен 
 	*/
-	choose(params = {}) {
-		const getAddedFiles = this.getAddedFiles;
-		const loadFiles = this.loadFiles.bind(this); // bind потому что в функции loadFiles идет обращение к контексту, но он там потерян, так как вызов идет отсюда, то есть уже 3 вложенности функций
-		
-		const loadFilesParams = _.omit(params, ['multiple']);
-		
-		const input = document.createElement('input');
-		input.type = 'file';
-		input.multiple = params?.multiple || false;
-		
-		input.oninput = e => {
-			const files = getAddedFiles(e);
-			loadFiles(files, loadFilesParams);
-		}
-		
-		input.click();
-	}
-	
-	
-	
-	
-	/*	Открытие диалога загрузки файлов (навесить на любой селектор) взято slack-api
-			- multiple: множественный выбор
-			- init: перед инициализацией загрузки файлов
-			- preload: маркировка ключем key блоков под миниатюры картинок или иконки файлов
-			- callback: файл загружен 
-	*/
-	chooseOnClick(params = {}, forcedSelector = null) {
+	choose(params = {}, forcedSelector = null) {
 		const getAddedFiles = this.getAddedFiles;
 		const loadFiles = this.loadFiles.bind(this); // bind потому что в функции loadFiles идет обращение к контексту, но он там потерян, так как вызов идет отсюда, то есть уже 3 вложенности функций
 		const selector = this.selector || forcedSelector;
@@ -74,7 +47,6 @@ export default class DdrFiles { // 29.07.23
 	
 	
 	
-	
 	/*	Cобытие бросания файлов в область drop (навесить на любой селектор)
 			- dragover: событие при наведении на область drop
 			- dragleave: событие при уходе из области drop
@@ -83,8 +55,8 @@ export default class DdrFiles { // 29.07.23
 			- preload: маркировка ключем key блоков под миниатюры картинок или иконки файлов
 			- callback: файл загружен 
 	*/
-	drop(params = {}) {
-		const selector = this.selector;
+	drop(params = {}, forcedSelector = null) {
+		const selector = this.selector || forcedSelector;
 		const getAddedFiles = this.getAddedFiles;
 		const loadFiles = this.loadFiles.bind(this);  // bind потому что в функции loadFiles идет обращение к контексту, но он там потерян, так как вызов идет отсюда, то есть уже 3 вложенности функций
 		
@@ -98,14 +70,10 @@ export default class DdrFiles { // 29.07.23
 			drop: null, //
 		}, dragFuncs);
 		
-		let dragstat = false;
-		
-		// при бросании файла
 		$(selector).on('drop', function(e) {
 			e.preventDefault();
 			e.stopPropagation();
 			callFunc((drop || dragleave), this);
-			dragstat = false;
 			
 			const files = getAddedFiles(e);
 			loadFiles(files, loadFilesFuncs);
@@ -113,6 +81,9 @@ export default class DdrFiles { // 29.07.23
 			return false;
 		});
 		
+		
+		
+		let dragstat = false;
 		
 		// при наведении
 		$(selector).on('dragover', function(e) {
@@ -148,32 +119,92 @@ export default class DdrFiles { // 29.07.23
 	
 	
 	
+	
+	
+	upload(params = {}) {
+		if (!Object.values(params).length) {
+			if (isDev) console.error('class DdrFiles -> не переданы параметры!');
+			return false;
+		}
+		const {chooseSelector, dropSelector} = _.pick(params, ['chooseSelector', 'dropSelector']);
+		const chooseParams = _.pick(params, ['multiple', 'init', 'preload', 'callback', 'done', 'fail']);
+		const dropParams = _.pick(params, ['dragover', 'dragleave', 'drop', 'init', 'preload', 'callback', 'done', 'fail']);
+		
+		
+		this.choose(chooseParams, chooseSelector)
+		this.drop(dropParams, dropSelector);
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	/*	Экспорт файлов полученных через AJAX (доработать)
 			- опции
 				- data: приходящие данные
 				- headers: заголовки
-				- filename: имя файла
+				- filename: имя файле
 			- коллбэк
 	*/
-	export(ops = {}, cb) {
-		const {data, headers, filename = 'noname'} = ops;
-		const headerContentDisp = headers["content-disposition"] || null;
+	async export(params = {}) {
+		let {query, data, headers, filename, done} = _.assign({
+			query: null, // url, params
+			data: null, // 
+			headers: null, // 
+			filename: null, //
+			done: null, //
+		}, params);
 		
-		const fName = headerContentDisp && headerContentDisp.split("filename=")[1].replace(/["']/g, "");
-		const fExt = getFileName(fName, 2);
+		if (query) {
+			const {url, params} = _.assign({
+				url: null,
+				params: {}, 
+			}, query);
+			
+			const {data: qData, error, status, headers: qHeaders} = await ddrQuery.get(url, params, {responseType: 'blob'});
+			
+			if (error) {
+				$.notify('export -> ddrQuery ошибка экспорта!', 'error');
+				callFunc(done, false);
+				return false;
+			}
+			
+			data = qData;
+			headers = qHeaders;
+		}
 		
-		const finalFileName = filename ? filename+'.'+fExt : fName;
+
+		if (typeof window.navigator.msSaveBlob !== 'undefined') {
+			const blob = new Blob([data], {
+				type: 'application/octet-stream',
+			});
+			window.navigator.msSaveBlob(blob, filename);
+		} else {
+			const headerContentDisp = headers["content-disposition"] || null;
+			
+			const fName = headerContentDisp && headerContentDisp.split("filename=")[1].replace(/["']/g, "");
+			
+			const fExt = getFileName(fName, 2);
+			const fExtToName = fExt ? '.'+fExt : '';
+			
+			const finalFileName = filename ? filename+fExtToName : fName;
+			
+			const contentType = headers["content-type"];
+			const blob = new Blob([data], {contentType});
+			const href = window.URL.createObjectURL(blob);
+			const el = document.createElement("a");
+			el.setAttribute("href", href);
+			el.setAttribute("download", finalFileName);
+			el.click();
+			window.URL.revokeObjectURL(blob);
+			
+		}
 		
-		const contentType = headers["content-type"];
-		const blob = new Blob([data], {contentType});
-		const href = window.URL.createObjectURL(blob);
-		const el = document.createElement("a");
-		el.setAttribute("href", href);
-		el.setAttribute("download", finalFileName);
-		el.click();
-		window.URL.revokeObjectURL(blob);
-		
-		callFunc(cb);
+		callFunc(done, true);
 	}
 	
 	
@@ -218,7 +249,7 @@ export default class DdrFiles { // 29.07.23
 	
 	
 	
-	/* Загрузка файлов и обработка их
+	/* Загрузка файлов и обработка из
 			-  массив файлов
 			- параметры
 				- init: null, // перед инициализацией загрузки файлов
