@@ -111,6 +111,7 @@
 						id="chooserAll"
 						action="getListAction:0"
 						class="pl3rem"
+						contract-chooser
 						active
 						>Все активные договоры
 							<strong
@@ -137,6 +138,7 @@
 									chooserdepartment="{{$dep->id}}"
 									class="pl3rem"
 									tag="chooserd epartment"
+									contract-chooser
 									action="getListAction:{{$dep->id}}"
 									>{{$dep->name ?? 'Без названия'}}
 									<strong
@@ -162,6 +164,7 @@
 							chooserdepartment="{{$user->department->id}}"
 							class="pl3rem"
 							action="getListAction:{{$user->department->id}}"
+							contract-chooser
 							>{{$user->department->name ?? 'Без названия'}}
 							<strong
 								class="
@@ -186,6 +189,7 @@
 						id="chooserArchive"
 						class="pl3rem"
 						action="getListAction:-1"
+						contract-chooser
 						>Архив
 						<strong
 							class="
@@ -380,7 +384,7 @@
 				search = null;
 				let replaceIconHtml = '<div class="postfix_icon bg-light"><i class="fa-solid fa-magnifying-glass"></i></div>';
 				$('#contractsSearchField').parent('.input').find('.postfix_icon').replaceWith(replaceIconHtml);
-				$('.chooser__item.searchCounts').removeClass('searchCounts');
+				$('.chooser__item.searchcontractcounts').removeClass('searchcontractcounts');
 				getList({
 					withCounts: search || selection.value,
 					callback: function() {
@@ -2584,7 +2588,7 @@
 			if (currentCount) $('[stepprice]').number(true, 2, '.', ' ');
 
 			if(withCounts){
-				$('.chooser__item').addClass('searchCounts');
+				$('.chooser__item').addClass('searchcontractcounts');
 			}
 			if (headers) {
 				$('#chooserAll').find('[selectionscounts]').empty();

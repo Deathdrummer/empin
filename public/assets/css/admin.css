@@ -6774,19 +6774,9 @@ span::before {
   height: 100%;
   cursor: pointer;
 }
-.chooser__item [selectionscounts] {
-  opacity: 0;
-  transition: opacity 0.16s;
-}
-.chooser__item:hover [selectionscounts] {
-  opacity: 1;
-}
 .chooser__item:hover.chooser_color-neutral {
   background-color: #efeff5;
   transition: background-color 0.16s, color 0.16s, border-color 0.16s, box-shadow 0.16s;
-}
-.chooser__item.searchCounts [selectionscounts] {
-  opacity: 1;
 }
 .chooser__item:active.chooser_color-neutral {
   background-color: #e9e9f1;
