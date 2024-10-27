@@ -8093,5 +8093,5 @@ section {
   opacity: 1;
 }
 [contract-chooser].searchcontractcounts [selectionscounts] {
-  opacity: 0.1;
+  opacity: 1;
 }
