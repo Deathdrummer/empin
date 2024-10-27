@@ -1716,7 +1716,6 @@
 
 
 
-
 			$.contractStore = (btn) => {
 				wait();
 				//let form = new FormData(document.querySelector('#newContractForm'));
