@@ -2,24 +2,24 @@
 	display: inline-block
 	border: 1px solid #ececf1
 	border-radius: 3px
-	
+
 	&__col
 		&:first-of-type
 			.chooser__item
 				border-radius: 3px 0 0 3px
-			
+
 		&:last-of-type
 			&:first-of-type
 				.chooser__item
 					border-radius: 3px
-			
+
 			&:not(:first-of-type)
 				.chooser__item
 					border-radius: 0 3px 3px 0
-		
+
 		&:not(:last-of-type)
 			border-right: 1px solid #e8e8f1
-	
+
 	&__item
 		display: flex
 		align-items: center
@@ -27,65 +27,63 @@
 		min-height: 20px
 		height: 100%
 		cursor: pointer
-		
+
+		[selectionscounts]
+			opacity: 0
+			transition: opacity 0.16s
 		&:hover
+			[selectionscounts]
+				opacity: 1
 			&.chooser_color-neutral
 				background-color: #efeff5
 				transition: background-color 0.16s, color 0.16s, border-color 0.16s, box-shadow 0.16s
-		
+		&.searchCounts
+			[selectionscounts]
+				opacity: 1
 		&:active
 			&.chooser_color-neutral
 				background-color: darken(#efeff5, 2%)
 				transition: background-color 0s, color 0s, border-color 0s, box-shadow 0s
-	
+
 		&_active
 			&.chooser_color-neutral
 				background-color: #aeaec5 !important
 				box-shadow: 0 0 0 1px #aeaec5 !important
-				
+
 				span
 					color: #fff !important
-			
+
 				&:not(.chooser__item_many)
 					cursor: default
 					//pointer-events: none
-		
+
 		span
 			display: inline-flex
 			align-items: center
-	
-	
-	
-	
+
+
+
+
 	&_color
 		&-neutral
 			background-color: #f7f7fb
-			
+
 			span
 				color: #717183
 				font-size: 14px
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
+
 	&-large
-		+resp(height, $inputHeight)	
-	
+		+resp(height, $inputHeight)
+
 	&-normal
 		+addict(height, $inputHeight, '/ 1.4')
-	
+
 	&-small
 		+addict(height, $inputHeight, '/ 1.6')
-			
-			
-			
-			
-	
-
-
-
-

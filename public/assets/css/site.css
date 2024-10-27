@@ -6574,25 +6574,21 @@ span::before {
 @keyframes ddrPopUpIn {
   from {
     background-color: transparent;
-    -webkit-backdrop-filter: blur(0px);
-            backdrop-filter: blur(0px);
+    backdrop-filter: blur(0px);
   }
   to {
     background-color: rgba(16, 48, 48, 0.4588235294);
-    -webkit-backdrop-filter: blur(3px);
-            backdrop-filter: blur(3px);
+    backdrop-filter: blur(3px);
   }
 }
 @keyframes ddrPopUpOut {
   from {
     background-color: rgba(16, 48, 48, 0.4588235294);
-    -webkit-backdrop-filter: blur(3px);
-            backdrop-filter: blur(3px);
+    backdrop-filter: blur(3px);
   }
   to {
     background-color: transparent;
-    -webkit-backdrop-filter: blur(0px);
-            backdrop-filter: blur(0px);
+    backdrop-filter: blur(0px);
   }
 }
 @keyframes ddrPopUpDialogIn {
@@ -6670,8 +6666,7 @@ span::before {
 }
 .ddrpopup__wait {
   background-color: rgba(253, 253, 253, 0.9607843137);
-  -webkit-backdrop-filter: blur(2px);
-          backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
 }
 .ddrpopup__wait .ddrpopupwait__icon {
   width: 50px;
@@ -6683,8 +6678,7 @@ span::before {
 }
 .ddrpopup__dialog {
   background-color: rgba(0, 115, 116, 0.1019607843);
-  -webkit-backdrop-filter: blur(2px);
-          backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
 }
 .ddrpopup__dialog .popupdialog {
   padding: 15px;
@@ -6780,9 +6774,19 @@ span::before {
   height: 100%;
   cursor: pointer;
 }
+.chooser__item [selectionscounts] {
+  opacity: 0;
+  transition: opacity 0.16s;
+}
+.chooser__item:hover [selectionscounts] {
+  opacity: 1;
+}
 .chooser__item:hover.chooser_color-neutral {
   background-color: #efeff5;
   transition: background-color 0.16s, color 0.16s, border-color 0.16s, box-shadow 0.16s;
+}
+.chooser__item.searchCounts [selectionscounts] {
+  opacity: 1;
 }
 .chooser__item:active.chooser_color-neutral {
   background-color: #e9e9f1;
