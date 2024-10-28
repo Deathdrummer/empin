@@ -279,8 +279,53 @@ class DdrCalc {
 	
 	
 	
+	count_days(data) {
+		let {
+			selector, // куда вставлять данные. Можно вызвать функцию: (selector, value) => $(selector).setAttrib('replacer', value)
+			initialDate, // дата начала
+			addWorkdays, // чекбокс вернуть все или только рабочие дня
+			middleware, // промежуточный расчет значения. Пример: middleware: [(value, calc) => calc('nds', value, percentNds), false],
+			numberFormat, // фрматировать вставляемое значение. Эквивалент $.number: [2, '.', ' '],
+			stat // производить расчет
+		} = $.extend({
+			selector: null,
+			initialDate: null,
+			addWorkdays: 0,
+			middleware: false,
+			numberFormat: false,
+			stat: () => true
+		}, data),
+			thisCls = this;
+		
+		$(thisCls.mainSelector).on(thisCls.inputEvent, function(e) {
+			if (!stat()) return;
+			let val = thisCls._valToNumber(e.target.value);
+			let result = _.round(thisCls._calc('count_days', val, initialDate, addWorkdays));
+			
+			if (_.isFunction(middleware[0])) {
+				result = middleware[0](result, thisCls._calc.bind(thisCls));
+			}
+			
+			//const calcValue = numberFormat ? $.number(_.round(result, 2), ...numberFormat) : _.round(result, 2);
+			
+			thisCls._insertValue(selector, result);
+			
+			thisCls.eventListeners.items.push(e);
+		});
+		
+	}
 	
-	//------------------------------------------------------------------------------------------
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	//------------------------------------------------------------------------------------------ Функции рассчетов
 	
 	
 	
@@ -323,6 +368,22 @@ class DdrCalc {
 				if (!reverseLess) return _.round(valueLess * (1 + nds / 100), 2);
 				return _.round(valueLess / (1 + nds / 100), 2);
 				break;
+			
+			case 'count_days':
+				let [countDays, initialDate, addWorkdays] = args;
+				
+				const initDate = new Date(initialDate);
+							
+			_.debounce(axiosQuery('get', 'site/contracts/work_calendar_count', {
+					year: initDate.getFullYear(),
+					month: initDate.getMonth() + 1,
+					day: initDate.getDay() + 1,
+					count_days: countDays,
+					add_work_days: addWorkdays,
+				}, 'json').then(({data, error, status, headers}) => {
+					return data;
+				}), 300);
+				break;
 				
 			default:
 				
@@ -333,6 +394,20 @@ class DdrCalc {
 	
 	
 	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	//------------------------------------------------------------------------------------------
 	
 	_valToNumber(value = null, toFixed = null) {
 		if (_.isNull(value)) return false;

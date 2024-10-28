@@ -9229,7 +9229,45 @@ var DdrCalc = /*#__PURE__*/function () {
           thisCls.eventListeners.items.push(e);
         });
       }
-    } //------------------------------------------------------------------------------------------
+    }
+  }, {
+    key: "count_days",
+    value: function count_days(data) {
+      var _$$extend4 = $.extend({
+        selector: null,
+        initialDate: null,
+        addWorkdays: 0,
+        middleware: false,
+        numberFormat: false,
+        stat: function stat() {
+          return true;
+        }
+      }, data),
+          selector = _$$extend4.selector,
+          initialDate = _$$extend4.initialDate,
+          addWorkdays = _$$extend4.addWorkdays,
+          middleware = _$$extend4.middleware,
+          numberFormat = _$$extend4.numberFormat,
+          stat = _$$extend4.stat,
+          thisCls = this;
+
+      $(thisCls.mainSelector).on(thisCls.inputEvent, function (e) {
+        if (!stat()) return;
+
+        var val = thisCls._valToNumber(e.target.value);
+
+        var result = _.round(thisCls._calc('count_days', val, initialDate, addWorkdays));
+
+        if (_.isFunction(middleware[0])) {
+          result = middleware[0](result, thisCls._calc.bind(thisCls));
+        } //const calcValue = numberFormat ? $.number(_.round(result, 2), ...numberFormat) : _.round(result, 2);
+
+
+        thisCls._insertValue(selector, result);
+
+        thisCls.eventListeners.items.push(e);
+      });
+    } //------------------------------------------------------------------------------------------ Функции рассчетов
 
   }, {
     key: "_calc",
@@ -9278,10 +9316,33 @@ var DdrCalc = /*#__PURE__*/function () {
           return _.round(valueLess / (1 + nds / 100), 2);
           break;
 
+        case 'count_days':
+          var countDays = args[0],
+              initialDate = args[1],
+              addWorkdays = args[2];
+          var initDate = new Date(initialDate);
+
+          _.debounce(axiosQuery('get', 'site/contracts/work_calendar_count', {
+            year: initDate.getFullYear(),
+            month: initDate.getMonth() + 1,
+            day: initDate.getDay() + 1,
+            count_days: countDays,
+            add_work_days: addWorkdays
+          }, 'json').then(function (_ref) {
+            var data = _ref.data,
+                error = _ref.error,
+                status = _ref.status,
+                headers = _ref.headers;
+            return data;
+          }), 300);
+
+          break;
+
         default:
           break;
       }
-    }
+    } //------------------------------------------------------------------------------------------
+
   }, {
     key: "_valToNumber",
     value: function _valToNumber() {
