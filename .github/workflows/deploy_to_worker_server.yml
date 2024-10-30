@@ -1,7 +1,9 @@
-name: Публикация на events.vendorteam.ru
+name: Публикация на empin-pro.ru
 
 on:
-  push
+  push:
+    branches:
+      - main  # Указываем, что экшн запускается только при пуше в ветку main
 
 env:
   SERVER_HOST: 185.4.75.200
@@ -12,7 +14,7 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    if: "contains(github.event.head_commit.message, '--D')"
+    # if: "contains(github.event.head_commit.message, '--D')"
     steps:
       - uses: actions/checkout@v3
 
