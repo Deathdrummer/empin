@@ -1,5 +1,5 @@
 <div ondblclick="event.stopPropagation();" oncontextmenu="event.stopPropagation();event.preventDefault();">
-	<h4 class="fz16px mb1rem">Этот объект в следующих подборках:</h4>
+	<h4 class="fz16px mb1rem">Этот договор в следующих подборках:</h4>
 	<div class="scrollblock-light pr5px minh2rem" style="max-height: calc(100vh - 100px);">
 		@if($selections)
 			<ul>
@@ -21,6 +21,7 @@
 							class="noselect w2rem-6px ml5px"
 							action="removeContractFromSelection:{{$selection['id'] ?? null}}"
 							style="border-radius:5px;border-color:transparent;height:26px;"
+							:enabled="$selection['can_write']"
 							>
 							<i class="fa-solid fa-xmark"></i>
 						</x-button>	

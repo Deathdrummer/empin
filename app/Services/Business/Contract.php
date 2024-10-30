@@ -951,9 +951,13 @@ class Contract {
 		
 		$allSelections = SelectionModel::toTooltip()->get();
 		
-		
-		
-		$allSelectionsWithKeys = $allSelections->mapWithKeys(function ($item, $key) {
+		$allSelectionsWithKeys = $allSelections->mapWithKeys(function ($item, $key) use($userId) {
+			//$item['can_read'] = in_array($userId, $item['subscribed']['read'] ?? []);
+			
+			$item['can_write'] = $userId == $item['account_id'] || in_array($userId, $item['subscribed']['write'] ?? []);
+			
+			unset($item['subscribed']);
+			
 			return [$item['id'] => $item];
 		})->toArray();
 		

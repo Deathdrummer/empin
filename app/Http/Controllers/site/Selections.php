@@ -466,16 +466,26 @@ class Selections extends Controller {
 	private function _subscribeSelection($selectionId, $userId, $permission) {
 		$row = ContractSelection::find($selectionId);
 		
-		$subscribed = $row->subscribed;
-		if (!isset($subscribed[$permission])) $subscribed[$permission] = [];
+		$primaryPermission = $permission == 'read' ? 'read' : 'write';
+		$secondaryPermission = $permission == 'read' ? 'write' : 'read';
 		
-		if (!in_array($userId, (array)$subscribed[$permission])) {
-			$subscribed[$permission][] = $userId;
-			$row->subscribed = $subscribed;
-        	$stat = $row->save();
-			return $stat;
+		$subscribed = $row->subscribed;
+		if (!isset($subscribed[$primaryPermission])) $subscribed[$primaryPermission] = [];
+		
+		if (!in_array($userId, (array)$subscribed[$primaryPermission])) {
+			
+			$subscribed[$primaryPermission][] = $userId;
 		} 
-        return true;
+		
+		if (isset($subscribed[$secondaryPermission]) && in_array($userId, (array)$subscribed[$secondaryPermission])) {
+			$index = array_search($userId, $subscribed[$secondaryPermission]);
+			unset($subscribed[$secondaryPermission][$index]);
+			if (empty($subscribed[$secondaryPermission])) unset($subscribed[$secondaryPermission]);
+		} 
+		
+		$row->subscribed = $subscribed;
+		$stat = $row->save();
+		return $stat;
 	}
 	
 	

@@ -384,7 +384,7 @@
 				search = null;
 				let replaceIconHtml = '<div class="postfix_icon bg-light"><i class="fa-solid fa-magnifying-glass"></i></div>';
 				$('#contractsSearchField').parent('.input').find('.postfix_icon').replaceWith(replaceIconHtml);
-				$('.chooser__item.searchcontractcounts').removeClass('searchcontractcounts');
+				
 				getList({
 					withCounts: search || selection.value,
 					callback: function() {
@@ -2475,6 +2475,7 @@
 			lastChoosedRow.value = null;
 			selectedContracts.clear();
 			loadedContractsIds.clear();
+			$('.chooser__item.searchcontractcounts').removeClass('searchcontractcounts');
 		} else {}
 
 
