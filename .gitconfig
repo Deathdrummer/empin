@@ -1,3 +1,0 @@
-[alias]
-    push-both = "!git push origin main && git push origin nikita"
-    push-both = "!git push origin main && git push origin ddr"
