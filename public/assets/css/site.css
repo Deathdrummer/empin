@@ -7665,6 +7665,7 @@ section {
 }
 .commoninfofile__remove[disabled] {
   pointer-events: none;
+  border-color: #eee;
 }
 .commoninfofile__remove[disabled] i {
   color: #eee;
