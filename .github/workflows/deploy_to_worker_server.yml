@@ -38,6 +38,7 @@ jobs:
           --exclude=/.editorconfig \
           --exclude=/.git \
           --exclude=/.github \
+          --exclude=/.gitconfig \
           --exclude=/public/build \
           --exclude=/public/hot \
           --exclude=/storage \
