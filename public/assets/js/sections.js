@@ -611,8 +611,32 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                 return;
               }
 
+              function preg_quote(str, delimiter) {
+                return (str + '').replace(new RegExp('[.\\\\+*?\\[\\^\\]$(){}=!<>|:\\' + (delimiter || '') + '-]', 'g'), '\\$&');
+              }
+
               setHtml(data, function () {
                 sendMessStat.value = false;
+                var search = $('#contractsSearchField').val();
+
+                if (search) {
+                  var s = ddrSplit(search, '+');
+
+                  if (s) {
+                    if (!_.isArray(s)) s = [s];
+                    $.each(s, function (k, searchItem) {
+                      if (searchItem === '' || searchItem === null) return true;
+                      var findSubStr = $('#chatMessageList').find('p:icontains("' + searchItem + '"), strong:icontains("' + searchItem + '")');
+
+                      if (findSubStr) {
+                        $.each(findSubStr, function (k, item) {
+                          $(item).html($(item).text().replace(new RegExp("(" + preg_quote(searchItem) + ")", 'gi'), '<span class="highlight">$1</span>'));
+                        });
+                      }
+                    });
+                  }
+                }
+
                 wait(false);
                 $('.chat__message').tripleTap(function (elem) {
                   selectText(elem);
