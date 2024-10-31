@@ -104,8 +104,12 @@ class ContractFilter extends AbstractFilter {
 					
 					// Поиск по JSON полю из relation таблицы
 					$query->when($dopsearch, function ($query) use ($search) {
-						return $query->orWhereHas('info', function ($query) use ($search) {
-							$query->where('data', 'like', '%'.$search.'%');
+						$query->orWhereHas('messages', function ($query) use ($search) {
+							$query->whereRaw('LOWER(message) LIKE ?', ['%' . strtolower($search) . '%']);
+						});
+						
+						$query->orWhereHas('info', function ($query) use ($search) {
+							$query->whereRaw('LOWER(data) LIKE ?', ['%' . strtolower($search) . '%']);
 						});
 					});
 					
