@@ -1,7 +1,7 @@
-name: Публикация на events.vendorteam.ru
+name: Публикация на empin-pro.ru
 
 on:
-  push
+  workflow_dispatch:  # Ручной запуск
 
 env:
   SERVER_HOST: 185.4.75.200
@@ -12,7 +12,7 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    if: "contains(github.event.head_commit.message, '--D')"
+    # if: "contains(github.event.head_commit.message, '--D')"
     steps:
       - uses: actions/checkout@v3
 
@@ -36,6 +36,7 @@ jobs:
           --exclude=/.editorconfig \
           --exclude=/.git \
           --exclude=/.github \
+          --exclude=/.gitconfig \
           --exclude=/public/build \
           --exclude=/public/hot \
           --exclude=/storage \
