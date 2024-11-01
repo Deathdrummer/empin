@@ -1,9 +1,7 @@
 name: Публикация на empin-pro.ru
 
 on:
-  push:
-    branches:
-      - main  # Указываем, что экшн запускается только при пуше в ветку main
+  workflow_dispatch:  # Ручной запуск
 
 env:
   SERVER_HOST: 185.4.75.200
