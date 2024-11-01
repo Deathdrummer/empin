@@ -848,7 +848,7 @@
 						fileColHtml += 			'<small filenamereplacer></small>';
 						fileColHtml += 		'</div>';
 						fileColHtml += 		'<div class="commoninfofile__buttons">';
-						fileColHtml += 			'<div class="commoninfofile__remove" commoninfofileremove><i class="fa-solid fa-trash" title="Удалить файл"></i></div>';
+						fileColHtml += 			'<div class="commoninfofile__remove" commoninfofileremove disabled><i class="fa-solid fa-trash" title="Удалить файл"></i></div>';
 						fileColHtml += 		'</div>';
 						fileColHtml += 	'</div>';
 						fileColHtml += '</div>';
@@ -914,6 +914,7 @@
 					$(fileContainer).find('[imgreplacer]').html(`<img src="${imgSrc}" />`);
 					$(fileContainer).find('[filenamereplacer]').text(`${name}.${ext}`);
 					$(fileContainer).find('[commoninfofileremove]').setAttrib('commoninfofileremove', filenameSys);
+					$(fileContainer).find('[commoninfofileremove]').removeAttrib('disabled');
 					$(fileContainer).setAttrib('filecontainer', filenameSys);
 					$(fileContainer).setAttrib('title', `${name}.${ext} (${fileSize}Мб)`);
 

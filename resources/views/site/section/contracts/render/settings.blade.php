@@ -8,7 +8,7 @@
 				</td>
 			</tr>
 			<tr class="h5rem">
-				<td><p>Искать в окне доп. информации:</p></td>
+				<td><p>Искать в окне доп. информации и чатах:</p></td>
 				<td class="w5rem h-center">
 					<x-checkbox onchange="$.setUserSetting('contracts.dopsearch', 'checkbox')" :checked="$settings['dopsearch'] ?? false" />
 				</td>
