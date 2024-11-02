@@ -826,6 +826,7 @@
 				chooseOnClick: true,
 				dropSelector: '#contractInfoDropFiles',
 				chooseSelector: '#contractInfoChooseFiles',
+				multiple: true,
 				dragover(selector) {
 					$(selector).addClass('commoninfo__dropfiles-dragged');
 				},
