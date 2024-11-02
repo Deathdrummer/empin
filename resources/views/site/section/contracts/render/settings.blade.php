@@ -8,9 +8,15 @@
 				</td>
 			</tr>
 			<tr class="h5rem">
-				<td><p>Искать в окне доп. информации и чатах:</p></td>
+				<td><p>Искать в окне доп. информации:</p></td>
 				<td class="w5rem h-center">
-					<x-checkbox onchange="$.setUserSetting('contracts.dopsearch', 'checkbox')" :checked="$settings['dopsearch'] ?? false" />
+					<x-checkbox onchange="$.setUserSetting('contracts.dopsearch.info', 'checkbox')" :checked="$settings['dopsearch']['info'] ?? false" />
+				</td>
+			</tr>
+			<tr class="h5rem">
+				<td><p>Искать в чатах:</p></td>
+				<td class="w5rem h-center">
+					<x-checkbox onchange="$.setUserSetting('contracts.dopsearch.chats', 'checkbox')" :checked="$settings['dopsearch']['chats'] ?? false" />
 				</td>
 			</tr>
 		</table>
