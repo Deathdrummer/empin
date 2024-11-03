@@ -1,7 +1,7 @@
 name: Публикация на empin-pro.ru
 
 on:
-  push:
+  pull_request:
     branches:
       - main
 
