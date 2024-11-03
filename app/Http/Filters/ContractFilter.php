@@ -83,7 +83,8 @@ class ContractFilter extends AbstractFilter {
 		
 		if ($searchItems) {
 			$user = app()->make(UserService::class);
-			$dopsearch = $user->getSettings('contracts.dopsearch');
+			$dopsearchInfo = $user->getSettings('contracts.dopsearch.info');
+			$dopsearchChats = $user->getSettings('contracts.dopsearch.chats');
 			
 			foreach ($searchItems as $search) {
 				$customersMatch = $this->_subSearch($settings['customers'], $search);
@@ -91,7 +92,7 @@ class ContractFilter extends AbstractFilter {
 				$contractorsMatch = $this->_subSearch($settings['contractors'], $search);
 			}
 			
-			$builder->where(function (Builder $query) use($searchItems, $customersMatch, $typesMatch, $contractorsMatch, $dopsearch) {
+			$builder->where(function (Builder $query) use($searchItems, $customersMatch, $typesMatch, $contractorsMatch, $dopsearchInfo, $dopsearchChats) {
 				foreach ($searchItems as $search) {
 					$query->orWhere('object_number', 'like', '%'.$search.'%');
 					$query->orWhere('title', 'like', '%'.$search.'%');
@@ -102,14 +103,17 @@ class ContractFilter extends AbstractFilter {
 					$query->orWhere('buy_number', 'like', '%'.$search.'%');
 					$query->orWhere('archive_dir', 'like', '%'.$search.'%');
 					
-					// Поиск по JSON полю из relation таблицы
-					$query->when($dopsearch, function ($query) use ($search) {
-						$query->orWhereHas('messages', function ($query) use ($search) {
-							$query->whereRaw('message COLLATE utf8mb4_general_ci LIKE ?', ['%' . $search . '%']);
-						});
-						
+					// Поиск по доп. информации
+					$query->when($dopsearchInfo, function ($query) use ($search) {
 						$query->orWhereHas('info', function ($query) use ($search) {
 							$query->whereRaw('data COLLATE utf8mb4_general_ci LIKE ?', ['%' . $search . '%']);
+						});
+					});
+					
+					// Поиск по чатам
+					$query->when($dopsearchChats, function ($query) use ($search) {
+						$query->orWhereHas('messages', function ($query) use ($search) {
+							$query->whereRaw('message COLLATE utf8mb4_general_ci LIKE ?', ['%' . $search . '%']);
 						});
 					});
 					
