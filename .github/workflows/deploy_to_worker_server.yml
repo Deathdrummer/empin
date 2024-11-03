@@ -1,7 +1,9 @@
 name: Публикация на empin-pro.ru
 
 on:
-  workflow_dispatch:  # Ручной запуск
+  push:
+    branches:
+      - main
 
 env:
   SERVER_HOST: 185.4.75.200
