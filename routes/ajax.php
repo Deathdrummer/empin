@@ -174,6 +174,8 @@ Route::resource('steps_patterns', StepsPatterns::class);
 
 
 
+Route::get('/contracts_files_list', [UploadFilesController::class, 'list']);
+Route::get('/get_values_to_filter', [UploadFilesController::class, 'get_values_to_filter']);
 Route::post('/upload_file', [UploadFilesController::class, 'upload']);
 Route::delete('/upload_file', [UploadFilesController::class, 'remove']);
 

@@ -68,7 +68,7 @@
 								variant="{{$button['variant'] ?? 'green'}}"
 								group="{{$button['group'] ?? 'normal'}}"
 								px="10"
-								action="{{$button['action']}}"
+								action="{{$button['action'] ?? null}}"
 								disabled="{{isset($button['disabled'])}}"
 								tag="cardbutton"
 								>{!!$button['icon'] ?? false ? '<i class="fa-solid fa-'.$button['icon'].'"></i>' : ''!!} {{$button['title'] ?? ''}}</x-button>
@@ -81,7 +81,7 @@
 							variant="{{$button['variant'] ?? 'green'}}"
 							group="{{$button['group'] ?? 'normal'}}"
 							px="10"
-							action="{{$button['action']}}"
+							action="{{$button['action'] ?? null}}"
 							disabled="{{isset($button['disabled'])}}"
 							tag="cardbutton"
 							>{!!$button['icon'] ?? false ? '<i class="fa-solid fa-'.$button['icon'].'"></i>' : ''!!} {{$button['title'] ?? ''}}</x-button>

@@ -492,6 +492,49 @@ if (! function_exists('dateFormatter')) {
 
 
 
+if (! function_exists('dateFormatterNew')) {
+	function dateFormatterNew($date, $template) {
+		// Если дата передана как строка, создаем объект DateTime
+		if (is_string($date)) {
+			$date = new DateTime($date);
+		}
+
+		// Массивы для месяцев и дней недели
+		$monthsNominative = ['январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь'];
+		$monthsGenitive = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+		$monthsShort = ['янв', 'фев', 'мар', 'апр', 'май', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
+		$daysShort = ['вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'];
+		$daysFull = ['воскресенье', 'понедельник', 'вторник', 'среда', 'четверг', 'пятница', 'суббота'];
+
+		// Получение всех нужных элементов даты
+		$yearFull = $date->format('Y');
+		$yearShort = $date->format('y');
+		$monthIndex = (int)$date->format('n') - 1; // индекс месяца (0-11)
+		$day = (int)$date->format('j');
+		$dayWithLeadingZero = $date->format('d');
+		$hour = $date->format('H'); // часы в 24-часовом формате
+		$minute = $date->format('i'); // минуты
+		$weekdayIndex = (int)$date->format('w'); // индекс дня недели (0-6, где 0 — воскресенье)
+
+		// Замена шаблонов на значения даты
+		return str_replace(
+			['{yyyy}', '{yy}', '{mmm}', '{mm}', '{m}', '{dd}', '{d}', '{ww}', '{w}', '{h}', '{i}'],
+			[$yearFull, $yearShort, $monthsGenitive[$monthIndex], $monthsNominative[$monthIndex], $monthsShort[$monthIndex], $dayWithLeadingZero, $day, $daysFull[$weekdayIndex], $daysShort[$weekdayIndex], $hour, $minute],
+			$template
+		);
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
 
 if (! function_exists('setting')) {
 	/**
