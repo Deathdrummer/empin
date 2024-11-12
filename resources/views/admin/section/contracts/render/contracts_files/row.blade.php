@@ -15,8 +15,10 @@
 	<x-table.td class="noselect"><p class="fz12px lh100">{{$contract['applicant']}}</p></x-table.td>
 	<x-table.td class="noselect"><p class="fz12px lh100">{{$author['pseudoname'] ?? '-'}}</p></x-table.td>
 	<x-table.td class="noselect">
-		<p class="fz12px">{{dateFormatterNew($upload_date, '{dd} {mmm} {yyyy} г.')}}</p>
-		<p class="fz12px mt3px">{{dateFormatterNew($upload_date, 'в {h}:{i}')}}</p>
+		<p class="fz12px">
+			{{dateFormatterNew($upload_date, '{dd} {mmm} {yyyy} г.')}}
+			<span class="d-block mt3px">{{dateFormatterNew($upload_date, 'в {h}:{i}')}}</span>
+		</p>
 	</x-table.td>
 	<x-table.td class="h-center noselect">
 		@if($contract['archive'])
@@ -27,10 +29,11 @@
 	</x-table.td>
 	
 	<x-table.td class="h-center noselect">
-		<i class="fa-solid fa-fw fa-ellipsis-vertical color-gray-600 color-blue-hovered" noselectrow pointer openrowmenu="{{$file['filename_sys']}}|{{$file['filename_orig']}}|{{$file['contract_id']}}"></i>
-		
-		{{-- <x-buttons-group group="small" w="3rem">
-			<x-button variant="red" tag="commoninfofileremove:{{$file['filename_sys']}}|{{$file['contract_id']}}" title="Удалить"><i class="fa-solid fa-trash-can"></i></x-button>
-		</x-buttons-group> --}}
+		<i
+			class="fa-solid fa-fw fa-ellipsis-vertical color-gray-600 color-blue-hovered"
+			noselectrow
+			pointer
+			openrowmenu="{{$file['filename_sys']}}|{{$file['filename_orig']}}|{{$file['contract_id']}}"
+			></i>
 	</x-table.td>
 </x-table.tr>

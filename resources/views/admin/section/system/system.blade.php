@@ -11,6 +11,7 @@
 						<li class="ddrtabsnav__item" ddrtabsitem="systemTab2">Настройки страниц</li>
 						<li class="ddrtabsnav__item" ddrtabsitem="systemTab3">Размеры</li>
 						<li class="ddrtabsnav__item" ddrtabsitem="systemTab4">Договор</li>
+						<li class="ddrtabsnav__item" ddrtabsitem="systemTab5">Админ. панель</li>
 					</ul>
 				</div>
 				
@@ -69,6 +70,9 @@
 							setting="contract-list-titles-row-height"
 							/>
 					</div>
+					
+					
+					
 					
 					
 					<div class="ddrtabscontent__item" ddrtabscontentitem="systemTab4">
@@ -319,6 +323,20 @@
 								<x-radio group="normal" label="Стоимость Генподрядного договора" value="gen" setting="contract-genpercent-change" />
 							</div>
 						</div>
+					</div>
+					
+					
+					<div class="ddrtabscontent__item" ddrtabscontentitem="systemTab5">
+						<p class="color-gray mb1rem">Количество строк для вывода файлов договоров:</p>
+						<x-input
+							class="w12rem"
+							type="number"
+							min="10"
+							max="500"
+							showrows
+							group="normal"
+							setting="contract-files-part-count"
+							/>
 					</div>
 				</div>
 			</div>

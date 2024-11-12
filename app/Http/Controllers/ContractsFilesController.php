@@ -1,6 +1,7 @@
 <?php namespace App\Http\Controllers;
 
 use App\Models\ContractFile;
+use Carbon\Carbon;
 use Error;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -36,12 +37,16 @@ class ContractsFilesController extends Controller {
 		
 		//$fileNameSys = basename($path);
 		
+		$fromId = auth()->user()?->id ?? null;
+		
 		ContractFile::insert([
 			'filename_orig' => $fileNameOrig,
 			'filename_sys' 	=> $uniqueFileName,
 			'contract_id' 	=> $contractId,
 			'is_image' 		=> $isImage,
-			'size' 			=> $size
+			'from_id' 		=> $fromId,
+			'size' 			=> $size,
+			'upload_date'	=> Carbon::now(),
 		]);
 		
 		return response()->json(['filename' => $uniqueFileName]);

@@ -114,11 +114,15 @@
 		filter: {},
 		search: null,
 	}, {set: ({target, prop, value, oldValue}) => {
+		if (prop !== 'offset') {
+			$('#contractsFilesList').scrollTop(0);
+		}
+		
 		if (prop == 'sort_field' && (oldValue !== null && value !== oldValue)) {
 			target.sort_order = 'asc';
 		} else if (prop == 'sort_field' && oldValue !== null) {
+			
 			target.sort_order = target.sort_order == 'asc' ? 'desc' : 'asc';
-			$('#contractsFilesList').scrollTop(0);
 		}
 		
 		if (prop != 'offset') target.offset = 0;
