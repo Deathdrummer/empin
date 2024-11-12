@@ -2,6 +2,7 @@
 
 use App\Http\Filters\ContractsFilesFilter;
 use App\Models\ContractFile;
+use App\Services\Settings;
 use App\Traits\Renderable;
 use App\Traits\Settingable;
 use Illuminate\Http\Request;
@@ -28,7 +29,7 @@ class UploadFilesController extends Controller {
 	* @param 
 	* @return 
 	*/
-	public function list(Request $request) {
+	public function list(Request $request, Settings $settings) {
 		[
 			'sort_field' 	=> $sortField,
 			'sort_order' 	=> $sortOrder,
@@ -46,7 +47,7 @@ class UploadFilesController extends Controller {
 		
 		
 		$files = null;
-		$limit = 10;
+		$limit = $settings->get('contract-files-part-count', 50);
 		
 		$filter = app()->make(ContractsFilesFilter::class, ['queryParams' => ['filter' => json_decode($filter, true), 'search' => $search]]);
 		
