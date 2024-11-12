@@ -5954,22 +5954,31 @@ var getHandlers = Symbol('handlers'),
 
 window.ddrWatcher = function (proxedObj) {
   var watcherFuncName = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-  // тут если из ref передается скаляр - то оборачиваем его в объект
+  // Обернем скаляр в объект, если передано не объектное значение
   proxedObj = _.isPlainObject(proxedObj) ? proxedObj : {
     proxedObj: proxedObj
-  }; // 1. Создадим хранилище обработчиков
+  }; // Создаем хранилище обработчиков
 
   proxedObj[getHandlers] = [];
-  proxedObj[setHandlers] = []; // положим туда функции-обработчики для вызовов в будущем
+  proxedObj[setHandlers] = []; // Метод для получения простого объекта со всеми свойствами, исключая символы и функции
+
+  proxedObj.all = function () {
+    // Создаем объект, содержащий только ключи-свойства (исключая функции и символы)
+    return Object.fromEntries(Object.entries(this).filter(function (_ref3) {
+      var _ref4 = _slicedToArray(_ref3, 2),
+          key = _ref4[0],
+          value = _ref4[1];
+
+      return _typeof(key) !== 'symbol' && typeof value !== 'function';
+    }));
+  }; // Метод для добавления функций-обработчиков
+
 
   proxedObj.observe = function (funcsObj) {
     var outerGetFunc, outerSetFunc, outerMixFunc;
 
     if (_.isFunction(funcsObj)) {
       outerMixFunc = funcsObj;
-      /*} else if (_.isString(funcsObj)) {
-      	window[funcsObj] = callback => outerMixFunc = callback;
-      */
     } else if (_.isPlainObject(funcsObj)) {
       if (_.isString(funcsObj === null || funcsObj === void 0 ? void 0 : funcsObj.get)) {
         window[funcsObj === null || funcsObj === void 0 ? void 0 : funcsObj.get] = function (callback) {
@@ -5986,7 +5995,7 @@ window.ddrWatcher = function (proxedObj) {
       } else {
         outerSetFunc = funcsObj === null || funcsObj === void 0 ? void 0 : funcsObj.set;
       }
-    } //console.log(outerMixFunc);
+    } // Добавляем функции-обработчики
 
 
     if (outerMixFunc) {
@@ -5998,36 +6007,46 @@ window.ddrWatcher = function (proxedObj) {
     if (outerSetFunc) this[setHandlers].push(outerSetFunc);
   };
 
-  if (_.isString(watcherFuncName)) window[watcherFuncName] = function (data) {
-    return proxedObj.observe(data);
-  };else proxedObj.observe(watcherFuncName); // 2. Создадим прокси для реакции на изменения
+  if (_.isString(watcherFuncName)) {
+    window[watcherFuncName] = function (data) {
+      return proxedObj.observe(data);
+    };
+  } else {
+    proxedObj.observe(watcherFuncName);
+  } // Создаем прокси для реакции на изменения
+
 
   return new Proxy(proxedObj, {
     get: function get(target, property, receiver) {
-      if (target[getHandlers]) target[getHandlers].forEach(function (handler) {
-        return handler({
-          type: 'get',
-          target: target,
-          prop: property,
-          value: target[property]
+      if (target[getHandlers]) {
+        target[getHandlers].forEach(function (handler) {
+          return handler({
+            type: 'get',
+            target: target,
+            prop: property,
+            value: target[property]
+          });
         });
-      });
+      }
+
       return Reflect.get.apply(Reflect, arguments);
     },
     set: function set(target, property, value, receiver) {
-      var success = Reflect.set.apply(Reflect, arguments); // перенаправим операцию к оригинальному объекту
+      var oldValue = target[property]; // Сохраняем старое значение
 
-      if (success) {
-        // если не произошло ошибки при записи свойства
-        // вызовем обработчики
-        if (target[setHandlers]) target[setHandlers].forEach(function (handler) {
+      var success = Reflect.set.apply(Reflect, arguments); // Выполняем операцию записи
+
+      if (success && target[setHandlers]) {
+        // Если запись прошла успешно
+        target[setHandlers].forEach(function (handler) {
           return handler({
             type: 'set',
             target: target,
             prop: property,
-            value: value
+            value: value,
+            oldValue: oldValue
           });
-        });
+        }); // Передаем старое значение в обработчик
       }
 
       return success;
@@ -6315,13 +6334,13 @@ window.getCurrentBreakPoint = function () {
 */
 
 
-window.scroll = function (_ref3) {
-  var _ref3$top = _ref3.top,
-      top = _ref3$top === void 0 ? null : _ref3$top,
-      _ref3$bottom = _ref3.bottom,
-      bottom = _ref3$bottom === void 0 ? null : _ref3$bottom,
-      _ref3$both = _ref3.both,
-      both = _ref3$both === void 0 ? null : _ref3$both;
+window.scroll = function (_ref5) {
+  var _ref5$top = _ref5.top,
+      top = _ref5$top === void 0 ? null : _ref5$top,
+      _ref5$bottom = _ref5.bottom,
+      bottom = _ref5$bottom === void 0 ? null : _ref5$bottom,
+      _ref5$both = _ref5.both,
+      both = _ref5$both === void 0 ? null : _ref5$both;
   $(window).scroll(function () {
     scrTop = $(window).scrollTop();
 
@@ -6627,8 +6646,8 @@ window.ddrHash = function (str) {
   var h1 = 0xdeadbeef ^ seed,
       h2 = 0x41c6ce57 ^ seed;
 
-  for (var _i = 0, ch; _i < str.length; _i++) {
-    ch = str.charCodeAt(_i);
+  for (var _i2 = 0, ch; _i2 < str.length; _i2++) {
+    ch = str.charCodeAt(_i2);
     h1 = Math.imul(h1 ^ ch, 2654435761);
     h2 = Math.imul(h2 ^ ch, 1597334677);
   }
@@ -6929,6 +6948,7 @@ $.fn.setAttrib = function (attr, value) {
   if ($(this).length == 0) return false;
   $(this).attr(attr, value || '');
   $(this)[0].setAttribute(attr, value || '');
+  return this;
 };
 /*
 	Удаление атрибута
@@ -6942,6 +6962,7 @@ $.fn.removeAttrib = function (attr) {
   $(this).prop(attr, false);
   $(this).removeAttr(attr);
   $(this)[0].removeAttribute(attr);
+  return this;
 };
 /*
 	Проверка наличия атрибута
@@ -8065,7 +8086,7 @@ window.buildFolders = function () {
 
   function createFolders(zip, folders) {
     var _loop = function _loop() {
-      var _Object$entries$_i = _slicedToArray(_Object$entries[_i2], 2),
+      var _Object$entries$_i = _slicedToArray(_Object$entries[_i3], 2),
           key = _Object$entries$_i[0],
           value = _Object$entries$_i[1];
 
@@ -8080,7 +8101,7 @@ window.buildFolders = function () {
       }
     };
 
-    for (var _i2 = 0, _Object$entries = Object.entries(folders); _i2 < _Object$entries.length; _i2++) {
+    for (var _i3 = 0, _Object$entries = Object.entries(folders); _i3 < _Object$entries.length; _i3++) {
       _loop();
     }
   }
@@ -14551,6 +14572,7 @@ $.fn.ddrWait = function () {
   var labelHtml = text ? '<p class="' + ddrwaitText + '" notouch>' + text + '</p>' : '',
       iconHtml = '<img src="/assets/images/loading.gif" ddrwaiticon class="' + ddrwaitIcon + '" notouch />';
   $(block).addClass(ddrwaitwrapper);
+  $(block).setAttrib('ddrwaiting');
   $(block).append('<div class="' + ddrwaitBlock + ' noselect" id="' + ddrwBId + '"' + (tag ? ' ' + tag : '') + '><div class="' + ddrwaitContent + '" ddrwaitindicator>' + iconHtml + labelHtml + '</div></div>');
   if (isBtn) $(block).ddrInputs('disable');
   $('#' + ddrwBId).ready(function () {
@@ -14569,16 +14591,19 @@ $.fn.ddrWait = function () {
     off: function off() {
       if (isBtn) $(block).ddrInputs('enable');
       $(block).removeClass(ddrwaitwrapper);
+      $(block).removeAttrib('ddrwaiting');
       $(block).find('#' + ddrwBId).setAttrib('hidden');
     },
     on: function on() {
       if (isBtn) $(block).ddrInputs('disable');
       $(block).addClass(ddrwaitwrapper);
+      $(block).setAttrib('ddrwaiting');
       $(block).find('#' + ddrwBId).removeAttrib('hidden');
     },
     destroy: function destroy() {
       if (isBtn) $(block).ddrInputs('enable');
       $(block).removeClass(ddrwaitwrapper);
+      $(block).removeAttrib('ddrwaiting');
       $(block).find('#' + ddrwBId).remove(); //$(block).find('.'+ddrwaitwrapper+', .'+ddrwaitBlock+', .'+ddrwaitContent+', .'+ddrwaitIcon+', .'+ddrwaitText).removeClass('s_*');
     }
   }; //console.log(ddrwaitwrapper, ddrwaitBlock, ddrwaitContent, ddrwaitIcon, ddrwaitText);

@@ -60,6 +60,7 @@ $.fn.ddrWait = function(params = null) {
 		iconHtml = '<img src="/assets/images/loading.gif" ddrwaiticon class="'+ddrwaitIcon+'" notouch />';
 	
 	$(block).addClass(ddrwaitwrapper);
+	$(block).setAttrib('ddrwaiting');
 	$(block).append('<div class="'+ddrwaitBlock+' noselect" id="'+ddrwBId+'"'+(tag ? ' '+tag : '')+'><div class="'+ddrwaitContent+'" ddrwaitindicator>'+iconHtml+labelHtml+'</div></div>');
 	if (isBtn) $(block).ddrInputs('disable');
 	
@@ -81,16 +82,19 @@ $.fn.ddrWait = function(params = null) {
 		off() {
 			if (isBtn) $(block).ddrInputs('enable');
 			$(block).removeClass(ddrwaitwrapper);
+			$(block).removeAttrib('ddrwaiting');
 			$(block).find('#'+ddrwBId).setAttrib('hidden');
 		},
 		on() {
 			if (isBtn) $(block).ddrInputs('disable');
 			$(block).addClass(ddrwaitwrapper);
+			$(block).setAttrib('ddrwaiting');
 			$(block).find('#'+ddrwBId).removeAttrib('hidden');
 		},
 		destroy() {
 			if (isBtn) $(block).ddrInputs('enable');
 			$(block).removeClass(ddrwaitwrapper);
+			$(block).removeAttrib('ddrwaiting');
 			$(block).find('#'+ddrwBId).remove();
 			//$(block).find('.'+ddrwaitwrapper+', .'+ddrwaitBlock+', .'+ddrwaitContent+', .'+ddrwaitIcon+', .'+ddrwaitText).removeClass('s_*');
 		}

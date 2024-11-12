@@ -234,66 +234,78 @@ window.ddrRef = function (data = null, watchFuncs = null) {
 
 
 let getHandlers = Symbol('handlers'),
-	setHandlers = Symbol('handlers');
+    setHandlers = Symbol('handlers');
+
 window.ddrWatcher = function(proxedObj, watcherFuncName = null) {
-	// тут если из ref передается скаляр - то оборачиваем его в объект
-	proxedObj = _.isPlainObject(proxedObj) ? proxedObj : {proxedObj};
-	
-	// 1. Создадим хранилище обработчиков
-	proxedObj[getHandlers] = [];
-	proxedObj[setHandlers] = [];
+    // Обернем скаляр в объект, если передано не объектное значение
+    proxedObj = _.isPlainObject(proxedObj) ? proxedObj : { proxedObj };
+    
+    // Создаем хранилище обработчиков
+    proxedObj[getHandlers] = [];
+    proxedObj[setHandlers] = [];
 
-	// положим туда функции-обработчики для вызовов в будущем
-	proxedObj.observe = function(funcsObj) {
-		let outerGetFunc, outerSetFunc, outerMixFunc;
-		if (_.isFunction(funcsObj)) {
-			outerMixFunc = funcsObj;
-		/*} else if (_.isString(funcsObj)) {
-			window[funcsObj] = callback => outerMixFunc = callback;
-		*/} else if (_.isPlainObject(funcsObj)) {
-			if (_.isString(funcsObj?.get)) {
-				window[funcsObj?.get] = callback => outerGetFunc = callback;
-			} else {
-				outerGetFunc = funcsObj?.get;
-			}
-			
-			if (_.isString(funcsObj?.set)) {
-				window[funcsObj?.set] = callback => outerSetFunc = callback;
-			} else {
-				outerSetFunc = funcsObj?.set;
-			}
-		}
-		
-		//console.log(outerMixFunc);
-		if (outerMixFunc) {
-			this[getHandlers].push(outerMixFunc);
-			this[setHandlers].push(outerMixFunc);
-		}
-		
-		if (outerGetFunc) this[getHandlers].push(outerGetFunc);
-		if (outerSetFunc) this[setHandlers].push(outerSetFunc);
-	};
-	
-	if (_.isString(watcherFuncName)) window[watcherFuncName] = (data) => proxedObj.observe(data);
-	else proxedObj.observe(watcherFuncName);
+    // Метод для получения простого объекта со всеми свойствами, исключая символы и функции
+    proxedObj.all = function() {
+        // Создаем объект, содержащий только ключи-свойства (исключая функции и символы)
+        return Object.fromEntries(
+            Object.entries(this).filter(([key, value]) => typeof key !== 'symbol' && typeof value !== 'function')
+        );
+    };
 
-	// 2. Создадим прокси для реакции на изменения
-	return new Proxy(proxedObj, {
-		get(target, property, receiver) {
-			if (target[getHandlers]) target[getHandlers].forEach(handler => handler({type: 'get', target, prop: property, value: target[property]}));
-			return Reflect.get(...arguments);
-		},
-		set(target, property, value, receiver) {
-			let success = Reflect.set(...arguments); // перенаправим операцию к оригинальному объекту
-			if (success) { // если не произошло ошибки при записи свойства
-				// вызовем обработчики
-				if (target[setHandlers]) target[setHandlers].forEach(handler => handler({type: 'set', target, prop: property, value}));
-			}
-			return success;
-		}
-	});
+    // Метод для добавления функций-обработчиков
+    proxedObj.observe = function(funcsObj) {
+        let outerGetFunc, outerSetFunc, outerMixFunc;
+        if (_.isFunction(funcsObj)) {
+            outerMixFunc = funcsObj;
+        } else if (_.isPlainObject(funcsObj)) {
+            if (_.isString(funcsObj?.get)) {
+                window[funcsObj?.get] = callback => outerGetFunc = callback;
+            } else {
+                outerGetFunc = funcsObj?.get;
+            }
+            
+            if (_.isString(funcsObj?.set)) {
+                window[funcsObj?.set] = callback => outerSetFunc = callback;
+            } else {
+                outerSetFunc = funcsObj?.set;
+            }
+        }
+        
+        // Добавляем функции-обработчики
+        if (outerMixFunc) {
+            this[getHandlers].push(outerMixFunc);
+            this[setHandlers].push(outerMixFunc);
+        }
+        
+        if (outerGetFunc) this[getHandlers].push(outerGetFunc);
+        if (outerSetFunc) this[setHandlers].push(outerSetFunc);
+    };
+    
+    if (_.isString(watcherFuncName)) {
+        window[watcherFuncName] = (data) => proxedObj.observe(data);
+    } else {
+        proxedObj.observe(watcherFuncName);
+    }
+
+    // Создаем прокси для реакции на изменения
+    return new Proxy(proxedObj, {
+        get(target, property, receiver) {
+            if (target[getHandlers]) {
+                target[getHandlers].forEach(handler => handler({ type: 'get', target, prop: property, value: target[property] }));
+            }
+            return Reflect.get(...arguments);
+        },
+        set(target, property, value, receiver) {
+            const oldValue = target[property]; // Сохраняем старое значение
+            let success = Reflect.set(...arguments); // Выполняем операцию записи
+            
+            if (success && target[setHandlers]) { // Если запись прошла успешно
+                target[setHandlers].forEach(handler => handler({ type: 'set', target, prop: property, value, oldValue })); // Передаем старое значение в обработчик
+            }
+            return success;
+        }
+    });
 }
-
 
 
 
@@ -1330,6 +1342,7 @@ $.fn.setAttrib = function(attr, value) {
 	if ($(this).length == 0) return false;
 	$(this).attr(attr, (value || ''));
 	$(this)[0].setAttribute(attr, (value || ''));
+	return this;
 };
 
 /*
@@ -1342,6 +1355,7 @@ $.fn.removeAttrib = function(attr) {
 	$(this).prop(attr, false);
 	$(this).removeAttr(attr);
 	$(this)[0].removeAttribute(attr);
+	return this;
 };
 
 

@@ -118,38 +118,43 @@
 						&-asc, &-desc
 							> *
 								color: #00c4ff
+							
+						&:hover:not(.sort-asc):not(.sort-desc)
+							> *
+								color: #6b84bd !important
 						
-						// &::after
-						// 	position: absolute
-						// 	left: calc(50% - 6px)
-						// 	font-size: 20px
-						// 	line-height: 20px
-						// 	cursor: pointer
-						// 	z-index: 10
-						// 	
-						// 
-						// &:not(.sort-asc):not(.sort-desc)
-						// 	+fontAwesome('\f0dc')
-						// 	
-						// 	&::after
-						// 		bottom: -11px	
-						// 		color: #f5f3f3
-						// 
-						// 
-						// &-asc
-						// 	+fontAwesome('\f0d8')
-						// 	
-						// 	&::after
-						// 		bottom: -12px
-						// 		color: #6b84bd
-						// 	
-						// 
-						// &-desc
-						// 	+fontAwesome('\f0d7')
-						// 	
-						// 	&::after
-						// 		bottom: -9px
-						// 		color: #6b84bd
+						&-row
+							&::after
+								position: absolute
+								left: calc(50% - 6px)
+								font-size: 20px
+								line-height: 20px
+								cursor: pointer
+								z-index: 10
+								
+							
+							&:not(.sort-asc):not(.sort-desc)
+								+fontAwesome('\f0dc')
+								
+								&::after
+									bottom: -11px	
+									color: #f5f3f3
+							
+							
+							&.sort-asc
+								+fontAwesome('\f0d8')
+								
+								&::after
+									bottom: -12px
+									color: #6b84bd
+								
+							
+							&.sort-desc
+								+fontAwesome('\f0d7')
+								
+								&::after
+									bottom: -9px
+									color: #6b84bd
 						
 							
 							
@@ -191,6 +196,10 @@
 						width: 100%
 						height: 100%
 						background-color: #ffffffcf
+				
+				&.selected
+					background-color: #d9d0e9 !important
+					box-shadow: 0 -1px 0 0 #f1eded
 					
 				
 				td

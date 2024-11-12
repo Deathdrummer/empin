@@ -6481,6 +6481,50 @@ span::before {
 .table > table > thead tr td.sort-asc > *, .table > table > thead tr td.sort-desc > * {
   color: #00c4ff;
 }
+.table > table > thead tr td.sort:hover:not(.sort-asc):not(.sort-desc) > * {
+  color: #6b84bd !important;
+}
+.table > table > thead tr td.sort-row::after {
+  position: absolute;
+  left: calc(50% - 6px);
+  font-size: 20px;
+  line-height: 20px;
+  cursor: pointer;
+  z-index: 10;
+}
+.table > table > thead tr td.sort-row:not(.sort-asc):not(.sort-desc) {
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+}
+.table > table > thead tr td.sort-row:not(.sort-asc):not(.sort-desc)::after {
+  content: "\f0dc";
+}
+.table > table > thead tr td.sort-row:not(.sort-asc):not(.sort-desc)::after {
+  bottom: -11px;
+  color: #f5f3f3;
+}
+.table > table > thead tr td.sort-row.sort-asc {
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+}
+.table > table > thead tr td.sort-row.sort-asc::after {
+  content: "\f0d8";
+}
+.table > table > thead tr td.sort-row.sort-asc::after {
+  bottom: -12px;
+  color: #6b84bd;
+}
+.table > table > thead tr td.sort-row.sort-desc {
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+}
+.table > table > thead tr td.sort-row.sort-desc::after {
+  content: "\f0d7";
+}
+.table > table > thead tr td.sort-row.sort-desc::after {
+  bottom: -9px;
+  color: #6b84bd;
+}
 .table > table > tbody:empty {
   height: 60px;
 }
@@ -6514,6 +6558,10 @@ span::before {
   width: 100%;
   height: 100%;
   background-color: rgba(255, 255, 255, 0.8117647059);
+}
+.table > table > tbody > tr.selected {
+  background-color: #d9d0e9 !important;
+  box-shadow: 0 -1px 0 0 #f1eded;
 }
 .table > table > tbody > tr td {
   position: relative;

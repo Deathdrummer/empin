@@ -20,8 +20,8 @@
 	-ms-user-select: none
 	user-select: none
 	
-	&::before
-		content: attr(noselect)
+	//&::before
+		//content: attr(noselect)
 
 .select
 	&-text
@@ -62,7 +62,7 @@
 .notouch, [notouch]
 	pointer-events: none
 
-.pointer
+.pointer, [pointer]
 	cursor: pointer
 	
 .prewrap
@@ -1418,9 +1418,16 @@ $tableColor: #efefef
 			
 			*
 				//color: #fff
-			
 		
-			
+		
+		&.covered
+			img		
+				object-fit: cover
+		
+		&.contained
+			img		
+				object-fit: contain
+				
 		
 		&.sort, [ddrtabletdmain].sort
 			position: relative
@@ -1603,6 +1610,10 @@ $tableColor: #efefef
 		+hr(10%, 90%, #8a9ba7)
 	
 	
+
+.pointer
+	cursor: pointer
+
 
 
 .lightsitem

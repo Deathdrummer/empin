@@ -45517,9 +45517,6 @@ template {
   -ms-user-select: none;
   user-select: none;
 }
-.noselect::before, [noselect]::before {
-  content: attr(noselect);
-}
 
 .select-text {
   -webkit-user-select: text;
@@ -45562,7 +45559,7 @@ template {
   pointer-events: none;
 }
 
-.pointer {
+.pointer, [pointer] {
   cursor: pointer;
 }
 
@@ -143782,6 +143779,12 @@ template {
 .ddrtable__td.selected {
   background-color: #e5ddf3 !important;
 }
+.ddrtable__td.covered img {
+  object-fit: cover;
+}
+.ddrtable__td.contained img {
+  object-fit: contain;
+}
 .ddrtable__td.sort, .ddrtable__td [ddrtabletdmain].sort {
   position: relative;
   cursor: pointer;
@@ -143967,6 +143970,10 @@ template {
   height: 1px;
   background-color: #8a9ba7;
   background-image: linear-gradient(to left, #fff 0%, #8a9ba7 10%, #8a9ba7 90%, #fff 100%);
+}
+
+.pointer {
+  cursor: pointer;
 }
 
 .lightsitem {

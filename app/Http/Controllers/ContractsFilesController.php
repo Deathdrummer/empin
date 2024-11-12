@@ -55,19 +55,39 @@ class ContractsFilesController extends Controller {
 	* @return 
 	*/
 	public function remove(Request $request) {
-		[
-			'filename_sys'	=> $filenameSys,
-			'contract_id'	=> $contractId,
-		] = $request->validate([
-			'filename_sys'	=> 'required|string',
-			'contract_id'	=> 'required|numeric',
-		]);
+		$isDeleted = false;
 		
-		
-		if (Storage::exists("contracts/{$contractId}/{$filenameSys}")) {
-			$isDeleted = Storage::delete("contracts/{$contractId}/{$filenameSys}");
-			if ($isDeleted) {
-				$stat = ContractFile::where('filename_sys', $filenameSys)->delete();
+		if ($request->has('files')) {
+			$filesData = $request->input('files');
+			foreach ($filesData as $fileData) {
+				$decodeFileeData = json_decode($fileData, true);
+				$filenameSys = $decodeFileeData['fileNameSys'];
+				$contractId = $decodeFileeData['contractId'];
+				
+				if (Storage::exists("contracts/{$contractId}/{$filenameSys}")) {
+					$isDeleted = Storage::delete("contracts/{$contractId}/{$filenameSys}");
+					if ($isDeleted) {
+						$stat = ContractFile::where('filename_sys', $filenameSys)->delete();
+					}
+				}
+				
+				if (!$isDeleted) return response()->json(['is_deleted' => $isDeleted]);
+			}
+			
+		} else {
+			[
+				'filename_sys'	=> $filenameSys,
+				'contract_id'	=> $contractId,
+			] = $request->validate([
+				'filename_sys'	=> 'required|string',
+				'contract_id'	=> 'required|numeric',
+			]);
+			
+			if (Storage::exists("contracts/{$contractId}/{$filenameSys}")) {
+				$isDeleted = Storage::delete("contracts/{$contractId}/{$filenameSys}");
+				if ($isDeleted) {
+					$stat = ContractFile::where('filename_sys', $filenameSys)->delete();
+				}
 			}
 		}
 		
