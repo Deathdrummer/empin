@@ -134,13 +134,14 @@ class Contracts extends Controller {
 			]
 		]);
 		
+		$user = auth('site')->user();
 		
 		$canEditAll = auth('site')->user()->can('dostup-ko-vsem-otdelam:site');
 		$isArchive = $request->has('archive') && $request->get('archive') == 1;
 		$isDepartment = $request->has('department_id');
 		$departmentId = $request->get('department_id');
 		
-		$edited = ($canEditAll && !$isArchive) || $isDepartment;
+		$edited = ($canEditAll && (!$isArchive || $user->can('edit-archive:site'))) || $isDepartment;
 		$searched = $request->has('search') && $request->get('search');
 		
 		
@@ -155,7 +156,7 @@ class Contracts extends Controller {
 				return [$item['id'] => $item['title']];
 			})->toArray() : null;
 		
-		$user = auth('site')->user();
+		
 		$rules = ($searched ? '1' : '0');
 		$rules .= ','.($selectionEdited ? '1' : '0');
 		$rules .= ','.($isArchive ? '1' : '0');
