@@ -555,6 +555,16 @@
 									</x-table.td>
 								@endif
 								
+								@if($column == 'power' && auth('site')->user()->can('contract-col-power:site'))
+									<x-table.td
+										class="w7rem sort{{$sortField == 'power' ? ' sort-'.$sortOrder : ''}}"
+										onclick="$.sorting(this, 'power')"
+										noscroll
+										ddrtabletdmain
+										><strong class="fz10px lh90 d-block text-center wodrbreak">Мощность кВт</strong>
+									</x-table.td>
+								@endif
+								
 							@empty	
 							@endforelse
 

@@ -298,6 +298,7 @@ class ContractsExport extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBinder i
 			'hoz_method' 		=> ['width' => 10, 'type' => 'bool'],
 			'type' 				=> ['width' => 15, 'type' => 'text'],
 			'contractor' 		=> ['width' => 20, 'type' => 'text'],
+			'power' 			=> ['width' => 10, 'type' => 'number'],
 			'archive_dir' 		=> ['width' => 30, 'type' => 'text'],
 		];
 		

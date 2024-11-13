@@ -89,6 +89,7 @@ class Contract extends Model {
 		'gencontracting',
 		'hoz_method',
 		'departments',
+		'power',
 		'archive',
 		'archive_dir',
 		'_sort'
