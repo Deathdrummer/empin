@@ -2478,6 +2478,10 @@
 			selectedContracts.clear();
 			loadedContractsIds.clear();
 			$('.chooser__item.searchcontractcounts').removeClass('searchcontractcounts');
+			
+			$('#chooserAll').find('[selectionscounts]').empty();
+			$('#chooserArchive').find('[selectionscounts]').empty();
+			$('[chooserdepartment]').find('[selectionscounts]').empty();
 		} else {}
 
 
@@ -2593,14 +2597,8 @@
 			if(withCounts){
 				$('.chooser__item').addClass('searchcontractcounts');
 			}
+			
 			if (headers) {
-				$('#chooserAll').find('[selectionscounts]').empty();
-				$('#chooserArchive').find('[selectionscounts]').empty();
-				$('[chooserdepartment]').find('[selectionscounts]').empty();
-
-
-
-
 				if (headers['x-count-contracts-all']) {
 					$('#chooserAll').find('[selectionscounts]').text(headers['x-count-contracts-all'] > 0 ? headers['x-count-contracts-all'] : '');
 				} else {
