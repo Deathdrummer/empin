@@ -45518,6 +45518,10 @@ template {
   user-select: none;
 }
 
+[data]::before {
+  content: attr(data);
+}
+
 .select-text {
   -webkit-user-select: text;
       -ms-user-select: text;

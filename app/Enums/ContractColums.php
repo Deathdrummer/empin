@@ -58,6 +58,7 @@ final class ContractColums extends Enum {
 	const date_close 	 	= 'Дата закрытия договора';
 	const archive_dir 		= 'Архивная папка';
 	const period 			= 'Срок исполнения договора';
+	const power 			= 'Мощность кВт';
 	const archive 			= 'В архиве';
 }
 

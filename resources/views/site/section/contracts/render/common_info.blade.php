@@ -45,7 +45,7 @@
 				@cando('contract-col-customer:site')
 					<tr>
 						<td>
-							<p class="color-gray-500" noselect="Заказчик:" format></p>
+							<p class="color-gray-500" noselect data="Заказчик:" format></p>
 						</td>
 						<td>
 							<p class="breakword select-text" tripleselect>{{$customers[$contract['customer']] ?? '-'}}</p>
@@ -56,7 +56,7 @@
 				@cando('contract-col-contractor:site')
 					<tr>
 						<td>
-							<p class="color-gray-500 format" noselect="Исполнитель:"></p>
+							<p class="color-gray-500 format" noselect data="Исполнитель:"></p>
 						</td>
 						<td>
 							<p class="breakword select-text" tripleselect>{{$contractors[$contract['contractor']] ?? '-'}}</p>
@@ -67,7 +67,7 @@
 				@cando('contract-col-type:site')
 					<tr>
 						<td>
-							<p class="color-gray-500 format" noselect="Тип договора:"></p>
+							<p class="color-gray-500 format" noselect data="Тип договора:"></p>
 						</td>
 						<td>
 							<p class="breakword select-text" tripleselect>{{$types[$contract['type']] ?? '-'}}</p>
@@ -78,7 +78,7 @@
 				@cando('contract-col-date_start:site')
 					<tr>
 						<td>
-							<p class="color-gray-500 format" noselect="Дата подписания договора:"></p>
+							<p class="color-gray-500 format" noselect data="Дата подписания договора:"></p>
 						</td>
 						<td>
 							<p class="breakword select-text" tripleselect>
@@ -95,7 +95,7 @@
 				@cando('contract-col-date_end:site')
 					<tr>
 						<td>
-							<p class="color-gray-500 format" noselect="Дата окончания работ по договору:"></p>
+							<p class="color-gray-500 format" noselect data="Дата окончания работ по договору:"></p>
 						</td>
 						<td>
 							<p class="breakword select-text" tripleselect>
@@ -112,7 +112,7 @@
 				@cando('contract-col-contract:site')
 					<tr>
 						<td>
-							<p class="color-gray-500 format" noselect="Номер договора:"></p>
+							<p class="color-gray-500 format" noselect data="Номер договора:"></p>
 						</td>
 						<td>
 							<p class="breakword select-text" tripleselect>{{$contract['contract'] ?? '-'}}</p>
@@ -123,7 +123,7 @@
 				@cando('contract-col-applicant:site')
 					<tr>
 						<td>
-							<p class="color-gray-500 format" noselect="Заявитель:"></p>
+							<p class="color-gray-500 format" noselect data="Заявитель:"></p>
 						</td>
 						<td>
 							<p class="breakword select-text" tripleselect>{{$contract['applicant'] ?? '-'}}</p>
@@ -135,7 +135,7 @@
 				@cando('contract-col-locality:site')
 					<tr>
 						<td>
-							<p class="color-gray-500 format" noselect="Населенный пункт:"></p>
+							<p class="color-gray-500 format" noselect data="Населенный пункт:"></p>
 						</td>
 						<td>
 							<p class="breakword select-text" tripleselect>{{$contract['locality'] ?? '-'}}</p>
@@ -146,7 +146,7 @@
 				@cando('contract-col-price:site')
 					<tr>
 						<td>
-							<p class="color-gray-500 format" noselect="Стоимость договора без НДС:"></p>
+							<p class="color-gray-500 format" noselect data="Стоимость договора без НДС:"></p>
 						</td>
 						<td>
 							<p class="breakword select-text" tripleselect>
@@ -163,7 +163,7 @@
 				@cando('contract-col-price_nds:site')
 					<tr>
 						<td>
-							<p class="color-gray-500 format" noselect="Стоимость договора с НДС:"></p>
+							<p class="color-gray-500 format" noselect data="Стоимость договора с НДС:"></p>
 						</td>
 						<td>
 							<p class="breakword select-text" tripleselect>
@@ -181,7 +181,7 @@
 				@if($contract['subcontracting'])
 					<tr>
 						<td>
-							<p class="color-gray-500 format" noselect="Стоимость генподрядного договора без НДС:"></p>
+							<p class="color-gray-500 format" noselect data="Стоимость генподрядного договора без НДС:"></p>
 						</td>
 						<td>
 							<p class="breakword select-text" tripleselect>
@@ -200,7 +200,7 @@
 				@if($contract['subcontracting'])
 					<tr>
 						<td>
-							<p class="color-gray-500 format" noselect="Стоимость генподрядного договора с НДС:"></p>
+							<p class="color-gray-500 format" noselect data="Стоимость генподрядного договора с НДС:"></p>
 						</td>
 						<td>
 							<p class="breakword select-text" tripleselect>
@@ -220,7 +220,7 @@
 				@if($contract['gencontracting'])
 					<tr>
 						<td>
-							<p class="color-gray-500 format" noselect="Стоимость генподрядного договора без НДС:"></p>
+							<p class="color-gray-500 format" noselect data="Стоимость генподрядного договора без НДС:"></p>
 						</td>
 						<td>
 							<p class="breakword select-text" tripleselect>
@@ -239,7 +239,7 @@
 				@if($contract['gencontracting'])
 					<tr>
 						<td>
-							<p class="color-gray-500 format" noselect="Стоимость генподрядного договора с НДС:"></p>
+							<p class="color-gray-500 format" noselect data="Стоимость генподрядного договора с НДС:"></p>
 						</td>
 						<td>
 							<p class="breakword select-text" tripleselect>
@@ -258,7 +258,7 @@
 				@if($contract['subcontracting'])
 					<tr>
 						<td>
-							<p class="color-gray-500 format" noselect="Дата подписания генподрядного договора:"></p>
+							<p class="color-gray-500 format" noselect data="Дата подписания генподрядного договора:"></p>
 						</td>
 						<td>
 							<p class="breakword select-text" tripleselect>
@@ -277,7 +277,7 @@
 				@if($contract['subcontracting'])
 					<tr>
 						<td>
-							<p class="color-gray-500 format" noselect="Дата окончания работ по генподрядному договору:"></p>
+							<p class="color-gray-500 format" noselect data="Дата окончания работ по генподрядному договору:"></p>
 						</td>
 						<td>
 							<p class="breakword select-text" tripleselect>
@@ -296,7 +296,7 @@
 				@if($contract['gencontracting'])
 					<tr>
 						<td>
-							<p class="color-gray-500 format" noselect="Дата подписания субподрядного договора:"></p>
+							<p class="color-gray-500 format" noselect data="Дата подписания субподрядного договора:"></p>
 						</td>
 						<td>
 							<p class="breakword select-text" tripleselect>
@@ -315,7 +315,7 @@
 				@if($contract['gencontracting'])
 					<tr>
 						<td>
-							<p class="color-gray-500 format" noselect="Дата окончания работ по субподрядному договору:"></p>
+							<p class="color-gray-500 format" noselect data="Дата окончания работ по субподрядному договору:"></p>
 						</td>
 						<td>
 							<p class="breakword select-text" tripleselect>
@@ -333,7 +333,7 @@
 				@cando('contract-col-hoz_method:site')
 					<tr>
 						<td>
-							<p class="color-gray-500 format" noselect="Хоз способ:"></p>
+							<p class="color-gray-500 format" noselect data="Хоз способ:"></p>
 						</td>
 						<td>
 							@if($contract['hoz_method'])
@@ -348,7 +348,7 @@
 				@cando('contract-col-subcontracting:site')
 					<tr>
 						<td>
-							<p class="color-gray-500 format" noselect="Субподряд:"></p>
+							<p class="color-gray-500 format" noselect data="Субподряд:"></p>
 						</td>
 						<td>
 							@if($contract['subcontracting'])
@@ -363,7 +363,7 @@
 				@cando('contract-col-gencontracting:site')
 					<tr>
 						<td>
-							<p class="color-gray-500 format" noselect="Генподряд:"></p>
+							<p class="color-gray-500 format" noselect data="Генподряд:"></p>
 						</td>
 						<td>
 							@if($contract['gencontracting'])
@@ -378,7 +378,7 @@
 				@cando('contract-col-buy_number:site')
 					<tr>
 						<td>
-							<p class="color-gray-500 format" noselect="Номер закупки:"></p>
+							<p class="color-gray-500 format" noselect data="Номер закупки:"></p>
 						</td>
 						<td>
 							<p class="breakword select-text" tripleselect>{{$contract['buy_number'] ?? '-'}}</p>
@@ -389,7 +389,7 @@
 				@cando('contract-col-date_buy:site')
 					<tr>
 						<td>
-							<p class="color-gray-500 format" noselect="Дата закупки:"></p>
+							<p class="color-gray-500 format" noselect data="Дата закупки:"></p>
 						</td>
 						<td>
 							<p class="breakword select-text" tripleselect>
@@ -406,7 +406,7 @@
 				@cando('contract-col-date_close:site')
 					<tr>
 						<td>
-							<p class="color-gray-500 format" noselect="Дата закрытия договора:"></p>
+							<p class="color-gray-500 format" noselect data="Дата закрытия договора:"></p>
 						</td>
 						<td>
 							<p class="breakword select-text" tripleselect>
@@ -420,10 +420,21 @@
 					</tr>
 				@endcando
 				
+				@cando('contract-col-power:site')
+					<tr>
+						<td>
+							<p class="color-gray-500 format" noselect data="Мощность кВт:"></p>
+						</td>
+						<td>
+							<p class="breakword select-text" tripleselect>{{$contract['power'] ?? '-'}}</p>
+						</td>
+					</tr>
+				@endcando
+				
 				@cando('contract-col-archive_dir:site')
 					<tr>
 						<td>
-							<p class="color-gray-500 format" noselect="Архивная папка:"></p>
+							<p class="color-gray-500 format" noselect data="Архивная папка:"></p>
 						</td>
 						<td>
 							<p class="breakword select-text" tripleselect>{{$contract['archive_dir'] ?? '-'}}</p>
@@ -434,7 +445,7 @@
 				@cando('contract-col-titul:site')
 					<tr>
 						<td>
-							<p class="color-gray-500 format" noselect="Титул:"></p>
+							<p class="color-gray-500 format" noselect data="Титул:"></p>
 						</td>
 						<td>
 							<p class="

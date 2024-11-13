@@ -205,6 +205,7 @@ class Contracts extends Controller {
 			'hoz_method' 		=> 'boolean|nullable',
 			'archive_dir' 		=> 'nullable|string',
 			'departments' 		=> 'array|exclude',
+			'power' 			=> 'nullable|numeric',
 			'_sort'				=> 'exclude|regex:/[0-9]+/'
 		]);
 		
@@ -375,6 +376,7 @@ class Contracts extends Controller {
 			'hoz_method' 		=> 'boolean|nullable',
 			'archive_dir' 		=> 'nullable|string',
 			'departments' 		=> 'array|exclude',
+			'power' 			=> 'nullable|numeric',
 			'views'				=> 'string|required|exclude'
 		]);
 		

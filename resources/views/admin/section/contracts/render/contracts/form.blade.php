@@ -85,8 +85,23 @@
 					</div>
 					
 					<div class="form__item">
-						<label class="form__label color-dark">Тип договора</label>
+						<div class="row g-10">
+							<div class="col">
+								<label class="form__label color-dark">Тип договора</label>
 						<x-select :options="$data['types']" name="type" value="{{$type ?? null}}" class="w100" />
+							</div>
+							<div class="col-auto">
+								<label class="form__label color-dark breakword">Устанавливаемая мощность</label>
+									<x-input
+										type="number"
+										name="power"
+										showrows
+										value="{{$power ?? 0}}"
+										class="w100"
+										placeholder="кВт"
+										/>
+							</div>
+						</div>	
 					</div>
 					
 					
@@ -204,7 +219,6 @@
 							</div>
 						</div>
 					</div>
-					
 				</div>
 			</div>
 			
