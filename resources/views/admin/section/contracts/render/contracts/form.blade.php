@@ -97,6 +97,8 @@
 										name="power"
 										showrows
 										value="{{$power ?? 0}}"
+										icontext="кВт"
+										iconbg="yellow"
 										class="w100"
 										placeholder="кВт"
 										/>

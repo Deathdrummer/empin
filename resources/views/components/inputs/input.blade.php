@@ -17,6 +17,7 @@
 	'showrows' 		=> false,
 	'action'        => 'setSetting',
 	'icon'        	=> null,
+	'icontext'   	=> null,
 	'iconbg'     	=> null,
 	'clearcolor'	=> null,
 	'cleared'		=> null,
@@ -32,7 +33,7 @@
 		($group ? $group.'-' : '').'input-'.$type => $type,
 		($group ? $group.'-' : '').'input_noempty' => !$cleared && $setValue($value, $settings, $setting),
 		($group ? $group.'-' : '').'input_disabled' => $group && ($disabled || !$enabled),
-		($group ? $group.'-' : '').'input_iconed' => $icon || $clearcolor,
+		($group ? $group.'-' : '').'input_iconed' => $icon || $icontext || $clearcolor,
 	])}}>
 	
 	@if($label)
@@ -81,7 +82,7 @@
 			$group.'-showpassword' => $group
 		])><i class="fa-solid fa-eye-slash" title="Показать пароль"></i></div>
 	
-	@elseif($icon)
+	@elseif($icon || $icontext)
 		<div
 			@class([
 				'postfix_icon',
@@ -91,7 +92,13 @@
 				'pointer' => $iconActionFunc
 			])
 			@if($iconActionFunc)onclick="$.{{$iconActionFunc}}(this{{$iconActionParams ? ', '.$iconActionParams : null}})" @endif
-			><i class="fa-solid fa-{{$icon}}"></i></div>
+			>
+			@if($icon)
+				<i class="fa-solid fa-{{$icon}}"></i>
+			@elseif($icontext)
+				<p>{{$icontext}}</p>
+			@endif
+			</div>
 	@endif
 	
 	<div class="{{($group ? $group.'-' : '').'input__errorlabel'}} noselect" errorlabel></div>
