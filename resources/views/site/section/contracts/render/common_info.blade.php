@@ -330,7 +330,7 @@
 				@endif
 				@endcando
 				
-				@cando('contract-col-hoz_method:site')
+				{{-- @cando('contract-col-hoz_method:site')
 					<tr>
 						<td>
 							<p class="color-gray-500 format" noselect data="Хоз способ:"></p>
@@ -343,7 +343,20 @@
 							@endif
 						</td>
 					</tr>
+				@endcando --}}
+				
+				
+				@cando('contract-col-power:site')
+					<tr>
+						<td>
+							<p class="color-gray-500 format" noselect data="Мощность:"></p>
+						</td>
+						<td>
+							<p class="breakword select-text" tripleselect>{{$contract['power'] ?? '-'}} <sup>кВт</sup></p>
+						</td>
+					</tr>
 				@endcando
+				
 				
 				@cando('contract-col-subcontracting:site')
 					<tr>
@@ -416,17 +429,6 @@
 									-
 								@endif
 							</p>
-						</td>
-					</tr>
-				@endcando
-				
-				@cando('contract-col-power:site')
-					<tr>
-						<td>
-							<p class="color-gray-500 format" noselect data="Мощность кВт:"></p>
-						</td>
-						<td>
-							<p class="breakword select-text" tripleselect>{{$contract['power'] ?? '-'}}</p>
 						</td>
 					</tr>
 				@endcando

@@ -20417,7 +20417,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                   $(cell).off('.savecelldata'); //------------------------------------------------------------- Сохранить
 
                   $(cell).one(tapEvent + '.savecelldata', '[savecelldata]', /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee6() {
-                    var row, prices, addictColums, priceRegex, cellVal, cellData, emptyVal, _yield$axiosQuery6, data, error, status, headers, _calcPrices;
+                    var row, prices, addictColums, priceRegex, cellVal, cellData, emptyVal, _yield$axiosQuery6, data, error, status, headers, _calcPrices, cellDataToedittedPlace;
 
                     return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee6$(_context6) {
                       while (1) {
@@ -20466,7 +20466,8 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
 
                             if (data) {
                               $.notify('Сохранено!');
-                              $(cell).find('[edittedplace]').text(cellData || emptyVal);
+                              cellDataToedittedPlace = column == 'power' && cellData == 0 ? '-' : cellData || emptyVal;
+                              $(cell).find('[edittedplace]').text(cellDataToedittedPlace);
                               cellWait.destroy();
 
                               if (type == 2) {
