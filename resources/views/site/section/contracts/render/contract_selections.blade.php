@@ -1,5 +1,5 @@
 <div ondblclick="event.stopPropagation();" oncontextmenu="event.stopPropagation();event.preventDefault();">
-	<h4 class="fz16px mb1rem">Этот договор в следующих подборках:</h4>
+	<h4 class="fz16px mb1rem">Договор в следующих подборках:</h4>
 	<div class="scrollblock-light pr5px minh2rem" style="max-height: calc(100vh - 100px);">
 		@if($selections)
 			<ul>
