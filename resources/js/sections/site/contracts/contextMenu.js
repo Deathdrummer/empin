@@ -853,6 +853,7 @@ export function contextMenu(
 						
 						edittedBlock[0].selectionStart = edittedBlock[0].selectionEnd = edittedBlock[0].value.length;
 						
+						
 						if (type == 2) {
 							$(cell).find('#edittedCellData').number(true, 2, '.', ' ');
 							
@@ -1172,7 +1173,8 @@ export function contextMenu(
 							
 							if (data) {
 								$.notify('Сохранено!');
-								$(cell).find('[edittedplace]').text(cellData || emptyVal);
+								const cellDataToedittedPlace = column == 'power' && cellData == 0 ? '-' : cellData || emptyVal;
+								$(cell).find('[edittedplace]').text(cellDataToedittedPlace);
 								cellWait.destroy();
 								if (type == 2) {
 									$(cell).find('[edittedplace]').number(true, 2, '.', ' ');

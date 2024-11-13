@@ -93,7 +93,7 @@
 							<div class="col-auto">
 								<label class="form__label color-dark breakword">Устанавливаемая мощность</label>
 									<x-input
-										type="number"
+										type="text"
 										name="power"
 										showrows
 										value="{{$power ?? 0}}"

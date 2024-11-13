@@ -492,7 +492,7 @@
 	
 	@if($column == 'power' && auth('site')->user()->can('contract-col-power:site'))
 		<x-table.td class="breakword h-center" commonlist contextedit="{{$id}},{{$column}},1" style="background-color: {{$selected_color.'75' ?? ''}};">
-			<p class="fz12px" edittedplace="-">{{$power ?? '-'}}</p>
+			<p class="fz12px" edittedplace="-">{{!isset($power) || $power == 0 ? '-' : $power}}</p>
 		</x-table.td>
 	@endif
 @empty	
