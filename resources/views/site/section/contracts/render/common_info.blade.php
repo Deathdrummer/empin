@@ -352,7 +352,11 @@
 							<p class="color-gray-500 format" noselect data="Мощность:"></p>
 						</td>
 						<td>
-							<p class="breakword select-text" tripleselect>{{$contract['power'] ?? '-'}} <sup>кВт</sup></p>
+							@if($contract['power'] ?? false)
+								<p class="breakword select-text" tripleselect>{{$contract['power']}} <sup>кВт</sup></p>
+							@else
+								<p>-</p>
+							@endif
 						</td>
 					</tr>
 				@endcando
