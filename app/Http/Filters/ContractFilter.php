@@ -152,7 +152,7 @@ class ContractFilter extends AbstractFilter {
 						if ($dateTo) $query->where($column, '<=', Carbon::parse($dateTo));
 					
 					} else {
-						$query->where($column, $value);
+						$query->orWhere($column, $value);
 					}
 				}
 			});
