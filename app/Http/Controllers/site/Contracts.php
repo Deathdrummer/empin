@@ -101,7 +101,7 @@ class Contracts extends Controller {
 		
 		$columnFilter = null;
 		if ($filterRequest = json_decode($request->get('filter', null), true)) {
-			$columnFilter = $filterRequest['column'] ?? null;
+			$columnFilter = array_column($filterRequest, 'column') ?? null;
 		}
 		
 		if (!$list || $list->isEmpty()) return $this->renderWithHeaders('list', compact('columnFilter'), $headers);

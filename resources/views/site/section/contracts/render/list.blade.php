@@ -116,8 +116,7 @@
 										ddrtabletdmain
 										>
 										<strong class="fz10px lh90 d-block text-center wodrbreak">Заказчик</strong>
-										
-										@if(isset($columnFilter) && $columnFilter == $column)
+										@if(isset($columnFilter) && in_array($column, $columnFilter))
 											<div class="placer placer-bottom placer-center">
 												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
 											</div>
@@ -141,9 +140,15 @@
 									<x-table.td
 										class="w6rem sort{{$sortField == 'date_send_action' ? ' sort-'.$sortOrder : ''}}"
 										onclick="$.sorting(this, 'date_send_action')"
+										oncontextmenu="$.contractFilterByDate('{{$column}}')"
 										noscroll
 										ddrtabletdmain
 										><strong class="fz10px lh90 d-block text-center wodrbreak">Дата подачи выполнения</strong>
+										@if(isset($columnFilter) && in_array($column, $columnFilter))
+											<div class="placer placer-bottom placer-center">
+												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
+											</div>
+										@endif
 									</x-table.td>
 								@endif
 								
@@ -330,6 +335,7 @@
 									<x-table.td
 										class="w6rem sort{{$sortField == 'date_report_from' ? ' sort-'.$sortOrder : ''}}"
 										onclick="$.sorting(this, 'date_report_from')"
+										oncontextmenu="$.contractFilterByDate('{{$column}}')"
 										noscroll
 										ddrtabletdmain
 										><strong class="fz10px lh90 d-block text-center wodrbreak">Отчет-ный период с</strong>
@@ -345,7 +351,7 @@
 										ddrtabletdmain
 										>
 										<strong class="fz10px lh90 d-block text-center wodrbreak">Дата подписания договора</strong>
-										@if(isset($columnFilter) && $columnFilter == $column)
+										@if(isset($columnFilter) && in_array($column, $columnFilter))
 											<div class="placer placer-bottom placer-center">
 												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
 											</div>
@@ -362,7 +368,7 @@
 										ddrtabletdmain
 										>
 										<strong class="fz10px lh90 d-block text-center wodrbreak">Дата окончания работ по договору</strong>
-										@if(isset($columnFilter) && $columnFilter == $column)
+										@if(isset($columnFilter) && in_array($column, $columnFilter))
 											<div class="placer placer-bottom placer-center">
 												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
 											</div>
@@ -379,7 +385,7 @@
 										ddrtabletdmain
 										>
 										<strong class="fz10px lh90 d-block text-center wodrbreak">Дата подписания генподрядного договора</strong>
-										@if(isset($columnFilter) && $columnFilter == $column)
+										@if(isset($columnFilter) && in_array($column, $columnFilter))
 											<div class="placer placer-bottom placer-center">
 												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
 											</div>
@@ -396,7 +402,7 @@
 										ddrtabletdmain
 										>
 										<strong class="fz10px lh90 d-block text-center wodrbreak">Дата окончания работ по генподрядному договору</strong>
-										@if(isset($columnFilter) && $columnFilter == $column)
+										@if(isset($columnFilter) && in_array($column, $columnFilter))
 											<div class="placer placer-bottom placer-center">
 												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
 											</div>
@@ -413,7 +419,7 @@
 										ddrtabletdmain
 										>
 										<strong class="fz10px lh90 d-block text-center wodrbreak">Дата подписания субподрядного договора</strong>
-										@if(isset($columnFilter) && $columnFilter == $column)
+										@if(isset($columnFilter) && in_array($column, $columnFilter))
 											<div class="placer placer-bottom placer-center">
 												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
 											</div>
@@ -430,7 +436,7 @@
 										ddrtabletdmain
 										>
 										<strong class="fz10px lh90 d-block text-center wodrbreak">Дата окончания работ по субподрядному договору</strong>
-										@if(isset($columnFilter) && $columnFilter == $column)
+										@if(isset($columnFilter) && in_array($column, $columnFilter))
 											<div class="placer placer-bottom placer-center">
 												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
 											</div>
@@ -499,7 +505,7 @@
 										ddrtabletdmain
 										>
 										<strong class="fz10px lh90 d-block text-center wodrbreak">Исполнитель</strong>
-										@if(isset($columnFilter) && $columnFilter == $column)
+										@if(isset($columnFilter) && in_array($column, $columnFilter))
 											<div class="placer placer-bottom placer-center">
 												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
 											</div>
@@ -521,9 +527,15 @@
 									<x-table.td
 										class="w7rem sort{{$sortField == 'date_buy' ? ' sort-'.$sortOrder : ''}}"
 										onclick="$.sorting(this, 'date_buy')"
+										oncontextmenu="$.contractFilterByDate('{{$column}}')"
 										noscroll
 										ddrtabletdmain
 										><strong class="fz10px lh90 d-block text-center wodrbreak">Дата закупки</strong>
+										@if(isset($columnFilter) && in_array($column, $columnFilter))
+											<div class="placer placer-bottom placer-center">
+												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
+											</div>
+										@endif
 									</x-table.td>
 								@endif
 								
@@ -536,7 +548,7 @@
 										ddrtabletdmain
 										>
 										<strong class="fz10px lh90 d-block text-center wodrbreak">Дата закрытия договора</strong>
-										@if(isset($columnFilter) && $columnFilter == $column)
+										@if(isset($columnFilter) && in_array($column, $columnFilter))
 											<div class="placer placer-bottom placer-center">
 												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
 											</div>
