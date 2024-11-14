@@ -264,7 +264,7 @@
 		canEditCell 			= '{{Auth::guard('site')->user()->can('contract-can-edit-cell::site')}}',
 		offset 					= 0,
 		search 					= null,
-		columnFilter 			= null, // поиск по значению из сстолбца
+		columnFilter 			= [], // поиск по значению из столбца
 		selection 				= ref(null),
 		editSelection 			= null,
 		searchWithArchive 		= false,
@@ -1936,7 +1936,7 @@
 
 	$.contractFilterBy = async ({target, preload, closeOnScroll, onContextMenu, onCloseContextMenu, changeAttrData, buildTitle, setStyle}, column) => {
 		if (abortCtrlFilter instanceof AbortController) abortCtrlFilter.abort();
-
+		
 		setStyle({
 			'mainFontSize': '12px',
 			'mainMinHeight': '30px',
@@ -1948,11 +1948,8 @@
 		onContextMenu(({setMaxHeight}) => {
 			setMaxHeight('calc(100vh - 300px)');
 		});
-
-
-		//console.log(column, currentList);
-
-
+		
+		
 		abortCtrlFilter = new AbortController();
 		const {data, error, status, headers, abort} = await axiosQuery('get', 'site/contracts/column_values', {column, currentList}, 'json', abortCtrlFilter);
 
@@ -1960,14 +1957,14 @@
 			$.notify('Ошибка загрузки данных', 'error');
 			console.log(error?.message, error.errors);
 		}
-
-
+		
 		const navData = [];
 		$.each(data, (_, {id, name, title}) => {
 			let itemTitle = name || title;
-
+			
 			let itemName;
-			if (columnFilter?.value == id) {
+			if (columnFilter.findIndex(item => item?.value == id && item?.column == column) !== -1) {
+			//if (columnFilter?.value == id) {
 				itemName = '<span class="color-blue">'+itemTitle+'</span>';
 			} else {
 				itemName = itemTitle;
@@ -1976,10 +1973,11 @@
 			navData.push({
 				name: itemName,
 				onClick() {
-					columnFilter = {
+					columnFilter.push({
 						column,
 						value: id
-					};
+					});
+					//columnFilter = 
 
 					dateFromValue = {},
 					dateToValue = {},
@@ -2141,11 +2139,11 @@
 			buildData.push(td.getFullYear()+'-'+addZero(td.getMonth() + 1)+'-'+addZero(td.getDate())+' 00:00:00');
 		} else buildData.push('');
 
-
-		columnFilter = {
+		columnFilter.push({
 			column: columnDateFilter,
 			value: buildData.join('|'), //dateFromValueFormat+'|'+dateToValueFormat,
-		};
+		})
+		//columnFilter = };
 
 		getList({
 			withCounts: search || selection.value,
@@ -2169,13 +2167,13 @@
 	//----------------------------------------------------------------------------------------------------- Отменить фильтрацию
 	$.cancelContractFilter = (event, column) => {
 		if (!column) {
-			columnFilter = null;
+			columnFilter = [];
 			dateFromValue = {};
 			dateToValue = {};
 			columnDateFilter = null;
 		} else {
 			event.stopPropagation();
-			columnFilter = null;
+			columnFilter = columnFilter.filter(item => item.column !== column);
 
 			delete(dateFromValue[column]);
 			delete(dateToValue[column]);
@@ -2505,12 +2503,13 @@
 		params['offset'] = localOffset != null ? localOffset : offset;
 		params['append'] = append ? 1 : 0;
 		params['search'] = search;
-		params['filter'] = columnFilter;
+		params['filter'] = columnFilter.length ? JSON.stringify(columnFilter) : null;
 		params['selection'] = selection.value;
 		params['edit_selection'] = editSelection;
 		params['selected_contracts'] = selectedContracts.items;
 		params['can_edit_selection'] = canEditSelection;
-
+		
+		
 		//-----------------------------------
 
 		if (!init) {
