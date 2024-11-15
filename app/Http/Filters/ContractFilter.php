@@ -5,6 +5,7 @@ use App\Traits\Settingable;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use App\Services\Business\User as UserService;
+use Illuminate\Support\Str;
 
 class ContractFilter extends AbstractFilter {
 	use Settingable;
@@ -151,6 +152,14 @@ class ContractFilter extends AbstractFilter {
 						if ($dateFrom) $query->where($column, '>=', Carbon::parse($dateFrom));
 						if ($dateTo) $query->where($column, '<=', Carbon::parse($dateTo));
 					
+					} elseif (Str::contains($value, '|')) {
+						$d = explode('|', $value);
+						
+						$valFrom = $d[0] ?? null;
+						$valTo = $d[1] ?? null;
+						
+						if ($valFrom) $query->where($column, '>=', $valFrom);
+						if ($valTo) $query->where($column, '<=', $valTo);
 					} else {
 						$query->orWhere($column, $value);
 					}
