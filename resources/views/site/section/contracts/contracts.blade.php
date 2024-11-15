@@ -106,7 +106,7 @@
 
 		<div class="row mb2rem align-items-center" id="tableContainer">
 			<div class="col">
-				<div class="horisontal horisontal_hidescroll horisontal_nopadding">
+				<div class="horisontal horisontal_hidescroll horisontal_nopadding" id="depsChooser">
 					<div class="horisontal__track">
 						<div class="horisontal__item">
 							<x-chooser variant="neutral" group="normal" px="10">
@@ -266,7 +266,7 @@
 
 
 <script type="module">
-
+	
 	const {calcSubcontracting, calcGencontracting, showSelections, contextMenu, contentSelection, selectionsList, getLastnameFromApplicant} = loadSectionScripts({section: 'contracts'});
 
 
@@ -351,6 +351,31 @@
 			selectedContracts.items = [];
 		}
 	});
+	
+	
+	
+	
+	
+	
+	//--------------------------------------------------------------------------------- Перемещение курсором мыши
+	let isMouseDownStat = false;
+	
+	$('#depsChooser').on('mousedown', (e) => {
+		isMouseDownStat = true;
+	});
+	
+	$('#depsChooser').on('mouseup mouseleave', (e) => {
+		isMouseDownStat = false;
+	});
+	
+	$('#depsChooser').on('mousemove', (e) => {
+		if (!isMouseDownStat) return;
+		const container = $('#depsChooser')[0];
+		const moveX = e.originalEvent.movementX;
+		container.scrollLeft -= moveX;
+	});
+
+
 
 
 
