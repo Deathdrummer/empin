@@ -182,9 +182,15 @@
 										style="width:{{isset($listWidth['price']) ? $listWidth['price'] : '110'}}px;"
 										class="sort{{$sortField == 'price' ? ' sort-'.$sortOrder : ''}}"
 										onclick="$.sorting(this, 'price')"
+										oncontextmenu="$.contractFilterBySumm('{{$column}}')"
 										noscroll
 										ddrtabletdmain
 										><strong class="fz10px lh90 d-block text-center wodrbreak">Стоимость договора без НДС</strong>
+										@if(isset($columnFilter) && in_array($column, $columnFilter))
+											<div class="placer placer-bottom placer-center">
+												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
+											</div>
+										@endif
 									</x-table.td>
 								@endif
 								
@@ -193,9 +199,15 @@
 										style="width:{{isset($listWidth['price_nds']) ? $listWidth['price_nds'] : '110'}}px;"
 										class="sort{{$sortField == 'price_nds' ? ' sort-'.$sortOrder : ''}}"
 										onclick="$.sorting(this, 'price_nds')"
+										oncontextmenu="$.contractFilterBySumm('{{$column}}')"
 										noscroll
 										ddrtabletdmain
 										><strong class="fz10px lh90 d-block text-center wodrbreak">Стоимость договора с НДС</strong>
+										@if(isset($columnFilter) && in_array($column, $columnFilter))
+											<div class="placer placer-bottom placer-center">
+												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
+											</div>
+										@endif
 									</x-table.td>
 								@endif
 								
@@ -204,9 +216,15 @@
 										style="width:{{isset($listWidth['price_gen']) ? $listWidth['price_gen'] : '110'}}px;"
 										class="sort{{$sortField == 'price_gen' ? ' sort-'.$sortOrder : ''}}"
 										onclick="$.sorting(this, 'price_gen')"
+										oncontextmenu="$.contractFilterBySumm('{{$column}}')"
 										noscroll
 										ddrtabletdmain
 										><strong class="fz10px lh90 d-block text-center wodrbreak">Стоимость генподрядного договора без НДС</strong>
+										@if(isset($columnFilter) && in_array($column, $columnFilter))
+											<div class="placer placer-bottom placer-center">
+												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
+											</div>
+										@endif
 									</x-table.td>
 								@endif
 								
@@ -215,9 +233,15 @@
 										style="width:{{isset($listWidth['price_gen_nds']) ? $listWidth['price_gen_nds'] : '110'}}px;"
 										class="sort{{$sortField == 'price_gen_nds' ? ' sort-'.$sortOrder : ''}}"
 										onclick="$.sorting(this, 'price_gen_nds')"
+										oncontextmenu="$.contractFilterBySumm('{{$column}}')"
 										noscroll
 										ddrtabletdmain
 										><strong class="fz10px lh90 d-block text-center wodrbreak">Стоимость генподрядного договора с НДС</strong>
+										@if(isset($columnFilter) && in_array($column, $columnFilter))
+											<div class="placer placer-bottom placer-center">
+												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
+											</div>
+										@endif
 									</x-table.td>
 								@endif
 								
@@ -226,9 +250,15 @@
 										style="width:{{isset($listWidth['price_sub']) ? $listWidth['price_sub'] : '110'}}px;"
 										class="sort{{$sortField == 'price_sub' ? ' sort-'.$sortOrder : ''}}"
 										onclick="$.sorting(this, 'price_sub')"
+										oncontextmenu="$.contractFilterBySumm('{{$column}}')"
 										noscroll
 										ddrtabletdmain
 										><strong class="fz10px lh90 d-block text-center wodrbreak">Стоимость субподрядного договора без НДС</strong>
+										@if(isset($columnFilter) && in_array($column, $columnFilter))
+											<div class="placer placer-bottom placer-center">
+												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
+											</div>
+										@endif
 									</x-table.td>
 								@endif
 								
@@ -237,9 +267,15 @@
 										style="width:{{isset($listWidth['price_sub_nds']) ? $listWidth['price_sub_nds'] : '110'}}px;"
 										class="sort{{$sortField == 'price_sub_nds' ? ' sort-'.$sortOrder : ''}}"
 										onclick="$.sorting(this, 'price_sub_nds')"
+										oncontextmenu="$.contractFilterBySumm('{{$column}}')"
 										noscroll
 										ddrtabletdmain
 										><strong class="fz10px lh90 d-block text-center wodrbreak">Стоимость субподрядного договора с НДС</strong>
+										@if(isset($columnFilter) && in_array($column, $columnFilter))
+											<div class="placer placer-bottom placer-center">
+												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
+											</div>
+										@endif
 									</x-table.td>
 								@endif
 								
@@ -248,9 +284,15 @@
 										style="width:{{isset($listWidth['price_avvr']) ? $listWidth['price_avvr'] : '110'}}px;"
 										class="sort{{$sortField == 'price_avvr' ? ' sort-'.$sortOrder : ''}}"
 										onclick="$.sorting(this, 'price_avvr')"
+										oncontextmenu="$.contractFilterBySumm('{{$column}}')"
 										noscroll
 										ddrtabletdmain
 										><strong class="fz10px lh90 d-block text-center wodrbreak">Сумма АВВР без НДС</strong>
+										@if(isset($columnFilter) && in_array($column, $columnFilter))
+											<div class="placer placer-bottom placer-center">
+												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
+											</div>
+										@endif
 									</x-table.td>
 								@endif
 								
@@ -259,9 +301,15 @@
 										style="width:{{isset($listWidth['price_avvr_nds']) ? $listWidth['price_avvr_nds'] : '110'}}px;"
 										class="sort{{$sortField == 'price_avvr_nds' ? ' sort-'.$sortOrder : ''}}"
 										onclick="$.sorting(this, 'price_avvr_nds')"
+										oncontextmenu="$.contractFilterBySumm('{{$column}}')"
 										noscroll
 										ddrtabletdmain
 										><strong class="fz10px lh90 d-block text-center wodrbreak">Сумма АВВР с НДС</strong>
+										@if(isset($columnFilter) && in_array($column, $columnFilter))
+											<div class="placer placer-bottom placer-center">
+												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
+											</div>
+										@endif
 									</x-table.td>
 								@endif
 								
@@ -270,9 +318,15 @@
 										style="width:{{isset($listWidth['avvr_nds_only']) ? $listWidth['avvr_nds_only'] : '110'}}px;"
 										class="sort{{$sortField == 'avvr_nds_only' ? ' sort-'.$sortOrder : ''}}"
 										onclick="$.sorting(this, 'avvr_nds_only')"
+										oncontextmenu="$.contractFilterBySumm('{{$column}}')"
 										noscroll
 										ddrtabletdmain
 										><strong class="fz10px lh90 d-block text-center wodrbreak">Сумма АВВР процента НДС</strong>
+										@if(isset($columnFilter) && in_array($column, $columnFilter))
+											<div class="placer placer-bottom placer-center">
+												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
+											</div>
+										@endif
 									</x-table.td>
 								@endif
 								
@@ -281,9 +335,15 @@
 										style="width:{{isset($listWidth['price_pir']) ? $listWidth['price_pir'] : '110'}}px;"
 										class="sort{{$sortField == 'price_pir' ? ' sort-'.$sortOrder : ''}}"
 										onclick="$.sorting(this, 'price_pir')"
+										oncontextmenu="$.contractFilterBySumm('{{$column}}')"
 										noscroll
 										ddrtabletdmain
 										><strong class="fz10px lh90 d-block text-center wodrbreak">Сумма ПИР без НДС</strong>
+										@if(isset($columnFilter) && in_array($column, $columnFilter))
+											<div class="placer placer-bottom placer-center">
+												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
+											</div>
+										@endif
 									</x-table.td>
 								@endif
 								
@@ -292,9 +352,15 @@
 										style="width:{{isset($listWidth['price_pir_nds']) ? $listWidth['price_pir_nds'] : '110'}}px;"
 										class="sort{{$sortField == 'price_pir_nds' ? ' sort-'.$sortOrder : ''}}"
 										onclick="$.sorting(this, 'price_pir_nds')"
+										oncontextmenu="$.contractFilterBySumm('{{$column}}')"
 										noscroll
 										ddrtabletdmain
 										><strong class="fz10px lh90 d-block text-center wodrbreak">Сумма ПИР с НДС</strong>
+										@if(isset($columnFilter) && in_array($column, $columnFilter))
+											<div class="placer placer-bottom placer-center">
+												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
+											</div>
+										@endif
 									</x-table.td>
 								@endif
 								
@@ -303,9 +369,15 @@
 										style="width:{{isset($listWidth['pir_nds_only']) ? $listWidth['pir_nds_only'] : '110'}}px;"
 										class="sort{{$sortField == 'pir_nds_only' ? ' sort-'.$sortOrder : ''}}"
 										onclick="$.sorting(this, 'pir_nds_only')"
+										oncontextmenu="$.contractFilterBySumm('{{$column}}')"
 										noscroll
 										ddrtabletdmain
 										><strong class="fz10px lh90 d-block text-center wodrbreak">Сумма ПИР процента НДС</strong>
+										@if(isset($columnFilter) && in_array($column, $columnFilter))
+											<div class="placer placer-bottom placer-center">
+												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
+											</div>
+										@endif
 									</x-table.td>
 								@endif
 								
@@ -314,9 +386,15 @@
 										style="width:{{isset($listWidth['price_smr']) ? $listWidth['price_smr'] : '110'}}px;"
 										class="sort{{$sortField == 'price_smr' ? ' sort-'.$sortOrder : ''}}"
 										onclick="$.sorting(this, 'price_smr')"
+										oncontextmenu="$.contractFilterBySumm('{{$column}}')"
 										noscroll
 										ddrtabletdmain
 										><strong class="fz10px lh90 d-block text-center wodrbreak">Сумма СМР без НДС</strong>
+										@if(isset($columnFilter) && in_array($column, $columnFilter))
+											<div class="placer placer-bottom placer-center">
+												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
+											</div>
+										@endif
 									</x-table.td>
 								@endif
 								
@@ -325,9 +403,15 @@
 										style="width:{{isset($listWidth['price_pnr']) ? $listWidth['price_pnr'] : '110'}}px;"
 										class="sort{{$sortField == 'price_pnr' ? ' sort-'.$sortOrder : ''}}"
 										onclick="$.sorting(this, 'price_pnr')"
+										oncontextmenu="$.contractFilterBySumm('{{$column}}')"
 										noscroll
 										ddrtabletdmain
 										><strong class="fz10px lh90 d-block text-center wodrbreak">Сумма ПНР без НДС</strong>
+										@if(isset($columnFilter) && in_array($column, $columnFilter))
+											<div class="placer placer-bottom placer-center">
+												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
+											</div>
+										@endif
 									</x-table.td>
 								@endif
 								
@@ -489,9 +573,15 @@
 										style="width:{{isset($listWidth['type']) ? $listWidth['type'] : '80'}}px;"
 										class="sort{{$sortField == 'type' ? ' sort-'.$sortOrder : ''}}"
 										onclick="$.sorting(this, 'type')"
+										contextmenu="contractFilterBy:{{$column}}"
 										noscroll
 										ddrtabletdmain
 										><strong class="fz10px lh90 d-block text-center wodrbreak">Тип договора</strong>
+										@if(isset($columnFilter) && in_array($column, $columnFilter))
+											<div class="placer placer-bottom placer-center">
+												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
+											</div>
+										@endif
 									</x-table.td>
 								@endif
 								

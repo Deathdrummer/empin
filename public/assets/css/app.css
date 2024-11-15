@@ -143470,6 +143470,8 @@ template {
 
 .horisontal {
   overflow-x: scroll;
+}
+.horisontal:not(.horisontal_nopadding) {
   padding-bottom: 10px;
 }
 .horisontal:not(.horisontal_hidescroll)::-webkit-scrollbar {

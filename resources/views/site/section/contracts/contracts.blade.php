@@ -104,43 +104,96 @@
 			</div>
 		</div>
 
-		<div class="row mb2rem" id="tableContainer">
-			<div class="col-auto">
-				<x-chooser variant="neutral" group="normal" px="10">
-					<x-chooser.item
-						id="chooserAll"
-						action="getListAction:0"
-						class="pl3rem"
-						contract-chooser
-						active
-						>Все активные договоры
-							<strong
-								class="
-									ml5px
-									iconed
-									iconed-noempty
-									border-rounded-8px
-									border-all
-									border-white
-									bg-yellow
-									color-dark
-									w2rem-8px
-									h2rem-2px
-									fz12px
-									lh100"
-								selectionscounts
-								></strong></x-chooser.item>
-
-					@if(auth('site')->user()->can('can-see-all-departments:site'))
-						@if(!is_null($departments) && !empty($departments))
-							@foreach($departments as $dep)
+		<div class="row mb2rem align-items-center" id="tableContainer">
+			<div class="col">
+				<div class="horisontal horisontal_hidescroll horisontal_nopadding">
+					<div class="horisontal__track">
+						<div class="horisontal__item">
+							<x-chooser variant="neutral" group="normal" px="10">
 								<x-chooser.item
-									chooserdepartment="{{$dep->id}}"
+									id="chooserAll"
+									action="getListAction:0"
 									class="pl3rem"
-									tag="chooserd epartment"
 									contract-chooser
-									action="getListAction:{{$dep->id}}"
-									>{{$dep->name ?? 'Без названия'}}
+									active
+									>Все активные договоры
+										<strong
+											class="
+												ml5px
+												iconed
+												iconed-noempty
+												border-rounded-8px
+												border-all
+												border-white
+												bg-yellow
+												color-dark
+												w2rem-8px
+												h2rem-2px
+												fz12px
+												lh100"
+											selectionscounts
+											></strong></x-chooser.item>
+
+								@if(auth('site')->user()->can('can-see-all-departments:site'))
+									@if(!is_null($departments) && !empty($departments))
+										@foreach($departments as $dep)
+											<x-chooser.item
+												chooserdepartment="{{$dep->id}}"
+												class="pl3rem"
+												tag="chooserd epartment"
+												contract-chooser
+												action="getListAction:{{$dep->id}}"
+												>{{$dep->name ?? 'Без названия'}}
+												<strong
+													class="
+														ml5px
+														iconed
+														iconed-noempty
+														border-rounded-8px
+														border-all
+														border-white
+														bg-yellow
+														color-dark
+														w2rem-8px
+														h2rem-2px
+														fz12px
+														lh100"
+													selectionscounts
+													></strong></x-chooser.item>
+										@endforeach
+									@endif
+								@elseif(isset($user->department->id) && !is_null($user->department->id))
+								<x-chooser.item
+										chooserdepartment="{{$user->department->id}}"
+										class="pl3rem"
+										action="getListAction:{{$user->department->id}}"
+										contract-chooser
+										>{{$user->department->name ?? 'Без названия'}}
+										<strong
+											class="
+												ml5px
+												iconed
+												iconed-noempty
+												border-rounded-8px
+												border-all
+												border-white
+												bg-yellow
+												color-dark
+												w2rem-8px
+												h2rem-2px
+												fz12px
+												lh100"
+											selectionscounts
+											></strong></x-chooser.item>
+								@endif
+
+
+								<x-chooser.item
+									id="chooserArchive"
+									class="pl3rem"
+									action="getListAction:-1"
+									contract-chooser
+									>Архив
 									<strong
 										class="
 											ml5px
@@ -153,64 +206,32 @@
 											color-dark
 											w2rem-8px
 											h2rem-2px
-											fz12px
+											fz13px
 											lh100"
-										selectionscounts
-										></strong></x-chooser.item>
-							@endforeach
-						@endif
-					@elseif(isset($user->department->id) && !is_null($user->department->id))
-					<x-chooser.item
-							chooserdepartment="{{$user->department->id}}"
-							class="pl3rem"
-							action="getListAction:{{$user->department->id}}"
-							contract-chooser
-							>{{$user->department->name ?? 'Без названия'}}
-							<strong
-								class="
-									ml5px
-									iconed
-									iconed-noempty
-									border-rounded-8px
-									border-all
-									border-white
-									bg-yellow
-									color-dark
-									w2rem-8px
-									h2rem-2px
-									fz12px
-									lh100"
-								selectionscounts
-								></strong></x-chooser.item>
-					@endif
-
-
-					<x-chooser.item
-						id="chooserArchive"
-						class="pl3rem"
-						action="getListAction:-1"
-						contract-chooser
-						>Архив
-						<strong
-							class="
-								ml5px
-								iconed
-								iconed-noempty
-								border-rounded-8px
-								border-all
-								border-white
-								bg-yellow
-								color-dark
-								w2rem-8px
-								h2rem-2px
-								fz13px
-								lh100"
-								selectionscounts
-								></strong></x-chooser.item>
-				</x-chooser>
+											selectionscounts
+											></strong></x-chooser.item>
+							</x-chooser>
+						</div>
+					</div>
+							
+				</div>
 			</div>
-			<div class="col">
+			<div class="col-auto">
 				<div id="gencontractingCount" class="h100 d-flex align-items-center"></div>
+			</div>
+			<div class="col-auto ml-auto">
+				<x-button
+					group="normal"
+					variant="neutral-light"
+					rounded="2px"
+					px="10"
+					action="cancelContractFilter"
+					id="clearAllFiltersBtn"
+					style="border-radius: 10px;"
+					class="hidden"
+					>Снять фильтры 
+					<img src="{{asset('assets/images/cancel_icon.png')}}" class="w1rem-8px ml2px" style="vertical-align: text-top;" alt="">
+				</x-button>
 			</div>
 		</div>
 
@@ -1927,6 +1948,7 @@
 	//----------------------------------------------------------------------------------------------------- Фильтрация по полю
 
 	let filterByDateTooltip,
+		filterBySummTooltip,
 		dateFromPicker,
 		dateToPicker,
 		dateFromValue = {},
@@ -1973,14 +1995,18 @@
 			navData.push({
 				name: itemName,
 				onClick() {
-					columnFilter.push({
-						column,
-						value: id
-					});
-					//columnFilter = 
+					const hasItem = columnFilter.findIndex(item => item.value == id) != -1;
+					if (hasItem) {
+						columnFilter = columnFilter.filter(item => item.value != id);
+					} else {
+						columnFilter.push({
+							column,
+							value: id
+						});
+					}
 
-					dateFromValue = {},
-					dateToValue = {},
+					dateFromValue = {};
+					dateToValue = {};
 
 					getList({
 						withCounts: search || selection.value,
@@ -2040,7 +2066,7 @@
 							'<input type="hidden" id="filterDateFrom" />' +
 							'<div></div>' +
 						'</div>' +
-						'<div>' +
+						'<div class="col">' +
 							'<strong class="form__label color-dark fz12px lh90 mb4px">Дата до:</strong>' +
 							'<input type="hidden" id="filterDateTo" />' +
 							'<div></div>' +
@@ -2120,7 +2146,7 @@
 
 
 
-	//----------------------------------------------------------------------------------------------------- Применить фильтр
+	//----------------------------------------------------------------------------------------------------- Применить фильтр по дате
 	$.setContractFilterByDate = async (column) => {
 
 		dateFromValue[column] = $('input#filterDateFrom').attr('date'),
@@ -2155,6 +2181,121 @@
 		dateFromPicker.remove()
 		dateToPicker.remove();
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+	//----------------------------------------------------------------------------------------------------- Фильтрация по суммам
+	$.contractFilterBySumm = (column) => {
+		if (filterBySummTooltip?.destroy != undefined) filterBySummTooltip.destroy();
+		
+		
+		filterBySummTooltip = $(event.currentTarget).ddrTooltip({
+			//cls: 'w44rem',
+			placement: 'bottom',
+			tag: 'noscroll',
+			minWidth: '100px',
+			minHeight: '50px',
+			duration: [200, 200],
+			trigger: 'click',
+			wait: {
+				iconHeight: '40px'
+			},
+			onShow: async function({reference, popper, show, hide, destroy, waitDetroy, setContent, setData, setProps}) {
+				
+				const initData = columnFilter.find(item => item.column == column)?.value?.split('|'),
+					valueFrom = initData ? (initData[0] || '') : '',
+					valueTo = initData ? (initData[1] || '') : '';
+				
+		
+
+
+				//abortCtrlFilterDates = new AbortController();
+				//const {data, error, status, headers, abort} = await axiosQuery('get', 'site/contracts/calendar', {}, 'text', abortCtrlFilterDates);
+
+				//let disabledBtn = !dateFromValue[column] && !dateToValue[column] ? 'disabled' : '';
+
+				const summHtml = '<div class="mt5px">' +
+					'<div class="row row-cols-2 g-10">' +
+						'<div class="col">' +
+							'<strong class="form__label color-dark fz12px lh90 mb4px">Сумма от:</strong>' +
+							'<div class="input small-input small-input-text w10rem"><input type="text" value="'+valueFrom+'" id="filterSummFrom" filtersumminput /></div>' +
+						'</div>' +
+						'<div class="col">' +
+							'<strong class="form__label color-dark fz12px lh90 mb4px">Сумма до:</strong>' +
+							'<div class="input small-input small-input-text w10rem"><input type="text" value="'+valueTo+'" id="filterSummTo" filtersumminput /></div>' +
+						'</div>' +
+					'</div>' +
+					'<div class="d-flex justify-content-end mt5px">' +
+						'<div class="button verysmall-button button-yellow">' +
+							'<button inpgroup="verysmall" id="contractFilterBySummBtn" disabled>Применить</button>' +
+						'</div>' +
+					'</div>' +
+				'</div>';
+
+				await setData(summHtml);
+
+				//dateFromPicker = _setDatePicker('filterDateFrom', dateFromValue[column]);
+				//dateToPicker = _setDatePicker('filterDateTo', dateToValue[column]);
+
+				waitDetroy();
+				// initD.getFullYear()+'-'+addZero(initD.getMonth() + 1)+'-'+addZero(initD.getDate()),
+				
+				const filterSummFromSelector = $(popper).find('#filterSummFrom'),
+					filterSummToSelector = $(popper).find('#filterSummTo'),
+					filterSummBtn = $(popper).find('#contractFilterBySummBtn');
+				
+				let filterSummFromVal, filterSummToVal;
+				
+				$(filterSummFromSelector).number(true, 2, '.', ' ');
+				$(filterSummToSelector).number(true, 2, '.', ' ');
+				
+				$(popper).find('[filtersumminput]').on('input', () => {
+					filterSummFromVal = Number(filterSummFromSelector.val()),
+					filterSummToVal = Number(filterSummToSelector.val());
+					
+					if ((filterSummFromVal >= 0 && filterSummToVal > 0) && (filterSummFromVal <= filterSummToVal)) $(filterSummBtn).removeAttrib('disabled');
+					else $(filterSummBtn).setAttrib('disabled');
+				});
+				
+				
+				$(popper).find('#contractFilterBySummBtn').on(tapEvent, function() {
+					columnFilter.push({
+						column,
+						value: `${filterSummFromVal}|${filterSummToVal}`,
+					})
+					
+					getList({
+						withCounts: search || selection.value,
+						callback: function() {}
+					});
+					
+					filterBySummTooltip.destroy();
+					
+				});
+			}
+		});
+	}
+	
+	
+
+
+
+
+
+
+
+
 
 
 
@@ -2184,8 +2325,9 @@
 			if (dateFromPicker?.remove) dateFromPicker.remove()
 			if (dateToPicker?.remove) dateToPicker.remove();
 		}
-
-
+		
+		$('#clearAllFiltersBtn').ddrInputs('disable');
+		
 		getList({
 			withCounts: search || selection.value,
 			callback: function() {}
@@ -2475,13 +2617,14 @@
 			lastChoosedRow.value = null;
 			selectedContracts.clear();
 			loadedContractsIds.clear();
-			$('.chooser__item.searchcontractcounts').removeClass('searchcontractcounts');
 			
-			$('#chooserAll').find('[selectionscounts]').empty();
-			$('#chooserArchive').find('[selectionscounts]').empty();
-			$('[chooserdepartment]').find('[selectionscounts]').empty();
+			
+			//$('#chooserAll').find('[selectionscounts]').empty();
+			//$('#chooserArchive').find('[selectionscounts]').empty();
+			//$('[chooserdepartment]').find('[selectionscounts]').empty();
 		} else {}
-
+		
+		
 
 		//-----------------------------------
 
@@ -2521,7 +2664,14 @@
 				//position: 'adaptive'
 			});
 		} else {}
-
+		
+		
+		if (!withCounts && !append && !selection.value && !search) {
+			$('.chooser__item.searchcontractcounts').removeClass('searchcontractcounts');
+		} else if (withCounts) {
+			$('.chooser__item').addClass('searchcontractcounts');
+		}
+		
 
 		abortCtrl = new AbortController();
 		axiosQuery('get', 'site/contracts', params, 'text', abortCtrl).then(({data, error, status, headers, abort}) => {
@@ -2592,10 +2742,8 @@
 			}
 
 			if (currentCount) $('[stepprice]').number(true, 2, '.', ' ');
-
-			if(withCounts){
-				$('.chooser__item').addClass('searchcontractcounts');
-			}
+			
+			
 			
 			if (headers) {
 				if (headers['x-count-contracts-all']) {
@@ -2619,6 +2767,11 @@
 					//$('[chooserdepartment]').find('[selectionscounts]').empty();
 				}
 			}
+			
+			if (columnFilter.length) {
+				$('#clearAllFiltersBtn').ddrInputs('removeClass', 'hidden');
+				$('#clearAllFiltersBtn').ddrInputs('enable');
+			} else $('#clearAllFiltersBtn').ddrInputs('addClass', 'hidden');
 
 			if (callback && typeof callback == 'function') callback(currentCount);
 		});

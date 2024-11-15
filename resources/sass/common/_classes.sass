@@ -1146,7 +1146,10 @@ $bPoints: map-remove($grid-breakpoints, xs)
 
 .horisontal
 	overflow-x: scroll
-	padding-bottom: 10px
+	
+	&:not(.horisontal_nopadding)
+		padding-bottom: 10px
+	
 	
 	&:not(.horisontal_hidescroll)
 		+scrollbar(#f9fbfd, #d6dbe0, 6px, 2px, 2px)

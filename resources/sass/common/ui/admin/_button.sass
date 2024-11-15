@@ -285,8 +285,28 @@
 				background-color: #828faf
 				border-color: #808eaf
 
-
-
+	
+	&-neutral-light	
+		button
+			background-color: #aeaec6
+			border: 1px solid #a7a7c2
+			color: #fff
+			box-shadow: none
+			transition: background-color 0.16s, border-color 0.16s, box-shadow 0.16s
+			
+			i
+				color: #fff
+		
+		&:not(:disabled):not(.disabled):hover
+			button
+				background-color: #9f9fbc
+				border-color: #9b9bba
+		
+		&:not(:disabled):not(.disabled).active, &:not(:disabled):not(.disabled):active
+			button
+				box-shadow: 0 0 0 0.2rem rgb(106 119 157 / 50%)
+				background-color: #8585a4
+				border-color: #8585a4
 				
 
 
@@ -490,4 +510,8 @@
 		
 		i
 			color: #d1d1d1
+		
+		img
+			filter: grayscale(100%) brightness(1.3)
+			
 		
