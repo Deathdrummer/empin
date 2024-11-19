@@ -226,9 +226,9 @@
 					rounded="2px"
 					px="10"
 					action="cancelContractFilter"
-					id="clearAllFiltersBtn222"
+					id="clearAllFiltersBtn"
 					style="border-radius: 10px;"
-					class="hidden2"
+					class="hidden"
 					>Снять фильтры 
 					<img src="{{asset('assets/images/cancel_icon.png')}}" class="w1rem-8px ml2px" style="vertical-align: text-top;" alt="">
 				</x-button>
