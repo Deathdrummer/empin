@@ -76,6 +76,7 @@ class Contract {
 	public function getWithDepartments(Request $request) {
 		$filter = app()->make(ContractFilter::class, ['queryParams' => $request->except(['sort_field', 'sort_order'])]);
 		
+		
 		$sortField = $request->get('sort_field', 'id');
 		$sortOrder = $request->get('sort_order', 'asc');
 		$limit = $request->get('limit', 25);
@@ -83,6 +84,8 @@ class Contract {
 		$selection = $request->get('selection', null);
 		$sortStep = strpos($sortField, ':') !== false ? (substr($sortField, strpos($sortField, ':') - strlen($sortField) + 1)) : null;
 		$selectedContracts = request('selected_contracts', []);
+		
+		
 		
 		if (!$userId = auth('site')->user()->id) return false;
 		
@@ -812,27 +815,29 @@ class Contract {
 			->get()
 			->pluck($column)
 			->toArray();
-		
 			
 		if (!$columnValues) return false;
 		if (!in_array($column, ['customer', 'type', 'contractor'])) return array_combine($columnValues, $columnValues);
 		
-		
-		
-		
-		
 		$settingsData = match ($column) {
 			'customer' 		=> $this->getSettings('contract-customers:customers', 'id'),
-			'type' 			=> $this->getSettings('contract-types:types'/* , 'id', 'title' */),
+			'type' 			=> $this->getSettings('contract-types:types', 'id'/* , 'title' */),
 			'contractor'	=> $this->getSettings('contract-contractors:contractors', 'id'/* , 'name' */),
 		};
 		
 		if (!$settingsData) return false;
 		
-		
 		$intersectedValues = array_intersect_key($settingsData, array_flip($columnValues));
 		
 		
+		$maxSort = arrFindMaxValueInField($intersectedValues, 'sort');
+		array_push($intersectedValues, [
+			'name' => '---',
+			'id' => -1,
+			'sort' => $maxSort+1,
+		]);
+		
+				
 		if (in_array($column, ['customer', 'contractor'])) {
 			usort($intersectedValues, fn($a, $b) => ($a['sort'] ?? 0) <=> ($b['sort'] ?? 0));
 		}

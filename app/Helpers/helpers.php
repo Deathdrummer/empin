@@ -196,6 +196,36 @@ if (! function_exists('arrTakeItem')) {
 
 
 
+
+
+if (! function_exists('arrFindMaxValueInField')) {
+	/**
+	 * Найти максимальное значение в определённом поле массива
+	 * @param array $array массив
+	 * @param string $field поле
+	 * @return 
+	*/
+	function arrFindMaxValueInField(array $array = null, string $field = null) {
+		if (!$array || !$field) return false;
+		$maxValue = null;
+
+		foreach ($array as $item) {
+			if (isset($item[$field])) {
+				if ($maxValue === null || $item[$field] > $maxValue) {
+					$maxValue = $item[$field];
+				}
+			}
+		}
+
+		return $maxValue;
+	}
+} 
+
+
+
+
+
+
 if (! function_exists('splitString')) {
 	/**
 	 * Разбивает строку по заданному разделителя

@@ -1,6 +1,8 @@
 <?php namespace App\Http\Filters;
 
 use App\Http\Filters\Base\AbstractFilter;
+use App\Models\ContractData;
+use App\Models\ContractDepartment;
 use App\Traits\Settingable;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
@@ -53,7 +55,6 @@ class ContractFilter extends AbstractFilter {
 	 */
 	public function pivot(Builder $builder, $values) {
 		if (isJson($values)) $values = json_decode($values, true);
-		
 		$builder->whereRelation('departments', function(Builder $query) use($values) {
 			foreach ($values as $field => $value) {
 				$query->where($field, $value);
@@ -140,28 +141,123 @@ class ContractFilter extends AbstractFilter {
 			$groupingFilters[$item['column']][] = $item['value'];
 		}
 		
+		
+		if (isset($groupingFilters['step'])) {
+			$stepsGroups = [];
+			foreach ($groupingFilters['step'] as $subArray) {
+				$stepType = array_shift($subArray);
+				$stepId = array_shift($subArray);
+				$stepsGroups[$stepType][$stepId][] = reset($subArray);
+			}
+			$groupingFilters['step'] = $stepsGroups;
+		}
+		
+		
 		foreach ($groupingFilters as $column => $values) {
 			$builder->where(function($query) use($column, $values) {
-				foreach ($values as $value) {
-					if (preg_match('/^date_/', $column)) {
-						$d = explode('|', $value);
-						
-						$dateFrom = $d[0] ?? null;
-						$dateTo = $d[1] ?? null;
-						
-						if ($dateFrom) $query->where($column, '>=', Carbon::parse($dateFrom));
-						if ($dateTo) $query->where($column, '<=', Carbon::parse($dateTo));
+				if ($column == 'step') { #Все фильтры step
 					
-					} elseif (Str::contains($value, '|')) {
-						$d = explode('|', $value);
+					$query->where(function($q) use($values) {
+						foreach ($values as $stepType => $stepCols) {
+							
+							if ($stepType == 1) { #--- Если это чекбокс
+								$q->where(function($qq) use($stepCols, $stepType) {
+									foreach ($stepCols as $stepId => $stepItems) {
+										$qq->where(function($qqq) use($stepType, $stepId, $stepItems) {
+											foreach ($stepItems as $stepValue) {
+												
+													if ($stepValue == -1) { # если чекбокс отсутствует
+														$qqq->orWhereNotIn(
+															'id',
+															ContractDepartment::select('contract_id')
+																->whereJsonContains('steps', ['step_id' => $stepId]));
+													} elseif ($stepValue == 0) { # если чекбокс неактивен
+														$qqq->orWhereIn(
+															'id',
+															ContractDepartment::select('contract_id')
+																->whereJsonContains('steps', ['step_id' => $stepId])
+																->whereNotIn(
+																	'contract_id',
+																	ContractData::select('contract_id')
+																		->where('step_id', $stepId)
+																		->where('type', $stepType)
+																		->where('data', 1)
+																)
+														);
+													} elseif ($stepValue == 1) { # если чекбокс активен
+														$qqq->orWhereIn(
+															'id',
+															ContractDepartment::select('contract_id')
+																->whereJsonContains('steps', ['step_id' => $stepId])
+																->whereIn(
+																	'contract_id',
+																	ContractData::select('contract_id')
+																		->where('step_id', $stepId)
+																		->where('type', $stepType)
+																		->where('data', 1)
+																)
+														);
+													}	
+												
+											}
+										});
+										
+									} 	
+								});
+								
+							} else if ($stepType == 3) { # Если это вып. список сотрудников
+								$q->where(function($qq) use($stepType, $stepCols) {
+									
+									foreach ($stepCols as $stepId => $stepItems) {
+										$qq->where(function($qqq) use($stepType, $stepId, $stepItems) {
+											foreach ($stepItems as $stepValue) {
+												$qqq->orWhereIn(
+													'id',
+													ContractData::select('contract_id')
+														->where('step_id', $stepId)
+														->where('type', $stepType)
+														->when($stepValue !== -1, function($q) use($stepValue) {
+															$q->where('data', $stepValue);
+														}, function($q) {
+															$q->whereNull('data');
+														})
+														
+												);	
+											}
+										});
+									}
+								});
+							}
+						} 	
+					});
+					
+				} else { # Остальные фильтры
+					foreach ($values as $value) {
+						if (preg_match('/^date_/', $column)) {
+							$d = explode('|', $value);
+							
+							$dateFrom = $d[0] ?? null;
+							$dateTo = $d[1] ?? null;
+							
+							if ($dateFrom) $query->where($column, '>=', Carbon::parse($dateFrom));
+							if ($dateTo) $query->where($column, '<=', Carbon::parse($dateTo));
 						
-						$valFrom = $d[0] ?? null;
-						$valTo = $d[1] ?? null;
+						} elseif ($column != 'step' && Str::contains($value, '|') ) {
+							$d = explode('|', $value);
+							
+							$valFrom = $d[0] ?? null;
+							$valTo = $d[1] ?? null;
+							
+							if ($valFrom) $query->where($column, '>=', $valFrom);
+							if ($valTo) $query->where($column, '<=', $valTo);
 						
-						if ($valFrom) $query->where($column, '>=', $valFrom);
-						if ($valTo) $query->where($column, '<=', $valTo);
-					} else {
-						$query->orWhere($column, $value);
+						} else {
+							if ($value == -1) {
+								$query->orWhereNull($column);
+							} else {
+								$query->orWhere($column, $value);
+							}
+						}
 					}
 				}
 			});

@@ -705,8 +705,6 @@
 							
 							
 							
-							
-							
 							{{-- Departments titles --}}
 							@forelse($alldeps as $dept)
 								@if(!count($dept['steps']))
@@ -754,9 +752,15 @@
 												])
 												style="width:{{$step['width'] ? $step['width'].'px' : 'auto'}};"
 												onclick="$.sorting(this, 'step:{{$step['id']}}')"
+												oncontextmenu="$.contractFilterByStep('{{$step['type']}}|{{$step['id']}}')"
 												ddrtabletdmain
 												>
 												<p class="fz10px lh90 text-center breakword">{{$step['name']}}</p>
+												@if(isset($columnFilter) && in_array('step:'.$step['id'], $columnFilter))
+													<div class="placer placer-bottom placer-center">
+														<i onclick="$.cancelContractFilter(event, 'step', '{{$step['type']}}', '{{$step['id']}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz10px" style="transform: translateY(5px);"></i>
+													</div>
+												@endif
 											</div>	
 										@empty	
 										@endforelse
