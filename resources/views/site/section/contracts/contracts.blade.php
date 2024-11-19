@@ -105,7 +105,7 @@
 		</div>
 
 		<div class="row mb2rem align-items-center" id="tableContainer">
-			<div class="col">
+			<div class="col-auto">
 				<div class="horisontal horisontal_hidescroll horisontal_nopadding" id="depsChooser">
 					<div class="horisontal__track">
 						<div class="horisontal__item">
@@ -219,7 +219,7 @@
 			<div class="col-auto">
 				<div id="gencontractingCount" class="h100 d-flex align-items-center"></div>
 			</div>
-			<div class="col-auto ml-auto">
+			<div class="col-auto">
 				<x-button
 					group="normal"
 					variant="neutral-light"
@@ -1974,8 +1974,10 @@
 
 	let filterByDateTooltip,
 		filterBySummTooltip,
+		filterByStepTooltip,
 		dateFromPicker,
 		dateToPicker,
+		datePopper,
 		dateFromValue = {},
 		dateToValue = {},
 		columnDateFilter;
@@ -1996,7 +1998,6 @@
 			setMaxHeight('calc(100vh - 300px)');
 		});
 		
-		
 		abortCtrlFilter = new AbortController();
 		const {data, error, status, headers, abort} = await axiosQuery('get', 'site/contracts/column_values', {column, currentList}, 'json', abortCtrlFilter);
 
@@ -2011,7 +2012,6 @@
 			
 			let itemName;
 			if (columnFilter.findIndex(item => item?.value == id && item?.column == column) !== -1) {
-			//if (columnFilter?.value == id) {
 				itemName = '<span class="color-blue">'+itemTitle+'</span>';
 			} else {
 				itemName = itemTitle;
@@ -2020,9 +2020,10 @@
 			navData.push({
 				name: itemName,
 				onClick() {
-					const hasItem = columnFilter.findIndex(item => item.value == id) != -1;
+					//console.log({column, id});
+					const hasItem = columnFilter.findIndex(item => item.column == column && item.value == id) != -1;
 					if (hasItem) {
-						columnFilter = columnFilter.filter(item => item.value != id);
+						columnFilter = columnFilter.filter(item => item.column != column || (item.column == column && item.value != id));
 					} else {
 						columnFilter.push({
 							column,
@@ -2057,7 +2058,6 @@
 
 
 
-
 	//----------------------------------------------------------------------------------------------------- Фильтрация по дате
 	$.contractFilterByDate = (column) => {
 		if (filterByDateTooltip?.destroy != undefined) filterByDateTooltip.destroy();
@@ -2077,8 +2077,12 @@
 			wait: {
 				iconHeight: '40px'
 			},
+			onDestroy: () => {datePopper = null;},
 			onShow: async function({reference, popper, show, hide, destroy, waitDetroy, setContent, setData, setProps}) {
-
+				
+				datePopper = popper;
+				
+				
 				//abortCtrlFilterDates = new AbortController();
 				//const {data, error, status, headers, abort} = await axiosQuery('get', 'site/contracts/calendar', {}, 'text', abortCtrlFilterDates);
 
@@ -2166,6 +2170,17 @@
 			}
 		});
 	}
+	
+	
+	
+	$(datePopper).on('keypress', (e) => {
+					console.log(123);
+					//if (e.keyCode == 13) {
+						
+					//}
+				});
+
+
 
 
 
@@ -2190,11 +2205,12 @@
 			buildData.push(td.getFullYear()+'-'+addZero(td.getMonth() + 1)+'-'+addZero(td.getDate())+' 00:00:00');
 		} else buildData.push('');
 
+		columnFilter = columnFilter.filter(item => item.column != columnDateFilter);
 		columnFilter.push({
 			column: columnDateFilter,
 			value: buildData.join('|'), //dateFromValueFormat+'|'+dateToValueFormat,
 		})
-		//columnFilter = };
+		
 
 		getList({
 			withCounts: search || selection.value,
@@ -2242,14 +2258,6 @@
 					valueFrom = initData ? (initData[0] || '') : '',
 					valueTo = initData ? (initData[1] || '') : '';
 				
-		
-
-
-				//abortCtrlFilterDates = new AbortController();
-				//const {data, error, status, headers, abort} = await axiosQuery('get', 'site/contracts/calendar', {}, 'text', abortCtrlFilterDates);
-
-				//let disabledBtn = !dateFromValue[column] && !dateToValue[column] ? 'disabled' : '';
-
 				const summHtml = '<div class="mt5px">' +
 					'<div class="row row-cols-2 g-10">' +
 						'<div class="col">' +
@@ -2270,11 +2278,7 @@
 
 				await setData(summHtml);
 
-				//dateFromPicker = _setDatePicker('filterDateFrom', dateFromValue[column]);
-				//dateToPicker = _setDatePicker('filterDateTo', dateToValue[column]);
-
 				waitDetroy();
-				// initD.getFullYear()+'-'+addZero(initD.getMonth() + 1)+'-'+addZero(initD.getDate()),
 				
 				const filterSummFromSelector = $(popper).find('#filterSummFrom'),
 					filterSummToSelector = $(popper).find('#filterSummTo'),
@@ -2285,16 +2289,35 @@
 				$(filterSummFromSelector).number(true, 2, '.', ' ');
 				$(filterSummToSelector).number(true, 2, '.', ' ');
 				
-				$(popper).find('[filtersumminput]').on('input', () => {
-					filterSummFromVal = Number(filterSummFromSelector.val()),
-					filterSummToVal = Number(filterSummToSelector.val());
+				$(popper).find('[filtersumminput]').on('input', (e) => {
+					if (Number(e.target.value) === 0 && e.target.value === '.00') e.target.value = '';
 					
-					if ((filterSummFromVal >= 0 && filterSummToVal > 0) && (filterSummFromVal <= filterSummToVal)) $(filterSummBtn).removeAttrib('disabled');
+					filterSummFromVal = filterSummFromSelector.val(),
+					filterSummToVal = filterSummToSelector.val();
+					
+					const filterSummFromNum = Number(filterSummFromVal),
+						filterSummToNum = Number(filterSummToVal);
+					
+					if (
+						(filterSummFromNum >= 0 && filterSummToNum == '') ||
+						(filterSummFromNum >= 0 && filterSummToNum > 0 && filterSummFromNum <= filterSummToNum)
+					) $(filterSummBtn).removeAttrib('disabled');
 					else $(filterSummBtn).setAttrib('disabled');
 				});
 				
 				
-				$(popper).find('#contractFilterBySummBtn').on(tapEvent, function() {
+				$(popper).find('[filtersumminput]').on('keypress', (e) => {
+					if (e.keyCode == 13) {
+						setFilterBySumm();
+					}
+				});
+				
+				
+				$(popper).find('#contractFilterBySummBtn').on(tapEvent, setFilterBySumm);
+				
+				
+				function setFilterBySumm() {
+					columnFilter = columnFilter.filter(item => item.column != column);
 					columnFilter.push({
 						column,
 						value: `${filterSummFromVal}|${filterSummToVal}`,
@@ -2306,11 +2329,116 @@
 					});
 					
 					filterBySummTooltip.destroy();
-					
-				});
+				}
 			}
 		});
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	//----------------------------------------------------------------------------------------------------- Фильтрация по этапам
+	$.contractFilterByStep = (stepData) => {
+		if (filterByStepTooltip?.destroy != undefined) filterByStepTooltip.destroy();
+		
+		filterByStepTooltip = $(event.currentTarget).ddrTooltip({
+			//cls: 'w44rem',
+			placement: 'bottom',
+			tag: 'noscroll',
+			minWidth: '100px',
+			minHeight: '50px',
+			duration: [200, 200],
+			trigger: 'click',
+			wait: {
+				iconHeight: '40px'
+			},
+			onShow: async function({reference, popper, show, hide, destroy, waitDetroy, setContent, setData, setProps}) {
+				const parseData = stepData.split('|'),
+					stepType = parseData[0],
+					stepId = parseData[1];
+				
+				// Тип данных.
+				// 1: Чекбокс
+				// 2: Текст
+				// 3: Список сотрудников
+				// 4: Денежный формат
+				// 5: Светофор
+				
+				let itemsHtml;			
+				if (stepType == 1) {
+					const isActiveChecked = columnFilter.findIndex(item => item.column === 'step' && item.value[0] == stepType && item.value[1] == stepId && item.value[2] == 1) !== -1,
+						isActiveUnchecked = columnFilter.findIndex(item => item.column === 'step' && item.value[0] == stepType && item.value[1] == stepId && item.value[2] == 0) !== -1,
+						isActiveNone = columnFilter.findIndex(item => item.column === 'step' && item.value[0] == stepType && item.value[1] == stepId && item.value[2] == -1) !== -1;
+					
+					itemsHtml = '<ul class="ddrlist" id="deptFilter">\
+						<li class="ddrlist__item pointer'+(isActiveChecked ? ' color-blue' : '')+' color-blue-hovered" filtervalue="1"'+(isActiveChecked ? ' checked' : '')+'><i class="fa-solid fa-fw fa-square-check" hovered colored></i> Активный чекбокс</li>\
+						<li class="ddrlist__item mt3px pointer'+(isActiveUnchecked ? ' color-blue' : '')+' color-blue-hovered" filtervalue="0"'+(isActiveUnchecked ? ' checked' : '')+'><i class="fa-regular fa-fw fa-square" hovered colored></i> Неактивный чекбокс</li>\
+						<li class="ddrlist__item mt3px pointer'+(isActiveNone ? ' color-blue' : '')+' color-blue-hovered" filtervalue="-1"'+(isActiveNone ? ' checked' : '')+'><i class="fa-solid fa-fw fa-ban" hovered colored></i> Чекбокс отсутствует</li>\
+					</ul>';
+					
+				} else if (stepType == 3) {
+					const {data, error, status, headers, abort} = await axiosQuery('get', 'ajax/get_employee_list');
+					
+					itemsHtml = '<div class="scrollblock scrollblock-light" style="min-height: 40px; max-height: calc(100vh - 300px);"><ul class="ddrlist" id="deptFilter">';
+					
+					const isActiveNone = columnFilter.findIndex(item => item.column === 'step' && item.value[0] == stepType && item.value[1] == stepId && item.value[2] == -1) !== -1;
+					itemsHtml += `<li class="ddrlist__item pointer ${isActiveNone ? ' color-blue' : ''} color-blue-hovered" filtervalue="-1"${isActiveNone ? ' checked' : ''}>Сотрудник не выбран</li>`;
+					
+					data.forEach(user => {
+						const isActive = columnFilter.findIndex(item => item.column === 'step' && item.value[0] == stepType && item.value[1] == stepId && item.value[2] == user.id) !== -1;
+					   	itemsHtml += `<li class="ddrlist__item pointer ${isActive ? ' color-blue' : ''} color-blue-hovered" filtervalue="${user.id}"${isActive ? ' checked' : ''}>${user.pseudoname}</li>`;
+					});
+					
+					itemsHtml += '</ul></div>';
+				}
+				
+				
+				await setData(itemsHtml);
+				
+				waitDetroy();
+				
+				$(popper).find('#deptFilter').on(tapEvent, '[filtervalue]', function(e) {
+					const stepValue = e.currentTarget.getAttribute('filtervalue'),
+						isChecked = e.currentTarget.hasAttribute('checked');
+					
+					if (isChecked) {
+						columnFilter = columnFilter.filter(item => item.column !== 'step' || !(item.value[0] == stepType && item.value[1] == stepId && item.value[2] == stepValue));
+					} else {
+						columnFilter.push({
+							column: 'step',
+							value: [Number(stepType), Number(stepId), Number(stepValue)],
+						})
+					}
+					
+					getList({
+						withCounts: search || selection.value,
+						callback: function() {}
+					});
+					
+					filterByStepTooltip.destroy();
+				});
+				
+				
+			}
+		});
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 
@@ -2331,7 +2459,7 @@
 
 
 	//----------------------------------------------------------------------------------------------------- Отменить фильтрацию
-	$.cancelContractFilter = (event, column) => {
+	$.cancelContractFilter = (event, column, ...stepData) => {
 		if (!column) {
 			columnFilter = [];
 			dateFromValue = {};
@@ -2339,8 +2467,15 @@
 			columnDateFilter = null;
 		} else {
 			event.stopPropagation();
-			columnFilter = columnFilter.filter(item => item.column !== column);
-
+			
+			if (column == 'step') {
+				const [stepType, stepId] = stepData;
+				columnFilter = columnFilter.filter(item => item.column !== 'step' || !(item.value[0] == stepType && item.value[1] == stepId));
+			} else {
+				columnFilter = columnFilter.filter(item => item.column !== column);
+			}
+			
+			
 			delete(dateFromValue[column]);
 			delete(dateToValue[column]);
 
@@ -2401,6 +2536,7 @@
 			tag: 'noscroll noopen',
 			offset: [0 -5],
 			minWidth: '100px',
+			maxWidth: '210px',
 			minHeight: '30px',
 			duration: [200, 200],
 			trigger: 'click',
@@ -2793,7 +2929,8 @@
 				}
 			}
 			
-			if (columnFilter.length) {
+			const uniqueFilterCols = new Set(columnFilter.map(item => item.column));
+			if (uniqueFilterCols.size > 1) {
 				$('#clearAllFiltersBtn').ddrInputs('removeClass', 'hidden');
 				$('#clearAllFiltersBtn').ddrInputs('enable');
 			} else $('#clearAllFiltersBtn').ddrInputs('addClass', 'hidden');

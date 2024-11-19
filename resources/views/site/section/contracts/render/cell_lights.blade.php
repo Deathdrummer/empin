@@ -1,5 +1,5 @@
 @if($contractsSmeta)
-	<div class="row">
+	<div class="row gy-8">
 		@foreach($contractsSmeta as $item)
 			<div class="col-auto">
 		  		<div

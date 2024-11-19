@@ -46150,209 +46150,266 @@ template {
 .color-black {
   color: #3d3e4e;
 }
-.color-black-hovered:hover {
+.color-black [colored] {
+  color: #3d3e4e;
+}
+.color-black-hovered:hover, .color-black-hovered:hover [hovered] {
   color: #3d3e4e;
   transition: color 0.16s;
 }
-.color-black-active:active {
+.color-black-active:active, .color-black-active:active [actived] {
   color: #3d3e4e !important;
   transition: color 0s !important;
 }
 .color-light {
   color: #d2d2df;
 }
-.color-light-hovered:hover {
+.color-light [colored] {
+  color: #d2d2df;
+}
+.color-light-hovered:hover, .color-light-hovered:hover [hovered] {
   color: #d2d2df;
   transition: color 0.16s;
 }
-.color-light-active:active {
+.color-light-active:active, .color-light-active:active [actived] {
   color: #d2d2df !important;
   transition: color 0s !important;
 }
 .color-white {
   color: #fff;
 }
-.color-white-hovered:hover {
+.color-white [colored] {
+  color: #fff;
+}
+.color-white-hovered:hover, .color-white-hovered:hover [hovered] {
   color: #fff;
   transition: color 0.16s;
 }
-.color-white-active:active {
+.color-white-active:active, .color-white-active:active [actived] {
   color: #fff !important;
   transition: color 0s !important;
 }
 .color-blue {
   color: #03d1ff;
 }
-.color-blue-hovered:hover {
+.color-blue [colored] {
+  color: #03d1ff;
+}
+.color-blue-hovered:hover, .color-blue-hovered:hover [hovered] {
   color: #03d1ff;
   transition: color 0.16s;
 }
-.color-blue-active:active {
+.color-blue-active:active, .color-blue-active:active [actived] {
   color: #03d1ff !important;
   transition: color 0s !important;
 }
 .color-orange {
   color: #ffb100;
 }
-.color-orange-hovered:hover {
+.color-orange [colored] {
+  color: #ffb100;
+}
+.color-orange-hovered:hover, .color-orange-hovered:hover [hovered] {
   color: #ffb100;
   transition: color 0.16s;
 }
-.color-orange-active:active {
+.color-orange-active:active, .color-orange-active:active [actived] {
   color: #ffb100 !important;
   transition: color 0s !important;
 }
 .color-red {
   color: #ff8585;
 }
-.color-red-hovered:hover {
+.color-red [colored] {
+  color: #ff8585;
+}
+.color-red-hovered:hover, .color-red-hovered:hover [hovered] {
   color: #ff8585;
   transition: color 0.16s;
 }
-.color-red-active:active {
+.color-red-active:active, .color-red-active:active [actived] {
   color: #ff8585 !important;
   transition: color 0s !important;
 }
 .color-green {
   color: #1ed52c;
 }
-.color-green-hovered:hover {
+.color-green [colored] {
+  color: #1ed52c;
+}
+.color-green-hovered:hover, .color-green-hovered:hover [hovered] {
   color: #1ed52c;
   transition: color 0.16s;
 }
-.color-green-active:active {
+.color-green-active:active, .color-green-active:active [actived] {
   color: #1ed52c !important;
   transition: color 0s !important;
 }
 .color-gray {
   color: #c1c1c1;
 }
-.color-gray-hovered:hover {
+.color-gray [colored] {
+  color: #c1c1c1;
+}
+.color-gray-hovered:hover, .color-gray-hovered:hover [hovered] {
   color: #c1c1c1;
   transition: color 0.16s;
 }
-.color-gray-active:active {
+.color-gray-active:active, .color-gray-active:active [actived] {
   color: #c1c1c1 !important;
   transition: color 0s !important;
 }
 .color-gray-100 {
   color: #f8f9fa;
 }
-.color-gray-100-hovered:hover {
+.color-gray-100 [colored] {
+  color: #f8f9fa;
+}
+.color-gray-100-hovered:hover, .color-gray-100-hovered:hover [hovered] {
   color: #f8f9fa;
   transition: color 0.16s;
 }
-.color-gray-100-active:active {
+.color-gray-100-active:active, .color-gray-100-active:active [actived] {
   color: #f8f9fa !important;
   transition: color 0s !important;
 }
 .color-gray-200 {
   color: #e9ecef;
 }
-.color-gray-200-hovered:hover {
+.color-gray-200 [colored] {
+  color: #e9ecef;
+}
+.color-gray-200-hovered:hover, .color-gray-200-hovered:hover [hovered] {
   color: #e9ecef;
   transition: color 0.16s;
 }
-.color-gray-200-active:active {
+.color-gray-200-active:active, .color-gray-200-active:active [actived] {
   color: #e9ecef !important;
   transition: color 0s !important;
 }
 .color-gray-300 {
   color: #dee2e6;
 }
-.color-gray-300-hovered:hover {
+.color-gray-300 [colored] {
+  color: #dee2e6;
+}
+.color-gray-300-hovered:hover, .color-gray-300-hovered:hover [hovered] {
   color: #dee2e6;
   transition: color 0.16s;
 }
-.color-gray-300-active:active {
+.color-gray-300-active:active, .color-gray-300-active:active [actived] {
   color: #dee2e6 !important;
   transition: color 0s !important;
 }
 .color-gray-400 {
   color: #ced4da;
 }
-.color-gray-400-hovered:hover {
+.color-gray-400 [colored] {
+  color: #ced4da;
+}
+.color-gray-400-hovered:hover, .color-gray-400-hovered:hover [hovered] {
   color: #ced4da;
   transition: color 0.16s;
 }
-.color-gray-400-active:active {
+.color-gray-400-active:active, .color-gray-400-active:active [actived] {
   color: #ced4da !important;
   transition: color 0s !important;
 }
 .color-gray-500 {
   color: #adb5bd;
 }
-.color-gray-500-hovered:hover {
+.color-gray-500 [colored] {
+  color: #adb5bd;
+}
+.color-gray-500-hovered:hover, .color-gray-500-hovered:hover [hovered] {
   color: #adb5bd;
   transition: color 0.16s;
 }
-.color-gray-500-active:active {
+.color-gray-500-active:active, .color-gray-500-active:active [actived] {
   color: #adb5bd !important;
   transition: color 0s !important;
 }
 .color-gray-600 {
   color: #6c757d;
 }
-.color-gray-600-hovered:hover {
+.color-gray-600 [colored] {
+  color: #6c757d;
+}
+.color-gray-600-hovered:hover, .color-gray-600-hovered:hover [hovered] {
   color: #6c757d;
   transition: color 0.16s;
 }
-.color-gray-600-active:active {
+.color-gray-600-active:active, .color-gray-600-active:active [actived] {
   color: #6c757d !important;
   transition: color 0s !important;
 }
 .color-gray-700 {
   color: #495057;
 }
-.color-gray-700-hovered:hover {
+.color-gray-700 [colored] {
+  color: #495057;
+}
+.color-gray-700-hovered:hover, .color-gray-700-hovered:hover [hovered] {
   color: #495057;
   transition: color 0.16s;
 }
-.color-gray-700-active:active {
+.color-gray-700-active:active, .color-gray-700-active:active [actived] {
   color: #495057 !important;
   transition: color 0s !important;
 }
 .color-gray-800 {
   color: #343a40;
 }
-.color-gray-800-hovered:hover {
+.color-gray-800 [colored] {
+  color: #343a40;
+}
+.color-gray-800-hovered:hover, .color-gray-800-hovered:hover [hovered] {
   color: #343a40;
   transition: color 0.16s;
 }
-.color-gray-800-active:active {
+.color-gray-800-active:active, .color-gray-800-active:active [actived] {
   color: #343a40 !important;
   transition: color 0s !important;
 }
 .color-gray-900 {
   color: #212529;
 }
-.color-gray-900-hovered:hover {
+.color-gray-900 [colored] {
+  color: #212529;
+}
+.color-gray-900-hovered:hover, .color-gray-900-hovered:hover [hovered] {
   color: #212529;
   transition: color 0.16s;
 }
-.color-gray-900-active:active {
+.color-gray-900-active:active, .color-gray-900-active:active [actived] {
   color: #212529 !important;
   transition: color 0s !important;
 }
 .color-darkgray {
   color: #99acad;
 }
-.color-darkgray-hovered:hover {
+.color-darkgray [colored] {
+  color: #99acad;
+}
+.color-darkgray-hovered:hover, .color-darkgray-hovered:hover [hovered] {
   color: #99acad;
   transition: color 0.16s;
 }
-.color-darkgray-active:active {
+.color-darkgray-active:active, .color-darkgray-active:active [actived] {
   color: #99acad !important;
   transition: color 0s !important;
 }
 .color-dark {
   color: #6a6b76;
 }
-.color-dark-hovered:hover {
+.color-dark [colored] {
+  color: #6a6b76;
+}
+.color-dark-hovered:hover, .color-dark-hovered:hover [hovered] {
   color: #6a6b76;
   transition: color 0.16s;
 }
-.color-dark-active:active {
+.color-dark-active:active, .color-dark-active:active [actived] {
   color: #6a6b76 !important;
   transition: color 0s !important;
 }

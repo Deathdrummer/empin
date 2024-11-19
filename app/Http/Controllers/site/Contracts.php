@@ -101,8 +101,18 @@ class Contracts extends Controller {
 		
 		$columnFilter = null;
 		if ($filterRequest = json_decode($request->get('filter', null), true)) {
-			$columnFilter = array_column($filterRequest, 'column') ?? null;
+			foreach ($filterRequest as $item) {
+				if ($item['column'] == 'step') {
+					$columnFilter[] = $item['column'].':'.$item['value'][1];
+				} else {
+					$columnFilter[] = $item['column'];
+				}
+			}
+			
+			$columnFilter = array_unique($columnFilter);
 		}
+		
+		
 		
 		if (!$list || $list->isEmpty()) return $this->renderWithHeaders('list', compact('columnFilter'), $headers);
 		

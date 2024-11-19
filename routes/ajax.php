@@ -15,6 +15,7 @@ use App\Http\Controllers\crud\StepsPatterns;
 use App\Http\Controllers\SiteParserController;
 use App\Http\Controllers\TabsController;
 use App\Http\Controllers\UploadFilesController;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -214,6 +215,18 @@ Route::put('/contracts/set_dept_hidden_status', [Contracts::class, 'set_dept_hid
 Route::post('/contracts/store_show', [Contracts::class, 'store_show']);
 Route::get('/contracts/check_exists_contracts', [Contracts::class, 'check_exists_contracts']);
 Route::resource('contracts', Contracts::class);
+
+
+
+
+
+
+
+Route::get('/get_employee_list', function () {
+    return User::select('id', 'pseudoname')->get();
+});
+
+
 
 
 
