@@ -104,8 +104,8 @@
 			</div>
 		</div>
 
-		<div class="row mb2rem align-items-center flex-nowrap" id="tableContainer">
-			<div class="col">
+		<div class="row mb2rem align-items-center flex-nowrap justify-content-start" id="tableContainer">
+			<div class="col-auto flex-shrink-1">
 				<div class="horisontal horisontal_hidescroll horisontal_nopadding" id="depsChooser">
 					<div class="horisontal__track">
 						<div class="horisontal__item">
@@ -226,9 +226,9 @@
 					rounded="2px"
 					px="10"
 					action="cancelContractFilter"
-					id="clearAllFiltersBtn"
+					id="clearAllFiltersBtn222"
 					style="border-radius: 10px;"
-					class="hidden"
+					class="hidden2"
 					>Снять фильтры 
 					<img src="{{asset('assets/images/cancel_icon.png')}}" class="w1rem-8px ml2px" style="vertical-align: text-top;" alt="">
 				</x-button>
