@@ -104,8 +104,8 @@
 			</div>
 		</div>
 
-		<div class="row mb2rem align-items-center" id="tableContainer">
-			<div class="col-auto">
+		<div class="row mb2rem align-items-center flex-nowrap" id="tableContainer">
+			<div class="col">
 				<div class="horisontal horisontal_hidescroll horisontal_nopadding" id="depsChooser">
 					<div class="horisontal__track">
 						<div class="horisontal__item">
@@ -1977,7 +1977,6 @@
 		filterByStepTooltip,
 		dateFromPicker,
 		dateToPicker,
-		datePopper,
 		dateFromValue = {},
 		dateToValue = {},
 		columnDateFilter;
@@ -2077,12 +2076,8 @@
 			wait: {
 				iconHeight: '40px'
 			},
-			onDestroy: () => {datePopper = null;},
 			onShow: async function({reference, popper, show, hide, destroy, waitDetroy, setContent, setData, setProps}) {
-				
-				datePopper = popper;
-				
-				
+
 				//abortCtrlFilterDates = new AbortController();
 				//const {data, error, status, headers, abort} = await axiosQuery('get', 'site/contracts/calendar', {}, 'text', abortCtrlFilterDates);
 
@@ -2170,17 +2165,6 @@
 			}
 		});
 	}
-	
-	
-	
-	$(datePopper).on('keypress', (e) => {
-					console.log(123);
-					//if (e.keyCode == 13) {
-						
-					//}
-				});
-
-
 
 
 
@@ -2929,7 +2913,8 @@
 				}
 			}
 			
-			const uniqueFilterCols = new Set(columnFilter.map(item => item.column));
+			const uniqueFilterCols = new Set(columnFilter.map(item => item.column == 'step' ? item.column+item.value[1] : item.column));
+			
 			if (uniqueFilterCols.size > 1) {
 				$('#clearAllFiltersBtn').ddrInputs('removeClass', 'hidden');
 				$('#clearAllFiltersBtn').ddrInputs('enable');
