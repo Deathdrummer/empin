@@ -222,8 +222,9 @@ Route::resource('contracts', Contracts::class);
 
 
 
-Route::get('/get_employee_list', function () {
-    return User::select('id', 'pseudoname')->get();
+Route::get('/get_employee_list', function (Request $request) {
+	$deptId = $request->input('dept_id', 0);
+    return User::select('id', 'pseudoname')->where('department_id', $deptId)->get();
 });
 
 

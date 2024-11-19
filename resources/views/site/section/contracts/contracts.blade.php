@@ -1989,10 +1989,9 @@
 			'mainFontSize': '12px',
 			'mainMinHeight': '30px',
 		});
-
-
+		
 		preload({iconSize: '3rem'});
-
+		
 		onContextMenu(({setMaxHeight}) => {
 			setMaxHeight('calc(100vh - 300px)');
 		});
@@ -2019,7 +2018,6 @@
 			navData.push({
 				name: itemName,
 				onClick() {
-					//console.log({column, id});
 					const hasItem = columnFilter.findIndex(item => item.column == column && item.value == id) != -1;
 					if (hasItem) {
 						columnFilter = columnFilter.filter(item => item.column != column || (item.column == column && item.value != id));
@@ -2035,7 +2033,13 @@
 
 					getList({
 						withCounts: search || selection.value,
-						callback: function() {}
+						callback: function() {
+							const iconHtml = '<div class="placer placer-bottom placer-center">\
+									<i onclick="$.cancelContractFilter(event, \''+column+'\')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>\
+								</div>';
+											
+							$(target.selector).append(iconHtml);
+						}
 					});
 				}
 			});
@@ -2058,6 +2062,7 @@
 
 
 	//----------------------------------------------------------------------------------------------------- Фильтрация по дате
+	let dateReference;
 	$.contractFilterByDate = (column) => {
 		if (filterByDateTooltip?.destroy != undefined) filterByDateTooltip.destroy();
 		if (dateFromPicker?.remove != undefined) dateFromPicker.remove();
@@ -2077,7 +2082,7 @@
 				iconHeight: '40px'
 			},
 			onShow: async function({reference, popper, show, hide, destroy, waitDetroy, setContent, setData, setProps}) {
-
+				dateReference = reference;
 				//abortCtrlFilterDates = new AbortController();
 				//const {data, error, status, headers, abort} = await axiosQuery('get', 'site/contracts/calendar', {}, 'text', abortCtrlFilterDates);
 
@@ -2172,7 +2177,6 @@
 
 	//----------------------------------------------------------------------------------------------------- Применить фильтр по дате
 	$.setContractFilterByDate = async (column) => {
-
 		dateFromValue[column] = $('input#filterDateFrom').attr('date'),
 		dateToValue[column] = $('input#filterDateTo').attr('date');
 
@@ -2189,16 +2193,23 @@
 			buildData.push(td.getFullYear()+'-'+addZero(td.getMonth() + 1)+'-'+addZero(td.getDate())+' 00:00:00');
 		} else buildData.push('');
 
-		columnFilter = columnFilter.filter(item => item.column != columnDateFilter);
+		columnFilter = columnFilter.filter(item => item.column != column);
 		columnFilter.push({
-			column: columnDateFilter,
+			column: column,
 			value: buildData.join('|'), //dateFromValueFormat+'|'+dateToValueFormat,
 		})
+		
 		
 
 		getList({
 			withCounts: search || selection.value,
-			callback: function() {}
+			callback: function() {
+				const iconHtml = '<div class="placer placer-bottom placer-center">\
+						<i onclick="$.cancelContractFilter(event, \''+column+'\')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>\
+					</div>';
+								
+				$(dateReference).append(iconHtml);
+			}
 		});
 
 		filterByDateTooltip.destroy();
@@ -2309,7 +2320,13 @@
 					
 					getList({
 						withCounts: search || selection.value,
-						callback: function() {}
+						callback: function() {
+							const iconHtml = '<div class="placer placer-bottom placer-center">\
+									<i onclick="$.cancelContractFilter(event, \'step\', \''+stepType+'\', \''+stepId+'\')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>\
+								</div>';
+											
+							$(reference).append(iconHtml);
+						}
 					});
 					
 					filterBySummTooltip.destroy();
@@ -2329,7 +2346,7 @@
 	
 	
 	//----------------------------------------------------------------------------------------------------- Фильтрация по этапам
-	$.contractFilterByStep = (stepData) => {
+	$.contractFilterByStep = (stepData, deptId = null) => {
 		if (filterByStepTooltip?.destroy != undefined) filterByStepTooltip.destroy();
 		
 		filterByStepTooltip = $(event.currentTarget).ddrTooltip({
@@ -2368,9 +2385,9 @@
 					</ul>';
 					
 				} else if (stepType == 3) {
-					const {data, error, status, headers, abort} = await axiosQuery('get', 'ajax/get_employee_list');
+					const {data, error, status, headers, abort} = await axiosQuery('get', 'ajax/get_employee_list', {dept_id: deptId});
 					
-					itemsHtml = '<div class="scrollblock scrollblock-light" style="min-height: 40px; max-height: calc(100vh - 300px);"><ul class="ddrlist" id="deptFilter">';
+					itemsHtml = '<div class="scrollblock scrollblock-light" style="min-height: 40px; max-height: 300px;"><ul class="ddrlist" id="deptFilter">';
 					
 					const isActiveNone = columnFilter.findIndex(item => item.column === 'step' && item.value[0] == stepType && item.value[1] == stepId && item.value[2] == -1) !== -1;
 					itemsHtml += `<li class="ddrlist__item pointer ${isActiveNone ? ' color-blue' : ''} color-blue-hovered" filtervalue="-1"${isActiveNone ? ' checked' : ''}>Сотрудник не выбран</li>`;
@@ -2403,7 +2420,13 @@
 					
 					getList({
 						withCounts: search || selection.value,
-						callback: function() {}
+						callback: function() {
+							const iconHtml = '<div class="placer placer-bottom placer-center">\
+									<i onclick="$.cancelContractFilter(event, \'step\', \''+stepType+'\', \''+stepId+'\')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz11px" style="transform: translateY(5px);"></i>\
+								</div>';
+											
+							$(reference).append(iconHtml);
+						}
 					});
 					
 					filterByStepTooltip.destroy();
@@ -2449,7 +2472,10 @@
 			dateFromValue = {};
 			dateToValue = {};
 			columnDateFilter = null;
-		} else {
+		
+		} else if (column == 'prev') {
+			columnFilter.pop();
+		}  else {
 			event.stopPropagation();
 			
 			if (column == 'step') {
@@ -2842,7 +2868,7 @@
 
 			} else {
 				totalCount = getTotalCount(headers, currentList);
-
+				
 				if (search && gencontractingCount > 0) {
 					const genCunt = '<strong class="ml5px iconed iconed-noempty border-rounded-8px border-all border-white bg-gray color-white w2rem-8px h2rem-2px fz13px lh100">'+gencontractingCount+'</strong>';
 					$('#gencontractingCount').html(genCunt+'<p class="color-gray-500 fz14px ml5px"> в генподрядных договорах</p>');
@@ -2850,7 +2876,21 @@
 					$('#gencontractingCount').empty();
 				}
 
-				$('#contractsTable').html(data);
+				if (totalCount) $('#contractsTable').html(data);
+				else {
+					
+					const emptyHtml = '<div class="ddrtable__tr ddrtable__tr_visible h5rem-4px d-flex align-items-center justify-content-center" ddrtabletr style="width:100vw;">\
+						<div class="text-center">\
+							<p class="color-light">Нет данных</p>\
+							\
+								<p class="color-blue pointer fz12px mt5px" onclick="$.cancelContractFilter(event, \'prev\')">Отменить последний фильтр</p>\
+							\
+						</div>\
+					</div>';
+					
+					
+					$('#contractsList').blockTable('insertData', emptyHtml);
+				}
 			}
 
 			const showTotal = headers && headers['x-count-contracts-current'] && ((params['offset'] + params['limit'] >= totalCount) || (totalCount <= params['limit']));
