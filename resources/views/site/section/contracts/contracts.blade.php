@@ -2506,8 +2506,12 @@
 					$(event.target).closest('[filtericon]').remove();
 				
 				} else if (column && column == 'prev') {
-					$('#contractsTable').find(`[filtericon="${prevColumn?.column+prevColumn?.value[1]}"]`).remove();
-				
+					if (prevColumn?.column == 'step') {
+						$('#contractsTable').find(`[filtericon="step${+prevColumn?.value[1]}"]`).remove();
+					} else {
+						$('#contractsTable').find(`[filtericon="${prevColumn?.column}"]`).remove();
+					}
+					
 				} else {
 					$('#contractsTable').find('[filtericon]').remove();
 				}
