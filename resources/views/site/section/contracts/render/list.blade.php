@@ -117,7 +117,7 @@
 										>
 										<strong class="fz10px lh90 d-block text-center wodrbreak">Заказчик</strong>
 										@if(isset($columnFilter) && in_array($column, $columnFilter))
-											<div class="placer placer-bottom placer-center">
+											<div class="placer placer-bottom placer-center" filtericon="{{$column}}">
 												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
 											</div>
 										@endif
@@ -145,7 +145,7 @@
 										ddrtabletdmain
 										><strong class="fz10px lh90 d-block text-center wodrbreak">Дата подачи выполнения</strong>
 										@if(isset($columnFilter) && in_array($column, $columnFilter))
-											<div class="placer placer-bottom placer-center">
+											<div class="placer placer-bottom placer-center" filtericon="{{$column}}">
 												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
 											</div>
 										@endif
@@ -187,7 +187,7 @@
 										ddrtabletdmain
 										><strong class="fz10px lh90 d-block text-center wodrbreak">Стоимость договора без НДС</strong>
 										@if(isset($columnFilter) && in_array($column, $columnFilter))
-											<div class="placer placer-bottom placer-center">
+											<div class="placer placer-bottom placer-center" filtericon="{{$column}}">
 												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
 											</div>
 										@endif
@@ -204,7 +204,7 @@
 										ddrtabletdmain
 										><strong class="fz10px lh90 d-block text-center wodrbreak">Стоимость договора с НДС</strong>
 										@if(isset($columnFilter) && in_array($column, $columnFilter))
-											<div class="placer placer-bottom placer-center">
+											<div class="placer placer-bottom placer-center" filtericon="{{$column}}">
 												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
 											</div>
 										@endif
@@ -221,7 +221,7 @@
 										ddrtabletdmain
 										><strong class="fz10px lh90 d-block text-center wodrbreak">Стоимость генподрядного договора без НДС</strong>
 										@if(isset($columnFilter) && in_array($column, $columnFilter))
-											<div class="placer placer-bottom placer-center">
+											<div class="placer placer-bottom placer-center" filtericon="{{$column}}">
 												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
 											</div>
 										@endif
@@ -238,7 +238,7 @@
 										ddrtabletdmain
 										><strong class="fz10px lh90 d-block text-center wodrbreak">Стоимость генподрядного договора с НДС</strong>
 										@if(isset($columnFilter) && in_array($column, $columnFilter))
-											<div class="placer placer-bottom placer-center">
+											<div class="placer placer-bottom placer-center" filtericon="{{$column}}">
 												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
 											</div>
 										@endif
@@ -255,7 +255,7 @@
 										ddrtabletdmain
 										><strong class="fz10px lh90 d-block text-center wodrbreak">Стоимость субподрядного договора без НДС</strong>
 										@if(isset($columnFilter) && in_array($column, $columnFilter))
-											<div class="placer placer-bottom placer-center">
+											<div class="placer placer-bottom placer-center" filtericon="{{$column}}">
 												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
 											</div>
 										@endif
@@ -272,7 +272,7 @@
 										ddrtabletdmain
 										><strong class="fz10px lh90 d-block text-center wodrbreak">Стоимость субподрядного договора с НДС</strong>
 										@if(isset($columnFilter) && in_array($column, $columnFilter))
-											<div class="placer placer-bottom placer-center">
+											<div class="placer placer-bottom placer-center" filtericon="{{$column}}">
 												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
 											</div>
 										@endif
@@ -289,7 +289,7 @@
 										ddrtabletdmain
 										><strong class="fz10px lh90 d-block text-center wodrbreak">Сумма АВВР без НДС</strong>
 										@if(isset($columnFilter) && in_array($column, $columnFilter))
-											<div class="placer placer-bottom placer-center">
+											<div class="placer placer-bottom placer-center" filtericon="{{$column}}">
 												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
 											</div>
 										@endif
@@ -306,7 +306,7 @@
 										ddrtabletdmain
 										><strong class="fz10px lh90 d-block text-center wodrbreak">Сумма АВВР с НДС</strong>
 										@if(isset($columnFilter) && in_array($column, $columnFilter))
-											<div class="placer placer-bottom placer-center">
+											<div class="placer placer-bottom placer-center" filtericon="{{$column}}">
 												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
 											</div>
 										@endif
@@ -323,7 +323,7 @@
 										ddrtabletdmain
 										><strong class="fz10px lh90 d-block text-center wodrbreak">Сумма АВВР процента НДС</strong>
 										@if(isset($columnFilter) && in_array($column, $columnFilter))
-											<div class="placer placer-bottom placer-center">
+											<div class="placer placer-bottom placer-center" filtericon="{{$column}}">
 												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
 											</div>
 										@endif
@@ -340,7 +340,7 @@
 										ddrtabletdmain
 										><strong class="fz10px lh90 d-block text-center wodrbreak">Сумма ПИР без НДС</strong>
 										@if(isset($columnFilter) && in_array($column, $columnFilter))
-											<div class="placer placer-bottom placer-center">
+											<div class="placer placer-bottom placer-center" filtericon="{{$column}}">
 												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
 											</div>
 										@endif
@@ -357,7 +357,7 @@
 										ddrtabletdmain
 										><strong class="fz10px lh90 d-block text-center wodrbreak">Сумма ПИР с НДС</strong>
 										@if(isset($columnFilter) && in_array($column, $columnFilter))
-											<div class="placer placer-bottom placer-center">
+											<div class="placer placer-bottom placer-center" filtericon="{{$column}}">
 												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
 											</div>
 										@endif
@@ -374,7 +374,7 @@
 										ddrtabletdmain
 										><strong class="fz10px lh90 d-block text-center wodrbreak">Сумма ПИР процента НДС</strong>
 										@if(isset($columnFilter) && in_array($column, $columnFilter))
-											<div class="placer placer-bottom placer-center">
+											<div class="placer placer-bottom placer-center" filtericon="{{$column}}">
 												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
 											</div>
 										@endif
@@ -391,7 +391,7 @@
 										ddrtabletdmain
 										><strong class="fz10px lh90 d-block text-center wodrbreak">Сумма СМР без НДС</strong>
 										@if(isset($columnFilter) && in_array($column, $columnFilter))
-											<div class="placer placer-bottom placer-center">
+											<div class="placer placer-bottom placer-center" filtericon="{{$column}}">
 												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
 											</div>
 										@endif
@@ -408,7 +408,7 @@
 										ddrtabletdmain
 										><strong class="fz10px lh90 d-block text-center wodrbreak">Сумма ПНР без НДС</strong>
 										@if(isset($columnFilter) && in_array($column, $columnFilter))
-											<div class="placer placer-bottom placer-center">
+											<div class="placer placer-bottom placer-center" filtericon="{{$column}}">
 												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
 											</div>
 										@endif
@@ -436,7 +436,7 @@
 										>
 										<strong class="fz10px lh90 d-block text-center wodrbreak">Дата подписания договора</strong>
 										@if(isset($columnFilter) && in_array($column, $columnFilter))
-											<div class="placer placer-bottom placer-center">
+											<div class="placer placer-bottom placer-center" filtericon="{{$column}}">
 												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
 											</div>
 										@endif
@@ -453,7 +453,7 @@
 										>
 										<strong class="fz10px lh90 d-block text-center wodrbreak">Дата окончания работ по договору</strong>
 										@if(isset($columnFilter) && in_array($column, $columnFilter))
-											<div class="placer placer-bottom placer-center">
+											<div class="placer placer-bottom placer-center" filtericon="{{$column}}">
 												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
 											</div>
 										@endif
@@ -470,7 +470,7 @@
 										>
 										<strong class="fz10px lh90 d-block text-center wodrbreak">Дата подписания генподрядного договора</strong>
 										@if(isset($columnFilter) && in_array($column, $columnFilter))
-											<div class="placer placer-bottom placer-center">
+											<div class="placer placer-bottom placer-center" filtericon="{{$column}}">
 												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
 											</div>
 										@endif
@@ -487,7 +487,7 @@
 										>
 										<strong class="fz10px lh90 d-block text-center wodrbreak">Дата окончания работ по генподрядному договору</strong>
 										@if(isset($columnFilter) && in_array($column, $columnFilter))
-											<div class="placer placer-bottom placer-center">
+											<div class="placer placer-bottom placer-center" filtericon="{{$column}}">
 												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
 											</div>
 										@endif
@@ -504,7 +504,7 @@
 										>
 										<strong class="fz10px lh90 d-block text-center wodrbreak">Дата подписания субподрядного договора</strong>
 										@if(isset($columnFilter) && in_array($column, $columnFilter))
-											<div class="placer placer-bottom placer-center">
+											<div class="placer placer-bottom placer-center" filtericon="{{$column}}">
 												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
 											</div>
 										@endif
@@ -521,7 +521,7 @@
 										>
 										<strong class="fz10px lh90 d-block text-center wodrbreak">Дата окончания работ по субподрядному договору</strong>
 										@if(isset($columnFilter) && in_array($column, $columnFilter))
-											<div class="placer placer-bottom placer-center">
+											<div class="placer placer-bottom placer-center" filtericon="{{$column}}">
 												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
 											</div>
 										@endif
@@ -578,7 +578,7 @@
 										ddrtabletdmain
 										><strong class="fz10px lh90 d-block text-center wodrbreak">Тип договора</strong>
 										@if(isset($columnFilter) && in_array($column, $columnFilter))
-											<div class="placer placer-bottom placer-center">
+											<div class="placer placer-bottom placer-center" filtericon="{{$column}}">
 												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
 											</div>
 										@endif
@@ -596,7 +596,7 @@
 										>
 										<strong class="fz10px lh90 d-block text-center wodrbreak">Исполнитель</strong>
 										@if(isset($columnFilter) && in_array($column, $columnFilter))
-											<div class="placer placer-bottom placer-center">
+											<div class="placer placer-bottom placer-center" filtericon="{{$column}}">
 												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
 											</div>
 										@endif
@@ -622,7 +622,7 @@
 										ddrtabletdmain
 										><strong class="fz10px lh90 d-block text-center wodrbreak">Дата закупки</strong>
 										@if(isset($columnFilter) && in_array($column, $columnFilter))
-											<div class="placer placer-bottom placer-center">
+											<div class="placer placer-bottom placer-center" filtericon="{{$column}}">
 												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
 											</div>
 										@endif
@@ -639,7 +639,7 @@
 										>
 										<strong class="fz10px lh90 d-block text-center wodrbreak">Дата закрытия договора</strong>
 										@if(isset($columnFilter) && in_array($column, $columnFilter))
-											<div class="placer placer-bottom placer-center">
+											<div class="placer placer-bottom placer-center" filtericon="{{$column}}">
 												<i onclick="$.cancelContractFilter(event, '{{$column}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>
 											</div>
 										@endif
@@ -759,7 +759,7 @@
 												>
 												<p class="fz10px lh90 text-center breakword">{{$step['name']}}</p>
 												@if(isset($columnFilter) && in_array('step:'.$step['id'], $columnFilter))
-													<div class="placer placer-bottom placer-center">
+													<div class="placer placer-bottom placer-center" filtericon="{{'step:'.$step['id']}}">
 														<i onclick="$.cancelContractFilter(event, 'step', '{{$step['type']}}', '{{$step['id']}}')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz11px" style="transform: translateY(5px);"></i>
 													</div>
 												@endif

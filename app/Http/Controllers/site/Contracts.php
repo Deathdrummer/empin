@@ -95,8 +95,19 @@ class Contracts extends Controller {
 			$headers['x-count-contracts-departments'] = json_encode($counts['departments']) ?? null;
 			$headers['x-count-contracts-archive'] = $counts['archive'] ?? null;
 			$headers['x-count-contracts-gencontracting'] = $counts['gencontracting'] ?? null;
+			
+			
+			$headers['x-count-current-list'] = match(true) {
+				$request->get('archive', false) == 1 => $counts['archive'],
+				!!$request->get('department_id', false) && isset($counts['departments'][$request->get('department_id')]) => $counts['departments'][$request->get('department_id')],
+				!$request->has('department_id') && $request->get('archive', false) == 0 => $counts['all'],
+				default	=> null,
+			};
+			
+			
+			toLog($headers['x-count-current-list']);
+			
 		}
-		
 		
 		
 		$columnFilter = null;
@@ -114,7 +125,7 @@ class Contracts extends Controller {
 		
 		
 		
-		if (!$list || $list->isEmpty()) return response()->json(null); //return $this->renderWithHeaders('list', compact('columnFilter'), $headers);
+		if (!$list || $list->isEmpty()) return response()->json(null)->withHeaders($headers); //return $this->renderWithHeaders('list', compact('columnFilter'), $headers);
 		
 		$alldeps = $this->department->getWithSteps($request);
 		
@@ -185,7 +196,6 @@ class Contracts extends Controller {
 			'setting'	=> 'contracts-smeta:contractsSmeta',
 			'key'		=> 'id',
 		]]);
-
 		
 		return $this->renderWithHeaders(
 			'list',

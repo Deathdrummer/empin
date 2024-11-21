@@ -2034,7 +2034,7 @@
 					getList({
 						withCounts: search || selection.value,
 						callback: function() {
-							const iconHtml = '<div class="placer placer-bottom placer-center">\
+							const iconHtml = '<div class="placer placer-bottom placer-center" filtericon="'+column+'">\
 									<i onclick="$.cancelContractFilter(event, \''+column+'\')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>\
 								</div>';
 											
@@ -2204,7 +2204,7 @@
 		getList({
 			withCounts: search || selection.value,
 			callback: function() {
-				const iconHtml = '<div class="placer placer-bottom placer-center">\
+				const iconHtml = '<div class="placer placer-bottom placer-center" filtericon="'+column+'">\
 						<i onclick="$.cancelContractFilter(event, \''+column+'\')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>\
 					</div>';
 								
@@ -2321,8 +2321,8 @@
 					getList({
 						withCounts: search || selection.value,
 						callback: function() {
-							const iconHtml = '<div class="placer placer-bottom placer-center">\
-									<i onclick="$.cancelContractFilter(event, \'step\', \''+stepType+'\', \''+stepId+'\')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>\
+							const iconHtml = '<div class="placer placer-bottom placer-center" filtericon="'+column+'">\
+									<i onclick="$.cancelContractFilter(event, \''+column+'\')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz14px"></i>\
 								</div>';
 											
 							$(reference).append(iconHtml);
@@ -2421,7 +2421,7 @@
 					getList({
 						withCounts: search || selection.value,
 						callback: function() {
-							const iconHtml = '<div class="placer placer-bottom placer-center">\
+							const iconHtml = '<div class="placer placer-bottom placer-center" filtericon="step'+stepId+'">\
 									<i onclick="$.cancelContractFilter(event, \'step\', \''+stepType+'\', \''+stepId+'\')" class="fa-solid fa-filter-circle-xmark fa-fw color-orange color-orange-hovered mb4px fz11px" style="transform: translateY(5px);"></i>\
 								</div>';
 											
@@ -2467,6 +2467,7 @@
 
 	//----------------------------------------------------------------------------------------------------- Отменить фильтрацию
 	$.cancelContractFilter = (event, column, ...stepData) => {
+		let prevColumn;
 		if (!column) {
 			columnFilter = [];
 			dateFromValue = {};
@@ -2474,7 +2475,7 @@
 			columnDateFilter = null;
 		
 		} else if (column == 'prev') {
-			columnFilter.pop();
+			prevColumn = columnFilter.pop();
 		}  else {
 			event.stopPropagation();
 			
@@ -2500,7 +2501,17 @@
 		
 		getList({
 			withCounts: search || selection.value,
-			callback: function() {}
+			callback: function() {
+				if ($(event.target).closest('[filtericon]').length) {
+					$(event.target).closest('[filtericon]').remove();
+				
+				} else if (column && column == 'prev') {
+					$('#contractsTable').find(`[filtericon="${prevColumn?.column+prevColumn?.value[1]}"]`).remove();
+				
+				} else {
+					$('#contractsTable').find('[filtericon]').remove();
+				}
+			}
 		});
 	}
 
@@ -2876,18 +2887,21 @@
 					$('#gencontractingCount').empty();
 				}
 
-				if (totalCount) $('#contractsTable').html(data);
+				if (headers['x-count-current-list'] > 0) $('#contractsTable').html(data);
 				else {
 					
-					const emptyHtml = '<div class="ddrtable__tr ddrtable__tr_visible h5rem-4px d-flex align-items-center justify-content-center" ddrtabletr style="width:100vw;">\
+					const emptyHtml = columnFilter.length ? '<div class="ddrtable__tr ddrtable__tr_visible h5rem-4px d-flex align-items-center justify-content-center" ddrtabletr style="width:100vw;">\
 						<div class="text-center">\
 							<p class="color-light">Нет данных</p>\
 							\
 								<p class="color-blue pointer fz12px mt5px" onclick="$.cancelContractFilter(event, \'prev\')">Отменить последний фильтр</p>\
 							\
 						</div>\
+					</div>' : '<div class="ddrtable__tr ddrtable__tr_visible h5rem-4px d-flex align-items-center justify-content-center" ddrtabletr style="width:100vw;">\
+						<div class="text-center">\
+							<p class="color-light">Нет данных</p>\
+						</div>\
 					</div>';
-					
 					
 					$('#contractsList').blockTable('insertData', emptyHtml);
 				}
