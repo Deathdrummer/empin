@@ -8,6 +8,7 @@ use App\Services\Business\Department as DepartmentService;
 use App\Traits\HasCrudController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 class Selections extends Controller {
@@ -570,6 +571,30 @@ class Selections extends Controller {
 		$row->archive = $command == 'to' ? 1 : ($command == 'from' ? 0 : 1);
 		$stat = $row->save();
 		return $stat;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	/** создать таблицу selection_sort с полями: selection_id, account_id, sort 
+	* это нужно для того, чтобы сортировать для каждого сотрудника, так как одна и та же подборка может быть более чем у одного сотрудника
+	* @param 
+	* @return 
+	*/
+	public function sort(Request $request) {
+		$items = $request->get('items');
+		
+		$query = "UPDATE contracts_selections SET _sort = CASE id ";
+		foreach ($items as $id => $sort) {
+			$query .= "WHEN $id THEN $sort ";
+		}
+		$query .= "END WHERE id IN (".implode(',', array_keys($items)).")";
+
+		DB::statement($query);		
 	}
 	
 	

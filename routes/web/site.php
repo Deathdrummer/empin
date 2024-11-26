@@ -291,8 +291,8 @@ Route::prefix('site')->middleware(['lang', 'isajax:site'])->group(function() {
 	Route::get('/contracts/column_values', [Contracts::class, 'column_values']);
 	
 	Route::get('/contracts/calendar', [Contracts::class, 'calendar']);
+	
 	Route::get('/contracts/work_calendar_count', [Contracts::class, 'work_calendar_count']);
-
 	
 	
 	
@@ -358,6 +358,8 @@ Route::prefix('site')->middleware(['lang', 'isajax:site'])->group(function() {
 	Route::put('/selections/remove_contract', [Selections::class, 'remove_contract']);
 	Route::put('/selections/remove_contracts', [Selections::class, 'remove_contracts']);
 	Route::post('/selections/store_show', [Selections::class, 'store_show']);
+	
+	Route::put('/selections/sort', [Selections::class, 'sort']);
 	
 	Route::get('/selections/users_to_share', [Selections::class, 'users_to_share']);
 	Route::post('/selections/share', [Selections::class, 'share']);
