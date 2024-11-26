@@ -21,6 +21,7 @@
 <x-table id="selectionsTable" class="w100" noborder>
 	<x-table.head>
 		<x-table.tr>
+			<x-table.td class="w-3rem"></x-table.td>
 			<x-table.td class="w-auto">
 				<strong class="d-block fz12px lh90">Название подборки</strong>
 			</x-table.td>

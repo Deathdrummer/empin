@@ -1,7 +1,9 @@
 <x-table.tr
 	class="h6rem"
 	archive="{{$archive ?? '0'}}"
+	selection="{{$id}}"
 	>
+	<x-table.td class="h-center" noborder handle><i class="fa-solid fa-fw fa-arrows-up-down color-gray fz12px"></i></x-table.td>
 	<x-table.td>
 		@if($subscribed_read)
 			<p class="fz12px ml6px">{{$title}}</p>

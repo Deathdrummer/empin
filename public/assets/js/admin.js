@@ -18842,32 +18842,32 @@ function selectionsList(selection, editSelection, _clearCounts, getList) {
     disabledButtons: true,
     winClass: 'ddrpopup_white'
   }).then( /*#__PURE__*/function () {
-    var _ref2 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee4(_ref) {
+    var _ref2 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee5(_ref) {
       var state, wait, setTitle, setButtons, loadData, setHtml, setLHtml, dialog, close, query, onScroll, disableButtons, enableButtons, setWidth, viewsPath, init;
-      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee4$(_context4) {
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee5$(_context5) {
         while (1) {
-          switch (_context4.prev = _context4.next) {
+          switch (_context5.prev = _context5.next) {
             case 0:
               state = _ref.state, wait = _ref.wait, setTitle = _ref.setTitle, setButtons = _ref.setButtons, loadData = _ref.loadData, setHtml = _ref.setHtml, setLHtml = _ref.setLHtml, dialog = _ref.dialog, close = _ref.close, query = _ref.query, onScroll = _ref.onScroll, disableButtons = _ref.disableButtons, enableButtons = _ref.enableButtons, setWidth = _ref.setWidth;
               //isClosed
               wait();
               viewsPath = 'site.section.contracts.render.selections';
-              _context4.next = 5;
+              _context5.next = 5;
               return axiosQuery('get', 'site/selections/init', {
                 views: viewsPath
               });
 
             case 5:
-              init = _context4.sent;
+              init = _context5.sent;
 
               if (!init.error) {
-                _context4.next = 10;
+                _context5.next = 10;
                 break;
               }
 
               console.log(init.error);
               wait(false);
-              return _context4.abrupt("return", false);
+              return _context5.abrupt("return", false);
 
             case 10:
               setHtml(init.data, function () {
@@ -18897,6 +18897,48 @@ function selectionsList(selection, editSelection, _clearCounts, getList) {
                       query = _ref3.query,
                       getParams = _ref3.getParams;
                   $('#selectionsTable').blockTable('buildTable');
+                  $("#selectionsList").sortable({
+                    axis: 'y',
+                    placeholder: 'sortable-placeholder h6rem',
+                    classes: {
+                      'ui-sortable-placeholder': 'ddrtable__tr'
+                    },
+                    stop: function stop(event, ui) {
+                      return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
+                        var sortedData, _yield$axiosQuery, data, error, status, headers;
+
+                        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
+                          while (1) {
+                            switch (_context.prev = _context.next) {
+                              case 0:
+                                sortedData = {};
+                                $("#selectionsList").find('[selection]').each(function (k, item) {
+                                  var id = $(item).attr('selection');
+                                  sortedData[id] = k + 1;
+                                });
+                                _context.next = 4;
+                                return axiosQuery('put', 'site/selections/sort', {
+                                  items: sortedData
+                                });
+
+                              case 4:
+                                _yield$axiosQuery = _context.sent;
+                                data = _yield$axiosQuery.data;
+                                error = _yield$axiosQuery.error;
+                                status = _yield$axiosQuery.status;
+                                headers = _yield$axiosQuery.headers;
+
+                              case 9:
+                              case "end":
+                                return _context.stop();
+                            }
+                          }
+                        }, _callee);
+                      }))();
+                    },
+                    //cancel: "[nohandle]"
+                    handle: '[handle]'
+                  });
                   wait(false);
                   enableButtons(true);
                   changeInputs({
@@ -19268,12 +19310,12 @@ function selectionsList(selection, editSelection, _clearCounts, getList) {
                   };
 
                   $.selectionExport = /*#__PURE__*/function () {
-                    var _ref18 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee2(btn, selectionId) {
-                      var row, selectionExportBtnWait, winHeight, _yield$axiosQuery, data, error, status, headers, exportDialogHtml;
+                    var _ref18 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee3(btn, selectionId) {
+                      var row, selectionExportBtnWait, winHeight, _yield$axiosQuery2, data, error, status, headers, exportDialogHtml;
 
-                      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee2$(_context2) {
+                      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee3$(_context3) {
                         while (1) {
-                          switch (_context2.prev = _context2.next) {
+                          switch (_context3.prev = _context3.next) {
                             case 0:
                               row = $(btn).closest('[ddrtabletr]');
                               $(btn).setAttrib('disabled');
@@ -19282,17 +19324,17 @@ function selectionsList(selection, editSelection, _clearCounts, getList) {
                                 bgColor: '#d2fafb99'
                               });
                               winHeight = $('[ddrpopupdata]').outerHeight() - 100;
-                              _context2.next = 6;
+                              _context3.next = 6;
                               return axiosQuery('get', 'site/contracts/to_export', {
                                 height: (winHeight < 300 ? 300 : winHeight) + 'px'
                               });
 
                             case 6:
-                              _yield$axiosQuery = _context2.sent;
-                              data = _yield$axiosQuery.data;
-                              error = _yield$axiosQuery.error;
-                              status = _yield$axiosQuery.status;
-                              headers = _yield$axiosQuery.headers;
+                              _yield$axiosQuery2 = _context3.sent;
+                              data = _yield$axiosQuery2.data;
+                              error = _yield$axiosQuery2.error;
+                              status = _yield$axiosQuery2.status;
+                              headers = _yield$axiosQuery2.headers;
                               exportDialogHtml = '<div class="w38rem text-start">' + '<h6 class="fz16px color-blue mb1rem text-center" style="color:#487c91;">Экспорт данных в Excel</h6>' + data + '</div>';
                               dialog(exportDialogHtml, {
                                 buttons: {
@@ -19302,12 +19344,12 @@ function selectionsList(selection, editSelection, _clearCounts, getList) {
                                     selectionExportBtnWait.destroy();
                                   },
                                   'Экспорт|blue': function () {
-                                    var _ЭкспортBlue = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee(_ref20) {
-                                      var closeDialog, selectionExportWinWait, colums, sort, order, _yield$axiosQuery2, data, error, status, headers, d;
+                                    var _ЭкспортBlue = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee2(_ref20) {
+                                      var closeDialog, selectionExportWinWait, colums, sort, order, _yield$axiosQuery3, data, error, status, headers, d;
 
-                                      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
+                                      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee2$(_context2) {
                                         while (1) {
-                                          switch (_context.prev = _context.next) {
+                                          switch (_context2.prev = _context2.next) {
                                             case 0:
                                               closeDialog = _ref20.closeDialog;
                                               selectionExportWinWait = $('[ddrpopupdialogwin]').ddrWait({
@@ -19320,7 +19362,7 @@ function selectionsList(selection, editSelection, _clearCounts, getList) {
                                                 colums.push(field);
                                               });
                                               sort = ddrStore('site-contracts-sortfield') || 'id', order = ddrStore('site-contracts-sortorder') || 'ASC';
-                                              _context.next = 7;
+                                              _context2.next = 7;
                                               return axiosQuery('post', 'site/contracts/to_export', {
                                                 selection_id: selectionId,
                                                 colums: colums,
@@ -19329,20 +19371,20 @@ function selectionsList(selection, editSelection, _clearCounts, getList) {
                                               }, 'blob');
 
                                             case 7:
-                                              _yield$axiosQuery2 = _context.sent;
-                                              data = _yield$axiosQuery2.data;
-                                              error = _yield$axiosQuery2.error;
-                                              status = _yield$axiosQuery2.status;
-                                              headers = _yield$axiosQuery2.headers;
+                                              _yield$axiosQuery3 = _context2.sent;
+                                              data = _yield$axiosQuery3.data;
+                                              error = _yield$axiosQuery3.error;
+                                              status = _yield$axiosQuery3.status;
+                                              headers = _yield$axiosQuery3.headers;
 
                                               if (!(headers['content-type'] != 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')) {
-                                                _context.next = 16;
+                                                _context2.next = 16;
                                                 break;
                                               }
 
                                               $.notify('Ошибка экспорта данных', 'error');
                                               selectionExportWinWait.off();
-                                              return _context.abrupt("return");
+                                              return _context2.abrupt("return");
 
                                             case 16:
                                               d = ddrDateBuilder();
@@ -19357,10 +19399,10 @@ function selectionsList(selection, editSelection, _clearCounts, getList) {
 
                                             case 18:
                                             case "end":
-                                              return _context.stop();
+                                              return _context2.stop();
                                           }
                                         }
-                                      }, _callee);
+                                      }, _callee2);
                                     }));
 
                                     function ЭкспортBlue(_x4) {
@@ -19396,10 +19438,10 @@ function selectionsList(selection, editSelection, _clearCounts, getList) {
 
                             case 13:
                             case "end":
-                              return _context2.stop();
+                              return _context3.stop();
                           }
                         }
-                      }, _callee2);
+                      }, _callee3);
                     }));
 
                     return function (_x2, _x3) {
@@ -19422,27 +19464,27 @@ function selectionsList(selection, editSelection, _clearCounts, getList) {
                     var success = isArchive ? 'Подборка успешно возвращена в активные!' : 'Подборка успешно отправлена в архив!';
                     dialog(mess, {
                       buttons: (_buttons = {}, _defineProperty(_buttons, actionBtn, function () {
-                        var _ref22 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee3(_ref21) {
-                          var closeDialog, _yield$axiosQuery3, data, error, status, headers, abort;
+                        var _ref22 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee4(_ref21) {
+                          var closeDialog, _yield$axiosQuery4, data, error, status, headers, abort;
 
-                          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee3$(_context3) {
+                          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee4$(_context4) {
                             while (1) {
-                              switch (_context3.prev = _context3.next) {
+                              switch (_context4.prev = _context4.next) {
                                 case 0:
                                   closeDialog = _ref21.closeDialog;
-                                  _context3.next = 3;
+                                  _context4.next = 3;
                                   return axiosQuery('put', 'site/selections/archive', {
                                     id: id,
                                     command: command
                                   }, 'json');
 
                                 case 3:
-                                  _yield$axiosQuery3 = _context3.sent;
-                                  data = _yield$axiosQuery3.data;
-                                  error = _yield$axiosQuery3.error;
-                                  status = _yield$axiosQuery3.status;
-                                  headers = _yield$axiosQuery3.headers;
-                                  abort = _yield$axiosQuery3.abort;
+                                  _yield$axiosQuery4 = _context4.sent;
+                                  data = _yield$axiosQuery4.data;
+                                  error = _yield$axiosQuery4.error;
+                                  status = _yield$axiosQuery4.status;
+                                  headers = _yield$axiosQuery4.headers;
+                                  abort = _yield$axiosQuery4.abort;
 
                                   if (error) {
                                     $.notify('Ошибка отправки подборки в архив!', 'error');
@@ -19469,10 +19511,10 @@ function selectionsList(selection, editSelection, _clearCounts, getList) {
 
                                 case 11:
                                 case "end":
-                                  return _context3.stop();
+                                  return _context4.stop();
                               }
                             }
-                          }, _callee3);
+                          }, _callee4);
                         }));
 
                         return function (_x5) {
@@ -19491,10 +19533,10 @@ function selectionsList(selection, editSelection, _clearCounts, getList) {
 
             case 11:
             case "end":
-              return _context4.stop();
+              return _context5.stop();
           }
         }
-      }, _callee4);
+      }, _callee5);
     }));
 
     return function (_x) {

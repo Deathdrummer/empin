@@ -103,10 +103,6 @@ class Contracts extends Controller {
 				!$request->has('department_id') && $request->get('archive', false) == 0 => $counts['all'],
 				default	=> null,
 			};
-			
-			
-			toLog($headers['x-count-current-list']);
-			
 		}
 		
 		
