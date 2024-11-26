@@ -1677,6 +1677,24 @@
 								$(input.target).ddrInputs('enable');
 							});
 						});
+						const initDate = ref('');
+						const checkWork = ref(0);
+						
+						$('[date-work-start]').on('datepicker', function(e) {
+							initDate.value = $(e.target).attr('date');
+							count_days.calc();
+						})
+
+						$('[add_works_days]').on('change', function(e) {
+							checkWork.value = $(e.target).is(':checked')?1:0;
+							count_days.calc();
+						})
+						const count_days = $('[count_days]').ddrCalc([{
+							selector: '[date-work-end]',
+							method: 'count_days',
+							initialDate: initDate,
+							addWorkdays: checkWork,
+						}]);
 					});
 				});
 

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "130c93168e00053d3bd37148f004cf98",
+    "content-hash": "b57abdae7f85daca922b31154e6303ae",
     "packages": [
         {
             "name": "bensampo/laravel-enum",
@@ -6209,6 +6209,52 @@
             "time": "2021-12-08T09:12:39+00:00"
         },
         {
+            "name": "tochka-developers/work-calendar",
+            "version": "v2.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/tochka-developers/work-calendar.git",
+                "reference": "a2a74ed3cdc96677b62047d317cca6e2cb38dd0d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/tochka-developers/work-calendar/zipball/a2a74ed3cdc96677b62047d317cca6e2cb38dd0d",
+                "reference": "a2a74ed3cdc96677b62047d317cca6e2cb38dd0d",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "ext-simplexml": "*",
+                "nesbot/carbon": "^2.",
+                "php": ">=7.2.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^7"
+            },
+            "type": "package",
+            "autoload": {
+                "psr-4": {
+                    "Tochka\\Calendar\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ivanov Sergey",
+                    "email": "ivanov@tochka.com"
+                }
+            ],
+            "description": "Russian Federation production calendar extension for Carbon",
+            "support": {
+                "issues": "https://github.com/tochka-developers/work-calendar/issues",
+                "source": "https://github.com/tochka-developers/work-calendar/tree/v2.3.0"
+            },
+            "time": "2024-11-02T07:07:13+00:00"
+        },
+        {
             "name": "vlucas/phpdotenv",
             "version": "v5.4.1",
             "source": {
@@ -9074,12 +9120,12 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": [],
+    "stability-flags": {},
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
         "php": "^8.1"
     },
-    "platform-dev": [],
+    "platform-dev": {},
     "plugin-api-version": "2.6.0"
 }

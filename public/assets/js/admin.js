@@ -9110,7 +9110,25 @@ $.ddrCRUD = function () {
 /*!*****************************************!*\
   !*** ./resources/js/plugins/ddrCalc.js ***!
   \*****************************************/
-/***/ (function() {
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"]; if (_i == null) return; var _arr = []; var _n = true; var _d = false; var _s, _e; try { for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 
@@ -9164,7 +9182,7 @@ $.fn.ddrCalc = function () {
   data.forEach(function (item) {
     var method = item.method;
     delete item['method'];
-    if (['percent', 'nds', 'percent_only'].indexOf(method) === -1) throw Error('ddrCalc ошибка! метода «' + method + '» не существует!');
+    if (['percent', 'nds', 'percent_only', 'count_days'].indexOf(method) === -1) throw Error('ddrCalc ошибка! метода «' + method + '» не существует!');
     methods[method](item);
   });
   return {
@@ -9421,21 +9439,52 @@ var DdrCalc = /*#__PURE__*/function () {
           stat = _$$extend4.stat,
           thisCls = this;
 
+      var changeCountDaysTout;
       $(thisCls.mainSelector).on(thisCls.inputEvent, function (e) {
-        if (!stat()) return;
+        clearTimeout(changeCountDaysTout);
+        changeCountDaysTout = setTimeout( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
+          var val, result, dateObject, dh;
+          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
+            while (1) {
+              switch (_context.prev = _context.next) {
+                case 0:
+                  if (stat()) {
+                    _context.next = 2;
+                    break;
+                  }
 
-        var val = thisCls._valToNumber(e.target.value);
+                  return _context.abrupt("return");
 
-        var result = _.round(thisCls._calc('count_days', val, initialDate, addWorkdays));
+                case 2:
+                  val = thisCls._valToNumber(e.target.value);
+                  result = thisCls._calc('count_days', val, initialDate, addWorkdays);
 
-        if (_.isFunction(middleware[0])) {
-          result = middleware[0](result, thisCls._calc.bind(thisCls));
-        } //const calcValue = numberFormat ? $.number(_.round(result, 2), ...numberFormat) : _.round(result, 2);
+                  if (_.isFunction(middleware[0])) {
+                    result = middleware[0](result, thisCls._calc.bind(thisCls));
+                  }
 
+                  if (!(initialDate.value && val)) {
+                    _context.next = 13;
+                    break;
+                  }
 
-        thisCls._insertValue(selector, result);
+                  _context.next = 8;
+                  return result();
 
-        thisCls.eventListeners.items.push(e);
+                case 8:
+                  dateObject = _context.sent;
+                  dh = dateObject.dateHuman;
+                  $(selector).find('input').attr("date", dateObject.date);
+                  $(selector).find('input').val(dh.day["short"] + ' ' + dh.month.named + ' ' + dh.year.full + ' г.');
+                  thisCls.eventListeners.items.push(e);
+
+                case 13:
+                case "end":
+                  return _context.stop();
+              }
+            }
+          }, _callee);
+        })), 300);
       });
     } //------------------------------------------------------------------------------------------ Функции рассчетов
 
@@ -9490,22 +9539,44 @@ var DdrCalc = /*#__PURE__*/function () {
           var countDays = args[0],
               initialDate = args[1],
               addWorkdays = args[2];
-          var initDate = new Date(initialDate);
+          return /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee2() {
+            var _initialDate$value$sp, _initialDate$value$sp2, day, month, year, initDate, _yield$axiosQuery, data, error, status, headers, date, dateFormated;
 
-          _.debounce(axiosQuery('get', 'site/contracts/work_calendar_count', {
-            year: initDate.getFullYear(),
-            month: initDate.getMonth() + 1,
-            day: initDate.getDay() + 1,
-            count_days: countDays,
-            add_work_days: addWorkdays
-          }, 'json').then(function (_ref) {
-            var data = _ref.data,
-                error = _ref.error,
-                status = _ref.status,
-                headers = _ref.headers;
-            return data;
-          }), 300);
+            return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee2$(_context2) {
+              while (1) {
+                switch (_context2.prev = _context2.next) {
+                  case 0:
+                    _initialDate$value$sp = initialDate.value.split('-'), _initialDate$value$sp2 = _slicedToArray(_initialDate$value$sp, 3), day = _initialDate$value$sp2[0], month = _initialDate$value$sp2[1], year = _initialDate$value$sp2[2];
+                    initDate = new Date(year, month - 1, day);
+                    _context2.next = 4;
+                    return axiosQuery('get', 'site/contracts/work_calendar_count', {
+                      year: initDate.getFullYear(),
+                      month: initDate.getMonth() + 1,
+                      day: initDate.getDate(),
+                      count_days: countDays,
+                      add_work_days: addWorkdays.value
+                    }, 'json');
 
+                  case 4:
+                    _yield$axiosQuery = _context2.sent;
+                    data = _yield$axiosQuery.data;
+                    error = _yield$axiosQuery.error;
+                    status = _yield$axiosQuery.status;
+                    headers = _yield$axiosQuery.headers;
+                    date = new Date(data);
+                    dateFormated = "".concat(date.getDate(), "-").concat(addZero(date.getMonth() + 1), "-").concat(addZero(date.getFullYear()));
+                    return _context2.abrupt("return", {
+                      date: dateFormated,
+                      dateHuman: ddrDateBuilder(data)
+                    });
+
+                  case 12:
+                  case "end":
+                    return _context2.stop();
+                }
+              }
+            }, _callee2);
+          }));
           break;
 
         default:

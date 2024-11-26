@@ -39,7 +39,7 @@ $.fn.ddrCalc = function(data = []) {
 		
 		delete(item['method']);
 		
-		if (['percent', 'nds', 'percent_only'].indexOf(method) === -1) throw Error('ddrCalc ошибка! метода «'+method+'» не существует!');
+		if (['percent', 'nds', 'percent_only','count_days'].indexOf(method) === -1) throw Error('ddrCalc ошибка! метода «'+method+'» не существует!');
 		
 		methods[method](item);
 	});
@@ -279,7 +279,8 @@ class DdrCalc {
 	
 	
 	
-	count_days(data) {
+		count_days(data) {
+
 		let {
 			selector, // куда вставлять данные. Можно вызвать функцию: (selector, value) => $(selector).setAttrib('replacer', value)
 			initialDate, // дата начала
@@ -296,23 +297,30 @@ class DdrCalc {
 			stat: () => true
 		}, data),
 			thisCls = this;
-		
-		$(thisCls.mainSelector).on(thisCls.inputEvent, function(e) {
-			if (!stat()) return;
-			let val = thisCls._valToNumber(e.target.value);
-			let result = _.round(thisCls._calc('count_days', val, initialDate, addWorkdays));
-			
-			if (_.isFunction(middleware[0])) {
-				result = middleware[0](result, thisCls._calc.bind(thisCls));
-			}
-			
-			//const calcValue = numberFormat ? $.number(_.round(result, 2), ...numberFormat) : _.round(result, 2);
-			
-			thisCls._insertValue(selector, result);
-			
-			thisCls.eventListeners.items.push(e);
+
+		let changeCountDaysTout;
+		$(thisCls.mainSelector).on(thisCls.inputEvent, function (e) {
+			clearTimeout(changeCountDaysTout);
+
+			changeCountDaysTout = setTimeout(async () => {
+				if (!stat()) return;
+				let val = thisCls._valToNumber(e.target.value);
+				let result = thisCls._calc('count_days', val, initialDate, addWorkdays);
+
+				if (_.isFunction(middleware[0])) {
+					result = middleware[0](result, thisCls._calc.bind(thisCls));
+				}
+
+				if (initialDate.value && val) {
+					const dateObject = await result();
+					const dh = dateObject.dateHuman;
+					$(selector).find('input').attr("date", dateObject.date);
+					$(selector).find('input').val(dh.day.short + ' ' + dh.month.named + ' ' + dh.year.full + ' г.');
+					thisCls.eventListeners.items.push(e);
+				}
+			}, 300)
 		});
-		
+
 	}
 	
 	
@@ -371,18 +379,23 @@ class DdrCalc {
 			
 			case 'count_days':
 				let [countDays, initialDate, addWorkdays] = args;
-				
-				const initDate = new Date(initialDate);
-							
-			_.debounce(axiosQuery('get', 'site/contracts/work_calendar_count', {
-					year: initDate.getFullYear(),
-					month: initDate.getMonth() + 1,
-					day: initDate.getDay() + 1,
-					count_days: countDays,
-					add_work_days: addWorkdays,
-				}, 'json').then(({data, error, status, headers}) => {
-					return data;
-				}), 300);
+				return async () => {
+					const [day, month, year] = initialDate.value.split('-');
+					const initDate = new Date(year, month - 1, day);
+					const { data, error, status, headers } = await axiosQuery('get', 'site/contracts/work_calendar_count', {
+						year: initDate.getFullYear(),
+						month: initDate.getMonth() + 1,
+						day: initDate.getDate(),
+						count_days: countDays,
+						add_work_days: addWorkdays.value,
+					}, 'json');
+					const date = new Date(data);
+					const dateFormated = `${date.getDate()}-${addZero(date.getMonth() + 1)}-${addZero(date.getFullYear())}`;
+					return {
+						date: dateFormated,
+						dateHuman: ddrDateBuilder(data)
+					}
+				}
 				break;
 				
 			default:
