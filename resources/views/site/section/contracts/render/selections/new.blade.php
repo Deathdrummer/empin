@@ -1,4 +1,5 @@
 <x-table.tr class="h6rem" index="{{$index}}">
+	<x-table.td></x-table.td>
 	<x-table.td>
 		<x-input
 			name="title"
