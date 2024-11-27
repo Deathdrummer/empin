@@ -35,6 +35,28 @@ export function selectionsList(selection, editSelection, _clearCounts, getList) 
 			}).then(({error, list, changeInputs, create, store, storeWithShow, update, destroy, remove, query, getParams}) => {
 				
 				$('#selectionsTable').blockTable('buildTable');
+				
+				$("#selectionsList").sortable({
+					axis: 'y',
+					placeholder: 'sortable-placeholder h6rem',
+					classes: {
+						'ui-sortable-placeholder': 'ddrtable__tr',
+					},
+					async stop(event, ui) {
+						const sortedData = {};
+						$("#selectionsList").find('[selection]').each((k, item) => {
+							let id = $(item).attr('selection');
+							sortedData[id] = k+1;
+						});
+						
+						const {data, error, status, headers} = await axiosQuery('put', 'site/selections/sort', {items: sortedData});
+					},
+					//cancel: "[nohandle]"
+					handle: '[handle]'
+				});
+				
+				
+				
 				wait(false);
 				enableButtons(true);
 				changeInputs({'[save], [update]': 'enable'});

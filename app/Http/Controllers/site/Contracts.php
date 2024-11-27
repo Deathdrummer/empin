@@ -38,7 +38,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Intervention\Image\Laravel\Facades\Image;
 use Illuminate\Support\Facades\File;
-
+use Tochka\Calendar\WorkCalendar;
 class Contracts extends Controller {
 	use Renderable, Settingable;
 	
@@ -103,10 +103,6 @@ class Contracts extends Controller {
 				!$request->has('department_id') && $request->get('archive', false) == 0 => $counts['all'],
 				default	=> null,
 			};
-			
-			
-			toLog($headers['x-count-current-list']);
-			
 		}
 		
 		
@@ -939,7 +935,30 @@ class Contracts extends Controller {
 		return $this->render('calendar');
 	}
 	
-	
+	public function work_calendar_count(Request $request) {
+		[
+			'year' 			=> $year,
+			'month'			=> $month,
+			'day'			=> $day,
+			'count_days' 	=> $countDays,
+			'add_work_days' => $addWorkdays,
+		] = $request->validate([
+			'year' 			=> 'required|string',
+			'month'			=> 'required|string',
+			'day' 			=> 'required|string',
+			'count_days' 	=> 'required|numeric',
+			'add_work_days' => 'present|boolean',
+		]);
+
+
+		$date = WorkCalendar::create($year, $month, $day);
+		if (!$addWorkdays) {
+			$date->addDay($countDays);
+		} else {
+			$date->addWorkdays($countDays);
+		}
+		return response()->json($date);
+	}
 	
 	
 	

@@ -8961,7 +8961,25 @@ $.ddrCRUD = function () {
 /*!*****************************************!*\
   !*** ./resources/js/plugins/ddrCalc.js ***!
   \*****************************************/
-/***/ (function() {
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"]; if (_i == null) return; var _arr = []; var _n = true; var _d = false; var _s, _e; try { for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 
@@ -9015,7 +9033,7 @@ $.fn.ddrCalc = function () {
   data.forEach(function (item) {
     var method = item.method;
     delete item['method'];
-    if (['percent', 'nds', 'percent_only'].indexOf(method) === -1) throw Error('ddrCalc ошибка! метода «' + method + '» не существует!');
+    if (['percent', 'nds', 'percent_only', 'count_days'].indexOf(method) === -1) throw Error('ddrCalc ошибка! метода «' + method + '» не существует!');
     methods[method](item);
   });
   return {
@@ -9272,21 +9290,52 @@ var DdrCalc = /*#__PURE__*/function () {
           stat = _$$extend4.stat,
           thisCls = this;
 
+      var changeCountDaysTout;
       $(thisCls.mainSelector).on(thisCls.inputEvent, function (e) {
-        if (!stat()) return;
+        clearTimeout(changeCountDaysTout);
+        changeCountDaysTout = setTimeout( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
+          var val, result, dateObject, dh;
+          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
+            while (1) {
+              switch (_context.prev = _context.next) {
+                case 0:
+                  if (stat()) {
+                    _context.next = 2;
+                    break;
+                  }
 
-        var val = thisCls._valToNumber(e.target.value);
+                  return _context.abrupt("return");
 
-        var result = _.round(thisCls._calc('count_days', val, initialDate, addWorkdays));
+                case 2:
+                  val = thisCls._valToNumber(e.target.value);
+                  result = thisCls._calc('count_days', val, initialDate, addWorkdays);
 
-        if (_.isFunction(middleware[0])) {
-          result = middleware[0](result, thisCls._calc.bind(thisCls));
-        } //const calcValue = numberFormat ? $.number(_.round(result, 2), ...numberFormat) : _.round(result, 2);
+                  if (_.isFunction(middleware[0])) {
+                    result = middleware[0](result, thisCls._calc.bind(thisCls));
+                  }
 
+                  if (!(initialDate.value && val)) {
+                    _context.next = 13;
+                    break;
+                  }
 
-        thisCls._insertValue(selector, result);
+                  _context.next = 8;
+                  return result();
 
-        thisCls.eventListeners.items.push(e);
+                case 8:
+                  dateObject = _context.sent;
+                  dh = dateObject.dateHuman;
+                  $(selector).find('input').attr("date", dateObject.date);
+                  $(selector).find('input').val(dh.day["short"] + ' ' + dh.month.named + ' ' + dh.year.full + ' г.');
+                  thisCls.eventListeners.items.push(e);
+
+                case 13:
+                case "end":
+                  return _context.stop();
+              }
+            }
+          }, _callee);
+        })), 300);
       });
     } //------------------------------------------------------------------------------------------ Функции рассчетов
 
@@ -9341,22 +9390,44 @@ var DdrCalc = /*#__PURE__*/function () {
           var countDays = args[0],
               initialDate = args[1],
               addWorkdays = args[2];
-          var initDate = new Date(initialDate);
+          return /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee2() {
+            var _initialDate$value$sp, _initialDate$value$sp2, day, month, year, initDate, _yield$axiosQuery, data, error, status, headers, date, dateFormated;
 
-          _.debounce(axiosQuery('get', 'site/contracts/work_calendar_count', {
-            year: initDate.getFullYear(),
-            month: initDate.getMonth() + 1,
-            day: initDate.getDay() + 1,
-            count_days: countDays,
-            add_work_days: addWorkdays
-          }, 'json').then(function (_ref) {
-            var data = _ref.data,
-                error = _ref.error,
-                status = _ref.status,
-                headers = _ref.headers;
-            return data;
-          }), 300);
+            return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee2$(_context2) {
+              while (1) {
+                switch (_context2.prev = _context2.next) {
+                  case 0:
+                    _initialDate$value$sp = initialDate.value.split('-'), _initialDate$value$sp2 = _slicedToArray(_initialDate$value$sp, 3), day = _initialDate$value$sp2[0], month = _initialDate$value$sp2[1], year = _initialDate$value$sp2[2];
+                    initDate = new Date(year, month - 1, day);
+                    _context2.next = 4;
+                    return axiosQuery('get', 'site/contracts/work_calendar_count', {
+                      year: initDate.getFullYear(),
+                      month: initDate.getMonth() + 1,
+                      day: initDate.getDate(),
+                      count_days: countDays,
+                      add_work_days: addWorkdays.value
+                    }, 'json');
 
+                  case 4:
+                    _yield$axiosQuery = _context2.sent;
+                    data = _yield$axiosQuery.data;
+                    error = _yield$axiosQuery.error;
+                    status = _yield$axiosQuery.status;
+                    headers = _yield$axiosQuery.headers;
+                    date = new Date(data);
+                    dateFormated = "".concat(date.getDate(), "-").concat(addZero(date.getMonth() + 1), "-").concat(addZero(date.getFullYear()));
+                    return _context2.abrupt("return", {
+                      date: dateFormated,
+                      dateHuman: ddrDateBuilder(data)
+                    });
+
+                  case 12:
+                  case "end":
+                    return _context2.stop();
+                }
+              }
+            }, _callee2);
+          }));
           break;
 
         default:
@@ -21611,32 +21682,32 @@ function selectionsList(selection, editSelection, _clearCounts, getList) {
     disabledButtons: true,
     winClass: 'ddrpopup_white'
   }).then( /*#__PURE__*/function () {
-    var _ref2 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee4(_ref) {
+    var _ref2 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee5(_ref) {
       var state, wait, setTitle, setButtons, loadData, setHtml, setLHtml, dialog, close, query, onScroll, disableButtons, enableButtons, setWidth, viewsPath, init;
-      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee4$(_context4) {
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee5$(_context5) {
         while (1) {
-          switch (_context4.prev = _context4.next) {
+          switch (_context5.prev = _context5.next) {
             case 0:
               state = _ref.state, wait = _ref.wait, setTitle = _ref.setTitle, setButtons = _ref.setButtons, loadData = _ref.loadData, setHtml = _ref.setHtml, setLHtml = _ref.setLHtml, dialog = _ref.dialog, close = _ref.close, query = _ref.query, onScroll = _ref.onScroll, disableButtons = _ref.disableButtons, enableButtons = _ref.enableButtons, setWidth = _ref.setWidth;
               //isClosed
               wait();
               viewsPath = 'site.section.contracts.render.selections';
-              _context4.next = 5;
+              _context5.next = 5;
               return axiosQuery('get', 'site/selections/init', {
                 views: viewsPath
               });
 
             case 5:
-              init = _context4.sent;
+              init = _context5.sent;
 
               if (!init.error) {
-                _context4.next = 10;
+                _context5.next = 10;
                 break;
               }
 
               console.log(init.error);
               wait(false);
-              return _context4.abrupt("return", false);
+              return _context5.abrupt("return", false);
 
             case 10:
               setHtml(init.data, function () {
@@ -21666,6 +21737,48 @@ function selectionsList(selection, editSelection, _clearCounts, getList) {
                       query = _ref3.query,
                       getParams = _ref3.getParams;
                   $('#selectionsTable').blockTable('buildTable');
+                  $("#selectionsList").sortable({
+                    axis: 'y',
+                    placeholder: 'sortable-placeholder h6rem',
+                    classes: {
+                      'ui-sortable-placeholder': 'ddrtable__tr'
+                    },
+                    stop: function stop(event, ui) {
+                      return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
+                        var sortedData, _yield$axiosQuery, data, error, status, headers;
+
+                        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
+                          while (1) {
+                            switch (_context.prev = _context.next) {
+                              case 0:
+                                sortedData = {};
+                                $("#selectionsList").find('[selection]').each(function (k, item) {
+                                  var id = $(item).attr('selection');
+                                  sortedData[id] = k + 1;
+                                });
+                                _context.next = 4;
+                                return axiosQuery('put', 'site/selections/sort', {
+                                  items: sortedData
+                                });
+
+                              case 4:
+                                _yield$axiosQuery = _context.sent;
+                                data = _yield$axiosQuery.data;
+                                error = _yield$axiosQuery.error;
+                                status = _yield$axiosQuery.status;
+                                headers = _yield$axiosQuery.headers;
+
+                              case 9:
+                              case "end":
+                                return _context.stop();
+                            }
+                          }
+                        }, _callee);
+                      }))();
+                    },
+                    //cancel: "[nohandle]"
+                    handle: '[handle]'
+                  });
                   wait(false);
                   enableButtons(true);
                   changeInputs({
@@ -22037,12 +22150,12 @@ function selectionsList(selection, editSelection, _clearCounts, getList) {
                   };
 
                   $.selectionExport = /*#__PURE__*/function () {
-                    var _ref18 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee2(btn, selectionId) {
-                      var row, selectionExportBtnWait, winHeight, _yield$axiosQuery, data, error, status, headers, exportDialogHtml;
+                    var _ref18 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee3(btn, selectionId) {
+                      var row, selectionExportBtnWait, winHeight, _yield$axiosQuery2, data, error, status, headers, exportDialogHtml;
 
-                      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee2$(_context2) {
+                      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee3$(_context3) {
                         while (1) {
-                          switch (_context2.prev = _context2.next) {
+                          switch (_context3.prev = _context3.next) {
                             case 0:
                               row = $(btn).closest('[ddrtabletr]');
                               $(btn).setAttrib('disabled');
@@ -22051,17 +22164,17 @@ function selectionsList(selection, editSelection, _clearCounts, getList) {
                                 bgColor: '#d2fafb99'
                               });
                               winHeight = $('[ddrpopupdata]').outerHeight() - 100;
-                              _context2.next = 6;
+                              _context3.next = 6;
                               return axiosQuery('get', 'site/contracts/to_export', {
                                 height: (winHeight < 300 ? 300 : winHeight) + 'px'
                               });
 
                             case 6:
-                              _yield$axiosQuery = _context2.sent;
-                              data = _yield$axiosQuery.data;
-                              error = _yield$axiosQuery.error;
-                              status = _yield$axiosQuery.status;
-                              headers = _yield$axiosQuery.headers;
+                              _yield$axiosQuery2 = _context3.sent;
+                              data = _yield$axiosQuery2.data;
+                              error = _yield$axiosQuery2.error;
+                              status = _yield$axiosQuery2.status;
+                              headers = _yield$axiosQuery2.headers;
                               exportDialogHtml = '<div class="w38rem text-start">' + '<h6 class="fz16px color-blue mb1rem text-center" style="color:#487c91;">Экспорт данных в Excel</h6>' + data + '</div>';
                               dialog(exportDialogHtml, {
                                 buttons: {
@@ -22071,12 +22184,12 @@ function selectionsList(selection, editSelection, _clearCounts, getList) {
                                     selectionExportBtnWait.destroy();
                                   },
                                   'Экспорт|blue': function () {
-                                    var _ЭкспортBlue = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee(_ref20) {
-                                      var closeDialog, selectionExportWinWait, colums, sort, order, _yield$axiosQuery2, data, error, status, headers, d;
+                                    var _ЭкспортBlue = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee2(_ref20) {
+                                      var closeDialog, selectionExportWinWait, colums, sort, order, _yield$axiosQuery3, data, error, status, headers, d;
 
-                                      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
+                                      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee2$(_context2) {
                                         while (1) {
-                                          switch (_context.prev = _context.next) {
+                                          switch (_context2.prev = _context2.next) {
                                             case 0:
                                               closeDialog = _ref20.closeDialog;
                                               selectionExportWinWait = $('[ddrpopupdialogwin]').ddrWait({
@@ -22089,7 +22202,7 @@ function selectionsList(selection, editSelection, _clearCounts, getList) {
                                                 colums.push(field);
                                               });
                                               sort = ddrStore('site-contracts-sortfield') || 'id', order = ddrStore('site-contracts-sortorder') || 'ASC';
-                                              _context.next = 7;
+                                              _context2.next = 7;
                                               return axiosQuery('post', 'site/contracts/to_export', {
                                                 selection_id: selectionId,
                                                 colums: colums,
@@ -22098,20 +22211,20 @@ function selectionsList(selection, editSelection, _clearCounts, getList) {
                                               }, 'blob');
 
                                             case 7:
-                                              _yield$axiosQuery2 = _context.sent;
-                                              data = _yield$axiosQuery2.data;
-                                              error = _yield$axiosQuery2.error;
-                                              status = _yield$axiosQuery2.status;
-                                              headers = _yield$axiosQuery2.headers;
+                                              _yield$axiosQuery3 = _context2.sent;
+                                              data = _yield$axiosQuery3.data;
+                                              error = _yield$axiosQuery3.error;
+                                              status = _yield$axiosQuery3.status;
+                                              headers = _yield$axiosQuery3.headers;
 
                                               if (!(headers['content-type'] != 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')) {
-                                                _context.next = 16;
+                                                _context2.next = 16;
                                                 break;
                                               }
 
                                               $.notify('Ошибка экспорта данных', 'error');
                                               selectionExportWinWait.off();
-                                              return _context.abrupt("return");
+                                              return _context2.abrupt("return");
 
                                             case 16:
                                               d = ddrDateBuilder();
@@ -22126,10 +22239,10 @@ function selectionsList(selection, editSelection, _clearCounts, getList) {
 
                                             case 18:
                                             case "end":
-                                              return _context.stop();
+                                              return _context2.stop();
                                           }
                                         }
-                                      }, _callee);
+                                      }, _callee2);
                                     }));
 
                                     function ЭкспортBlue(_x4) {
@@ -22165,10 +22278,10 @@ function selectionsList(selection, editSelection, _clearCounts, getList) {
 
                             case 13:
                             case "end":
-                              return _context2.stop();
+                              return _context3.stop();
                           }
                         }
-                      }, _callee2);
+                      }, _callee3);
                     }));
 
                     return function (_x2, _x3) {
@@ -22191,27 +22304,27 @@ function selectionsList(selection, editSelection, _clearCounts, getList) {
                     var success = isArchive ? 'Подборка успешно возвращена в активные!' : 'Подборка успешно отправлена в архив!';
                     dialog(mess, {
                       buttons: (_buttons = {}, _defineProperty(_buttons, actionBtn, function () {
-                        var _ref22 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee3(_ref21) {
-                          var closeDialog, _yield$axiosQuery3, data, error, status, headers, abort;
+                        var _ref22 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee4(_ref21) {
+                          var closeDialog, _yield$axiosQuery4, data, error, status, headers, abort;
 
-                          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee3$(_context3) {
+                          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee4$(_context4) {
                             while (1) {
-                              switch (_context3.prev = _context3.next) {
+                              switch (_context4.prev = _context4.next) {
                                 case 0:
                                   closeDialog = _ref21.closeDialog;
-                                  _context3.next = 3;
+                                  _context4.next = 3;
                                   return axiosQuery('put', 'site/selections/archive', {
                                     id: id,
                                     command: command
                                   }, 'json');
 
                                 case 3:
-                                  _yield$axiosQuery3 = _context3.sent;
-                                  data = _yield$axiosQuery3.data;
-                                  error = _yield$axiosQuery3.error;
-                                  status = _yield$axiosQuery3.status;
-                                  headers = _yield$axiosQuery3.headers;
-                                  abort = _yield$axiosQuery3.abort;
+                                  _yield$axiosQuery4 = _context4.sent;
+                                  data = _yield$axiosQuery4.data;
+                                  error = _yield$axiosQuery4.error;
+                                  status = _yield$axiosQuery4.status;
+                                  headers = _yield$axiosQuery4.headers;
+                                  abort = _yield$axiosQuery4.abort;
 
                                   if (error) {
                                     $.notify('Ошибка отправки подборки в архив!', 'error');
@@ -22238,10 +22351,10 @@ function selectionsList(selection, editSelection, _clearCounts, getList) {
 
                                 case 11:
                                 case "end":
-                                  return _context3.stop();
+                                  return _context4.stop();
                               }
                             }
-                          }, _callee3);
+                          }, _callee4);
                         }));
 
                         return function (_x5) {
@@ -22260,10 +22373,10 @@ function selectionsList(selection, editSelection, _clearCounts, getList) {
 
             case 11:
             case "end":
-              return _context4.stop();
+              return _context5.stop();
           }
         }
-      }, _callee4);
+      }, _callee5);
     }));
 
     return function (_x) {

@@ -36,11 +36,23 @@
 						<div class="row row-cols-2 g-10">
 							<div class="col">
 								<label class="form__label color-dark">Дата подписания договора</label>
-								<x-datepicker name="date_start" date="{{$date_start ?? null}}" calendarid="contractDate{{$data['rand_id']}}" class="w100" />
+								<x-datepicker date-work-start name="date_start" date="{{$date_start ?? null}}" calendarid="contractDate{{$data['rand_id']}}" class="w100" />
 							</div>
 							<div class="col">
 								<label class="form__label color-dark">Дата окончания работ по договору</label>
-								<x-datepicker name="date_end" date="{{$date_end ?? null}}" calendarid="contractDate{{$data['rand_id']}}" class="w100" />
+								<x-datepicker date-work-end name="date_end" date="{{$date_end ?? null}}" calendarid="contractDate{{$data['rand_id']}}" class="w100" />
+							</div>
+						</div>
+					</div>
+					<div class="form__item">
+						<div class="row row-cols-2 g-10">
+							<div class="col-auto">
+								<label class="form__label color-dark">Кол-во дней</label>
+								<x-input tag="count_days" type="number" class="w7rem" placeholder="0" />
+							</div>
+								<div class="col-auto">
+								<label class="form__label color-dark">Рабочие дни</label>
+								<x-checkbox tag="add_works_days" />
 							</div>
 						</div>
 					</div>

@@ -3,11 +3,13 @@
 use App\Http\Controllers\Controller;
 use App\Models\ContractSelection;
 use App\Models\Selection;
+use App\Models\SelectionSort;
 use App\Services\Business\User as UserService;
 use App\Services\Business\Department as DepartmentService;
 use App\Traits\HasCrudController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 class Selections extends Controller {
@@ -93,7 +95,13 @@ class Selections extends Controller {
 				$query->where('archive', 0);
 			}]) */
 			->withCount('contracts')
-			->orderBy('_sort', 'ASC')
+			->orderBy(function ($query) {
+				$query->select('sort')
+					->from('selection_sort')
+					->whereColumn('selection_sort.selection_id', 'contracts_selections.id')
+					->where('selection_sort.account_id', '=', auth()->id())
+					->limit(1);
+			})
 			->get()
 			->map(function($item) use($userId) {
 				$item['subscribed_read'] = $item['account_id'] != $userId && in_array($userId, ($item['subscribed']['read'] ?? [])) ? true : false;
@@ -175,6 +183,13 @@ class Selections extends Controller {
 		if (!$created = Selection::create($validFields)) return false;
 		
 		$userId = auth('site')->user()->id;
+		
+		$maxSelectionSort = SelectionSort::where(['account_id' => $userId])->max('sort') ?: 0;
+		SelectionSort::create([
+			'account_id' 	=> $userId,
+			'selection_id'	=> $created->id, 
+			'sort' 			=> $maxSelectionSort+1,
+		]);
 		
 		$created['subscribed_read'] = $created['account_id'] != $userId && in_array($userId, ($created['subscribed']['read'] ?? [])) ? true : false;
 		$created['subscribed_write'] = $created['account_id'] != $userId && in_array($userId, ($created['subscribed']['write'] ?? [])) ? true : false;
@@ -572,6 +587,40 @@ class Selections extends Controller {
 		return $stat;
 	}
 	
+	
+	
+	
+	
+	
+	
+	
+	/** создать таблицу selection_sort с полями: selection_id, account_id, sort 
+	* это нужно для того, чтобы сортировать для каждого сотрудника, так как одна и та же подборка может быть более чем у одного сотрудника
+	*/
+
+	/**
+	 * @param 
+	 * @return 
+	 */
+	public function sort(Request $request) {
+		$items = collect($request->get('items'));
+		$userId = auth('site')->user()->id;
+		$newItems = $items->map(function ($sort,  $selectionId ) use ($userId) {
+			return [
+				'account_id'	=> $userId,
+				'selection_id'	=> $selectionId,
+				'sort' 			=> $sort
+			];
+		})->values();
+		
+		SelectionSort::upsert(
+			$newItems->toArray(),
+			['account_id', 'selection_id'],
+			['sort']
+		);
+		
+		return response()->json(true);
+	}
 	
 
 }
