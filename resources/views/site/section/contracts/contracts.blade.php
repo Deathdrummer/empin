@@ -288,6 +288,7 @@
 		columnFilter 			= [], // поиск по значению из столбца
 		selection 				= ref(null),
 		editSelection 			= null,
+		canEditSelection 		= ref(0),
 		searchWithArchive 		= false,
 		selectedContracts 		= {},
 		loadedContractsIds 		= {},
@@ -499,7 +500,7 @@
 
 	//--------------------------------------------------------------------------------- Подборки
 	$.openSelectionsWin = (openSelectionBtn) => {
-		selectionsList(selection, editSelection, _clearCounts, getList);
+		selectionsList(selection, editSelection, _clearCounts, getList, canEditSelection);
 	}
 
 
@@ -2787,17 +2788,19 @@
 	function getList(settings) {
 		if (abortCtrl instanceof AbortController) abortCtrl.abort();
 
+
+		console.log(settings);
 		let {
 			init,
 			withCounts,
-			canEditSelection,
+			//canEditSelection,
 			append,
 			offset: localOffset,
 			callback
 		} = _.assign({
 			init: false,
 			withCounts: false,
-			canEditSelection: null,
+			//canEditSelection: null,
 			append: false,
 			offset: null,
 			callback: false
@@ -2854,7 +2857,7 @@
 		params['selection'] = selection.value;
 		params['edit_selection'] = editSelection;
 		params['selected_contracts'] = selectedContracts.items;
-		params['can_edit_selection'] = canEditSelection;
+		params['can_edit_selection'] = canEditSelection.value;
 		
 		
 		//-----------------------------------
