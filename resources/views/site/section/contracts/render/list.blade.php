@@ -3,7 +3,6 @@
 		@foreach($list as $contract)
 			<x-table.tr
 				class="h5rem-4px{{$contract['selected'] ? ' ddrtable__tr-selected' : ''}}"
-				style="background-color: {{$contract['selected_color'] ?? ''}};"
 				ondblclick="$.openContractInfo(this, '{{$contract['id']}}');"
 				isnew="{{$contract['is_new'] ? 1 : 0}}"
 				contractid="{{$contract['id']}}"
