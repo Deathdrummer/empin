@@ -393,7 +393,7 @@ if (!function_exists('arrGetFirstItem')) {
 
 if (! function_exists('getActionFuncName')) {
 	/**
-	 * Извлекает элемент из массива, сокращая сам массив
+	 * 
 	 * @param array $arr массив
 	 * @param ...$addict  дополнительные параметры
 	 * @return string|null
@@ -416,7 +416,7 @@ if (! function_exists('getActionFuncName')) {
 
 if (! function_exists('buildAction')) {
 	/**
-	 * Извлекает элемент из массива, сокращая сам массив
+	 * 
 	 * @param array $arr массив
 	 * @param ...$addict  дополнительные параметры
 	 * @return string|null
@@ -465,7 +465,7 @@ if (! function_exists('buildAction')) {
 
 if (! function_exists('buildActionParams')) {
 	/**
-	 * Извлекает элемент из массива, сокращая сам массив
+	 * 
 	 * @param array $arr массив
 	 * @return string|null
 	*/

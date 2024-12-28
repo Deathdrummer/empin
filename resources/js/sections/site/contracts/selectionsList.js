@@ -1,4 +1,4 @@
-export function selectionsList(selection, editSelection, _clearCounts, getList) {
+export function selectionsList(selection, editSelection, _clearCounts, getList, canEditSelection) {
 	ddrPopup({
 		title: 'Подборки договоров',
 		width: 1000,
@@ -386,13 +386,14 @@ export function selectionsList(selection, editSelection, _clearCounts, getList) 
 					$('[selectionsbtn]').ddrInputs('disable');
 					close();
 					selection.value = id;
+					canEditSelection.value = canEdit;
 					editSelection = null;
 					
 					let selectionTitle = $(btn).closest('[ddrtabletr]').find('input[name="title"]').val() || $(btn).closest('[ddrtabletr]').find('p').text();
 					
 					_clearCounts();
 					getList({
-						canEditSelection: canEdit,
+						//canEditSelection: canEdit,
 						withCounts: true,
 						callback: function() {
 							$('#currentSelectionTitle').text(selectionTitle);
