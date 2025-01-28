@@ -67,7 +67,7 @@
 					style="background-color: {{$contract['departments'][$dept['id']]['steps'][$step['id']]['color']}};"
 					@endif --}}
 					>
-					@if($edited)
+					@if($edited && auth('site')->user()->can('contract-choose-employee:site'))
 						<x-select
 							group="small"
 							:options="$deps_users[$dept['id']] ?? null"
@@ -77,12 +77,14 @@
 							choose="Сотрудник не выбран"
 							empty-has-value
 							choose-empty
-							:enabled="auth('site')->user()->can('contract-choose-employee:site')"
 							action="contractSetData:{{$contract['id']}},{{$dept['id']}},{{$step['id']}},{{$step['type']}}"
 							/>
 					@else
 						@isset($contractdata[$contract['id']][$dept['id']][$step['id']]['data'])
-							<p class="fz12px lh100">{{$deps_users[$dept['id']][$contractdata[$contract['id']][$dept['id']][$step['id']]['data']] ?? null}}</p>
+							@php
+								$idx = arrGetIndexFromField($deps_users[$dept['id']]->toArray() ?? [], 'value', $contractdata[$contract['id']][$dept['id']][$step['id']]['data'] ?? null);
+							@endphp
+							<p class="fz12px lh100">{{$deps_users[$dept['id']][$idx]['title'] ?? null}}</p>
 						@endisset
 					@endif
 				</x-table.td>
