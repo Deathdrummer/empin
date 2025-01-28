@@ -77,6 +77,7 @@
 							choose="Сотрудник не выбран"
 							empty-has-value
 							choose-empty
+							:enabled="auth('site')->user()->can('contract-choose-employee:site')"
 							action="contractSetData:{{$contract['id']}},{{$dept['id']}},{{$step['id']}},{{$step['type']}}"
 							/>
 					@else
