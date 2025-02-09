@@ -1337,7 +1337,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                         editedSelect = '<div class="select small-select small-select_noempty w100">' + '<select id="select' + randId + '" inpgroup="small" oninput="$.contractSetData(this, ' + contractId + ',' + departmentId + ',' + stepId + ',3)">' + '<option value="" selected="">Сотрудник не выбран</option>' + listHtml + '</select>' + '<div class="small-select__errorlabel noselect" errorlabel=""></div>' + '</div>';
                         $(cell).html(editedSelect);
                       } else {
-                        $(cell).html('<p class="fz12px">-</p>');
+                        $(cell).html('<p class="fz12px lh100 text-center" selectstr>-</p>');
                       }
 
                       $.notify('Вып. список успешно добавлен!');

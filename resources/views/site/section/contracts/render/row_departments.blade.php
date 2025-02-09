@@ -87,6 +87,8 @@
 								$idx = arrGetIndexFromField($deps_users[$dept['id']]->toArray() ?? [], 'value', $contractdata[$contract['id']][$dept['id']][$step['id']]['data'] ?? null);
 							@endphp
 							<p class="fz12px lh100" selectstr>{{$deps_users[$dept['id']][$idx]['title'] ?? '-'}}</p>
+						@else
+							<p class="fz12px lh100 text-center" selectstr>-</p>
 						@endisset
 					@endif
 				</x-table.td>

@@ -766,7 +766,7 @@ export function contextMenu(
 								
 								$(cell).html(editedSelect);
 							} else {
-								$(cell).html('<p class="fz12px">-</p>');
+								$(cell).html('<p class="fz12px lh100 text-center" selectstr>-</p>');
 							}
 							$.notify('Вып. список успешно добавлен!');
 						} else {
