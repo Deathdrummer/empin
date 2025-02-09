@@ -869,7 +869,7 @@ class Contracts extends Controller {
 			'contractId' 	=> $contractId,
 			'departmentId' 	=> $departmentId,
 			'stepId' 		=> $stepId,
-			'value' 		=> $value,
+			'value' 		=> $hasCheckox,
 		] = $request->validate([
 			'contractId' 	=> 'required|numeric',
 			'departmentId' 	=> 'required|numeric',
@@ -887,7 +887,7 @@ class Contracts extends Controller {
 		
 		$steps = $initStepsData->steps ?? [];
 		
-		if ($value) {
+		if ($hasCheckox) {
 			//$stepsArrKey = array_search($stepId, array_column($steps, 'step_id'));
             if ($steps) Arr::forget($steps, $stepId);
 			ContractData::where(['contract_id' => $contractId, 'department_id' => $departmentId, 'step_id' => $stepId])->delete();
@@ -898,9 +898,26 @@ class Contracts extends Controller {
 		
 		$initStepsData->steps = array_values($steps);
        
-	    $stat = $initStepsData->save();
+	    if (!$stat = $initStepsData->save()) return response()->json($stat);
+		
+		if (!$hasCheckox) {
+			$depsUsers = $this->department->getUsersToAssign([$departmentId], ['id:value', 'pseudoname:title', 'dismissed:disabled', 'dismissed:hidden']);
+			$list = $depsUsers[$departmentId] ?? null;
+			return response()->json($list);
+		}
+		
 		return response()->json($stat);
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	

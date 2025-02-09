@@ -6445,7 +6445,7 @@ window.isHover = function () {
 window.pregSplit = function () {
   var str = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
   var separator = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-  if (!_.isString(str)) return;
+  if (!_.isString(str) || !str) return;
   var splitData = str.split(/\s*[,|]\s*|\s*[;]\s*|\s+/);
   return splitData.map(function (item) {
     return _clearData(item);
@@ -19091,7 +19091,7 @@ function _asyncIterator(iterable) { var method, async, sync, retry = 2; for ("un
 
 function AsyncFromSyncIterator(s) { function AsyncFromSyncIteratorContinuation(r) { if (Object(r) !== r) return Promise.reject(new TypeError(r + " is not an object.")); var done = r.done; return Promise.resolve(r.value).then(function (value) { return { value: value, done: done }; }); } return AsyncFromSyncIterator = function AsyncFromSyncIterator(s) { this.s = s, this.n = s.next; }, AsyncFromSyncIterator.prototype = { s: null, n: null, next: function next() { return AsyncFromSyncIteratorContinuation(this.n.apply(this.s, arguments)); }, "return": function _return(value) { var ret = this.s["return"]; return void 0 === ret ? Promise.resolve({ value: value, done: !0 }) : AsyncFromSyncIteratorContinuation(ret.apply(this.s, arguments)); }, "throw": function _throw(value) { var thr = this.s["return"]; return void 0 === thr ? Promise.reject(value) : AsyncFromSyncIteratorContinuation(thr.apply(this.s, arguments)); } }, new AsyncFromSyncIterator(s); }
 
-function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sendMessStat, lastChoosedRow, canEditCell, canCreateCheckbox, canRemoveCheckbox, getCounts) {
+function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sendMessStat, lastChoosedRow, canEditCell, canCreateCheckbox, canRemoveCheckbox, canCreateSelect, canRemoveSelect, canChooseEmployee, getCounts) {
   var commentsTooltip, cellEditTooltip;
 
   $.contractContextMenu = function (_ref, contractId, departmentId, selectionId, objectNumber, title, hasDepsToSend, messagesCount, searched, selectionEdited, isArchive, canToArchive, // отправка договора в архив
@@ -19117,7 +19117,9 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
         setCloseSubNavTOut = _ref.setCloseSubNavTOut;
     var isCommon = !!$(target.pointer).closest('[ddrtabletd]').hasAttr('commonlist') || false;
     var isDeptCheckbox = !!$(target.pointer).closest('[ddrtabletd]').hasAttr('deptcheck') || false;
-    var hasCheckbox = !!$(target.pointer).closest('[ddrtabletd]').children().length;
+    var isDeptSelect = !!$(target.pointer).closest('[ddrtabletd]').hasAttr('deptselect') || false;
+    var hasCheckbox = !!$(target.pointer).closest('[ddrtabletd]').children('.checkbox').length;
+    var hasSelect = !!$(target.pointer).closest('[ddrtabletd]').children('.select, [selectstr]').length;
     var contextEdited = !!$(target.pointer).closest('[ddrtabletd]').hasAttr('contextedit');
     var disableEditCell = !$(target.pointer).closest('[ddrtabletd]').attr('contextedit');
     var selectedTextCell = !!$(target.pointer).closest('[ddrtabletd]').find('[edittedplace]').hasClass('select-text') || !!$(target.pointer).closest('[ddrtabletd]').find('[edittedblock]').length || !!$('#contractsTable').find('[ddrtabletd].selected').length && $(target.pointer).closest('[ddrtabletd]').hasClass('selected');
@@ -19932,20 +19934,107 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
         }))();
       }
     }, {
+      name: hasSelect && canRemoveSelect ? 'Удалить вып. список' : !hasSelect && canCreateSelect ? 'Добавить вып. список' : '',
+      visible: isDeptSelect && !isArchive && (!hasSelect && canCreateSelect || hasSelect && canRemoveSelect) && !selectedTextCell,
+      sort: 1,
+      onClick: function onClick() {
+        return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee3() {
+          var cell, edited, attrData, _pregSplit5, _pregSplit6, _pregSplit6$, contractId, _pregSplit6$2, departmentId, _pregSplit6$3, stepId, waitCell, _yield$axiosQuery3, list, error, status, headers, randId, listHtml, editedSelect;
+
+          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee3$(_context3) {
+            while (1) {
+              switch (_context3.prev = _context3.next) {
+                case 0:
+                  cell = $(target.pointer).closest('[ddrtabletd]');
+                  edited = !!$(cell).attr('edited');
+                  attrData = $(cell).attr('deptselect');
+                  _pregSplit5 = pregSplit(attrData), _pregSplit6 = _slicedToArray(_pregSplit5, 3), _pregSplit6$ = _pregSplit6[0], contractId = _pregSplit6$ === void 0 ? null : _pregSplit6$, _pregSplit6$2 = _pregSplit6[1], departmentId = _pregSplit6$2 === void 0 ? null : _pregSplit6$2, _pregSplit6$3 = _pregSplit6[2], stepId = _pregSplit6$3 === void 0 ? null : _pregSplit6$3;
+                  waitCell = $(cell).ddrWait({
+                    iconHeight: '30px',
+                    bgColor: '#efe9f9'
+                  });
+                  _context3.next = 7;
+                  return axiosQuery('post', 'site/contracts/step_checkbox', {
+                    contractId: contractId,
+                    departmentId: departmentId,
+                    stepId: stepId,
+                    value: hasSelect
+                  }, 'json');
+
+                case 7:
+                  _yield$axiosQuery3 = _context3.sent;
+                  list = _yield$axiosQuery3.data;
+                  error = _yield$axiosQuery3.error;
+                  status = _yield$axiosQuery3.status;
+                  headers = _yield$axiosQuery3.headers;
+
+                  if (!error) {
+                    _context3.next = 17;
+                    break;
+                  }
+
+                  console.log(error);
+                  $.notify('Ошибка! Не удалось ' + (hasSelect ? 'удалить' : 'добавить') + ' вып. список!', 'error');
+                  waitCell.destroy();
+                  return _context3.abrupt("return");
+
+                case 17:
+                  // canCreateCheckbox canRemoveCheckbox
+                  if (list) {
+                    if (!hasSelect) {
+                      if (edited && canChooseEmployee) {
+                        randId = generateCode('nnnnnnn');
+                        listHtml = '';
+
+                        if (list && _.isArray(list)) {
+                          list.forEach(function (_ref16) {
+                            var value = _ref16.value,
+                                title = _ref16.title,
+                                disabled = _ref16.disabled,
+                                hidden = _ref16.hidden;
+                            if (hidden) return true;
+                            listHtml += "<option value=\"".concat(value, "\"").concat(disabled ? ' disabled' : '', ">").concat(title, "</option>");
+                          });
+                        }
+
+                        editedSelect = '<div class="select small-select small-select_noempty w100">' + '<select id="select' + randId + '" inpgroup="small" oninput="$.contractSetData(this, ' + contractId + ',' + departmentId + ',' + stepId + ',3)">' + '<option value="" selected="">Сотрудник не выбран</option>' + listHtml + '</select>' + '<div class="small-select__errorlabel noselect" errorlabel=""></div>' + '</div>';
+                        $(cell).html(editedSelect);
+                      } else {
+                        $(cell).html('<p class="fz12px lh100 text-center" selectstr>-</p>');
+                      }
+
+                      $.notify('Вып. список успешно добавлен!');
+                    } else {
+                      $(cell).empty();
+                      $.notify('Вып. список успешно удален!');
+                    }
+
+                    waitCell.destroy();
+                  }
+
+                case 18:
+                case "end":
+                  return _context3.stop();
+              }
+            }
+          }, _callee3);
+        }))();
+      }
+    }, {
       name: 'Комментарии',
-      visible: hasCheckbox && isDeptCheckbox && !selectedTextCell,
+      visible: (hasCheckbox && isDeptCheckbox || hasSelect && isDeptSelect) && !selectedTextCell,
       sort: 2,
       onClick: function onClick() {
-        return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee5() {
-          var cell, attrData, _pregSplit5, _pregSplit6, _pregSplit6$, contractId, _pregSplit6$2, departmentId, _pregSplit6$3, stepId;
+        return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee6() {
+          var cell, attrData, _pregSplit7, _pregSplit8, _pregSplit8$, contractId, _pregSplit8$2, departmentId, _pregSplit8$3, stepId;
 
-          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee5$(_context5) {
+          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee6$(_context6) {
             while (1) {
-              switch (_context5.prev = _context5.next) {
+              switch (_context6.prev = _context6.next) {
                 case 0:
                   cell = $(target.pointer).closest('[ddrtabletd]');
                   attrData = $(cell).attr('deptcheck');
-                  _pregSplit5 = pregSplit(attrData), _pregSplit6 = _slicedToArray(_pregSplit5, 3), _pregSplit6$ = _pregSplit6[0], contractId = _pregSplit6$ === void 0 ? null : _pregSplit6$, _pregSplit6$2 = _pregSplit6[1], departmentId = _pregSplit6$2 === void 0 ? null : _pregSplit6$2, _pregSplit6$3 = _pregSplit6[2], stepId = _pregSplit6$3 === void 0 ? null : _pregSplit6$3;
+                  _pregSplit7 = pregSplit(attrData), _pregSplit8 = _slicedToArray(_pregSplit7, 3), _pregSplit8$ = _pregSplit8[0], contractId = _pregSplit8$ === void 0 ? null : _pregSplit8$, _pregSplit8$2 = _pregSplit8[1], departmentId = _pregSplit8$2 === void 0 ? null : _pregSplit8$2, _pregSplit8$3 = _pregSplit8[2], stepId = _pregSplit8$3 === void 0 ? null : _pregSplit8$3;
                   commentsTooltip = $(cell).ddrTooltip({
                     //cls: 'w44rem',
                     placement: 'bottom',
@@ -19959,15 +20048,15 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                       iconHeight: '40px'
                     },
                     onShow: function () {
-                      var _onShow = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee4(_ref16) {
-                        var reference, popper, show, hide, destroy, waitDetroy, setContent, setData, setProps, _yield$axiosQuery3, data, error, status, headers, textarea, inputCellCommentTOut;
+                      var _onShow = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee5(_ref17) {
+                        var reference, popper, show, hide, destroy, waitDetroy, setContent, setData, setProps, _yield$axiosQuery4, data, error, status, headers, textarea, inputCellCommentTOut;
 
-                        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee4$(_context4) {
+                        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee5$(_context5) {
                           while (1) {
-                            switch (_context4.prev = _context4.next) {
+                            switch (_context5.prev = _context5.next) {
                               case 0:
-                                reference = _ref16.reference, popper = _ref16.popper, show = _ref16.show, hide = _ref16.hide, destroy = _ref16.destroy, waitDetroy = _ref16.waitDetroy, setContent = _ref16.setContent, setData = _ref16.setData, setProps = _ref16.setProps;
-                                _context4.next = 3;
+                                reference = _ref17.reference, popper = _ref17.popper, show = _ref17.show, hide = _ref17.hide, destroy = _ref17.destroy, waitDetroy = _ref17.waitDetroy, setContent = _ref17.setContent, setData = _ref17.setData, setProps = _ref17.setProps;
+                                _context5.next = 3;
                                 return axiosQuery('get', 'site/contracts/cell_comment', {
                                   contract_id: contractId,
                                   department_id: departmentId,
@@ -19975,12 +20064,12 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                 }, 'json');
 
                               case 3:
-                                _yield$axiosQuery3 = _context4.sent;
-                                data = _yield$axiosQuery3.data;
-                                error = _yield$axiosQuery3.error;
-                                status = _yield$axiosQuery3.status;
-                                headers = _yield$axiosQuery3.headers;
-                                _context4.next = 10;
+                                _yield$axiosQuery4 = _context5.sent;
+                                data = _yield$axiosQuery4.data;
+                                error = _yield$axiosQuery4.error;
+                                status = _yield$axiosQuery4.status;
+                                headers = _yield$axiosQuery4.headers;
+                                _context5.next = 10;
                                 return setData(data);
 
                               case 10:
@@ -19998,15 +20087,15 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                   var _this = this;
 
                                   clearTimeout(inputCellCommentTOut);
-                                  inputCellCommentTOut = setTimeout( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee3() {
-                                    var comment, _yield$axiosQuery4, postRes, postErr, status, headers;
+                                  inputCellCommentTOut = setTimeout( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee4() {
+                                    var comment, _yield$axiosQuery5, postRes, postErr, status, headers;
 
-                                    return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee3$(_context3) {
+                                    return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee4$(_context4) {
                                       while (1) {
-                                        switch (_context3.prev = _context3.next) {
+                                        switch (_context4.prev = _context4.next) {
                                           case 0:
                                             comment = $(_this).val();
-                                            _context3.next = 3;
+                                            _context4.next = 3;
                                             return axiosQuery('post', 'site/contracts/cell_comment', {
                                               contract_id: contractId,
                                               department_id: departmentId,
@@ -20015,20 +20104,20 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                             }, 'json');
 
                                           case 3:
-                                            _yield$axiosQuery4 = _context3.sent;
-                                            postRes = _yield$axiosQuery4.data;
-                                            postErr = _yield$axiosQuery4.error;
-                                            status = _yield$axiosQuery4.status;
-                                            headers = _yield$axiosQuery4.headers;
+                                            _yield$axiosQuery5 = _context4.sent;
+                                            postRes = _yield$axiosQuery5.data;
+                                            postErr = _yield$axiosQuery5.error;
+                                            status = _yield$axiosQuery5.status;
+                                            headers = _yield$axiosQuery5.headers;
 
                                             if (!postErr) {
-                                              _context3.next = 12;
+                                              _context4.next = 12;
                                               break;
                                             }
 
                                             console.log(postErr);
                                             $.notify('Ошибка! Не удалось задать комментарий!', 'error');
-                                            return _context3.abrupt("return");
+                                            return _context4.abrupt("return");
 
                                           case 12:
                                             if (postRes) {
@@ -20038,19 +20127,19 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
 
                                           case 13:
                                           case "end":
-                                            return _context3.stop();
+                                            return _context4.stop();
                                         }
                                       }
-                                    }, _callee3);
+                                    }, _callee4);
                                   })), 500);
                                 });
 
                               case 16:
                               case "end":
-                                return _context4.stop();
+                                return _context5.stop();
                             }
                           }
-                        }, _callee4);
+                        }, _callee5);
                       }));
 
                       function onShow(_x) {
@@ -20065,10 +20154,10 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
 
                 case 4:
                 case "end":
-                  return _context5.stop();
+                  return _context6.stop();
               }
             }
-          }, _callee5);
+          }, _callee6);
         }))();
       }
     }, {
@@ -20080,16 +20169,16 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
       disabled: $(target.pointer).closest('[ddrtabletd]').hasAttr('editted') || disableEditCell || !enableEditPriceCell,
       sort: 7,
       onClick: function onClick() {
-        return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee11() {
-          var cell, attrData, _pregSplit7, _pregSplit8, _pregSplit8$, contractId, _pregSplit8$2, column, _pregSplit8$3, type, cellWait, _yield$axiosQuery5, data, error, status, headers, percentNds, edittedBlock, primarySelector, row, _pregSplit9, _pregSplit10, contractingPercent, _subContracting, _genContracting, _setValueToSelector;
+        return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee12() {
+          var cell, attrData, _pregSplit9, _pregSplit10, _pregSplit10$, contractId, _pregSplit10$2, column, _pregSplit10$3, type, cellWait, _yield$axiosQuery6, data, error, status, headers, percentNds, edittedBlock, primarySelector, row, _pregSplit11, _pregSplit12, contractingPercent, _subContracting, _genContracting, _setValueToSelector;
 
-          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee11$(_context11) {
+          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee12$(_context12) {
             while (1) {
-              switch (_context11.prev = _context11.next) {
+              switch (_context12.prev = _context12.next) {
                 case 0:
                   cell = $(target.pointer).closest('[ddrtabletd]');
                   attrData = $(cell).attr('contextedit');
-                  _pregSplit7 = pregSplit(attrData), _pregSplit8 = _slicedToArray(_pregSplit7, 3), _pregSplit8$ = _pregSplit8[0], contractId = _pregSplit8$ === void 0 ? null : _pregSplit8$, _pregSplit8$2 = _pregSplit8[1], column = _pregSplit8$2 === void 0 ? null : _pregSplit8$2, _pregSplit8$3 = _pregSplit8[2], type = _pregSplit8$3 === void 0 ? null : _pregSplit8$3;
+                  _pregSplit9 = pregSplit(attrData), _pregSplit10 = _slicedToArray(_pregSplit9, 3), _pregSplit10$ = _pregSplit10[0], contractId = _pregSplit10$ === void 0 ? null : _pregSplit10$, _pregSplit10$2 = _pregSplit10[1], column = _pregSplit10$2 === void 0 ? null : _pregSplit10$2, _pregSplit10$3 = _pregSplit10[2], type = _pregSplit10$3 === void 0 ? null : _pregSplit10$3;
                   /*
                   	type (типы данных)
                   		1. текст
@@ -20113,11 +20202,11 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                   });
 
                   if (!([1, 2].indexOf(type) !== -1)) {
-                    _context11.next = 31;
+                    _context12.next = 31;
                     break;
                   }
 
-                  _context11.next = 10;
+                  _context12.next = 10;
                   return axiosQuery('get', 'site/contracts/cell_edit', {
                     contract_id: contractId,
                     column: column,
@@ -20125,21 +20214,21 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                   });
 
                 case 10:
-                  _yield$axiosQuery5 = _context11.sent;
-                  data = _yield$axiosQuery5.data;
-                  error = _yield$axiosQuery5.error;
-                  status = _yield$axiosQuery5.status;
-                  headers = _yield$axiosQuery5.headers;
+                  _yield$axiosQuery6 = _context12.sent;
+                  data = _yield$axiosQuery6.data;
+                  error = _yield$axiosQuery6.error;
+                  status = _yield$axiosQuery6.status;
+                  headers = _yield$axiosQuery6.headers;
 
                   if (!error) {
-                    _context11.next = 20;
+                    _context12.next = 20;
                     break;
                   }
 
                   $.notify('Ошибка редактирования ячейки!', 'error');
                   cellWait.destroy();
                   console.log(error === null || error === void 0 ? void 0 : error.message, error.errors);
-                  return _context11.abrupt("return");
+                  return _context12.abrupt("return");
 
                 case 20:
                   percentNds = headers['price_nds'] || 0;
@@ -20151,7 +20240,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                   if (type == 2) {
                     $(cell).find('#edittedCellData').number(true, 2, '.', ' '); //------------------------------------------------------------- Калькулятор
 
-                    primarySelector = $(cell).find('#edittedCellData'), row = $(primarySelector).closest('[ddrtabletr]'), _pregSplit9 = pregSplit($(cell).find('[calcprice]').attr('calcprice')), _pregSplit10 = _slicedToArray(_pregSplit9, 4), contractingPercent = _pregSplit10[1], _subContracting = _pregSplit10[2], _genContracting = _pregSplit10[3];
+                    primarySelector = $(cell).find('#edittedCellData'), row = $(primarySelector).closest('[ddrtabletr]'), _pregSplit11 = pregSplit($(cell).find('[calcprice]').attr('calcprice')), _pregSplit12 = _slicedToArray(_pregSplit11, 4), contractingPercent = _pregSplit12[1], _subContracting = _pregSplit12[2], _genContracting = _pregSplit12[3];
 
                     _setValueToSelector = function _setValueToSelector() {
                       var field = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
@@ -20487,12 +20576,12 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                   });
                   $(cell).off('.savecelldata'); //------------------------------------------------------------- Сохранить
 
-                  $(cell).one(tapEvent + '.savecelldata', '[savecelldata]', /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee6() {
-                    var row, prices, addictColums, priceRegex, cellVal, cellData, emptyVal, _yield$axiosQuery6, data, error, status, headers, _calcPrices, cellDataToedittedPlace;
+                  $(cell).one(tapEvent + '.savecelldata', '[savecelldata]', /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee7() {
+                    var row, prices, addictColums, priceRegex, cellVal, cellData, emptyVal, _yield$axiosQuery7, data, error, status, headers, _calcPrices, cellDataToedittedPlace;
 
-                    return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee6$(_context6) {
+                    return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee7$(_context7) {
                       while (1) {
-                        switch (_context6.prev = _context6.next) {
+                        switch (_context7.prev = _context7.next) {
                           case 0:
                             row = $(cell).closest('[ddrtabletr]'), prices = $(row).find('[calcprice]:not([replacer=""])'), addictColums = {};
 
@@ -20513,7 +20602,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                             cellVal = $(cell).find('#edittedCellData').val();
                             cellData = priceRegex.test(column) ? Number(cellVal) : cellVal;
                             emptyVal = $(cell).find('[edittedplace]').attr('edittedplace');
-                            _context6.next = 10;
+                            _context7.next = 10;
                             return axiosQuery('post', 'site/contracts/cell_edit', {
                               contract_id: contractId,
                               column: column,
@@ -20523,11 +20612,11 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                             }, 'json');
 
                           case 10:
-                            _yield$axiosQuery6 = _context6.sent;
-                            data = _yield$axiosQuery6.data;
-                            error = _yield$axiosQuery6.error;
-                            status = _yield$axiosQuery6.status;
-                            headers = _yield$axiosQuery6.headers;
+                            _yield$axiosQuery7 = _context7.sent;
+                            data = _yield$axiosQuery7.data;
+                            error = _yield$axiosQuery7.error;
+                            status = _yield$axiosQuery7.status;
+                            headers = _yield$axiosQuery7.headers;
 
                             if (error) {
                               cellWait.off();
@@ -20552,12 +20641,12 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
 
                           case 17:
                           case "end":
-                            return _context6.stop();
+                            return _context7.stop();
                         }
                       }
-                    }, _callee6, this);
+                    }, _callee7, this);
                   })));
-                  _context11.next = 32;
+                  _context12.next = 32;
                   break;
 
                 case 31:
@@ -20577,12 +20666,12 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                         iconHeight: '40px'
                       },
                       onShow: function () {
-                        var _onShow2 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee10(_ref19) {
-                          var reference, popper, show, hide, destroy, waitDetroy, setContent, setData, setProps, _setValueToSelector, isFilledSlaveCell, _getDateReportFrom, calendarBlock, currentDate, datePicker, _yield$axiosQuery9, _data, _error, _status, _headers;
+                        var _onShow2 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee11(_ref20) {
+                          var reference, popper, show, hide, destroy, waitDetroy, setContent, setData, setProps, _setValueToSelector, isFilledSlaveCell, _getDateReportFrom, calendarBlock, currentDate, datePicker, _yield$axiosQuery10, _data, _error, _status, _headers;
 
-                          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee10$(_context10) {
+                          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee11$(_context11) {
                             while (1) {
-                              switch (_context10.prev = _context10.next) {
+                              switch (_context11.prev = _context11.next) {
                                 case 0:
                                   _getDateReportFrom = function _getDateReportFrom2(dateSendAction, dateStart) {
                                     if (!dateSendAction || !dateStart) return null;
@@ -20608,7 +20697,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                     return null;
                                   };
 
-                                  reference = _ref19.reference, popper = _ref19.popper, show = _ref19.show, hide = _ref19.hide, destroy = _ref19.destroy, waitDetroy = _ref19.waitDetroy, setContent = _ref19.setContent, setData = _ref19.setData, setProps = _ref19.setProps;
+                                  reference = _ref20.reference, popper = _ref20.popper, show = _ref20.show, hide = _ref20.hide, destroy = _ref20.destroy, waitDetroy = _ref20.waitDetroy, setContent = _ref20.setContent, setData = _ref20.setData, setProps = _ref20.setProps;
                                   _setValueToSelector = function _setValueToSelector(toCellText) {
                                     var attrdata = $(reference).attr('contextedit'),
                                         slaveCellName = attrdata.includes('date_start') ? 'date_send_action' : 'date_start',
@@ -20636,12 +20725,12 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                   };
 
                                   if (!(type == 3)) {
-                                    _context10.next = 13;
+                                    _context11.next = 13;
                                     break;
                                   }
 
                                   calendarBlock = '<div ondblclick="event.stopPropagation();">' + '<div><div id="editCellCalendar"></div></div>' + '<div class="mt5px text-end">' + '<div class="button verysmall-button button-light">' + '<button title="Очистить" id="editCellCalendarClear">Очистить</button>' + '</div>' + '</div>' + '</div>';
-                                  _context10.next = 7;
+                                  _context11.next = 7;
                                   return setData(calendarBlock);
 
                                 case 7:
@@ -20655,14 +20744,14 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                     alwaysShow: true,
                                     dateSelected: currentDate ? new Date(currentDate) : new Date(),
                                     onSelect: function () {
-                                      var _onSelect = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee7(_ref20, date) {
-                                        var el, destroy, rawDate, toCellText, dateToSave, emptyVal, cellDateWait, addict_colums, _yield$axiosQuery7, data, error, _cellEditTooltip2;
+                                      var _onSelect = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee8(_ref21, date) {
+                                        var el, destroy, rawDate, toCellText, dateToSave, emptyVal, cellDateWait, addict_colums, _yield$axiosQuery8, data, error, _cellEditTooltip2;
 
-                                        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee7$(_context7) {
+                                        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee8$(_context8) {
                                           while (1) {
-                                            switch (_context7.prev = _context7.next) {
+                                            switch (_context8.prev = _context8.next) {
                                               case 0:
-                                                el = _ref20.el, destroy = _ref20.destroy;
+                                                el = _ref21.el, destroy = _ref21.destroy;
                                                 rawDate = date.getFullYear() + '-' + addZero(date.getMonth() + 1) + '-' + addZero(date.getDate()) + ' 00:00:00';
                                                 toCellText = addZero(date.getDate()) + '.' + addZero(date.getMonth() + 1) + '.' + date.getFullYear().toString().substr(-2);
                                                 dateToSave = date.getFullYear().toString().substr(-2) + '.' + addZero(date.getMonth() + 1) + '.' + addZero(date.getDate());
@@ -20677,7 +20766,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                                   addict_colums['date_report_from'] = dateToSave;
                                                 }
 
-                                                _context7.next = 10;
+                                                _context8.next = 10;
                                                 return axiosQuery('post', 'site/contracts/cell_edit', {
                                                   contract_id: contractId,
                                                   column: column,
@@ -20687,9 +20776,9 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                                 }, 'json');
 
                                               case 10:
-                                                _yield$axiosQuery7 = _context7.sent;
-                                                data = _yield$axiosQuery7.data;
-                                                error = _yield$axiosQuery7.error;
+                                                _yield$axiosQuery8 = _context8.sent;
+                                                data = _yield$axiosQuery8.data;
+                                                error = _yield$axiosQuery8.error;
 
                                                 if (error) {
                                                   cellDateWait.off();
@@ -20714,10 +20803,10 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
 
                                               case 15:
                                               case "end":
-                                                return _context7.stop();
+                                                return _context8.stop();
                                             }
                                           }
-                                        }, _callee7);
+                                        }, _callee8);
                                       }));
 
                                       function onSelect(_x3, _x4) {
@@ -20727,12 +20816,12 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                       return onSelect;
                                     }()
                                   });
-                                  $('#editCellCalendarClear').one(tapEvent, /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee8() {
-                                    var cellDateWait, addict_colums, emptyVal, _yield$axiosQuery8, data, error, _cellEditTooltip3;
+                                  $('#editCellCalendarClear').one(tapEvent, /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee9() {
+                                    var cellDateWait, addict_colums, emptyVal, _yield$axiosQuery9, data, error, _cellEditTooltip3;
 
-                                    return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee8$(_context8) {
+                                    return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee9$(_context9) {
                                       while (1) {
-                                        switch (_context8.prev = _context8.next) {
+                                        switch (_context9.prev = _context9.next) {
                                           case 0:
                                             cellDateWait = $(reference).ddrWait({
                                               iconHeight: '30px',
@@ -20746,7 +20835,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                             }
 
                                             emptyVal = $(cell).find('[edittedplace]').attr('edittedplace');
-                                            _context8.next = 5;
+                                            _context9.next = 5;
                                             return axiosQuery('post', 'site/contracts/cell_edit', {
                                               contract_id: contractId,
                                               column: column,
@@ -20756,9 +20845,9 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                             }, 'json');
 
                                           case 5:
-                                            _yield$axiosQuery8 = _context8.sent;
-                                            data = _yield$axiosQuery8.data;
-                                            error = _yield$axiosQuery8.error;
+                                            _yield$axiosQuery9 = _context9.sent;
+                                            data = _yield$axiosQuery9.data;
+                                            error = _yield$axiosQuery9.error;
 
                                             if (error) {
                                               cellDateWait.off();
@@ -20777,17 +20866,17 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
 
                                           case 10:
                                           case "end":
-                                            return _context8.stop();
+                                            return _context9.stop();
                                         }
                                       }
-                                    }, _callee8);
+                                    }, _callee9);
                                   })));
                                   $(datePicker.el).siblings('.qs-datepicker-container').addClass('qs-datepicker-container-noshadow qs-datepicker-container-relative ');
-                                  _context10.next = 22;
+                                  _context11.next = 22;
                                   break;
 
                                 case 13:
-                                  _context10.next = 15;
+                                  _context11.next = 15;
                                   return axiosQuery('get', 'site/contracts/cell_edit', {
                                     contract_id: contractId,
                                     column: column,
@@ -20796,12 +20885,12 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                   }, 'json');
 
                                 case 15:
-                                  _yield$axiosQuery9 = _context10.sent;
-                                  _data = _yield$axiosQuery9.data;
-                                  _error = _yield$axiosQuery9.error;
-                                  _status = _yield$axiosQuery9.status;
-                                  _headers = _yield$axiosQuery9.headers;
-                                  _context10.next = 22;
+                                  _yield$axiosQuery10 = _context11.sent;
+                                  _data = _yield$axiosQuery10.data;
+                                  _error = _yield$axiosQuery10.error;
+                                  _status = _yield$axiosQuery10.status;
+                                  _headers = _yield$axiosQuery10.headers;
+                                  _context11.next = 22;
                                   return setData(_data);
 
                                 case 22:
@@ -20812,19 +20901,19 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                     // При скролле списка скрыть тултип комментариев
                                     if (((_cellEditTooltip4 = cellEditTooltip) === null || _cellEditTooltip4 === void 0 ? void 0 : _cellEditTooltip4.destroy) != undefined) cellEditTooltip.destroy();
                                   });
-                                  $(popper).find('[edittedlistvalue]').one(tapEvent, /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee9() {
+                                  $(popper).find('[edittedlistvalue]').one(tapEvent, /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee10() {
                                     var _cellEditTooltip5;
 
-                                    var value, emptyVal, _yield$axiosQuery10, savedRes, savedErr;
+                                    var value, emptyVal, _yield$axiosQuery11, savedRes, savedErr;
 
-                                    return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee9$(_context9) {
+                                    return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee10$(_context10) {
                                       while (1) {
-                                        switch (_context9.prev = _context9.next) {
+                                        switch (_context10.prev = _context10.next) {
                                           case 0:
                                             cellWait.on();
                                             value = $(this).attr('edittedlistvalue');
                                             emptyVal = $(cell).find('[edittedplace]').attr('edittedplace');
-                                            _context9.next = 5;
+                                            _context10.next = 5;
                                             return axiosQuery('post', 'site/contracts/cell_edit', {
                                               contract_id: contractId,
                                               column: column,
@@ -20834,9 +20923,9 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                             }, 'json');
 
                                           case 5:
-                                            _yield$axiosQuery10 = _context9.sent;
-                                            savedRes = _yield$axiosQuery10.data;
-                                            savedErr = _yield$axiosQuery10.error;
+                                            _yield$axiosQuery11 = _context10.sent;
+                                            savedRes = _yield$axiosQuery11.data;
+                                            savedErr = _yield$axiosQuery11.error;
 
                                             if (savedErr) {
                                               cellWait.off();
@@ -20854,18 +20943,18 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
 
                                           case 14:
                                           case "end":
-                                            return _context9.stop();
+                                            return _context10.stop();
                                         }
                                       }
-                                    }, _callee9, this);
+                                    }, _callee10, this);
                                   })));
 
                                 case 25:
                                 case "end":
-                                  return _context10.stop();
+                                  return _context11.stop();
                               }
                             }
-                          }, _callee10);
+                          }, _callee11);
                         }));
 
                         function onShow(_x2) {
@@ -20885,10 +20974,10 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
 
                 case 33:
                 case "end":
-                  return _context11.stop();
+                  return _context12.stop();
               }
             }
-          }, _callee11);
+          }, _callee12);
         }))();
       }
     }, {
@@ -20897,12 +20986,12 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
       countLeft: countSelected > 1 ? countSelected : null,
       sort: 8,
       onClick: function onClick() {
-        return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee13() {
-          var contractsIds, _yield$ddrPopup, state, popper, wait, setTitle, setButtons, loadData, setHtml, setLHtml, dialog, close, query, onScroll, disableButtons, enableButtons, setWidth, _yield$axiosQuery11, data, error, status, headers, selectAllChecksStat, checkCountChecked;
+        return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee14() {
+          var contractsIds, _yield$ddrPopup, state, popper, wait, setTitle, setButtons, loadData, setHtml, setLHtml, dialog, close, query, onScroll, disableButtons, enableButtons, setWidth, _yield$axiosQuery12, data, error, status, headers, selectAllChecksStat, checkCountChecked;
 
-          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee13$(_context13) {
+          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee14$(_context14) {
             while (1) {
-              switch (_context13.prev = _context13.next) {
+              switch (_context14.prev = _context14.next) {
                 case 0:
                   checkCountChecked = function _checkCountChecked() {
                     var countChecked = $('#excelColumsList').find('[columtoxeport]:checked').length;
@@ -20915,7 +21004,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                   };
 
                   contractsIds = selectedContracts.items;
-                  _context13.next = 4;
+                  _context14.next = 4;
                   return ddrPopup({
                     title: 'Экспорт данных в Excel',
                     // заголовок
@@ -20931,7 +21020,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                   });
 
                 case 4:
-                  _yield$ddrPopup = _context13.sent;
+                  _yield$ddrPopup = _context14.sent;
                   state = _yield$ddrPopup.state;
                   popper = _yield$ddrPopup.popper;
                   wait = _yield$ddrPopup.wait;
@@ -20948,22 +21037,22 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                   enableButtons = _yield$ddrPopup.enableButtons;
                   setWidth = _yield$ddrPopup.setWidth;
                   wait();
-                  _context13.next = 23;
+                  _context14.next = 23;
                   return axiosQuery('get', 'site/contracts/to_export');
 
                 case 23:
-                  _yield$axiosQuery11 = _context13.sent;
-                  data = _yield$axiosQuery11.data;
-                  error = _yield$axiosQuery11.error;
-                  status = _yield$axiosQuery11.status;
-                  headers = _yield$axiosQuery11.headers;
+                  _yield$axiosQuery12 = _context14.sent;
+                  data = _yield$axiosQuery12.data;
+                  error = _yield$axiosQuery12.error;
+                  status = _yield$axiosQuery12.status;
+                  headers = _yield$axiosQuery12.headers;
 
                   if (error) {
                     $.notify('Ошибка! Не удалось открыть окно настроек экспорта!', 'error');
                     console.log(error === null || error === void 0 ? void 0 : error.message, error.errors);
                   }
 
-                  _context13.next = 31;
+                  _context14.next = 31;
                   return setHtml(data);
 
                 case 31:
@@ -20979,12 +21068,12 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                   $('#excelColumsList').find('[columtoxeport]').on('change', function () {
                     checkCountChecked();
                   });
-                  $.exportContractsData = /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee12() {
-                    var colums, sort, order, _yield$axiosQuery12, data, error, status, headers, d;
+                  $.exportContractsData = /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee13() {
+                    var colums, sort, order, _yield$axiosQuery13, data, error, status, headers, d;
 
-                    return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee12$(_context12) {
+                    return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee13$(_context13) {
                       while (1) {
-                        switch (_context12.prev = _context12.next) {
+                        switch (_context13.prev = _context13.next) {
                           case 0:
                             wait();
                             colums = [];
@@ -20993,7 +21082,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                               colums.push(field);
                             });
                             sort = ddrStore('site-contracts-sortfield') || 'id', order = ddrStore('site-contracts-sortorder') || 'ASC';
-                            _context12.next = 6;
+                            _context13.next = 6;
                             return axiosQuery('post', 'site/contracts/to_export', {
                               contracts_ids: contractsIds,
                               colums: colums,
@@ -21002,20 +21091,20 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                             }, 'blob');
 
                           case 6:
-                            _yield$axiosQuery12 = _context12.sent;
-                            data = _yield$axiosQuery12.data;
-                            error = _yield$axiosQuery12.error;
-                            status = _yield$axiosQuery12.status;
-                            headers = _yield$axiosQuery12.headers;
+                            _yield$axiosQuery13 = _context13.sent;
+                            data = _yield$axiosQuery13.data;
+                            error = _yield$axiosQuery13.error;
+                            status = _yield$axiosQuery13.status;
+                            headers = _yield$axiosQuery13.headers;
 
                             if (!(headers['content-type'] != 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')) {
-                              _context12.next = 15;
+                              _context13.next = 15;
                               break;
                             }
 
                             $.notify('Ошибка экспорта данных', 'error');
                             wait(false);
-                            return _context12.abrupt("return");
+                            return _context13.abrupt("return");
 
                           case 15:
                             d = ddrDateBuilder();
@@ -21029,18 +21118,18 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
 
                           case 17:
                           case "end":
-                            return _context12.stop();
+                            return _context13.stop();
                         }
                       }
-                    }, _callee12);
+                    }, _callee13);
                   }));
 
                 case 36:
                 case "end":
-                  return _context13.stop();
+                  return _context14.stop();
               }
             }
-          }, _callee13);
+          }, _callee14);
         }))();
       }
     }, {
@@ -21049,12 +21138,12 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
       disabled: !!$(target.pointer).closest('[ddrtabletd]').find('[edittedblock]').length && !getSelectionStr(),
       sort: 1,
       onClick: function onClick() {
-        return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee14() {
+        return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee15() {
           var _row, allData, copiedData;
 
-          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee14$(_context14) {
+          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee15$(_context15) {
             while (1) {
-              switch (_context14.prev = _context14.next) {
+              switch (_context15.prev = _context15.next) {
                 case 0:
                   if (getSelectionStr()) {
                     copyStringToClipboard(getSelectionStr());
@@ -21089,10 +21178,10 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
 
                 case 1:
                 case "end":
-                  return _context14.stop();
+                  return _context15.stop();
               }
             }
-          }, _callee14);
+          }, _callee15);
         }))();
       }
     }, {
@@ -21105,28 +21194,28 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
       //hidden: countSelected > 1,
       sort: 3,
       onClick: function onClick() {
-        return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee15() {
-          var titlePin, titlePinDone, pinProcNotif, _yield$axiosQuery13, data, error, status, headers, pinnedIconHtml;
+        return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee16() {
+          var titlePin, titlePinDone, pinProcNotif, _yield$axiosQuery14, data, error, status, headers, pinnedIconHtml;
 
-          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee15$(_context15) {
+          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee16$(_context16) {
             while (1) {
-              switch (_context15.prev = _context15.next) {
+              switch (_context16.prev = _context16.next) {
                 case 0:
                   titlePin = isPinned ? 'Открепление' : 'Закрепление';
                   titlePinDone = isPinned ? 'открепления ' : 'закрепления ';
                   pinProcNotif = processNotify(buildTitle(countSelected, titlePin + ' # %...', ['договора', 'договоров', 'договоров']));
-                  _context15.next = 5;
+                  _context16.next = 5;
                   return axiosQuery('put', 'site/contracts/pin', {
                     contracts_ids: pinnedInSelected,
                     stat: allPinned
                   }, 'json');
 
                 case 5:
-                  _yield$axiosQuery13 = _context15.sent;
-                  data = _yield$axiosQuery13.data;
-                  error = _yield$axiosQuery13.error;
-                  status = _yield$axiosQuery13.status;
-                  headers = _yield$axiosQuery13.headers;
+                  _yield$axiosQuery14 = _context16.sent;
+                  data = _yield$axiosQuery14.data;
+                  error = _yield$axiosQuery14.error;
+                  status = _yield$axiosQuery14.status;
+                  headers = _yield$axiosQuery14.headers;
 
                   if (error) {
                     //$.notify('Ошибка закрепления договора!', 'error');
@@ -21157,10 +21246,10 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
 
                 case 12:
                 case "end":
-                  return _context15.stop();
+                  return _context16.stop();
               }
             }
-          }, _callee15);
+          }, _callee16);
         }))();
       }
     }, {
@@ -21183,25 +21272,25 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
             //faIcon: 'fa-solid fa-angles-right',
             visible: true,
             onClick: function onClick(selector) {
-              return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee16() {
-                var _yield$axiosQuery14, data, error, status, headers;
+              return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee17() {
+                var _yield$axiosQuery15, data, error, status, headers;
 
-                return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee16$(_context16) {
+                return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee17$(_context17) {
                   while (1) {
-                    switch (_context16.prev = _context16.next) {
+                    switch (_context17.prev = _context17.next) {
                       case 0:
-                        _context16.next = 2;
+                        _context17.next = 2;
                         return axiosQuery('post', 'site/contracts/colorselections', {
                           contractIds: selectedContracts.items,
                           colorId: item.id
                         }, 'json');
 
                       case 2:
-                        _yield$axiosQuery14 = _context16.sent;
-                        data = _yield$axiosQuery14.data;
-                        error = _yield$axiosQuery14.error;
-                        status = _yield$axiosQuery14.status;
-                        headers = _yield$axiosQuery14.headers;
+                        _yield$axiosQuery15 = _context17.sent;
+                        data = _yield$axiosQuery15.data;
+                        error = _yield$axiosQuery15.error;
+                        status = _yield$axiosQuery15.status;
+                        headers = _yield$axiosQuery15.headers;
 
                         if (error) {
                           $.notify('Ошибка применеия цвета!', 'error');
@@ -21223,10 +21312,10 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
 
                       case 9:
                       case "end":
-                        return _context16.stop();
+                        return _context17.stop();
                     }
                   }
-                }, _callee16);
+                }, _callee17);
               }))();
             }
           };
@@ -21240,10 +21329,10 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
       countOnArrow: true,
       sort: 9,
       onClick: function onClick() {
-        return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee17() {
-          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee17$(_context17) {
+        return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee18() {
+          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee18$(_context18) {
             while (1) {
-              switch (_context17.prev = _context17.next) {
+              switch (_context18.prev = _context18.next) {
                 case 0:
                   ddrPopup({
                     title: 'Редактирование ' + buildTitle(countSelected, ' # %', ['акта', 'актов', 'актов']),
@@ -21253,26 +21342,26 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                       action: 'setEditActs',
                       disabled: 1
                     }]
-                  }).then(function (_ref24) {
-                    var state = _ref24.state,
-                        wait = _ref24.wait,
-                        setTitle = _ref24.setTitle,
-                        setButtons = _ref24.setButtons,
-                        loadData = _ref24.loadData,
-                        setHtml = _ref24.setHtml,
-                        setLHtml = _ref24.setLHtml,
-                        dialog = _ref24.dialog,
-                        close = _ref24.close,
-                        onScroll = _ref24.onScroll,
-                        disableButtons = _ref24.disableButtons,
-                        enableButtons = _ref24.enableButtons,
-                        setWidth = _ref24.setWidth;
+                  }).then(function (_ref25) {
+                    var state = _ref25.state,
+                        wait = _ref25.wait,
+                        setTitle = _ref25.setTitle,
+                        setButtons = _ref25.setButtons,
+                        loadData = _ref25.loadData,
+                        setHtml = _ref25.setHtml,
+                        setLHtml = _ref25.setLHtml,
+                        dialog = _ref25.dialog,
+                        close = _ref25.close,
+                        onScroll = _ref25.onScroll,
+                        disableButtons = _ref25.disableButtons,
+                        enableButtons = _ref25.enableButtons,
+                        setWidth = _ref25.setWidth;
                     wait();
-                    axiosQuery('get', 'site/contracts/edit_acts').then(function (_ref25) {
-                      var data = _ref25.data,
-                          error = _ref25.error,
-                          status = _ref25.status,
-                          headers = _ref25.headers;
+                    axiosQuery('get', 'site/contracts/edit_acts').then(function (_ref26) {
+                      var data = _ref26.data,
+                          error = _ref26.error,
+                          status = _ref26.status,
+                          headers = _ref26.headers;
 
                       if (error) {
                         $.notify('Не удалось загрузить форму!', 'error');
@@ -21293,11 +21382,11 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                       var form = $('#editActsForm').ddrForm();
                       axiosQuery('post', 'site/contracts/edit_acts', _objectSpread({
                         contracts_ids: selectedContracts.items
-                      }, form)).then(function (_ref26) {
-                        var data = _ref26.data,
-                            error = _ref26.error,
-                            status = _ref26.status,
-                            headers = _ref26.headers;
+                      }, form)).then(function (_ref27) {
+                        var data = _ref27.data,
+                            error = _ref27.error,
+                            status = _ref27.status,
+                            headers = _ref27.headers;
 
                         if (error) {
                           $.notify('Не удалось сохранить данные!', 'error');
@@ -21327,10 +21416,10 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
 
                 case 1:
                 case "end":
-                  return _context17.stop();
+                  return _context18.stop();
               }
             }
-          }, _callee17);
+          }, _callee18);
         }))();
       }
     }, {
@@ -21342,61 +21431,61 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
       countOnArrow: true,
       sort: 10,
       onClick: function onClick() {
-        return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee20() {
-          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee20$(_context20) {
+        return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee21() {
+          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee21$(_context21) {
             while (1) {
-              switch (_context20.prev = _context20.next) {
+              switch (_context21.prev = _context21.next) {
                 case 0:
                   ddrPopup({
                     title: 'Шаблоны для выгрузки',
                     width: 500,
                     buttons: ['Закрыть']
                   }).then( /*#__PURE__*/function () {
-                    var _ref28 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee19(_ref27) {
-                      var state, wait, setTitle, setButtons, loadData, setHtml, setLHtml, dialog, close, onClose, onScroll, disableButtons, enableButtons, setWidth, _yield$axiosQuery15, data, error, status, headers;
+                    var _ref29 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee20(_ref28) {
+                      var state, wait, setTitle, setButtons, loadData, setHtml, setLHtml, dialog, close, onClose, onScroll, disableButtons, enableButtons, setWidth, _yield$axiosQuery16, data, error, status, headers;
 
-                      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee19$(_context19) {
+                      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee20$(_context20) {
                         while (1) {
-                          switch (_context19.prev = _context19.next) {
+                          switch (_context20.prev = _context20.next) {
                             case 0:
-                              state = _ref27.state, wait = _ref27.wait, setTitle = _ref27.setTitle, setButtons = _ref27.setButtons, loadData = _ref27.loadData, setHtml = _ref27.setHtml, setLHtml = _ref27.setLHtml, dialog = _ref27.dialog, close = _ref27.close, onClose = _ref27.onClose, onScroll = _ref27.onScroll, disableButtons = _ref27.disableButtons, enableButtons = _ref27.enableButtons, setWidth = _ref27.setWidth;
+                              state = _ref28.state, wait = _ref28.wait, setTitle = _ref28.setTitle, setButtons = _ref28.setButtons, loadData = _ref28.loadData, setHtml = _ref28.setHtml, setLHtml = _ref28.setLHtml, dialog = _ref28.dialog, close = _ref28.close, onClose = _ref28.onClose, onScroll = _ref28.onScroll, disableButtons = _ref28.disableButtons, enableButtons = _ref28.enableButtons, setWidth = _ref28.setWidth;
                               //isClosed
                               wait();
-                              _context19.next = 4;
+                              _context20.next = 4;
                               return axiosQuery('get', 'site/contracts/export_act', {
                                 contract_id: contractId
                               });
 
                             case 4:
-                              _yield$axiosQuery15 = _context19.sent;
-                              data = _yield$axiosQuery15.data;
-                              error = _yield$axiosQuery15.error;
-                              status = _yield$axiosQuery15.status;
-                              headers = _yield$axiosQuery15.headers;
+                              _yield$axiosQuery16 = _context20.sent;
+                              data = _yield$axiosQuery16.data;
+                              error = _yield$axiosQuery16.error;
+                              status = _yield$axiosQuery16.status;
+                              headers = _yield$axiosQuery16.headers;
 
                               if (!error) {
-                                _context19.next = 14;
+                                _context20.next = 14;
                                 break;
                               }
 
                               $.notify('Не загрузить данные!', 'error');
                               console.log(error === null || error === void 0 ? void 0 : error.message, error === null || error === void 0 ? void 0 : error.errors);
                               wait(false);
-                              return _context19.abrupt("return");
+                              return _context20.abrupt("return");
 
                             case 14:
-                              _context19.next = 16;
+                              _context20.next = 16;
                               return setHtml(data);
 
                             case 16:
                               enableButtons(true);
                               $('[choosetemplateid]').on(tapEvent, /*#__PURE__*/function () {
-                                var _ref29 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee18(e) {
-                                  var templateId, ranged, _$$ddrWait, destroy, _yield$axiosQuery16, _data2, _error2, _status2, _headers2, _iteratorAbruptCompletion, _didIteratorError, _iteratorError, _iterator, _step, _contractId, _yield$axiosQuery17, _data3, _error3, _status3, _headers3;
+                                var _ref30 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee19(e) {
+                                  var templateId, ranged, _$$ddrWait, destroy, _yield$axiosQuery17, _data2, _error2, _status2, _headers2, _iteratorAbruptCompletion, _didIteratorError, _iteratorError, _iterator, _step, _contractId, _yield$axiosQuery18, _data3, _error3, _status3, _headers3;
 
-                                  return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee18$(_context18) {
+                                  return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee19$(_context19) {
                                     while (1) {
-                                      switch (_context18.prev = _context18.next) {
+                                      switch (_context19.prev = _context19.next) {
                                         case 0:
                                           templateId = $(e.currentTarget).attr('choosetemplateid'), ranged = $(e.currentTarget).hasAttr('ranged'), _$$ddrWait = $('#contractsCard').ddrWait({
                                             bgColor: '#ffffffe6',
@@ -21407,22 +21496,22 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                           });
 
                                           if (templateId) {
-                                            _context18.next = 5;
+                                            _context19.next = 5;
                                             break;
                                           }
 
                                           $.notify('Ошибка выгрузки! Шаблон не найден', 'error');
-                                          return _context18.abrupt("return");
+                                          return _context19.abrupt("return");
 
                                         case 5:
                                           wait();
 
                                           if (!ranged) {
-                                            _context18.next = 28;
+                                            _context19.next = 28;
                                             break;
                                           }
 
-                                          _context18.next = 9;
+                                          _context19.next = 9;
                                           return axiosQuery('post', 'site/contracts/export_act', {
                                             contract_id: selectedContracts.items,
                                             template_id: templateId,
@@ -21430,14 +21519,14 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                           }, 'blob');
 
                                         case 9:
-                                          _yield$axiosQuery16 = _context18.sent;
-                                          _data2 = _yield$axiosQuery16.data;
-                                          _error2 = _yield$axiosQuery16.error;
-                                          _status2 = _yield$axiosQuery16.status;
-                                          _headers2 = _yield$axiosQuery16.headers;
+                                          _yield$axiosQuery17 = _context19.sent;
+                                          _data2 = _yield$axiosQuery17.data;
+                                          _error2 = _yield$axiosQuery17.error;
+                                          _status2 = _yield$axiosQuery17.status;
+                                          _headers2 = _yield$axiosQuery17.headers;
 
                                           if (!_error2) {
-                                            _context18.next = 20;
+                                            _context19.next = 20;
                                             break;
                                           }
 
@@ -21445,18 +21534,18 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                           console.log(_error2 === null || _error2 === void 0 ? void 0 : _error2.message, _error2 === null || _error2 === void 0 ? void 0 : _error2.errors);
                                           wait(false);
                                           destroy();
-                                          return _context18.abrupt("return");
+                                          return _context19.abrupt("return");
 
                                         case 20:
                                           if (_headers2['x-export-filename']) {
-                                            _context18.next = 25;
+                                            _context19.next = 25;
                                             break;
                                           }
 
                                           $.notify('Не удалось загрузить данные! Возможно, не загружен файл шаблона.', 'error');
                                           wait(false);
                                           destroy();
-                                          return _context18.abrupt("return");
+                                          return _context19.abrupt("return");
 
                                         case 25:
                                           $.ddrExport({
@@ -21466,41 +21555,41 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                           }, function () {
                                             destroy();
                                           });
-                                          _context18.next = 74;
+                                          _context19.next = 74;
                                           break;
 
                                         case 28:
                                           _iteratorAbruptCompletion = false;
                                           _didIteratorError = false;
-                                          _context18.prev = 30;
+                                          _context19.prev = 30;
                                           _iterator = _asyncIterator(selectedContracts.items);
 
                                         case 32:
-                                          _context18.next = 34;
+                                          _context19.next = 34;
                                           return _iterator.next();
 
                                         case 34:
-                                          if (!(_iteratorAbruptCompletion = !(_step = _context18.sent).done)) {
-                                            _context18.next = 58;
+                                          if (!(_iteratorAbruptCompletion = !(_step = _context19.sent).done)) {
+                                            _context19.next = 58;
                                             break;
                                           }
 
                                           _contractId = _step.value;
-                                          _context18.next = 38;
+                                          _context19.next = 38;
                                           return axiosQuery('post', 'site/contracts/export_act', {
                                             contract_id: [_contractId],
                                             template_id: templateId
                                           }, 'blob');
 
                                         case 38:
-                                          _yield$axiosQuery17 = _context18.sent;
-                                          _data3 = _yield$axiosQuery17.data;
-                                          _error3 = _yield$axiosQuery17.error;
-                                          _status3 = _yield$axiosQuery17.status;
-                                          _headers3 = _yield$axiosQuery17.headers;
+                                          _yield$axiosQuery18 = _context19.sent;
+                                          _data3 = _yield$axiosQuery18.data;
+                                          _error3 = _yield$axiosQuery18.error;
+                                          _status3 = _yield$axiosQuery18.status;
+                                          _headers3 = _yield$axiosQuery18.headers;
 
                                           if (!_error3) {
-                                            _context18.next = 49;
+                                            _context19.next = 49;
                                             break;
                                           }
 
@@ -21508,18 +21597,18 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                           console.log(_error3 === null || _error3 === void 0 ? void 0 : _error3.message, _error3 === null || _error3 === void 0 ? void 0 : _error3.errors);
                                           wait(false);
                                           destroy();
-                                          return _context18.abrupt("return");
+                                          return _context19.abrupt("return");
 
                                         case 49:
                                           if (_headers3['x-export-filename']) {
-                                            _context18.next = 54;
+                                            _context19.next = 54;
                                             break;
                                           }
 
                                           $.notify('Не удалось загрузить данные! Возможно, не загружен файл шаблона.', 'error');
                                           wait(false);
                                           destroy();
-                                          return _context18.abrupt("return");
+                                          return _context19.abrupt("return");
 
                                         case 54:
                                           $.ddrExport({
@@ -21532,82 +21621,82 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
 
                                         case 55:
                                           _iteratorAbruptCompletion = false;
-                                          _context18.next = 32;
+                                          _context19.next = 32;
                                           break;
 
                                         case 58:
-                                          _context18.next = 64;
+                                          _context19.next = 64;
                                           break;
 
                                         case 60:
-                                          _context18.prev = 60;
-                                          _context18.t0 = _context18["catch"](30);
+                                          _context19.prev = 60;
+                                          _context19.t0 = _context19["catch"](30);
                                           _didIteratorError = true;
-                                          _iteratorError = _context18.t0;
+                                          _iteratorError = _context19.t0;
 
                                         case 64:
-                                          _context18.prev = 64;
-                                          _context18.prev = 65;
+                                          _context19.prev = 64;
+                                          _context19.prev = 65;
 
                                           if (!(_iteratorAbruptCompletion && _iterator["return"] != null)) {
-                                            _context18.next = 69;
+                                            _context19.next = 69;
                                             break;
                                           }
 
-                                          _context18.next = 69;
+                                          _context19.next = 69;
                                           return _iterator["return"]();
 
                                         case 69:
-                                          _context18.prev = 69;
+                                          _context19.prev = 69;
 
                                           if (!_didIteratorError) {
-                                            _context18.next = 72;
+                                            _context19.next = 72;
                                             break;
                                           }
 
                                           throw _iteratorError;
 
                                         case 72:
-                                          return _context18.finish(69);
+                                          return _context19.finish(69);
 
                                         case 73:
-                                          return _context18.finish(64);
+                                          return _context19.finish(64);
 
                                         case 74:
                                           wait(false); //close();
 
                                         case 75:
                                         case "end":
-                                          return _context18.stop();
+                                          return _context19.stop();
                                       }
                                     }
-                                  }, _callee18, null, [[30, 60, 64, 74], [65,, 69, 73]]);
+                                  }, _callee19, null, [[30, 60, 64, 74], [65,, 69, 73]]);
                                 }));
 
                                 return function (_x6) {
-                                  return _ref29.apply(this, arguments);
+                                  return _ref30.apply(this, arguments);
                                 };
                               }());
 
                             case 18:
                             case "end":
-                              return _context19.stop();
+                              return _context20.stop();
                           }
                         }
-                      }, _callee19);
+                      }, _callee20);
                     }));
 
                     return function (_x5) {
-                      return _ref28.apply(this, arguments);
+                      return _ref29.apply(this, arguments);
                     };
                   }());
 
                 case 1:
                 case "end":
-                  return _context20.stop();
+                  return _context21.stop();
               }
             }
-          }, _callee20);
+          }, _callee21);
         }))();
       }
     }];
