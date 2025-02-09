@@ -7,6 +7,9 @@ export function contextMenu(
 	canEditCell,
 	canCreateCheckbox,
 	canRemoveCheckbox,
+	canCreateSelect,
+	canRemoveSelect,
+	canChooseEmployee,
 	getCounts) {
 	
 	let commentsTooltip, cellEditTooltip;
@@ -39,7 +42,9 @@ export function contextMenu(
 		
 		const isCommon = !!$(target.pointer).closest('[ddrtabletd]').hasAttr('commonlist') || false;
 		const isDeptCheckbox = !!$(target.pointer).closest('[ddrtabletd]').hasAttr('deptcheck') || false;
-		const hasCheckbox = !!$(target.pointer).closest('[ddrtabletd]').children().length;
+		const isDeptSelect = !!$(target.pointer).closest('[ddrtabletd]').hasAttr('deptselect') || false;
+		const hasCheckbox = !!$(target.pointer).closest('[ddrtabletd]').children('.checkbox').length;
+		const hasSelect = !!$(target.pointer).closest('[ddrtabletd]').children('.select, [selectstr]').length;
 		const contextEdited = !!$(target.pointer).closest('[ddrtabletd]').hasAttr('contextedit');
 		const disableEditCell = !$(target.pointer).closest('[ddrtabletd]').attr('contextedit');
 		const selectedTextCell = !!$(target.pointer).closest('[ddrtabletd]').find('[edittedplace]').hasClass('select-text') || !!$(target.pointer).closest('[ddrtabletd]').find('[edittedblock]').length || (!!$('#contractsTable').find('[ddrtabletd].selected').length && $(target.pointer).closest('[ddrtabletd]').hasClass('selected'));
@@ -49,7 +54,6 @@ export function contextMenu(
 		let calcDates;
 		let allPinned;
 		let pinnedInSelected = {};
-		
 		
 		
 		// Если это оин пункт "копировать"
@@ -707,8 +711,74 @@ export function contextMenu(
 					}
 				}
 			}, {
+				name: hasSelect && canRemoveSelect ? 'Удалить вып. список' : (!hasSelect && canCreateSelect ? 'Добавить вып. список' : ''),
+				visible: isDeptSelect && !isArchive && ((!hasSelect && canCreateSelect) || (hasSelect && canRemoveSelect)) && !selectedTextCell,
+				sort: 1,
+				async onClick() {	
+					const cell = $(target.pointer).closest('[ddrtabletd]');
+					const edited = !!$(cell).attr('edited');
+					const attrData = $(cell).attr('deptselect');
+					
+					const [contractId = null, departmentId = null, stepId = null] = pregSplit(attrData);
+					
+					const waitCell = $(cell).ddrWait({
+						iconHeight: '30px',
+						bgColor: '#efe9f9',
+					});
+					
+					
+					
+					const {data: list, error, status, headers} = await axiosQuery('post', 'site/contracts/step_checkbox', {
+						contractId, 
+						departmentId,
+						stepId,
+						value: hasSelect
+					}, 'json');
+					
+					
+					if (error) {
+						console.log(error);
+						$.notify('Ошибка! Не удалось '+(hasSelect ? 'удалить' : 'добавить')+' вып. список!', 'error');
+						waitCell.destroy();
+						return;
+					}
+					
+					// canCreateCheckbox canRemoveCheckbox
+					if (list) {
+						if (!hasSelect) {
+							if (edited && canChooseEmployee) {
+								const randId = generateCode('nnnnnnn');
+								let listHtml = '';
+								
+								if (list && _.isArray(list)) {
+									list.forEach(({value, title, disabled, hidden}) => {
+										if (hidden) return true;
+										listHtml += `<option value="${value}"${disabled ? ' disabled' : ''}>${title}</option>`;
+									});
+								}
+								const editedSelect = '<div class="select small-select small-select_noempty w100">'+
+									'<select id="select'+randId+'" inpgroup="small" oninput="$.contractSetData(this, '+contractId+','+departmentId+','+stepId+',3)">'+
+										'<option value="" selected="">Сотрудник не выбран</option>'+
+										listHtml+
+									'</select>'+
+									'<div class="small-select__errorlabel noselect" errorlabel=""></div>'+
+								'</div>'
+								
+								$(cell).html(editedSelect);
+							} else {
+								$(cell).html('<p class="fz12px">-</p>');
+							}
+							$.notify('Вып. список успешно добавлен!');
+						} else {
+							$(cell).empty();
+							$.notify('Вып. список успешно удален!');
+						}
+						waitCell.destroy();
+					}
+				}
+			}, {
 				name: 'Комментарии',
-				visible: hasCheckbox && isDeptCheckbox && !selectedTextCell,
+				visible: ((hasCheckbox && isDeptCheckbox) || (hasSelect && isDeptSelect)) && !selectedTextCell,
 				sort: 2,
 				async onClick() {
 					const cell = $(target.pointer).closest('[ddrtabletd]');

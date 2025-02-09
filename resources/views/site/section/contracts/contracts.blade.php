@@ -4,8 +4,6 @@
 		class="noselect"
 		loading
 		>
-
-
 		<li
 			onclick="$.commonSettings()"
 			teleport="#menuTeleport"
@@ -93,6 +91,7 @@
 
 
 				@cando('sozdanie-dogovora:site')
+				
 					<x-button
 						style="border-radius: 10px; border-color:transparent; margin-left:20px;"
 						group="large"
@@ -282,6 +281,9 @@
 		countShownLoadings 		= {{$setting['count-shown-loadings'] ?? 2}},
 		canCreateCheckbox 		= '{{Auth::guard('site')->user()->can('contract-create-checkbox::site')}}',
 		canRemoveCheckbox 		= '{{Auth::guard('site')->user()->can('contract-remove-checkbox::site')}}',
+		canCreateSelect 		= '{{Auth::guard('site')->user()->can('contract-create-select::site')}}',
+		canRemoveSelect 		= '{{Auth::guard('site')->user()->can('contract-remove-select::site')}}',
+		canChooseEmployee 		= '{{Auth::guard('site')->user()->can('contract-choose-employee:site')}}',
 		canEditCell 			= '{{Auth::guard('site')->user()->can('contract-can-edit-cell::site')}}',
 		offset 					= 0,
 		search 					= null,
@@ -1328,6 +1330,7 @@
 	//---------------------------------------------------------------------------------  Заполнение данных договоров
 	let contractSetDataTOut, oldInputId = null;
 	$.contractSetData = (input, contractId, departmentId, stepId, type) => {
+		console.log('contractSetData');
 		let cell = type == 5 ? $(`[deptlights^="${contractId},${departmentId},${stepId}"]`) : $(input).closest('[ddrtabletd]');
 
 		$(input).ddrInputs('addClass', 'notouch');
@@ -1962,6 +1965,9 @@
 		canEditCell,
 		canCreateCheckbox,
 		canRemoveCheckbox,
+		canCreateSelect,
+		canRemoveSelect,
+		canChooseEmployee,
 		getCounts);
 
 

@@ -66,6 +66,8 @@
 					{{-- @if(!$contractdata[$contract['id']][$dept['id']][$step['id']]['data'] ?? true)
 					style="background-color: {{$contract['departments'][$dept['id']]['steps'][$step['id']]['color']}};"
 					@endif --}}
+					deptselect="{{$contract['id']}},{{$dept['id']}},{{$step['id']}}"
+					edited="{{$edited}}"
 					>
 					@if($edited && auth('site')->user()->can('contract-choose-employee:site'))
 						<x-select
@@ -84,7 +86,7 @@
 							@php
 								$idx = arrGetIndexFromField($deps_users[$dept['id']]->toArray() ?? [], 'value', $contractdata[$contract['id']][$dept['id']][$step['id']]['data'] ?? null);
 							@endphp
-							<p class="fz12px lh100">{{$deps_users[$dept['id']][$idx]['title'] ?? null}}</p>
+							<p class="fz12px lh100" selectstr>{{$deps_users[$dept['id']][$idx]['title'] ?? '-'}}</p>
 						@endisset
 					@endif
 				</x-table.td>
@@ -156,6 +158,18 @@
 						<div class="trangled trangled-top-right"></div>
 					@endif
 					</x-table.td>
+			@elseif($step['type'] == 3)
+				<x-table.td
+					class="h-center"
+					deptselect="{{$contract['id']}},{{$dept['id']}},{{$step['id']}}"
+					{{-- onmouseenter="{{isset($contract['departments'][$dept['id']]['steps'][$step['id']]['has_comment']) && $contract['departments'][$dept['id']]['steps'][$step['id']]['has_comment'] ? '$.commentsTooltip(event);' : ''}}"
+					onmouseleave="$.commentsTooltipLeave();" --}}
+					edited="{{$edited}}"
+					>
+					@if(isset($contract['departments'][$dept['id']]['steps'][$step['id']]['has_comment']) && $contract['departments'][$dept['id']]['steps'][$step['id']]['has_comment'])
+						<div class="trangled trangled-top-right"></div>
+					@endif
+				</x-table.td>
 			@else
 				<x-table.td class="center"></x-table.td>
 			@endif
