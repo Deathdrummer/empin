@@ -30,4 +30,16 @@ class Step extends Model {
 		'_sort'
 	];
 	
+	
+	
+	/**
+	* 
+	* @param 
+	* @return 
+	*/
+	public function scopeDropdowns($query, $deptId) {
+		return $query->where('department_id', $deptId)
+			->where('type', '3');
+	}
+	
 }

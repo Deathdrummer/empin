@@ -183,7 +183,7 @@ $.ddrCRUD = function(settings = false) {
 			axiosQuery('get', _route(id), params, 'text', abortCtrl).then(({data, error, status, headers}) => {
 				if (cb && typeof cb == 'function') cb(data, container, {error, status, headers});
 			}).catch((e) => {
-				if (cb && typeof cb == 'function') cb(false, e);
+				if (cb && typeof cb == 'function') cb(false, container, e);
 			});
 		}, 
 		
@@ -195,7 +195,7 @@ $.ddrCRUD = function(settings = false) {
 			axiosQuery('get', _route(id, 'edit'), params, 'text', abortCtrl).then(({data, error, status, headers}) => {
 				if (cb && typeof cb == 'function') cb(data, container, {error, status, headers});
 			}).catch((e) => {
-				if (cb && typeof cb == 'function') cb(false, e);
+				if (cb && typeof cb == 'function') cb(false, container, e);
 			});
 		},
 		
@@ -231,7 +231,7 @@ $.ddrCRUD = function(settings = false) {
 		},
 		
 		// params - это если нужно к данным добавить те данне, что указаны в параметрах при инициализации, к примеру views
-		query({method = false, route = null, data = false, responseType = 'json', params = false}, cb = false) {
+		query({method = false, route = null, data = {}, responseType = 'json', params = false}, cb = false) {
 			if (!method) throw new Error('ddrCRUD -> query: не указан метод или URL!');
 			
 			if (params && globalParams) {
@@ -242,6 +242,8 @@ $.ddrCRUD = function(settings = false) {
 					});
 				}
 			}
+			
+			data['views'] = viewsPath;
 			
 			abortCtrl = new AbortController();
 			axiosQuery(method, _route(route), data, responseType, abortCtrl).then(({data, error, status, headers}) => {
@@ -327,10 +329,12 @@ $.ddrCRUD = function(settings = false) {
 			} else {
 				lastSortIndex = parseInt(headers['x-last-sort-index']);
 				if (init) {
-					if (data) $(container).html(data);
-					else $(container).empty();
+					if ($(container).length) {
+						if (data) $(container).html(data);
+						else $(container).empty();
+					}
 					
-					if (cb && typeof cb == 'function') cb(!error);
+					if (cb && typeof cb == 'function') cb(!error, data);
 				} else {
 					if (cb && typeof cb == 'function') cb(data, {error, status, headers});
 				}

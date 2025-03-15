@@ -901,7 +901,7 @@ class Contracts extends Controller {
 	    if (!$stat = $initStepsData->save()) return response()->json($stat);
 		
 		if (!$hasCheckox) {
-			$depsUsers = $this->department->getUsersToAssign([$departmentId], ['id:value', 'pseudoname:title', 'dismissed:disabled', 'dismissed:hidden']);
+			$depsUsers = $this->department->getUsersToAssign([$departmentId], ['id:value', 'full_name:title', 'dismissed:disabled', 'dismissed:hidden']);
 			$list = $depsUsers[$departmentId] ?? null;
 			return response()->json($list);
 		}
@@ -1766,7 +1766,8 @@ class Contracts extends Controller {
 	private function _addDepsUsersToData($alldeps = null) {
 		$this->data['deps_users'] = [];
 		if (!$alldeps) return false;
-		$depsUsers = $this->department->getUsersToAssign($alldeps, ['id:value', 'pseudoname:title', 'dismissed:disabled', 'dismissed:hidden']);
+		$depsUsers = $this->department->getUsersToAssign($alldeps, ['id:value', 'full_name:title', 'dismissed:disabled', 'dismissed:hidden']);
+		toLog($depsUsers);
 		$this->data['deps_users'] = $depsUsers ?? [];
 	}
 	

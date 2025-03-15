@@ -72,21 +72,22 @@
 					@if($edited && auth('site')->user()->can('contract-choose-employee:site'))
 						<x-select
 							group="small"
-							:options="$deps_users[$dept['id']] ?? null"
+							:options="$deps_users[$dept['id']][$step['id']] ?? null"
 							:value="$contractdata[$contract['id']][$dept['id']][$step['id']]['data'] ?? null"
 							:showactive="$contractdata[$contract['id']][$dept['id']][$step['id']]['data'] ?? null"
 							class="w100"
 							choose="Сотрудник не выбран"
 							empty-has-value
 							choose-empty
+							tag="listid:{{$step['type']}},{{$step['id']}}"
 							action="contractSetData:{{$contract['id']}},{{$dept['id']}},{{$step['id']}},{{$step['type']}}"
 							/>
 					@else
 						@isset($contractdata[$contract['id']][$dept['id']][$step['id']]['data'])
 							@php
-								$idx = arrGetIndexFromField($deps_users[$dept['id']]->toArray() ?? [], 'value', $contractdata[$contract['id']][$dept['id']][$step['id']]['data'] ?? null);
+								$idx = arrGetIndexFromField($deps_users[$dept['id']][$step['id']] ?? [], 'value', $contractdata[$contract['id']][$dept['id']][$step['id']]['data'] ?? null);
 							@endphp
-							<p class="fz12px lh100" selectstr>{{$deps_users[$dept['id']][$idx]['title'] ?? '-'}}</p>
+							<p class="fz12px lh100" selectstr>{{$deps_users[$dept['id']][$step['id']][$idx]['title'] ?? '-'}}</p>
 						@else
 							<p class="fz12px lh100 text-center" selectstr>-</p>
 						@endisset

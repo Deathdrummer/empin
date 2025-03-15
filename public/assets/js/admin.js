@@ -5500,7 +5500,7 @@ _.mixin({
 /* Глобальные переменные */
 
 
-window.findWrapByInputType = ['file', 'checkbox', 'radio', 'contenteditable']; // plugins/ddrInputs: искать обрамляющие селекторы по типу, а не по тегу
+window.findWrapByInputType = ['file', 'checkbox', 'toggle', 'radio', 'contenteditable']; // plugins/ddrInputs: искать обрамляющие селекторы по типу, а не по тегу
 
 jQuery.expr[":"].icontains = jQuery.expr.createPseudo(function (arg) {
   return function (elem) {
@@ -7186,20 +7186,20 @@ window.setTagAttribute = function () {
 
   return Boolean(rules) ? ' ' + attrName : '';
 };
+
+var scrollPosition = 0;
 /*
 	Запретить скролл
 */
 
-
 window.disableScroll = function () {
-  //var scrollPosition = [
-  //  self.pageXOffset || document.documentElement.scrollLeft || document.body.scrollLeft,
-  //  self.pageYOffset || document.documentElement.scrollTop  || document.body.scrollTop
-  //];
-  //$('html').setAttrib('scroll-position', scrollPosition.join('|'));
-  ddrCssVar('previous-overflow', $('html').css('overflow')); //$('html').setAttrib('previous-overflow', $('html').css('overflow'));
-
-  $('html').css('overflow', 'hidden'); //window.scrollTo(scrollPosition[0], scrollPosition[1]);
+  scrollPosition = $(window).scrollTop();
+  $('body').css({
+    'overflow': 'hidden',
+    'position': 'fixed',
+    'width': '100%',
+    'top': "-".concat(scrollPosition, "px")
+  });
 };
 /*
 	Разрешить скролл
@@ -7207,18 +7207,13 @@ window.disableScroll = function () {
 
 
 window.enableScroll = function () {
-  /*var scrollPosition = $('html').attr('scroll-position');
-  if (scrollPosition) {
-  	scrollPosition = scrollPosition.split('|');
-  	$('html').css('overflow', $('html').attr('previous-overflow'));
-  	$('html').removeAttrib('scroll-position');
-  	$('html').removeAttrib('previous-overflow');
-  	$('html').removeAttrib('style');
-  	window.scrollTo(scrollPosition[0], scrollPosition[1]);
-  }*/
-  $('html').css('overflow', ddrCssVar('previous-overflow')); //$('html').removeAttrib('scroll-position');
-  //$('html').removeAttrib('previous-overflow');
-  //$('html').removeAttrib('style');
+  $('body').css({
+    'overflow': '',
+    'position': '',
+    'width': '',
+    'top': ''
+  });
+  $(window).scrollTop(scrollPosition);
 };
 /*
 	Зафиксировать элемент при скролле
@@ -8601,6 +8596,7 @@ var BlockTable = /*#__PURE__*/function () {
 /***/ (function() {
 
 $.fn.card = function (comand) {
+  var destroyWait;
   var selector = this,
       comands = {
     ready: function ready() {
@@ -8609,15 +8605,88 @@ $.fn.card = function (comand) {
         $(selector).find('[cardwait]').remove();
       }, 500);
     },
+    wait: function wait() {
+      var stat = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+
+      if (stat) {
+        var _ddrWaitObj;
+
+        ddrWaitObj = $(selector).ddrWait({
+          iconHeight: '34px',
+          bgColor: '#ffffffd1'
+        });
+        destroyWait = (_ddrWaitObj = ddrWaitObj) === null || _ddrWaitObj === void 0 ? void 0 : _ddrWaitObj.destroy;
+      }
+    },
+    clear: function clear() {
+      $(selector).children().not('[cardwait]').remove();
+    },
+    setData: function setData(data) {
+      comands.clear();
+      $(selector).prepend(data);
+    },
     disableButton: function disableButton() {
       $(selector).find('[cardbutton]').ddrInputs('disable');
     },
     enableButton: function enableButton() {
       $(selector).find('[cardbutton]').ddrInputs('enable');
+    },
+    setWidth: function setWidth() {
+      var width = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+      var cb = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+      var duration = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+
+      if (width) {
+        $(selector).setAttrib('initw', _getElementWidth(selector)); // Сохраняем начальную ширину
+        //$(selector).addClass('card_center');
+
+        $(selector).animate({
+          width: width
+        }, duration, function () {
+          if (cb) cb();
+        });
+      } else {
+        $(selector).animate({
+          width: $(selector).attr('initw') || '100%'
+        }, duration, function () {
+          $(selector).removeAttr('initw'); // Удаляем сохраненную ширину после анимации
+          //$(selector).removeClass('card_center');
+
+          if (cb) cb();
+        });
+      }
     }
   };
-  comands[comand]();
-};
+
+  if (!comands[comand]) {
+    console.error('card -> Такого метода не существует!');
+    return false;
+  }
+
+  for (var _len = arguments.length, params = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+    params[_key - 1] = arguments[_key];
+  }
+
+  comands[comand].apply(comands, params);
+  return {
+    destroyWait: destroyWait
+  };
+}; //-------------------------------------------------------------------------------------------------------
+
+
+function _getElementWidth(selector) {
+  var el = $(selector)[0]; // Получаем DOM-элемент
+
+  if (!el) return null; // Если элемента нет, возвращаем null
+
+  var computedWidth = window.getComputedStyle(el).getPropertyValue('width'); // Проверяем, установлена ли ширина явно в CSS
+
+  if (el.style.width === '') {
+    return null; // Если ширина не указана явно, возвращаем null
+  }
+
+  return computedWidth; // Возвращаем ширину, если она есть
+}
 
 /***/ }),
 
@@ -8844,7 +8913,7 @@ $.ddrCRUD = function () {
           headers: headers
         });
       })["catch"](function (e) {
-        if (cb && typeof cb == 'function') cb(false, e);
+        if (cb && typeof cb == 'function') cb(false, container, e);
       });
     },
     edit: function edit() {
@@ -8869,7 +8938,7 @@ $.ddrCRUD = function () {
           headers: headers
         });
       })["catch"](function (e) {
-        if (cb && typeof cb == 'function') cb(false, e);
+        if (cb && typeof cb == 'function') cb(false, container, e);
       });
     },
     update: function update() {
@@ -8931,7 +9000,7 @@ $.ddrCRUD = function () {
           _ref7$route = _ref7.route,
           route = _ref7$route === void 0 ? null : _ref7$route,
           _ref7$data = _ref7.data,
-          data = _ref7$data === void 0 ? false : _ref7$data,
+          data = _ref7$data === void 0 ? {} : _ref7$data,
           _ref7$responseType = _ref7.responseType,
           responseType = _ref7$responseType === void 0 ? 'json' : _ref7$responseType,
           _ref7$params = _ref7.params,
@@ -8949,6 +9018,7 @@ $.ddrCRUD = function () {
         }
       }
 
+      data['views'] = viewsPath;
       abortCtrl = new AbortController();
       axiosQuery(method, _route(route), data, responseType, abortCtrl).then(function (_ref8) {
         var data = _ref8.data,
@@ -9030,8 +9100,11 @@ $.ddrCRUD = function () {
         lastSortIndex = parseInt(headers['x-last-sort-index']);
 
         if (init) {
-          if (data) $(container).html(data);else $(container).empty();
-          if (cb && typeof cb == 'function') cb(!error);
+          if ($(container).length) {
+            if (data) $(container).html(data);else $(container).empty();
+          }
+
+          if (cb && typeof cb == 'function') cb(!error, data);
         } else {
           if (cb && typeof cb == 'function') cb(data, {
             error: error,
@@ -12428,7 +12501,7 @@ var DdrInput = /*#__PURE__*/function () {
       var _item$tagName, _item$type, _item$type$toLowerCas;
 
       var tag = item === null || item === void 0 ? void 0 : (_item$tagName = item.tagName) === null || _item$tagName === void 0 ? void 0 : _item$tagName.toLowerCase(),
-          type = typeof $(item).attr('contenteditable') !== 'undefined' ? 'contenteditable' : item !== null && item !== void 0 && item.type ? item === null || item === void 0 ? void 0 : (_item$type = item.type) === null || _item$type === void 0 ? void 0 : (_item$type$toLowerCas = _item$type.toLowerCase()) === null || _item$type$toLowerCas === void 0 ? void 0 : _item$type$toLowerCas.replace('select-one', 'select') : null,
+          type = $(item).attr('tagname') !== 'undefined' ? $(item).attr('tagname') : typeof $(item).attr('contenteditable') !== 'undefined' ? 'contenteditable' : item !== null && item !== void 0 && item.type ? item === null || item === void 0 ? void 0 : (_item$type = item.type) === null || _item$type === void 0 ? void 0 : (_item$type$toLowerCas = _item$type.toLowerCase()) === null || _item$type$toLowerCas === void 0 ? void 0 : _item$type$toLowerCas.replace('select-one', 'select') : null,
           group = typeof $(item).attr('inpgroup') !== 'undefined' ? $(item).attr('inpgroup') + '-' : '',
           wrapperClass = findWrapByInputType.indexOf(type) !== -1 ? group + type : group + tag,
           wrapperSelector = $(item).closest('.' + wrapperClass).length ? $(item).closest('.' + wrapperClass) : false;
@@ -12614,6 +12687,14 @@ var DdrInput = /*#__PURE__*/function () {
             group = _ref3.group,
             wrapperClass = _ref3.wrapperClass,
             wrapperSelector = _ref3.wrapperSelector;
+        console.log({
+          item: item,
+          tag: tag,
+          type: type,
+          group: group,
+          wrapperClass: wrapperClass,
+          wrapperSelector: wrapperSelector
+        });
 
         if (wrapperSelector) {
           if ($(wrapperSelector).hasClass(wrapperClass + '_disabled') === false) $(wrapperSelector).addClass(wrapperClass + '_disabled');
@@ -13322,6 +13403,11 @@ window.ddrPopup = function () {
         if (callback && typeof callback == 'function') callback();
       });
     },
+    onCancel: function onCancel(callback) {
+      $(ddrPopupSelector).on('ddrpopup:cancel', function () {
+        if (callback && typeof callback == 'function') callback();
+      });
+    },
     onScroll: function onScroll(callback) {
       var latency = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 100;
       $(ddrPopupSelector).on("scrollstart", function () {
@@ -13434,7 +13520,11 @@ window.ddrPopup = function () {
     $(ddrPopupSelector).on(evEnd, function (e) {
       if (target == (e === null || e === void 0 ? void 0 : e.target) && tapEventInfo(e, {
         attribute: 'ddrpopupwrap'
-      })) _close();
+      })) {
+        _close();
+
+        $(ddrPopupSelector).trigger('ddrpopup:cancel');
+      }
     });
     $(ddrPopupSelector).find('[ddrpopupwin], [ddrpopupdialog]').on(evEnd, function (e) {
       e.stopPropagation();
@@ -13446,6 +13536,8 @@ window.ddrPopup = function () {
   }
 
   $(ddrPopupSelector).on(tapEvent, '[ddrpopupclose]', function (e) {
+    $(ddrPopupSelector).trigger('ddrpopup:cancel');
+
     _close();
   }); //------------------------------------------------------------------------------------------------
 

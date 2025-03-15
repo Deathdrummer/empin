@@ -16,7 +16,7 @@ _.mixin({
 
 
 /* Глобальные переменные */
-window.findWrapByInputType = ['file', 'checkbox', 'radio', 'contenteditable']; // plugins/ddrInputs: искать обрамляющие селекторы по типу, а не по тегу
+window.findWrapByInputType = ['file', 'checkbox', 'toggle', 'radio', 'contenteditable']; // plugins/ddrInputs: искать обрамляющие селекторы по типу, а не по тегу
 
 
 jQuery.expr[":"].icontains = jQuery.expr.createPseudo(function(arg) {

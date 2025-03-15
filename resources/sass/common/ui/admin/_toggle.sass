@@ -1,0 +1,85 @@
+$toggle-width: 44px // соответствует w-11 (11 * 4px)
+$toggle-height: 24px // соответствует h-6 (6 * 4px)
+$toggle-bg-off: #dbdbeb // серый фон выключенного состояния
+$toggle-bg-on:  #9c6481 // синий фон включенного состояния
+$toggle-thumb-size: 20px // соответствует w-5/h-5 (5 * 4px)
+$toggle-thumb-bg: #ffffff
+$toggle-thumb-border: #fafafa
+$toggle-transition-duration: 0.2s
+$toggle-padding: 2px // отступ для позиционирования кружка
+
+
+
+
+.toggle
+	position: relative
+	display: inline-flex
+	align-items: center
+	
+	&:not(.large-toggle_disabled)
+		cursor: pointer
+
+// Скрываем стандартный чекбокс, но оставляем его функциональность
+input[type="checkbox"]
+	position: absolute
+	width: 100%
+	height: 100%
+	opacity: 0
+	margin: 0
+	z-index: 2
+	
+
+
+.toggle-switch 
+	width: $toggle-width
+	height: $toggle-height
+	background-color: $toggle-bg-off
+	border-radius: $toggle-height // чтобы получился полный скругленный фон
+	position: relative
+	transition: background-color $toggle-transition-duration ease
+	
+input[type="checkbox"]:disabled
+	~ .toggle-switch
+		background-color: #ededed
+		pointer-events: none
+		
+		.toggle-thumb
+			box-shadow: none
+		
+	
+	
+
+
+.toggle-thumb
+	position: absolute
+	top: $toggle-padding
+	left: $toggle-padding
+	width: $toggle-thumb-size
+	height: $toggle-thumb-size
+	background-color: $toggle-thumb-bg
+	border: 1px solid $toggle-thumb-border
+	border-radius: 50%
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3)
+	transition: transform $toggle-transition-duration ease
+
+
+// При включенном состоянии: фон переключателя становится синим
+// и кружок перемещается вправо
+input[type="checkbox"]
+	&:checked
+		&:not(:disabled) + .toggle-switch
+			background-color: $toggle-bg-on
+		
+		&:disabled + .toggle-switch
+			background-color: #d1b9c5
+		
+		
+
+
+input[type="checkbox"]:checked + .toggle-switch .toggle-thumb
+	transform: translateX(20px)
+
+
+// Фокус (если требуется выделение)
+input[type="checkbox"]:focus + .toggle-switch
+	box-shadow: 0 0 0 2px #fff
