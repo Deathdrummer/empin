@@ -45,8 +45,7 @@ class User extends Authenticatable implements MustVerifyEmail {
      * @var array
      */
 	protected $fillable = [
-		'name',
-		'pseudoname',
+		'staff_id',
 		'email',
 		'password',
 		'locale',
@@ -56,7 +55,6 @@ class User extends Authenticatable implements MustVerifyEmail {
 		'contract_colums',
 		'contract_deps',
 		'settings',
-		'_sort',
 	];
 	
 	
@@ -66,9 +64,9 @@ class User extends Authenticatable implements MustVerifyEmail {
      * @var array
      */
 	protected $casts = [
-        'contract_colums' => 'array',
-        'contract_deps' => 'array',
-        'settings' => 'array',
+        'contract_colums' 	=> 'array',
+        'contract_deps' 	=> 'array',
+        'settings' 			=> 'array',
     ];
 	
 	
@@ -139,8 +137,8 @@ class User extends Authenticatable implements MustVerifyEmail {
 	 * @param 
 	 * @return 
 	 */
-	public function getEmailAttribute($email) {
-		return decodeEmail($email);
+	public function getEmailAttribute($email = null) {
+		return $email ? decodeEmail($email) : null;
 	}
 	
 	
@@ -191,6 +189,20 @@ class User extends Authenticatable implements MustVerifyEmail {
 		$this->notify(new ResetPassword($token, 'site'));
 	}
 	
+	
+	
+	
+	
+	
+	/**
+	* 
+	* @param 
+	* @return 
+	*/
+	public function scopeFromStaff($query, $userId = false) {
+		if (!$userId) return $query;
+		return $query->where('staff_id', $userId);
+	}
 	
 	
 	

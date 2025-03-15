@@ -364,7 +364,7 @@ if (!function_exists('arrGetFirstItem')) {
 	 * @param array $inputArray  массив
 	 * @return mixed  первое значение массива
 	*/
-	function arrGetFirstItem(array|Collection $inputArray):mixed {
+	function arrGetFirstItem(array|Collection|null $inputArray):mixed {
 		if (!$inputArray) return null;
 		if ($inputArray instanceof Collection) return $inputArray?->first();
  		return reset($inputArray);

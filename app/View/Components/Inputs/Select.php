@@ -33,7 +33,7 @@ class Select extends Component {
 		array $exclude = [],
 		mixed $showactive = null,
 		string $choose = 'Выбрать...',
-		string $empty = null,
+		?string $empty = null,
 		$chooseEmpty = null,
 		$emptyHasValue = null,
 		?string $action = null,
@@ -55,7 +55,6 @@ class Select extends Component {
 		$options = $options instanceof Collection ? $options?->toArray() : $options;
 		
 		$firstItem = arrGetFirstItem($options);
-		
 		
 		if ($firstItem) {
 			if (is_array($firstItem)) {

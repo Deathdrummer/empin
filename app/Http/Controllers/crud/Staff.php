@@ -75,7 +75,7 @@ class Staff extends Controller {
 		
 		$list = User::with('roles:id')
 			->withExists(['roles as hasRoles', 'permissions as hasPermissions'])
-			->where(['dismissed' => 0])
+			//->where(['dismissed' => 0])
 			->orderBy('_sort', 'ASC')
 			->get();
 		

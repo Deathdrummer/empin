@@ -2,6 +2,8 @@
 
 use App\Models\Department as DepartmentModel;
 use App\Http\Filters\DepartmentFilter;
+use App\Models\ListUser;
+use App\Models\Staff;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Builder;
@@ -172,13 +174,36 @@ class Department {
 		
 		if (empty($depsIds)) return [];
 		
-		$depsUsers = User::whereIn('department_id', $depsIds)
+		$staffLists = ListUser::getStaffLists();
+		
+		$depsUsers = Staff::whereHas('registred', function ($query) use ($depsIds) {
+				$query->whereIn('department_id', $depsIds);
+			})
+			->with(['registred' => function ($query) {
+				$query->select('id', 'staff_id', 'department_id');
+			}])
 			->get()
-			->mapToGroups(function ($item, $key) use($userFields) {
-				return [$item['department_id'] => $this->_buildUserArray($item, $userFields)];
+			->mapWithKeys(function ($item, $key) {
+				return [$item['id'] => $item];
 			});
-		//toLog($depsUsers);
-		return $depsUsers;
+			/* ->mapToGroups(function ($item, $key) use ($userFields, $staffLists) {
+				$staffLists
+				
+				
+				return [$item->department_id => $this->_buildUserArray($item, $userFields)];
+			}) */;
+		
+		$depsListsUsers = $staffLists->mapWithKeys(function ($listsIds, $staffId) use ($depsUsers, $userFields) {
+			$user = $depsUsers[$staffId];
+			$grouped = [];
+			foreach ($listsIds as $lId) {
+				// Группируем по department_id -> list_id
+				$grouped[$user->department_id][$lId][] = $this->_buildUserArray($user, $userFields);
+			}
+			return $grouped;
+		})->toArray();
+		
+		return $depsListsUsers;
 	}
 	
 	

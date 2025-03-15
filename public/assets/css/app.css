@@ -46146,6 +46146,26 @@ template {
   color: #fff;
   fill: #fff;
 }
+.bg-hovered-lighten {
+  transition: filter 0.16s;
+}
+.bg-hovered-lighten:hover {
+  filter: brightness(1.01);
+}
+.bg-hovered-lighten:active {
+  filter: brightness(1.02);
+  transition: filter 0s;
+}
+.bg-hovered-darken {
+  transition: filter 0.16s;
+}
+.bg-hovered-darken:hover {
+  filter: brightness(0.99);
+}
+.bg-hovered-darken:active {
+  filter: brightness(0.98);
+  transition: filter 0s;
+}
 
 .color-black {
   color: #3d3e4e;
@@ -46413,6 +46433,26 @@ template {
   color: #6a6b76 !important;
   transition: color 0s !important;
 }
+.color-hovered-lighten {
+  transition: filter 0.16s;
+}
+.color-hovered-lighten:hover {
+  filter: brightness(1.1);
+}
+.color-hovered-lighten:active {
+  filter: brightness(1.2);
+  transition: filter 0s;
+}
+.color-hovered-darken {
+  transition: filter 0.16s;
+}
+.color-hovered-darken:hover {
+  filter: brightness(0.9);
+}
+.color-hovered-darken:active {
+  filter: brightness(0.8);
+  transition: filter 0s;
+}
 
 .border-left {
   border-left: 1px solid !important;
@@ -46536,6 +46576,26 @@ template {
 }
 .border-blue {
   border-color: #00abff !important;
+}
+.border-hovered-lighten {
+  transition: filter 0.16s;
+}
+.border-hovered-lighten:hover {
+  filter: brightness(1.1);
+}
+.border-hovered-lighten:active {
+  filter: brightness(1.2);
+  transition: filter 0s;
+}
+.border-hovered-darken {
+  transition: filter 0.16s;
+}
+.border-hovered-darken:hover {
+  filter: brightness(0.9);
+}
+.border-hovered-darken:active {
+  filter: brightness(0.8);
+  transition: filter 0s;
 }
 
 .w-0, .w0 {

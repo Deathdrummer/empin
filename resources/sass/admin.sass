@@ -537,6 +537,11 @@ section
 	//	opacity: 1
 	//	pointer-events: auto
 	
+	&_center
+		margin-right: auto
+		margin-left: auto
+	
+	
 	
 	&__wait
 		position: absolute
@@ -554,6 +559,10 @@ section
 		&_closing
 			opacity: 0
 			transition: opacity 0.3s ease 0.2s
+		
+		&_firstclosing
+			opacity: 0
+			transition: opacity 0.2s ease
 	
 	
 	.cardwait

@@ -1444,46 +1444,38 @@ window.setTagAttribute = function(attrName = null, rules = null, joinSign = ' ')
 
 
 
+
+
+
+
+
+let scrollPosition = 0;
+
 /*
 	Запретить скролл
 */
 window.disableScroll = function() {
-	//var scrollPosition = [
-	//  self.pageXOffset || document.documentElement.scrollLeft || document.body.scrollLeft,
-	//  self.pageYOffset || document.documentElement.scrollTop  || document.body.scrollTop
-	//];
-
-	//$('html').setAttrib('scroll-position', scrollPosition.join('|'));
-	ddrCssVar('previous-overflow', $('html').css('overflow'));
-	//$('html').setAttrib('previous-overflow', $('html').css('overflow'));
-	$('html').css('overflow', 'hidden');
-	//window.scrollTo(scrollPosition[0], scrollPosition[1]);
+    scrollPosition = $(window).scrollTop();
+    $('body').css({
+        'overflow': 'hidden',
+        'position': 'fixed',
+        'width': '100%',
+        'top': `-${scrollPosition}px`
+    });
 }
-
-
-
 
 /*
 	Разрешить скролл
 */
 window.enableScroll = function() {
-	/*var scrollPosition = $('html').attr('scroll-position');
-	if (scrollPosition) {
-		scrollPosition = scrollPosition.split('|');
-		$('html').css('overflow', $('html').attr('previous-overflow'));
-		$('html').removeAttrib('scroll-position');
-		$('html').removeAttrib('previous-overflow');
-		$('html').removeAttrib('style');
-		window.scrollTo(scrollPosition[0], scrollPosition[1]);
-	}*/
-	
-	$('html').css('overflow', ddrCssVar('previous-overflow'));
-	//$('html').removeAttrib('scroll-position');
-	//$('html').removeAttrib('previous-overflow');
-	//$('html').removeAttrib('style');
+    $('body').css({
+        'overflow': '',
+        'position': '',
+        'width': '',
+        'top': ''
+    });
+    $(window).scrollTop(scrollPosition);
 }
-
-
 
 
 

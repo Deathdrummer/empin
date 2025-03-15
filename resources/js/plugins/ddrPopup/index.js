@@ -148,6 +148,11 @@ window.ddrPopup = function(settings = {}, callback = false) {
 				if (callback && typeof callback == 'function') callback();
 			});
 		},
+		onCancel(callback) {
+			$(ddrPopupSelector).on('ddrpopup:cancel', () => {
+				if (callback && typeof callback == 'function') callback();
+			});
+		},
 		onScroll(callback, latency = 100) {
 			$(ddrPopupSelector).on("scrollstart", function() {
 				if (callback && typeof callback == 'function') callback('start');
@@ -264,7 +269,10 @@ window.ddrPopup = function(settings = {}, callback = false) {
 		});
 		
 		$(ddrPopupSelector).on(evEnd, function(e) {
-			if (target == e?.target && tapEventInfo(e, {attribute: 'ddrpopupwrap'})) _close();
+			if (target == e?.target && tapEventInfo(e, {attribute: 'ddrpopupwrap'})) {
+				_close();
+				$(ddrPopupSelector).trigger('ddrpopup:cancel');
+			} 
 		});
 		
 		$(ddrPopupSelector).find('[ddrpopupwin], [ddrpopupdialog]').on(evEnd, function(e) {
@@ -279,6 +287,7 @@ window.ddrPopup = function(settings = {}, callback = false) {
 	
 	
 	$(ddrPopupSelector).on(tapEvent, '[ddrpopupclose]', function(e) {
+		$(ddrPopupSelector).trigger('ddrpopup:cancel');
 		_close();
 	});
 	

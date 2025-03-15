@@ -13,6 +13,7 @@ use App\View\Components\Inputs\Localebar;
 use App\View\Components\Inputs\Textarea;
 use App\View\Components\Inputs\Radio;
 use App\View\Components\Inputs\Select;
+use App\View\Components\Inputs\Toggle;
 use App\View\Components\Settings;
 use App\View\Components\Simplelist;
 use App\View\Components\Tabs;
@@ -67,6 +68,7 @@ class AppServiceProvider extends ServiceProvider
 		Blade::component('input', Input::class);
 		Blade::component('textarea', Textarea::class);
 		Blade::component('checkbox', Checkbox::class);
+		Blade::component('toggle', Toggle::class);
 		Blade::component('radio', Radio::class);
 		Blade::component('select', Select::class);
 		Blade::component('file', File::class);

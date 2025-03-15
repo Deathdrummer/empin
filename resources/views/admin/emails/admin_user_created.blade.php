@@ -1,5 +1,5 @@
 @isset($adminUser['password'])
-	<h2>Вы зарегистрироны в системе.</h2>
+	<h2>Вы зарегистрированы в системе!</h2>
 	<p>Email: {{$adminUser['email']}}</p>
 	<p>Ваш пароль: {{$adminUser['password']}}</p>
 	<p><a href="{{url('/admin')}}">Войти в систему</a></p>

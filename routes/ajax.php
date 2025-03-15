@@ -12,6 +12,7 @@ use App\Http\Controllers\crud\Roles;
 use App\Http\Controllers\crud\Staff;
 use App\Http\Controllers\crud\Steps;
 use App\Http\Controllers\crud\StepsPatterns;
+use App\Http\Controllers\crud\UsersNew;
 use App\Http\Controllers\SiteParserController;
 use App\Http\Controllers\TabsController;
 use App\Http\Controllers\UploadFilesController;
@@ -119,6 +120,29 @@ Route::put('/staff/permissions', [Staff::class, 'set_permissions']);
 Route::middleware('lang')->post('/staff/send_email', [Staff::class, 'send_email']);
 Route::post('/staff/store_show', [Staff::class, 'store_show']);
 Route::resource('staff', Staff::class);
+
+
+// Сотрудники нов.
+Route::post('/users_new/permissions', [UsersNew::class, 'permissions']);
+Route::put('/users_new/permissions', [UsersNew::class, 'set_permissions']);
+
+Route::get('users_new/reg_staff_to_user', [UsersNew::class, 'get_staff_to_user_form']);
+Route::post('users_new/reg_staff_to_user', [UsersNew::class, 'reg_staff_to_user']);
+Route::delete('users_new/reg_staff_to_user', [UsersNew::class, 'unreg_user_from_staff']);
+
+Route::get('users_new/change_user_email', [UsersNew::class, 'get_user_email']);
+Route::post('users_new/change_user_email', [UsersNew::class, 'change_user_email']);
+Route::post('/users_new/send_email', [UsersNew::class, 'send_email']);
+
+Route::post('/users_new/set_role', [UsersNew::class, 'set_role']);
+Route::post('/users_new/set_department', [UsersNew::class, 'set_department']);
+
+Route::post('/users_new/list_user', [UsersNew::class, 'add_to_list_user']);
+Route::delete('/users_new/list_user', [UsersNew::class, 'remove_from_list_user']);
+
+
+Route::post('/users_new/store_show', [UsersNew::class, 'store_show']);
+Route::resource('users_new', UsersNew::class);
 
 
 

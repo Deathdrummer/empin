@@ -68,6 +68,7 @@
 							disabled="{{$button['disabled'] ?? $disabledButtons}}"
 							action="{{$button['action'] ?? false}}"
 							id="{{$button['id'] ?? false}}"
+							tag="{{$button['tag'] ?? false}}"
 							>{{__($button['title'])}}</x-button>
 					@else
 						<x-button
