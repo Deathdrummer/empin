@@ -2793,9 +2793,6 @@
 
 	function getList(settings) {
 		if (abortCtrl instanceof AbortController) abortCtrl.abort();
-
-
-		console.log(settings);
 		let {
 			init,
 			withCounts,
@@ -2885,7 +2882,6 @@
 			$('.chooser__item').addClass('searchcontractcounts');
 		}
 		
-
 		abortCtrl = new AbortController();
 		axiosQuery('get', 'site/contracts', params, 'text', abortCtrl).then(({data, error, status, headers, abort}) => {
 			if (error) {

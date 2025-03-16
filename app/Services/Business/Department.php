@@ -194,10 +194,11 @@ class Department {
 			}) */;
 		
 		$depsListsUsers = $staffLists->mapWithKeys(function ($listsIds, $staffId) use ($depsUsers, $userFields) {
-			$user = $depsUsers[$staffId];
 			$grouped = [];
+			
+			if (!$user = $depsUsers[$staffId] ?? false) return $grouped;
+			
 			foreach ($listsIds as $lId) {
-				// Группируем по department_id -> list_id
 				$grouped[$user->department_id][$lId][] = $this->_buildUserArray($user, $userFields);
 			}
 			return $grouped;
