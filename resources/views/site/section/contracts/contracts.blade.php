@@ -1330,7 +1330,6 @@
 	//---------------------------------------------------------------------------------  Заполнение данных договоров
 	let contractSetDataTOut, oldInputId = null;
 	$.contractSetData = (input, contractId, departmentId, stepId, type) => {
-		console.log('contractSetData');
 		let cell = type == 5 ? $(`[deptlights^="${contractId},${departmentId},${stepId}"]`) : $(input).closest('[ddrtabletd]');
 
 		$(input).ddrInputs('addClass', 'notouch');
@@ -1381,6 +1380,8 @@
 				default:
 					break;
 			}
+			
+			console.log({contractId, departmentId, stepId, type, value});
 
 			axiosQuery('put', 'site/contracts', {contractId, departmentId, stepId, type, value}).then(({data, error, status, headers}) => {
 				if (error) {
