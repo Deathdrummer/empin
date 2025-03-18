@@ -397,6 +397,7 @@ class Selections extends Controller {
 		$subscribed = request('subscribed') ?: false;
 		
 		$depsUsers = $this->user->getWithDepartments(false, auth('site')->user()->id);
+		
 		$departments = $this->department->getAll()->keyBy('id');
 		
 		return $this->view($viewsPath.'.users', compact('depsUsers', 'departments', 'selectionId', 'subscribed'));
