@@ -1767,6 +1767,7 @@ class Contracts extends Controller {
 		$this->data['deps_users'] = [];
 		if (!$alldeps) return false;
 		$depsUsers = $this->department->getUsersToAssign($alldeps, ['id:value', 'full_name:title', 'dismissed:disabled', 'dismissed:hidden']);
+		
 		$this->data['deps_users'] = $depsUsers ?? [];
 	}
 	

@@ -184,20 +184,20 @@ class Department {
 			->mapWithKeys(function ($item, $key) {
 				return [$item['id'] => $item];
 			});
+			
 		
-		$depsListsUsers = ListUser::getStaffLists()
-			->mapWithKeys(function ($listsIds, $staffId) use ($depsUsers, $userFields) {
-				$grouped = [];
-				
-				if (!$user = $depsUsers[$staffId] ?? false) return $grouped;
-				
-				foreach ($listsIds as $lId) {
-					$grouped[$user->department_id][$lId][] = $this->_buildUserArray($user, $userFields);
-				}
-				return $grouped;
-			})->toArray();
+		$staffLists = ListUser::getStaffLists();
 		
-		return $depsListsUsers;
+		$result = [];
+		$staffLists->each(function ($listsIds, $staffId) use ($depsUsers, $userFields, &$result) {
+			if (!$user = $depsUsers[$staffId] ?? false) return false;
+			
+			foreach ($listsIds as $lId) {
+				$result[$user->department_id][$lId][] = $this->_buildUserArray($user, $userFields);
+			}
+		});
+		
+		return $result;
 	}
 	
 	
