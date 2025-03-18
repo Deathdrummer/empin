@@ -84,7 +84,7 @@ class Staff extends Model {
 	
 	
 	public function getDepartmentIdAttribute() {
-        return optional($this->registred)->first()?->department_id ?? null;
+        return optional($this->registred)->department_id;
     }
 	
 	

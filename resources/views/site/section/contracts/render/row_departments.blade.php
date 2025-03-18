@@ -70,6 +70,7 @@
 					edited="{{$edited}}"
 					>
 					@if($edited && auth('site')->user()->can('contract-choose-employee:site'))
+						{{-- contractId departmentId stepId stepType --}}
 						<x-select
 							group="small"
 							:options="$deps_users[$dept['id']][$step['id']] ?? null"

@@ -174,8 +174,6 @@ class Department {
 		
 		if (empty($depsIds)) return [];
 		
-		$staffLists = ListUser::getStaffLists();
-		
 		$depsUsers = Staff::whereHas('registred', function ($query) use ($depsIds) {
 				$query->whereIn('department_id', $depsIds);
 			})
@@ -186,23 +184,18 @@ class Department {
 			->mapWithKeys(function ($item, $key) {
 				return [$item['id'] => $item];
 			});
-			/* ->mapToGroups(function ($item, $key) use ($userFields, $staffLists) {
-				$staffLists
-				
-				
-				return [$item->department_id => $this->_buildUserArray($item, $userFields)];
-			}) */;
 		
-		$depsListsUsers = $staffLists->mapWithKeys(function ($listsIds, $staffId) use ($depsUsers, $userFields) {
-			$grouped = [];
-			
-			if (!$user = $depsUsers[$staffId] ?? false) return $grouped;
-			
-			foreach ($listsIds as $lId) {
-				$grouped[$user->department_id][$lId][] = $this->_buildUserArray($user, $userFields);
-			}
-			return $grouped;
-		})->toArray();
+		$depsListsUsers = ListUser::getStaffLists()
+			->mapWithKeys(function ($listsIds, $staffId) use ($depsUsers, $userFields) {
+				$grouped = [];
+				
+				if (!$user = $depsUsers[$staffId] ?? false) return $grouped;
+				
+				foreach ($listsIds as $lId) {
+					$grouped[$user->department_id][$lId][] = $this->_buildUserArray($user, $userFields);
+				}
+				return $grouped;
+			})->toArray();
 		
 		return $depsListsUsers;
 	}
