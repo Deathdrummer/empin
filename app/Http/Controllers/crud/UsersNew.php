@@ -77,10 +77,10 @@ class UsersNew extends Controller {
 		if (!$viewPath) return response()->json(['no_view' => true]);
 		
 		$list = Staff::select(['id', 'fname', 'sname', 'mname', 'work_post'])
+			->with('registred:id,staff_id,department_id')
 			->working()
 			->withExists('registred as is_registred')
 			->get();
-		
 		
 		$itemView = $viewPath.'.item';
 		

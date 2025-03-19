@@ -50,7 +50,7 @@ class Staff extends Model {
 	public $timestamps = true;
 	
 	
-	protected $appends = ['full_name', 'department_id'];
+	protected $appends = ['full_name'];
 	
 	
 	
@@ -82,10 +82,6 @@ class Staff extends Model {
         return "{$this->sname} {$this->fname} {$this->mname}";
     }
 	
-	
-	public function getDepartmentIdAttribute() {
-        return optional($this->registred)->department_id;
-    }
 	
 	
 	
