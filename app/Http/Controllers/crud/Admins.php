@@ -74,8 +74,8 @@ class Admins extends Controller {
 		
 		$list = AdminUser::with('roles:id')
 			->withExists(['roles as hasRoles', 'permissions as hasPermissions'])
-			->where('id', '!=', Auth::guard('admin')->user()->id)
-			->where('is_main_admin', '!=', 1)
+			//->where('id', '!=', Auth::guard('admin')->user()->id)
+			//->where('is_main_admin', '!=', 1)
 			->orderBy('_sort', 'ASC')
 			->get();
 		
