@@ -51,7 +51,7 @@
 					@forelse($users as $user)
 						<x-list.item>
 							<div class="d-flex align-items-center justify-content-between border-bottom border-gray-300">
-								<p>{{$user['pseudoname']}}</p>
+								<p>{{$user['full_name']}}</p>
 								
 								<div class="row align-items-center gx-6">
 									<div class="col">

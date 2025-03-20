@@ -396,7 +396,7 @@ class Selections extends Controller {
 		
 		$subscribed = request('subscribed') ?: false;
 		
-		$depsUsers = $this->user->getWithDepartments(false, auth('site')->user()->id);
+		$depsUsers = $this->user->get(excludeUsers: [auth('site')->user()->id], fields: ['full_name', 'department_id'], groupBy: 'department_id');
 		
 		$departments = $this->department->getAll()->keyBy('id');
 		
