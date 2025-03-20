@@ -20,17 +20,28 @@ class User {
 	* @param array|null $userFields Поля из таблицы users (по умолчанию все, кроме исключенных)
 	* @return \Illuminate\Support\Collection Коллекция объединенных данных сотрудников
 	*/
-	public function get(?array $fields = [], array|Collection $departments = [], ?bool $registred = null, $keyBy = null) {
+	public function get(
+		?array $fields = [],
+		mixed $departments = null,
+		?bool $registred = null,
+		$keyBy = null,
+		$groupBy = null,
+		?array $excludeUsers = null,
+		string $orderBy = '_sort') {
 		return Staff::with('registred')
-			->when($departments, function($query) use($departments) {
-				$query->whereHas('registred', function ($q) use ($departments) {
-					$q->whereIn('department_id', $departments);
+			->whereHas('registred', function ($query) use ($departments, $excludeUsers) {
+				if ($departments == -1) $query->whereNull('department_id');
+				elseif ($departments) $query->whereIn('department_id', (array)$departments);
+				
+				$query->when($excludeUsers, function($q) use($excludeUsers) {
+					$q->whereNotIn('id', (array)$excludeUsers);
 				});
-			}, function($query) use($registred) {
+			})
+			->when(!is_null($registred), function($query) use($registred) {
 				if ($registred === true) $query->whereHas('registred');
 				elseif ($registred === false) $query->whereDoesntHave('registred');
-				else return $query;
 			})
+			->orderBy($orderBy)
 			->get()
 			->map(function($item) use ($fields) {
 				// Базовые обязательные поля
@@ -69,7 +80,10 @@ class User {
 
 				return $result;
 			})
-			->keyBy($keyBy ?? 'id'); // Делаем id ключом массива
+			->keyBy($keyBy ?? 'id')
+			->when($groupBy, function ($collection) use ($groupBy) {
+				return $collection->groupBy($groupBy);
+			}); // Делаем id ключом массива
 	}
 	
 	
@@ -81,7 +95,12 @@ class User {
 	 * @param 
 	 * @return 
 	 */
-	public function getWithDepartments($depId = false, $excludeUsers = []) {
+	/* public function getWithDepartments($depId = false, $excludeUsers = []) {
+		
+		$usersService = app()->make(User::class);
+		
+		$depsUsers = $usersService->get(fields: ['department_id', 'full_name', 'fname', 'working'], registred: true, departments: [$depId]);
+		
 		return Usermodel::when($depId, function($query) use($depId) {
 				if ($depId == -1) $query->whereNull('department_id');
 				else $query->where('department_id', $depId);
@@ -92,7 +111,11 @@ class User {
 			->orderBy('_sort')
 			->get()
 			->groupBy('department_id', false);
-	}
+	} */
+	
+	
+	
+	
 	
 	
 	

@@ -309,7 +309,6 @@ export function selectionsList(selection, editSelection, _clearCounts, getList, 
 				//--------------------------------- Поделиться подборкой с другими сотрудниками
 				let statusesTooltip, destroyTooltip, sharePopper;
 				$.selectionShare = (btn, selection_id, subscribed = false) => {
-					
 					statusesTooltip = $(btn).ddrTooltip({
 						cls: 'w30rem',
 						placement: 'left-start',
