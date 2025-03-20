@@ -84,7 +84,7 @@ class User extends Authenticatable implements MustVerifyEmail {
 	
 	
 	
-	protected $appends = ['name', 'pseudoname'];
+	//protected $appends = ['name', 'pseudoname'];
 	
 	
 	
@@ -123,20 +123,6 @@ class User extends Authenticatable implements MustVerifyEmail {
 		return $this->belongsTo(Staff::class, 'staff_id', 'id');
 	}
 	
-	
-	
-	
-	public function getPseudonameAttribute() {
-		$info = optional($this->userinfo);
-        return "{$info?->sname} {$info?->fname} {$info?->mname}";
-    }
-	
-	
-	
-	public function getNameAttribute() {
-		$info = optional($this->userInfo);
-        return "{$info?->sname} {$info?->fname} {$info?->mname}";
-    }
 	
 	
 	

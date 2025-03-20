@@ -5,11 +5,74 @@ use App\Models\User as Usermodel;
 use App\Models\ContractCellComment as ContractCellCommentModel;
 use App\Models\Contract as Contractmodel;
 use App\Models\ContractSelectedColor;
+use App\Models\Staff;
 use App\Services\Settings;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Collection;
 
 class User {
+	
+	
+	/**
+	* Получает данные сотрудников с возможностью фильтрации полей
+	*
+	* @param array|null $staffFields Поля из таблицы staff (по умолчанию все, кроме исключенных)
+	* @param array|null $userFields Поля из таблицы users (по умолчанию все, кроме исключенных)
+	* @return \Illuminate\Support\Collection Коллекция объединенных данных сотрудников
+	*/
+	public function get(?array $fields = [], array|Collection $departments = [], ?bool $registred = null, $keyBy = null) {
+		return Staff::with('registred')
+			->when($departments, function($query) use($departments) {
+				$query->whereHas('registred', function ($q) use ($departments) {
+					$q->whereIn('department_id', $departments);
+				});
+			}, function($query) use($registred) {
+				if ($registred === true) $query->whereHas('registred');
+				elseif ($registred === false) $query->whereDoesntHave('registred');
+				else return $query;
+			})
+			->get()
+			->map(function($item) use ($fields) {
+				// Базовые обязательные поля
+				$result = [
+					'id' => $item->registred?->id,
+					'staff_id' => $item->registred?->staff_id,
+				];
+
+				// Если поля не указаны - берем все доступные
+				if (empty($fields)) {
+					// Добавляем все поля из Staff (включая аксессоры)
+					foreach ($item->toArray() as $key => $value) {
+						if (!in_array($key, ['id', '_sort', 'created_at', 'updated_at', 'registred'])) {
+							$result[$key] = $value;
+						}
+					}
+
+					// Добавляем все поля из registred (User)
+					if ($item->registred) {
+						foreach ($item->registred->toArray() as $key => $value) {
+							if (!in_array($key, ['password', 'remember_token', 'id', 'staff_id'])) {
+								$result[$key] = $value;
+							}
+						}
+					}
+				} else {
+					// Иначе - добавляем только указанные поля
+					foreach ($fields as $field) {
+						if (isset($item->$field)) {
+							$result[$field] = $item->$field;
+						} elseif ($item->registred && isset($item->registred->$field)) {
+							$result[$field] = $item->registred->$field;
+						}
+					}
+				}
+
+				return $result;
+			})
+			->keyBy($keyBy ?? 'id'); // Делаем id ключом массива
+	}
+	
+	
 	
 	
 	

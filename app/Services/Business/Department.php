@@ -5,6 +5,7 @@ use App\Http\Filters\DepartmentFilter;
 use App\Models\ListUser;
 use App\Models\Staff;
 use App\Models\User;
+use App\Services\Business\User as BusinessUser;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -174,26 +175,18 @@ class Department {
 		
 		if (empty($depsIds)) return [];
 		
-		$depsUsers = Staff::whereHas('registred', function ($query) use ($depsIds) {
-				$query->whereIn('department_id', $depsIds);
-			})
-			->with(['registred' => function ($query) {
-				$query->select('id', 'staff_id', 'department_id');
-			}])
-			->get()
-			->mapWithKeys(function ($item, $key) {
-				return [$item['id'] => $item];
-			});
-			
+		
+		$usersService = app()->make(BusinessUser::class);
+		
+		$depsUsers = $usersService->get(fields: ['department_id', 'full_name', 'fname', 'working'], registred: true, departments: $depsIds);
 		
 		$staffLists = ListUser::getStaffLists();
 		
 		$result = [];
 		$staffLists->each(function ($listsIds, $staffId) use ($depsUsers, $userFields, &$result) {
 			if (!$user = $depsUsers[$staffId] ?? false) return false;
-			
 			foreach ($listsIds as $lId) {
-				$result[$user->department_id][$lId][] = $this->_buildUserArray($user, $userFields);
+				$result[$user['department_id']][$lId][] = $this->_buildUserArray($user, $userFields);
 			}
 		});
 		
@@ -202,6 +195,16 @@ class Department {
 	
 	
 	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	//-----------------------------------------------------------------------------------------------------------------------------------
 	
 	/**
 	 * @param 

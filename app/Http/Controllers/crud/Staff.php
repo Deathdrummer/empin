@@ -243,7 +243,7 @@ class Staff extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function destroy(?int $id = null) {
-		$stat = User::where('id', $id)->update(['dismissed' => 1, 'password' => null, 'temporary_password' => null, 'remember_token' => null]);
+		$stat = User::where('id', $id)->update(['working' => 0, 'password' => null, 'temporary_password' => null, 'remember_token' => null]);
 		//$stat = User::destroy($id);
 		return response()->json($stat);
     }

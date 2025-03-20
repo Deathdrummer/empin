@@ -7,6 +7,7 @@ use App\Http\Requests\Auth\UserEmailVerificationRequest;
 use App\Models\Department as DepartmentModel;
 use App\Models\Section;
 use App\Models\User;
+use App\Services\Business\User as BusinessUser;
 use App\Services\Settings;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\Request;
