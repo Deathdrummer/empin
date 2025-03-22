@@ -175,10 +175,11 @@ class Department {
 		
 		if (empty($depsIds)) return [];
 		
+		$depsIds = !is_array($depsIds) ? $depsIds?->toArray() : $depsIds;
 		
 		$usersService = app()->make(BusinessUser::class);
 		
-		$depsUsers = $usersService->get(fields: ['department_id', 'full_name', 'working'], registred: true, departments: $depsIds->toArray());
+		$depsUsers = $usersService->get(fields: ['department_id', 'full_name', 'working'], registred: true, departments: $depsIds);
 		
 		$staffLists = ListUser::getStaffLists();
 		

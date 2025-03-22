@@ -17,6 +17,8 @@ use App\Http\Controllers\SiteParserController;
 use App\Http\Controllers\TabsController;
 use App\Http\Controllers\UploadFilesController;
 use App\Models\User;
+use App\Services\Business\Department;
+use App\Services\Business\User as BusinessUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -246,9 +248,17 @@ Route::resource('contracts', Contracts::class);
 
 
 
-Route::get('/get_employee_list', function (Request $request) {
+Route::get('/get_employee_list', function (Request $request, Department $departmentService) {
 	$deptId = $request->input('dept_id', 0);
-    return User::select('id', 'pseudoname')->where('department_id', $deptId)->get();
+	$stepId = $request->input('step_id', 0);
+	
+	$depsUsers = $departmentService->getUsersToAssign([$deptId], ['id', 'full_name']);
+	//$test = $usersService->get(fields: ['department_id', 'full_name', 'working'], registred: true, departments: [$deptId]);
+	
+	
+	return $depsUsers[$deptId][$stepId];
+	
+    //return User::select('id', 'pseudoname')->where('department_id', $deptId)->get();
 });
 
 
