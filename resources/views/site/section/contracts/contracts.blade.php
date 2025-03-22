@@ -2411,7 +2411,7 @@
 					</ul>';
 					
 				} else if (stepType == 3) {
-					const {data, error, status, headers, abort} = await axiosQuery('get', 'ajax/get_employee_list', {dept_id: deptId});
+					const {data, error, status, headers, abort} = await axiosQuery('get', 'ajax/get_employee_list', {dept_id: deptId, step_id: stepId});
 					
 					itemsHtml = '<div class="scrollblock scrollblock-light" style="min-height: 40px; max-height: 300px;"><ul class="ddrlist" id="deptFilter">';
 					
@@ -2420,7 +2420,7 @@
 					
 					data.forEach(user => {
 						const isActive = columnFilter.findIndex(item => item.column === 'step' && item.value[0] == stepType && item.value[1] == stepId && item.value[2] == user.id) !== -1;
-					   	itemsHtml += `<li class="ddrlist__item pointer ${isActive ? ' color-blue' : ''} color-blue-hovered" filtervalue="${user.id}"${isActive ? ' checked' : ''}>${user.pseudoname}</li>`;
+					   	itemsHtml += `<li class="ddrlist__item pointer ${isActive ? ' color-blue' : ''} color-blue-hovered" filtervalue="${user.id}"${isActive ? ' checked' : ''}>${user.full_name}</li>`;
 					});
 					
 					itemsHtml += '</ul></div>';
