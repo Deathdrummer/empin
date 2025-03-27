@@ -188,9 +188,9 @@
 			<div class="col-auto">
 				<x-toggle
 					group="large"
-					action=":{{$id}}"
+					action="setShowInSelectionAction:{{$id}}"
 					id=""
-					{{-- :checked="$is_registred" --}}
+					:checked="$disable_show_in_selections"
 					/>
 			</div>
 			<div class="col-auto"><p class="fz16px">Не отображать в списке «Поделиться подборкой»</p></div>

@@ -396,7 +396,12 @@ class Selections extends Controller {
 		
 		$subscribed = request('subscribed') ?: false;
 		
-		$depsUsers = $this->user->get(excludeUsers: [auth('site')->user()->id], fields: ['full_name', 'department_id'], groupBy: 'department_id');
+		$depsUsers = $this->user->get(
+			excludeUsers: [auth('site')->user()->id],
+			fields: ['full_name', 'department_id'],
+			groupBy: 'department_id',
+			where: ['disable_show_in_selections' => false]
+		);
 		
 		$departments = $this->department->getAll()->keyBy('id');
 		
