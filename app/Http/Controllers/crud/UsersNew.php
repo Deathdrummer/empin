@@ -290,7 +290,7 @@ class UsersNew extends Controller {
 		
 		if (!$viewPath) return response()->json(['no_view' => true]);
 		
-		$staff = Staff::find($userId)->with('registred')->first();
+		$staff = Staff::with('registred')->find($userId);
 		
 		return $this->view($viewPath.'.reg_staff_to_user', $staff['registred'], [], ['x-user' => $staff['registred']]);
 	}
@@ -587,6 +587,35 @@ class UsersNew extends Controller {
 	
 	
 	
+	
+	
+	
+	
+	
+	/**
+	* 
+	* @param 
+	* @return 
+	*/
+	public function set_show_in_selection(Request $request) {
+		[
+			'staff_id' 	=> $staffId,
+			'stat' 		=> $stat
+		] = $request->validate([
+			'staff_id' 	=> 'required|integer|exists:staff,id',
+			'stat' 		=> 'required|boolean'
+		]);
+		
+		$staff = Staff::find($staffId);
+		
+		$staff->disable_show_in_selections = $stat;
+		
+		$res = $staff->save();
+
+		return response()->json([
+			'deleted' => (bool) $res
+		]);
+	}
 	
 	
 	

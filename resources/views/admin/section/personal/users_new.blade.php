@@ -631,11 +631,6 @@
 		
 		
 		
-		
-		
-		
-		
-		
 		$.toDropdownListAction = (btn, staffId, listId) => {
 			let method = $(btn).is(':checked') ? 'post' : 'delete';
 			$(btn).ddrInputs('disable');
@@ -652,6 +647,35 @@
 				$(btn).ddrInputs('enable');
 			});
 		}
+		
+		
+		
+		
+		
+		
+		
+		
+		$.setShowInSelectionAction = (btn, staffId) => {
+			$(btn).ddrInputs('disable');
+			
+			let checkStat = $(btn).is(':checked') ? 1 : 0;
+			
+			
+			
+			
+			query({
+				method: 'put',
+				route: 'set_show_in_selection',
+				data: {staff_id: staffId, stat: checkStat}
+			}, (stat, container, {error, status, headers}) => {
+				if (error) {
+					$.notify(error?.message, 'error');
+					console.log(error);	
+				}
+				$(btn).ddrInputs('enable');
+			});
+		}
+		
 		
 		
 		

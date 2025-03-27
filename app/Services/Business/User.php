@@ -27,6 +27,7 @@ class User {
 		$keyBy = null,
 		$groupBy = null,
 		?array $excludeUsers = null,
+		?array $where = null,
 		string $orderBy = '_sort') {
 		return Staff::with('registred')
 			->whereHas('registred', function ($query) use ($departments, $excludeUsers) {
@@ -40,6 +41,9 @@ class User {
 			->when(!is_null($registred), function($query) use($registred) {
 				if ($registred === true) $query->whereHas('registred');
 				elseif ($registred === false) $query->whereDoesntHave('registred');
+			})
+			->when(!is_null($where), function($query) use($where) {
+				$query->where(['disable_show_in_selections' => 0]);
 			})
 			->orderBy($orderBy)
 			->get()
