@@ -686,6 +686,26 @@
 		
 		
 		
+		$.setWorkingAction = (btn, staffId) => {
+			$(btn).ddrInputs('disable');
+			
+			let checkStat = $(btn).is(':checked') ? 0 : 1;
+			
+			query({
+				method: 'put',
+				route: 'set_working',
+				data: {staff_id: staffId, stat: checkStat}
+			}, (stat, container, {error, status, headers}) => {
+				if (error) {
+					$.notify(error?.message, 'error');
+					console.log(error);	
+				}
+				$(btn).ddrInputs('enable');
+			});
+		}
+		
+		
+		
 		
 		
 			

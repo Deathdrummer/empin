@@ -143,6 +143,7 @@ Route::post('/users_new/list_user', [UsersNew::class, 'add_to_list_user']);
 Route::delete('/users_new/list_user', [UsersNew::class, 'remove_from_list_user']);
 
 Route::put('/users_new/set_show_in_selection', [UsersNew::class, 'set_show_in_selection']);
+Route::put('/users_new/set_working', [UsersNew::class, 'set_working']);
 
 
 Route::post('/users_new/store_show', [UsersNew::class, 'store_show']);

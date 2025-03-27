@@ -78,7 +78,6 @@ class UsersNew extends Controller {
 		
 		$list = Staff::select(['id', 'fname', 'sname', 'mname', 'work_post'])
 			->with('registred:id,staff_id,department_id')
-			->working()
 			->withExists('registred as is_registred')
 			->get();
 		
@@ -612,10 +611,35 @@ class UsersNew extends Controller {
 		
 		$res = $staff->save();
 
-		return response()->json([
-			'deleted' => (bool) $res
-		]);
+		return response()->json($res);
 	}
+	
+	
+	
+	
+	/**
+	* 
+	* @param 
+	* @return 
+	*/
+	public function set_working(Request $request) {
+		[
+			'staff_id' 	=> $staffId,
+			'stat' 		=> $stat
+		] = $request->validate([
+			'staff_id' 	=> 'required|integer|exists:staff,id',
+			'stat' 		=> 'required|boolean'
+		]);
+		
+		$staff = Staff::find($staffId);
+		
+		$staff->working = $stat;
+		
+		$res = $staff->save();
+
+		return response()->json($res);
+	}
+	
 	
 	
 	
