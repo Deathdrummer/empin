@@ -25,6 +25,11 @@
 							<p class="header__pagetitle" id="sectionTitle"></p>
 						</div>
 					</div>
+					<div class="col-auto">
+						<div class="header__block">
+							<teleport id="headerTeleport"></teleport>
+						</div>
+					</div>
 					{{-- <div class="col-auto">
 						<div class="header__block">
 							<x-localebar group="large" />
@@ -119,7 +124,8 @@
 <script type="module">
 	let loadSectionController,
 		uriSegment = getUrlSegment(1),
-		startPage = '{{$admin_start_page ?? 'common'}}';
+		startPage = '{{$admin_start_page ?? 'common'}}',
+		teleportEements = [];;
 		
 	loadSection(uriSegment);
 	
@@ -309,6 +315,8 @@
 		
 		let getSection = axiosQuery('post', '/admin/get_section', {section}, 'text', loadSectionController);
 		
+		removeTeleports();
+		
 		getSection.then(function ({data, error, status, headers}) {
 			if (status != 200) {
 				if (error.message) $.notify(error.message, 'error');
@@ -317,7 +325,8 @@
 				$('#sectionTitle').text('');
 				throw new Error('loadSection -> ошибка загрузки раздела!');
 			} else {
-				$('#sectionPlace').html(data);
+				const dataDom = buildTeleports(data);
+				$('#sectionPlace').html(dataDom);
 				$('#sectionTitle').html(setPageTitle(headers['x-page-title']));
 			}
 			
@@ -342,6 +351,54 @@
 		  console.log(event.state);
 		}*/
 	}
+	
+	
+	
+	
+	
+	// Извлечь из HTML блоки для телепортации, вставить телепорты и вернуть HTML без телепортов
+	function buildTeleports(data = null) {
+		if (_.isNull(data)) return;
+		let dataDom = $(data);
+		let teleports = $(dataDom).find('[teleport]');
+		if (teleports.length == 0) return data;
+		
+		$(dataDom).find('[teleport]').remove();
+		
+		const hasPleces = {};
+		
+		$.each(teleports, function(k, teleport) {
+			let to = $(teleport).attr('teleport');
+			
+			if ($(to)[0] && teleport) {
+				teleportEements.push({
+					placement: $(to)[0].outerHTML,
+					data: teleport
+				});
+			}
+			
+			$(teleport).removeAttrib('teleport');
+			
+			if (Object.keys(hasPleces).includes(to)) $(hasPleces[to]).after(teleport);
+			else $(to).replaceWith(teleport);
+			hasPleces[to] = teleport;
+		});
+		
+		return dataDom;
+	}
+	
+	
+	function removeTeleports() {
+		$.each(teleportEements, function(k, {placement, data}) {
+			$(data).replaceWith(placement);
+		});
+		//$(teleportEements).remove();
+		teleportEements = [];
+		//
+		//$(document).find('[teleport]').remove();
+	}
+	
+	
 	
 	
 	
