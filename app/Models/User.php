@@ -120,11 +120,15 @@ class User extends Authenticatable implements MustVerifyEmail {
 	
 	
 	public function userinfo() {
-		return $this->belongsTo(Staff::class, 'staff_id', 'id');
+		return $this->belongsTo(Staff::class, 'staff_id', 'id')->withDefault();;
 	}
 	
 	
 	
+	public function getFullNameAttribute() {
+		$userData = $this->userinfo;
+        return "{$userData->sname} {$userData->fname} {$userData->mname}";
+    }
 	
 	
 	/**

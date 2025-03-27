@@ -145,7 +145,12 @@ Route::middleware(['lang'])->get('/{section?}', function (Request $request, $sec
 	
 	$nav = auth('site')->check() ? (new Section)->getSections($activeNav) : [];
 	
-	$user = Auth::guard('site')->user();
+	
+	//$user = Auth::guard('site')->user();
+	
+	$user = User::with('userinfo')->find(Auth::guard('site')->id());
+	
+	toLog($user->toArray());
 	
 	return view('site.index', compact('locale', 'user', 'nav', 'activeNav'), $settings->all());
 })->name('site');

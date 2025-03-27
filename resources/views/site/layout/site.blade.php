@@ -47,7 +47,7 @@
 				
 				<div class="col-auto ms-auto">
 					<div class="header__block">
-						<p class="fz16px "><strong>{{$user->pseudoname ?? $user->name}}</strong></p>
+						<p class="fz16px "><strong>{{$user->full_name}}</strong></p>
 					</div>
 				</div>
 				

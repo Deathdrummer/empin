@@ -1,4 +1,14 @@
 <section>
+	
+	<div teleport="#headerTeleport">
+		<x-button
+			group="normal"
+			variant="purple"
+			action="openSetColumsWin"
+			title="Отображение столбцов"
+			><i class="fa-solid fa-filter"></i> Фильтры</x-button>
+	</div>
+	
 	<x-card id="usersNewCard" loading>
 		<div class="table">
 			<table class="w100">
@@ -659,9 +669,6 @@
 			$(btn).ddrInputs('disable');
 			
 			let checkStat = $(btn).is(':checked') ? 1 : 0;
-			
-			
-			
 			
 			query({
 				method: 'put',
