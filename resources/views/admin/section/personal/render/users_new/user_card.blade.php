@@ -196,6 +196,21 @@
 			<div class="col-auto"><p class="fz16px">Не отображать в списке «Поделиться подборкой»</p></div>
 		</div>
 	</div>
+	
+	<div class="ddrlist__item mb2rem">
+		<div class="row align-items-center">
+			<div class="col-auto">
+				<x-toggle
+					group="large"
+					action="setWorkingAction:{{$id}}"
+					id=""
+					:checked="!$working"
+					/>
+				}
+			</div>
+			<div class="col-auto"><p class="fz16px">Уволен</p></div>
+		</div>
+	</div>
 </div>
 
 @endif
