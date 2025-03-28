@@ -5933,8 +5933,9 @@ window.ref = function (data) {
 window.ddrRef = function () {
   var data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
   var watchFuncs = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+  var storeKey = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
   var dataToWath;
-  if (watchFuncs) return ddrWatcher(data, watchFuncs);
+  if (watchFuncs) return ddrWatcher(data, watchFuncs, storeKey);
   return new Proxy(_.isPlainObject(data) ? data : {
     value: data
   }, {
@@ -5953,26 +5954,35 @@ var getHandlers = Symbol('handlers'),
     setHandlers = Symbol('handlers');
 
 window.ddrWatcher = function (proxedObj) {
-  var watcherFuncName = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-  // Обернем скаляр в объект, если передано не объектное значение
+  var funcsObj = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+  var storeKey = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
   proxedObj = _.isPlainObject(proxedObj) ? proxedObj : {
     proxedObj: proxedObj
-  }; // Создаем хранилище обработчиков
-
+  };
   proxedObj[getHandlers] = [];
-  proxedObj[setHandlers] = []; // Метод для получения простого объекта со всеми свойствами, исключая символы и функции
+  proxedObj[setHandlers] = [];
 
   proxedObj.all = function () {
-    // Создаем объект, содержащий только ключи-свойства (исключая функции и символы)
-    return Object.fromEntries(Object.entries(this).filter(function (_ref3) {
-      var _ref4 = _slicedToArray(_ref3, 2),
-          key = _ref4[0],
-          value = _ref4[1];
+    var cleanObject = function cleanObject(obj) {
+      if (Array.isArray(obj)) {
+        return obj.map(function (item) {
+          return _.isPlainObject(item) || Array.isArray(item) ? cleanObject(item) : item;
+        });
+      } else if (_.isPlainObject(obj)) {
+        return Object.fromEntries(Object.entries(obj).map(function (_ref3) {
+          var _ref4 = _slicedToArray(_ref3, 2),
+              key = _ref4[0],
+              value = _ref4[1];
 
-      return _typeof(key) !== 'symbol' && typeof value !== 'function';
-    }));
-  }; // Метод для добавления функций-обработчиков
+          return [key, _.isPlainObject(value) || Array.isArray(value) ? cleanObject(value) : value];
+        }));
+      }
 
+      return obj;
+    };
+
+    return cleanObject(this);
+  };
 
   proxedObj.observe = function (funcsObj) {
     var outerGetFunc, outerSetFunc, outerMixFunc;
@@ -5980,23 +5990,9 @@ window.ddrWatcher = function (proxedObj) {
     if (_.isFunction(funcsObj)) {
       outerMixFunc = funcsObj;
     } else if (_.isPlainObject(funcsObj)) {
-      if (_.isString(funcsObj === null || funcsObj === void 0 ? void 0 : funcsObj.get)) {
-        window[funcsObj === null || funcsObj === void 0 ? void 0 : funcsObj.get] = function (callback) {
-          return outerGetFunc = callback;
-        };
-      } else {
-        outerGetFunc = funcsObj === null || funcsObj === void 0 ? void 0 : funcsObj.get;
-      }
-
-      if (_.isString(funcsObj === null || funcsObj === void 0 ? void 0 : funcsObj.set)) {
-        window[funcsObj === null || funcsObj === void 0 ? void 0 : funcsObj.set] = function (callback) {
-          return outerSetFunc = callback;
-        };
-      } else {
-        outerSetFunc = funcsObj === null || funcsObj === void 0 ? void 0 : funcsObj.set;
-      }
-    } // Добавляем функции-обработчики
-
+      outerGetFunc = funcsObj === null || funcsObj === void 0 ? void 0 : funcsObj.get;
+      outerSetFunc = funcsObj === null || funcsObj === void 0 ? void 0 : funcsObj.set;
+    }
 
     if (outerMixFunc) {
       this[getHandlers].push(outerMixFunc);
@@ -6007,51 +6003,107 @@ window.ddrWatcher = function (proxedObj) {
     if (outerSetFunc) this[setHandlers].push(outerSetFunc);
   };
 
-  if (_.isString(watcherFuncName)) {
-    window[watcherFuncName] = function (data) {
-      return proxedObj.observe(data);
-    };
-  } else {
-    proxedObj.observe(watcherFuncName);
-  } // Создаем прокси для реакции на изменения
+  if (funcsObj) {
+    proxedObj.observe(funcsObj);
+  }
 
+  if (storeKey && typeof storeKey === 'string') {
+    var storedData = ddrStore2(storeKey);
 
-  return new Proxy(proxedObj, {
-    get: function get(target, property, receiver) {
-      if (target[getHandlers]) {
-        target[getHandlers].forEach(function (handler) {
-          return handler({
-            type: 'get',
-            target: target,
-            prop: property,
-            value: target[property]
-          });
-        });
-      }
-
-      return Reflect.get.apply(Reflect, arguments);
-    },
-    set: function set(target, property, value, receiver) {
-      var oldValue = target[property]; // Сохраняем старое значение
-
-      var success = Reflect.set.apply(Reflect, arguments); // Выполняем операцию записи
-
-      if (success && target[setHandlers]) {
-        // Если запись прошла успешно
-        target[setHandlers].forEach(function (handler) {
-          return handler({
-            type: 'set',
-            target: target,
-            prop: property,
-            value: value,
-            oldValue: oldValue
-          });
-        }); // Передаем старое значение в обработчик
-      }
-
-      return success;
+    if (storedData && (_typeof(storedData) === 'object' || isJson(storedData))) {
+      var parsedData = _typeof(storedData) === 'object' ? storedData : JSON.parse(storedData);
+      Object.assign(proxedObj, parsedData);
     }
-  });
+  }
+
+  var createDeepProxy = function createDeepProxy(obj, parentHandlers) {
+    return new Proxy(obj, {
+      get: function get(target, property, receiver) {
+        var value = Reflect.get(target, property, receiver); // Обрабатываем только если свойство не символ и это не метод
+
+        if (_typeof(property) !== 'symbol' && typeof value !== 'function' && target[getHandlers]) {
+          target[getHandlers].forEach(function (handler) {
+            return handler({
+              type: 'get',
+              target: target,
+              prop: property,
+              value: value
+            });
+          });
+        } // Если значение - объект, рекурсивно оборачиваем его в ddrWatcher
+
+
+        if (_.isPlainObject(value)) {
+          return ddrWatcher(value, funcsObj, storeKey);
+        } // Если значение - массив, возвращаем его без оборачивания в прокси
+
+
+        if (Array.isArray(value)) {
+          return value;
+        }
+
+        return value;
+      },
+      set: function set(target, property, value, receiver) {
+        var oldValue = target[property];
+        var success = Reflect.set(target, property, value, receiver);
+
+        if (success && parentHandlers[setHandlers]) {
+          parentHandlers[setHandlers].forEach(function (handler) {
+            return handler({
+              type: 'set',
+              target: target,
+              prop: property,
+              value: value,
+              oldValue: oldValue
+            });
+          });
+        }
+
+        if (success && storeKey && typeof storeKey === 'string') {
+          var cleanData = proxedObj.all();
+          ddrStore2(storeKey, cleanData);
+        }
+
+        return success;
+      },
+      ownKeys: function ownKeys(target) {
+        return Reflect.ownKeys(target).filter(function (key) {
+          return _typeof(key) !== 'symbol' && typeof target[key] !== 'function';
+        });
+      },
+      getOwnPropertyDescriptor: function getOwnPropertyDescriptor(target, property) {
+        if (_typeof(property) === 'symbol' || typeof target[property] === 'function') {
+          return undefined;
+        }
+
+        return Reflect.getOwnPropertyDescriptor(target, property);
+      }
+    });
+  };
+
+  return createDeepProxy(proxedObj, proxedObj);
+};
+/*
+Функция для работы с localStorage:
+  - key: ключ
+  - value: если не указано, возвращает значение; если false — удаляет ключ
+*/
+
+
+window.ddrStore2 = function (key, value) {
+  if (!key || typeof key !== 'string') return false;
+
+  if (value === false) {
+    localStorage.removeItem(key);
+  } else if (value !== undefined) {
+    if (_typeof(value) === 'object') value = JSON.stringify(value);
+    localStorage.setItem(key, value);
+  } else {
+    var getValue = localStorage.getItem(key);
+    if (isJson(getValue)) getValue = JSON.parse(getValue);
+    return getValue !== null ? getValue : null;
+  }
 };
 /*
 	shift  		shift 	shiftKey

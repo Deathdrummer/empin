@@ -15,12 +15,18 @@ class Department {
 	
 	
 	/**
-	 * @param Request  $request
-	 * @param string  $sort
-	 * @return 
-	 */
-	public function getAll() {
-		return DepartmentModel::orderBy('_sort', 'ASC')->get();
+	* Retrieves all records with the specified fields.
+	*
+	* @param array $fields The fields to include in the result. Defaults to ['id', 'name', 'show_only_assigned', 'sort'].
+	* @return mixed
+	*/
+	public function getAll(array $fields = ['id', 'name', 'show_only_assigned', 'sort']) {
+		// Гарантируем, что поле id всегда есть в списке
+		$selectedFields = array_unique(array_merge(['id'], $fields));
+		
+		return DepartmentModel::select($selectedFields)
+			->orderBy('_sort', 'ASC')
+			->get();
 	}
 	
 	

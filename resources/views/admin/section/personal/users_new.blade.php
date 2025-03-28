@@ -4,7 +4,7 @@
 		<x-button
 			group="normal"
 			variant="purple"
-			action="openSetColumsWin"
+			action="openStaffFilters"
 			title="Отображение столбцов"
 			><i class="fa-solid fa-filter"></i> Фильтры</x-button>
 	</div>
@@ -38,13 +38,51 @@
 
 <script type="module">
 	
+	
+	
+	//localStorage.removeItem('store-filters-staff');
+	
+	//console.log(ddrStore2('store-filters-staff'));
+	
+
+	
+	let listFunc;
+	const filters = ddrWatcher(
+	    {
+	    	working: 1,
+	    	registred: 1,
+	    	departments: []
+	    }, {
+	        get: ({type, target, prop, value}) => {
+	        	//console.log('get'/*, filters.all()*/);
+	        },
+	        set: ({type, target, prop, value, oldValue}) => {
+	        	listFunc();
+	        }
+	    },
+	    'store-filters-staff' // сохраняем данные в localStorage с этим ключом
+	);
+	
+	
+	
+	
+	
+	//filters.departments.push(89);
+	
+	
+	
+	
 	$.ddrCRUD({
 		container: '#usersNewList',
 		itemToIndex: 'tr',
 		route: 'ajax/users_new',
 		viewsPath: 'admin.section.personal.render.users_new',
+		params: {
+			list: filters
+		}
 		//onInit(container) {},
 	}).then(({error, list, changeInputs, create, show, store, storeWithShow, update, edit, destroy, remove, query}) => {
+		listFunc = list;
 		$('#usersNewCard').card('ready');
 		
 		if (error) {
@@ -712,7 +750,105 @@
 		
 		
 		
+		$.openStaffFilters = async (btn) => {
+			//$(btn).ddrInputs('disable');
+			
+			
+			const {
+				state,
+				popper,
+				wait,
+				setTitle,
+				setButtons,
+				loadData,
+				setHtml,
+				setLHtml,
+				dialog,
+				close,
+				onClose,
+				onCancel,
+				onScroll,
+				disableButtons,
+				enableButtons,
+				setWidth,
+			} = await ddrPopup({
+				//url,
+				//method,
+				//params,
+				title: 'Фильтры', // заголовок
+				width: 1000, // ширина окна
+				//frameOnly, // Загрузить только каркас
+				//html, // контент
+				//lhtml, // контент из языковых файлов
+				//buttons, // массив кнопок
+				//buttonsAlign, // выравнивание вправо
+				//disabledButtons, // при старте все кнопки кроме закрытия будут disabled
+				//closeByBackdrop, // Закрывать окно только по кнопкам [ddrpopupclose]
+				//changeWidthAnimationDuration, // ms
+				//buttonsGroup, // группа для кнопок
+				//winClass, // добавить класс к модальному окну
+				//centerMode, // контент по центру
+				//topClose // верхняя кнопка закрыть
+			});
+			
+			
+			//ddrRef()
+			//let checkStat = $(btn).is(':checked') ? 0 : 1;
+			
+			query({
+				method: 'get',
+				route: 'filters',
+				data: {filters: {...filters}}
+			}, async (data, container, {error, status, headers}) => {
+				if (error) {
+					$.notify(error?.message, 'error');
+					console.log(error);	
+				}
+				
+				await setHtml(data);
+				
+				$.setWorkingStat = (toggle, isActive, stat = null) => {
+					if (isActive) return;
+					filters.working = stat;
+				}
+				
+				$.setRegStat = (toggle, stat = null) => {
+					const isChecked = $(toggle).is(':checked') ? 1 : 0;
+					filters.registred = isChecked ? 1 : 0;
+				}
+				
+				
+				$.setDepartment = (checkbox, deptId = null) => {
+					const isChecked = $(checkbox).is(':checked');
+					
+				    if (isChecked) {
+				    	if (!filters.departments.includes(deptId)) filters.departments = [...filters.departments, deptId];
+				    } else {
+				        filters.departments = filters.departments.filter(id => id !== deptId);
+				    }	
+				    
+				    //console.log(filters);
+				};
+				
+				//$(btn).ddrInputs('enable');
+			});
+		}
 		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		//------------------------------------------------------------------------------------------------------------------------
 		
 		
 		$.closeUserCard = (selector, userId) => {

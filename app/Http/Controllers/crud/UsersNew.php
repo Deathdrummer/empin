@@ -1,12 +1,14 @@
 <?php namespace App\Http\Controllers\crud;
 
 use App\Http\Controllers\Controller;
+use App\Http\Filters\StaffFilter;
 use App\Mail\UserCreated;
 use App\Models\Department;
 use App\Models\ListUser;
 use App\Models\Staff;
 use App\Models\Step;
 use App\Models\User;
+use App\Services\Business\Department as BusinessDepartment;
 use App\Traits\HasCrudController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
@@ -72,13 +74,21 @@ class UsersNew extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request) {
+		
+		
+		
     	$validData = $request->validate(['views' => 'string|required']);
 		$viewPath = $validData['views'];
 		if (!$viewPath) return response()->json(['no_view' => true]);
 		
+		$queryParams = $request->except(['views', '_responsetype']);
+		
+		$filter = app()->make(StaffFilter::class, compact('queryParams'));
+		
 		$list = Staff::select(['id', 'fname', 'sname', 'mname', 'work_post'])
 			->with('registred:id,staff_id,department_id')
 			->withExists('registred as is_registred')
+			->filter($filter)
 			->get();
 		
 		$itemView = $viewPath.'.item';
@@ -293,6 +303,9 @@ class UsersNew extends Controller {
 		
 		return $this->view($viewPath.'.reg_staff_to_user', $staff['registred'], [], ['x-user' => $staff['registred']]);
 	}
+	
+	
+	
 	
 	
 	
@@ -639,6 +652,44 @@ class UsersNew extends Controller {
 
 		return response()->json($res);
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	public function filters(Request $request, BusinessDepartment $department) { 
+		[
+			'views'		=> $viewPath,
+			'filters'	=> $filters,
+		] = $request->validate([
+			'views' 	=> 'string|required',
+			'filters' 	=> 'string|required',
+		]);
+		
+		$filters = json_decode($filters, true);
+		
+		if (!$viewPath) return response()->json(['no_view' => true]);
+		
+		$departmentsList = $department->getAll(fields: ['name'])->map(function($item) use($filters) {
+			$item['active'] = in_array($item['id'], $filters['departments'] ?? []);
+			return $item;
+		});
+		
+		return $this->view($viewPath.'.staff_filters', ['departmentsList' => $departmentsList, ...$filters]);
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	
