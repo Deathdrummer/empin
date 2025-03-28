@@ -1,8 +1,12 @@
+@aware([
+	'groupWrap' => null,
+])
+
 @props([
 	'id'    => 'chooser'.rand(0,9999999),
 	'many'  => null,
 	//'disabled'  => $groupDisabled,
-	'group'     => null,
+	'group'     => $groupWrap,
 	//'variant'   => $groupVariant,
 	//'rounded'   => $groupRounded,
 	//'px'        => $groupPx,

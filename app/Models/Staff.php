@@ -2,13 +2,14 @@
 
 use App\Models\Traits\Collectionable;
 use App\Models\Traits\Dateable;
+use App\Models\Traits\Filterable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 
 class Staff extends Model {
-    use HasFactory, Notifiable, HasRoles, Collectionable, Dateable;
+    use HasFactory, Filterable, Notifiable, HasRoles, Collectionable, Dateable;
 	
 	/**
      * Таблица

@@ -25,7 +25,7 @@
 							<p class="header__pagetitle" id="sectionTitle"></p>
 						</div>
 					</div>
-					<div class="col-auto">
+					<div class="col-auto ms-auto">
 						<div class="header__block">
 							<teleport id="headerTeleport"></teleport>
 						</div>
@@ -42,7 +42,7 @@
 							@endverify
 						</div>
 					</div> --}}
-					<div class="col-auto ms-auto">
+					<div class="col-auto">
 						<div class="header__block">
 							<div class="header__logout noselect" logout>
 								<i class="fa-solid fa-arrow-right-from-bracket"></i>
