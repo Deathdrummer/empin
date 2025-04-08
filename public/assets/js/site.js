@@ -6008,7 +6008,7 @@ window.ddrWatcher = function (proxedObj) {
   }
 
   if (storeKey && typeof storeKey === 'string') {
-    var storedData = ddrStore2(storeKey);
+    var storedData = ddrStore(storeKey);
 
     if (storedData && (_typeof(storedData) === 'object' || isJson(storedData))) {
       var parsedData = _typeof(storedData) === 'object' ? storedData : JSON.parse(storedData);
@@ -6062,7 +6062,7 @@ window.ddrWatcher = function (proxedObj) {
 
         if (success && storeKey && typeof storeKey === 'string') {
           var cleanData = proxedObj.all();
-          ddrStore2(storeKey, cleanData);
+          ddrStore(storeKey, cleanData);
         }
 
         return success;
@@ -6083,27 +6083,6 @@ window.ddrWatcher = function (proxedObj) {
   };
 
   return createDeepProxy(proxedObj, proxedObj);
-};
-/*
-Функция для работы с localStorage:
-  - key: ключ
-  - value: если не указано, возвращает значение; если false — удаляет ключ
-*/
-
-
-window.ddrStore2 = function (key, value) {
-  if (!key || typeof key !== 'string') return false;
-
-  if (value === false) {
-    localStorage.removeItem(key);
-  } else if (value !== undefined) {
-    if (_typeof(value) === 'object') value = JSON.stringify(value);
-    localStorage.setItem(key, value);
-  } else {
-    var getValue = localStorage.getItem(key);
-    if (isJson(getValue)) getValue = JSON.parse(getValue);
-    return getValue !== null ? getValue : null;
-  }
 };
 /*
 	shift  		shift 	shiftKey
