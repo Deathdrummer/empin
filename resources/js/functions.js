@@ -282,7 +282,7 @@ window.ddrWatcher = function (proxedObj, funcsObj = null, storeKey = false) {
     }
 
     if (storeKey && typeof storeKey === 'string') {
-	    const storedData = ddrStore2(storeKey);
+	    const storedData = ddrStore(storeKey);
 	    if (storedData && (typeof storedData === 'object' || isJson(storedData))) {
 	        const parsedData = typeof storedData === 'object' ? storedData : JSON.parse(storedData);
 	        Object.assign(proxedObj, parsedData);
@@ -326,7 +326,7 @@ window.ddrWatcher = function (proxedObj, funcsObj = null, storeKey = false) {
 
                 if (success && storeKey && typeof storeKey === 'string') {
                     const cleanData = proxedObj.all();
-                    ddrStore2(storeKey, cleanData);
+                    ddrStore(storeKey, cleanData);
                 }
 
                 return success;
@@ -348,25 +348,6 @@ window.ddrWatcher = function (proxedObj, funcsObj = null, storeKey = false) {
     return createDeepProxy(proxedObj, proxedObj);
 };
 
-/*
-Функция для работы с localStorage:
-  - key: ключ
-  - value: если не указано, возвращает значение; если false — удаляет ключ
-*/
-window.ddrStore2 = function (key, value) {
-    if (!key || typeof key !== 'string') return false;
-
-    if (value === false) {
-        localStorage.removeItem(key);
-    } else if (value !== undefined) {
-        if (typeof value === 'object') value = JSON.stringify(value);
-        localStorage.setItem(key, value);
-    } else {
-        let getValue = localStorage.getItem(key);
-        if (isJson(getValue)) getValue = JSON.parse(getValue);
-        return getValue !== null ? getValue : null;
-    }
-};
 
 
 
@@ -2391,6 +2372,7 @@ window.ddrStore = function(key, value) {
 		return getValue !== null ? getValue : null;
 	}
 }
+
 
 
 

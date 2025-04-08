@@ -780,7 +780,7 @@ class Contracts extends Controller {
 			->get()
 			->map(function($item) use($accountId) {
 				$item['self'] = $item['account_id'] == $accountId;
-				$item['name'] = $item['user']['pseudoname'] ?? $item['user']['name'] ?? 'Анонимный сотрудник';
+				$item['name'] = $item['user']['full_name'] ?? 'Анонимный сотрудник';
 				$item['date'] = Carbon::parse($item['created_at'])->format('Y-m-d');
 				return $item;
 			});
@@ -809,7 +809,7 @@ class Contracts extends Controller {
 		]);
 		
 		$createdMessage['self'] = true;
-		$createdMessage['name'] = $createdMessage->user['pseudoname'] ?? $createdMessage->user['name'] ?? 'Анонимный сотрудник';
+		$createdMessage['name'] = $createdMessage->user['full_name'] ?? $createdMessage->user['name'] ?? 'Анонимный сотрудник';
 		
 		if ($createdMessage) return $this->render('chat.item', $createdMessage);
 		return response()->json(false);

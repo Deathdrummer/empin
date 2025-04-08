@@ -36,7 +36,7 @@ class User extends Authenticatable implements MustVerifyEmail {
 	 *
      * @var string
      */
-	//protected $appends = ['email_cyrillic'];
+	protected $appends = ['full_name',/* 'email_cyrillic' */];
 	
 	
 	/**
