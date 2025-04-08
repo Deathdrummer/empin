@@ -167,7 +167,7 @@ class Department {
 	 * @param Bool  $userFields вернуть поля пользователя
 	 * @return 
 	 */
-	public function getUsersToAssign($depsData, $userFields = false) {
+	public function getUsersToAssign($depsData, $userFields = false, $registred = true) {
 		$depsIds = [];
 		
 		if (gettype($depsData) == 'object') {
@@ -185,7 +185,7 @@ class Department {
 		
 		$usersService = app()->make(BusinessUser::class);
 		
-		$depsUsers = $usersService->get(fields: ['department_id', 'full_name', 'working'], registred: true, departments: $depsIds);
+		$depsUsers = $usersService->get(fields: ['department_id', 'full_name', 'working'], registred: $registred, departments: $depsIds);
 		
 		$staffLists = ListUser::getStaffLists();
 		
