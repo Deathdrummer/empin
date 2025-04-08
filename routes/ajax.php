@@ -257,7 +257,7 @@ Route::get('/get_employee_list', function (Request $request, Department $departm
 	$deptId = $request->input('dept_id', 0);
 	$stepId = $request->input('step_id', 0);
 	
-	$depsUsers = $departmentService->getUsersToAssign([$deptId], ['id', 'full_name']);
+	$depsUsers = $departmentService->getUsersToAssign([$deptId], ['id', 'full_name'], registred: null);
 	//$test = $usersService->get(fields: ['department_id', 'full_name', 'working'], registred: true, departments: [$deptId]);
 	
 	
