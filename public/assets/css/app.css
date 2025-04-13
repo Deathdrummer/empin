@@ -143539,6 +143539,166 @@ template {
     line-height: 2em !important;
   }
 }
+.rounded-1px, .rounded1px, .radius-1px, .radius-1px {
+  border-radius: 1px !important;
+}
+
+.rounded-2px, .rounded2px, .radius-2px, .radius-2px {
+  border-radius: 2px !important;
+}
+
+.rounded-3px, .rounded3px, .radius-3px, .radius-3px {
+  border-radius: 3px !important;
+}
+
+.rounded-4px, .rounded4px, .radius-4px, .radius-4px {
+  border-radius: 4px !important;
+}
+
+.rounded-5px, .rounded5px, .radius-5px, .radius-5px {
+  border-radius: 5px !important;
+}
+
+.rounded-6px, .rounded6px, .radius-6px, .radius-6px {
+  border-radius: 6px !important;
+}
+
+.rounded-7px, .rounded7px, .radius-7px, .radius-7px {
+  border-radius: 7px !important;
+}
+
+.rounded-8px, .rounded8px, .radius-8px, .radius-8px {
+  border-radius: 8px !important;
+}
+
+.rounded-9px, .rounded9px, .radius-9px, .radius-9px {
+  border-radius: 9px !important;
+}
+
+.rounded-10px, .rounded10px, .radius-10px, .radius-10px {
+  border-radius: 10px !important;
+}
+
+.rounded-11px, .rounded11px, .radius-11px, .radius-11px {
+  border-radius: 11px !important;
+}
+
+.rounded-12px, .rounded12px, .radius-12px, .radius-12px {
+  border-radius: 12px !important;
+}
+
+.rounded-13px, .rounded13px, .radius-13px, .radius-13px {
+  border-radius: 13px !important;
+}
+
+.rounded-14px, .rounded14px, .radius-14px, .radius-14px {
+  border-radius: 14px !important;
+}
+
+.rounded-15px, .rounded15px, .radius-15px, .radius-15px {
+  border-radius: 15px !important;
+}
+
+.rounded-16px, .rounded16px, .radius-16px, .radius-16px {
+  border-radius: 16px !important;
+}
+
+.rounded-17px, .rounded17px, .radius-17px, .radius-17px {
+  border-radius: 17px !important;
+}
+
+.rounded-18px, .rounded18px, .radius-18px, .radius-18px {
+  border-radius: 18px !important;
+}
+
+.rounded-19px, .rounded19px, .radius-19px, .radius-19px {
+  border-radius: 19px !important;
+}
+
+.rounded-20px, .rounded20px, .radius-20px, .radius-20px {
+  border-radius: 20px !important;
+}
+
+.rounded-21px, .rounded21px, .radius-21px, .radius-21px {
+  border-radius: 21px !important;
+}
+
+.rounded-22px, .rounded22px, .radius-22px, .radius-22px {
+  border-radius: 22px !important;
+}
+
+.rounded-23px, .rounded23px, .radius-23px, .radius-23px {
+  border-radius: 23px !important;
+}
+
+.rounded-24px, .rounded24px, .radius-24px, .radius-24px {
+  border-radius: 24px !important;
+}
+
+.rounded-25px, .rounded25px, .radius-25px, .radius-25px {
+  border-radius: 25px !important;
+}
+
+.rounded-26px, .rounded26px, .radius-26px, .radius-26px {
+  border-radius: 26px !important;
+}
+
+.rounded-27px, .rounded27px, .radius-27px, .radius-27px {
+  border-radius: 27px !important;
+}
+
+.rounded-28px, .rounded28px, .radius-28px, .radius-28px {
+  border-radius: 28px !important;
+}
+
+.rounded-29px, .rounded29px, .radius-29px, .radius-29px {
+  border-radius: 29px !important;
+}
+
+.rounded-30px, .rounded30px, .radius-30px, .radius-30px {
+  border-radius: 30px !important;
+}
+
+.rounded-1rem, .rounded1rem, .radius-1rem, .radius-1rem {
+  border-radius: 1rem !important;
+}
+
+.rounded-2rem, .rounded2rem, .radius-2rem, .radius-2rem {
+  border-radius: 2rem !important;
+}
+
+.rounded-3rem, .rounded3rem, .radius-3rem, .radius-3rem {
+  border-radius: 3rem !important;
+}
+
+.rounded-4rem, .rounded4rem, .radius-4rem, .radius-4rem {
+  border-radius: 4rem !important;
+}
+
+.rounded-5rem, .rounded5rem, .radius-5rem, .radius-5rem {
+  border-radius: 5rem !important;
+}
+
+.rounded-6rem, .rounded6rem, .radius-6rem, .radius-6rem {
+  border-radius: 6rem !important;
+}
+
+.rounded-7rem, .rounded7rem, .radius-7rem, .radius-7rem {
+  border-radius: 7rem !important;
+}
+
+.rounded-8rem, .rounded8rem, .radius-8rem, .radius-8rem {
+  border-radius: 8rem !important;
+}
+
+.rounded-9rem, .rounded9rem, .radius-9rem, .radius-9rem {
+  border-radius: 9rem !important;
+}
+
+.rounded-10rem, .rounded10rem, .radius-10rem, .radius-10rem {
+  border-radius: 10rem !important;
+}
+
 .tippy-box {
   background-color: #fff !important;
   box-shadow: 0 0 11px -2px rgba(0, 0, 0, 0.2117647059);

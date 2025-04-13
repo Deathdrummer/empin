@@ -76,4 +76,19 @@ class ContractData extends Model {
 			//logger($model->toArray());
 		});
 	}
+	
+	
+	
+	
+	
+	
+	/**
+     * Информация 
+     */
+	public function meta() {
+		return $this->belongsTo(Contract::class, 'contract_id', 'id');
+	}
+	
+	
+	
 }

@@ -30,6 +30,7 @@ class User {
 		?array $where = null,
 		?array $staffIds = null,
 		string $orderBy = '_sort') {
+			
 		return Staff::with('registred')
 			->whereHas('registred', function ($query) use ($departments, $excludeUsers) {
 				if ($departments == -1) $query->whereNull('department_id');
