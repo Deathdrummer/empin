@@ -1766,7 +1766,7 @@ class Contracts extends Controller {
 	private function _addDepsUsersToData($alldeps = null, $contractdata = null) {
 		$this->data['deps_users'] = [];
 		if (!$alldeps) return false;
-		$depsUsers = $this->department->getUsersToAssign($alldeps, ['id:value', 'full_name:title', 'working:enabled']);
+		$depsUsers = $this->department->getUsersToAssign($alldeps, ['id:value', 'full_name:title', 'working:enabled'], workStat: 1);
 		
 		if ($contractdata) {
 			# получаем ID сотрудников из выбранных пунктов выпадающих списков сотрудников
@@ -1794,6 +1794,7 @@ class Contracts extends Controller {
 						'value' => $choosedStaff['id'],
 						'title' => $choosedStaff['full_name'],
 						'disabled' => 1,
+						'hidden' => 1,
 						'selected' => 1,
 					];
 				}
