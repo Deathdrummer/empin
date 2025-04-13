@@ -167,7 +167,7 @@ class Department {
 	 * @param Bool  $userFields вернуть поля пользователя
 	 * @return 
 	 */
-	public function getUsersToAssign($depsData, $userFields = false, $registred = true) {
+	public function getUsersToAssign($depsData, $userFields = false, $registred = true, $workStat = null) {
 		$depsIds = [];
 		
 		if (gettype($depsData) == 'object') {
@@ -185,13 +185,13 @@ class Department {
 		
 		$usersService = app()->make(BusinessUser::class);
 		
-		$depsUsers = $usersService->get(fields: ['department_id', 'full_name', 'working'], registred: $registred, departments: $depsIds);
+		$depsUsers = $usersService->get(fields: ['department_id', 'full_name', 'working'], registred: $registred, departments: $depsIds, workStat: $workStat);
 		
 		$staffLists = ListUser::getStaffLists();
 		
 		$result = [];
 		$staffLists->each(function ($listsIds, $staffId) use ($depsUsers, $userFields, &$result) {
-			if (!$user = $depsUsers[$staffId] ?? false) return false;
+			if (!$user = $depsUsers[$staffId] ?? false) return true;
 			foreach ($listsIds as $lId) {
 				$result[$user['department_id']][$lId][] = $this->_buildUserArray($user, $userFields);
 			}

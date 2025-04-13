@@ -24,13 +24,14 @@ class User {
 		?array $fields = [],
 		mixed $departments = null,
 		?bool $registred = null,
+		?bool $workStat = null, # 0 - уволенные, 1 - работающие
 		$keyBy = null,
 		$groupBy = null,
 		?array $excludeUsers = null,
 		?array $where = null,
 		?array $staffIds = null,
 		string $orderBy = '_sort') {
-			
+		
 		return Staff::with('registred')
 			->whereHas('registred', function ($query) use ($departments, $excludeUsers) {
 				if ($departments == -1) $query->whereNull('department_id');
@@ -49,6 +50,9 @@ class User {
 			})
 			->when(!is_null($staffIds), function($query) use($staffIds) {
 				$query->whereIn('id', $staffIds);
+			})
+			->when(!is_null($workStat), function($query) use($workStat) {
+				$query->where('working', $workStat);
 			})
 			->orderBy($orderBy)
 			->get()
