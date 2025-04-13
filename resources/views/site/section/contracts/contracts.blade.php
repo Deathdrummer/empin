@@ -2411,17 +2411,19 @@
 					</ul>';
 					
 				} else if (stepType == 3) {
-					const {data, error, status, headers, abort} = await axiosQuery('get', 'ajax/get_employee_list', {dept_id: deptId, step_id: stepId});
+					const {data, error, status, headers, abort} = await axiosQuery('get', 'ajax/get_employee_list', {dept_id: deptId, step_id: stepId, list: currentList});
 					
 					itemsHtml = '<div class="scrollblock scrollblock-light" style="min-height: 40px; max-height: 300px;"><ul class="ddrlist" id="deptFilter">';
 					
 					const isActiveNone = columnFilter.findIndex(item => item.column === 'step' && item.value[0] == stepType && item.value[1] == stepId && item.value[2] == -1) !== -1;
 					itemsHtml += `<li class="ddrlist__item pointer ${isActiveNone ? ' color-blue' : ''} color-blue-hovered" filtervalue="-1"${isActiveNone ? ' checked' : ''}>Сотрудник не выбран</li>`;
 					
-					data.forEach(user => {
-						const isActive = columnFilter.findIndex(item => item.column === 'step' && item.value[0] == stepType && item.value[1] == stepId && item.value[2] == user.id) !== -1;
-					   	itemsHtml += `<li class="ddrlist__item pointer ${isActive ? ' color-blue' : ''} color-blue-hovered" filtervalue="${user.id}"${isActive ? ' checked' : ''}>${user.full_name}</li>`;
-					});
+					if (data) {
+						data.forEach(user => {
+							const isActive = columnFilter.findIndex(item => item.column === 'step' && item.value[0] == stepType && item.value[1] == stepId && item.value[2] == user.id) !== -1;
+						   	itemsHtml += `<li class="ddrlist__item pointer ${isActive ? ' color-blue' : ''} color-blue-hovered" filtervalue="${user.id}"${isActive ? ' checked' : ''}>${user.full_name}</li>`;
+						});
+					}
 					
 					itemsHtml += '</ul></div>';
 				}

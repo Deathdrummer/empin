@@ -76,7 +76,6 @@ class Contract {
 	public function getWithDepartments(Request $request) {
 		$filter = app()->make(ContractFilter::class, ['queryParams' => $request->except(['sort_field', 'sort_order'])]);
 		
-		
 		$sortField = $request->get('sort_field', 'id');
 		$sortOrder = $request->get('sort_order', 'asc');
 		$limit = $request->get('limit', 25);
@@ -84,7 +83,6 @@ class Contract {
 		$selection = $request->get('selection', null);
 		$sortStep = strpos($sortField, ':') !== false ? (substr($sortField, strpos($sortField, ':') - strlen($sortField) + 1)) : null;
 		$selectedContracts = request('selected_contracts', []);
-		
 		
 		
 		if (!$userId = auth('site')->user()->id) return false;

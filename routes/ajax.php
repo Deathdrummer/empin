@@ -16,6 +16,7 @@ use App\Http\Controllers\crud\UsersNew;
 use App\Http\Controllers\SiteParserController;
 use App\Http\Controllers\TabsController;
 use App\Http\Controllers\UploadFilesController;
+use App\Models\ContractData;
 use App\Models\User;
 use App\Services\Business\Department;
 use App\Services\Business\User as BusinessUser;
@@ -253,15 +254,36 @@ Route::resource('contracts', Contracts::class);
 
 
 
-Route::get('/get_employee_list', function (Request $request, Department $departmentService) {
+Route::get('/get_employee_list', function (Request $request, BusinessUser $usersService) {
 	$deptId = $request->input('dept_id', 0);
 	$stepId = $request->input('step_id', 0);
+	$listId = $request->input('list', null);
+	$isArhive = $listId == -1;
 	
-	$depsUsers = $departmentService->getUsersToAssign([$deptId], ['id', 'full_name'], registred: null);
+	
+	
+	$staffIds = ContractData::select(['data', 'contract_id'])
+		->whereHas('meta', function($query) use($isArhive) {
+			if (!$isArhive) $query->where('archive', 0)->orWhereNull('archive');
+			else $query->where('archive', 1);
+		})
+		->where('department_id', $deptId)
+		->where('step_id', $stepId)
+		->where('type', 3)
+		->get()
+		->pluck('data')
+		->unique()
+		->filter()
+		->values()
+		->map(fn ($item) => (int)$item)
+		->toArray();
+	
+	$depsUsers = $usersService->get(fields: ['department_id', 'full_name', 'working'], departments: $deptId, staffIds: $staffIds)->values();
+	
+	//$depsUsers = $departmentService->getUsersToAssign([$deptId], ['id', 'full_name'], registred: null);
 	//$test = $usersService->get(fields: ['department_id', 'full_name', 'working'], registred: true, departments: [$deptId]);
 	
-	
-	return $depsUsers[$deptId][$stepId];
+	return $depsUsers;
 	
     //return User::select('id', 'pseudoname')->where('department_id', $deptId)->get();
 });

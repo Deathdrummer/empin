@@ -28,7 +28,9 @@ class User {
 		$groupBy = null,
 		?array $excludeUsers = null,
 		?array $where = null,
+		?array $staffIds = null,
 		string $orderBy = '_sort') {
+			
 		return Staff::with('registred')
 			->whereHas('registred', function ($query) use ($departments, $excludeUsers) {
 				if ($departments == -1) $query->whereNull('department_id');
@@ -44,6 +46,9 @@ class User {
 			})
 			->when(!is_null($where), function($query) use($where) {
 				$query->where(['disable_show_in_selections' => 0]);
+			})
+			->when(!is_null($staffIds), function($query) use($staffIds) {
+				$query->whereIn('id', $staffIds);
 			})
 			->orderBy($orderBy)
 			->get()

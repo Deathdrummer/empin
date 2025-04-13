@@ -120,16 +120,16 @@ class Contracts extends Controller {
 		}
 		
 		
-		
 		if (!$list || $list->isEmpty()) return response()->json(null)->withHeaders($headers); //return $this->renderWithHeaders('list', compact('columnFilter'), $headers);
 		
 		$alldeps = $this->department->getWithSteps($request);
 		
-		
-		$this->_addDepsUsersToData($alldeps);
-		
 		$contractdata = $this->contract->buildData($list->keys());
+		
+		$this->_addDepsUsersToData($alldeps, $contractdata); // + добавить отключенных выбранных сотрудников к выподающим спискам
+		
 		$userColums = $this->contract->getUserColums();
+		
 		
 		$this->addSettingToGlobalData([[
 				'setting'	=> 'contract-customers:customers',
@@ -1763,10 +1763,43 @@ class Contracts extends Controller {
 	 * @param 
 	 * @return 
 	 */
-	private function _addDepsUsersToData($alldeps = null) {
+	private function _addDepsUsersToData($alldeps = null, $contractdata = null) {
 		$this->data['deps_users'] = [];
 		if (!$alldeps) return false;
 		$depsUsers = $this->department->getUsersToAssign($alldeps, ['id:value', 'full_name:title', 'working:enabled']);
+		
+		if ($contractdata) {
+			# получаем ID сотрудников из выбранных пунктов выпадающих списков сотрудников
+			$choosedStaffIds = array_values(array_unique(iterator_to_array((function ($array) {
+				foreach ($array as $contractId => $departments) foreach ($departments as $deptId => $Steps) foreach ($Steps as $StepId => $sData) {
+					if (($sData['type'] ?? null) == 3) yield (int)$sData['data'];
+				}
+			})($contractdata), false)));
+			
+			$usersService = app()->make(UserService::class);
+			$choosedStaffData = $usersService->get(fields: ['full_name', 'working'], staffIds: $choosedStaffIds, keyBy: 'id');
+			
+			$choosedStaffStructuredData = [];
+			foreach ($contractdata as $contractId => $departments) foreach ($departments as $deptId => $Steps) foreach ($Steps as $StepId => $sData) {
+				if (($sData['type'] ?? null) != 3 || isset($choosedStaffStructuredData[$deptId][$StepId][(int)$sData['data']])) continue;
+				$choosedStaffStructuredData[$deptId][$StepId][(int)$sData['data']] = $choosedStaffData[(int)$sData['data']] ?? null;
+			}
+			
+			foreach ($depsUsers as $deptId => $deptData) foreach ($deptData as $stepId => $users) {
+				if (!isset($choosedStaffStructuredData[$deptId][$stepId])) continue;
+				foreach ($choosedStaffStructuredData[$deptId][$stepId] as $choosedStaff) {
+					if (is_null($choosedStaff) || !isset($depsUsers[$deptId][$stepId]) || arrGetIndexFromField($depsUsers[$deptId][$stepId], 'value', $choosedStaff['id']) !== false) continue;
+					
+					$depsUsers[$deptId][$stepId][] = [
+						'value' => $choosedStaff['id'],
+						'title' => $choosedStaff['full_name'],
+						'disabled' => 1,
+						'selected' => 1,
+					];
+				}
+			}
+		}
+		
 		
 		$this->data['deps_users'] = $depsUsers ?? [];
 	}

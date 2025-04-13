@@ -6707,25 +6707,21 @@ input[type=checkbox]:focus + .toggle-switch {
 @keyframes ddrPopUpIn {
   from {
     background-color: transparent;
-    -webkit-backdrop-filter: blur(0px);
-            backdrop-filter: blur(0px);
+    backdrop-filter: blur(0px);
   }
   to {
     background-color: rgba(16, 48, 48, 0.4588235294);
-    -webkit-backdrop-filter: blur(3px);
-            backdrop-filter: blur(3px);
+    backdrop-filter: blur(3px);
   }
 }
 @keyframes ddrPopUpOut {
   from {
     background-color: rgba(16, 48, 48, 0.4588235294);
-    -webkit-backdrop-filter: blur(3px);
-            backdrop-filter: blur(3px);
+    backdrop-filter: blur(3px);
   }
   to {
     background-color: transparent;
-    -webkit-backdrop-filter: blur(0px);
-            backdrop-filter: blur(0px);
+    backdrop-filter: blur(0px);
   }
 }
 @keyframes ddrPopUpDialogIn {
@@ -6803,8 +6799,7 @@ input[type=checkbox]:focus + .toggle-switch {
 }
 .ddrpopup__wait {
   background-color: rgba(253, 253, 253, 0.9607843137);
-  -webkit-backdrop-filter: blur(2px);
-          backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
 }
 .ddrpopup__wait .ddrpopupwait__icon {
   width: 50px;
@@ -6816,8 +6811,7 @@ input[type=checkbox]:focus + .toggle-switch {
 }
 .ddrpopup__dialog {
   background-color: rgba(0, 115, 116, 0.1019607843);
-  -webkit-backdrop-filter: blur(2px);
-          backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
 }
 .ddrpopup__dialog .popupdialog {
   padding: 15px;
@@ -7816,6 +7810,9 @@ section {
   background-color: #fff;
   padding: 15px;
   border-radius: 4px;
+}
+.card.inline {
+  display: inline-flex;
 }
 .card__wait {
   position: absolute;
