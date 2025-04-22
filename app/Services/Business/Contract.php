@@ -935,17 +935,23 @@ class Contract {
 	 * @param 
 	 * @return 
 	 */
-	public function getSelections($contractId = null) {
+	public function getSelections($contractId = null, $showArchive = null) {
 		$userId = auth('site')->user()->id;
 		
 		$selections = [];
 		
 		if ($contractId) {
 			$contract = ContractModel::where('id', $contractId)
-				->with(['selections' => function ($query) use($userId) {
-					$query->where('account_id', $userId)
-						->orWhereJsonContains('subscribed', ['read' => $userId])
-						->orWhereJsonContains('subscribed', ['write' => $userId]);
+				->with(['selections' => function ($q) use ($userId, $showArchive) {
+					$q->where(function ($q2) use ($userId) {
+						$q2->where('account_id', $userId)
+							->orWhereJsonContains('subscribed', ['read'  => $userId])
+							->orWhereJsonContains('subscribed', ['write' => $userId]);
+					});
+					
+					if (!$showArchive) {
+						$q->where('archive', '=', 0);
+					}
 				}])
 				->first();
 			

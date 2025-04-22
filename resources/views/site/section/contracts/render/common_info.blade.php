@@ -6,7 +6,8 @@
 		justify-content-between
 		pl30px
 		pr60px
-		">
+		"
+		contextmenu="copyCommonInfoItem">
 		
 		@cando('contract-col-title:site')
 			<h3 class="select-text" tripleselect>{{$contract['title'] ?? '-'}}</h3>

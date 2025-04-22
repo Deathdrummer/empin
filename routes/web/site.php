@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\site\Contracts;
 use App\Http\Controllers\site\Selections;
+use App\Http\Controllers\site\Timesheet;
 use App\Http\Controllers\UserController;
 use App\Http\Requests\Auth\UserEmailVerificationRequest;
 use App\Models\Department as DepartmentModel;
@@ -371,6 +372,19 @@ Route::prefix('site')->middleware(['lang', 'isajax:site'])->group(function() {
 	Route::post('/selections/add_selection_from_contextmenu', [Selections::class, 'add_selection_from_contextmenu']);
 	
 	Route::resource('selections', Selections::class);
+	
+	
+	
+	
+	
+	
+	
+	
+	// План-график работ
+	Route::get('/timesheet/init', [Timesheet::class, 'init']);
+	Route::get('/timesheet/slides', [Timesheet::class, 'get_slides_data']);
+	
+	
 });
 
 
