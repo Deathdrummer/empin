@@ -295,11 +295,13 @@ class Contracts extends Controller {
 	 * @param 
 	 * @return 
 	 */
-	public function contract_selections() {
+	public function contract_selections(UserService $user) {
 		$contractId = request('contract_id', null);
 		if (is_null($contractId)) return response()->json(false);
 		
-		$selections = $this->contract->getSelections($contractId);
+		$showArchiveSelectionsInObjectNumber = $user->getSettings('contracts.show_archive_selections_in_object_number');
+		
+		$selections = $this->contract->getSelections($contractId, showArchive: $showArchiveSelectionsInObjectNumber);
 		return $this->render('contract_selections', compact('selections'));
 	}
 	
