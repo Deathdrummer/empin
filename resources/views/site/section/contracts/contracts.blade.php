@@ -1181,7 +1181,7 @@
 			async onClick() {
 				$(target.pointer).val('');
 				try {
-			        const text = 'sdfsdf'; //await pasteStringFromClipboard();
+			        const text = await pasteStringFromClipboard();
 			        $(target.pointer).val(text);
 			    } catch (err) {
 			        console.error('Не удалось прочитать буфер обмена:', err);
