@@ -751,6 +751,14 @@
 	}
 	
 	
+	async function pasteStringFromClipboard() {
+	    if (!navigator.clipboard) {
+	        throw new Error('Clipboard API не поддерживается в этом браузере');
+	    }
+	    return await navigator.clipboard.readText();
+	}
+	
+	
 	
 	function getRandMessage(massArr) {
 		if (!_.isArray(massArr) || massArr.length == 0) return false;
