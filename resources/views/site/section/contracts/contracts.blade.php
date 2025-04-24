@@ -45,6 +45,7 @@
 					placeholder="Поиск..."
 					cleared
 					tag="tool:56"
+					contextmenu="pasteDataToSearchField"
 					/>
 
 				{{-- <x-button
@@ -1146,6 +1147,52 @@
 			}
 		}];
 	}
+	
+	
+	
+	
+	
+	$.pasteDataToSearchField = async ({target, closeOnScroll, onContextMenu, onCloseContextMenu, changeAttrData, buildTitle, setStyle}) => {
+		//const hasSelectedStr = !!getSelectionStr();
+		
+	{{-- 	console.log();	
+		//console.log(hasSelectedStr);
+	 --}}
+
+
+
+		//if (!hasSelectedStr) return false;
+
+		setStyle({
+			mainMinHeight: '30px',
+			mainZIndex: 1001
+		});
+
+		onContextMenu(() => {
+
+		});
+
+		closeOnScroll('#contractsList');
+
+		return [{
+			name: 'Вставить',
+			visible: true,
+			sort: 1,
+			async onClick() {
+				$(target.pointer).val('');
+				try {
+			        const text = 'sdfsdf'; //await pasteStringFromClipboard();
+			        $(target.pointer).val(text);
+			    } catch (err) {
+			        console.error('Не удалось прочитать буфер обмена:', err);
+			    }
+				$.notify('Вставлено!', {autoHideDelay: 2000});
+			}
+		}];
+	}
+	
+	
+	
 
 
 

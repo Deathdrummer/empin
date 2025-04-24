@@ -6453,10 +6453,36 @@ window.copyStringToClipboard = function () {
     document.body.removeChild(el);
   }
 };
+
+window.pasteStringFromClipboard = /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee3() {
+  return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee3$(_context3) {
+    while (1) {
+      switch (_context3.prev = _context3.next) {
+        case 0:
+          if (navigator.clipboard) {
+            _context3.next = 2;
+            break;
+          }
+
+          throw new Error('Clipboard API не поддерживается в этом браузере');
+
+        case 2:
+          _context3.next = 4;
+          return navigator.clipboard.readText();
+
+        case 4:
+          return _context3.abrupt("return", _context3.sent);
+
+        case 5:
+        case "end":
+          return _context3.stop();
+      }
+    }
+  }, _callee3);
+}));
 /*
 	Определение устройства: desktop или mobile
 */
-
 
 window.thisDevice = 'desktop';
 

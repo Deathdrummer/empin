@@ -782,6 +782,16 @@ window.copyStringToClipboard = function(str = null) {
 
 
 
+window.pasteStringFromClipboard = async function() {
+    if (!navigator.clipboard) {
+        throw new Error('Clipboard API не поддерживается в этом браузере');
+    }
+    return await navigator.clipboard.readText();
+}
+
+
+
+
 
 /*
 	Определение устройства: desktop или mobile

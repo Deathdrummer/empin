@@ -175,6 +175,16 @@ class DdrDateTime {
 	
 	
 	
+	public static function getOffsetDate(int $offsetDays = 0):Carbon {
+    	return Carbon::now()->addDays($offsetDays);
+	}
+	
+	
+	
+	
+	
+	
+	
 	/** Конвертировать формат даты
 	 * @return String|null
 	 */
