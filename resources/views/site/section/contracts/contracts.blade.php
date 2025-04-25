@@ -1153,16 +1153,6 @@
 	
 	
 	$.pasteDataToSearchField = async ({target, closeOnScroll, onContextMenu, onCloseContextMenu, changeAttrData, buildTitle, setStyle}) => {
-		//const hasSelectedStr = !!getSelectionStr();
-		
-	{{-- 	console.log();	
-		//console.log(hasSelectedStr);
-	 --}}
-
-
-
-		//if (!hasSelectedStr) return false;
-
 		setStyle({
 			mainMinHeight: '30px',
 			mainZIndex: 1001
@@ -1179,6 +1169,7 @@
 			visible: true,
 			sort: 1,
 			async onClick() {
+				$(target.pointer)trigger('input');
 				$(target.pointer).val('');
 				try {
 			        const text = await pasteStringFromClipboard();
