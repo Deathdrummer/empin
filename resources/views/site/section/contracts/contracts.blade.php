@@ -1169,7 +1169,7 @@
 			visible: true,
 			sort: 1,
 			async onClick() {
-				$(target.pointer)trigger('input');
+				$(target.pointer).trigger('input');
 				$(target.pointer).val('');
 				try {
 			        const text = await pasteStringFromClipboard();
