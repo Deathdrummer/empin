@@ -17,7 +17,6 @@ return new class extends Migration {
 			
 			$table->unsignedBigInteger('department_id')->nullable();
 			$table->longText('steps')->nullable();
-			$table->longText('steps')->nullable();
             $table->timestamp('updated_show')->nullable();
         });
     }

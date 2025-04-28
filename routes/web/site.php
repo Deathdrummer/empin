@@ -57,7 +57,7 @@ Route::post('/email/verification-notification', function (Request $request) {
 Route::get('/forgot-password', function (Request $request) {
 	$email = encodeEmail($request->input('email'));
 	return view('site.auth.forgot-password', ['email' => $email]);
-})->middleware('lang', 'guest:site')->name('password.request');
+})->middleware('lang', 'guest:site');
 
 Route::post('/forgot-password', function (Request $request) {
 	$request->merge(['email' => encodeEmail($request->input('email'))]);
@@ -102,7 +102,7 @@ Route::post('/reset-password', function (Request $request) {
 	} else {
 		return response()->json(['errors' => ['email' => __($status)]]);
 	}
-})->middleware(['lang', 'guest:site'])->name('password.update');
+})->middleware(['lang', 'guest:site']);
 
 
 
