@@ -13,22 +13,15 @@ class VisionAssistantService
 	private array  $referenceFiles;
 	private string $instruction;
 
-	private const ASSISTANT_CACHE = 'openai.vision.assistant_id';
 	private const THREAD_CACHE    = 'openai.vision.thread_id';
 
 	public function __construct()
 	{
-		// 1) load config
 		$this->referenceFiles = config('openai.image_files', []);
 		$this->instruction    = config('openai.vision_instruction', '');
-
-		// 2) get / create assistant (after $instruction is set!)
 		$this->assistantId = config('openai.assistant_id');
 	}
 
-	/* -----------------------------------------------------------------
-	 |  Public API
-	 | ---------------------------------------------------------------- */
 	/**
 	 * Ask the vision assistant a question.
 	 *
@@ -45,9 +38,8 @@ class VisionAssistantService
 			'assistant_id' => $this->assistantId,
 		]);
 
-		// wait for completion
 		do {
-			usleep(300_000);                                   // 0.3 s
+			usleep(300_000);
 			$run = OpenAI::threads()->runs()->retrieve($threadId, $run->id);
 		} while (in_array($run->status, ['queued', 'in_progress']));
 
@@ -64,7 +56,6 @@ class VisionAssistantService
 		return Cache::rememberForever(self::THREAD_CACHE, function () {
 			$thread = OpenAI::threads()->create([]);
 
-			// Send the 20 reference images (max 10 per message)
 			foreach (array_chunk($this->referenceFiles, 10) as $chunk) {
 				$this->createUserMessage($thread->id, '', $chunk);
 			}
@@ -73,9 +64,6 @@ class VisionAssistantService
 		});
 	}
 
-	/* -----------------------------------------------------------------
-	 |  Helpers
-	 | ---------------------------------------------------------------- */
 	private function createUserMessage(string $threadId, string $text, array $fileIds): void
 	{
 		$firstBatchFree = $text === '' ? 10 : 9;
@@ -99,52 +87,28 @@ class VisionAssistantService
 		}
 	}
 
-	/**
-	 * Download an image from a URL, save it with a valid extension,
-	 * upload to OpenAI, return the resulting file_id.
-	 *
-	 * @throws RequestException
-	 */
 	private function uploadTempImage(string $url): string
 	{
-		// ----- download -------------------------------------------------
 		$binary   = Http::get($url)->throw()->body();
 		$pathInfo = pathinfo(parse_url($url, PHP_URL_PATH) ?? '');
 		$ext      = strtolower($pathInfo['extension'] ?? 'png');
 
-		// sanitize / default
 		if (! in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
 			$ext = 'png';
 		}
 
-		// ----- save to a temp file with correct extension ---------------
 		$tempPath = tempnam(sys_get_temp_dir(), 'img_');
 		$finalPath = "{$tempPath}.{$ext}";
 		rename($tempPath, $finalPath);          // ensures extension
 		file_put_contents($finalPath, $binary);
 
-		// ----- upload ---------------------------------------------------
 		$res = OpenAI::files()->upload([
 			'purpose' => 'vision',
 			'file'    => fopen($finalPath, 'r'),
 		]);
 
-		// cleanup
 		unlink($finalPath);
 
 		return $res->id;
-	}
-
-	/**
-	 * Create the assistant once and return its ID.
-	 */
-	private function createAssistant(): string
-	{
-		$assistant = OpenAI::assistants()->create([
-			'model'        => 'gpt-4o',
-			'instructions' => $this->instruction,
-		]);
-
-		return $assistant->id;
 	}
 }
