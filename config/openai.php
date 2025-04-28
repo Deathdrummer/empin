@@ -26,7 +26,7 @@ return [
 
     'request_timeout' => env('OPENAI_REQUEST_TIMEOUT', 30),
 
-	'images' => [
+	'image_files'         => [
 		'file-SecP2YtZHu4ZVGNsZJyTdQ',
 		'file-X5jo5Tw9Y4dYE8MHbJKcev',
 		'file-3TH7YpJALtHxo4nUHmAtGa',
@@ -48,10 +48,8 @@ return [
 		'file-XmhGp2feuNVAtzfzRf5q8Y',
 		'file-MUDQYg9cbXTiK2YXRUZk56',
 	],
-
-	// put your long-lived vision instruction here
-	'instruction' => 'Ты юморист и любишь рассказывать шутки. '
-		. 'Отвечай дружелюбно и весело на все вопросы. '
-		. 'В конце каждого ответа обязательно добавляй смешную шутку или анекдот. ',
+	
+	'instruction' => '',
+	
 	'assistant_id' => 'asst_7y8dYdaljx57SStzZ4ElBHOm'
 ];
