@@ -2,58 +2,56 @@
 
 namespace App\Services;
 
+use Illuminate\Http\UploadedFile;
 use Illuminate\Http\Client\RequestException;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\{Cache, Http, Storage};
 use OpenAI\Laravel\Facades\OpenAI;
 
 /**
- * Сервис для взаимодействия с ассистентом видения OpenAI.
+ * Vision‑assistant gateway с авто‑синком инструкций и референс‑файлов.
  *
- * Класс предоставляет функциональность для создания потоков, отправки сообщений
- * от имени пользователя, прикрепления изображений и выполнения задач с использованием
- * ассистента видения OpenAI. Реализована обработка файлов и управление идентификатором
- * текущего потока через кэш.
+ * Алгоритм:
+ *   • При первом обращении сканируем storage/openai/vision для инструкций и медиа.
+ *   • Для изменившихся файлов считаем hash, перезаливаем на OpenAI и кешируем id.
+ *   • Если текст инструкции изменён — апдейтим ассистента.
+ *   • Поток перезапускаем, когда что‑то меняется.
+ *   • ask() принимает prompt и либо URL‑картинку, либо UploadedFile|path.
  */
 class VisionAssistantService
 {
-	private string $assistantId;
-	private array $referenceFiles;
-	private string $instruction;
+	public const THREAD_CACHE           = 'openai.vision.thread_id';
+	private const FILE_MAP_CACHE        = 'openai.vision.file_map';
+	private const INSTRUCTION_HASH_CACHE = 'openai.vision.instruction_hash';
 
-	private const THREAD_CACHE = 'openai.vision.thread_id';
+	private string $assistantId;
+	private string $dir;
+	private string $instructionFile;
+	private \Illuminate\Contracts\Filesystem\Filesystem $disk;
 
 	public function __construct()
 	{
-		$this->referenceFiles = config('openai.image_files', []);
-		$this->instruction = config('openai.vision_instruction', '');
-		$this->assistantId = config('openai.assistant_id');
+		$this->assistantId     = config('openai.assistant_id');
+		$this->disk = Storage::disk('local');
+		$this->dir  = 'openai/vision';
+		$this->instructionFile = storage_path('/app/openai/vision/instruction.txt');
 	}
 
 	/**
-	 * Отправляет запрос на выполнение задачи и возвращает результат.
+	 * Запрашивает ответ ассистента.
 	 *
-	 * Метод использует идентификатор потока для создания сообщения пользователя,
-	 * добавляет временные вложения, если передан URL изображения, а затем
-	 * инициализирует выполнение задачи с указанным ассистентом. После выполнения
-	 * задачи ожидает завершения обработки и возвращает текст последнего сообщения.
-	 *
-	 * @param string $prompt Текст запроса, который нужно отправить.
-	 * @param string|null $imageUrl URL изображения для временного вложения (опционально).
-	 *
-	 * @return string Возвращает текст ответа из последнего сообщения потока.
 	 * @throws RequestException
 	 */
-	public function ask(string $prompt, ?string $imageUrl = null): string
+	public function ask(string $prompt, string|UploadedFile|null $image = null): string
 	{
-		$threadId = $this->bootThread();
-		$attachments = $imageUrl ? [$this->uploadTempImage($imageUrl)] : [];
+		$this->syncReferenceFiles();
+		$this->syncInstruction();
+
+		$threadId   = $this->bootThread();
+		$attachments = $image ? [$this->uploadImage($image)] : [];
 
 		$this->createUserMessage($threadId, $prompt, $attachments);
 
-		$run = OpenAI::threads()->runs()->create($threadId, [
-			'assistant_id' => $this->assistantId,
-		]);
+		$run = OpenAI::threads()->runs()->create($threadId, ['assistant_id' => $this->assistantId]);
 
 		do {
 			usleep(300_000);
@@ -64,93 +62,126 @@ class VisionAssistantService
 
 		return $latest->data[0]->content[0]->text->value;
 	}
+	
+	/**
+	 * Синхронизирует reference‑файлы: добавляет новые, обновляет изменённые, удаляет старые.
+	 */
+	private function syncReferenceFiles(): void
+	{
+		$current = Cache::get(self::FILE_MAP_CACHE, []);
+		$updated = [];
 
+		foreach ($this->disk->files($this->dir) as $path) {
+			if (basename($path) === 'instruction.txt') {
+				continue;
+			}
+
+			$full  = $this->disk->path($path);
+			$hash  = md5_file($full);
+			$entry = $current[$path] ?? null;
+
+			if (!$entry || $entry['hash'] !== $hash) {
+				$id    = OpenAI::files()->upload([
+					'purpose' => 'vision',
+					'file'    => fopen($full, 'r'),
+				])->id;
+				$entry = ['hash' => $hash, 'id' => $id];
+				Cache::forget(self::THREAD_CACHE);
+			}
+
+			$updated[$path] = $entry;
+		}
+
+		$deleted = array_diff_key($current, $updated);
+		if ($deleted) {
+			foreach ($deleted as $old) {
+				try {
+					OpenAI::files()->delete($old['id']);
+				} catch (\Throwable) {
+					// если файл уже удалён вручную в панели, молча игнорируем
+				}
+			}
+			Cache::forget(self::THREAD_CACHE);
+		}
+
+		Cache::forever(self::FILE_MAP_CACHE, $updated);
+	}
+
+	
+	private function syncInstruction(): void
+	{
+		if (!is_file($this->instructionFile)) {
+			return;
+		}
+
+		$local = file_get_contents($this->instructionFile);
+		$local = str_replace(["\r\n", "\r"], "\n", $local);
+
+		$remote = OpenAI::assistants()
+			->retrieve($this->assistantId)
+			->instructions ?? '';
+		if ($local !== $remote) {
+			OpenAI::assistants()->modify($this->assistantId, [
+				'instructions' => $local,
+			]);
+
+			Cache::forget(self::THREAD_CACHE);
+		}
+	}
 
 	/**
-	 * Инициализирует поток и сохраняет его идентификатор в кэше.
-	 *
-	 * Метод создает новый поток с использованием OpenAI, разбивает
-	 * массив ссылочных файлов на части и вызывает метод для
-	 * создания пользовательских сообщений в соответствующем потоке.
-	 *
-	 * @return string Возвращает идентификатор созданного потока.
+	 * Создаёт поток (или возвращает кешированный) и прикрепляет reference‑файлы.
 	 */
 	private function bootThread(): string
 	{
 		return Cache::rememberForever(self::THREAD_CACHE, function () {
 			$thread = OpenAI::threads()->create([]);
-
-			foreach (array_chunk($this->referenceFiles, 10) as $chunk) {
+			$ids    = array_column(Cache::get(self::FILE_MAP_CACHE, []), 'id');
+			foreach (array_chunk($ids, 10) as $chunk) {
 				$this->createUserMessage($thread->id, '', $chunk);
 			}
-
 			return $thread->id;
 		});
 	}
 
 	/**
-	 * Создает сообщение пользователя с текстом и прикрепленными файлами в указанной теме.
-	 *
-	 * @param string $threadId Идентификатор темы, в которую создается сообщение.
-	 * @param string $text Текст сообщения. Может быть пустым.
-	 * @param array $fileIds Массив идентификаторов файлов, которые необходимо прикрепить к сообщению.
-	 *
-	 * @return void
+	 * Пушит message в поток.
 	 */
 	private function createUserMessage(string $threadId, string $text, array $fileIds): void
 	{
 		$firstBatchFree = $text === '' ? 10 : 9;
-		$chunks = array_chunk($fileIds, $firstBatchFree);
-
-		foreach ($chunks as $index => $chunk) {
+		foreach (array_chunk($fileIds, $firstBatchFree) as $index => $chunk) {
 			$content = [];
-
 			if ($index === 0 && $text !== '') {
 				$content[] = ['type' => 'text', 'text' => $text];
 			}
-
 			foreach ($chunk as $id) {
 				$content[] = ['type' => 'image_file', 'image_file' => ['file_id' => $id]];
 			}
-
-			OpenAI::threads()->messages()->create($threadId, [
-				'role' => 'user',
-				'content' => $content,
-			]);
+			OpenAI::threads()->messages()->create($threadId, ['role' => 'user', 'content' => $content]);
 		}
 	}
 
 	/**
-	 * Загружает временное изображение из указанного URL и отправляет его на сервер.
+	 * Заливает картинку (URL или локальную) и возвращает file_id.
 	 *
-	 * @param string $url URL изображения, которое необходимо обработать.
-	 *
-	 * @return string Идентификатор загруженного файла.
-	 *
-	 * @throws RequestException Если запрос на получение изображения завершился неудачей.
+	 * @throws RequestException
 	 */
-	private function uploadTempImage(string $url): string
+	private function uploadImage(string|UploadedFile $image): string
 	{
-		$binary = Http::get($url)->throw()->body();
-		$pathInfo = pathinfo(parse_url($url, PHP_URL_PATH) ?? '');
-		$ext = strtolower($pathInfo['extension'] ?? 'png');
-
-		if (!in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
-			$ext = 'png';
+		if ($image instanceof UploadedFile || is_file($image)) {
+			$path = $image instanceof UploadedFile ? $image->getRealPath() : $image;
+			return OpenAI::files()->upload(['purpose' => 'vision', 'file' => fopen($path, 'r')])->id;
 		}
 
-		$tempPath = tempnam(sys_get_temp_dir(), 'img_');
-		$finalPath = "{$tempPath}.{$ext}";
-		rename($tempPath, $finalPath);
-		file_put_contents($finalPath, $binary);
+		$binary    = Http::get($image)->throw()->body();
+		$extension = pathinfo(parse_url($image, PHP_URL_PATH) ?? '', PATHINFO_EXTENSION) ?: 'png';
+		$tempPath  = tempnam(sys_get_temp_dir(), 'img_') . ".{$extension}";
+		file_put_contents($tempPath, $binary);
 
-		$res = OpenAI::files()->upload([
-			'purpose' => 'vision',
-			'file' => fopen($finalPath, 'r'),
-		]);
+		$id = OpenAI::files()->upload(['purpose' => 'vision', 'file' => fopen($tempPath, 'r')])->id;
+		unlink($tempPath);
 
-		unlink($finalPath);
-
-		return $res->id;
+		return $id;
 	}
 }
