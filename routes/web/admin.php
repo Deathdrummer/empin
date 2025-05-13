@@ -4,14 +4,19 @@ use App\Http\Controllers\AdminController;
 use App\Http\Requests\Auth\AdminEmailVerificationRequest;
 use App\Models\AdminSection;
 use App\Models\AdminUser;
+use App\Models\AssistentFile;
 use App\Services\Settings;
+use App\Services\VisionAssistantService;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
+use Intervention\Image\Laravel\Facades\Image;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
 
@@ -161,7 +166,7 @@ Route::middleware(['lang', 'auth:admin', 'isajax:admin'])->post('/get_section', 
 	}
 	
 	
-	//$settingsData = $settings->getGroup($section ?: 'common') ?: [];
+	$settingsData = []; //$settings->getGroup($section ?: 'common') ?: [];
 	
 	$sectionPath = $section;
 	
@@ -190,6 +195,52 @@ Route::middleware(['lang', 'auth:admin', 'isajax:admin'])->post('/get_section', 
 	} 
 	
 	
+	
+	switch ($section) {
+		case 'system':
+			$files = null;
+			if ($assistentfiles = AssistentFile::get()) {
+				$files = $assistentfiles->filter(function($row) {
+					$path = 'assistent/'.$row['filename_sys'];
+					if (!Storage::exists($path)) return false;
+					
+					if (!$row['is_image']) {
+						$extension = File::extension($path);
+						$row['thumb'] = "/assets/images/filetypes/{$extension}.png";
+						return true;
+					} 
+					
+					$image = Image::read('storage/'.$path);
+					$thumb = $image->scale(height: 70);
+					$row['thumb'] = $thumb->toGif()->toDataUri();
+					return true;
+				});
+			}
+		
+			$settingsData['files'] = $files;
+			
+			
+			$planPromptPath = 'prompts/plan.txt';
+			$settingsData['prompt_file_name'] = 'plan.txt';
+			$settingsData['prompt_file_data'] = Storage::exists($planPromptPath) ? Storage::get($planPromptPath) : '';
+			
+			
+			$assistent = app()->make(VisionAssistantService::class);
+			
+			$settingsData['answer'] = $assistent->ask('сколько будет 2 + 2');
+			
+			
+			break;
+		
+		default:
+			# code...
+			break;
+	}
+	
+	
+	
+	
+	
 	$page = AdminSection::select('page_title')
 		->where('section', str_replace([
 			'.index','.default',$section.'.'.$section],
@@ -199,7 +250,7 @@ Route::middleware(['lang', 'auth:admin', 'isajax:admin'])->post('/get_section', 
 	
 	$pageTitle[] = $page ? $page->page_title : null; /* urlencode(__('custom.no_section_header_title')) */
 	
-	return response()->view('admin.section.'.$sectionPath, []/* $settingsData */, 200)->header('X-Page-Title', json_encode($pageTitle));
+	return response()->view('admin.section.'.$sectionPath, $settingsData, 200)->header('X-Page-Title', json_encode($pageTitle));
 });
 
 

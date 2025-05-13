@@ -25,5 +25,6 @@
 		{{$setInpGroup()}}
 		{{$isMultiple()}}
 		@if($tag) {!!$tag!!} @endif
+		hidden
 		>
 </div>

@@ -687,7 +687,7 @@ class Contracts extends Controller {
 		}
 		
 		$files = null;
-		if ($contractfiles = ContractFile::GetByConmtractId($contractId)->get()) {
+		if ($contractfiles = ContractFile::GetByContractId($contractId)->get()) {
 			$files = $contractfiles->filter(function($row) {
 				$path = 'contracts/'.$row['contract_id'].'/'.$row['filename_sys'];
 				if (!Storage::exists($path)) return false;

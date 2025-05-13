@@ -33,8 +33,8 @@ class VisionAssistantService
 	{
 		$this->assistantId     = config('openai.assistant_id');
 		$this->disk = Storage::disk('local');
-		$this->dir  = 'openai/vision';
-		$this->instructionFile = storage_path('/app/openai/vision/instruction.txt');
+		$this->dir  = 'assistent';
+		$this->instructionFile = 'prompts/plan.txt';
 
 		$this->openai = \OpenAI::factory()
 			->withApiKey(config('openai.api_key'))
@@ -130,7 +130,7 @@ class VisionAssistantService
 			return;
 		}
 
-		$local = file_get_contents($this->instructionFile);
+		$local = Storage::exists($this->instructionFile) ? Storage::get($this->instructionFile) : '';
 		$local = str_replace(["\r\n", "\r"], "\n", $local);
 
 		$remote = $this->openai->assistants()

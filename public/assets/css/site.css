@@ -5057,13 +5057,14 @@ input[type=checkbox]:focus + .toggle-switch {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 250px;
-  height: 250px;
+  width: 150px;
+  height: 150px;
   border: 1px solid #ccc;
   border-radius: 4px;
+  cursor: pointer;
 }
 .ddr-file__empty {
-  font-size: 30px;
+  font-size: 20px;
   font-family: Fira Sans, sans-serif;
   font-weight: 400;
   color: #c8ccd1;

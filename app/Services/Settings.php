@@ -34,7 +34,7 @@ class Settings {
 	 * @param array|string ...$keys
 	 * @return Collection|array|null
 	 */
-	public function getMany(array|string $key, array|string ...$keys): Collection|array|null {
+	public function getMany(array|string $key, array|string ...$keys): Collection|array|null|bool {
 		if (!$key) return false;
 		
 		$keys = collect([]);
@@ -171,7 +171,7 @@ class Settings {
 	 * @param 
 	 * @return array 
 	 */
-	private function parseKey(?string $keyStr = null): array {
+	private function parseKey(?string $keyStr = null):bool|array {
 		if (!$keyStr) return false;
 		$expKey = explode('.', $keyStr);
 		$key = array_shift($expKey);

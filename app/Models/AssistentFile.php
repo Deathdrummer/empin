@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
-class ContractFile extends Model {
+class AssistentFile extends Model {
     use HasFactory, Collectionable, Filterable;
 	
 	
@@ -15,7 +15,7 @@ class ContractFile extends Model {
 	 *
      * @var string
      */
-	protected $table = 'contract_files';
+	protected $table = 'assistent_files';
 	
 	
 	/**
@@ -44,38 +44,6 @@ class ContractFile extends Model {
 	
 	
 	
-	
-	
-	/**
-	 * @param 
-	 * @return 
-	 */
-	public function contract():HasOne {
-		return $this->hasOne(Contract::class, 'id', 'contract_id')->select(['id', 'object_number', 'applicant', 'archive']);
-	}
-	
-	
-	/**
-	 * @param 
-	 * @return 
-	 */
-	public function author():HasOne {
-		return $this->hasOne(User::class, 'id', 'from_id')->select(['id', 'name', 'pseudoname']);
-	}
-	
-	
-	
-	
-	
-	/**
-	* 
-	* @param 
-	* @return 
-	*/
-	public function scopeGetByContractId($query, $contractId = null) {
-		if (!$contractId) return false;
-		return $query->where('contract_id', $contractId);
-	}
 	
 	
 }
