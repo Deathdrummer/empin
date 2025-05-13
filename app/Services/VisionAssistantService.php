@@ -6,7 +6,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\{Cache, Http, Storage};
 use OpenAI\Laravel\Facades\OpenAI;
-
+use GuzzleHttp\Client as GuzzleClient;
 /**
  * Vision‑assistant gateway с авто‑синком инструкций и референс‑файлов.
  *
@@ -27,13 +27,29 @@ class VisionAssistantService
 	private string $dir;
 	private string $instructionFile;
 	private \Illuminate\Contracts\Filesystem\Filesystem $disk;
-
+	private \OpenAI\Client $openai;
+	
 	public function __construct()
 	{
 		$this->assistantId     = config('openai.assistant_id');
 		$this->disk = Storage::disk('local');
 		$this->dir  = 'openai/vision';
 		$this->instructionFile = storage_path('/app/openai/vision/instruction.txt');
+
+		$this->openai = \OpenAI::factory()
+			->withApiKey(config('openai.api_key'))
+			->withHttpClient(new GuzzleClient([
+				'headers' => [
+					'OpenAI-Beta' => 'assistants=v2',
+				],
+				'proxy'  => [
+					'http'  => config('openai.proxy_url'),
+					'https' => config('openai.proxy_url'),
+				],
+				'verify'  => false,
+				'timeout' => 60,
+			]))
+			->make();
 	}
 
 	/**
@@ -51,14 +67,14 @@ class VisionAssistantService
 
 		$this->createUserMessage($threadId, $prompt, $attachments);
 
-		$run = OpenAI::threads()->runs()->create($threadId, ['assistant_id' => $this->assistantId]);
+		$run = $this->openai->threads()->runs()->create($threadId, ['assistant_id' => $this->assistantId]);
 
 		do {
 			usleep(300_000);
-			$run = OpenAI::threads()->runs()->retrieve($threadId, $run->id);
+			$run = $this->openai->threads()->runs()->retrieve($threadId, $run->id);
 		} while (in_array($run->status, ['queued', 'in_progress']));
 
-		$latest = OpenAI::threads()->messages()->list($threadId, ['limit' => 1]);
+		$latest = $this->openai->threads()->messages()->list($threadId, ['limit' => 1]);
 
 		return $latest->data[0]->content[0]->text->value;
 	}
@@ -81,7 +97,7 @@ class VisionAssistantService
 			$entry = $current[$path] ?? null;
 
 			if (!$entry || $entry['hash'] !== $hash) {
-				$id    = OpenAI::files()->upload([
+				$id    = $this->openai->files()->upload([
 					'purpose' => 'vision',
 					'file'    => fopen($full, 'r'),
 				])->id;
@@ -96,7 +112,7 @@ class VisionAssistantService
 		if ($deleted) {
 			foreach ($deleted as $old) {
 				try {
-					OpenAI::files()->delete($old['id']);
+					$this->openai->files()->delete($old['id']);
 				} catch (\Throwable) {
 					// если файл уже удалён вручную в панели, молча игнорируем
 				}
@@ -117,11 +133,11 @@ class VisionAssistantService
 		$local = file_get_contents($this->instructionFile);
 		$local = str_replace(["\r\n", "\r"], "\n", $local);
 
-		$remote = OpenAI::assistants()
+		$remote = $this->openai->assistants()
 			->retrieve($this->assistantId)
 			->instructions ?? '';
 		if ($local !== $remote) {
-			OpenAI::assistants()->modify($this->assistantId, [
+			$this->openai->assistants()->modify($this->assistantId, [
 				'instructions' => $local,
 			]);
 
@@ -135,7 +151,7 @@ class VisionAssistantService
 	private function bootThread(): string
 	{
 		return Cache::rememberForever(self::THREAD_CACHE, function () {
-			$thread = OpenAI::threads()->create([]);
+			$thread = $this->openai->threads()->create([]);
 			$ids    = array_column(Cache::get(self::FILE_MAP_CACHE, []), 'id');
 			foreach (array_chunk($ids, 10) as $chunk) {
 				$this->createUserMessage($thread->id, '', $chunk);
@@ -158,7 +174,7 @@ class VisionAssistantService
 			foreach ($chunk as $id) {
 				$content[] = ['type' => 'image_file', 'image_file' => ['file_id' => $id]];
 			}
-			OpenAI::threads()->messages()->create($threadId, ['role' => 'user', 'content' => $content]);
+			$this->openai->threads()->messages()->create($threadId, ['role' => 'user', 'content' => $content]);
 		}
 	}
 
@@ -171,7 +187,7 @@ class VisionAssistantService
 	{
 		if ($image instanceof UploadedFile || is_file($image)) {
 			$path = $image instanceof UploadedFile ? $image->getRealPath() : $image;
-			return OpenAI::files()->upload(['purpose' => 'vision', 'file' => fopen($path, 'r')])->id;
+			return $this->openai->files()->upload(['purpose' => 'vision', 'file' => fopen($path, 'r')])->id;
 		}
 
 		$binary    = Http::get($image)->throw()->body();
@@ -179,7 +195,7 @@ class VisionAssistantService
 		$tempPath  = tempnam(sys_get_temp_dir(), 'img_') . ".{$extension}";
 		file_put_contents($tempPath, $binary);
 
-		$id = OpenAI::files()->upload(['purpose' => 'vision', 'file' => fopen($tempPath, 'r')])->id;
+		$id = $this->openai->files()->upload(['purpose' => 'vision', 'file' => fopen($tempPath, 'r')])->id;
 		unlink($tempPath);
 
 		return $id;

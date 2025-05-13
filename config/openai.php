@@ -14,6 +14,7 @@ return [
 
     'api_key' => env('OPENAI_API_KEY'),
     'organization' => env('OPENAI_ORGANIZATION'),
+    'proxy_url' => env('OPENAI_PROXY_URL', 'http://jKLuRw:cBapQt@158.46.182.154:8000'),
 
     /*
     |--------------------------------------------------------------------------
