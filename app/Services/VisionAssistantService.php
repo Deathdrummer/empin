@@ -7,6 +7,7 @@ use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\{Cache, Http, Storage};
 use OpenAI\Laravel\Facades\OpenAI;
 use GuzzleHttp\Client as GuzzleClient;
+
 /**
  * Vision‑assistant gateway с авто‑синком инструкций и референс‑файлов.
  *
@@ -88,7 +89,7 @@ class VisionAssistantService
 		$updated = [];
 
 		foreach ($this->disk->files($this->dir) as $path) {
-			if (basename($path) === 'instruction.txt') {
+			if (basename($path) === 'plan.txt') {
 				continue;
 			}
 
@@ -123,7 +124,6 @@ class VisionAssistantService
 		Cache::forever(self::FILE_MAP_CACHE, $updated);
 	}
 
-	
 	private function syncInstruction(): void
 	{
 		if (!is_file($this->instructionFile)) {
@@ -136,6 +136,7 @@ class VisionAssistantService
 		$remote = $this->openai->assistants()
 			->retrieve($this->assistantId)
 			->instructions ?? '';
+
 		if ($local !== $remote) {
 			$this->openai->assistants()->modify($this->assistantId, [
 				'instructions' => $local,
@@ -154,27 +155,53 @@ class VisionAssistantService
 			$thread = $this->openai->threads()->create([]);
 			$ids    = array_column(Cache::get(self::FILE_MAP_CACHE, []), 'id');
 			foreach (array_chunk($ids, 10) as $chunk) {
-				$this->createUserMessage($thread->id, '', $chunk);
+				$this->createUserMessage($thread->id, '', $chunk, 'assistant');
 			}
 			return $thread->id;
 		});
 	}
-
+	
 	/**
 	 * Пушит message в поток.
 	 */
-	private function createUserMessage(string $threadId, string $text, array $fileIds): void
+	private function createUserMessage(string $threadId, string $text, array $fileIds, string $role = 'user'): void
 	{
+		if (empty($fileIds)) {
+			$this->openai->threads()->messages()->create($threadId, [
+				'role' => $role,
+				'content' => [
+					[
+						'type' => 'text',
+						'text' => $text,
+					],
+				],
+			]);
+			return;
+		}
+
 		$firstBatchFree = $text === '' ? 10 : 9;
+
 		foreach (array_chunk($fileIds, $firstBatchFree) as $index => $chunk) {
 			$content = [];
+
 			if ($index === 0 && $text !== '') {
-				$content[] = ['type' => 'text', 'text' => $text];
+				$content[] = [
+					'type' => 'text',
+					'text' => $text,
+				];
 			}
+
 			foreach ($chunk as $id) {
-				$content[] = ['type' => 'image_file', 'image_file' => ['file_id' => $id]];
+				$content[] = [
+					'type' => 'image_file',
+					'image_file' => ['file_id' => $id],
+				];
 			}
-			$this->openai->threads()->messages()->create($threadId, ['role' => 'user', 'content' => $content]);
+
+			$this->openai->threads()->messages()->create($threadId, [
+				'role' => $role,
+				'content' => $content,
+			]);
 		}
 	}
 
