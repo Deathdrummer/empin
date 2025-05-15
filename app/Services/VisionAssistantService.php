@@ -3,39 +3,30 @@
 namespace App\Services;
 
 use Illuminate\Http\UploadedFile;
-use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\{Cache, Http, Storage};
 use OpenAI\Laravel\Facades\OpenAI;
 use GuzzleHttp\Client as GuzzleClient;
 
-/**
- * Vision‑assistant gateway с авто‑синком инструкций и референс‑файлов.
- *
- * Алгоритм:
- *   • При первом обращении сканируем storage/openai/vision для инструкций и медиа.
- *   • Для изменившихся файлов считаем hash, перезаливаем на OpenAI и кешируем id.
- *   • Если текст инструкции изменён — апдейтим ассистента.
- *   • Поток перезапускаем, когда что‑то меняется.
- *   • ask() принимает prompt и либо URL‑картинку, либо UploadedFile|path.
- */
 class VisionAssistantService
 {
-	public const THREAD_CACHE           = 'openai.vision.thread_id';
-	private const FILE_MAP_CACHE        = 'openai.vision.file_map';
-	private const INSTRUCTION_HASH_CACHE = 'openai.vision.instruction_hash';
+	public const THREAD_CACHE = 'openai.vision.thread_id';
+	private const FILE_MAP_CACHE = 'openai.vision.file_map';
 
 	private string $assistantId;
 	private string $dir;
 	private string $instructionFile;
 	private \Illuminate\Contracts\Filesystem\Filesystem $disk;
 	private \OpenAI\Client $openai;
-	
-	public function __construct()
-	{
-		$this->assistantId     = config('openai.assistant_id');
+
+	public function __construct(
+		?string $assistantId = null,
+		?string $instructionFile = null,
+		?string $dir = null
+	) {
+		$this->assistantId = $assistantId ?? config('openai.assistant_id');
+		$this->instructionFile = $instructionFile ?? 'prompts/plan.txt';
+		$this->dir = $dir ?? 'assistent';
 		$this->disk = Storage::disk('local');
-		$this->dir  = 'assistent';
-		$this->instructionFile = 'prompts/plan.txt';
 
 		$this->openai = \OpenAI::factory()
 			->withApiKey(config('openai.api_key'))
@@ -43,30 +34,90 @@ class VisionAssistantService
 				'headers' => [
 					'OpenAI-Beta' => 'assistants=v2',
 				],
-				'proxy'  => [
-					'http'  => config('openai.proxy_url'),
+				'proxy' => [
+					'http' => config('openai.proxy_url'),
 					'https' => config('openai.proxy_url'),
 				],
-				'verify'  => false,
+				'verify' => false,
 				'timeout' => 60,
 			]))
 			->make();
 	}
 
+	public function use(string $assistantId, ?string $instructionFile = null, ?string $dir = null): static
+	{
+		$this->assistantId = $assistantId;
+		if ($instructionFile) {
+			$this->instructionFile = $instructionFile;
+		}
+		if ($dir) {
+			$this->dir = $dir;
+		}
+		Cache::forget(self::THREAD_CACHE);
+		return $this;
+	}
+	
 	/**
-	 * Запрашивает ответ ассистента.
+	 * Возвращает список всех ассистентов вашей организации.
+	 * 
+	 * @param array{
+	 *     limit?:   int,
+	 *     order?:   'asc'|'desc',
+	 *     after?:   string,
+	 *     before?:  string,
+	 * } $params
 	 *
-	 * @throws RequestException
+	 * @return array Массив в формате, возвращаемом OpenAI API.
 	 */
-	public function ask(string $prompt, string|UploadedFile|null $image = null): string
+	public function listAssistants(array $params = []): array
+	{
+		return $this->openai->assistants()->list($params)->toArray();
+	}
+	
+	/**
+	 * Создаёт нового ассистента.
+	 *
+	 * @param array{
+	 *     model: string,
+	 *     instructions: string,
+	 *     name?: string,
+	 *     description?: string,
+	 *     tools?: array<array{type: string, function?: array, tool_resources?: array}>,
+	 *     tool_resources?: array,
+	 *     metadata?: array<string, scalar>,
+	 *     temperature?: float,
+	 *     top_p?: float,
+	 *     format?: 'auto'|'text'|'json_object',
+	 *     response_format?: 'auto'|'text'|'json_object',
+	 * } $params
+	 *
+	 * @return array Данные нового ассистента в оригинальном формате OpenAI.
+	 */
+	public function createAssistant(array $params): array
+	{
+		return $this->openai->assistants()->create($params)->toArray();
+	}
+
+	public function ask(?string $prompt = null, UploadedFile|string|array|null $files = null): string
 	{
 		$this->syncReferenceFiles();
 		$this->syncInstruction();
 
-		$threadId   = $this->bootThread();
-		$attachments = $image ? [$this->uploadImage($image)] : [];
+		$threadId = $this->bootThread();
 
-		$this->createUserMessage($threadId, $prompt, $attachments);
+		$attachments = [];
+		if ($files !== null) {
+			$files = is_array($files) ? $files : [$files];
+			foreach ($files as $file) {
+				$kind = $this->detectFileKind($file);
+				$attachments[] = [
+					'id' => $this->uploadFile($file, $kind),
+					'kind' => $kind,
+				];
+			}
+		}
+
+		$this->createUserMessage($threadId, $prompt ?? '', $attachments);
 
 		$run = $this->openai->threads()->runs()->create($threadId, ['assistant_id' => $this->assistantId]);
 
@@ -79,30 +130,28 @@ class VisionAssistantService
 
 		return $latest->data[0]->content[0]->text->value;
 	}
-	
-	/**
-	 * Синхронизирует reference‑файлы: добавляет новые, обновляет изменённые, удаляет старые.
-	 */
+
 	private function syncReferenceFiles(): void
 	{
 		$current = Cache::get(self::FILE_MAP_CACHE, []);
 		$updated = [];
 
 		foreach ($this->disk->files($this->dir) as $path) {
-			if (basename($path) === 'plan.txt') {
+			if (basename($path) === basename($this->instructionFile)) {
 				continue;
 			}
 
-			$full  = $this->disk->path($path);
-			$hash  = md5_file($full);
+			$full = $this->disk->path($path);
+			$hash = md5_file($full);
+			$kind = $this->detectFileKind($full);
 			$entry = $current[$path] ?? null;
 
 			if (!$entry || $entry['hash'] !== $hash) {
-				$id    = $this->openai->files()->upload([
-					'purpose' => 'vision',
-					'file'    => fopen($full, 'r'),
+				$id = $this->openai->files()->upload([
+					'purpose' => $kind === 'image_file' ? 'vision' : 'assistants',
+					'file' => fopen($full, 'r'),
 				])->id;
-				$entry = ['hash' => $hash, 'id' => $id];
+				$entry = ['hash' => $hash, 'id' => $id, 'kind' => $kind];
 				Cache::forget(self::THREAD_CACHE);
 			}
 
@@ -110,14 +159,14 @@ class VisionAssistantService
 		}
 
 		$deleted = array_diff_key($current, $updated);
-		if ($deleted) {
-			foreach ($deleted as $old) {
-				try {
-					$this->openai->files()->delete($old['id']);
-				} catch (\Throwable) {
-					// если файл уже удалён вручную в панели, молча игнорируем
-				}
+		foreach ($deleted as $old) {
+			try {
+				$this->openai->files()->delete($old['id']);
+			} catch (\Throwable) {
 			}
+		}
+
+		if ($deleted) {
 			Cache::forget(self::THREAD_CACHE);
 		}
 
@@ -126,78 +175,58 @@ class VisionAssistantService
 
 	private function syncInstruction(): void
 	{
-		if (!is_file($this->instructionFile)) {
+		if (!Storage::exists($this->instructionFile)) {
 			return;
 		}
 
-		$local = Storage::exists($this->instructionFile) ? Storage::get($this->instructionFile) : '';
-		$local = str_replace(["\r\n", "\r"], "\n", $local);
+		$local = str_replace(["\r\n", "\r"], "\n", Storage::get($this->instructionFile));
 
-		$remote = $this->openai->assistants()
-			->retrieve($this->assistantId)
-			->instructions ?? '';
+		$remote = $this->openai->assistants()->retrieve($this->assistantId)->instructions ?? '';
 
 		if ($local !== $remote) {
 			$this->openai->assistants()->modify($this->assistantId, [
 				'instructions' => $local,
 			]);
-
 			Cache::forget(self::THREAD_CACHE);
 		}
 	}
 
-	/**
-	 * Создаёт поток (или возвращает кешированный) и прикрепляет reference‑файлы.
-	 */
 	private function bootThread(): string
 	{
 		return Cache::rememberForever(self::THREAD_CACHE, function () {
 			$thread = $this->openai->threads()->create([]);
-			$ids    = array_column(Cache::get(self::FILE_MAP_CACHE, []), 'id');
-			foreach (array_chunk($ids, 10) as $chunk) {
+			$entries = array_values(Cache::get(self::FILE_MAP_CACHE, []));
+			foreach (array_chunk($entries, 10) as $chunk) {
 				$this->createUserMessage($thread->id, '', $chunk, 'assistant');
 			}
 			return $thread->id;
 		});
 	}
-	
-	/**
-	 * Пушит message в поток.
-	 */
-	private function createUserMessage(string $threadId, string $text, array $fileIds, string $role = 'user'): void
+
+	private function createUserMessage(string $threadId, string $text, array $attachments, string $role = 'user'): void
 	{
-		if (empty($fileIds)) {
+		if (empty($attachments)) {
 			$this->openai->threads()->messages()->create($threadId, [
 				'role' => $role,
-				'content' => [
-					[
-						'type' => 'text',
-						'text' => $text,
-					],
-				],
+				'content' => [['type' => 'text', 'text' => $text]],
 			]);
 			return;
 		}
 
 		$firstBatchFree = $text === '' ? 10 : 9;
-
-		foreach (array_chunk($fileIds, $firstBatchFree) as $index => $chunk) {
+		foreach (array_chunk($attachments, $firstBatchFree) as $index => $chunk) {
 			$content = [];
-
 			if ($index === 0 && $text !== '') {
-				$content[] = [
-					'type' => 'text',
-					'text' => $text,
-				];
+				$content[] = ['type' => 'text', 'text' => $text];
 			}
-
-			foreach ($chunk as $id) {
-				$content[] = [
-					'type' => 'image_file',
-					'image_file' => ['file_id' => $id],
-				];
+			foreach ($chunk as $att) {
+				if (!is_array($att)) {
+					$att = ['id' => $att, 'kind' => 'file'];
+				}
+				$content[] = $att['kind'] === 'image_file'
+					? ['type' => 'image_file', 'image_file' => ['file_id' => $att['id']]]
+					: ['type' => 'file', 'file' => ['file_id' => $att['id']]];
 			}
-
 			$this->openai->threads()->messages()->create($threadId, [
 				'role' => $role,
 				'content' => $content,
@@ -205,26 +234,34 @@ class VisionAssistantService
 		}
 	}
 
-	/**
-	 * Заливает картинку (URL или локальную) и возвращает file_id.
-	 *
-	 * @throws RequestException
-	 */
-	private function uploadImage(string|UploadedFile $image): string
+	private function uploadFile(string|UploadedFile $file, string $kind): string
 	{
-		if ($image instanceof UploadedFile || is_file($image)) {
-			$path = $image instanceof UploadedFile ? $image->getRealPath() : $image;
-			return $this->openai->files()->upload(['purpose' => 'vision', 'file' => fopen($path, 'r')])->id;
+		if ($file instanceof UploadedFile || is_file($file)) {
+			$path = $file instanceof UploadedFile ? $file->getRealPath() : $file;
+			return $this->openai->files()->upload([
+				'purpose' => $kind === 'image_file' ? 'vision' : 'assistants',
+				'file' => fopen($path, 'r'),
+			])->id;
 		}
 
-		$binary    = Http::get($image)->throw()->body();
-		$extension = pathinfo(parse_url($image, PHP_URL_PATH) ?? '', PATHINFO_EXTENSION) ?: 'png';
-		$tempPath  = tempnam(sys_get_temp_dir(), 'img_') . ".{$extension}";
-		file_put_contents($tempPath, $binary);
+		$binary = Http::get($file)->throw()->body();
+		$ext = pathinfo(parse_url($file, PHP_URL_PATH) ?? '', PATHINFO_EXTENSION) ?: 'dat';
+		$tmp = tempnam(sys_get_temp_dir(), 'file_') . ".$ext";
+		file_put_contents($tmp, $binary);
 
-		$id = $this->openai->files()->upload(['purpose' => 'vision', 'file' => fopen($tempPath, 'r')])->id;
-		unlink($tempPath);
+		$id = $this->openai->files()->upload([
+			'purpose' => $kind === 'image_file' ? 'vision' : 'assistants',
+			'file' => fopen($tmp, 'r'),
+		])->id;
+		unlink($tmp);
 
 		return $id;
+	}
+
+	private function detectFileKind(string|UploadedFile $file): string
+	{
+		$path = $file instanceof UploadedFile ? $file->getRealPath() : $file;
+		$mime = is_file($path) ? mime_content_type($path) : Http::head($file)->header('Content-Type');
+		return str_starts_with($mime, 'image/') ? 'image_file' : 'file';
 	}
 }
