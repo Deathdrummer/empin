@@ -203,36 +203,44 @@ class VisionAssistantService
 		});
 	}
 
-	private function createUserMessage(string $threadId, string $text, array $attachments, string $role = 'user'): void
-	{
-		if (empty($attachments)) {
-			$this->openai->threads()->messages()->create($threadId, [
-				'role' => $role,
-				'content' => [['type' => 'text', 'text' => $text]],
-			]);
-			return;
+	private function createUserMessage(
+		string $threadId,
+		string $text,
+		array  $attachments,
+		string $role = 'user'
+	): void {
+		$content   = [];
+		$attaches  = [];
+
+		if ($text !== '') {
+			$content[] = ['type' => 'text', 'text' => $text];
 		}
 
-		$firstBatchFree = $text === '' ? 10 : 9;
-		foreach (array_chunk($attachments, $firstBatchFree) as $index => $chunk) {
-			$content = [];
-			if ($index === 0 && $text !== '') {
-				$content[] = ['type' => 'text', 'text' => $text];
+		foreach ($attachments as $att) {
+			if ($att['kind'] === 'image_file') {
+				$content[] = [
+					'type'       => 'image_file',
+					'image_file' => ['file_id' => $att['id']],
+				];
+			} else {
+				$attaches[] = [
+					'file_id' => $att['id'],
+					'tools'   => [['type' => 'file_search']],
+				];
 			}
-			foreach ($chunk as $att) {
-				if (!is_array($att)) {
-					$att = ['id' => $att, 'kind' => 'file'];
-				}
-				$content[] = $att['kind'] === 'image_file'
-					? ['type' => 'image_file', 'image_file' => ['file_id' => $att['id']]]
-					: ['type' => 'file', 'file' => ['file_id' => $att['id']]];
-			}
-			$this->openai->threads()->messages()->create($threadId, [
-				'role' => $role,
-				'content' => $content,
-			]);
 		}
+
+		if ($content === []) {
+			$content[] = ['type' => 'text', 'text' => 'Ответь по вложенным файлам'];
+		}
+
+		$this->openai->threads()->messages()->create($threadId, [
+			'role'        => $role,
+			'content'     => $content,
+			'attachments' => $attaches ?: null,
+		]);
 	}
+
 
 	private function uploadFile(string|UploadedFile $file, string $kind): string
 	{
