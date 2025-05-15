@@ -54,6 +54,7 @@ class VisionAssistantService
 			$this->dir = $dir;
 		}
 		Cache::forget(self::THREAD_CACHE);
+		Cache::forget(self::FILE_MAP_CACHE);
 		return $this;
 	}
 	
