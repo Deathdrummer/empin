@@ -20,42 +20,40 @@ class VisionAssistantService
 	private \Illuminate\Contracts\Filesystem\Filesystem $disk;
 	private \OpenAI\Client $openai;
 
+	/** @var string[] MIME‑типы, которые можно класть в Vector Store */
 	private const VECTOR_MIME = [
-		'text/x-c',
-		'text/x-c++',
-		'text/x-csharp',
-		'text/css',
-		'application/msword',
+		'text/x-c', 'text/x-c++', 'text/x-csharp', 'text/css', 'application/msword',
 		'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-		'text/x-golang',
-		'text/html',
-		'text/x-java',
-		'text/javascript',
-		'application/json',
-		'text/markdown',
-		'application/pdf',
-		'text/x-php',
+		'text/x-golang', 'text/html', 'text/x-java', 'text/javascript', 'application/json',
+		'text/markdown', 'application/pdf', 'text/x-php',
 		'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-		'text/x-python',
-		'text/x-script.python',
-		'text/x-ruby',
-		'application/x-sh',
-		'text/x-tex',
-		'application/typescript',
-		'text/plain',
+		'text/x-python', 'text/x-script.python', 'text/x-ruby', 'application/x-sh',
+		'text/x-tex', 'application/typescript', 'text/plain',
+	];
+
+	/** @var string[] MIME‑типы, которые поддерживает Code Interpreter */
+	private const CODE_MIME = [
+		// дублируем VECTOR_MIME, потому что текстовые файлы CI тоже кушает
+		...self::VECTOR_MIME,
+		'text/csv', 'application/csv', 'image/jpeg', 'image/png', 'image/gif',
+		'application/octet-stream', 'application/x-tar',
+		'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+		'application/xml', 'text/xml', 'application/zip',
 	];
 
 	public function __construct(
 		?string $assistantId = null,
 		?string $instructionFile = null,
 		?string $dir = null,
-		?string $contextInstructionFile = null
-	) {
+		?string $contextInstructionFile = null,
+	)
+	{
 		$this->assistantId = $assistantId ?? config('openai.assistant_id');
 		$this->instructionFile = $instructionFile ?? 'prompts/plan.txt';
 		$this->dir = $dir ?? 'assistent';
 		$this->contextInstructionFile = $contextInstructionFile;
 		$this->disk = Storage::disk('local');
+
 		$this->openai = \OpenAI::factory()
 			->withApiKey(config('openai.api_key'))
 			->withHttpClient(new GuzzleClient([
@@ -71,27 +69,24 @@ class VisionAssistantService
 	}
 
 	public function use(
-		string $assistantId,
+		string  $assistantId,
 		?string $instructionFile = null,
 		?string $dir = null,
-		?string $contextInstructionFile = null
-	): static {
+		?string $contextInstructionFile = null,
+	): static
+	{
 		$this->assistantId = $assistantId;
-		if ($instructionFile) {
-			$this->instructionFile = $instructionFile;
-		}
-		if ($dir) {
-			$this->dir = $dir;
-		}
-		if ($contextInstructionFile !== null) {
-			$this->contextInstructionFile = $contextInstructionFile;
-		}
+		$this->instructionFile = $instructionFile ?? $this->instructionFile;
+		$this->dir = $dir ?? $this->dir;
+		$this->contextInstructionFile = $contextInstructionFile ?? $this->contextInstructionFile;
+
 		Cache::forget(self::THREAD_CACHE);
 		Cache::forget(self::FILE_MAP_CACHE);
 		Cache::forget(self::VECTOR_STORE_CACHE);
+
 		return $this;
 	}
-	
+
 	/**
 	 * Возвращает список всех ассистентов вашей организации.
 	 * 
@@ -108,7 +103,7 @@ class VisionAssistantService
 	{
 		return $this->openai->assistants()->list($params)->toArray();
 	}
-	
+
 	/**
 	 * Создаёт нового ассистента.
 	 *
@@ -133,52 +128,59 @@ class VisionAssistantService
 		return $this->openai->assistants()->create($params)->toArray();
 	}
 
-	public function ask(?string $prompt = null, UploadedFile|string|array|null $files = null, bool $save = false): string
+	/**
+	 * Главная точка входа для диалога.
+	 * @param UploadedFile|string|array<UploadedFile|string>|null $files
+	 */
+	public function ask(?string $prompt = null, UploadedFile|string|array|null $files = null, bool $saveThread = false): string
 	{
-		if (!$save) {
+		if (!$saveThread) {
 			Cache::forget(self::THREAD_CACHE);
 		}
+
 		$this->syncReferenceFiles();
 		$this->syncInstruction();
 
 		$threadId = $this->bootThread();
 
-		$imageAttachments = [];
-		$vectorFileIds = [];
+		$vectorIds = [];
+		$codeIds = [];
+		$otherAtt = [];
 
 		if ($files !== null) {
-			$files = is_array($files) ? $files : [$files];
-			foreach ($files as $file) {
-				$kind = $this->detectFileKind($file);
-				$id = $this->uploadFile($file, $kind);
-				if ($kind === 'image_file') {
-					$imageAttachments[] = ['id' => $id, 'kind' => 'image_file'];
-				} elseif ($kind === 'file') {
-					$mime = $this->getMime($file);
-					if (in_array($mime, self::VECTOR_MIME, true)) {
-						$vectorFileIds[] = $id;
-					} else {
-						$imageAttachments[] = ['id' => $id, 'kind' => 'image_file'];
-					}
-				}
+			foreach ((array)$files as $f) {
+				$mime = $this->getMime($f);
+				$category = $this->classifyMime($mime);
+
+				$purpose = $category === 'other' && str_starts_with($mime, 'image/') ? 'vision' : 'assistants';
+				$fileId = $this->uploadFile($f, $purpose);
+
+				match ($category) {
+					'vector' => $vectorIds[] = $fileId,
+					'code' => $codeIds[] = $fileId,
+					default => $otherAtt[] = [$fileId, $mime],
+				};
 			}
 		}
 
-		if ($vectorFileIds) {
-			$this->ensureVectorStore($vectorFileIds);
+		if ($vectorIds) {
+			$this->ensureVectorStore($vectorIds);
+		}
+		if ($codeIds) {
+			$this->ensureCodeInterpreter($codeIds);
 		}
 
-		$this->createUserMessage($threadId, $prompt ?? '', $imageAttachments);
+		$this->attachOther($threadId, $prompt ?? '', $otherAtt);
 
 		$run = $this->openai->threads()->runs()->create($threadId, ['assistant_id' => $this->assistantId]);
 		do {
 			usleep(300_000);
 			$run = $this->openai->threads()->runs()->retrieve($threadId, $run->id);
-		} while (in_array($run->status, ['queued', 'in_progress']));
+		} while (in_array($run->status, ['queued', 'in_progress'], true));
 
 		$latest = $this->openai->threads()->messages()->list($threadId, ['limit' => 1]);
 
-		if (!$save) {
+		if (!$saveThread) {
 			Cache::forget(self::THREAD_CACHE);
 			try {
 				$this->openai->threads()->delete($threadId);
@@ -189,51 +191,60 @@ class VisionAssistantService
 		return $latest->data[0]->content[0]->text->value;
 	}
 
+	/* ---------- ВНУТРЕННЯЯ РАБОТА ---------- */
+
 	private function syncReferenceFiles(): void
 	{
-		$current = Cache::get(self::FILE_MAP_CACHE, []);
-		$updated = [];
-		$vectorFileIds = [];
+		$cached = Cache::get(self::FILE_MAP_CACHE, []);
+		$new = [];
+		$vector = [];
+		$code = [];
 
 		foreach ($this->disk->files($this->dir) as $path) {
 			if (basename($path) === basename($this->instructionFile)) {
 				continue;
 			}
-			$full = $this->disk->path($path);
-			$hash = md5_file($full);
-			$kind = $this->detectFileKind($full);
-			$entry = $current[$path] ?? null;
+
+			$hash = md5_file($this->disk->path($path));
+			$mime = mime_content_type($this->disk->path($path));
+			$cat = $this->classifyMime($mime);
+
+			$entry = $cached[$path] ?? null;
 			if (!$entry || $entry['hash'] !== $hash) {
-				$id = $this->openai->files()->upload([
-					'purpose' => $kind === 'image_file' ? 'vision' : 'assistants',
-					'file' => fopen($full, 'r'),
+				$purpose = $cat === 'other' && str_starts_with($mime, 'image/') ? 'vision' : 'assistants';
+				$fileId = $this->openai->files()->upload([
+					'purpose' => $purpose,
+					'file' => fopen($this->disk->path($path), 'r'),
 				])->id;
-				$entry = ['hash' => $hash, 'id' => $id, 'kind' => $kind];
+
+				$entry = ['id' => $fileId, 'hash' => $hash, 'mime' => $mime, 'cat' => $cat];
 				Cache::forget(self::THREAD_CACHE);
 			}
-			if ($kind === 'file') {
-				$mime = mime_content_type($full);
-				if (in_array($mime, self::VECTOR_MIME, true)) {
-					$vectorFileIds[] = $entry['id'];
-				}
-			}
-			$updated[$path] = $entry;
+
+			match ($cat) {
+				'vector' => $vector[] = $entry['id'],
+				'code' => $code[] = $entry['id'],
+				default => null,
+			};
+
+			$new[$path] = $entry;
 		}
 
-		$deleted = array_diff_key($current, $updated);
-		foreach ($deleted as $old) {
+		$deleted = array_diff_key($cached, $new);
+		foreach ($deleted as $d) {
 			try {
-				$this->openai->files()->delete($old['id']);
+				$this->openai->files()->delete($d['id']);
 			} catch (\Throwable) {
 			}
 		}
-		if ($deleted) {
-			Cache::forget(self::THREAD_CACHE);
-		}
-		Cache::forever(self::FILE_MAP_CACHE, $updated);
 
-		if ($vectorFileIds) {
-			$this->ensureVectorStore($vectorFileIds);
+		Cache::forever(self::FILE_MAP_CACHE, $new);
+
+		if ($vector) {
+			$this->ensureVectorStore($vector);
+		}
+		if ($code) {
+			$this->ensureCodeInterpreter($code);
 		}
 	}
 
@@ -254,76 +265,68 @@ class VisionAssistantService
 	{
 		return Cache::rememberForever(self::THREAD_CACHE, function () {
 			$thread = $this->openai->threads()->create([]);
+
 			$entries = array_values(Cache::get(self::FILE_MAP_CACHE, []));
-			$context = $this->getContextInstruction();
-			foreach (array_chunk($entries, 10) as $i => $chunk) {
-				$text = $i === 0 ? $context : '';
-				$this->createUserMessage($thread->id, $text, $chunk, 'user');
+			$other = array_filter($entries, fn($e) => $e['cat'] === 'other');
+
+			$context = $this->contextInstructionFile && Storage::exists($this->contextInstructionFile)
+				? trim(Storage::get($this->contextInstructionFile))
+				: '';
+
+			if ($other || $context !== '') {
+				$attachments = [];
+				foreach ($other as $o) {
+					if (str_starts_with($o['mime'], 'image/')) {
+						$attachments[] = ['kind' => 'image_file', 'id' => $o['id'], 'mime' => $o['mime']];
+					} else {
+						$attachments[] = ['kind' => 'file', 'id' => $o['id'], 'mime' => $o['mime']];
+					}
+				}
+				$this->attachOther($thread->id, $context, $attachments);
 			}
-			if ($entries === [] && $context !== '') {
-				$this->createUserMessage($thread->id, $context, [], 'user');
-			}
+
 			return $thread->id;
 		});
 	}
 
-	private function getContextInstruction(): string
-	{
-		if (!$this->contextInstructionFile || !Storage::exists($this->contextInstructionFile)) {
-			return '';
-		}
-		return trim(Storage::get($this->contextInstructionFile));
-	}
-
-	private function createUserMessage(string $threadId, string $text, array $attachments, string $role = 'user'): void
+	/**
+	 * @param array<int, array{0|string,1|string}|array{id:string,mime:string}|array> $attachments
+	 */
+	private function attachOther(string $threadId, string $text, array $attachments): void
 	{
 		$content = [];
-		$attaches = [];
+		$attachArr = [];
+
 		if ($text !== '') {
 			$content[] = ['type' => 'text', 'text' => $text];
 		}
+
 		foreach ($attachments as $att) {
-			if ($att['kind'] === 'image_file') {
-				$content[] = ['type' => 'image_file', 'image_file' => ['file_id' => $att['id']]];
+			[$fileId, $mime] = is_array($att) && isset($att['id']) ? [$att['id'], $att['mime']] : $att;
+			if (str_starts_with($mime, 'image/')) {
+				$content[] = ['type' => 'image_file', 'image_file' => ['file_id' => $fileId]];
 			} else {
-				$attaches[] = ['file_id' => $att['id'], 'tools' => [['type' => 'file_search']]];
+				$attachArr[] = ['file_id' => $fileId];
 			}
 		}
-		if ($content === []) {
-			$content[] = ['type' => 'text', 'text' => 'Ответь по вложенным файлам'];
+
+		if ($content === [] && $attachArr === []) {
+			return;
 		}
+
 		$this->openai->threads()->messages()->create($threadId, [
-			'role' => $role,
-			'content' => $content,
-			'attachments' => $attaches ?: null,
+			'role' => 'user',
+			'content' => $content ?: [['type' => 'text', 'text' => 'Посмотри вложения']],
+			'attachments' => $attachArr ?: null,
 		]);
 	}
 
-	private function uploadFile(string|UploadedFile $file, string $kind): string
-	{
-		if ($file instanceof UploadedFile || is_file($file)) {
-			$path = $file instanceof UploadedFile ? $file->getRealPath() : $file;
-			return $this->openai->files()->upload([
-				'purpose' => $kind === 'image_file' ? 'vision' : 'assistants',
-				'file' => fopen($path, 'r'),
-			])->id;
-		}
-		$binary = Http::get($file)->throw()->body();
-		$ext = pathinfo(parse_url($file, PHP_URL_PATH) ?: '', PATHINFO_EXTENSION) ?: 'dat';
-		$tmp = tempnam(sys_get_temp_dir(), 'file_') . ".$ext";
-		file_put_contents($tmp, $binary);
-		$id = $this->openai->files()->upload([
-			'purpose' => $kind === 'image_file' ? 'vision' : 'assistants',
-			'file' => fopen($tmp, 'r'),
-		])->id;
-		unlink($tmp);
-		return $id;
-	}
+	/* ---------- FILE HELPERS ---------- */
 
-	private function detectFileKind(string|UploadedFile $file): string
+	private function classifyMime(string $mime): string
 	{
-		$mime = $this->getMime($file);
-		return str_starts_with($mime, 'image/') ? 'image_file' : 'file';
+		return in_array($mime, self::VECTOR_MIME, true) ? 'vector'
+			: (in_array($mime, self::CODE_MIME, true) ? 'code' : 'other');
 	}
 
 	private function getMime(string|UploadedFile $file): string
@@ -332,35 +335,72 @@ class VisionAssistantService
 		return is_file($path) ? mime_content_type($path) : Http::head($file)->header('Content-Type');
 	}
 
+	private function uploadFile(string|UploadedFile $file, string $purpose = 'assistants'): string
+	{
+		if ($file instanceof UploadedFile || is_file($file)) {
+			$real = $file instanceof UploadedFile ? $file->getRealPath() : $file;
+			return $this->openai->files()->upload([
+				'purpose' => $purpose,
+				'file' => fopen($real, 'r'),
+			])->id;
+		}
+
+		$binary = Http::get($file)->throw()->body();
+		$ext = pathinfo(parse_url($file, PHP_URL_PATH) ?: '', PATHINFO_EXTENSION) ?: 'dat';
+		$tmp = tempnam(sys_get_temp_dir(), 'file_') . ".{$ext}";
+		file_put_contents($tmp, $binary);
+		$id = $this->openai->files()->upload([
+			'purpose' => $purpose,
+			'file' => fopen($tmp, 'r'),
+		])->id;
+		unlink($tmp);
+		return $id;
+	}
+
+	/* ---------- VECTOR STORE / CODE INTERPRETER ---------- */
+
 	private function ensureVectorStore(array $fileIds): void
 	{
-		if ($fileIds === []) {
-			return;
-		}
 		$vsId = Cache::get(self::VECTOR_STORE_CACHE);
 		if (!$vsId) {
-			$assistant = $this->openai->assistants()->retrieve($this->assistantId);
-			$existing = $assistant->tool_resources['file_search']['vector_store_ids'] ?? [];
+			$asst = $this->openai->assistants()->retrieve($this->assistantId);
+			$existing = $asst->tool_resources['file_search']['vector_store_ids'] ?? [];
 			$vsId = $existing[0] ?? null;
 		}
+
 		if (!$vsId) {
-			$vs = $this->openai->vectorStores()->create(['file_ids' => $fileIds, 'name' => 'VisionStore_' . $this->assistantId]);
+			$vs = $this->openai->vectorStores()->create(['file_ids' => $fileIds, 'name' => 'VS_' . $this->assistantId]);
 			$vsId = $vs->id;
 			$this->openai->assistants()->modify($this->assistantId, [
-				'tool_resources' => [
-					'file_search' => [
-						'vector_store_ids' => [$vsId],
-					],
-				],
+				'tool_resources' => ['file_search' => ['vector_store_ids' => [$vsId]]],
 			]);
 		} else {
-			foreach ($fileIds as $id) {
+			foreach ($fileIds as $fid) {
 				try {
-					$this->openai->vectorStores()->files()->create($vsId, ['file_id' => $id]);
+					$this->openai->vectorStores()->files()->create($vsId, ['file_id' => $fid]);
 				} catch (\Throwable) {
 				}
 			}
 		}
+
 		Cache::forever(self::VECTOR_STORE_CACHE, $vsId);
+	}
+
+	private function ensureCodeInterpreter(array $fileIds): void
+	{
+		$assistant = $this->openai->assistants()->retrieve($this->assistantId);
+		$tools = $assistant->tools;
+		$hasCI = collect($tools)->contains(fn($t) => ($t['type'] ?? null) === 'code_interpreter');
+		if (!$hasCI) {
+			$tools[] = ['type' => 'code_interpreter'];
+		}
+
+		$currentIds = $assistant->tool_resources['code_interpreter']['file_ids'] ?? [];
+		$newIds = array_values(array_unique(array_merge($currentIds, $fileIds)));
+
+		$this->openai->assistants()->modify($this->assistantId, [
+			'tools' => $tools,
+			'tool_resources' => ['code_interpreter' => ['file_ids' => $newIds]],
+		]);
 	}
 }
