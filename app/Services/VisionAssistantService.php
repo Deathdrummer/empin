@@ -16,6 +16,7 @@ class VisionAssistantService
 	private string $assistantId;
 	private string $dir;
 	private string $instructionFile;
+	private ?string $contextInstructionFile;
 	private \Illuminate\Contracts\Filesystem\Filesystem $disk;
 	private \OpenAI\Client $openai;
 
@@ -44,11 +45,16 @@ class VisionAssistantService
 		'text/plain',
 	];
 
-	public function __construct(?string $assistantId = null, ?string $instructionFile = null, ?string $dir = null)
-	{
+	public function __construct(
+		?string $assistantId = null,
+		?string $instructionFile = null,
+		?string $dir = null,
+		?string $contextInstructionFile = null
+	) {
 		$this->assistantId = $assistantId ?? config('openai.assistant_id');
 		$this->instructionFile = $instructionFile ?? 'prompts/plan.txt';
 		$this->dir = $dir ?? 'assistent';
+		$this->contextInstructionFile = $contextInstructionFile;
 		$this->disk = Storage::disk('local');
 		$this->openai = \OpenAI::factory()
 			->withApiKey(config('openai.api_key'))
@@ -64,14 +70,21 @@ class VisionAssistantService
 			->make();
 	}
 
-	public function use(string $assistantId, ?string $instructionFile = null, ?string $dir = null): static
-	{
+	public function use(
+		string $assistantId,
+		?string $instructionFile = null,
+		?string $dir = null,
+		?string $contextInstructionFile = null
+	): static {
 		$this->assistantId = $assistantId;
 		if ($instructionFile) {
 			$this->instructionFile = $instructionFile;
 		}
 		if ($dir) {
 			$this->dir = $dir;
+		}
+		if ($contextInstructionFile !== null) {
+			$this->contextInstructionFile = $contextInstructionFile;
 		}
 		Cache::forget(self::THREAD_CACHE);
 		Cache::forget(self::FILE_MAP_CACHE);
@@ -242,11 +255,24 @@ class VisionAssistantService
 		return Cache::rememberForever(self::THREAD_CACHE, function () {
 			$thread = $this->openai->threads()->create([]);
 			$entries = array_values(Cache::get(self::FILE_MAP_CACHE, []));
-			foreach (array_chunk($entries, 10) as $chunk) {
-				$this->createUserMessage($thread->id, '', $chunk, 'user');
+			$context = $this->getContextInstruction();
+			foreach (array_chunk($entries, 10) as $i => $chunk) {
+				$text = $i === 0 ? $context : '';
+				$this->createUserMessage($thread->id, $text, $chunk, 'user');
+			}
+			if ($entries === [] && $context !== '') {
+				$this->createUserMessage($thread->id, $context, [], 'user');
 			}
 			return $thread->id;
 		});
+	}
+
+	private function getContextInstruction(): string
+	{
+		if (!$this->contextInstructionFile || !Storage::exists($this->contextInstructionFile)) {
+			return '';
+		}
+		return trim(Storage::get($this->contextInstructionFile));
 	}
 
 	private function createUserMessage(string $threadId, string $text, array $attachments, string $role = 'user'): void
