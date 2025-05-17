@@ -235,9 +235,9 @@ Route::middleware(['lang', 'auth:admin', 'isajax:admin'])->post('/get_section', 
 			
 			$list = $assistentService->listAssistants();
 			
-			$assistent = $assistentService->use($list['data'][0]['id'], 'prompts/plan.txt', 'assistent');
+			$assistent = $assistentService->use($list['data'][0]['id'], 'prompts/plan.txt', 'assistent', 'prompts/context.txt');
 
-			$settingsData['answer'] = $assistent->ask('Кто ты по профессии?');
+			$settingsData['answer'] = $assistent->ask('Как посчитать корень квадратный из 25?');
 			
 			
 			break;
