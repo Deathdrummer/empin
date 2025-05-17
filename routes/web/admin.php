@@ -225,9 +225,19 @@ Route::middleware(['lang', 'auth:admin', 'isajax:admin'])->post('/get_section', 
 			$settingsData['prompt_file_data'] = Storage::exists($planPromptPath) ? Storage::get($planPromptPath) : '';
 			
 			
-			$assistent = app()->make(VisionAssistantService::class);
+			//--------------------------------------------------------------------------------
 			
-			$settingsData['answer'] = $assistent->ask('сколько будет 2 + 2');
+			
+			//$image = asset('assets/images/ampin.jpeg');
+			
+			
+			$assistentService = app()->make(VisionAssistantService::class);
+			
+			$list = $assistentService->listAssistants();
+			
+			$assistent = $assistentService->use($list['data'][0]['id'], 'prompts/plan.txt', 'assistent');
+
+			$settingsData['answer'] = $assistent->ask('Кто ты по профессии?');
 			
 			
 			break;

@@ -26,7 +26,7 @@ class VisionAssistantService
 		$this->assistantId = $assistantId ?? config('openai.assistant_id');
 		$this->instructionFile = $instructionFile ?? 'prompts/plan.txt';
 		$this->dir = $dir ?? 'assistent';
-		$this->disk = Storage::disk('local');
+		$this->disk = Storage::disk();
 
 		$this->openai = \OpenAI::factory()
 			->withApiKey(config('openai.api_key'))
@@ -136,6 +136,9 @@ class VisionAssistantService
 	{
 		$current = Cache::get(self::FILE_MAP_CACHE, []);
 		$updated = [];
+		
+		toLog($this->dir);
+		toLog($this->disk->files($this->dir));
 
 		foreach ($this->disk->files($this->dir) as $path) {
 			if (basename($path) === basename($this->instructionFile)) {
