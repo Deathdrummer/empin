@@ -140,36 +140,19 @@ class VisionAssistantService
 		$this->syncReferenceFiles();
 		$this->syncInstruction();
 
-		$threadId = $this->bootThread();
-
-		$vectorIds = [];
-		$codeIds = [];
-		$otherAtt = [];
+		$threadId   = $this->bootThread();
+		$attachments = [];
 
 		if ($files !== null) {
-			foreach ((array)$files as $f) {
-				$mime = $this->getMime($f);
-				$category = $this->classifyMime($mime);
-
-				$purpose = $category === 'other' && str_starts_with($mime, 'image/') ? 'vision' : 'assistants';
-				$fileId = $this->uploadFile($f, $purpose);
-
-				match ($category) {
-					'vector' => $vectorIds[] = $fileId,
-					'code' => $codeIds[] = $fileId,
-					default => $otherAtt[] = [$fileId, $mime],
-				};
+			foreach ((array) $files as $f) {
+				$mime    = $this->getMime($f);
+				$purpose = str_starts_with($mime, 'image/') ? 'vision' : 'assistants';
+				$fileId  = $this->uploadFile($f, $purpose);
+				$attachments[] = [$fileId, $mime];
 			}
 		}
 
-		if ($vectorIds) {
-			$this->ensureVectorStore($vectorIds);
-		}
-		if ($codeIds) {
-			$this->ensureCodeInterpreter($codeIds);
-		}
-
-		$this->attachOther($threadId, $prompt ?? '', $otherAtt);
+		$this->attachOther($threadId, $prompt ?? '', $attachments);
 
 		$run = $this->openai->threads()->runs()->create($threadId, ['assistant_id' => $this->assistantId]);
 		do {
