@@ -175,9 +175,9 @@ class VisionAssistantService
 		do {
 			usleep(300_000);
 			$run = $this->openai->threads()->runs()->retrieve($threadId, $run->id);
-		} while (in_array($run->status, ['queued', 'in_progress'], true));
+		} while ($run->status !== 'completed');
 
-		$latest = $this->openai->threads()->messages()->list($threadId, ['limit' => 1]);
+		$answer = $this->fetchLastAssistantText($threadId);
 
 		if (!$saveThread) {
 			Cache::forget(self::THREAD_CACHE);
@@ -187,7 +187,7 @@ class VisionAssistantService
 			}
 		}
 
-		return $latest->data[0]->content[0]->text->value;
+		return $answer;
 	}
 
 	/* ---------- ВНУТРЕННЯЯ РАБОТА ---------- */
@@ -321,6 +321,28 @@ class VisionAssistantService
 	}
 
 	/* ---------- FILE HELPERS ---------- */
+
+	private function fetchLastAssistantText(string $threadId): string
+	{
+		$list = $this->openai->threads()
+			->messages()
+			->list($threadId, ['limit' => 20, 'order' => 'desc'])
+			->data;
+
+		foreach ($list as $msg) {
+			if ($msg->role !== 'assistant') {
+				continue;
+			}
+
+			foreach ($msg->content as $part) {
+				if ($part->type === 'text' && trim($part->text->value) !== '') {
+					return trim($part->text->value);
+				}
+			}
+		}
+
+		return 'Ассистент не вернул текстового ответа.';
+	}
 
 	private function classifyMime(string $mime): string
 	{
