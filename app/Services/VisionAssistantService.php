@@ -374,6 +374,7 @@ class VisionAssistantService
 			'purpose' => $purpose,
 			'file' => fopen($tmp, 'r'),
 		])->id;
+		toLog($id);
 		unlink($tmp);
 		return $id;
 	}

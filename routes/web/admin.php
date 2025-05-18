@@ -236,8 +236,11 @@ Route::middleware(['lang', 'auth:admin', 'isajax:admin'])->post('/get_section', 
 			$list = $assistentService->listAssistants();
 			
 			$assistent = $assistentService->use($list['data'][0]['id'], 'prompts/plan.txt', 'assistent');
+			
+			$question = 'что изображено на картинке?';
+			
 
-			$settingsData['answer'] = $assistent->ask('выполни поставленную инструкцию');
+			$settingsData['answer'] = $assistent->ask($question, 'https://empin-pro.ru/assets/images/ampin.png');
 			
 			
 			break;
