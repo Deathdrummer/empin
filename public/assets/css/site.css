@@ -8473,7 +8473,7 @@ section {
   color: #eee9f3;
 }
 .timesheetcard__teams {
-  height: calc(100vh - 216px);
+  height: calc(100vh - 220px);
   min-height: 394px;
 }
 .timesheetcard__team {
