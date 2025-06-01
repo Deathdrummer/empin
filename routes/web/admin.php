@@ -220,7 +220,7 @@ Route::middleware(['lang', 'auth:admin', 'isajax:admin'])->post('/get_section', 
 			$settingsData['files'] = $files;
 			
 			
-			$planPromptPath = 'prompts/plan.txt';
+			/* $planPromptPath = 'prompts/plan.txt';
 			$settingsData['prompt_file_name'] = 'plan.txt';
 			$settingsData['prompt_file_data'] = Storage::exists($planPromptPath) ? Storage::get($planPromptPath) : '';
 			
@@ -241,7 +241,7 @@ Route::middleware(['lang', 'auth:admin', 'isajax:admin'])->post('/get_section', 
 			
 
 			$settingsData['answer'] = $assistent->ask($question);
-			
+			 */
 			
 			break;
 		
