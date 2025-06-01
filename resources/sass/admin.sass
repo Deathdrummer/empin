@@ -874,3 +874,201 @@ section
 		color: #000000
 	
 	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.assistentfiles // окно с общей информацией
+	border-radius: 34px
+	padding: 40px 26px 0px
+
+	&__scrollblock
+		min-height: 370px
+		padding-right: 1rem
+		
+	
+	&__dropfiles
+			height: 370px
+			//background-color: #c3dfe7
+			box-shadow: 0 0 0 1px #cadbf1
+			border-radius: 3px
+			margin-top: 10px
+			margin-bottom: 1rem
+			padding-top: 10px
+			padding-bottom: 40px
+			border: 3px dashed transparent
+			+scrollbar(#efefef, #d3d0dd, 4px)
+			overflow-y: scroll
+			min-height: 100px
+			padding-right: 1rem
+
+			&-dragged
+				border-color: #9999d0
+				box-shadow: none
+				background-color: #fefdff
+		
+	&__nofiles
+		position: relative
+		top: 180px
+		//transform: translateY(5em)
+
+
+
+
+.assistentfile
+	//border: 1px solid #777
+	position: relative
+	cursor: pointer
+
+	&__icon
+		display: flex
+		align-items: center
+		justify-content: center
+		position: relative
+		border-radius: 3px
+		overflow: hidden
+		height: 70px
+
+		&::after
+			content: ''
+			position: absolute
+			inset: 0
+			width: 100%
+			height: 100%
+			background-color: #0004
+			opacity: 0
+			pointer-events: none
+			transition: opacity 0.16s
+
+		img
+			height: 70px
+			width: 100%
+			object-fit: contain
+			transition: filter 0.16s
+
+
+	&__title
+		position: absolute
+		bottom: 0
+		left: 0
+		height: 0
+		width: 100%
+
+		small
+			position: absolute
+			top: 0
+			left: 0
+			width: 100%
+			padding-top: 5px
+			display: block
+			text-align: center
+			font-size: 12px
+			word-break: break-word
+			//background-color: #fff9
+			//z-index: 10
+
+
+	&:not(:hover)
+		.assistentfile__title small
+			//white-space: nowrap
+			overflow: hidden
+			text-overflow: ellipsis
+			display: -webkit-box
+			-webkit-box-orient: vertical
+			-webkit-line-clamp: 2
+			max-height: 50px
+		
+	
+	&:hover
+		.assistentfile__buttons
+			opacity: 1
+
+		.assistentfile__icon img
+			filter: brightness(1.1)
+
+		.assistentfile__title small
+			z-index: 10
+			background-color: #ffffffea
+
+	&__buttons
+		position: absolute
+		top: 3px
+		right: 3px
+		opacity: 0
+		transition: opacity 0.16s
+
+
+	&__remove
+		cursor: pointer
+		background-color: #fff
+		border-radius: 50%
+		padding: 3px
+		width: 26px
+		height: 26px
+		display: flex
+		align-items: center
+		justify-content: center
+		border: 1px solid #fcc
+		z-index: 10
+
+		&[disabled]
+			pointer-events: none
+			border-color: #eee
+
+			i
+				color: #eee
+
+		i
+			color: #ff8585
+			transition: color 0.16s
+		
+		&:hover
+			i
+				color: darken(#ff8585, 20%)
+
+
+
+
+
+
+
+.contractsfilesitem
+	color: #565656
+	cursor: pointer
+	padding: 3px 6px
+	border-radius: 3px
+	
+	& + .contractsfilesitem
+		margin-top: 3px
+	
+	&:hover:not([checked])
+		background-color: #f3f3f3
+	
+	&[checked]
+		background-color: #a3efff
+		color: #000000
+
+
+
+
+

@@ -72,7 +72,7 @@ class ContractFile extends Model {
 	* @param 
 	* @return 
 	*/
-	public function scopeGetByConmtractId($query, $contractId = null) {
+	public function scopeGetByContractId($query, $contractId = null) {
 		if (!$contractId) return false;
 		return $query->where('contract_id', $contractId);
 	}

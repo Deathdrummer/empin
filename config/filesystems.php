@@ -73,6 +73,8 @@ return [
 
     'links' => [
         public_path('storage') => storage_path('app/public'),
+        public_path('assistent') => storage_path('app/public/assistent'),
+        public_path('prompts') => storage_path('app/public/prompts'),
     ],
 
 ];

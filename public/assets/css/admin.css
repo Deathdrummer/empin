@@ -5057,13 +5057,14 @@ input[type=checkbox]:focus + .toggle-switch {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 250px;
-  height: 250px;
+  width: 150px;
+  height: 150px;
   border: 1px solid #ccc;
   border-radius: 4px;
+  cursor: pointer;
 }
 .ddr-file__empty {
-  font-size: 30px;
+  font-size: 20px;
   font-family: Fira Sans, sans-serif;
   font-weight: 400;
   color: #c8ccd1;
@@ -7903,6 +7904,179 @@ section {
   transition: color 0.16s;
 }
 .commoninfofile__remove:hover i {
+  color: #ff1f1f;
+}
+
+.contractsfilesitem {
+  color: #565656;
+  cursor: pointer;
+  padding: 3px 6px;
+  border-radius: 3px;
+}
+.contractsfilesitem + .contractsfilesitem {
+  margin-top: 3px;
+}
+.contractsfilesitem:hover:not([checked]) {
+  background-color: #f3f3f3;
+}
+.contractsfilesitem[checked] {
+  background-color: #a3efff;
+  color: #000000;
+}
+
+.assistentfiles {
+  border-radius: 34px;
+  padding: 40px 26px 0px;
+}
+.assistentfiles__scrollblock {
+  min-height: 370px;
+  padding-right: 1rem;
+}
+.assistentfiles__dropfiles {
+  height: 370px;
+  box-shadow: 0 0 0 1px #cadbf1;
+  border-radius: 3px;
+  margin-top: 10px;
+  margin-bottom: 1rem;
+  padding-top: 10px;
+  padding-bottom: 40px;
+  border: 3px dashed transparent;
+  overflow-y: scroll;
+  min-height: 100px;
+  padding-right: 1rem;
+}
+.assistentfiles__dropfiles::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+.assistentfiles__dropfiles::-webkit-scrollbar-track {
+  background-color: #efefef;
+  border-radius: 0;
+}
+.assistentfiles__dropfiles::-webkit-scrollbar-thumb {
+  background-color: #d3d0dd;
+  width: 13px;
+  height: 13px;
+  border-radius: 0;
+}
+.assistentfiles__dropfiles::-webkit-scrollbar-thumb:hover {
+  background-color: #b7b2c8;
+}
+.assistentfiles__dropfiles::-webkit-resizer {
+  display: none;
+  width: 0px;
+  height: 0px;
+  background: transparent;
+  border-radius: 0;
+}
+.assistentfiles__dropfiles-dragged {
+  border-color: #9999d0;
+  box-shadow: none;
+  background-color: #fefdff;
+}
+.assistentfiles__nofiles {
+  position: relative;
+  top: 180px;
+}
+
+.assistentfile {
+  position: relative;
+  cursor: pointer;
+}
+.assistentfile__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  border-radius: 3px;
+  overflow: hidden;
+  height: 70px;
+}
+.assistentfile__icon::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.2666666667);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.16s;
+}
+.assistentfile__icon img {
+  height: 70px;
+  width: 100%;
+  object-fit: contain;
+  transition: filter 0.16s;
+}
+.assistentfile__title {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 0;
+  width: 100%;
+}
+.assistentfile__title small {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding-top: 5px;
+  display: block;
+  text-align: center;
+  font-size: 12px;
+  word-break: break-word;
+}
+.assistentfile:not(:hover) .assistentfile__title small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  max-height: 50px;
+}
+.assistentfile:hover .assistentfile__buttons {
+  opacity: 1;
+}
+.assistentfile:hover .assistentfile__icon img {
+  filter: brightness(1.1);
+}
+.assistentfile:hover .assistentfile__title small {
+  z-index: 10;
+  background-color: rgba(255, 255, 255, 0.9176470588);
+}
+.assistentfile__buttons {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  opacity: 0;
+  transition: opacity 0.16s;
+}
+.assistentfile__remove {
+  cursor: pointer;
+  background-color: #fff;
+  border-radius: 50%;
+  padding: 3px;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #fcc;
+  z-index: 10;
+}
+.assistentfile__remove[disabled] {
+  pointer-events: none;
+  border-color: #eee;
+}
+.assistentfile__remove[disabled] i {
+  color: #eee;
+}
+.assistentfile__remove i {
+  color: #ff8585;
+  transition: color 0.16s;
+}
+.assistentfile__remove:hover i {
   color: #ff1f1f;
 }
 

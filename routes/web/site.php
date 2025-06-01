@@ -382,7 +382,16 @@ Route::prefix('site')->middleware(['lang', 'isajax:site'])->group(function() {
 	
 	// План-график работ
 	Route::get('/timesheet/init', [Timesheet::class, 'init']);
-	Route::get('/timesheet/slides', [Timesheet::class, 'get_slides_data']);
+	Route::get('/timesheet/slides', [Timesheet::class, 'getSlidesData']);
+	Route::get('/timesheet/contracts', [Timesheet::class, 'contractsList']);
+	
+	Route::post('/timesheet/contract', [Timesheet::class, 'addContract']);
+	Route::post('/timesheet/team', [Timesheet::class, 'addTeam']);
+	Route::post('/timesheet/comment', [Timesheet::class, 'addComment']);
+	
+	Route::get('/timesheet/staff', [Timesheet::class, 'getStaff']);
+	
+	
 	
 	
 });

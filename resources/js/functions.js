@@ -24,6 +24,23 @@ $.fn.tripleTap = function(callback) {
 
 
 
+
+	
+window.toDate = function (val = null) {
+    if (!val) return null;
+    // Если уже Date — обрезаем время
+    if (val instanceof Date) return new Date(val.getFullYear(), val.getMonth(), val.getDate());
+    // Если строка: берём только yyyy-mm-dd (или парсим, если это ISO)
+    const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(val);
+    if (m) return new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+    // иначе просто пытаемся спарсить через Date
+    const d = new Date(val);
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+}
+
+
+
+
 /*
 	Разделяет название файла на само название и расширение.
 	возвращает:
@@ -200,156 +217,6 @@ window.ref = function (data) {
 	proxy.value = data;
 	return proxy;
 }
-
-
-
-
-
-
-
-
-
-window.ddrRef = function(data = null, watchFuncs = null, storeKey = false) {
-	let dataToWath;
-	
-	if (watchFuncs) return ddrWatcher(data, watchFuncs, storeKey);
-	
-	return new Proxy(_.isPlainObject(data) ? data : {value: data}, {
-		get(target, prop, receiver) {
-			if (prop in target) {
-				if (_.isNumber(target[prop])) return Number(target[prop]);
-				return Reflect.get(target, prop, receiver); // (1)
-			} else {
-				return null;
-			}
-		}
-	});
-}
-
-
-
-
-
-
-
-
-let getHandlers = Symbol('handlers'),
-    setHandlers = Symbol('handlers');
-
-window.ddrWatcher = function (proxedObj, funcsObj = null, storeKey = false) {
-    proxedObj = _.isPlainObject(proxedObj) ? proxedObj : { proxedObj };
-
-    proxedObj[getHandlers] = [];
-    proxedObj[setHandlers] = [];
-
-    proxedObj.all = function () {
-        const cleanObject = obj => {
-            if (Array.isArray(obj)) {
-                return obj.map(item => (_.isPlainObject(item) || Array.isArray(item) ? cleanObject(item) : item));
-            } else if (_.isPlainObject(obj)) {
-                return Object.fromEntries(
-                    Object.entries(obj).map(([key, value]) => [
-                        key,
-                        _.isPlainObject(value) || Array.isArray(value) ? cleanObject(value) : value,
-                    ])
-                );
-            }
-            return obj;
-        };
-        return cleanObject(this);
-    };
-
-    proxedObj.observe = function (funcsObj) {
-        let outerGetFunc, outerSetFunc, outerMixFunc;
-
-        if (_.isFunction(funcsObj)) {
-            outerMixFunc = funcsObj;
-        } else if (_.isPlainObject(funcsObj)) {
-            outerGetFunc = funcsObj?.get;
-            outerSetFunc = funcsObj?.set;
-        }
-
-        if (outerMixFunc) {
-            this[getHandlers].push(outerMixFunc);
-            this[setHandlers].push(outerMixFunc);
-        }
-        if (outerGetFunc) this[getHandlers].push(outerGetFunc);
-        if (outerSetFunc) this[setHandlers].push(outerSetFunc);
-    };
-
-    if (funcsObj) {
-        proxedObj.observe(funcsObj);
-    }
-
-    if (storeKey && typeof storeKey === 'string') {
-	    const storedData = ddrStore(storeKey);
-	    if (storedData && (typeof storedData === 'object' || isJson(storedData))) {
-	        const parsedData = typeof storedData === 'object' ? storedData : JSON.parse(storedData);
-	        Object.assign(proxedObj, parsedData);
-	    }
-	}
-
-
-    const createDeepProxy = (obj, parentHandlers) => {
-        return new Proxy(obj, {
-            get(target, property, receiver) {
-			    const value = Reflect.get(target, property, receiver);
-
-			    // Обрабатываем только если свойство не символ и это не метод
-			    if (typeof property !== 'symbol' && typeof value !== 'function' && target[getHandlers]) {
-			        target[getHandlers].forEach(handler =>
-			            handler({ type: 'get', target, prop: property, value })
-			        );
-			    }
-
-			    // Если значение - объект, рекурсивно оборачиваем его в ddrWatcher
-			    if (_.isPlainObject(value)) {
-			        return ddrWatcher(value, funcsObj, storeKey);
-			    }
-
-			    // Если значение - массив, возвращаем его без оборачивания в прокси
-			    if (Array.isArray(value)) {
-			        return value;
-			    }
-
-			    return value;
-			},
-            set(target, property, value, receiver) {
-                const oldValue = target[property];
-                const success = Reflect.set(target, property, value, receiver);
-
-                if (success && parentHandlers[setHandlers]) {
-                    parentHandlers[setHandlers].forEach(handler =>
-                        handler({ type: 'set', target, prop: property, value, oldValue })
-                    );
-                }
-
-                if (success && storeKey && typeof storeKey === 'string') {
-                    const cleanData = proxedObj.all();
-                    ddrStore(storeKey, cleanData);
-                }
-
-                return success;
-            },
-            ownKeys(target) {
-                return Reflect.ownKeys(target).filter(
-                    key => typeof key !== 'symbol' && typeof target[key] !== 'function'
-                );
-            },
-            getOwnPropertyDescriptor(target, property) {
-                if (typeof property === 'symbol' || typeof target[property] === 'function') {
-                    return undefined;
-                }
-                return Reflect.getOwnPropertyDescriptor(target, property);
-            },
-        });
-    };
-
-    return createDeepProxy(proxedObj, proxedObj);
-};
-
-
-
 
 
 

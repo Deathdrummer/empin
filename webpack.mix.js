@@ -13,6 +13,7 @@ mix.browserSync({
 	ignored: /node_modules/,
 	files: [
 		'./resources/views/**/*.blade.php',
+		'./resources/views/**/*.tpl',
 		'./resources/js/**/*.js',
 		'./public/assets/css/site.css',
 		'./public/assets/css/admin.css',
@@ -31,6 +32,14 @@ mix
 				'@sass': path.resolve(__dirname, 'resources/sass'),
 				'@fonts': path.resolve(__dirname, 'resources/fonts'),
 			}
+		},
+		module: {
+			rules: [
+				{
+					test: /\.tpl$/,
+					use: 'raw-loader'
+				}
+			]
 		}
 	})
 	.sass('resources/sass/common/app.scss', 'public/assets/css')

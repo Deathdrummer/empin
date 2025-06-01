@@ -5057,13 +5057,14 @@ input[type=checkbox]:focus + .toggle-switch {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 250px;
-  height: 250px;
+  width: 150px;
+  height: 150px;
   border: 1px solid #ccc;
   border-radius: 4px;
+  cursor: pointer;
 }
 .ddr-file__empty {
-  font-size: 30px;
+  font-size: 20px;
   font-family: Fira Sans, sans-serif;
   font-weight: 400;
   color: #c8ccd1;
@@ -7139,18 +7140,18 @@ teleport {
   margin-left: 10px;
 }
 .header__logo > div img {
-  height: 42px;
+  height: 20px;
   width: auto;
   object-fit: contain;
 }
 @media screen and (min-width: 576px) {
   .header__logo > div img {
-    height: 48px;
+    height: 30px;
   }
 }
 @media screen and (min-width: 768px) {
   .header__logo > div img {
-    height: 50px;
+    height: 40px;
   }
 }
 @media screen and (min-width: 992px) {
@@ -7173,6 +7174,40 @@ teleport {
   line-height: 18px;
   font-weight: 400;
   color: #181824;
+}
+.header__username > * {
+  font-size: 12px;
+  line-height: 12px;
+}
+@media screen and (min-width: 576px) {
+  .header__username > * {
+    font-size: 12px;
+    line-height: 12px;
+  }
+}
+@media screen and (min-width: 768px) {
+  .header__username > * {
+    font-size: 13px;
+    line-height: 13px;
+  }
+}
+@media screen and (min-width: 992px) {
+  .header__username > * {
+    font-size: 14px;
+    line-height: 14px;
+  }
+}
+@media screen and (min-width: 1200px) {
+  .header__username > * {
+    font-size: 15px;
+    line-height: 15px;
+  }
+}
+@media screen and (min-width: 1400px) {
+  .header__username > * {
+    font-size: 16px;
+    line-height: 16px;
+  }
 }
 .header__nav .headernav {
   display: flex;
@@ -8231,4 +8266,570 @@ section {
 }
 [contract-chooser].searchcontractcounts [selectionscounts] {
   opacity: 1;
+}
+
+.ddrswiper {
+  overflow-x: hidden;
+  overflow-y: hidden;
+  white-space: preserve nowrap;
+  font-size: 0px;
+  height: 100%;
+  margin-right: -5px;
+  border-radius: inherit;
+}
+@media screen and (min-width: 576px) {
+  .ddrswiper {
+    margin-right: -5px;
+  }
+}
+@media screen and (min-width: 768px) {
+  .ddrswiper {
+    margin-right: -10px;
+  }
+}
+@media screen and (min-width: 992px) {
+  .ddrswiper {
+    margin-right: -12px;
+  }
+}
+@media screen and (min-width: 1200px) {
+  .ddrswiper {
+    margin-right: -10px;
+  }
+}
+.ddrswiper__item-current .card {
+  background-color: #fff !important;
+}
+.ddrswiper__item-current .card .timesheetcard__title {
+  filter: opacity(1);
+}
+.ddrswiper__item {
+  display: inline-block;
+  width: var(--slide-width);
+  height: 100%;
+  position: relative;
+  padding-top: 15px;
+  padding-bottom: 15px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-radius: inherit;
+}
+@media screen and (min-width: 576px) {
+  .ddrswiper__item {
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+}
+@media screen and (min-width: 768px) {
+  .ddrswiper__item {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+}
+@media screen and (min-width: 992px) {
+  .ddrswiper__item {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+}
+@media screen and (min-width: 1200px) {
+  .ddrswiper__item {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+}
+.ddrswiper__item > * {
+  font-size: initial;
+  line-height: initial;
+  white-space: normal;
+}
+.ddrswiper__item .card {
+  background-color: #fefefe;
+  padding: 10px;
+}
+.ddrswiper__item:active {
+  cursor: grabbing;
+}
+.ddrswiper__item [noswipe] {
+  cursor: initial;
+}
+.ddrswiper__item [noswipe] * {
+  cursor: inherit;
+}
+.ddrswiper__item.test {
+  background-color: #f00;
+}
+.ddrswiper__item-waiting > *:not(.ddrswiper__waiting) {
+  opacity: 0.3;
+}
+.ddrswiper__item-waiting .ddrswiper__waiting {
+  opacity: 1;
+  pointer-events: auto;
+}
+.ddrswiper__spacer {
+  display: inline-block;
+  position: relative;
+  height: 0;
+  pointer-events: none;
+}
+.ddrswiper__waiting {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: inherit;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+.ddrswiper__waiting > div {
+  text-align: center;
+}
+.ddrswiper__waiting img {
+  width: 40px;
+  filter: hue-rotate(189deg) grayscale(0.5);
+}
+.ddrswiper__waiting p {
+  margin-top: 15px;
+  color: #b8c3db;
+}
+
+.timesheetcard {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0px;
+  justify-content: space-between;
+  border-radius: inherit;
+}
+.timesheetcard__top {
+  margin-bottom: 1rem;
+  text-align: center;
+  position: relative;
+}
+.timesheetcard__top::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 100%;
+  border: 0;
+  height: 1px;
+  background-color: #d4dbe0;
+  background-image: linear-gradient(to left, #fff 0%, #d4dbe0 10%, #d4dbe0 90%, #fff 100%);
+}
+.timesheetcard__panel {
+  position: sticky;
+  top: 0px;
+  z-index: 1;
+  background-color: #fff;
+  padding-left: 3px;
+  padding-right: 3px;
+}
+.timesheetcard__panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-color: #f3eff6;
+  border-radius: 10px 10px 0 0;
+  z-index: -1;
+}
+.timesheetcard__title {
+  display: block;
+  font-size: 16px;
+  line-height: 22px;
+  padding-right: 10px;
+  padding-left: 10px;
+  filter: opacity(0.8);
+  transition: filter 0.2s;
+}
+.timesheetcard_today .timesheetcard__subtitle {
+  box-shadow: 0 0 0 1px #a09cb3 inset;
+  font-weight: 700;
+  border-radius: 5px;
+  margin-left: 25px;
+  margin-right: 25px;
+  padding-bottom: 2px;
+  color: #867d96;
+}
+.timesheetcard__subtitle {
+  font-size: 14px;
+  color: #9fa5b2;
+  display: inline-block;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+.timesheetcard__content {
+  flex: 1 0 auto;
+  position: relative;
+}
+.timesheetcard__content:not(:has([team]))::before {
+  content: "Нет бригад";
+  position: absolute;
+  top: 40%;
+  width: 100%;
+  text-align: center;
+  color: #eee9f3;
+}
+.timesheetcard__teams {
+  height: calc(100vh - 216px);
+  min-height: 394px;
+}
+.timesheetcard__team {
+  position: relative;
+  background-color: #f3eff6;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding-left: 3px;
+  padding-right: 3px;
+}
+.timesheetcard__team::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 5px;
+  backdrop-filter: blur(0px);
+  background-color: transparent;
+  pointer-events: none;
+  transition: backdrop-filter 0.16s, background-color 0.16s;
+}
+.timesheetcard__team:nth-child(n+2) {
+  margin-top: 2rem;
+}
+.timesheetcard__team-wait::after {
+  backdrop-filter: blur(4px);
+  background-color: rgba(226, 221, 231, 0.4196078431);
+}
+.timesheetcard__master {
+  font-size: 14px;
+  margin-top: -1px;
+  display: block;
+}
+.timesheetcard__contracts {
+  min-height: 5rem;
+  position: relative;
+}
+.timesheetcard__contracts:not(:has(li))::after {
+  content: "Нет договоров";
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: calc(100% - 4px);
+  background-color: #fff;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 0;
+  font-size: 13px;
+  color: #eee9f3;
+}
+.timesheetcard__contracts > li {
+  position: relative;
+}
+.timesheetcard__contracts > li:nth-child(n+2) {
+  margin-top: 2rem;
+}
+.timesheetcard__table td {
+  padding: 2px 4px !important;
+}
+.timesheetcard__table td:nth-child(1) {
+  width: 40px;
+}
+.timesheetcard__table td:nth-child(2) {
+  width: 90px;
+}
+.timesheetcard__search {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  padding: 40px 10px 20px;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 10;
+  border-radius: 5px;
+  transition: opacity 0s;
+}
+.timesheetcard__search-visible {
+  opacity: 1;
+  pointer-events: auto;
+  transition: opacity 0.16s;
+}
+.timesheetcard__search .normal-input-search {
+  position: sticky;
+  top: 40px;
+}
+.timesheetcard__search .normal-input-search input {
+  position: sticky;
+  top: 10px;
+}
+.timesheetcard__searchresutls {
+  position: absolute;
+  bottom: 0;
+  height: 0;
+  width: 100%;
+  background-color: #f00;
+}
+.timesheetcard .searchresutls__list {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  max-height: 200px;
+  padding: 3px;
+  background-color: #fff;
+  box-shadow: 0 1px 2px 0 rgba(161, 155, 186, 0.2588235294);
+}
+.timesheetcard .searchresutls__list li {
+  transition: background-color 0.16s;
+}
+.timesheetcard .searchresutls__list li:nth-child(n+2) {
+  margin-top: 10px;
+}
+.timesheetcard .searchresutls__list li:not(:last-of-type) .searchresutls__table tr::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -5px;
+  width: 100%;
+  border: 0;
+  height: 1px;
+  background-color: #d4dbe0;
+  background-image: linear-gradient(to left, #fff 0%, #d4dbe0 10%, #d4dbe0 90%, #fff 100%);
+  pointer-events: none;
+}
+.timesheetcard .searchresutls__list li:hover {
+  background-color: #f6f2f9;
+  cursor: pointer;
+}
+.timesheetcard .searchresutls__list li.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+}
+.timesheetcard .searchresutls__list li.empty p {
+  color: #eee9f3;
+}
+.timesheetcard .searchresutls__table tr {
+  position: relative;
+}
+.timesheetcard .searchresutls__table tr td {
+  position: relative;
+  padding: 2px 4px;
+}
+.timesheetcard .searchresutls__table tr td:nth-child(1)::after, .timesheetcard .searchresutls__table tr td:nth-child(2)::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 4px;
+  width: 1px;
+  height: calc(100% - 8px);
+  background-color: #e9eaf2;
+  pointer-events: none;
+}
+.timesheetcard .searchresutls__table tr td:nth-child(1) {
+  width: 40px;
+}
+.timesheetcard .searchresutls__table tr td:nth-child(2) {
+  width: 90px;
+}
+.timesheetcard__chat {
+  margin-top: 1rem;
+}
+.timesheetcard__chatblock {
+  margin-top: 4px;
+}
+.timesheetcard .tchat {
+  margin-bottom: 3px;
+}
+.timesheetcard .tchat__message {
+  background-color: rgba(255, 255, 255, 0.6588235294);
+  border-radius: 5px;
+  padding: 4px;
+}
+.timesheetcard .tchat__message:nth-child(n+2) {
+  margin-top: 4px;
+}
+.timesheetcard .tchat .tmessage__name {
+  font-size: 10px;
+  display: block;
+}
+.timesheetcard .tchat .tmessage__date {
+  font-size: 10px;
+  display: block;
+  text-align: right;
+  color: #b6abbf;
+}
+.timesheetcard .tchat .tmessage__message {
+  font-size: 12px;
+  line-height: 12px;
+  color: #a195ab;
+}
+.timesheetcard .tchat .tmessage_self .tmessage__name {
+  color: #14c1dc;
+}
+.timesheetcard .tchat__form {
+  display: flex;
+  margin-top: 4px;
+}
+.timesheetcard .tchat__input {
+  background-color: #fff;
+  border-radius: 3px;
+  flex: 1 1 auto;
+  font-size: 12px;
+  line-height: 12px;
+  padding: 4px;
+  word-break: break-word;
+  position: relative;
+  outline: none;
+}
+.timesheetcard .tchat__input:empty:not(:focus)::before {
+  content: attr(placeholder);
+  color: #bbb;
+  font-style: italic;
+  pointer-events: none;
+  font-size: 12px;
+  line-height: 12px;
+  position: absolute;
+}
+.timesheetcard .tchat__btn {
+  border: none;
+  background: none;
+  align-self: start;
+  margin-left: 4px;
+  cursor: pointer;
+  margin-right: 2px;
+}
+.timesheetcard .tchat__btn i {
+  color: #74b6c5;
+  font-size: 16px;
+}
+.timesheetcard .tchat__btn:hover i {
+  color: #449bae;
+}
+.timesheetcard .tchat__btn:active i {
+  color: #007790;
+}
+.timesheetcard .tchat__btn[disabled] {
+  cursor: default;
+  pointer-events: none;
+}
+.timesheetcard .tchat__btn[disabled] i {
+  color: #dddddd;
+}
+.timesheetcard__bottom {
+  margin-top: 1rem;
+  text-align: center;
+  position: relative;
+}
+.timesheetcard__bottom::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: -10px;
+  width: 100%;
+  border: 0;
+  height: 1px;
+  background-color: #d4dbe0;
+  background-image: linear-gradient(to left, #fff 0%, #d4dbe0 10%, #d4dbe0 90%, #fff 100%);
+}
+.timesheetcard__btn {
+  background-color: #9ea8bf;
+  border-radius: 4px;
+  border: none;
+  vertical-align: top;
+  font-size: 18px;
+  line-height: 10px;
+  color: #fff;
+  width: 20px;
+  height: 20px;
+  cursor: pointer !important;
+}
+.timesheetcard__btn i {
+  font-size: 13px;
+  color: #fff;
+}
+.timesheetcard__btn[disabled] {
+  filter: grayscale(1.5) contrast(150%);
+  cursor: default !important;
+}
+.timesheetcard__btn:hover:not([disabled]) {
+  background-color: #959fb7;
+  color: #fff;
+  transition: background-color 0.16s, color 0.16s;
+}
+.timesheetcard__btn:active:not([disabled]) {
+  background-color: #828faf;
+  color: #fff;
+  transition: background-color 0s, color 0s;
+}
+.timesheetcard__staffwrap {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(248, 248, 249, 0.7215686275);
+  backdrop-filter: blur(5px);
+  border-radius: inherit;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.16s;
+  z-index: 1;
+}
+.timesheetcard__staffwrap-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+.timesheetcard__stafftitle {
+  position: absolute;
+  top: 22px;
+  width: 100%;
+  text-align: center;
+  font-size: 16px;
+  color: #7d718d;
+  font-weight: bold;
+}
+.timesheetcard__stafftitle i {
+  font-size: 16px;
+  vertical-align: middle;
+  cursor: pointer;
+  color: #9d98b5;
+  margin-left: 6px;
+}
+.timesheetcard__stafftitle i:hover {
+  color: #6f659f;
+}
+.timesheetcard__stafflist {
+  position: absolute;
+  inset: 0;
+  margin-top: 60px;
+  margin-right: 4px;
+  padding-left: 10px;
+  padding-right: 5px;
+  height: calc(100% - 110px);
+}
+.timesheetcard__stafflist li {
+  padding: 5px;
+  border-radius: 5px;
+  cursor: pointer;
+  color: #fff;
+  transition: background-color 0.16s;
+}
+.timesheetcard__stafflist li p {
+  color: #7a7182;
+  transition: color 0.16s;
+}
+.timesheetcard__stafflist li:hover {
+  background-color: rgba(145, 133, 161, 0.1411764706);
+}
+.timesheetcard__stafflist li:active {
+  background-color: rgba(100, 82, 123, 0.5411764706);
+  transition: background-color 0s;
+}
+.timesheetcard__stafflist li:active p {
+  color: #fff;
+  transition: color 0s;
 }

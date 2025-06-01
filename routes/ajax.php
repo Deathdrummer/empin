@@ -3,6 +3,7 @@
 use App\Enums\ContractColums;
 use App\Enums\VirtualVars;
 use App\Http\Controllers\admin\Acts;
+use App\Http\Controllers\AssistentFilesController;
 use App\Http\Controllers\ContractsFilesController;
 use App\Http\Controllers\crud\Admins;
 use App\Http\Controllers\crud\Contracts;
@@ -13,6 +14,7 @@ use App\Http\Controllers\crud\Staff;
 use App\Http\Controllers\crud\Steps;
 use App\Http\Controllers\crud\StepsPatterns;
 use App\Http\Controllers\crud\UsersNew;
+use App\Http\Controllers\PromptFilesController;
 use App\Http\Controllers\SiteParserController;
 use App\Http\Controllers\TabsController;
 use App\Http\Controllers\UploadFilesController;
@@ -218,6 +220,20 @@ Route::delete('/upload_file', [UploadFilesController::class, 'remove']);
 Route::post('/contracts_files', [ContractsFilesController::class, 'upload']);
 Route::get('/contracts_files', [ContractsFilesController::class, 'download']);
 Route::delete('/contracts_files', [ContractsFilesController::class, 'remove']);
+
+
+
+# Файлы ассистента
+Route::post('/assistent_files', [AssistentFilesController::class, 'upload']);
+Route::get('/assistent_files', [AssistentFilesController::class, 'download']);
+Route::delete('/assistent_files', [AssistentFilesController::class, 'remove']);
+
+Route::put('/prompt_files', [PromptFilesController::class, 'save']);
+
+
+
+
+
 
 
 

@@ -1,7 +1,7 @@
 <div class="app">
 	<header class="header">
 		<div class="header__container">
-			<div class="row justify-content-between g-20">
+			<div class="row justify-content-between g-10 g-sm-12 g-md-15 g-lg-20">
 				<div class="col-auto">
 					<div class="header__block">
 						<div class="header__logo">
@@ -47,7 +47,7 @@
 				
 				<div class="col-auto ms-auto">
 					<div class="header__block">
-						<p class="fz16px "><strong>{{$user->full_name}}</strong></p>
+						<p class="fz16px header__username"><strong>{{$user->full_name}}</strong></p>
 					</div>
 				</div>
 				
