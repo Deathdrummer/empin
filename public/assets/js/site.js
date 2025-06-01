@@ -5408,6 +5408,8 @@ Object.keys(ddrWraps).forEach(function (key) {
   return window[key] = ddrWraps[key];
 });
 
+__webpack_require__(/*! @/ref */ "./resources/js/ref.js");
+
 __webpack_require__(/*! @/functions */ "./resources/js/functions.js");
 
 __webpack_require__(/*! @/common */ "./resources/js/common.js");
@@ -20245,6 +20247,459 @@ $.fn.ddrTooltip = function (params, callback) {
   };
 
   return toolTipObj;
+};
+
+/***/ }),
+
+/***/ "./resources/js/ref.js":
+/*!*****************************!*\
+  !*** ./resources/js/ref.js ***!
+  \*****************************/
+/***/ (function() {
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"]; if (_i == null) return; var _arr = []; var _n = true; var _d = false; var _s, _e; try { for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+
+// ref.js
+// Убедитесь, что Lodash (_) доступен глобально, или импортируйте его, если используете модули.
+// import _ from 'lodash'; 
+// Вспомогательные символы для хранения обработчиков
+var getHandlers = Symbol('getHandlers');
+var setHandlers = Symbol('setHandlers'); // Вспомогательная функция для проверки JSON (используется в ddrStore)
+
+function _isJsonStringInternal(str) {
+  if (typeof str !== 'string') return false;
+
+  try {
+    JSON.parse(str);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+/**
+ * Функция для работы с localStorage.
+ * @param {string} key - Ключ.
+ * @param {*} [value] - Значение.
+ * @returns {*|boolean} - Извлеченное значение, null если не найдено, true/false для операций записи/удаления.
+ */
+
+
+window.ddrStore = function (key, value) {
+  if (!key || typeof key !== 'string') {
+    console.error('ddrStore: Ключ должен быть непустой строкой.');
+    return false;
+  }
+
+  if (value === false) {
+    // Удаление
+    try {
+      localStorage.removeItem(key);
+      return true;
+    } catch (e) {
+      console.error('ddrStore: Ошибка при удалении из localStorage:', e);
+      return false;
+    }
+  } else if (value !== undefined) {
+    // Запись
+    var valueToStore = value;
+
+    if (_typeof(valueToStore) === 'object' && valueToStore !== null) {
+      try {
+        valueToStore = JSON.stringify(valueToStore);
+      } catch (e) {
+        console.error('ddrStore: Ошибка при JSON.stringify объекта:', e);
+        return false;
+      }
+    }
+
+    try {
+      localStorage.setItem(key, valueToStore);
+      return true;
+    } catch (e) {
+      console.error('ddrStore: Ошибка при записи в localStorage (возможно, переполнение):', e);
+      return false;
+    }
+  } else {
+    // Чтение
+    try {
+      var getValue = localStorage.getItem(key);
+      if (getValue === null) return null; // Ключ не найден
+
+      if (_isJsonStringInternal(getValue)) {
+        try {
+          return JSON.parse(getValue);
+        } catch (e) {
+          // Если это была невалидная JSON строка
+          console.warn('ddrStore: Значение по ключу было похоже на JSON, но не распарсилось. Возвращено как строка.', key, getValue);
+          return getValue;
+        }
+      }
+
+      return getValue; // Возвращаем как есть (может быть числом или булевым значением, сохраненным как строка)
+    } catch (e) {
+      console.error('ddrStore: Ошибка при чтении из localStorage:', e);
+      return null;
+    }
+  }
+};
+/**
+ * Создает прокси для массива для отслеживания мутаций.
+ * @param {Array} originalArray - Исходный массив.
+ * @param {string} arrayPropertyKey - Имя свойства в parentObject, которое содержит этот массив.
+ * @param {object} parentObject - Непосредственный объект-владелец этого массива.
+ * @param {object} rootWatcherInstance - Экземпляр ddrWatcher самого верхнего уровня.
+ * @returns {Proxy} Проксированный массив.
+ */
+
+
+function createArrayProxy(originalArray, arrayPropertyKey, parentObject, rootWatcherInstance) {
+  var arrayMutatingMethods = ['push', 'pop', 'shift', 'unshift', 'splice', 'fill', 'sort', 'reverse'];
+  return new Proxy(originalArray, {
+    get: function get(targetArr, prop, receiver) {
+      var value = Reflect.get(targetArr, prop, receiver);
+
+      if (typeof value === 'function' && arrayMutatingMethods.includes(prop)) {
+        return function () {
+          for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+            args[_key] = arguments[_key];
+          }
+
+          var arraySnapshotBeforeMutation = _toConsumableArray(targetArr);
+
+          var result = value.apply(targetArr, args);
+
+          if (rootWatcherInstance && rootWatcherInstance[setHandlers] && rootWatcherInstance[setHandlers].length > 0) {
+            rootWatcherInstance[setHandlers].forEach(function (handler) {
+              return handler({
+                type: 'set',
+                target: parentObject,
+                prop: arrayPropertyKey,
+                value: targetArr,
+                oldValue: arraySnapshotBeforeMutation,
+                mutationInfo: {
+                  method: prop,
+                  args: args
+                }
+              });
+            });
+          }
+
+          if (rootWatcherInstance && rootWatcherInstance.ddrStoreKey && typeof rootWatcherInstance.ddrStoreKey === 'string') {
+            try {
+              var cleanData = rootWatcherInstance.all();
+              window.ddrStore(rootWatcherInstance.ddrStoreKey, cleanData);
+            } catch (e) {
+              console.error("Ошибка в createArrayProxy (метод массива) при сохранении:", e);
+            }
+          }
+
+          return result;
+        };
+      } // Если необходима глубокая реактивность для элементов массива (объектов/других массивов):
+      // if (_.isPlainObject(value)) return window.ddrWatcher(value, null /* funcsObj для детей? */, null, rootWatcherInstance);
+      // if (Array.isArray(value) && value !== targetArr) return createArrayProxy(value, prop, targetArr, rootWatcherInstance);
+
+
+      return value;
+    },
+    set: function set(targetArr, indexOrProp, value, receiver) {
+      var oldValueAtIndex = targetArr[indexOrProp];
+
+      var arraySnapshotBeforeMutation = _toConsumableArray(targetArr);
+
+      var success = Reflect.set(targetArr, indexOrProp, value, receiver);
+
+      if (success) {
+        if (rootWatcherInstance && rootWatcherInstance[setHandlers] && rootWatcherInstance[setHandlers].length > 0) {
+          rootWatcherInstance[setHandlers].forEach(function (handler) {
+            return handler({
+              type: 'set',
+              target: parentObject,
+              prop: arrayPropertyKey,
+              value: targetArr,
+              oldValue: arraySnapshotBeforeMutation,
+              mutationInfo: {
+                property: indexOrProp,
+                newValue: value,
+                oldValue: oldValueAtIndex
+              }
+            });
+          });
+        }
+
+        if (rootWatcherInstance && rootWatcherInstance.ddrStoreKey && typeof rootWatcherInstance.ddrStoreKey === 'string') {
+          try {
+            var cleanData = rootWatcherInstance.all();
+            window.ddrStore(rootWatcherInstance.ddrStoreKey, cleanData);
+          } catch (e) {
+            console.error("Ошибка в createArrayProxy (set индекс/свойство) при сохранении:", e);
+          }
+        }
+      }
+
+      return success;
+    }
+  });
+}
+
+window.ddrWatcher = function (objToWatch) {
+  var funcsObj = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+  var storeKeyFromUser = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
+  var _rootWatcherInternalContext = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
+
+  var currentProxedData = _.isPlainObject(objToWatch) ? objToWatch : {
+    value: objToWatch
+  };
+  var rootInstance = _rootWatcherInternalContext || currentProxedData;
+
+  if (!_rootWatcherInternalContext) {
+    currentProxedData.ddrStoreKey = typeof storeKeyFromUser === 'string' && storeKeyFromUser ? storeKeyFromUser : null;
+    currentProxedData[getHandlers] = [];
+    currentProxedData[setHandlers] = [];
+
+    if (typeof currentProxedData.all !== 'function') {
+      currentProxedData.all = function () {
+        var cleanObject = function cleanObject(obj) {
+          if (Array.isArray(obj)) {
+            return obj.map(function (item) {
+              return _.isPlainObject(item) || Array.isArray(item) ? cleanObject(item) : item;
+            });
+          } else if (_.isPlainObject(obj)) {
+            return Object.fromEntries(Object.entries(obj).filter(function (_ref) {
+              var _ref2 = _slicedToArray(_ref, 1),
+                  key = _ref2[0];
+
+              return !(key === 'ddrStoreKey' || key === 'all' || key === 'observe' || _typeof(key) === 'symbol' || typeof obj[key] === 'function' && (key === 'all' || key === 'observe'));
+            }).map(function (_ref3) {
+              var _ref4 = _slicedToArray(_ref3, 2),
+                  key = _ref4[0],
+                  value = _ref4[1];
+
+              return [key, _.isPlainObject(value) || Array.isArray(value) ? cleanObject(value) : value];
+            }));
+          }
+
+          return obj;
+        };
+
+        var dataToClean = _objectSpread({}, this);
+
+        delete dataToClean[getHandlers];
+        delete dataToClean[setHandlers];
+        delete dataToClean.all;
+        delete dataToClean.observe;
+        delete dataToClean.ddrStoreKey;
+        return cleanObject(dataToClean);
+      };
+    }
+
+    if (typeof currentProxedData.observe !== 'function') {
+      currentProxedData.observe = function (funcs) {
+        var g, s, m;
+        if (_.isFunction(funcs)) m = funcs;else if (_.isPlainObject(funcs)) {
+          g = funcs === null || funcs === void 0 ? void 0 : funcs.get;
+          s = funcs === null || funcs === void 0 ? void 0 : funcs.set;
+        }
+
+        if (m) {
+          this[getHandlers].push(m);
+          this[setHandlers].push(m);
+        }
+
+        if (g) this[getHandlers].push(g);
+        if (s) this[setHandlers].push(s);
+      };
+    }
+
+    if (funcsObj) currentProxedData.observe(funcsObj);
+
+    if (currentProxedData.ddrStoreKey) {
+      var storedData = window.ddrStore(currentProxedData.ddrStoreKey);
+
+      if (storedData !== null) {
+        if (_typeof(storedData) === 'object' && storedData !== null) {
+          Object.keys(storedData).forEach(function (key) {
+            if (Object.prototype.hasOwnProperty.call(storedData, key) && !(key === 'ddrStoreKey' || key === 'all' || key === 'observe' || _typeof(key) === 'symbol' || typeof currentProxedData[key] === 'function')) {
+              currentProxedData[key] = storedData[key];
+            }
+          });
+        } else if (currentProxedData.hasOwnProperty('value') && !_.isPlainObject(objToWatch)) {
+          currentProxedData.value = storedData;
+        }
+      }
+    }
+  }
+
+  return new Proxy(currentProxedData, {
+    get: function get(target, property, receiver) {
+      var value = Reflect.get(target, property, receiver);
+      if (property === 'isProxy') return true;
+
+      if (_typeof(property) !== 'symbol' && typeof value !== 'function' && rootInstance[getHandlers] && rootInstance[getHandlers].length > 0) {
+        rootInstance[getHandlers].forEach(function (handler) {
+          return handler({
+            type: 'get',
+            target: target,
+            prop: property,
+            value: value
+          });
+        });
+      }
+
+      if (_.isPlainObject(value)) {
+        return window.ddrWatcher(value, funcsObj, null, rootInstance);
+      }
+
+      if (Array.isArray(value)) {
+        return _toConsumableArray(value); // ⬅️ вот это ключевой момент
+      }
+
+      return value;
+    },
+    set: function set(target, property, value, receiver) {
+      var oldValue = target[property]; // Не вызываем обработчики и сохранение для служебных полей, если они устанавливаются изнутри
+
+      var isInternalField = property === 'ddrStoreKey' || _typeof(property) === 'symbol' || property === 'all' || property === 'observe';
+      var success = Reflect.set(target, property, value, receiver);
+
+      if (success && !isInternalField) {
+        if (rootInstance[setHandlers] && rootInstance[setHandlers].length > 0) {
+          rootInstance[setHandlers].forEach(function (handler) {
+            return handler({
+              type: 'set',
+              target: target,
+              prop: property,
+              value: value,
+              oldValue: oldValue
+            });
+          });
+        }
+
+        if (rootInstance.ddrStoreKey) {
+          try {
+            var cleanData = rootInstance.all();
+            window.ddrStore(rootInstance.ddrStoreKey, cleanData);
+          } catch (e) {
+            console.error("Ошибка при вызове .all() или ddrStore в ddrWatcher (set):", e);
+          }
+        }
+      }
+
+      return success;
+    },
+    ownKeys: function ownKeys(target) {
+      return Reflect.ownKeys(target).filter(function (key) {
+        return !(key === 'ddrStoreKey' || key === 'all' || key === 'observe' || _typeof(key) === 'symbol');
+      });
+    },
+    getOwnPropertyDescriptor: function getOwnPropertyDescriptor(target, property) {
+      if (property === 'ddrStoreKey' || property === 'all' || property === 'observe' || _typeof(property) === 'symbol') {
+        return undefined;
+      }
+
+      return Reflect.getOwnPropertyDescriptor(target, property);
+    }
+  });
+};
+
+window.ddrRef = function () {
+  var data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+  var watchFuncsOrStoreKey = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+  var storeKeyFromThirdArg = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+  var useWatcher = false;
+  var effectiveStoreKey = null;
+
+  if (watchFuncsOrStoreKey && _typeof(watchFuncsOrStoreKey) === 'object' && watchFuncsOrStoreKey !== null && !Array.isArray(watchFuncsOrStoreKey)
+  /* убедимся, что это не массив */
+  ) {
+    useWatcher = true;
+    effectiveStoreKey = typeof storeKeyFromThirdArg === 'string' && storeKeyFromThirdArg ? storeKeyFromThirdArg : null;
+  } else if (typeof watchFuncsOrStoreKey === 'string' && watchFuncsOrStoreKey) {
+    useWatcher = false;
+    effectiveStoreKey = watchFuncsOrStoreKey;
+  } else if (typeof storeKeyFromThirdArg === 'string' && storeKeyFromThirdArg) {
+    useWatcher = false;
+    effectiveStoreKey = storeKeyFromThirdArg;
+  }
+
+  if (useWatcher) {
+    return window.ddrWatcher(data, watchFuncsOrStoreKey, effectiveStoreKey, null);
+  } else {
+    var targetObject;
+
+    if (effectiveStoreKey) {
+      var dataFromStorage = window.ddrStore(effectiveStoreKey);
+
+      if (dataFromStorage !== null) {
+        targetObject = dataFromStorage;
+      } else {
+        targetObject = _.isPlainObject(data) ? data : {
+          value: data
+        };
+        window.ddrStore(effectiveStoreKey, targetObject);
+      }
+    } else {
+      targetObject = _.isPlainObject(data) ? data : {
+        value: data
+      };
+    }
+
+    var proxyHandlers = {
+      get: function get(target, prop, receiver) {
+        if (prop === 'isProxy') return false;
+
+        if (prop in target) {
+          var value = Reflect.get(target, prop, receiver);
+          if (_.isNumber(value)) return Number(value); // Ваша логика для чисел
+
+          return value;
+        } else {
+          return null; // Ваша логика для несуществующих свойств
+        }
+      }
+    };
+
+    if (effectiveStoreKey) {
+      proxyHandlers.set = function (target, prop, value, receiver) {
+        var success = Reflect.set(target, prop, value, receiver);
+
+        if (success) {
+          window.ddrStore(effectiveStoreKey, target);
+        }
+
+        return success;
+      };
+    }
+
+    return new Proxy(targetObject, proxyHandlers);
+  }
 };
 
 /***/ }),

@@ -87,6 +87,7 @@ Object.keys(ddrWraps).forEach(key => window[key] = ddrWraps[key]);
 
 
 
+require('@/ref');
 require('@/functions');
 require('@/common');
 require('@/sections');
