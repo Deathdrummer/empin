@@ -3,50 +3,73 @@
 use App\Helpers\DdrDateTime;
 use App\Services\Settings;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
 use Symfony\Component\Mime\Encoder\IdnAddressEncoder;
 
 
+if (!function_exists('toLog')) {
+    /**
+     * DDR Логгер
+     *
+     * @param  mixed  $message
+     * @param  array  $params
+     * @return mixed
+     */
+    function toLog($message = null, $params = []): mixed {
+        if (is_null($message)) {
+            return app('log');
+        }
 
-if (! function_exists('toLog')) {
-	/**
-	* DDR Логгер
-	*
-	* @param  mixed  $message
-	* @param  array  $context
-	* @return mixed
-	*/
-	function toLog($message = null, $params = []):mixed {
-		if (is_null($message)) {
-			return app('log');
+        $humanDate = $params['humandate'] ?? false;
+
+        // Рекурсивная обработка ресурсов
+        $message = cleanResource($message);
+
+        // Рекурсивная дата-обработка
+        if (is_array($message)) {
+            arrayWalkRecursive($message, $humanDate);
+        } elseif ($message instanceof Carbon) {
+            $message = $humanDate
+                ? DdrDateTime::date($message, ['shift' => '-']) . ' в ' . DdrDateTime::time($message, ['shift' => '-']) . ' [Carbon]'
+                : DdrDateTime::shift($message, 'UTC') . ' [Carbon]';
+        }
+
+        return app('log')->debug($message, $params['context'] ?? []);
+    }
+
+    /**
+     * Преобразование ресурсов в массивы (рекурсивно)
+     */
+    function cleanResource(mixed $data): mixed {
+		if ($data instanceof AnonymousResourceCollection) {
+			return cleanResource($data->toResponse(app('request'))->getData(true));
 		}
-		
-		$humanDate = $params['humandate'] ?? false;
-		
-		if (is_array($message)) {
-			
-			
-			arrayWalkRecursive($message, $humanDate);
-		} else {
-			if ($message instanceof Carbon) {
-				if ($humanDate) {
-					$message = DdrDateTime::date($message, ['shift' => '-']).' в '.DdrDateTime::time($message, ['shift' => '-']).' [Carbon]';
-				} else {
-					$message = DdrDateTime::shift($message, 'UTC').' [Carbon]';
-				}
-			} elseif ($message instanceof Illuminate\Support\Collection) {
-				$message = $message->toArray();
-				$message = arrayWalkRecursive($message, $humanDate);
-			} elseif (is_numeric($message)) {
-				//$message = strpos($message, '.') !== false ? (float)$message : (int)$message;
-			}
+
+		if ($data instanceof JsonResource) {
+			return cleanResource($data->toArray(app('request')));
 		}
-		
-		return app('log')->debug($message, $params['context'] ?? []);
+
+		if ($data instanceof Collection) {
+			return $data->map(fn($item) => cleanResource($item))->all();
+		}
+
+		if ($data instanceof Model) {
+			return cleanResource($data->toArray());
+		}
+
+		if (is_array($data)) {
+			return array_map(fn($item) => cleanResource($item), $data);
+		}
+
+		return $data;
 	}
 }
+
 
 
 if (!function_exists('arrayWalkRecursive')) {

@@ -1,8 +1,8 @@
 @import "@sass/common/vars"
 
-=hr($start: 10%, $end: 90%, $bgColor: #d4dbe0)
+=hr($start: 10%, $end: 90%, $bgColor: #d4dbe0, $weight: 1px)
 	border: 0
-	height: 1px
+	height: $weight
 	background:
 		color: $bgColor
 		image: linear-gradient(to left, #fff 0%, $bgColor $start, $bgColor $end, #fff 100%)

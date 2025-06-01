@@ -200,9 +200,9 @@ class DdrDateTime {
 	/** Конвертировать формат даты
 	 * @return String|null
 	 */
-	public static function dateToHuman($dateTimeStr = null, $outputFormat = ['MMMM DD YYYY', 'Do MMMM'], $originalFormat = 'Y-m-d H:i:s'):String|null {
+	public static function dateToHuman($dateTimeStr = null, $locale = 'ru_pure', $outputFormat = ['MMMM DD YYYY', 'Do MMMM'], $originalFormat = 'Y-m-d H:i:s'):String|null {
 		
-		return self::date($dateTimeStr, ['locale' => 'ru_pure']);
+		return self::date($dateTimeStr, ['locale' => $locale]);
 		
 		/* if (!$dateTimeStr) return null;
         $dateTime = Carbon::createFromFormat($originalFormat, $dateTimeStr);
@@ -213,6 +213,23 @@ class DdrDateTime {
         return $dateTime->translatedFormat($outputFormat); */
 	}
 	
+	
+	
+	
+	
+	
+	public static function dayOfWeek(Carbon|string $date, string $locale = 'ru'):string {
+		$carbon = $date instanceof Carbon ? $date : Carbon::parse($date);
+		return $carbon->locale($locale)->isoFormat('dddd');
+	}
+	
+	
+	
+	
+	public static function numOfWeek(Carbon|string $date, string $locale = 'ru'):string {
+		$carbon = $date instanceof Carbon ? $date : Carbon::parse($date);
+		return $carbon->dayOfWeekIso;
+	}
 	
 	
 	

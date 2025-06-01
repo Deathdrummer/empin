@@ -43864,6 +43864,7 @@ a {
   text-decoration: none;
   background-color: transparent;
   -webkit-text-decoration-skip: objects;
+  cursor: pointer;
 }
 a[disabled] {
   background-color: #ccc !important;
@@ -45635,6 +45636,10 @@ template {
 [hiderows]::-webkit-outer-spin-button {
   opacity: 0 !important;
   display: none !important;
+}
+
+.pointer {
+  cursor: pointer !important;
 }
 
 .scrollblock:not(.scrollblock-hidden):not(.scrollblock-hidescroll):not(.scrollblock-light)::-webkit-scrollbar {

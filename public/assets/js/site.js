@@ -5394,6 +5394,19 @@ window.axiosQuery = (__webpack_require__(/*! @plugins/axiosQuery */ "./resources
 //     cluster: process.env.MIX_PUSHER_APP_CLUSTER,
 //     forceTLS: true
 // });
+// сделать глобальными все экспортируемые функции из js/ddrRender/ddrRender
+
+var ddr = __webpack_require__(/*! @/ddrRender/ddrRender */ "./resources/js/ddrRender/ddrRender.js");
+
+Object.keys(ddr).forEach(function (key) {
+  return window[key] = ddr[key];
+}); // сделать глобальными все экспортируемые функции из js/ddrRender/wrappers
+
+var ddrWraps = __webpack_require__(/*! @/wrappers */ "./resources/js/wrappers.js");
+
+Object.keys(ddrWraps).forEach(function (key) {
+  return window[key] = ddrWraps[key];
+});
 
 __webpack_require__(/*! @/functions */ "./resources/js/functions.js");
 
@@ -5671,6 +5684,883 @@ function initBaseScripts() {
 
 /***/ }),
 
+/***/ "./resources/js/ddrRender/ddrRender.js":
+/*!*********************************************!*\
+  !*** ./resources/js/ddrRender/ddrRender.js ***!
+  \*********************************************/
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "ddrMountWithRefs": function() { return /* binding */ ddrMountWithRefs; },
+/* harmony export */   "ddrRender": function() { return /* binding */ ddrRender; },
+/* harmony export */   "ddrRenderWithEvents": function() { return /* binding */ ddrRenderWithEvents; }
+/* harmony export */ });
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _ddrTemplateParser__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ddrTemplateParser */ "./resources/js/ddrRender/ddrTemplateParser.js");
+/* harmony import */ var lru_cache__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! lru-cache */ "./node_modules/lru-cache/dist/esm/index.js");
+/* harmony import */ var fast_json_stable_stringify__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! fast-json-stable-stringify */ "./node_modules/fast-json-stable-stringify/index.js");
+/* harmony import */ var fast_json_stable_stringify__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(fast_json_stable_stringify__WEBPACK_IMPORTED_MODULE_3__);
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"]; if (_i == null) return; var _arr = []; var _n = true; var _d = false; var _s, _e; try { for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+
+
+
+
+var templateModules = __webpack_require__("./resources/views/render sync recursive \\.tpl$");
+
+var templatesCache = {};
+
+function loadTemplate(_x) {
+  return _loadTemplate.apply(this, arguments);
+}
+
+function _loadTemplate() {
+  _loadTemplate = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee(templateName) {
+    var _templateModules$defa;
+
+    var relPath, raw;
+    return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
+      while (1) {
+        switch (_context.prev = _context.next) {
+          case 0:
+            if (!templatesCache[templateName]) {
+              _context.next = 2;
+              break;
+            }
+
+            return _context.abrupt("return", templatesCache[templateName]);
+
+          case 2:
+            // путь внутри context должен начинаться с ./
+            relPath = "./".concat(templateName.replace(/\./g, '/'), ".tpl");
+
+            if (templateModules.keys().includes(relPath)) {
+              _context.next = 5;
+              break;
+            }
+
+            throw new Error("\u0428\u0430\u0431\u043B\u043E\u043D \"".concat(templateName, "\" \u043D\u0435 \u043D\u0430\u0439\u0434\u0435\u043D \u043F\u043E \u043F\u0443\u0442\u0438 \"").concat(relPath, "\""));
+
+          case 5:
+            // raw-loader отдаёт строку в .default или напрямую
+            raw = (_templateModules$defa = templateModules(relPath)["default"]) !== null && _templateModules$defa !== void 0 ? _templateModules$defa : templateModules(relPath);
+            raw = raw.replace(/\{#[\s\S]*?#\}/g, '');
+            templatesCache[templateName] = raw;
+            return _context.abrupt("return", raw);
+
+          case 9:
+          case "end":
+            return _context.stop();
+        }
+      }
+    }, _callee);
+  }));
+  return _loadTemplate.apply(this, arguments);
+}
+
+var renderCache = new lru_cache__WEBPACK_IMPORTED_MODULE_2__.LRUCache({
+  max: 100,
+  ttl: 1000 * 60 * 10
+});
+var compiledTemplates = {}; // готовые функции
+
+var pendingCompiles = {}; // промисы компиляции
+
+/**
+ * Генерирует уникальный ключ для данных
+ */
+
+function generateCacheKey(templateName, data) {
+  return "".concat(templateName, ":").concat(fast_json_stable_stringify__WEBPACK_IMPORTED_MODULE_3___default()(data));
+}
+/**
+ * Асинхронный рендер с директивами и LRU-кешированием
+ */
+
+
+function ddrRender(_x2) {
+  return _ddrRender.apply(this, arguments);
+}
+
+function _ddrRender() {
+  _ddrRender = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee3(templateName) {
+    var data,
+        key,
+        testMode,
+        cacheKey,
+        _args3 = arguments;
+    return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee3$(_context3) {
+      while (1) {
+        switch (_context3.prev = _context3.next) {
+          case 0:
+            data = _args3.length > 1 && _args3[1] !== undefined ? _args3[1] : {};
+            key = _args3.length > 2 && _args3[2] !== undefined ? _args3[2] : null;
+            testMode = _args3.length > 3 && _args3[3] !== undefined ? _args3[3] : false;
+            cacheKey = key !== null && key !== void 0 ? key : generateCacheKey(templateName, data); // 1️⃣	Есть готовый HTML в кэше	 → сразу возвращаем
+
+            if (!renderCache.has(cacheKey)) {
+              _context3.next = 8;
+              break;
+            }
+
+            _ddrTemplateParser__WEBPACK_IMPORTED_MODULE_1__.renderStats.hits++; // статистика
+
+            if (testMode) console.log('%c[CACHE HIT]', 'color:green', cacheKey);
+            return _context3.abrupt("return", renderCache.get(cacheKey));
+
+          case 8:
+            if (!pendingCompiles[cacheKey]) {
+              _context3.next = 10;
+              break;
+            }
+
+            return _context3.abrupt("return", pendingCompiles[cacheKey]);
+
+          case 10:
+            // 3️⃣	Мы первые — запускаем компиляцию и кладём промис в pending
+            _ddrTemplateParser__WEBPACK_IMPORTED_MODULE_1__.renderStats.misses++;
+            if (testMode) console.log('%c[CACHE MISS]', 'color:red', cacheKey);
+            pendingCompiles[cacheKey] = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee2() {
+              var raw, html;
+              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee2$(_context2) {
+                while (1) {
+                  switch (_context2.prev = _context2.next) {
+                    case 0:
+                      if (compiledTemplates[cacheKey]) {
+                        _context2.next = 5;
+                        break;
+                      }
+
+                      _context2.next = 3;
+                      return loadTemplate(templateName);
+
+                    case 3:
+                      raw = _context2.sent;
+                      compiledTemplates[cacheKey] = (0,_ddrTemplateParser__WEBPACK_IMPORTED_MODULE_1__.compileTemplate)(raw);
+
+                    case 5:
+                      html = compiledTemplates[cacheKey](data);
+                      renderCache.set(cacheKey, html);
+                      delete pendingCompiles[cacheKey]; // очистили «в процессе»
+
+                      if (testMode) console.log('%c[RENDER]', 'color:cyan', cacheKey);
+                      return _context2.abrupt("return", html);
+
+                    case 10:
+                    case "end":
+                      return _context2.stop();
+                  }
+                }
+              }, _callee2);
+            }))();
+            return _context3.abrupt("return", pendingCompiles[cacheKey]);
+
+          case 14:
+          case "end":
+            return _context3.stop();
+        }
+      }
+    }, _callee3);
+  }));
+  return _ddrRender.apply(this, arguments);
+}
+
+function ddrRenderWithEvents(_x3, _x4) {
+  return _ddrRenderWithEvents.apply(this, arguments);
+}
+/**
+ * ddrMountWithRefs(
+ *   target        – DOM | jQuery | string-селектор
+ *   tpl           – имя шаблона
+ *   data          – объект данных
+ *   key?          – кастомный cache-key
+ *   jQueryRefs?   – true → refs[name] = $(el)
+ * )
+ */
+
+function _ddrRenderWithEvents() {
+  _ddrRenderWithEvents = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee4(tpl, data) {
+    var html, $dom, lastTouchTime, TOUCH_DELAY;
+    return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee4$(_context4) {
+      while (1) {
+        switch (_context4.prev = _context4.next) {
+          case 0:
+            _context4.next = 2;
+            return ddrRender(tpl, data);
+
+          case 2:
+            html = _context4.sent;
+            $dom = $(html);
+            lastTouchTime = 0;
+            TOUCH_DELAY = 500;
+            $dom.on('touchend click', '[ddr-click]', function (e) {
+              var _this = this;
+
+              if (this.disabled || this.hasAttribute('disabled')) return; // TOUCH: фиксация времени и предотвращение фантомного клика
+
+              if (e.type === 'touchend') {
+                lastTouchTime = Date.now();
+                e.preventDefault(); // важно!
+              } else if (e.type === 'click' && Date.now() - lastTouchTime < TOUCH_DELAY) {
+                return; // Игнорируем click, если только что был touchend
+              } // Флаг на элементе для debounce
+
+
+              if (this._ddrClicked) return;
+              this._ddrClicked = true;
+              setTimeout(function () {
+                _this._ddrClicked = false;
+              }, 50);
+              var $el = $(this);
+              var expr = $el.attr('ddr-click');
+              if (!expr) return;
+
+              var _expr$split = expr.split(':'),
+                  _expr$split2 = _slicedToArray(_expr$split, 2),
+                  func = _expr$split2[0],
+                  params = _expr$split2[1];
+
+              var contextStr = $el.attr('data-ddr-context');
+              var contextData = {};
+
+              if (contextStr) {
+                try {
+                  contextData = JSON.parse(contextStr);
+                } catch (e) {
+                  contextData = {};
+                }
+              }
+
+              var args = params ? params.split(',').map(function (param) {
+                var key = param.trim();
+
+                if (contextData.hasOwnProperty(key)) {
+                  return contextData[key];
+                } // Если ключа нет — пробуем преобразовать к числу
+                // Только если строка действительно является числом
+
+
+                if (!isNaN(key) && key !== '') {
+                  return Number(key);
+                }
+
+                return key;
+              }) : [];
+
+              if ($.isFunction($[func])) {
+                var _$;
+
+                (_$ = $)[func].apply(_$, [this].concat(_toConsumableArray(args)));
+              } else {
+                console.warn("\u0424\u0443\u043D\u043A\u0446\u0438\u044F $.".concat(func, " \u043D\u0435 \u043D\u0430\u0439\u0434\u0435\u043D\u0430"));
+              }
+            });
+            $dom.on('input', '[ddr-input]', function (e) {
+              if (this.disabled || this.hasAttribute('disabled')) return;
+              var $el = $(this);
+              var expr = $el.attr('ddr-input');
+              if (!expr) return;
+
+              var _expr$split3 = expr.split(':'),
+                  _expr$split4 = _slicedToArray(_expr$split3, 2),
+                  func = _expr$split4[0],
+                  params = _expr$split4[1];
+
+              var contextStr = $el.attr('data-ddr-context');
+              var contextData = {};
+
+              if (contextStr) {
+                try {
+                  contextData = JSON.parse(contextStr);
+                } catch (e) {
+                  contextData = {};
+                }
+              }
+
+              var args = params ? params.split(',').map(function (param) {
+                var key = param.trim();
+
+                if (contextData.hasOwnProperty(key)) {
+                  return contextData[key];
+                }
+
+                if (!isNaN(key) && key !== '') {
+                  return Number(key);
+                }
+
+                return key;
+              }) : [];
+
+              if ($.isFunction($[func])) {
+                var _$2;
+
+                (_$2 = $)[func].apply(_$2, [this].concat(_toConsumableArray(args)));
+              } else {
+                console.warn("\u0424\u0443\u043D\u043A\u0446\u0438\u044F $.".concat(func, " \u043D\u0435 \u043D\u0430\u0439\u0434\u0435\u043D\u0430"));
+              }
+            });
+            return _context4.abrupt("return", $dom);
+
+          case 9:
+          case "end":
+            return _context4.stop();
+        }
+      }
+    }, _callee4);
+  }));
+  return _ddrRenderWithEvents.apply(this, arguments);
+}
+
+function ddrMountWithRefs(_x5, _x6) {
+  return _ddrMountWithRefs.apply(this, arguments);
+}
+
+function _ddrMountWithRefs() {
+  _ddrMountWithRefs = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee5(target, tpl) {
+    var data,
+        key,
+        jQueryRefs,
+        $target,
+        html,
+        tplEl,
+        frag,
+        refs,
+        _args5 = arguments;
+    return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee5$(_context5) {
+      while (1) {
+        switch (_context5.prev = _context5.next) {
+          case 0:
+            data = _args5.length > 2 && _args5[2] !== undefined ? _args5[2] : {};
+            key = _args5.length > 3 && _args5[3] !== undefined ? _args5[3] : null;
+            jQueryRefs = _args5.length > 4 && _args5[4] !== undefined ? _args5[4] : true;
+
+            /* ── приводим target к jQuery ── */
+            $target = target instanceof $ ? target : $(target);
+
+            if ($target.length) {
+              _context5.next = 6;
+              break;
+            }
+
+            throw new Error('Target element not found');
+
+          case 6:
+            _context5.next = 8;
+            return ddrRender(tpl, data, key);
+
+          case 8:
+            html = _context5.sent;
+
+            /* ── превращаем в fragment, собираем refs ── */
+            tplEl = document.createElement('template');
+            tplEl.innerHTML = html.trim();
+            frag = tplEl.content.cloneNode(true);
+            refs = {};
+            frag.querySelectorAll('[ddr-ref]').forEach(function (el) {
+              var name = el.getAttribute('ddr-ref');
+              el.removeAttribute('ddr-ref');
+              var refVal = jQueryRefs ? $(el) : el;
+
+              if (refs[name]) {
+                (Array.isArray(refs[name]) ? refs[name] : refs[name] = [refs[name]]).push(refVal);
+              } else refs[name] = refVal;
+            });
+            /* ── вставляем fragment c помощью jQuery ── */
+
+            $target.append(frag); // можно .prepend(frag) при необходимости
+
+            return _context5.abrupt("return", refs);
+
+          case 16:
+          case "end":
+            return _context5.stop();
+        }
+      }
+    }, _callee5);
+  }));
+  return _ddrMountWithRefs.apply(this, arguments);
+}
+
+/***/ }),
+
+/***/ "./resources/js/ddrRender/ddrTemplateParser.js":
+/*!*****************************************************!*\
+  !*** ./resources/js/ddrRender/ddrTemplateParser.js ***!
+  \*****************************************************/
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "compileTemplate": function() { return /* binding */ compileTemplate; },
+/* harmony export */   "evalInScope": function() { return /* binding */ evalInScope; },
+/* harmony export */   "parseTemplateVars": function() { return /* binding */ parseTemplateVars; },
+/* harmony export */   "processDirectives": function() { return /* binding */ processDirectives; },
+/* harmony export */   "renderStats": function() { return /* binding */ renderStats; }
+/* harmony export */ });
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e2) { throw _e2; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e3) { didErr = true; err = _e3; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"]; if (_i == null) return; var _arr = []; var _n = true; var _d = false; var _s, _e; try { for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+
+
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+function _construct(Parent, args, Class) { if (_isNativeReflectConstruct()) { _construct = Reflect.construct; } else { _construct = function _construct(Parent, args, Class) { var a = [null]; a.push.apply(a, args); var Constructor = Function.bind.apply(Parent, a); var instance = new Constructor(); if (Class) _setPrototypeOf(instance, Class.prototype); return instance; }; } return _construct.apply(null, arguments); }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+var renderStats = {
+  hits: 0,
+  misses: 0
+};
+function evalInScope(expression, context) {
+  try {
+    return _construct(Function, _toConsumableArray(Object.keys(context)).concat(["return ".concat(expression)])).apply(void 0, _toConsumableArray(Object.values(context)));
+  } catch (_unused) {
+    return false;
+  }
+}
+function parseTemplateVars(template, data) {
+  return template.replace(/{{\s*([\w.]+)\s*}}/g, function (_, path) {
+    var _path$split$reduce;
+
+    return (_path$split$reduce = path.split('.').reduce(function (acc, key) {
+      return acc == null ? '' : acc[key];
+    }, data)) !== null && _path$split$reduce !== void 0 ? _path$split$reduce : '';
+  });
+}
+function compileTemplate(raw) {
+  // удаляем все блоки вида {# … #}
+  var stripped = raw.replace(/\{#[\s\S]*?#\}/g, '');
+  return /*#__PURE__*/function () {
+    var _ref = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee(data) {
+      var doc, root;
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              doc = new DOMParser().parseFromString(stripped, 'text/html');
+              root = doc.body.cloneNode(true);
+              processDirectives(root, data);
+              return _context.abrupt("return", root.innerHTML);
+
+            case 4:
+            case "end":
+              return _context.stop();
+          }
+        }
+      }, _callee);
+    }));
+
+    return function (_x) {
+      return _ref.apply(this, arguments);
+    };
+  }();
+} // Собираем все элементы (и текстовые узлы) в массив
+
+function collectNodes(root) {
+  var nodes = [];
+  var walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT, null, false);
+  var node;
+
+  while (node = walker.nextNode()) {
+    nodes.push(node);
+  }
+
+  return nodes;
+}
+
+function processNode(node, data) {
+  var _node$hasAttribute, _node$hasAttribute2, _node$hasAttribute3;
+
+  // ddr-text
+  if ((_node$hasAttribute = node.hasAttribute) !== null && _node$hasAttribute !== void 0 && _node$hasAttribute.call(node, 'ddr-text')) {
+    var _evalInScope;
+
+    var expr = node.getAttribute('ddr-text').trim();
+    node.textContent = (_evalInScope = evalInScope(expr, data)) !== null && _evalInScope !== void 0 ? _evalInScope : '';
+    node.removeAttribute('ddr-text');
+  } // ddr-html
+
+
+  if ((_node$hasAttribute2 = node.hasAttribute) !== null && _node$hasAttribute2 !== void 0 && _node$hasAttribute2.call(node, 'ddr-html')) {
+    var _evalInScope2;
+
+    var _expr = node.getAttribute('ddr-html').trim();
+
+    node.innerHTML = (_evalInScope2 = evalInScope(_expr, data)) !== null && _evalInScope2 !== void 0 ? _evalInScope2 : '';
+    node.removeAttribute('ddr-html');
+  } // ddr-class
+
+
+  if ((_node$hasAttribute3 = node.hasAttribute) !== null && _node$hasAttribute3 !== void 0 && _node$hasAttribute3.call(node, 'ddr-class')) {
+    var _expr2 = node.getAttribute('ddr-class').trim();
+
+    if (_expr2.startsWith('{') && _expr2.endsWith('}')) {
+      _expr2 = "(".concat(_expr2, ")");
+    }
+
+    var result = evalInScope(_expr2, data);
+
+    if (_typeof(result) === 'object' && result !== null) {
+      Object.entries(result).forEach(function (_ref2) {
+        var _ref3 = _slicedToArray(_ref2, 2),
+            cls = _ref3[0],
+            on = _ref3[1];
+
+        return node.classList.toggle(cls, !!on);
+      });
+    } else if (typeof result === 'string') {
+      result.split(/\s+/).forEach(function (cls) {
+        return node.classList.add(cls);
+      });
+    }
+
+    node.removeAttribute('ddr-class');
+  } // подстановка {{…}} в атрибутах
+
+
+  for (var _i2 = 0, _arr2 = _toConsumableArray(node.attributes || []); _i2 < _arr2.length; _i2++) {
+    var attr = _arr2[_i2];
+    var substituted = parseTemplateVars(attr.value, data);
+
+    if (substituted !== attr.value) {
+      attr.value = substituted;
+    }
+  } // ddr-click, ddr-input
+
+
+  for (var _i3 = 0, _arr3 = _toConsumableArray(node.attributes || []); _i3 < _arr3.length; _i3++) {
+    var _attr = _arr3[_i3];
+
+    if (_attr.name === 'ddr-click') {
+      (function () {
+        var handler = _attr.value;
+        node.setAttribute('data-ddr-click', handler);
+
+        var _handler$split = handler.split(':'),
+            _handler$split2 = _slicedToArray(_handler$split, 2),
+            params = _handler$split2[1];
+
+        var contextObj = {};
+
+        if (params) {
+          params.split(',').forEach(function (param) {
+            var parts = param.trim().split('.');
+            var topKey = parts[0];
+
+            if (data.hasOwnProperty(topKey)) {
+              if (parts.length > 1) {
+                var val = data[topKey];
+
+                for (var i = 1; i < parts.length; i++) {
+                  var _val;
+
+                  val = (_val = val) === null || _val === void 0 ? void 0 : _val[parts[i]];
+                }
+
+                contextObj[parts.join('.')] = val;
+              } else {
+                contextObj[topKey] = data[topKey];
+              }
+            }
+          });
+        }
+
+        try {
+          node.setAttribute('data-ddr-context', JSON.stringify(contextObj));
+        } catch (e) {
+          node.setAttribute('data-ddr-context', '{}');
+        }
+      })();
+    }
+
+    if (_attr.name === 'ddr-input') {
+      var handler = _attr.value;
+      node.setAttribute('data-ddr-input', handler);
+    }
+  }
+}
+
+function processDirectives(el, data) {
+  var nodes = collectNodes(el);
+  var prevIfRemoved = false;
+
+  var _iterator = _createForOfIteratorHelper(nodes),
+      _step;
+
+  try {
+    var _loop = function _loop() {
+      var node = _step.value;
+
+      if (node.nodeType === 1) {
+        // ddr-for
+        if (node.hasAttribute('ddr-for')) {
+          var expr = node.getAttribute('ddr-for').trim();
+
+          var _ref4 = expr.match(/^(\w+)\s+in\s+([\w.]+)$/) || [],
+              _ref5 = _slicedToArray(_ref4, 3),
+              item = _ref5[1],
+              listExpr = _ref5[2];
+
+          var rawListVal = evalInScope(listExpr, data);
+          var listVal = Array.isArray(rawListVal) ? rawListVal : [];
+
+          if (!item) {
+            console.error('Ошибка ddr-for: не задан item', {
+              expr: expr,
+              data: data
+            });
+            node._ddr_remove = true;
+            return "continue";
+          }
+
+          var parent = node.parentElement;
+          var reference = node.nextSibling;
+          listVal.forEach(function (val) {
+            var clone = node.cloneNode(true);
+            clone.removeAttribute('ddr-for');
+
+            var scoped = _objectSpread(_objectSpread({}, data), {}, _defineProperty({}, item, val)); // ВАЖНО: сначала обрабатываем сам клон (чтобы ddr-click сработал на этом уровне!)
+
+
+            processNode(clone, scoped); // Потом — рекурсивно всех детей клона
+
+            processDirectives(clone, scoped);
+            parent.insertBefore(clone, reference);
+          });
+          node._ddr_remove = true;
+          return "continue";
+        } // ddr-if
+
+
+        if (node.hasAttribute('ddr-if')) {
+          var _expr3 = node.getAttribute('ddr-if').trim();
+
+          if (!evalInScope(_expr3, data)) {
+            prevIfRemoved = true;
+            node._ddr_remove = true;
+            return "continue";
+          }
+
+          prevIfRemoved = false;
+          node.removeAttribute('ddr-if');
+        } // ddr-else
+        else if (node.hasAttribute('ddr-else')) {
+          if (prevIfRemoved) {
+            prevIfRemoved = false;
+            node.removeAttribute('ddr-else');
+          } else {
+            node._ddr_remove = true;
+            return "continue";
+          }
+        } // ddr-text
+
+
+        if (node.hasAttribute('ddr-text')) {
+          var _evalInScope3;
+
+          var _expr4 = node.getAttribute('ddr-text').trim();
+
+          node.textContent = (_evalInScope3 = evalInScope(_expr4, data)) !== null && _evalInScope3 !== void 0 ? _evalInScope3 : '';
+          node.removeAttribute('ddr-text');
+        } // ddr-html
+
+
+        if (node.hasAttribute('ddr-html')) {
+          var _evalInScope4;
+
+          var _expr5 = node.getAttribute('ddr-html').trim();
+
+          node.innerHTML = (_evalInScope4 = evalInScope(_expr5, data)) !== null && _evalInScope4 !== void 0 ? _evalInScope4 : '';
+          node.removeAttribute('ddr-html');
+        } // ddr-class
+
+
+        if (node.hasAttribute('ddr-class')) {
+          var _expr6 = node.getAttribute('ddr-class').trim();
+
+          if (_expr6.startsWith('{') && _expr6.endsWith('}')) {
+            _expr6 = "(".concat(_expr6, ")");
+          }
+
+          var result = evalInScope(_expr6, data);
+
+          if (_typeof(result) === 'object' && result !== null) {
+            Object.entries(result).forEach(function (_ref6) {
+              var _ref7 = _slicedToArray(_ref6, 2),
+                  cls = _ref7[0],
+                  on = _ref7[1];
+
+              return node.classList.toggle(cls, !!on);
+            });
+          } else if (typeof result === 'string') {
+            result.split(/\s+/).forEach(function (cls) {
+              return node.classList.add(cls);
+            });
+          }
+
+          node.removeAttribute('ddr-class');
+        } // подстановка {{…}} в атрибутах
+
+
+        for (var _i4 = 0, _arr4 = _toConsumableArray(node.attributes); _i4 < _arr4.length; _i4++) {
+          var attr = _arr4[_i4];
+          var substituted = parseTemplateVars(attr.value, data);
+
+          if (substituted !== attr.value) {
+            attr.value = substituted;
+          }
+        } // ddr-click, ddr-input
+
+
+        for (var _i5 = 0, _arr5 = _toConsumableArray(node.attributes); _i5 < _arr5.length; _i5++) {
+          var _attr2 = _arr5[_i5];
+
+          if (_attr2.name === 'ddr-click') {
+            (function () {
+              var handler = _attr2.value;
+              node.setAttribute('data-ddr-click', handler);
+
+              var _handler$split3 = handler.split(':'),
+                  _handler$split4 = _slicedToArray(_handler$split3, 2),
+                  params = _handler$split4[1];
+
+              var contextObj = {};
+
+              if (params) {
+                params.split(',').forEach(function (param) {
+                  var parts = param.trim().split('.');
+                  var topKey = parts[0];
+
+                  if (data.hasOwnProperty(topKey)) {
+                    if (parts.length > 1) {
+                      var val = data[topKey];
+
+                      for (var i = 1; i < parts.length; i++) {
+                        var _val2;
+
+                        val = (_val2 = val) === null || _val2 === void 0 ? void 0 : _val2[parts[i]];
+                      }
+
+                      contextObj[parts.join('.')] = val;
+                    } else {
+                      contextObj[topKey] = data[topKey];
+                    }
+                  }
+                });
+              }
+
+              try {
+                node.setAttribute('data-ddr-context', JSON.stringify(contextObj));
+              } catch (e) {
+                node.setAttribute('data-ddr-context', '{}');
+              }
+            })();
+          }
+
+          if (_attr2.name === 'ddr-input') {
+            var handler = _attr2.value;
+            node.setAttribute('data-ddr-input', handler);
+          }
+        }
+      } else if (node.nodeType === 3) {
+        node.textContent = parseTemplateVars(node.textContent, data);
+      }
+    };
+
+    for (_iterator.s(); !(_step = _iterator.n()).done;) {
+      var _ret = _loop();
+
+      if (_ret === "continue") continue;
+    } // Второй проход: удаляем помеченные
+
+  } catch (err) {
+    _iterator.e(err);
+  } finally {
+    _iterator.f();
+  }
+
+  var _iterator2 = _createForOfIteratorHelper(nodes),
+      _step2;
+
+  try {
+    for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
+      var node = _step2.value;
+
+      if (node._ddr_remove) {
+        node.parentElement && node.parentElement.removeChild(node);
+      }
+    }
+  } catch (err) {
+    _iterator2.e(err);
+  } finally {
+    _iterator2.f();
+  }
+}
+
+/***/ }),
+
 /***/ "./resources/js/functions.js":
 /*!***********************************!*\
   !*** ./resources/js/functions.js ***!
@@ -5725,6 +6615,19 @@ $.fn.tripleTap = function (callback) {
       if (callback && typeof callback == 'function') callback(this);
     }
   });
+};
+
+window.toDate = function () {
+  var val = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+  if (!val) return null; // Если уже Date — обрезаем время
+
+  if (val instanceof Date) return new Date(val.getFullYear(), val.getMonth(), val.getDate()); // Если строка: берём только yyyy-mm-dd (или парсим, если это ISO)
+
+  var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(val);
+  if (m) return new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3])); // иначе просто пытаемся спарсить через Date
+
+  var d = new Date(val);
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate());
 };
 /*
 	Разделяет название файла на само название и расширение.
@@ -5928,161 +6831,6 @@ window.ref = function (data) {
   });
   proxy.value = data;
   return proxy;
-};
-
-window.ddrRef = function () {
-  var data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
-  var watchFuncs = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-  var storeKey = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-  var dataToWath;
-  if (watchFuncs) return ddrWatcher(data, watchFuncs, storeKey);
-  return new Proxy(_.isPlainObject(data) ? data : {
-    value: data
-  }, {
-    get: function get(target, prop, receiver) {
-      if (prop in target) {
-        if (_.isNumber(target[prop])) return Number(target[prop]);
-        return Reflect.get(target, prop, receiver); // (1)
-      } else {
-        return null;
-      }
-    }
-  });
-};
-
-var getHandlers = Symbol('handlers'),
-    setHandlers = Symbol('handlers');
-
-window.ddrWatcher = function (proxedObj) {
-  var funcsObj = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-  var storeKey = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-  proxedObj = _.isPlainObject(proxedObj) ? proxedObj : {
-    proxedObj: proxedObj
-  };
-  proxedObj[getHandlers] = [];
-  proxedObj[setHandlers] = [];
-
-  proxedObj.all = function () {
-    var cleanObject = function cleanObject(obj) {
-      if (Array.isArray(obj)) {
-        return obj.map(function (item) {
-          return _.isPlainObject(item) || Array.isArray(item) ? cleanObject(item) : item;
-        });
-      } else if (_.isPlainObject(obj)) {
-        return Object.fromEntries(Object.entries(obj).map(function (_ref3) {
-          var _ref4 = _slicedToArray(_ref3, 2),
-              key = _ref4[0],
-              value = _ref4[1];
-
-          return [key, _.isPlainObject(value) || Array.isArray(value) ? cleanObject(value) : value];
-        }));
-      }
-
-      return obj;
-    };
-
-    return cleanObject(this);
-  };
-
-  proxedObj.observe = function (funcsObj) {
-    var outerGetFunc, outerSetFunc, outerMixFunc;
-
-    if (_.isFunction(funcsObj)) {
-      outerMixFunc = funcsObj;
-    } else if (_.isPlainObject(funcsObj)) {
-      outerGetFunc = funcsObj === null || funcsObj === void 0 ? void 0 : funcsObj.get;
-      outerSetFunc = funcsObj === null || funcsObj === void 0 ? void 0 : funcsObj.set;
-    }
-
-    if (outerMixFunc) {
-      this[getHandlers].push(outerMixFunc);
-      this[setHandlers].push(outerMixFunc);
-    }
-
-    if (outerGetFunc) this[getHandlers].push(outerGetFunc);
-    if (outerSetFunc) this[setHandlers].push(outerSetFunc);
-  };
-
-  if (funcsObj) {
-    proxedObj.observe(funcsObj);
-  }
-
-  if (storeKey && typeof storeKey === 'string') {
-    var storedData = ddrStore(storeKey);
-
-    if (storedData && (_typeof(storedData) === 'object' || isJson(storedData))) {
-      var parsedData = _typeof(storedData) === 'object' ? storedData : JSON.parse(storedData);
-      Object.assign(proxedObj, parsedData);
-    }
-  }
-
-  var createDeepProxy = function createDeepProxy(obj, parentHandlers) {
-    return new Proxy(obj, {
-      get: function get(target, property, receiver) {
-        var value = Reflect.get(target, property, receiver); // Обрабатываем только если свойство не символ и это не метод
-
-        if (_typeof(property) !== 'symbol' && typeof value !== 'function' && target[getHandlers]) {
-          target[getHandlers].forEach(function (handler) {
-            return handler({
-              type: 'get',
-              target: target,
-              prop: property,
-              value: value
-            });
-          });
-        } // Если значение - объект, рекурсивно оборачиваем его в ddrWatcher
-
-
-        if (_.isPlainObject(value)) {
-          return ddrWatcher(value, funcsObj, storeKey);
-        } // Если значение - массив, возвращаем его без оборачивания в прокси
-
-
-        if (Array.isArray(value)) {
-          return value;
-        }
-
-        return value;
-      },
-      set: function set(target, property, value, receiver) {
-        var oldValue = target[property];
-        var success = Reflect.set(target, property, value, receiver);
-
-        if (success && parentHandlers[setHandlers]) {
-          parentHandlers[setHandlers].forEach(function (handler) {
-            return handler({
-              type: 'set',
-              target: target,
-              prop: property,
-              value: value,
-              oldValue: oldValue
-            });
-          });
-        }
-
-        if (success && storeKey && typeof storeKey === 'string') {
-          var cleanData = proxedObj.all();
-          ddrStore(storeKey, cleanData);
-        }
-
-        return success;
-      },
-      ownKeys: function ownKeys(target) {
-        return Reflect.ownKeys(target).filter(function (key) {
-          return _typeof(key) !== 'symbol' && typeof target[key] !== 'function';
-        });
-      },
-      getOwnPropertyDescriptor: function getOwnPropertyDescriptor(target, property) {
-        if (_typeof(property) === 'symbol' || typeof target[property] === 'function') {
-          return undefined;
-        }
-
-        return Reflect.getOwnPropertyDescriptor(target, property);
-      }
-    });
-  };
-
-  return createDeepProxy(proxedObj, proxedObj);
 };
 /*
 	shift  		shift 	shiftKey
@@ -6365,13 +7113,13 @@ window.getCurrentBreakPoint = function () {
 */
 
 
-window.scroll = function (_ref5) {
-  var _ref5$top = _ref5.top,
-      top = _ref5$top === void 0 ? null : _ref5$top,
-      _ref5$bottom = _ref5.bottom,
-      bottom = _ref5$bottom === void 0 ? null : _ref5$bottom,
-      _ref5$both = _ref5.both,
-      both = _ref5$both === void 0 ? null : _ref5$both;
+window.scroll = function (_ref3) {
+  var _ref3$top = _ref3.top,
+      top = _ref3$top === void 0 ? null : _ref3$top,
+      _ref3$bottom = _ref3.bottom,
+      bottom = _ref3$bottom === void 0 ? null : _ref3$bottom,
+      _ref3$both = _ref3.both,
+      both = _ref3$both === void 0 ? null : _ref3$both;
   $(window).scroll(function () {
     scrTop = $(window).scrollTop();
 
@@ -6703,8 +7451,8 @@ window.ddrHash = function (str) {
   var h1 = 0xdeadbeef ^ seed,
       h2 = 0x41c6ce57 ^ seed;
 
-  for (var _i2 = 0, ch; _i2 < str.length; _i2++) {
-    ch = str.charCodeAt(_i2);
+  for (var _i = 0, ch; _i < str.length; _i++) {
+    ch = str.charCodeAt(_i);
     h1 = Math.imul(h1 ^ ch, 2654435761);
     h2 = Math.imul(h2 ^ ch, 1597334677);
   }
@@ -8138,7 +8886,7 @@ window.buildFolders = function () {
 
   function createFolders(zip, folders) {
     var _loop = function _loop() {
-      var _Object$entries$_i = _slicedToArray(_Object$entries[_i3], 2),
+      var _Object$entries$_i = _slicedToArray(_Object$entries[_i2], 2),
           key = _Object$entries$_i[0],
           value = _Object$entries$_i[1];
 
@@ -8153,7 +8901,7 @@ window.buildFolders = function () {
       }
     };
 
-    for (var _i3 = 0, _Object$entries = Object.entries(folders); _i3 < _Object$entries.length; _i3++) {
+    for (var _i2 = 0, _Object$entries = Object.entries(folders); _i2 < _Object$entries.length; _i2++) {
       _loop();
     }
   }
@@ -14568,6 +15316,710 @@ $.fn.ddrScrollX = function (params) {
 
   });
 };
+
+/***/ }),
+
+/***/ "./resources/js/plugins/ddrSwiper.js":
+/*!*******************************************!*\
+  !*** ./resources/js/plugins/ddrSwiper.js ***!
+  \*******************************************/
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
+var _excluded = ["index"];
+
+function _objectWithoutProperties(source, excluded) { if (source == null) return {}; var target = _objectWithoutPropertiesLoose(source, excluded); var key, i; if (Object.getOwnPropertySymbols) { var sourceSymbolKeys = Object.getOwnPropertySymbols(source); for (i = 0; i < sourceSymbolKeys.length; i++) { key = sourceSymbolKeys[i]; if (excluded.indexOf(key) >= 0) continue; if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue; target[key] = source[key]; } } return target; }
+
+function _objectWithoutPropertiesLoose(source, excluded) { if (source == null) return {}; var target = {}; var sourceKeys = Object.keys(source); var key, i; for (i = 0; i < sourceKeys.length; i++) { key = sourceKeys[i]; if (excluded.indexOf(key) >= 0) continue; target[key] = source[key]; } return target; }
+
+
+
+function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+$.fn.ddrSwiper = function (options) {
+  return this.each(function () {
+    var instance = ddrSwiper(_objectSpread({
+      selector: this
+    }, options));
+    $(this).data('ddrSwiper', instance); // Сохраняем экземпляр
+  });
+};
+/**
+ * ddrSwiper — jQuery-плагин горизонтального свайпера с адаптивом и кастомной загрузкой данных.
+ *
+ * Пример инициализации:
+ *
+ * $('#mySlider').ddrSwiper({
+ *     slidesPerView: 6,
+ *     slidesCount: 40,
+ *     responsive: [
+ *         { breakpoint: 1200, slidesPerView: 4 },
+ *         { breakpoint: 900, slidesPerView: 2 },
+ *         { breakpoint: 600, slidesPerView: 1 }
+ *     ],
+ *     template: 'timesheet.slide',
+ *     loadSlidesData: async function(indexes) {
+ *         // Вернуть фунцию {data, error} или объект с данными
+ *         return await axiosQuery('get', '/api/slides', {indexes}, 'json');
+ *     },
+ *     onInit: function() { console.log('Слайдер готов'); },
+ *     onChange: function(idx) { console.log('Сменился слайд:', idx); },
+ *     onLoadData: function(newIndexes) { console.log('Загружены новые данные:', newIndexes); }
+ * });
+ *
+ * ------------------- Опции -------------------
+ * selector           — селектор или DOM-элемент (ставится автоматически)
+ * centerSlide        — 'center' или индекс стартового слайда (по умолчанию 'center')
+ * slidesPerView      — видимых слайдов (по умолчанию 5)
+ * slidesCount        — общее кол-во слайдов (по умолчанию 21)
+ * loadNewOffset      — кол-во догружаемых слайдов (по умолчанию 10)
+ * slideBlank         — HTML шаблон с [placer] для вставки данных
+ * responsive         — массив [{breakpoint, slidesPerView}, ...] для адаптива
+ * template           — название шаблона для рендера (например, 'timesheet.slide')
+ * loadSlidesData     — function(indexes, abortCtrl) или массив/объект слайдов.
+ *                      - функция должна вернуть {data, error}
+ *                      - если передан массив/объект, используется как есть
+ * onInit             — коллбэк при инициализации (function)
+ * onChange           — коллбэк при смене активного слайда (function)
+ * onLoadData         — коллбэк после загрузки новых данных (function)
+ *
+ * ------------------- Методы -------------------
+ * $('#mySlider').data('ddrSwiper') возвращает объект с методами:
+ *   scrollTo(idx)         — прокрутка к слайду с индексом idx
+ *   reload()              — пересобрать слайдер
+ *   getCurrentIndex()     — вернуть текущий индекс активного слайда
+ *   destroy()             — очистить слайдер, отвязать обработчики
+ *
+ * ------------------- Важное -------------------
+ * - Чтобы заблокировать свайп по элементу, добавь ему атрибут [noswipe].
+ * - Если не передан loadSlidesData, ничего не загрузится (ошибка).
+ * - slidesPerView меняется автоматически при ресайзе окна (если задан responsive).
+ */
+
+
+function ddrSwiper(options) {
+  var defaults = {
+    selector: '#ddrSwiper',
+    centerSlide: 'center',
+    slidesPerView: 5,
+    slidesCount: 21,
+    loadNewOffset: 10,
+    slideBlank: "<div class=\"card minh50rem h100 w100 rounded-5rem\">[placer]</div>",
+    responsive: [],
+    // новый параметр!
+    template: null,
+    onInit: null,
+    onChange: null,
+    onLoadData: null
+  };
+
+  var config = _objectSpread(_objectSpread({}, defaults), options);
+
+  function getSlidesPerView() {
+    var slides = config.slidesPerView; // базовое
+
+    if (Array.isArray(config.responsive)) {
+      var width = window.innerWidth;
+
+      for (var i = 0; i < config.responsive.length; i++) {
+        var rule = config.responsive[i];
+
+        if (width <= rule.breakpoint) {
+          slides = rule.slidesPerView;
+        }
+      }
+    }
+
+    return slides;
+  }
+
+  var $swiper = $(config.selector instanceof Element ? config.selector : config.selector);
+
+  if ($swiper.length === 0) {
+    console.warn("ddrSwiper: \u043A\u043E\u043D\u0442\u0435\u0439\u043D\u0435\u0440 ".concat(config.selector, " \u043D\u0435 \u043D\u0430\u0439\u0434\u0435\u043D"));
+    return;
+  }
+
+  var swiperContainer = $swiper[0];
+  var slideWidth = swiperContainer.offsetWidth / getSlidesPerView();
+  var swipeStat = false;
+  var countSlides = config.slidesCount;
+  var slidesShift = 0;
+  var currentSlideSelector = null;
+  var currentSlide = config.centerSlide === 'center' ? Math.ceil(config.slidesCount / 2) - 1 : config.centerSlide >= 0 ? config.centerSlide > config.slidesCount ? config.slidesCount : config.centerSlide : 0;
+  var spaceWidth = slideWidth * Math.floor(getSlidesPerView() / 2);
+  var containerWidth = swiperContainer.offsetWidth;
+  var observer = null;
+  var loadNewSlidesAbortCtrl;
+  var resizeTimeout = null;
+  var lastSlidesPerView = getSlidesPerView(); // ------------------------ Инициализация слайдов ------------------------
+
+  function initSlides() {
+    ddrCssVar('slide-width', "calc(100% / ".concat(getSlidesPerView(), ")"));
+    var initSlides = [],
+        initIndex = config.centerSlide === 'center' ? -Math.floor(config.slidesCount / 2) : 0,
+        sCount = config.centerSlide === 'center' ? Math.ceil(config.slidesCount / 2) : config.slidesCount,
+        initIndexes = [];
+
+    for (var i = initIndex; i < sCount; i++) {
+      initSlides.push(buildSlide(i));
+      initIndexes.push(i);
+    }
+
+    $swiper.prepend(initSlides);
+    $swiper.prepend("<div class=\"ddrswiper__spacer ddrswiper__spacer-start\" style=\"width: ".concat(spaceWidth, "px;\"></div>"));
+    $swiper.append("<div class=\"ddrswiper__spacer ddrswiper__spacer-end\" style=\"width: ".concat(spaceWidth, "px;\"></div>"));
+    $swiper.scrollLeft(slideWidth * currentSlide);
+    initializeObserver();
+    getSlidesData(initIndexes);
+  } // ------------------------ Observer ------------------------
+
+
+  function initializeObserver() {
+    if (observer) observer.disconnect();
+    var swiperItems = swiperContainer.querySelectorAll('.ddrswiper__item');
+    containerWidth = swiperContainer.offsetWidth;
+    observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          var intersectingItem = entry.target;
+          var itemIndex = Array.from(swiperItems).indexOf(intersectingItem);
+          var slideStep = itemIndex - currentSlide;
+          if (swipeStat) slidesShift += slideStep;
+          $swiper.trigger('ddrSetCurrentSlide', [itemIndex, intersectingItem, slideStep]);
+          currentSlide = itemIndex;
+          currentSlideSelector = intersectingItem;
+        }
+      });
+    }, {
+      root: swiperContainer,
+      rootMargin: "0px ".concat(-containerWidth / 2, "px 0px ").concat(-containerWidth / 2, "px"),
+      threshold: 0
+    });
+    swiperItems.forEach(function (item) {
+      return observer.observe(item);
+    });
+  } // ------------------------ Построение слайда ------------------------
+
+
+  function buildSlide() {
+    var index = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+    return "<div class=\"ddrswiper__item ddrswiper__item-waiting\" ddrswiper-index=\"".concat(index, "\" ddrswiperitem>\n\t\t\t<div class=\"ddrswiper__waiting\" ddrswiperwaiting>\n\t\t\t\t<div>\n\t\t\t\t\t<img src=\"/assets/images/loading.gif\" notouch />\n\t\t\t\t\t<p>\u0417\u0430\u0433\u0440\u0443\u0437\u043A\u0430...</p>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t\t").concat(config.slideBlank || '', "\n\t\t</div>");
+  } // ------------------------ Получение данных для слайдов ------------------------
+
+
+  function getSlidesData(_x) {
+    return _getSlidesData.apply(this, arguments);
+  }
+
+  function _getSlidesData() {
+    _getSlidesData = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee(indexes) {
+      var response, _ref2, data, error;
+
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              if (loadNewSlidesAbortCtrl instanceof AbortController) loadNewSlidesAbortCtrl.abort();
+              loadNewSlidesAbortCtrl = new AbortController();
+
+              if (!(typeof config.loadSlidesData === 'function')) {
+                _context.next = 8;
+                break;
+              }
+
+              _context.next = 5;
+              return config.loadSlidesData(indexes, loadNewSlidesAbortCtrl);
+
+            case 5:
+              response = _context.sent;
+              _context.next = 14;
+              break;
+
+            case 8:
+              if (!(Array.isArray(config.loadSlidesData) || _typeof(config.loadSlidesData) === 'object')) {
+                _context.next = 12;
+                break;
+              }
+
+              response = {
+                data: config.loadSlidesData,
+                error: false
+              };
+              _context.next = 14;
+              break;
+
+            case 12:
+              $.notify('Ошибка! Не передан источник данных для слайдов!', 'error');
+              return _context.abrupt("return");
+
+            case 14:
+              _ref2 = response || {}, data = _ref2.data, error = _ref2.error;
+
+              if (!(error || !data)) {
+                _context.next = 19;
+                break;
+              }
+
+              $.notify('Ошибка! Не удалось загрузить данные слайдов!', 'error');
+              console.log((error === null || error === void 0 ? void 0 : error.message) || error);
+              return _context.abrupt("return");
+
+            case 19:
+              data.forEach(function (slideData) {
+                return setSlideContent(slideData);
+              });
+
+            case 20:
+            case "end":
+              return _context.stop();
+          }
+        }
+      }, _callee);
+    }));
+    return _getSlidesData.apply(this, arguments);
+  }
+
+  function setSlideContent(_x2) {
+    return _setSlideContent.apply(this, arguments);
+  } // ------------------------ Добавление слайдов ------------------------
+
+
+  function _setSlideContent() {
+    _setSlideContent = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee3(_ref) {
+      var index, data, slide, $slideContent, _config$render, template, _config$render$action, actions, ddrRenderWrapFn, $placer;
+
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee3$(_context3) {
+        while (1) {
+          switch (_context3.prev = _context3.next) {
+            case 0:
+              index = _ref.index, data = _objectWithoutProperties(_ref, _excluded);
+              slide = $swiper.find(".ddrswiper__item[ddrswiper-index=\"".concat(index, "\"]"));
+
+              if (slide.length) {
+                _context3.next = 4;
+                break;
+              }
+
+              return _context3.abrupt("return");
+
+            case 4:
+              if (!config.template) {
+                _context3.next = 10;
+                break;
+              }
+
+              _context3.next = 7;
+              return ddrRenderWithEvents(config.template, data);
+
+            case 7:
+              $slideContent = _context3.sent;
+              _context3.next = 26;
+              break;
+
+            case 10:
+              if (!(typeof config.render === 'function')) {
+                _context3.next = 16;
+                break;
+              }
+
+              _context3.next = 13;
+              return config.render(data, index, $swiper);
+
+            case 13:
+              $slideContent = _context3.sent;
+              _context3.next = 26;
+              break;
+
+            case 16:
+              if (!(_typeof(config.render) === 'object')) {
+                _context3.next = 24;
+                break;
+              }
+
+              _config$render = config === null || config === void 0 ? void 0 : config.render, template = _config$render.template, _config$render$action = _config$render.actions, actions = _config$render$action === void 0 ? null : _config$render$action;
+              ddrRenderWrapFn = ddrRenderWrap({
+                template: template,
+                middleware: function () {
+                  var _middleware = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee2(selector, vars, abortCtrl) {
+                    return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee2$(_context2) {
+                      while (1) {
+                        switch (_context2.prev = _context2.next) {
+                          case 0:
+                            return _context2.abrupt("return", data);
+
+                          case 1:
+                          case "end":
+                            return _context2.stop();
+                        }
+                      }
+                    }, _callee2);
+                  }));
+
+                  function middleware(_x3, _x4, _x5) {
+                    return _middleware.apply(this, arguments);
+                  }
+
+                  return middleware;
+                }(),
+                actions: actions,
+                render: function render(selector, html) {
+                  return html;
+                }
+              });
+              _context3.next = 21;
+              return ddrRenderWrapFn($('<div></div>'));
+
+            case 21:
+              $slideContent = _context3.sent;
+              _context3.next = 26;
+              break;
+
+            case 24:
+              console.error('ddrSwiper: не передан ни render, ни template!');
+              return _context3.abrupt("return");
+
+            case 26:
+              $placer = slide.find('[placer]');
+              $placer.empty().append($slideContent);
+              slide.removeClass('ddrswiper__item-waiting');
+
+            case 29:
+            case "end":
+              return _context3.stop();
+          }
+        }
+      }, _callee3);
+    }));
+    return _setSlideContent.apply(this, arguments);
+  }
+
+  function addSlides(count) {
+    if (count === 0) return;
+    var firstSlide = $swiper.find('.ddrswiper__item').first();
+    var lastSlide = $swiper.find('.ddrswiper__item').last();
+    var newSlides = [];
+    var newIndexes = [];
+
+    if (count < 0) {
+      var _$;
+
+      var lastIndex = Number(firstSlide.attr('ddrswiper-index'));
+
+      for (var i = 1; i <= Math.abs(count); i++) {
+        newSlides.push(buildSlide(lastIndex - i));
+        newIndexes.push(lastIndex - i);
+      }
+
+      (_$ = $(firstSlide)).before.apply(_$, _toConsumableArray(newSlides.reverse()));
+    } else if (count > 0) {
+      var _$2;
+
+      var _lastIndex = Number(lastSlide.attr('ddrswiper-index'));
+
+      for (var _i = 1; _i <= Math.abs(count); _i++) {
+        newSlides.push(buildSlide(_lastIndex + _i));
+        newIndexes.push(_lastIndex + _i);
+      }
+
+      (_$2 = $(lastSlide)).after.apply(_$2, newSlides);
+    }
+
+    getSlidesData(newIndexes);
+    $swiper.trigger('ddrLoadSlidesData', [newIndexes]);
+  } // ------------------------ Удаление слайдов ------------------------
+
+
+  function removeSlides() {
+    var count = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+    if (count === 0) return;
+    if (count > 0) $swiper.find('.ddrswiper__item').slice(0, count).remove();else if (count < 0) $swiper.find('.ddrswiper__item').slice(count).remove();
+  } // ------------------------ Установка позиции ------------------------
+
+
+  function setPosition(count) {
+    if (count === 0) return;
+    var scrollPos = $swiper.scrollLeft();
+    $swiper.scrollLeft(scrollPos - slideWidth * count);
+  } // ------------------------ Получение X-координаты ------------------------
+
+
+  function getPageX(e) {
+    if (e.type.startsWith('touch')) {
+      var touch = e.originalEvent.touches[0] || e.originalEvent.changedTouches[0];
+      return touch.pageX;
+    }
+
+    return e.pageX;
+  } // ------------------------ Навешивание событий ------------------------
+
+
+  $swiper.off('mousedown.ddrscroll touchstart.ddrscroll').on('mousedown.ddrscroll touchstart.ddrscroll', function (e) {
+    if ($(e.target).closest('[noswipe]', this).length) {
+      return; // Прерываем обработку свайпа
+    } // Игнорируем второе событие, если уже идет свайп
+
+
+    if (swipeStat) return;
+    var isTouch = e.type === 'touchstart';
+    swipeStat = true;
+    countSlides = $swiper.find('.ddrswiper__item').length;
+    $swiper.stop(true);
+    var $item = $(this);
+    var startX = getPageX(e);
+    var initialLeft = parseInt($item.css('left')) || 0;
+    var scrollLeft = $swiper.scrollLeft();
+    var startSpaceWidth = $swiper.find('.ddrswiper__spacer-start').outerWidth();
+    var endSpaceWidth = $swiper.find('.ddrswiper__spacer-end').outerWidth();
+    var scrLeftEnd = $swiper.get(0).scrollWidth - swiperContainer.offsetWidth;
+    var fixLeft = false,
+        fixRight = false; // Обработчики move и end
+
+    function onMove(e) {
+      var pageX = getPageX(e);
+      var delta = pageX - startX;
+      var edgeShift;
+      var scrLeft = $swiper.scrollLeft();
+
+      if (scrLeft === 0) {
+        if (fixLeft === false) fixLeft = pageX;
+        edgeShift = pageX - fixLeft;
+        $swiper.find('.ddrswiper__spacer-start').css('width', startSpaceWidth + edgeShift / 6);
+      }
+
+      if (scrLeft >= scrLeftEnd) {
+        if (fixRight === false) fixRight = pageX;
+        edgeShift = fixRight - pageX;
+        $swiper.find('.ddrswiper__spacer-end').css('width', endSpaceWidth + edgeShift / 6);
+      }
+
+      $swiper.scrollLeft(scrollLeft - (initialLeft + delta));
+    }
+
+    function onEnd(e) {
+      // Снимаем обработчики
+      if (isTouch) {
+        $(document).off('touchmove.ddrscroll', onMove);
+        $(document).off('touchend.ddrscroll touchcancel.ddrscroll', onEnd);
+      } else {
+        $(document).off('mousemove.ddrscroll', onMove);
+        $(document).off('mouseup.ddrscroll', onEnd);
+      }
+
+      $swiper.find('.ddrswiper__spacer-start').stop(true, false).animate({
+        width: startSpaceWidth
+      }, 100);
+      $swiper.find('.ddrswiper__spacer-end').stop(true, false).animate({
+        width: endSpaceWidth
+      }, 100);
+      var scrollLeft = $swiper.scrollLeft() + slideWidth / 2,
+          scrollSlides = Math.floor(scrollLeft / slideWidth);
+      $swiper.animate({
+        scrollLeft: slideWidth * scrollSlides
+      }, {
+        duration: 200,
+        easing: 'customQuad',
+        complete: function complete() {
+          $swiper.trigger('ddrTransitionEnd', [slidesShift]);
+          slidesShift = 0;
+        }
+      });
+      swipeStat = false;
+    } // Навешиваем только нужные обработчики
+
+
+    if (isTouch) {
+      $(document).on('touchmove.ddrscroll', onMove);
+      $(document).on('touchend.ddrscroll touchcancel.ddrscroll', onEnd);
+    } else {
+      $(document).on('mousemove.ddrscroll', onMove);
+      $(document).on('mouseup.ddrscroll', onEnd);
+    }
+
+    e.preventDefault();
+  }); // ------------------------ Триггеры переходов и смены слайда ------------------------
+
+  $swiper.on('ddrTransitionEnd', function (e, slidesShift) {
+    $swiper.find('.ddrswiper__item.ddrswiper__item-current').removeClass('ddrswiper__item-current');
+    $(currentSlideSelector).addClass('ddrswiper__item-current');
+    if (slidesShift == 0) return;
+    var offset = 0;
+    if (config.slidesCount != countSlides) console.warn("\u043A\u043E\u043B\u0438\u0447\u0435\u0441\u0442\u0432\u043E \u0441\u043B\u0430\u0439\u0434\u043E\u0432 \u043E\u0442\u043B\u0438\u0447\u0430\u0435\u0442\u0441\u044F \u043E\u0442 \u0438\u0437\u043D\u0430\u0447\u0430\u043B\u044C\u043D\u043E\u0433\u043E! \u0411\u044B\u043B\u043E: ".concat(config.slidesCount, " \u0421\u0442\u0430\u043B\u043E: ").concat(countSlides));
+
+    if (slidesShift > 0) {
+      offset = config.loadNewOffset - (config.slidesCount - currentSlide - 1);
+    } else if (slidesShift < 0) {
+      offset = -(config.loadNewOffset - currentSlide);
+    }
+
+    if (offset != 0) {
+      removeSlides(offset);
+      addSlides(offset);
+      setPosition(offset);
+      initializeObserver();
+    }
+  });
+  $swiper.on('ddrSetCurrentSlide', function (e, index, slide, slideOffset) {
+    if (!swipeStat) {
+      $swiper.find('.ddrswiper__item.ddrswiper__item-current').removeClass('ddrswiper__item-current');
+      $(slide).addClass('ddrswiper__item-current');
+    }
+
+    if (typeof config.onChange === 'function') {
+      config.onChange(index, slide, slideOffset);
+    }
+  }); // ------------------------ Пользовательский коллбэк на загрузку новых данных ------------------------
+
+  $swiper.on('ddrLoadSlidesData', function (e, newIndexes) {
+    if (typeof config.onLoadData === 'function') {
+      config.onLoadData(newIndexes);
+    }
+  }); // ------------------------ Кастомное ускорение ------------------------
+
+  $.easing.customQuad = function (x, t, b, c, d) {
+    t /= d;
+    return c * (1 - Math.pow(1 - t, 1.5)) + b;
+  };
+
+  if (typeof config.onInit === 'function') {
+    config.onInit();
+  } // ------------------------ Запуск ------------------------
+
+
+  initSlides(); // Адаптивность — пересчет при resize
+
+  $(window).on('resize.ddrSwiper', function () {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(onResize, 150); // debounce 150мс
+  });
+
+  function onResize() {
+    var currentSlidesPerView = getSlidesPerView();
+
+    if (currentSlidesPerView !== lastSlidesPerView) {
+      // 1. Запомнить индекс текущего активного слайда
+      var prevIndex = currentSlide; // 2. Перестроить слайдер
+
+      $swiper.empty();
+      lastSlidesPerView = currentSlidesPerView;
+      initSlides(); // 3. После перестройки — прокрутить к нужному индексу (или последнему)
+
+      setTimeout(function () {
+        var $slides = $swiper.find('.ddrswiper__item');
+        var maxIndex = Math.max(0, $slides.length - 1); // Если был выбран индекс больше, чем стало слайдов — берем последний
+
+        var targetIndex = prevIndex > maxIndex ? maxIndex : prevIndex;
+        var slide = $swiper.find(".ddrswiper__item[ddrswiper-index=\"".concat(targetIndex, "\"]"));
+
+        if (slide.length) {
+          slideWidth = swiperContainer.offsetWidth / getSlidesPerView();
+          var targetScrollLeft = slideWidth * targetIndex; // Если только один слайд видим, всегда скроллим в начало
+
+          if (currentSlidesPerView === 1) {
+            $swiper.scrollLeft(targetScrollLeft);
+          } else {
+            // Центрируем как обычно
+            $swiper.scrollLeft(targetScrollLeft);
+          } // Отмечаем активный
+
+
+          $swiper.find('.ddrswiper__item.ddrswiper__item-current').removeClass('ddrswiper__item-current');
+          slide.addClass('ddrswiper__item-current');
+          currentSlide = targetIndex;
+          currentSlideSelector = slide[0];
+        }
+      }, 0);
+      return;
+    } // Если slidesPerView не изменился — просто пересчитываем размеры и позицию
+
+
+    slideWidth = swiperContainer.offsetWidth / currentSlidesPerView;
+    spaceWidth = slideWidth * Math.floor(currentSlidesPerView / 2);
+    containerWidth = swiperContainer.offsetWidth; // spacer-элементы
+
+    $swiper.find('.ddrswiper__spacer-start, .ddrswiper__spacer-end').css('width', spaceWidth + 'px'); // Тоже: если slidesPerView === 1, скроллим просто к текущему
+
+    if (currentSlidesPerView === 1) {
+      $swiper.scrollLeft(slideWidth * currentSlide);
+    } else {
+      $swiper.scrollLeft(slideWidth * currentSlide);
+    }
+
+    initializeObserver();
+  }
+
+  return {
+    scrollTo: function scrollTo(idx) {
+      // Проверяем, существует ли такой слайд
+      var slide = $swiper.find(".ddrswiper__item[ddrswiper-index=\"".concat(idx, "\"]"));
+      if (!slide.length) return; // Прокрутка с анимацией
+
+      var targetScrollLeft = slideWidth * idx;
+      $swiper.animate({
+        scrollLeft: targetScrollLeft
+      }, {
+        duration: 200,
+        easing: 'customQuad',
+        complete: function complete() {
+          // Установим активный слайд вручную
+          $swiper.find('.ddrswiper__item.ddrswiper__item-current').removeClass('ddrswiper__item-current');
+          slide.addClass('ddrswiper__item-current');
+          currentSlide = idx;
+          currentSlideSelector = slide[0];
+        }
+      });
+    },
+    reload: function reload() {
+      // Убрать всё из контейнера
+      $swiper.empty(); // Перезапустить инициализацию
+
+      initSlides();
+    },
+    getCurrentIndex: function getCurrentIndex() {
+      return currentSlide;
+    },
+    destroy: function destroy() {
+      $(window).off('resize.ddrSwiper');
+
+      if (observer) {
+        observer.disconnect();
+        observer = null;
+      }
+
+      $swiper.off('.ddrscroll');
+      $swiper.off('ddrTransitionEnd');
+      $swiper.off('ddrSetCurrentSlide');
+      $swiper.off('ddrLoadSlidesData');
+      $swiper.empty();
+      $swiper.removeData('ddrSwiper');
+    }
+  };
+}
 
 /***/ }),
 
@@ -22807,6 +24259,768 @@ function getLastnameFromApplicant() {
 
 /***/ }),
 
+/***/ "./resources/js/wrappers.js":
+/*!**********************************!*\
+  !*** ./resources/js/wrappers.js ***!
+  \**********************************/
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "ddrDebounceWrap": function() { return /* binding */ ddrDebounceWrap; },
+/* harmony export */   "ddrInpWrap": function() { return /* binding */ ddrInpWrap; },
+/* harmony export */   "ddrOneWrap": function() { return /* binding */ ddrOneWrap; },
+/* harmony export */   "ddrRenderWrap": function() { return /* binding */ ddrRenderWrap; }
+/* harmony export */ });
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
+
+
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"]; if (_i == null) return; var _arr = []; var _n = true; var _d = false; var _s, _e; try { for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e2) { throw _e2; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e3) { didErr = true; err = _e3; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+/**
+ * ddrDebounceWrap — универсальная debounce-обёртка для любой функции.
+ *
+ * Позволяет легко оборачивать любые функции с задержкой вызова и гибкими настройками
+ * (leading, trailing, maxWait).
+ *
+ * @param {function} fn         — Функция, которую нужно вызывать с задержкой (дебаунсом)
+ * @param {number}   timeout    — Задержка в миллисекундах (по умолчанию 300)
+ * @param {object}   options    — Опции debounce:
+ *                                - leading  (bool, default: true)  — вызывать на первом срабатывании
+ *                                - trailing (bool, default: false) — вызывать на последнем срабатывании
+ *                                - maxWait  (number, default: 1000)— максимальная задержка между вызовами
+ *
+ * @returns {function}          — Обёрнутая функция-дебаунсер (может вызываться с любыми аргументами)
+ *
+ * -----------------------------
+ * Пример использования:
+ *
+ *   const logDebounced = ddrDebounceWrap(
+ *       (x, y) => { console.log('Debounced!', x, y); },
+ *       400,
+ *       {leading: true, trailing: false, maxWait: 1000}
+ *   );
+ *
+ *   logDebounced('foo', 123); // вызовется один раз через 400мс после последнего вызова
+ *
+ * -----------------------------
+ * Можно использовать для:
+ * - событий input/keyup
+ * - ajax-запросов
+ * - динамического рендера
+ * - любых часто срабатывающих функций
+ * 
+ * 
+ * ddrDebounceWrap — универсальная debounce-обёртка для любой функции.
+ * @param {function} fn — функция, которую надо вызывать с задержкой
+ * @param {number} timeout — задержка в мс (по умолчанию 300)
+ * @param {object} options — опции debounce (leading, trailing, maxWait)
+ * @return {function} — функция-дебаунсер
+ */
+function ddrDebounceWrap(fn) {
+  var timeout = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 300;
+  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {
+    leading: true,
+    trailing: false,
+    maxWait: 1000
+  };
+  var _options$leading = options.leading,
+      leading = _options$leading === void 0 ? true : _options$leading,
+      _options$trailing = options.trailing,
+      trailing = _options$trailing === void 0 ? false : _options$trailing,
+      _options$maxWait = options.maxWait,
+      maxWait = _options$maxWait === void 0 ? 1000 : _options$maxWait;
+
+  var debounced = _.debounce(fn, timeout, {
+    leading: leading,
+    trailing: trailing,
+    maxWait: maxWait
+  });
+
+  return function () {
+    for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
+    }
+
+    return debounced.apply(this, args);
+  };
+}
+/**
+ * ddrRenderWrap — универсальная JS-обёртка для асинхронного рендера шаблонов с поддержкой flat-раскрытия, computed/async переменных и post-processing.
+ * 
+ * @param {Object} options — объект настроек
+ * @param {string} options.template — Имя шаблона для ddrRender (обязательно)
+ * @param {Array} options.map — Массив описания переменных для шаблона:
+ *    - строка: обычная переменная (`'key'`)
+ *    - flat-строка: раскрытие всех полей объекта (`'...key'`)
+ *    - объект: кастомная переменная `{key: fn/const/Promise}` или flat через ключ `'...key'`
+ * @param {Function} [options.middleware] — Пост-обработчик mappingData после map, сигнатура:
+ *      (selector, mappingData, abortCtrl) => mappingData | false
+ *      (возврати false чтобы отменить рендер)
+ * @param {Function} options.render — Колбек после рендера шаблона:
+ *      (selector, html, mappingData) => void
+ * @param {number} [options.timeout=300] — debounce задержка в мс
+ * @param {boolean} [options.leading=true] — debounce: сразу на первый вызов
+ * @param {boolean} [options.trailing=false] — debounce: на последний вызов
+ * @param {number} [options.maxWait=1000] — debounce: максимальная задержка в мс
+ *
+ * Пример использования:
+ * 
+ * $.showContract = ddrRenderWrap({
+ *     template: 'contract.card',
+ *     map: [
+ *         'teamId',
+ *         '...contract', // flat — все поля объекта contract как отдельные переменные
+ *         {title: (selector, args) => args[2].toUpperCase()},
+ *         {'...user': async (selector, args) => await apiGetUser(args[3])},
+ *         'manager'
+ *     ],
+ *     middleware: (selector, mappingData, abortCtrl) => {
+ *         if (!mappingData.teamId) return false;
+ *         mappingData.label = `[${mappingData.id}] ${mappingData.title}`;
+ *         mappingData.isBigTeam = mappingData.teamId > 100;
+ *         return mappingData;
+ *     },
+ *     render: (selector, html, mappingData) => {
+ *         $(selector).html(html);
+ *         console.log('mappingData:', mappingData);
+ *     },
+ *     timeout: 300,
+ *     leading: true,
+ *     trailing: false,
+ *     maxWait: 1000
+ * });
+ * 
+ * // Вызов:
+ * // $.showContract(this, 1, {id:123, title:'Объект'}, 'строка', userObj, 'Иван')
+ * // mappingData в шаблоне:
+ * // {
+ * //   teamId: 1,
+ * //   id: 123, title: 'Объект', // (flat contract)
+ * //   title: 'СТРОКА',           // (computed в map)
+ * //   ...userObj,               // (flat user)
+ * //   manager: 'Иван',
+ * //   label: '[123] Объект',    // (computed в middleware)
+ * //   isBigTeam: false
+ * // }
+ *
+ * --- Варианты элементов map ---
+ *   - 'key'            → mappingData.key = args[N]
+ *   - '...key'         → flat-раскрытие всех полей объекта args[N]
+ *   - {foo: fn/const}  → mappingData.foo = fn(selector, args) | const | await Promise
+ *   - {'...foo': ...}  → flat-раскрытие результата fn/Promise/const в mappingData
+ *
+ * Все типы args автокастятся к числу/boolean/строке.
+ * Middleware может мутировать mappingData и возвращать новые поля (computed/валидация).
+ * Flat/spread по '...key' возможен в строке и объекте. Если не объект — warning.
+ */
+
+function ddrRenderWrap(options) {
+  var template = options.template,
+      _options$map = options.map,
+      map = _options$map === void 0 ? [] : _options$map,
+      actions = options.actions,
+      middleware = options.middleware,
+      render = options.render,
+      _options$timeout = options.timeout,
+      timeout = _options$timeout === void 0 ? 300 : _options$timeout,
+      _options$leading2 = options.leading,
+      leading = _options$leading2 === void 0 ? true : _options$leading2,
+      _options$trailing2 = options.trailing,
+      trailing = _options$trailing2 === void 0 ? false : _options$trailing2,
+      _options$maxWait2 = options.maxWait,
+      maxWait = _options$maxWait2 === void 0 ? 1000 : _options$maxWait2;
+  var debounceParams = {
+    leading: leading,
+    trailing: trailing,
+    maxWait: maxWait
+  };
+  var eventAttrMap = {
+    'click': '[data-ddr-click], [ddr-click]',
+    'input': '[data-ddr-input], [ddr-input]',
+    'change': '[data-ddr-change], [ddr-change]' // Добавь другие нужные события по аналогии!
+
+  };
+
+  function autocast(val) {
+    if (typeof val === 'boolean' || typeof val === 'number' || val == null) return val;
+    if (typeof val !== 'string') return val;
+    if (val === 'true') return true;
+    if (val === 'false') return false;
+    if (val.trim() === '') return val;
+    if (!isNaN(val)) return val.indexOf('.') > -1 ? parseFloat(val) : parseInt(val, 10);
+    return val;
+  }
+
+  var handler = _.debounce( /*#__PURE__*/function () {
+    var _ref = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee(selector) {
+      var abortCtrl,
+          _len2,
+          args,
+          _key2,
+          castedArgs,
+          mappingData,
+          argIndex,
+          _iterator,
+          _step,
+          item,
+          value,
+          _i2,
+          _Object$entries,
+          _Object$entries$_i,
+          key,
+          _value,
+          obj,
+          val,
+          finalData,
+          mwResult,
+          html,
+          $html,
+          _args = arguments;
+
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              abortCtrl = new AbortController();
+
+              for (_len2 = _args.length, args = new Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+                args[_key2 - 1] = _args[_key2];
+              }
+
+              castedArgs = args.map(autocast); // --- Формируем mappingData по map (support flat '...key') ---
+
+              mappingData = {};
+              argIndex = 0;
+              _iterator = _createForOfIteratorHelper(map);
+              _context.prev = 6;
+
+              _iterator.s();
+
+            case 8:
+              if ((_step = _iterator.n()).done) {
+                _context.next = 50;
+                break;
+              }
+
+              item = _step.value;
+
+              if (!(typeof item === 'string')) {
+                _context.next = 14;
+                break;
+              }
+
+              if (item.startsWith('...')) {
+                value = castedArgs[argIndex++];
+
+                if (value && _typeof(value) === 'object' && !Array.isArray(value)) {
+                  Object.assign(mappingData, value);
+                } else {
+                  console.warn("[ddrRenderWrap] flat '".concat(item, "': \u0430\u0440\u0433\u0443\u043C\u0435\u043D\u0442 \u043D\u0435 \u043E\u0431\u044A\u0435\u043A\u0442, flat \u043F\u0440\u043E\u0438\u0433\u043D\u043E\u0440\u0438\u0440\u043E\u0432\u0430\u043D"), value);
+                }
+              } else {
+                mappingData[item] = castedArgs[argIndex++];
+              }
+
+              _context.next = 48;
+              break;
+
+            case 14:
+              if (!(_typeof(item) === 'object' && !Array.isArray(item) && item !== null)) {
+                _context.next = 48;
+                break;
+              }
+
+              _i2 = 0, _Object$entries = Object.entries(item);
+
+            case 16:
+              if (!(_i2 < _Object$entries.length)) {
+                _context.next = 48;
+                break;
+              }
+
+              _Object$entries$_i = _slicedToArray(_Object$entries[_i2], 2), key = _Object$entries$_i[0], _value = _Object$entries$_i[1];
+
+              if (!key.startsWith('...')) {
+                _context.next = 30;
+                break;
+              }
+
+              obj = void 0;
+
+              if (!(typeof _value === 'function')) {
+                _context.next = 26;
+                break;
+              }
+
+              _context.next = 23;
+              return _value(selector, castedArgs, abortCtrl);
+
+            case 23:
+              obj = _context.sent;
+              _context.next = 27;
+              break;
+
+            case 26:
+              obj = _value;
+
+            case 27:
+              if (obj && _typeof(obj) === 'object' && !Array.isArray(obj)) {
+                Object.assign(mappingData, obj);
+              } else {
+                console.warn("[ddrRenderWrap] flat '".concat(key, "': \u0430\u0440\u0433\u0443\u043C\u0435\u043D\u0442 \u043D\u0435 \u043E\u0431\u044A\u0435\u043A\u0442, flat \u043F\u0440\u043E\u0438\u0433\u043D\u043E\u0440\u0438\u0440\u043E\u0432\u0430\u043D"), obj);
+              }
+
+              _context.next = 45;
+              break;
+
+            case 30:
+              val = void 0;
+
+              if (!(typeof _value === 'function')) {
+                _context.next = 37;
+                break;
+              }
+
+              _context.next = 34;
+              return _value(selector, castedArgs, abortCtrl);
+
+            case 34:
+              val = _context.sent;
+              _context.next = 44;
+              break;
+
+            case 37:
+              if (!(_value && typeof _value.then === 'function')) {
+                _context.next = 43;
+                break;
+              }
+
+              _context.next = 40;
+              return _value;
+
+            case 40:
+              val = _context.sent;
+              _context.next = 44;
+              break;
+
+            case 43:
+              val = _value;
+
+            case 44:
+              mappingData[key] = val;
+
+            case 45:
+              _i2++;
+              _context.next = 16;
+              break;
+
+            case 48:
+              _context.next = 8;
+              break;
+
+            case 50:
+              _context.next = 55;
+              break;
+
+            case 52:
+              _context.prev = 52;
+              _context.t0 = _context["catch"](6);
+
+              _iterator.e(_context.t0);
+
+            case 55:
+              _context.prev = 55;
+
+              _iterator.f();
+
+              return _context.finish(55);
+
+            case 58:
+              // --- После map вызываем middleware с готовыми данными ---
+              finalData = mappingData;
+
+              if (!(typeof middleware === 'function')) {
+                _context.next = 66;
+                break;
+              }
+
+              _context.next = 62;
+              return middleware(selector, mappingData, abortCtrl);
+
+            case 62:
+              mwResult = _context.sent;
+
+              if (!(mwResult === false)) {
+                _context.next = 65;
+                break;
+              }
+
+              return _context.abrupt("return");
+
+            case 65:
+              if (mwResult && _typeof(mwResult) === 'object') finalData = mwResult;
+
+            case 66:
+              _context.next = 68;
+              return ddrRenderWithEvents(template, finalData);
+
+            case 68:
+              html = _context.sent;
+
+              if (!(typeof render === 'function')) {
+                _context.next = 73;
+                break;
+              }
+
+              $html = $(html); // это твой корневой элемент, jQuery-объект
+
+              if (actions && _typeof(actions) === 'object') {
+                $html.find('[ddr-action]').each(function () {
+                  var $el = $(this);
+                  var actionAttr = $el.attr('ddr-action');
+                  if (!actionAttr) return;
+                  var actionDefs = actionAttr.split('|').map(function (a) {
+                    return a.trim();
+                  }).filter(Boolean);
+                  actionDefs.forEach(function (def) {
+                    var _def$split = def.split(':'),
+                        _def$split2 = _slicedToArray(_def$split, 2),
+                        name = _def$split2[0],
+                        params = _def$split2[1]; // 1. Сокращённая запись: 'name:event1,event2'
+
+
+                    Object.entries(actions).forEach(function (_ref2) {
+                      var _ref3 = _slicedToArray(_ref2, 2),
+                          actionKey = _ref3[0],
+                          handler = _ref3[1];
+
+                      var _actionKey$split = actionKey.split(':'),
+                          _actionKey$split2 = _slicedToArray(_actionKey$split, 2),
+                          keyName = _actionKey$split2[0],
+                          eventsStr = _actionKey$split2[1];
+
+                      if (keyName !== name) return;
+
+                      if (eventsStr) {
+                        var events = eventsStr.split(',').map(function (e) {
+                          return e.trim();
+                        });
+                        events.forEach(function (event) {
+                          // === Универсальный фильтр ===
+                          if (eventAttrMap[event] && $el.is(eventAttrMap[event])) return;
+                          $el.off(event + '.ddrAction.' + name).on(event + '.ddrAction.' + name, function (evn) {
+                            var argsArr = params ? params.split(',').map(function (s) {
+                              return s.trim();
+                            }) : [];
+                            handler(this, {
+                              root: $html,
+                              args: argsArr,
+                              e: evn,
+                              map: finalData
+                            });
+                          });
+                        });
+                      }
+                    }); // 2. Старый стиль: actions[name] — массив или объект
+
+                    var actionCfg = actions[name];
+                    if (!actionCfg) return;
+                    var actionList = Array.isArray(actionCfg) ? actionCfg : [actionCfg];
+                    actionList.forEach(function (item, idx) {
+                      if (!item || typeof item.action !== 'function') return; // === Универсальный фильтр ===
+
+                      if (eventAttrMap[item.event] && $el.is(eventAttrMap[item.event])) return;
+                      $el.off(item.event + '.ddrAction.' + name + idx).on(item.event + '.ddrAction.' + name + idx, function (evn) {
+                        var argsArr = params ? params.split(',').map(function (s) {
+                          return s.trim();
+                        }) : [];
+                        item.action(this, {
+                          root: $html,
+                          args: argsArr,
+                          e: evn,
+                          map: finalData
+                        });
+                      });
+                    });
+                  });
+                });
+              } // передаём $html (jQuery-объект) — так render вставляет уже готовый DOM
+
+
+              return _context.abrupt("return", render(selector, $html, finalData));
+
+            case 73:
+            case "end":
+              return _context.stop();
+          }
+        }
+      }, _callee, null, [[6, 52, 55, 58]]);
+    }));
+
+    return function (_x) {
+      return _ref.apply(this, arguments);
+    };
+  }(), timeout, debounceParams);
+
+  return function (selector) {
+    for (var _len3 = arguments.length, args = new Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
+      args[_key3 - 1] = arguments[_key3];
+    }
+
+    return handler.call.apply(handler, [this, selector].concat(args));
+  };
+}
+/**
+ * ddrOneWrap — обёртка для jQuery .one, с автоперевешиванием, исключениями и уникальным namespace.
+ *
+ * Пример использования:
+ *
+ * $(teamSelector).one(
+ *     tapEvent + '.teams',
+ *     ddrOneWrap(
+ *         ['[searchinput]'],
+ *         (currentTarget, e, ns) => {
+ *             $(currentTarget).removeClass('timesheetcard__team-wait');
+ *             $(teamSelector).find('[search]').removeClass('timesheetcard__search-visible');
+ *             $(currentTarget).removeAttrib('noswipe');
+ *             // ns — уникальный namespace текущего обработчика
+ *         }
+ *     )
+ * );
+ *
+ * ------------------- Параметры -------------------
+ * excludeSelectors  — (array) список CSS-селекторов, по которым обработчик игнорируется и перевешивается заново
+ * callback          — (function(currentTarget, e, ns)) функция, вызываемая при срабатывании (если не исключение)
+ *                      - currentTarget: элемент, на который вешалось событие
+ *                      - e: событие
+ *                      - ns: уникальный namespace обработчика (строка вида '.ddrone_abc123')
+ *
+ * ------------------- Как работает -------------------
+ * - Если событие пришло по элементу, попадающему под любой excludeSelector,
+ *   обработчик автоматически перевешивается на этот же элемент с тем же уникальным namespace.
+ * - Если событие не попадает под исключения — вызывается callback.
+ * - Можно использовать стрелочные функции и обычные функции в качестве callback.
+ * - Каждый вызов ddrOneWrap генерирует свой уникальный namespace для изоляции обработчиков.
+ *
+ * ------------------- Применение -------------------
+ * - Для кейсов, когда нужно "однократное" событие, но по некоторым элементам
+ *   (например, по инпутам/иконкам) действие должно игнорироваться и перевешиваться.
+ * - Полностью безопасно для повторного использования на одном элементе с разными логиками.
+ *
+ * ------------------- Пример -------------------
+ * $(el).one('click', ddrOneWrap(['input, .icon'], (currentTarget, e, ns) => {
+ *     // логика, если клик не по input/.icon
+ * }));
+ */
+// ddrOneWrap — универсальное решение с поддержкой исключения даже при mouseup/click вне исключения,
+// если mousedown был на исключении или его потомке
+
+function ddrOneWrap(excludeSelectors, callback) {
+  var ns = '.ddrone_' + Math.random().toString(36).slice(2, 10);
+  var downOnExclude = false; // Отслеживаем mousedown/touchstart глобально
+
+  function isOnExclude(e) {
+    var _iterator2 = _createForOfIteratorHelper(excludeSelectors),
+        _step2;
+
+    try {
+      for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
+        var sel = _step2.value;
+
+        if ($(e.target).closest(sel).length) {
+          return true;
+        }
+      }
+    } catch (err) {
+      _iterator2.e(err);
+    } finally {
+      _iterator2.f();
+    }
+
+    return false;
+  }
+
+  document.addEventListener('mousedown', function (e) {
+    downOnExclude = isOnExclude(e);
+  }, true);
+  document.addEventListener('touchstart', function (e) {
+    downOnExclude = isOnExclude(e);
+  }, true); // После mouseup/touchend обязательно сбрасываем флаг
+
+  document.addEventListener('mouseup', function () {
+    downOnExclude = false;
+  }, true);
+  document.addEventListener('touchend', function () {
+    downOnExclude = false;
+  }, true);
+
+  var handler = function handler(e) {
+    if (downOnExclude) {
+      // Если был mousedown/touchstart на исключении, событие игнорируем
+      var type = e.type.replace(/\..*$/, '');
+      $(e.currentTarget).one(type + ns, handler);
+      return;
+    }
+
+    callback(e.currentTarget, e, ns);
+  };
+
+  return handler;
+}
+/**
+ * ddrInpWrap — debounce-обёртка для input-событий с поддержкой async/await, отмены запросов и авто-мемоизацией value.
+ *
+ * === Пример использования ===
+ * 
+ * // В шаблоне:
+ * <input data-ddr-input="teamSearchContracts:rool">
+ * 
+ * // В коде:
+ * $.teamSearchContracts = ddrInpWrap(async (inp, [rool], e, abortCtrl) => {
+ *     inp.setAttribute('disabled', 'disabled');
+ *     try {
+ *         const {data, error} = await axiosQuery('get', '/api/search', {}, 'json', abortCtrl);
+ *         // обработка результата
+ *     } catch (err) {
+ *         // обработка ошибок, в т.ч. отмены
+ *     } finally {
+ *         inp.removeAttribute('disabled');
+ *     }
+ * }, 200);
+ *
+ * === Как это работает ===
+ * - В обработчик первым аргументом приходит DOM-элемент input.
+ * - Вторым — массив аргументов из data-ddr-input (например, [rool]).
+ * - Третьим — оригинальное событие input (если нужно).
+ * - Четвёртым — объект AbortController для отмены async-запросов.
+ *
+ * === Особенности и гарантии ===
+ * - Вызов твоей функции происходит только если inp.value действительно изменился.
+ * - Если пользователь вводит быстро — предыдущее async-обращение отменяется через AbortController.
+ * - Ты не создаёшь AbortController вручную — всё под капотом ddrInpWrap.
+ * - Обработчик не вызывается на заблокированном поле (disabled).
+ * - Поддерживает и sync, и async функции (await внутри можно использовать как угодно).
+ * - Дебаунс для каждого input отдельный и независимый.
+ *
+ * === Как работает делегат ===
+ * В data-ddr-input параметры передаются через запятую, парсятся в массив и передаются вторым аргументом твоей функции:
+ *   $[func](this, [foo, bar], e)
+ *
+ * === Пример делегата ===
+ * $dom.on('input', '[data-ddr-input]', function(e) {
+ *   ...
+ *   const argsArr = parseParams(params); // вернёт массив аргументов
+ *   $[func](this, argsArr, e);
+ * });
+ */
+
+function ddrInpWrap(callback) {
+  var timeout = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 150;
+  var debounceMap = new WeakMap();
+  var valueMap = new WeakMap();
+  var abortMap = new WeakMap();
+  return function (inp) {
+    var _debounced;
+
+    var argsArr = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+    if (inp.disabled) return;
+    var lastValue = valueMap.get(inp);
+    if (lastValue === inp.value) return;
+    valueMap.set(inp, inp.value);
+    var debounced = debounceMap.get(inp);
+
+    if (!debounced) {
+      debounced = _.debounce( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee2() {
+        var abort,
+            _len5,
+            cbArgs,
+            _key5,
+            res,
+            _window,
+            _args2 = arguments;
+
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                abort = abortMap.get(inp);
+                if (abort) abort.abort();
+                abort = new AbortController();
+                abortMap.set(inp, abort);
+                _context2.prev = 4;
+
+                for (_len5 = _args2.length, cbArgs = new Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
+                  cbArgs[_key5] = _args2[_key5];
+                }
+
+                res = callback.call.apply(callback, [inp, cbArgs[0], cbArgs[1] || []].concat(_toConsumableArray(cbArgs.slice(2)), [abort]));
+
+                if (!(res && typeof res.then === 'function')) {
+                  _context2.next = 10;
+                  break;
+                }
+
+                _context2.next = 10;
+                return res;
+
+              case 10:
+                _context2.next = 15;
+                break;
+
+              case 12:
+                _context2.prev = 12;
+                _context2.t0 = _context2["catch"](4);
+                if ((_window = window) !== null && _window !== void 0 && _window.console) console.error('ddrInpWrap error', _context2.t0);
+
+              case 15:
+              case "end":
+                return _context2.stop();
+            }
+          }
+        }, _callee2, null, [[4, 12]]);
+      })), timeout);
+      debounceMap.set(inp, debounced);
+    }
+
+    for (var _len4 = arguments.length, rest = new Array(_len4 > 2 ? _len4 - 2 : 0), _key4 = 2; _key4 < _len4; _key4++) {
+      rest[_key4 - 2] = arguments[_key4];
+    }
+
+    (_debounced = debounced).call.apply(_debounced, [inp, inp, argsArr].concat(rest));
+  };
+}
+
+/***/ }),
+
 /***/ "./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[8].oneOf[1].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[8].oneOf[1].use[2]!./node_modules/tippy.js/dist/tippy.css":
 /*!********************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[8].oneOf[1].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[8].oneOf[1].use[2]!./node_modules/tippy.js/dist/tippy.css ***!
@@ -22964,6 +25178,76 @@ module.exports = function (cssWithMappingToString) {
 
   return list;
 };
+
+/***/ }),
+
+/***/ "./node_modules/fast-json-stable-stringify/index.js":
+/*!**********************************************************!*\
+  !*** ./node_modules/fast-json-stable-stringify/index.js ***!
+  \**********************************************************/
+/***/ (function(module) {
+
+"use strict";
+
+
+module.exports = function (data, opts) {
+    if (!opts) opts = {};
+    if (typeof opts === 'function') opts = { cmp: opts };
+    var cycles = (typeof opts.cycles === 'boolean') ? opts.cycles : false;
+
+    var cmp = opts.cmp && (function (f) {
+        return function (node) {
+            return function (a, b) {
+                var aobj = { key: a, value: node[a] };
+                var bobj = { key: b, value: node[b] };
+                return f(aobj, bobj);
+            };
+        };
+    })(opts.cmp);
+
+    var seen = [];
+    return (function stringify (node) {
+        if (node && node.toJSON && typeof node.toJSON === 'function') {
+            node = node.toJSON();
+        }
+
+        if (node === undefined) return;
+        if (typeof node == 'number') return isFinite(node) ? '' + node : 'null';
+        if (typeof node !== 'object') return JSON.stringify(node);
+
+        var i, out;
+        if (Array.isArray(node)) {
+            out = '[';
+            for (i = 0; i < node.length; i++) {
+                if (i) out += ',';
+                out += stringify(node[i]) || 'null';
+            }
+            return out + ']';
+        }
+
+        if (node === null) return 'null';
+
+        if (seen.indexOf(node) !== -1) {
+            if (cycles) return JSON.stringify('__cycle__');
+            throw new TypeError('Converting circular structure to JSON');
+        }
+
+        var seenIndex = seen.push(node) - 1;
+        var keys = Object.keys(node).sort(cmp && cmp(node));
+        out = '';
+        for (i = 0; i < keys.length; i++) {
+            var key = keys[i];
+            var value = stringify(node[key]);
+
+            if (!value) continue;
+            if (out) out += ',';
+            out += JSON.stringify(key) + ':' + value;
+        }
+        seen.splice(seenIndex, 1);
+        return '{' + out + '}';
+    })(data);
+};
+
 
 /***/ }),
 
@@ -52231,6 +54515,78 @@ process.umask = function() { return 0; };
 
 /***/ }),
 
+/***/ "./resources/views/render/timesheet/comment.tpl":
+/*!******************************************************!*\
+  !*** ./resources/views/render/timesheet/comment.tpl ***!
+  \******************************************************/
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony default export */ __webpack_exports__["default"] = ("<li class=\"tchat__message tmessage tmessage_self\">\r\n\t<div class=\"row justify-content-between mb2px\">\r\n\t\t<div class=\"col-auto\"><strong class=\"tmessage__name\">{{from.fname}} {{from.sname}}</strong></div>\r\n\t\t<div class=\"col-auto\"><small class=\"tmessage__date\">{{created_at}}</small></div>\r\n\t</div>\r\n\t<p class=\"tmessage__message format\">{{message}}</p>\r\n</li>");
+
+/***/ }),
+
+/***/ "./resources/views/render/timesheet/contract.tpl":
+/*!*******************************************************!*\
+  !*** ./resources/views/render/timesheet/contract.tpl ***!
+  \*******************************************************/
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony default export */ __webpack_exports__["default"] = ("<li contract>\r\n\t<div class=\"table timesheetcard__table\">\r\n\t\t<table>\r\n\t\t\t<tr>\r\n\t\t\t\t<td><strong class=\"fz10px\">{{object_number}}</strong></td>\r\n\t\t\t\t<td><p class=\"fz10px\">{{title}}</p></td>\r\n\t\t\t\t<td>\r\n\t\t\t\t\t<div class=\"scrollblock scrollblock-light h4rem fz10px\">{{titul}}</div>\r\n\t\t\t\t</td>\r\n\t\t\t</tr>\r\n\t\t</table>\r\n\t</div>\r\n\t\r\n\t<div class=\"timesheetcard__chatblock tchat\">\r\n\t\t<ul class=\"tchat__list\" tchat></ul>\r\n\t\t\r\n\t\t<div class=\"tchat__form\" noswipe>\r\n\t\t\t<div class=\"tchat__input\" contenteditable placeholder=\"Сообщение...\" tchatmess ddr-action=\"setBtnStat|setToEnter:{{timesheet_contract_id}}\"></div>\r\n\t\t\t<button class=\"tchat__btn\" ddr-click=\"teamAddComment:timesheet_contract_id\" noswipe title=\"Отправить\" ddr-action=\"sendMess\" disabled><i class=\"fa fa-paper-plane\"></i></button>\r\n\t\t</div>\r\n\t</div>\r\n</li>");
+
+/***/ }),
+
+/***/ "./resources/views/render/timesheet/search.tpl":
+/*!*****************************************************!*\
+  !*** ./resources/views/render/timesheet/search.tpl ***!
+  \*****************************************************/
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony default export */ __webpack_exports__["default"] = ("<ul class=\"searchresutls__list scrollblock scrollblock-light\">\r\n\t<li ddr-for=\"contract in search\">\r\n\t\t<table class=\"searchresutls__table\" ddr-click=\"chooseSearchedContract:contract,teamId\">\r\n\t\t\t<tr>\r\n\t\t\t\t<td><strong class=\"fz10px\">{{contract.object_number}}</strong></td>\r\n\t\t\t\t<td><p class=\"fz10px\">{{contract.title}}</p></td>\r\n\t\t\t\t<td>\r\n\t\t\t\t\t<div class=\"h4rem fz10px scrollblock scrollblock-hidescroll\">{{contract.titul}}</div>\r\n\t\t\t\t</td>\r\n\t\t\t</tr>\r\n\t\t</table>\r\n\t</li>\r\n\t<li ddr-if=\"!search.length\" class=\"empty\"><p>нет данных</p></li>\r\n</ul>");
+
+/***/ }),
+
+/***/ "./resources/views/render/timesheet/slide.tpl":
+/*!****************************************************!*\
+  !*** ./resources/views/render/timesheet/slide.tpl ***!
+  \****************************************************/
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony default export */ __webpack_exports__["default"] = ("<div class=\"timesheetcard\" ddr-class=\"{'timesheetcard_today': isToday}\" timesheetcard>\r\n\t<div class=\"timesheetcard__top\">\r\n\t\t<h3 ddr-class=\"{'color-red': isWeekEnd}\" class=\"timesheetcard__title\">{{humanDate}}</h3>\r\n\t\t<p class=\"timesheetcard__subtitle\">{{weekDay}}</p>\r\n\t</div>\r\n\t\r\n\t<div class=\"timesheetcard__content\">\r\n\t\t<div class=\"timesheetcard__teams scrollblock scrollblock-hidescroll\" teams>\r\n\t\t\t<div ddr-for=\"team in teams\" class=\"timesheetcard__team\" team>\r\n\t\t\t\t<div class=\"timesheetcard__search\" search>\r\n\t\t\t\t\t<div class=\"input normal-input normal-input-search normal-input_iconed w100\" style=\"box-shadow: 0 0 8px 0 #0000000a;\">\t\r\n\t\t\t\t\t\t<input type=\"search\" value=\"\" placeholder=\"Поиск...\" autocomplete=\"off\" inpgroup=\"normal\" searchinput ddr-input=\"teamSearchContracts\">\r\n\t\t\t\t\t\t<div class=\"postfix_icon\">\r\n\t\t\t\t\t\t\t<i class=\"fa-solid fa-magnifying-glass\"></i>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t<div class=\"normal-input__errorlabel noselect\" errorlabel=\"\"></div>\r\n\t\t\t\t\t\t<div class=\"timesheetcard__searchresutls searchresutls\"searchresutls></div>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t\t\r\n\t\t\t\t<div class=\"row justify-content-between align-items-center h3rem timesheetcard__panel\">\r\n\t\t\t\t\t<div class=\"col-auto\">\r\n\t\t\t\t\t\t<strong class=\"timesheetcard__master\">{{team.master.full_name}}</strong>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"col-auto\">\r\n\t\t\t\t\t\t<button class=\"timesheetcard__btn\" ddr-click=\"teamOpenSearch:team.id,day\" noswipe title=\"Добавить договор\">\r\n\t\t\t\t\t\t\t<i class=\"fa-solid fa-plus\"></i>\r\n\t\t\t\t\t\t</button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t\t\r\n\t\t\t\t<ul ddr-if=\"team.contracts\" class=\"timesheetcard__contracts\" contractslist>\r\n\t\t\t\t\t<li ddr-for=\"contract in team.contracts\" contract>\r\n\t\t\t\t\t\t<div class=\"table timesheetcard__table\">\r\n\t\t\t\t\t\t\t<table>\r\n\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t<td><strong class=\"fz10px\">{{contract.object_number}}</strong></td>\r\n\t\t\t\t\t\t\t\t\t<td><p class=\"fz10px\">{{contract.title}}</p></td>\r\n\t\t\t\t\t\t\t\t\t<td>\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"scrollblock scrollblock-light h4rem fz10px\">{{contract.titul}}</div>\r\n\t\t\t\t\t\t\t\t\t</td>\r\n\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t</table>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t<div class=\"timesheetcard__chatblock tchat\">\r\n\t\t\t\t\t\t\t<ul class=\"tchat__list\" tchat>\r\n\t\t\t\t\t\t\t\t<li ddr-for=\"mess in contract.chat\" class=\"tchat__message tmessage\" ddr-class=\"{'tmessage_self': mess.self}\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"row justify-content-between mb2px\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-auto\"><strong class=\"tmessage__name\">{{mess.from.fname}} {{mess.from.sname}}</strong></div>\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-auto\"><small class=\"tmessage__date\">{{mess.created_at}}</small></div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t<p class=\"tmessage__message format\">{{mess.message}}</p>\r\n\t\t\t\t\t\t\t\t</li>\r\n\t\t\t\t\t\t\t</ul>\r\n\t\t\t\t\t\t\t\r\n\t\t\t\t\t\t\t<div class=\"tchat__form\" noswipe>\r\n\t\t\t\t\t\t\t\t<div class=\"tchat__input\" contenteditable placeholder=\"Сообщение...\" tchatmess ddr-action=\"setBtnStat|setToEnter:{{contract.timesheet_contract_id}}\"></div>\r\n\t\t\t\t\t\t\t\t<button class=\"tchat__btn\" ddr-click=\"teamAddComment:contract.timesheet_contract_id\" noswipe title=\"Отправить\" ddr-action=\"sendMess\" disabled><i class=\"fa fa-paper-plane\"></i></button>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\t\r\n\t\t\t\t\t</li>\r\n\t\t\t\t</ul>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n\t\t\r\n\t<div class=\"timesheetcard__bottom\">\r\n\t\t<div class=\"button small-button button-light\">\r\n\t\t\t<button class=\"pointer\" ddr-click=\"getTeamList:day\" noswipe>Добавить бригаду</button>\r\n\t\t</div>\r\n\t</div>\r\n\t\r\n\t<div class=\"timesheetcard__staffwrap\" staffwrap>\r\n\t\t<p class=\"timesheetcard__stafftitle\">Выберите Бригадира <i class=\"fa fa-close\" title=\"Отмена\"></i></p>\r\n\t\t<div stafflist></div>\r\n\t</div>\r\n</div>");
+
+/***/ }),
+
+/***/ "./resources/views/render/timesheet/stafflist.tpl":
+/*!********************************************************!*\
+  !*** ./resources/views/render/timesheet/stafflist.tpl ***!
+  \********************************************************/
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony default export */ __webpack_exports__["default"] = ("<ul class=\"timesheetcard__stafflist scrollblock scrollblock-light\">\r\n\t<li ddr-for=\"stf in staff\" class=\"timesheetcard__staffitem\" ddr-click=\"addTeam:stf.id,day,stf.full_name\" staffitem title=\"Выбрать\">\r\n\t\t<p>{{stf.full_name}}</p>\r\n\t</li>\r\n</ul>");
+
+/***/ }),
+
+/***/ "./resources/views/render/timesheet/team.tpl":
+/*!***************************************************!*\
+  !*** ./resources/views/render/timesheet/team.tpl ***!
+  \***************************************************/
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony default export */ __webpack_exports__["default"] = ("<div class=\"timesheetcard__team\" team>\t\r\n\t<div class=\"timesheetcard__search\" search>\r\n\t\t<div class=\"input normal-input normal-input-search normal-input_iconed w100\" style=\"box-shadow: 0 0 8px 0 #0000000a;\">\t\r\n\t\t\t<input type=\"search\" value=\"\" placeholder=\"Поиск...\" autocomplete=\"off\" inpgroup=\"normal\" searchinput ddr-input=\"teamSearchContracts\">\r\n\t\t\t<div class=\"postfix_icon\">\r\n\t\t\t\t<i class=\"fa-solid fa-magnifying-glass\"></i>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"normal-input__errorlabel noselect\" errorlabel=\"\"></div>\r\n\t\t\t<div class=\"timesheetcard__searchresutls searchresutls\"searchresutls></div>\r\n\t\t</div>\r\n\t</div>\r\n\t\r\n\t<div class=\"row justify-content-between align-items-center h3rem timesheetcard__panel\">\r\n\t\t<div class=\"col-auto\">\r\n\t\t\t<strong class=\"timesheetcard__master\">{{staffFullName}}</strong>\r\n\t\t</div>\r\n\t\t<div class=\"col-auto\">\r\n\t\t\t<button class=\"timesheetcard__btn\" ddr-click=\"teamOpenSearch:teamId,day\" noswipe title=\"Добавить договор\">\r\n\t\t\t\t<i class=\"fa-solid fa-plus\"></i>\r\n\t\t\t</button>\r\n\t\t</div>\r\n\t</div>\r\n\t\r\n\t<ul class=\"timesheetcard__contracts\" contractslist></ul>\r\n</div>");
+
+/***/ }),
+
 /***/ "./node_modules/regenerator-runtime/runtime.js":
 /*!*****************************************************!*\
   !*** ./node_modules/regenerator-runtime/runtime.js ***!
@@ -55855,6 +58211,1600 @@ webpackContext.resolve = webpackContextResolve;
 module.exports = webpackContext;
 webpackContext.id = "./resources/js/sections sync recursive ^\\.\\/.*\\/index\\.js$";
 
+/***/ }),
+
+/***/ "./resources/views/render sync recursive \\.tpl$":
+/*!*********************************************!*\
+  !*** ./resources/views/render/ sync \.tpl$ ***!
+  \*********************************************/
+/***/ (function(module, __unused_webpack_exports, __webpack_require__) {
+
+var map = {
+	"./timesheet/comment.tpl": "./resources/views/render/timesheet/comment.tpl",
+	"./timesheet/contract.tpl": "./resources/views/render/timesheet/contract.tpl",
+	"./timesheet/search.tpl": "./resources/views/render/timesheet/search.tpl",
+	"./timesheet/slide.tpl": "./resources/views/render/timesheet/slide.tpl",
+	"./timesheet/stafflist.tpl": "./resources/views/render/timesheet/stafflist.tpl",
+	"./timesheet/team.tpl": "./resources/views/render/timesheet/team.tpl"
+};
+
+
+function webpackContext(req) {
+	var id = webpackContextResolve(req);
+	return __webpack_require__(id);
+}
+function webpackContextResolve(req) {
+	if(!__webpack_require__.o(map, req)) {
+		var e = new Error("Cannot find module '" + req + "'");
+		e.code = 'MODULE_NOT_FOUND';
+		throw e;
+	}
+	return map[req];
+}
+webpackContext.keys = function webpackContextKeys() {
+	return Object.keys(map);
+};
+webpackContext.resolve = webpackContextResolve;
+module.exports = webpackContext;
+webpackContext.id = "./resources/views/render sync recursive \\.tpl$";
+
+/***/ }),
+
+/***/ "./node_modules/lru-cache/dist/esm/index.js":
+/*!**************************************************!*\
+  !*** ./node_modules/lru-cache/dist/esm/index.js ***!
+  \**************************************************/
+/***/ (function(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "LRUCache": function() { return /* binding */ LRUCache; }
+/* harmony export */ });
+/* provided dependency */ var process = __webpack_require__(/*! process/browser.js */ "./node_modules/process/browser.js");
+/**
+ * @module LRUCache
+ */
+const perf = typeof performance === 'object' &&
+    performance &&
+    typeof performance.now === 'function'
+    ? performance
+    : Date;
+const warned = new Set();
+/* c8 ignore start */
+const PROCESS = (typeof process === 'object' && !!process ? process : {});
+/* c8 ignore start */
+const emitWarning = (msg, type, code, fn) => {
+    typeof PROCESS.emitWarning === 'function'
+        ? PROCESS.emitWarning(msg, type, code, fn)
+        : console.error(`[${code}] ${type}: ${msg}`);
+};
+let AC = globalThis.AbortController;
+let AS = globalThis.AbortSignal;
+/* c8 ignore start */
+if (typeof AC === 'undefined') {
+    //@ts-ignore
+    AS = class AbortSignal {
+        onabort;
+        _onabort = [];
+        reason;
+        aborted = false;
+        addEventListener(_, fn) {
+            this._onabort.push(fn);
+        }
+    };
+    //@ts-ignore
+    AC = class AbortController {
+        constructor() {
+            warnACPolyfill();
+        }
+        signal = new AS();
+        abort(reason) {
+            if (this.signal.aborted)
+                return;
+            //@ts-ignore
+            this.signal.reason = reason;
+            //@ts-ignore
+            this.signal.aborted = true;
+            //@ts-ignore
+            for (const fn of this.signal._onabort) {
+                fn(reason);
+            }
+            this.signal.onabort?.(reason);
+        }
+    };
+    let printACPolyfillWarning = PROCESS.env?.LRU_CACHE_IGNORE_AC_WARNING !== '1';
+    const warnACPolyfill = () => {
+        if (!printACPolyfillWarning)
+            return;
+        printACPolyfillWarning = false;
+        emitWarning('AbortController is not defined. If using lru-cache in ' +
+            'node 14, load an AbortController polyfill from the ' +
+            '`node-abort-controller` package. A minimal polyfill is ' +
+            'provided for use by LRUCache.fetch(), but it should not be ' +
+            'relied upon in other contexts (eg, passing it to other APIs that ' +
+            'use AbortController/AbortSignal might have undesirable effects). ' +
+            'You may disable this with LRU_CACHE_IGNORE_AC_WARNING=1 in the env.', 'NO_ABORT_CONTROLLER', 'ENOTSUP', warnACPolyfill);
+    };
+}
+/* c8 ignore stop */
+const shouldWarn = (code) => !warned.has(code);
+const TYPE = Symbol('type');
+const isPosInt = (n) => n && n === Math.floor(n) && n > 0 && isFinite(n);
+/* c8 ignore start */
+// This is a little bit ridiculous, tbh.
+// The maximum array length is 2^32-1 or thereabouts on most JS impls.
+// And well before that point, you're caching the entire world, I mean,
+// that's ~32GB of just integers for the next/prev links, plus whatever
+// else to hold that many keys and values.  Just filling the memory with
+// zeroes at init time is brutal when you get that big.
+// But why not be complete?
+// Maybe in the future, these limits will have expanded.
+const getUintArray = (max) => !isPosInt(max)
+    ? null
+    : max <= Math.pow(2, 8)
+        ? Uint8Array
+        : max <= Math.pow(2, 16)
+            ? Uint16Array
+            : max <= Math.pow(2, 32)
+                ? Uint32Array
+                : max <= Number.MAX_SAFE_INTEGER
+                    ? ZeroArray
+                    : null;
+/* c8 ignore stop */
+class ZeroArray extends Array {
+    constructor(size) {
+        super(size);
+        this.fill(0);
+    }
+}
+class Stack {
+    heap;
+    length;
+    // private constructor
+    static #constructing = false;
+    static create(max) {
+        const HeapCls = getUintArray(max);
+        if (!HeapCls)
+            return [];
+        Stack.#constructing = true;
+        const s = new Stack(max, HeapCls);
+        Stack.#constructing = false;
+        return s;
+    }
+    constructor(max, HeapCls) {
+        /* c8 ignore start */
+        if (!Stack.#constructing) {
+            throw new TypeError('instantiate Stack using Stack.create(n)');
+        }
+        /* c8 ignore stop */
+        this.heap = new HeapCls(max);
+        this.length = 0;
+    }
+    push(n) {
+        this.heap[this.length++] = n;
+    }
+    pop() {
+        return this.heap[--this.length];
+    }
+}
+/**
+ * Default export, the thing you're using this module to get.
+ *
+ * The `K` and `V` types define the key and value types, respectively. The
+ * optional `FC` type defines the type of the `context` object passed to
+ * `cache.fetch()` and `cache.memo()`.
+ *
+ * Keys and values **must not** be `null` or `undefined`.
+ *
+ * All properties from the options object (with the exception of `max`,
+ * `maxSize`, `fetchMethod`, `memoMethod`, `dispose` and `disposeAfter`) are
+ * added as normal public members. (The listed options are read-only getters.)
+ *
+ * Changing any of these will alter the defaults for subsequent method calls.
+ */
+class LRUCache {
+    // options that cannot be changed without disaster
+    #max;
+    #maxSize;
+    #dispose;
+    #disposeAfter;
+    #fetchMethod;
+    #memoMethod;
+    /**
+     * {@link LRUCache.OptionsBase.ttl}
+     */
+    ttl;
+    /**
+     * {@link LRUCache.OptionsBase.ttlResolution}
+     */
+    ttlResolution;
+    /**
+     * {@link LRUCache.OptionsBase.ttlAutopurge}
+     */
+    ttlAutopurge;
+    /**
+     * {@link LRUCache.OptionsBase.updateAgeOnGet}
+     */
+    updateAgeOnGet;
+    /**
+     * {@link LRUCache.OptionsBase.updateAgeOnHas}
+     */
+    updateAgeOnHas;
+    /**
+     * {@link LRUCache.OptionsBase.allowStale}
+     */
+    allowStale;
+    /**
+     * {@link LRUCache.OptionsBase.noDisposeOnSet}
+     */
+    noDisposeOnSet;
+    /**
+     * {@link LRUCache.OptionsBase.noUpdateTTL}
+     */
+    noUpdateTTL;
+    /**
+     * {@link LRUCache.OptionsBase.maxEntrySize}
+     */
+    maxEntrySize;
+    /**
+     * {@link LRUCache.OptionsBase.sizeCalculation}
+     */
+    sizeCalculation;
+    /**
+     * {@link LRUCache.OptionsBase.noDeleteOnFetchRejection}
+     */
+    noDeleteOnFetchRejection;
+    /**
+     * {@link LRUCache.OptionsBase.noDeleteOnStaleGet}
+     */
+    noDeleteOnStaleGet;
+    /**
+     * {@link LRUCache.OptionsBase.allowStaleOnFetchAbort}
+     */
+    allowStaleOnFetchAbort;
+    /**
+     * {@link LRUCache.OptionsBase.allowStaleOnFetchRejection}
+     */
+    allowStaleOnFetchRejection;
+    /**
+     * {@link LRUCache.OptionsBase.ignoreFetchAbort}
+     */
+    ignoreFetchAbort;
+    // computed properties
+    #size;
+    #calculatedSize;
+    #keyMap;
+    #keyList;
+    #valList;
+    #next;
+    #prev;
+    #head;
+    #tail;
+    #free;
+    #disposed;
+    #sizes;
+    #starts;
+    #ttls;
+    #hasDispose;
+    #hasFetchMethod;
+    #hasDisposeAfter;
+    /**
+     * Do not call this method unless you need to inspect the
+     * inner workings of the cache.  If anything returned by this
+     * object is modified in any way, strange breakage may occur.
+     *
+     * These fields are private for a reason!
+     *
+     * @internal
+     */
+    static unsafeExposeInternals(c) {
+        return {
+            // properties
+            starts: c.#starts,
+            ttls: c.#ttls,
+            sizes: c.#sizes,
+            keyMap: c.#keyMap,
+            keyList: c.#keyList,
+            valList: c.#valList,
+            next: c.#next,
+            prev: c.#prev,
+            get head() {
+                return c.#head;
+            },
+            get tail() {
+                return c.#tail;
+            },
+            free: c.#free,
+            // methods
+            isBackgroundFetch: (p) => c.#isBackgroundFetch(p),
+            backgroundFetch: (k, index, options, context) => c.#backgroundFetch(k, index, options, context),
+            moveToTail: (index) => c.#moveToTail(index),
+            indexes: (options) => c.#indexes(options),
+            rindexes: (options) => c.#rindexes(options),
+            isStale: (index) => c.#isStale(index),
+        };
+    }
+    // Protected read-only members
+    /**
+     * {@link LRUCache.OptionsBase.max} (read-only)
+     */
+    get max() {
+        return this.#max;
+    }
+    /**
+     * {@link LRUCache.OptionsBase.maxSize} (read-only)
+     */
+    get maxSize() {
+        return this.#maxSize;
+    }
+    /**
+     * The total computed size of items in the cache (read-only)
+     */
+    get calculatedSize() {
+        return this.#calculatedSize;
+    }
+    /**
+     * The number of items stored in the cache (read-only)
+     */
+    get size() {
+        return this.#size;
+    }
+    /**
+     * {@link LRUCache.OptionsBase.fetchMethod} (read-only)
+     */
+    get fetchMethod() {
+        return this.#fetchMethod;
+    }
+    get memoMethod() {
+        return this.#memoMethod;
+    }
+    /**
+     * {@link LRUCache.OptionsBase.dispose} (read-only)
+     */
+    get dispose() {
+        return this.#dispose;
+    }
+    /**
+     * {@link LRUCache.OptionsBase.disposeAfter} (read-only)
+     */
+    get disposeAfter() {
+        return this.#disposeAfter;
+    }
+    constructor(options) {
+        const { max = 0, ttl, ttlResolution = 1, ttlAutopurge, updateAgeOnGet, updateAgeOnHas, allowStale, dispose, disposeAfter, noDisposeOnSet, noUpdateTTL, maxSize = 0, maxEntrySize = 0, sizeCalculation, fetchMethod, memoMethod, noDeleteOnFetchRejection, noDeleteOnStaleGet, allowStaleOnFetchRejection, allowStaleOnFetchAbort, ignoreFetchAbort, } = options;
+        if (max !== 0 && !isPosInt(max)) {
+            throw new TypeError('max option must be a nonnegative integer');
+        }
+        const UintArray = max ? getUintArray(max) : Array;
+        if (!UintArray) {
+            throw new Error('invalid max value: ' + max);
+        }
+        this.#max = max;
+        this.#maxSize = maxSize;
+        this.maxEntrySize = maxEntrySize || this.#maxSize;
+        this.sizeCalculation = sizeCalculation;
+        if (this.sizeCalculation) {
+            if (!this.#maxSize && !this.maxEntrySize) {
+                throw new TypeError('cannot set sizeCalculation without setting maxSize or maxEntrySize');
+            }
+            if (typeof this.sizeCalculation !== 'function') {
+                throw new TypeError('sizeCalculation set to non-function');
+            }
+        }
+        if (memoMethod !== undefined &&
+            typeof memoMethod !== 'function') {
+            throw new TypeError('memoMethod must be a function if defined');
+        }
+        this.#memoMethod = memoMethod;
+        if (fetchMethod !== undefined &&
+            typeof fetchMethod !== 'function') {
+            throw new TypeError('fetchMethod must be a function if specified');
+        }
+        this.#fetchMethod = fetchMethod;
+        this.#hasFetchMethod = !!fetchMethod;
+        this.#keyMap = new Map();
+        this.#keyList = new Array(max).fill(undefined);
+        this.#valList = new Array(max).fill(undefined);
+        this.#next = new UintArray(max);
+        this.#prev = new UintArray(max);
+        this.#head = 0;
+        this.#tail = 0;
+        this.#free = Stack.create(max);
+        this.#size = 0;
+        this.#calculatedSize = 0;
+        if (typeof dispose === 'function') {
+            this.#dispose = dispose;
+        }
+        if (typeof disposeAfter === 'function') {
+            this.#disposeAfter = disposeAfter;
+            this.#disposed = [];
+        }
+        else {
+            this.#disposeAfter = undefined;
+            this.#disposed = undefined;
+        }
+        this.#hasDispose = !!this.#dispose;
+        this.#hasDisposeAfter = !!this.#disposeAfter;
+        this.noDisposeOnSet = !!noDisposeOnSet;
+        this.noUpdateTTL = !!noUpdateTTL;
+        this.noDeleteOnFetchRejection = !!noDeleteOnFetchRejection;
+        this.allowStaleOnFetchRejection = !!allowStaleOnFetchRejection;
+        this.allowStaleOnFetchAbort = !!allowStaleOnFetchAbort;
+        this.ignoreFetchAbort = !!ignoreFetchAbort;
+        // NB: maxEntrySize is set to maxSize if it's set
+        if (this.maxEntrySize !== 0) {
+            if (this.#maxSize !== 0) {
+                if (!isPosInt(this.#maxSize)) {
+                    throw new TypeError('maxSize must be a positive integer if specified');
+                }
+            }
+            if (!isPosInt(this.maxEntrySize)) {
+                throw new TypeError('maxEntrySize must be a positive integer if specified');
+            }
+            this.#initializeSizeTracking();
+        }
+        this.allowStale = !!allowStale;
+        this.noDeleteOnStaleGet = !!noDeleteOnStaleGet;
+        this.updateAgeOnGet = !!updateAgeOnGet;
+        this.updateAgeOnHas = !!updateAgeOnHas;
+        this.ttlResolution =
+            isPosInt(ttlResolution) || ttlResolution === 0
+                ? ttlResolution
+                : 1;
+        this.ttlAutopurge = !!ttlAutopurge;
+        this.ttl = ttl || 0;
+        if (this.ttl) {
+            if (!isPosInt(this.ttl)) {
+                throw new TypeError('ttl must be a positive integer if specified');
+            }
+            this.#initializeTTLTracking();
+        }
+        // do not allow completely unbounded caches
+        if (this.#max === 0 && this.ttl === 0 && this.#maxSize === 0) {
+            throw new TypeError('At least one of max, maxSize, or ttl is required');
+        }
+        if (!this.ttlAutopurge && !this.#max && !this.#maxSize) {
+            const code = 'LRU_CACHE_UNBOUNDED';
+            if (shouldWarn(code)) {
+                warned.add(code);
+                const msg = 'TTL caching without ttlAutopurge, max, or maxSize can ' +
+                    'result in unbounded memory consumption.';
+                emitWarning(msg, 'UnboundedCacheWarning', code, LRUCache);
+            }
+        }
+    }
+    /**
+     * Return the number of ms left in the item's TTL. If item is not in cache,
+     * returns `0`. Returns `Infinity` if item is in cache without a defined TTL.
+     */
+    getRemainingTTL(key) {
+        return this.#keyMap.has(key) ? Infinity : 0;
+    }
+    #initializeTTLTracking() {
+        const ttls = new ZeroArray(this.#max);
+        const starts = new ZeroArray(this.#max);
+        this.#ttls = ttls;
+        this.#starts = starts;
+        this.#setItemTTL = (index, ttl, start = perf.now()) => {
+            starts[index] = ttl !== 0 ? start : 0;
+            ttls[index] = ttl;
+            if (ttl !== 0 && this.ttlAutopurge) {
+                const t = setTimeout(() => {
+                    if (this.#isStale(index)) {
+                        this.#delete(this.#keyList[index], 'expire');
+                    }
+                }, ttl + 1);
+                // unref() not supported on all platforms
+                /* c8 ignore start */
+                if (t.unref) {
+                    t.unref();
+                }
+                /* c8 ignore stop */
+            }
+        };
+        this.#updateItemAge = index => {
+            starts[index] = ttls[index] !== 0 ? perf.now() : 0;
+        };
+        this.#statusTTL = (status, index) => {
+            if (ttls[index]) {
+                const ttl = ttls[index];
+                const start = starts[index];
+                /* c8 ignore next */
+                if (!ttl || !start)
+                    return;
+                status.ttl = ttl;
+                status.start = start;
+                status.now = cachedNow || getNow();
+                const age = status.now - start;
+                status.remainingTTL = ttl - age;
+            }
+        };
+        // debounce calls to perf.now() to 1s so we're not hitting
+        // that costly call repeatedly.
+        let cachedNow = 0;
+        const getNow = () => {
+            const n = perf.now();
+            if (this.ttlResolution > 0) {
+                cachedNow = n;
+                const t = setTimeout(() => (cachedNow = 0), this.ttlResolution);
+                // not available on all platforms
+                /* c8 ignore start */
+                if (t.unref) {
+                    t.unref();
+                }
+                /* c8 ignore stop */
+            }
+            return n;
+        };
+        this.getRemainingTTL = key => {
+            const index = this.#keyMap.get(key);
+            if (index === undefined) {
+                return 0;
+            }
+            const ttl = ttls[index];
+            const start = starts[index];
+            if (!ttl || !start) {
+                return Infinity;
+            }
+            const age = (cachedNow || getNow()) - start;
+            return ttl - age;
+        };
+        this.#isStale = index => {
+            const s = starts[index];
+            const t = ttls[index];
+            return !!t && !!s && (cachedNow || getNow()) - s > t;
+        };
+    }
+    // conditionally set private methods related to TTL
+    #updateItemAge = () => { };
+    #statusTTL = () => { };
+    #setItemTTL = () => { };
+    /* c8 ignore stop */
+    #isStale = () => false;
+    #initializeSizeTracking() {
+        const sizes = new ZeroArray(this.#max);
+        this.#calculatedSize = 0;
+        this.#sizes = sizes;
+        this.#removeItemSize = index => {
+            this.#calculatedSize -= sizes[index];
+            sizes[index] = 0;
+        };
+        this.#requireSize = (k, v, size, sizeCalculation) => {
+            // provisionally accept background fetches.
+            // actual value size will be checked when they return.
+            if (this.#isBackgroundFetch(v)) {
+                return 0;
+            }
+            if (!isPosInt(size)) {
+                if (sizeCalculation) {
+                    if (typeof sizeCalculation !== 'function') {
+                        throw new TypeError('sizeCalculation must be a function');
+                    }
+                    size = sizeCalculation(v, k);
+                    if (!isPosInt(size)) {
+                        throw new TypeError('sizeCalculation return invalid (expect positive integer)');
+                    }
+                }
+                else {
+                    throw new TypeError('invalid size value (must be positive integer). ' +
+                        'When maxSize or maxEntrySize is used, sizeCalculation ' +
+                        'or size must be set.');
+                }
+            }
+            return size;
+        };
+        this.#addItemSize = (index, size, status) => {
+            sizes[index] = size;
+            if (this.#maxSize) {
+                const maxSize = this.#maxSize - sizes[index];
+                while (this.#calculatedSize > maxSize) {
+                    this.#evict(true);
+                }
+            }
+            this.#calculatedSize += sizes[index];
+            if (status) {
+                status.entrySize = size;
+                status.totalCalculatedSize = this.#calculatedSize;
+            }
+        };
+    }
+    #removeItemSize = _i => { };
+    #addItemSize = (_i, _s, _st) => { };
+    #requireSize = (_k, _v, size, sizeCalculation) => {
+        if (size || sizeCalculation) {
+            throw new TypeError('cannot set size without setting maxSize or maxEntrySize on cache');
+        }
+        return 0;
+    };
+    *#indexes({ allowStale = this.allowStale } = {}) {
+        if (this.#size) {
+            for (let i = this.#tail; true;) {
+                if (!this.#isValidIndex(i)) {
+                    break;
+                }
+                if (allowStale || !this.#isStale(i)) {
+                    yield i;
+                }
+                if (i === this.#head) {
+                    break;
+                }
+                else {
+                    i = this.#prev[i];
+                }
+            }
+        }
+    }
+    *#rindexes({ allowStale = this.allowStale } = {}) {
+        if (this.#size) {
+            for (let i = this.#head; true;) {
+                if (!this.#isValidIndex(i)) {
+                    break;
+                }
+                if (allowStale || !this.#isStale(i)) {
+                    yield i;
+                }
+                if (i === this.#tail) {
+                    break;
+                }
+                else {
+                    i = this.#next[i];
+                }
+            }
+        }
+    }
+    #isValidIndex(index) {
+        return (index !== undefined &&
+            this.#keyMap.get(this.#keyList[index]) === index);
+    }
+    /**
+     * Return a generator yielding `[key, value]` pairs,
+     * in order from most recently used to least recently used.
+     */
+    *entries() {
+        for (const i of this.#indexes()) {
+            if (this.#valList[i] !== undefined &&
+                this.#keyList[i] !== undefined &&
+                !this.#isBackgroundFetch(this.#valList[i])) {
+                yield [this.#keyList[i], this.#valList[i]];
+            }
+        }
+    }
+    /**
+     * Inverse order version of {@link LRUCache.entries}
+     *
+     * Return a generator yielding `[key, value]` pairs,
+     * in order from least recently used to most recently used.
+     */
+    *rentries() {
+        for (const i of this.#rindexes()) {
+            if (this.#valList[i] !== undefined &&
+                this.#keyList[i] !== undefined &&
+                !this.#isBackgroundFetch(this.#valList[i])) {
+                yield [this.#keyList[i], this.#valList[i]];
+            }
+        }
+    }
+    /**
+     * Return a generator yielding the keys in the cache,
+     * in order from most recently used to least recently used.
+     */
+    *keys() {
+        for (const i of this.#indexes()) {
+            const k = this.#keyList[i];
+            if (k !== undefined &&
+                !this.#isBackgroundFetch(this.#valList[i])) {
+                yield k;
+            }
+        }
+    }
+    /**
+     * Inverse order version of {@link LRUCache.keys}
+     *
+     * Return a generator yielding the keys in the cache,
+     * in order from least recently used to most recently used.
+     */
+    *rkeys() {
+        for (const i of this.#rindexes()) {
+            const k = this.#keyList[i];
+            if (k !== undefined &&
+                !this.#isBackgroundFetch(this.#valList[i])) {
+                yield k;
+            }
+        }
+    }
+    /**
+     * Return a generator yielding the values in the cache,
+     * in order from most recently used to least recently used.
+     */
+    *values() {
+        for (const i of this.#indexes()) {
+            const v = this.#valList[i];
+            if (v !== undefined &&
+                !this.#isBackgroundFetch(this.#valList[i])) {
+                yield this.#valList[i];
+            }
+        }
+    }
+    /**
+     * Inverse order version of {@link LRUCache.values}
+     *
+     * Return a generator yielding the values in the cache,
+     * in order from least recently used to most recently used.
+     */
+    *rvalues() {
+        for (const i of this.#rindexes()) {
+            const v = this.#valList[i];
+            if (v !== undefined &&
+                !this.#isBackgroundFetch(this.#valList[i])) {
+                yield this.#valList[i];
+            }
+        }
+    }
+    /**
+     * Iterating over the cache itself yields the same results as
+     * {@link LRUCache.entries}
+     */
+    [Symbol.iterator]() {
+        return this.entries();
+    }
+    /**
+     * A String value that is used in the creation of the default string
+     * description of an object. Called by the built-in method
+     * `Object.prototype.toString`.
+     */
+    [Symbol.toStringTag] = 'LRUCache';
+    /**
+     * Find a value for which the supplied fn method returns a truthy value,
+     * similar to `Array.find()`. fn is called as `fn(value, key, cache)`.
+     */
+    find(fn, getOptions = {}) {
+        for (const i of this.#indexes()) {
+            const v = this.#valList[i];
+            const value = this.#isBackgroundFetch(v)
+                ? v.__staleWhileFetching
+                : v;
+            if (value === undefined)
+                continue;
+            if (fn(value, this.#keyList[i], this)) {
+                return this.get(this.#keyList[i], getOptions);
+            }
+        }
+    }
+    /**
+     * Call the supplied function on each item in the cache, in order from most
+     * recently used to least recently used.
+     *
+     * `fn` is called as `fn(value, key, cache)`.
+     *
+     * If `thisp` is provided, function will be called in the `this`-context of
+     * the provided object, or the cache if no `thisp` object is provided.
+     *
+     * Does not update age or recenty of use, or iterate over stale values.
+     */
+    forEach(fn, thisp = this) {
+        for (const i of this.#indexes()) {
+            const v = this.#valList[i];
+            const value = this.#isBackgroundFetch(v)
+                ? v.__staleWhileFetching
+                : v;
+            if (value === undefined)
+                continue;
+            fn.call(thisp, value, this.#keyList[i], this);
+        }
+    }
+    /**
+     * The same as {@link LRUCache.forEach} but items are iterated over in
+     * reverse order.  (ie, less recently used items are iterated over first.)
+     */
+    rforEach(fn, thisp = this) {
+        for (const i of this.#rindexes()) {
+            const v = this.#valList[i];
+            const value = this.#isBackgroundFetch(v)
+                ? v.__staleWhileFetching
+                : v;
+            if (value === undefined)
+                continue;
+            fn.call(thisp, value, this.#keyList[i], this);
+        }
+    }
+    /**
+     * Delete any stale entries. Returns true if anything was removed,
+     * false otherwise.
+     */
+    purgeStale() {
+        let deleted = false;
+        for (const i of this.#rindexes({ allowStale: true })) {
+            if (this.#isStale(i)) {
+                this.#delete(this.#keyList[i], 'expire');
+                deleted = true;
+            }
+        }
+        return deleted;
+    }
+    /**
+     * Get the extended info about a given entry, to get its value, size, and
+     * TTL info simultaneously. Returns `undefined` if the key is not present.
+     *
+     * Unlike {@link LRUCache#dump}, which is designed to be portable and survive
+     * serialization, the `start` value is always the current timestamp, and the
+     * `ttl` is a calculated remaining time to live (negative if expired).
+     *
+     * Always returns stale values, if their info is found in the cache, so be
+     * sure to check for expirations (ie, a negative {@link LRUCache.Entry#ttl})
+     * if relevant.
+     */
+    info(key) {
+        const i = this.#keyMap.get(key);
+        if (i === undefined)
+            return undefined;
+        const v = this.#valList[i];
+        const value = this.#isBackgroundFetch(v)
+            ? v.__staleWhileFetching
+            : v;
+        if (value === undefined)
+            return undefined;
+        const entry = { value };
+        if (this.#ttls && this.#starts) {
+            const ttl = this.#ttls[i];
+            const start = this.#starts[i];
+            if (ttl && start) {
+                const remain = ttl - (perf.now() - start);
+                entry.ttl = remain;
+                entry.start = Date.now();
+            }
+        }
+        if (this.#sizes) {
+            entry.size = this.#sizes[i];
+        }
+        return entry;
+    }
+    /**
+     * Return an array of [key, {@link LRUCache.Entry}] tuples which can be
+     * passed to {@link LRLUCache#load}.
+     *
+     * The `start` fields are calculated relative to a portable `Date.now()`
+     * timestamp, even if `performance.now()` is available.
+     *
+     * Stale entries are always included in the `dump`, even if
+     * {@link LRUCache.OptionsBase.allowStale} is false.
+     *
+     * Note: this returns an actual array, not a generator, so it can be more
+     * easily passed around.
+     */
+    dump() {
+        const arr = [];
+        for (const i of this.#indexes({ allowStale: true })) {
+            const key = this.#keyList[i];
+            const v = this.#valList[i];
+            const value = this.#isBackgroundFetch(v)
+                ? v.__staleWhileFetching
+                : v;
+            if (value === undefined || key === undefined)
+                continue;
+            const entry = { value };
+            if (this.#ttls && this.#starts) {
+                entry.ttl = this.#ttls[i];
+                // always dump the start relative to a portable timestamp
+                // it's ok for this to be a bit slow, it's a rare operation.
+                const age = perf.now() - this.#starts[i];
+                entry.start = Math.floor(Date.now() - age);
+            }
+            if (this.#sizes) {
+                entry.size = this.#sizes[i];
+            }
+            arr.unshift([key, entry]);
+        }
+        return arr;
+    }
+    /**
+     * Reset the cache and load in the items in entries in the order listed.
+     *
+     * The shape of the resulting cache may be different if the same options are
+     * not used in both caches.
+     *
+     * The `start` fields are assumed to be calculated relative to a portable
+     * `Date.now()` timestamp, even if `performance.now()` is available.
+     */
+    load(arr) {
+        this.clear();
+        for (const [key, entry] of arr) {
+            if (entry.start) {
+                // entry.start is a portable timestamp, but we may be using
+                // node's performance.now(), so calculate the offset, so that
+                // we get the intended remaining TTL, no matter how long it's
+                // been on ice.
+                //
+                // it's ok for this to be a bit slow, it's a rare operation.
+                const age = Date.now() - entry.start;
+                entry.start = perf.now() - age;
+            }
+            this.set(key, entry.value, entry);
+        }
+    }
+    /**
+     * Add a value to the cache.
+     *
+     * Note: if `undefined` is specified as a value, this is an alias for
+     * {@link LRUCache#delete}
+     *
+     * Fields on the {@link LRUCache.SetOptions} options param will override
+     * their corresponding values in the constructor options for the scope
+     * of this single `set()` operation.
+     *
+     * If `start` is provided, then that will set the effective start
+     * time for the TTL calculation. Note that this must be a previous
+     * value of `performance.now()` if supported, or a previous value of
+     * `Date.now()` if not.
+     *
+     * Options object may also include `size`, which will prevent
+     * calling the `sizeCalculation` function and just use the specified
+     * number if it is a positive integer, and `noDisposeOnSet` which
+     * will prevent calling a `dispose` function in the case of
+     * overwrites.
+     *
+     * If the `size` (or return value of `sizeCalculation`) for a given
+     * entry is greater than `maxEntrySize`, then the item will not be
+     * added to the cache.
+     *
+     * Will update the recency of the entry.
+     *
+     * If the value is `undefined`, then this is an alias for
+     * `cache.delete(key)`. `undefined` is never stored in the cache.
+     */
+    set(k, v, setOptions = {}) {
+        if (v === undefined) {
+            this.delete(k);
+            return this;
+        }
+        const { ttl = this.ttl, start, noDisposeOnSet = this.noDisposeOnSet, sizeCalculation = this.sizeCalculation, status, } = setOptions;
+        let { noUpdateTTL = this.noUpdateTTL } = setOptions;
+        const size = this.#requireSize(k, v, setOptions.size || 0, sizeCalculation);
+        // if the item doesn't fit, don't do anything
+        // NB: maxEntrySize set to maxSize by default
+        if (this.maxEntrySize && size > this.maxEntrySize) {
+            if (status) {
+                status.set = 'miss';
+                status.maxEntrySizeExceeded = true;
+            }
+            // have to delete, in case something is there already.
+            this.#delete(k, 'set');
+            return this;
+        }
+        let index = this.#size === 0 ? undefined : this.#keyMap.get(k);
+        if (index === undefined) {
+            // addition
+            index = (this.#size === 0
+                ? this.#tail
+                : this.#free.length !== 0
+                    ? this.#free.pop()
+                    : this.#size === this.#max
+                        ? this.#evict(false)
+                        : this.#size);
+            this.#keyList[index] = k;
+            this.#valList[index] = v;
+            this.#keyMap.set(k, index);
+            this.#next[this.#tail] = index;
+            this.#prev[index] = this.#tail;
+            this.#tail = index;
+            this.#size++;
+            this.#addItemSize(index, size, status);
+            if (status)
+                status.set = 'add';
+            noUpdateTTL = false;
+        }
+        else {
+            // update
+            this.#moveToTail(index);
+            const oldVal = this.#valList[index];
+            if (v !== oldVal) {
+                if (this.#hasFetchMethod && this.#isBackgroundFetch(oldVal)) {
+                    oldVal.__abortController.abort(new Error('replaced'));
+                    const { __staleWhileFetching: s } = oldVal;
+                    if (s !== undefined && !noDisposeOnSet) {
+                        if (this.#hasDispose) {
+                            this.#dispose?.(s, k, 'set');
+                        }
+                        if (this.#hasDisposeAfter) {
+                            this.#disposed?.push([s, k, 'set']);
+                        }
+                    }
+                }
+                else if (!noDisposeOnSet) {
+                    if (this.#hasDispose) {
+                        this.#dispose?.(oldVal, k, 'set');
+                    }
+                    if (this.#hasDisposeAfter) {
+                        this.#disposed?.push([oldVal, k, 'set']);
+                    }
+                }
+                this.#removeItemSize(index);
+                this.#addItemSize(index, size, status);
+                this.#valList[index] = v;
+                if (status) {
+                    status.set = 'replace';
+                    const oldValue = oldVal && this.#isBackgroundFetch(oldVal)
+                        ? oldVal.__staleWhileFetching
+                        : oldVal;
+                    if (oldValue !== undefined)
+                        status.oldValue = oldValue;
+                }
+            }
+            else if (status) {
+                status.set = 'update';
+            }
+        }
+        if (ttl !== 0 && !this.#ttls) {
+            this.#initializeTTLTracking();
+        }
+        if (this.#ttls) {
+            if (!noUpdateTTL) {
+                this.#setItemTTL(index, ttl, start);
+            }
+            if (status)
+                this.#statusTTL(status, index);
+        }
+        if (!noDisposeOnSet && this.#hasDisposeAfter && this.#disposed) {
+            const dt = this.#disposed;
+            let task;
+            while ((task = dt?.shift())) {
+                this.#disposeAfter?.(...task);
+            }
+        }
+        return this;
+    }
+    /**
+     * Evict the least recently used item, returning its value or
+     * `undefined` if cache is empty.
+     */
+    pop() {
+        try {
+            while (this.#size) {
+                const val = this.#valList[this.#head];
+                this.#evict(true);
+                if (this.#isBackgroundFetch(val)) {
+                    if (val.__staleWhileFetching) {
+                        return val.__staleWhileFetching;
+                    }
+                }
+                else if (val !== undefined) {
+                    return val;
+                }
+            }
+        }
+        finally {
+            if (this.#hasDisposeAfter && this.#disposed) {
+                const dt = this.#disposed;
+                let task;
+                while ((task = dt?.shift())) {
+                    this.#disposeAfter?.(...task);
+                }
+            }
+        }
+    }
+    #evict(free) {
+        const head = this.#head;
+        const k = this.#keyList[head];
+        const v = this.#valList[head];
+        if (this.#hasFetchMethod && this.#isBackgroundFetch(v)) {
+            v.__abortController.abort(new Error('evicted'));
+        }
+        else if (this.#hasDispose || this.#hasDisposeAfter) {
+            if (this.#hasDispose) {
+                this.#dispose?.(v, k, 'evict');
+            }
+            if (this.#hasDisposeAfter) {
+                this.#disposed?.push([v, k, 'evict']);
+            }
+        }
+        this.#removeItemSize(head);
+        // if we aren't about to use the index, then null these out
+        if (free) {
+            this.#keyList[head] = undefined;
+            this.#valList[head] = undefined;
+            this.#free.push(head);
+        }
+        if (this.#size === 1) {
+            this.#head = this.#tail = 0;
+            this.#free.length = 0;
+        }
+        else {
+            this.#head = this.#next[head];
+        }
+        this.#keyMap.delete(k);
+        this.#size--;
+        return head;
+    }
+    /**
+     * Check if a key is in the cache, without updating the recency of use.
+     * Will return false if the item is stale, even though it is technically
+     * in the cache.
+     *
+     * Check if a key is in the cache, without updating the recency of
+     * use. Age is updated if {@link LRUCache.OptionsBase.updateAgeOnHas} is set
+     * to `true` in either the options or the constructor.
+     *
+     * Will return `false` if the item is stale, even though it is technically in
+     * the cache. The difference can be determined (if it matters) by using a
+     * `status` argument, and inspecting the `has` field.
+     *
+     * Will not update item age unless
+     * {@link LRUCache.OptionsBase.updateAgeOnHas} is set.
+     */
+    has(k, hasOptions = {}) {
+        const { updateAgeOnHas = this.updateAgeOnHas, status } = hasOptions;
+        const index = this.#keyMap.get(k);
+        if (index !== undefined) {
+            const v = this.#valList[index];
+            if (this.#isBackgroundFetch(v) &&
+                v.__staleWhileFetching === undefined) {
+                return false;
+            }
+            if (!this.#isStale(index)) {
+                if (updateAgeOnHas) {
+                    this.#updateItemAge(index);
+                }
+                if (status) {
+                    status.has = 'hit';
+                    this.#statusTTL(status, index);
+                }
+                return true;
+            }
+            else if (status) {
+                status.has = 'stale';
+                this.#statusTTL(status, index);
+            }
+        }
+        else if (status) {
+            status.has = 'miss';
+        }
+        return false;
+    }
+    /**
+     * Like {@link LRUCache#get} but doesn't update recency or delete stale
+     * items.
+     *
+     * Returns `undefined` if the item is stale, unless
+     * {@link LRUCache.OptionsBase.allowStale} is set.
+     */
+    peek(k, peekOptions = {}) {
+        const { allowStale = this.allowStale } = peekOptions;
+        const index = this.#keyMap.get(k);
+        if (index === undefined ||
+            (!allowStale && this.#isStale(index))) {
+            return;
+        }
+        const v = this.#valList[index];
+        // either stale and allowed, or forcing a refresh of non-stale value
+        return this.#isBackgroundFetch(v) ? v.__staleWhileFetching : v;
+    }
+    #backgroundFetch(k, index, options, context) {
+        const v = index === undefined ? undefined : this.#valList[index];
+        if (this.#isBackgroundFetch(v)) {
+            return v;
+        }
+        const ac = new AC();
+        const { signal } = options;
+        // when/if our AC signals, then stop listening to theirs.
+        signal?.addEventListener('abort', () => ac.abort(signal.reason), {
+            signal: ac.signal,
+        });
+        const fetchOpts = {
+            signal: ac.signal,
+            options,
+            context,
+        };
+        const cb = (v, updateCache = false) => {
+            const { aborted } = ac.signal;
+            const ignoreAbort = options.ignoreFetchAbort && v !== undefined;
+            if (options.status) {
+                if (aborted && !updateCache) {
+                    options.status.fetchAborted = true;
+                    options.status.fetchError = ac.signal.reason;
+                    if (ignoreAbort)
+                        options.status.fetchAbortIgnored = true;
+                }
+                else {
+                    options.status.fetchResolved = true;
+                }
+            }
+            if (aborted && !ignoreAbort && !updateCache) {
+                return fetchFail(ac.signal.reason);
+            }
+            // either we didn't abort, and are still here, or we did, and ignored
+            const bf = p;
+            if (this.#valList[index] === p) {
+                if (v === undefined) {
+                    if (bf.__staleWhileFetching) {
+                        this.#valList[index] = bf.__staleWhileFetching;
+                    }
+                    else {
+                        this.#delete(k, 'fetch');
+                    }
+                }
+                else {
+                    if (options.status)
+                        options.status.fetchUpdated = true;
+                    this.set(k, v, fetchOpts.options);
+                }
+            }
+            return v;
+        };
+        const eb = (er) => {
+            if (options.status) {
+                options.status.fetchRejected = true;
+                options.status.fetchError = er;
+            }
+            return fetchFail(er);
+        };
+        const fetchFail = (er) => {
+            const { aborted } = ac.signal;
+            const allowStaleAborted = aborted && options.allowStaleOnFetchAbort;
+            const allowStale = allowStaleAborted || options.allowStaleOnFetchRejection;
+            const noDelete = allowStale || options.noDeleteOnFetchRejection;
+            const bf = p;
+            if (this.#valList[index] === p) {
+                // if we allow stale on fetch rejections, then we need to ensure that
+                // the stale value is not removed from the cache when the fetch fails.
+                const del = !noDelete || bf.__staleWhileFetching === undefined;
+                if (del) {
+                    this.#delete(k, 'fetch');
+                }
+                else if (!allowStaleAborted) {
+                    // still replace the *promise* with the stale value,
+                    // since we are done with the promise at this point.
+                    // leave it untouched if we're still waiting for an
+                    // aborted background fetch that hasn't yet returned.
+                    this.#valList[index] = bf.__staleWhileFetching;
+                }
+            }
+            if (allowStale) {
+                if (options.status && bf.__staleWhileFetching !== undefined) {
+                    options.status.returnedStale = true;
+                }
+                return bf.__staleWhileFetching;
+            }
+            else if (bf.__returned === bf) {
+                throw er;
+            }
+        };
+        const pcall = (res, rej) => {
+            const fmp = this.#fetchMethod?.(k, v, fetchOpts);
+            if (fmp && fmp instanceof Promise) {
+                fmp.then(v => res(v === undefined ? undefined : v), rej);
+            }
+            // ignored, we go until we finish, regardless.
+            // defer check until we are actually aborting,
+            // so fetchMethod can override.
+            ac.signal.addEventListener('abort', () => {
+                if (!options.ignoreFetchAbort ||
+                    options.allowStaleOnFetchAbort) {
+                    res(undefined);
+                    // when it eventually resolves, update the cache.
+                    if (options.allowStaleOnFetchAbort) {
+                        res = v => cb(v, true);
+                    }
+                }
+            });
+        };
+        if (options.status)
+            options.status.fetchDispatched = true;
+        const p = new Promise(pcall).then(cb, eb);
+        const bf = Object.assign(p, {
+            __abortController: ac,
+            __staleWhileFetching: v,
+            __returned: undefined,
+        });
+        if (index === undefined) {
+            // internal, don't expose status.
+            this.set(k, bf, { ...fetchOpts.options, status: undefined });
+            index = this.#keyMap.get(k);
+        }
+        else {
+            this.#valList[index] = bf;
+        }
+        return bf;
+    }
+    #isBackgroundFetch(p) {
+        if (!this.#hasFetchMethod)
+            return false;
+        const b = p;
+        return (!!b &&
+            b instanceof Promise &&
+            b.hasOwnProperty('__staleWhileFetching') &&
+            b.__abortController instanceof AC);
+    }
+    async fetch(k, fetchOptions = {}) {
+        const { 
+        // get options
+        allowStale = this.allowStale, updateAgeOnGet = this.updateAgeOnGet, noDeleteOnStaleGet = this.noDeleteOnStaleGet, 
+        // set options
+        ttl = this.ttl, noDisposeOnSet = this.noDisposeOnSet, size = 0, sizeCalculation = this.sizeCalculation, noUpdateTTL = this.noUpdateTTL, 
+        // fetch exclusive options
+        noDeleteOnFetchRejection = this.noDeleteOnFetchRejection, allowStaleOnFetchRejection = this.allowStaleOnFetchRejection, ignoreFetchAbort = this.ignoreFetchAbort, allowStaleOnFetchAbort = this.allowStaleOnFetchAbort, context, forceRefresh = false, status, signal, } = fetchOptions;
+        if (!this.#hasFetchMethod) {
+            if (status)
+                status.fetch = 'get';
+            return this.get(k, {
+                allowStale,
+                updateAgeOnGet,
+                noDeleteOnStaleGet,
+                status,
+            });
+        }
+        const options = {
+            allowStale,
+            updateAgeOnGet,
+            noDeleteOnStaleGet,
+            ttl,
+            noDisposeOnSet,
+            size,
+            sizeCalculation,
+            noUpdateTTL,
+            noDeleteOnFetchRejection,
+            allowStaleOnFetchRejection,
+            allowStaleOnFetchAbort,
+            ignoreFetchAbort,
+            status,
+            signal,
+        };
+        let index = this.#keyMap.get(k);
+        if (index === undefined) {
+            if (status)
+                status.fetch = 'miss';
+            const p = this.#backgroundFetch(k, index, options, context);
+            return (p.__returned = p);
+        }
+        else {
+            // in cache, maybe already fetching
+            const v = this.#valList[index];
+            if (this.#isBackgroundFetch(v)) {
+                const stale = allowStale && v.__staleWhileFetching !== undefined;
+                if (status) {
+                    status.fetch = 'inflight';
+                    if (stale)
+                        status.returnedStale = true;
+                }
+                return stale ? v.__staleWhileFetching : (v.__returned = v);
+            }
+            // if we force a refresh, that means do NOT serve the cached value,
+            // unless we are already in the process of refreshing the cache.
+            const isStale = this.#isStale(index);
+            if (!forceRefresh && !isStale) {
+                if (status)
+                    status.fetch = 'hit';
+                this.#moveToTail(index);
+                if (updateAgeOnGet) {
+                    this.#updateItemAge(index);
+                }
+                if (status)
+                    this.#statusTTL(status, index);
+                return v;
+            }
+            // ok, it is stale or a forced refresh, and not already fetching.
+            // refresh the cache.
+            const p = this.#backgroundFetch(k, index, options, context);
+            const hasStale = p.__staleWhileFetching !== undefined;
+            const staleVal = hasStale && allowStale;
+            if (status) {
+                status.fetch = isStale ? 'stale' : 'refresh';
+                if (staleVal && isStale)
+                    status.returnedStale = true;
+            }
+            return staleVal ? p.__staleWhileFetching : (p.__returned = p);
+        }
+    }
+    async forceFetch(k, fetchOptions = {}) {
+        const v = await this.fetch(k, fetchOptions);
+        if (v === undefined)
+            throw new Error('fetch() returned undefined');
+        return v;
+    }
+    memo(k, memoOptions = {}) {
+        const memoMethod = this.#memoMethod;
+        if (!memoMethod) {
+            throw new Error('no memoMethod provided to constructor');
+        }
+        const { context, forceRefresh, ...options } = memoOptions;
+        const v = this.get(k, options);
+        if (!forceRefresh && v !== undefined)
+            return v;
+        const vv = memoMethod(k, v, {
+            options,
+            context,
+        });
+        this.set(k, vv, options);
+        return vv;
+    }
+    /**
+     * Return a value from the cache. Will update the recency of the cache
+     * entry found.
+     *
+     * If the key is not found, get() will return `undefined`.
+     */
+    get(k, getOptions = {}) {
+        const { allowStale = this.allowStale, updateAgeOnGet = this.updateAgeOnGet, noDeleteOnStaleGet = this.noDeleteOnStaleGet, status, } = getOptions;
+        const index = this.#keyMap.get(k);
+        if (index !== undefined) {
+            const value = this.#valList[index];
+            const fetching = this.#isBackgroundFetch(value);
+            if (status)
+                this.#statusTTL(status, index);
+            if (this.#isStale(index)) {
+                if (status)
+                    status.get = 'stale';
+                // delete only if not an in-flight background fetch
+                if (!fetching) {
+                    if (!noDeleteOnStaleGet) {
+                        this.#delete(k, 'expire');
+                    }
+                    if (status && allowStale)
+                        status.returnedStale = true;
+                    return allowStale ? value : undefined;
+                }
+                else {
+                    if (status &&
+                        allowStale &&
+                        value.__staleWhileFetching !== undefined) {
+                        status.returnedStale = true;
+                    }
+                    return allowStale ? value.__staleWhileFetching : undefined;
+                }
+            }
+            else {
+                if (status)
+                    status.get = 'hit';
+                // if we're currently fetching it, we don't actually have it yet
+                // it's not stale, which means this isn't a staleWhileRefetching.
+                // If it's not stale, and fetching, AND has a __staleWhileFetching
+                // value, then that means the user fetched with {forceRefresh:true},
+                // so it's safe to return that value.
+                if (fetching) {
+                    return value.__staleWhileFetching;
+                }
+                this.#moveToTail(index);
+                if (updateAgeOnGet) {
+                    this.#updateItemAge(index);
+                }
+                return value;
+            }
+        }
+        else if (status) {
+            status.get = 'miss';
+        }
+    }
+    #connect(p, n) {
+        this.#prev[n] = p;
+        this.#next[p] = n;
+    }
+    #moveToTail(index) {
+        // if tail already, nothing to do
+        // if head, move head to next[index]
+        // else
+        //   move next[prev[index]] to next[index] (head has no prev)
+        //   move prev[next[index]] to prev[index]
+        // prev[index] = tail
+        // next[tail] = index
+        // tail = index
+        if (index !== this.#tail) {
+            if (index === this.#head) {
+                this.#head = this.#next[index];
+            }
+            else {
+                this.#connect(this.#prev[index], this.#next[index]);
+            }
+            this.#connect(this.#tail, index);
+            this.#tail = index;
+        }
+    }
+    /**
+     * Deletes a key out of the cache.
+     *
+     * Returns true if the key was deleted, false otherwise.
+     */
+    delete(k) {
+        return this.#delete(k, 'delete');
+    }
+    #delete(k, reason) {
+        let deleted = false;
+        if (this.#size !== 0) {
+            const index = this.#keyMap.get(k);
+            if (index !== undefined) {
+                deleted = true;
+                if (this.#size === 1) {
+                    this.#clear(reason);
+                }
+                else {
+                    this.#removeItemSize(index);
+                    const v = this.#valList[index];
+                    if (this.#isBackgroundFetch(v)) {
+                        v.__abortController.abort(new Error('deleted'));
+                    }
+                    else if (this.#hasDispose || this.#hasDisposeAfter) {
+                        if (this.#hasDispose) {
+                            this.#dispose?.(v, k, reason);
+                        }
+                        if (this.#hasDisposeAfter) {
+                            this.#disposed?.push([v, k, reason]);
+                        }
+                    }
+                    this.#keyMap.delete(k);
+                    this.#keyList[index] = undefined;
+                    this.#valList[index] = undefined;
+                    if (index === this.#tail) {
+                        this.#tail = this.#prev[index];
+                    }
+                    else if (index === this.#head) {
+                        this.#head = this.#next[index];
+                    }
+                    else {
+                        const pi = this.#prev[index];
+                        this.#next[pi] = this.#next[index];
+                        const ni = this.#next[index];
+                        this.#prev[ni] = this.#prev[index];
+                    }
+                    this.#size--;
+                    this.#free.push(index);
+                }
+            }
+        }
+        if (this.#hasDisposeAfter && this.#disposed?.length) {
+            const dt = this.#disposed;
+            let task;
+            while ((task = dt?.shift())) {
+                this.#disposeAfter?.(...task);
+            }
+        }
+        return deleted;
+    }
+    /**
+     * Clear the cache entirely, throwing away all values.
+     */
+    clear() {
+        return this.#clear('delete');
+    }
+    #clear(reason) {
+        for (const index of this.#rindexes({ allowStale: true })) {
+            const v = this.#valList[index];
+            if (this.#isBackgroundFetch(v)) {
+                v.__abortController.abort(new Error('deleted'));
+            }
+            else {
+                const k = this.#keyList[index];
+                if (this.#hasDispose) {
+                    this.#dispose?.(v, k, reason);
+                }
+                if (this.#hasDisposeAfter) {
+                    this.#disposed?.push([v, k, reason]);
+                }
+            }
+        }
+        this.#keyMap.clear();
+        this.#valList.fill(undefined);
+        this.#keyList.fill(undefined);
+        if (this.#ttls && this.#starts) {
+            this.#ttls.fill(0);
+            this.#starts.fill(0);
+        }
+        if (this.#sizes) {
+            this.#sizes.fill(0);
+        }
+        this.#head = 0;
+        this.#tail = 0;
+        this.#free.length = 0;
+        this.#calculatedSize = 0;
+        this.#size = 0;
+        if (this.#hasDisposeAfter && this.#disposed) {
+            const dt = this.#disposed;
+            let task;
+            while ((task = dt?.shift())) {
+                this.#disposeAfter?.(...task);
+            }
+        }
+    }
+}
+//# sourceMappingURL=index.js.map
+
 /***/ })
 
 /******/ 	});
@@ -56208,6 +60158,8 @@ __webpack_require__(/*! @plugins/jquery.ui */ "./resources/js/plugins/jquery.ui.
 __webpack_require__(/*! @plugins/ddrCalc */ "./resources/js/plugins/ddrCalc.js");
 
 __webpack_require__(/*! @plugins/ddrFiles */ "./resources/js/plugins/ddrFiles/index.js");
+
+__webpack_require__(/*! @plugins/ddrSwiper */ "./resources/js/plugins/ddrSwiper.js");
 
 $.notify.defaults({
   clickToHide: true,

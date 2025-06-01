@@ -62,7 +62,7 @@ class VisionAssistantService
 					'https' => config('openai.proxy_url'),
 				],
 				'verify' => false,
-				'timeout' => 60,
+				'timeout' => 3600,
 			]))
 			->make();
 	}

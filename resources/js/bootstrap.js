@@ -71,6 +71,22 @@ window.axiosQuery = require('@plugins/axiosQuery').default;
 
 
 
+// сделать глобальными все экспортируемые функции из js/ddrRender/ddrRender
+const ddr = require('@/ddrRender/ddrRender');
+Object.keys(ddr).forEach(key => window[key] = ddr[key]);
+
+
+
+
+// сделать глобальными все экспортируемые функции из js/ddrRender/wrappers
+const ddrWraps = require('@/wrappers');
+Object.keys(ddrWraps).forEach(key => window[key] = ddrWraps[key]);
+
+
+
+
+
+
 require('@/functions');
 require('@/common');
 require('@/sections');
