@@ -347,15 +347,15 @@
 							class="w100"
 							rows="10"
 							group="normal"
-							action="updatePromptFile:'{{$prompt_file_name}}'"
-							:value="$prompt_file_data"
+							{{-- action="updatePromptFile:'{{$prompt_file_name}}'" --}}
+							{{-- :value="$prompt_file_data" --}}
 							/>
 						
 						<div class="h3rem"></div>
 							
 						<p class="color-gray mb1rem">Файлы:</p>
 						
-						<p class="format">{{$answer}}</p>
+						{{-- <p class="format">{{$answer}}</p> --}}
 						
 						<div class="assistentfiles__scrollblock">
 							<div class="assistentfiles__dropfiles" id="assistentDropFiles">
