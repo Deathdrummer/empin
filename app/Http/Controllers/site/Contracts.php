@@ -1493,9 +1493,9 @@ class Contracts extends Controller {
 					
 					if (strpos($buildedVariable, '||') !== false) {
 						preg_match('/([a-z_]+)\|\|(.+)/', $buildedVariable, $matches);
-						[, $parsedVar, $formatStr] = $matches;
+						[, $parsedVar, $formatStr] = $matches ?: [null, null, null];
 						
-						$resVal = isset($buildContractdata[$parsedVar]) && $buildContractdata[$parsedVar] ? $formatStr : '';
+						$resVal = isset($buildContractdata[$parsedVar]) && $buildContractdata[$parsedVar] ? $formatStr : '-';
 						
 						$varsMap['${'.$variable.'}'][$k] = $resVal;
 						
@@ -1507,7 +1507,6 @@ class Contracts extends Controller {
 					$varsMap['${'.$variable.'}'][$k] = $buildContractdata[$variable] ?? '';
 				}
 			}
-			
 			
 			
 			if ($ranged) {

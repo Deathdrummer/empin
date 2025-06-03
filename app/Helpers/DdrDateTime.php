@@ -200,19 +200,18 @@ class DdrDateTime {
 	/** Конвертировать формат даты
 	 * @return String|null
 	 */
-	public static function dateToHuman($dateTimeStr = null, $locale = 'ru_pure', $outputFormat = ['MMMM DD YYYY', 'Do MMMM'], $originalFormat = 'Y-m-d H:i:s'):String|null {
+	public static function dateToHuman(?string $raw):?string {
+		if (!$raw) return null;
+
+		$date = Carbon::parse($raw)
+			->locale('ru')
+			->isoFormat('D MMMM YYYY');
 		
-		return self::date($dateTimeStr, ['locale' => $locale]);
-		
-		/* if (!$dateTimeStr) return null;
-        $dateTime = Carbon::createFromFormat($originalFormat, $dateTimeStr);
-        if ($dateTime === false || $dateTime->format($originalFormat) !== $dateTimeStr) {
-            return false;
-        }
-        $dateTime->locale('ru');
-        return $dateTime->translatedFormat($outputFormat); */
+		//toLog($date);
+			
+		return $date;
 	}
-	
+		
 	
 	
 	
