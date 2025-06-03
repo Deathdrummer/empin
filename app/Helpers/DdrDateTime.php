@@ -206,7 +206,7 @@ class DdrDateTime {
 		$date = Carbon::parse($raw)
 			->locale('ru')
 			->isoFormat('D MMMM YYYY');
-			
+		
 		//toLog($date);
 			
 		return $date;

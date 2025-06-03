@@ -1509,7 +1509,6 @@ class Contracts extends Controller {
 			}
 			
 			
-			
 			if ($ranged) {
 				$varsMap = $this->_convertVarsToRange($varsMap);
 			} else {
