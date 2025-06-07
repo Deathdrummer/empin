@@ -20,6 +20,13 @@
 				:checked="$show_only_assigned ?? null"
 				/>
 		</td>
+		<td class="center">
+			<x-checkbox
+				name="show_in_timesheet"
+				group="large"
+				:checked="$show_in_timesheet ?? null"
+				/>
+		</td>
 		<td>
 			<x-input name="sort" type="number" class="w100" value="{{$sort}}" placeholder="0" showrows />
 		</td>

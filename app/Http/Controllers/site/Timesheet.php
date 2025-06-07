@@ -6,11 +6,12 @@ use App\Http\Filters\ContractFilter;
 use App\Http\Resources\TimesheetChatResource;
 use App\Http\Resources\TimesheetTeamResource;
 use App\Models\Contract as ContractModel;
+use App\Models\Department;
 use App\Models\Staff;
 use App\Models\TimesheetContract;
 use App\Models\TimesheetTeam;
 use App\Services\Business\User as UserService;
-
+use App\Services\Settings;
 use App\Traits\Renderable;
 use App\Traits\Settingable;
 use Carbon\Carbon;
@@ -231,7 +232,9 @@ class Timesheet extends Controller {
 	* @return 
 	*/
 	public function getStaff() {
+		$depsIds = Department::where('show_in_timesheet', true)->select('id')->pluck('id');
 		$staff = Staff::select(['id', 'sname', 'fname', 'mname'])
+			->whereRelation('registred', fn($q) => $q->whereIn('department_id', $depsIds))
 			->get();
 		
 		return response()->json($staff);

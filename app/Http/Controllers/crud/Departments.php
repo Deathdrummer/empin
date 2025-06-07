@@ -131,10 +131,12 @@ class Departments extends Controller {
 		if (!$request) return false;
 		
 		$validFields = $request->validate([
-			'name'				=> 'string|required|unique:departments,name',
-			'assigned_primary'	=> 'numeric|nullable',
-			'sort'				=> 'required|numeric',
-			'_sort'				=> 'required|regex:/[0-9]+/'
+			'name'					=> 'string|required|unique:departments,name',
+			'assigned_primary'		=> 'numeric|nullable',
+			'show_only_assigned'	=> 'boolean|nullable',
+			'show_in_timesheet'		=> 'boolean|nullable',
+			'sort'					=> 'required|numeric',
+			'_sort'					=> 'required|regex:/[0-9]+/'
 		]);
 		
 		return Department::create($validFields);
@@ -191,6 +193,7 @@ class Departments extends Controller {
 			],
 			'assigned_primary'		=> 'numeric|nullable',
 			'show_only_assigned'	=> 'boolean|nullable',
+			'show_in_timesheet'		=> 'boolean|nullable',
 			'sort'					=> 'numeric'
 		]);
 		

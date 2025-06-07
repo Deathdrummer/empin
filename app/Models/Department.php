@@ -27,6 +27,8 @@ class Department extends Model {
 		'name',
 		'sort',
 		'assigned_primary',
+		'show_only_assigned',
+		'show_in_timesheet',
 		'_sort'
 	];
 	
