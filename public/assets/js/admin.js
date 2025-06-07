@@ -51544,7 +51544,7 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony default export */ __webpack_exports__["default"] = ("<ul class=\"timesheetcard__stafflist scrollblock scrollblock-light\">\r\n\t<li ddr-for=\"stf in staff\" class=\"timesheetcard__staffitem\" ddr-click=\"addTeam:stf.id,day,stf.full_name\" staffitem title=\"Выбрать\">\r\n\t\t<p>{{stf.full_name}}</p>\r\n\t</li>\r\n</ul>");
+/* harmony default export */ __webpack_exports__["default"] = ("<ul class=\"timesheetcard__stafflist scrollblock scrollblock-light\">\r\n\t<li ddr-for=\"stf in staff\" class=\"timesheetcard__staffitem\" ddr-click=\"addTeam:stf.id,day,stf.full_name\" staffitem title=\"Выбрать\">\r\n\t\t<p>{{stf.full_name}}</p>\r\n\t</li>\r\n\t<p class=\"text-center color-gray-400\" ddr-if=\"staff.length == 0\">Нет сотрудников</p>\r\n</ul>");
 
 /***/ }),
 
