@@ -11,9 +11,9 @@
 	
 	<x-table.td></x-table.td>
 	
-	<x-table.td class="noselect"><p>{{$contract['object_number']}}</p></x-table.td>
-	<x-table.td class="noselect"><p class="fz12px lh100">{{$contract['applicant']}}</p></x-table.td>
-	<x-table.td class="noselect"><p class="fz12px lh100">{{$author['pseudoname'] ?? '-'}}</p></x-table.td>
+	<x-table.td class="noselect"><p>{{$contract['object_number'] ?? '-'}}</p></x-table.td>
+	<x-table.td class="noselect"><p class="fz12px lh100">{{$contract['applicant'] ?? '-'}}</p></x-table.td>
+	<x-table.td class="noselect"><p class="fz12px lh100">{{$author['full_name'] ?? '-'}}</p></x-table.td>
 	<x-table.td class="noselect">
 		<p class="fz12px">
 			{{dateFormatterNew($upload_date, '{dd} {mmm} {yyyy} г.')}}
@@ -21,7 +21,7 @@
 		</p>
 	</x-table.td>
 	<x-table.td class="h-center noselect">
-		@if($contract['archive'])
+		@if($contract['archive'] ?? false)
 			<i class="fa-solid fa-box-archive color-gray fz16px" title="Архивный договор"></i>
 		@else
 			<i class="fa-solid fa-circle-check color-green fz16px" title="Действующий договор"></i>
