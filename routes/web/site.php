@@ -385,9 +385,13 @@ Route::prefix('site')->middleware(['lang', 'isajax:site'])->group(function() {
 	Route::get('/timesheet/slides', [Timesheet::class, 'getSlidesData']);
 	Route::get('/timesheet/contracts', [Timesheet::class, 'contractsList']);
 	
-	Route::post('/timesheet/contract', [Timesheet::class, 'addContract']);
 	Route::post('/timesheet/team', [Timesheet::class, 'addTeam']);
+	Route::post('/timesheet/contract', [Timesheet::class, 'addContract']);
 	Route::post('/timesheet/comment', [Timesheet::class, 'addComment']);
+	
+	Route::delete('/timesheet/team', [Timesheet::class, 'removeTeam']);
+	Route::delete('/timesheet/contract', [Timesheet::class, 'removeContract']);
+	Route::delete('/timesheet/comment', [Timesheet::class, 'removeComment']);
 	
 	Route::get('/timesheet/staff', [Timesheet::class, 'getStaff']);
 	

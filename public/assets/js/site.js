@@ -54978,7 +54978,7 @@ process.umask = function() { return 0; };
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony default export */ __webpack_exports__["default"] = ("<li class=\"tchat__message tmessage tmessage_self\">\r\n\t<div class=\"row justify-content-between mb2px\">\r\n\t\t<div class=\"col-auto\"><strong class=\"tmessage__name\">{{from.fname}} {{from.sname}}</strong></div>\r\n\t\t<div class=\"col-auto\"><small class=\"tmessage__date\">{{created_at}}</small></div>\r\n\t</div>\r\n\t<p class=\"tmessage__message format\">{{message}}</p>\r\n</li>");
+/* harmony default export */ __webpack_exports__["default"] = ("<li \r\n\tclass=\"tchat__message tmessage tmessage_self\"\r\n\tonpointerdown=\"longPressStart(event)\"\r\n\tonpointermove=\"longPressMove(event)\"\r\n    onpointerup=\"longPressCancel(event)\"\r\n    onpointerleave=\"longPressCancel(event)\"\r\n    data-onhold=\"tsRemoveMessage:{{id}}\"\r\n    data-duration=\"600\"\r\n    contextmenu=\"tsRemoveMessageContext:{{id}}\"\r\n    message\r\n\t>\r\n\t\r\n\t<div class=\"timesheetcard__remove h100\" removemessageblock>\r\n\t\t<p class=\"tsremove\" removemessage><i class=\"fa-solid fa-trash\"></i> Удалить</p>\r\n\t\t<button class=\"tsclose\" closeremovemessage><i class=\"fa-solid fa-xmark\"></i></button>\r\n\t</div>\r\n\t\r\n\t<div class=\"row justify-content-between mb2px\">\r\n\t\t<div class=\"col-auto\"><strong class=\"tmessage__name\">{{from.fname}} {{from.sname}}</strong></div>\r\n\t\t<div class=\"col-auto\"><small class=\"tmessage__date\">{{created_at}}</small></div>\r\n\t</div>\r\n\t<p class=\"tmessage__message format\">{{message}}</p>\r\n</li>");
 
 /***/ }),
 
@@ -54990,7 +54990,7 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony default export */ __webpack_exports__["default"] = ("<li contract>\r\n\t<div class=\"table timesheetcard__table\">\r\n\t\t<table>\r\n\t\t\t<tr>\r\n\t\t\t\t<td><strong class=\"fz10px\">{{object_number}}</strong></td>\r\n\t\t\t\t<td><p class=\"fz10px\">{{title}}</p></td>\r\n\t\t\t\t<td>\r\n\t\t\t\t\t<div class=\"scrollblock scrollblock-light h4rem fz10px\">{{titul}}</div>\r\n\t\t\t\t</td>\r\n\t\t\t</tr>\r\n\t\t</table>\r\n\t</div>\r\n\t\r\n\t<div class=\"timesheetcard__chatblock tchat\">\r\n\t\t<ul class=\"tchat__list\" tchat></ul>\r\n\t\t\r\n\t\t<div class=\"tchat__form\" noswipe>\r\n\t\t\t<div class=\"tchat__input\" contenteditable placeholder=\"Сообщение...\" tchatmess ddr-action=\"setBtnStat|setToEnter:{{timesheet_contract_id}}\"></div>\r\n\t\t\t<button class=\"tchat__btn\" ddr-click=\"teamAddComment:timesheet_contract_id\" noswipe title=\"Отправить\" ddr-action=\"sendMess\" disabled><i class=\"fa fa-paper-plane\"></i></button>\r\n\t\t</div>\r\n\t</div>\r\n</li>");
+/* harmony default export */ __webpack_exports__["default"] = ("<li contract>\r\n\t\r\n\t<div \r\n\t\tclass=\"table timesheetcard__table\"\r\n\t\tcontracttable\r\n\t\tonpointerdown=\"longPressStart(event)\"\r\n\t\tonpointermove=\"longPressMove(event)\"\r\n\t    onpointerup=\"longPressCancel(event)\"\r\n\t    onpointerleave=\"longPressCancel(event)\"\r\n\t    data-onhold=\"tsRemoveContract:{{timesheet_contract_id}}\"\r\n\t    data-duration=\"600\"\r\n\t    contextmenu=\"tsRemoveContractContext:{{timesheet_contract_id}}\"\r\n\t\t>\r\n\t\t\r\n\t\t<div class=\"timesheetcard__remove h4rem-4px\" removecontractblock>\r\n\t\t\t<p class=\"tsremove\" removecontract><i class=\"fa-solid fa-trash\"></i> Удалить</p>\r\n\t\t\t<button class=\"tsclose\" closeremovecontract><i class=\"fa-solid fa-xmark\"></i></button>\r\n\t\t</div>\r\n\t\t\r\n\t\t<table>\r\n\t\t\t<tr>\r\n\t\t\t\t<td><strong class=\"fz10px\">{{object_number}}</strong></td>\r\n\t\t\t\t<td><p class=\"fz10px\">{{title}}</p></td>\r\n\t\t\t\t<td>\r\n\t\t\t\t\t<div class=\"scrollblock scrollblock-light h4rem fz10px\">{{titul}}</div>\r\n\t\t\t\t</td>\r\n\t\t\t</tr>\r\n\t\t</table>\r\n\t</div>\r\n\t\r\n\t<div class=\"timesheetcard__chatblock tchat\">\r\n\t\t<ul class=\"tchat__list\" tchat></ul>\r\n\t\t\r\n\t\t<div class=\"tchat__form\" noswipe>\r\n\t\t\t<div class=\"tchat__input\" contenteditable placeholder=\"Сообщение...\" tchatmess ddr-action=\"setBtnStat|setToEnter:{{timesheet_contract_id}}\"></div>\r\n\t\t\t<button class=\"tchat__btn\" ddr-click=\"teamAddComment:timesheet_contract_id\" noswipe title=\"Отправить\" ddr-action=\"sendMess\" disabled><i class=\"fa fa-paper-plane\"></i></button>\r\n\t\t</div>\r\n\t</div>\r\n</li>");
 
 /***/ }),
 
@@ -55014,7 +55014,7 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony default export */ __webpack_exports__["default"] = ("<div class=\"timesheetcard\" ddr-class=\"{'timesheetcard_today': isToday}\" timesheetcard>\r\n\t<div class=\"timesheetcard__top\">\r\n\t\t<h3 ddr-class=\"{'color-red': isWeekEnd}\" class=\"timesheetcard__title\">{{humanDate}}</h3>\r\n\t\t<p class=\"timesheetcard__subtitle\">{{weekDay}}</p>\r\n\t</div>\r\n\t\r\n\t<div class=\"timesheetcard__content\">\r\n\t\t<div class=\"timesheetcard__teams scrollblock scrollblock-hidescroll\" teams>\r\n\t\t\t<div ddr-for=\"team in teams\" class=\"timesheetcard__team\" team>\r\n\t\t\t\t<div class=\"timesheetcard__search\" search>\r\n\t\t\t\t\t<div class=\"input normal-input normal-input-search normal-input_iconed w100\" style=\"box-shadow: 0 0 8px 0 #0000000a;\">\t\r\n\t\t\t\t\t\t<input type=\"search\" value=\"\" placeholder=\"Поиск...\" autocomplete=\"off\" inpgroup=\"normal\" searchinput ddr-input=\"teamSearchContracts\">\r\n\t\t\t\t\t\t<div class=\"postfix_icon\">\r\n\t\t\t\t\t\t\t<i class=\"fa-solid fa-magnifying-glass\"></i>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t<div class=\"normal-input__errorlabel noselect\" errorlabel=\"\"></div>\r\n\t\t\t\t\t\t<div class=\"timesheetcard__searchresutls searchresutls\"searchresutls></div>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t\t\r\n\t\t\t\t<div class=\"row justify-content-between align-items-center h3rem timesheetcard__panel\">\r\n\t\t\t\t\t<div class=\"col-auto\">\r\n\t\t\t\t\t\t<strong class=\"timesheetcard__master\">{{team.master.full_name}}</strong>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"col-auto\">\r\n\t\t\t\t\t\t<button class=\"timesheetcard__btn\" ddr-click=\"teamOpenSearch:team.id,day\" noswipe title=\"Добавить договор\">\r\n\t\t\t\t\t\t\t<i class=\"fa-solid fa-plus\"></i>\r\n\t\t\t\t\t\t</button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t\t\r\n\t\t\t\t<ul ddr-if=\"team.contracts\" class=\"timesheetcard__contracts\" contractslist>\r\n\t\t\t\t\t<li ddr-for=\"contract in team.contracts\" contract>\r\n\t\t\t\t\t\t<div class=\"table timesheetcard__table\">\r\n\t\t\t\t\t\t\t<table>\r\n\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t<td><strong class=\"fz10px\">{{contract.object_number}}</strong></td>\r\n\t\t\t\t\t\t\t\t\t<td><p class=\"fz10px\">{{contract.title}}</p></td>\r\n\t\t\t\t\t\t\t\t\t<td>\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"scrollblock scrollblock-light h4rem fz10px\">{{contract.titul}}</div>\r\n\t\t\t\t\t\t\t\t\t</td>\r\n\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t</table>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t<div class=\"timesheetcard__chatblock tchat\">\r\n\t\t\t\t\t\t\t<ul class=\"tchat__list\" tchat>\r\n\t\t\t\t\t\t\t\t<li ddr-for=\"mess in contract.chat\" class=\"tchat__message tmessage\" ddr-class=\"{'tmessage_self': mess.self}\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"row justify-content-between mb2px\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-auto\"><strong class=\"tmessage__name\">{{mess.from.fname}} {{mess.from.sname}}</strong></div>\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-auto\"><small class=\"tmessage__date\">{{mess.created_at}}</small></div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t<p class=\"tmessage__message format\">{{mess.message}}</p>\r\n\t\t\t\t\t\t\t\t</li>\r\n\t\t\t\t\t\t\t</ul>\r\n\t\t\t\t\t\t\t\r\n\t\t\t\t\t\t\t<div class=\"tchat__form\" noswipe>\r\n\t\t\t\t\t\t\t\t<div class=\"tchat__input\" contenteditable placeholder=\"Сообщение...\" tchatmess ddr-action=\"setBtnStat|setToEnter:{{contract.timesheet_contract_id}}\"></div>\r\n\t\t\t\t\t\t\t\t<button class=\"tchat__btn\" ddr-click=\"teamAddComment:contract.timesheet_contract_id\" noswipe title=\"Отправить\" ddr-action=\"sendMess\" disabled><i class=\"fa fa-paper-plane\"></i></button>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\t\r\n\t\t\t\t\t</li>\r\n\t\t\t\t</ul>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n\t\t\r\n\t<div class=\"timesheetcard__bottom\">\r\n\t\t<div class=\"button small-button button-light\">\r\n\t\t\t<button class=\"pointer\" ddr-click=\"getTeamList:day\" noswipe>Добавить бригаду</button>\r\n\t\t</div>\r\n\t</div>\r\n\t\r\n\t<div class=\"timesheetcard__staffwrap\" staffwrap>\r\n\t\t<p class=\"timesheetcard__stafftitle\">Выберите Бригадира <i class=\"fa fa-close\" title=\"Отмена\"></i></p>\r\n\t\t<div stafflist></div>\r\n\t</div>\r\n</div>");
+/* harmony default export */ __webpack_exports__["default"] = ("<div class=\"timesheetcard\" ddr-class=\"{'timesheetcard_today': isToday}\" timesheetcard>\r\n\t<div class=\"timesheetcard__top\">\r\n\t\t<h3 ddr-class=\"{'color-red': isWeekEnd}\" class=\"timesheetcard__title\">{{humanDate}}</h3>\r\n\t\t<p class=\"timesheetcard__subtitle\">{{weekDay}}</p>\r\n\t</div>\r\n\t\r\n\t<div class=\"timesheetcard__content\">\r\n\t\t<div class=\"timesheetcard__teams scrollblock scrollblock-hidescroll\" teams>\r\n\t\t\t<div ddr-for=\"team in teams\" class=\"timesheetcard__team\" team>\r\n\t\t\t\t<div class=\"timesheetcard__search\" search>\r\n\t\t\t\t\t<div class=\"input normal-input normal-input-search normal-input_iconed w100\" style=\"box-shadow: 0 0 8px 0 #0000000a;\">\t\r\n\t\t\t\t\t\t<input type=\"search\" value=\"\" placeholder=\"Поиск...\" autocomplete=\"off\" inpgroup=\"normal\" searchinput ddr-input=\"teamSearchContracts\">\r\n\t\t\t\t\t\t<div class=\"postfix_icon\">\r\n\t\t\t\t\t\t\t<i class=\"fa-solid fa-magnifying-glass\"></i>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t<div class=\"normal-input__errorlabel noselect\" errorlabel=\"\"></div>\r\n\t\t\t\t\t\t<div class=\"timesheetcard__searchresutls searchresutls\"searchresutls></div>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t\t\r\n\t\t\t\t<div class=\"timesheetcard__remove-sticky\">\r\n\t\t\t\t\t<div class=\"timesheetcard__remove timesheetcard__remove-team h3rem\" removeteamblock>\r\n\t\t\t\t\t\t<p class=\"tsremove\" removeteam><i class=\"fa-solid fa-trash\"></i> Удалить</p>\r\n\t\t\t\t\t\t<button class=\"tsclose\" closeremoveteam><i class=\"fa-solid fa-xmark\"></i></button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t\t\t\r\n\t\t\t\t\r\n\t\t\t\t<div class=\"row justify-content-between align-items-center h3rem timesheetcard__panel\"\r\n\t\t\t\t\tonpointerdown=\"longPressStart(event)\"\r\n\t\t\t\t\tonpointermove=\"longPressMove(event)\"\r\n\t\t\t        onpointerup=\"longPressCancel(event)\"\r\n\t\t\t        onpointerleave=\"longPressCancel(event)\"\r\n\t\t\t        data-onhold=\"tsRemoveTeam:{{team.id}}\"\r\n\t\t\t        data-duration=\"600\"\r\n\t\t\t        contextmenu=\"tsRemoveTeamContext:{{team.id}}\"\r\n\t\t\t        >\r\n\t\t\t\t\t<div class=\"col-auto\">\r\n\t\t\t\t\t\t<strong class=\"timesheetcard__master\">{{team.master.full_name}}</strong>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"col-auto\">\r\n\t\t\t\t\t\t<button class=\"timesheetcard__btn\" ddr-click=\"teamOpenSearch:team.id,day\" noswipe title=\"Добавить договор\">\r\n\t\t\t\t\t\t\t<i class=\"fa-solid fa-plus\"></i>\r\n\t\t\t\t\t\t</button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t\t\r\n\t\t\t\t<ul ddr-if=\"team.contracts\" class=\"timesheetcard__contracts\" contractslist>\r\n\t\t\t\t\t<li ddr-for=\"contract in team.contracts\" contract>\r\n\t\t\t\t\t\t<div class=\"table timesheetcard__table\"\r\n\t\t\t\t\t\t\tcontracttable\r\n\t\t\t\t\t\t\tonpointerdown=\"longPressStart(event)\"\r\n\t\t\t\t\t\t\tonpointermove=\"longPressMove(event)\"\r\n\t\t\t\t\t        onpointerup=\"longPressCancel(event)\"\r\n\t\t\t\t\t        onpointerleave=\"longPressCancel(event)\"\r\n\t\t\t\t\t        data-onhold=\"tsRemoveContract:{{contract.timesheet_contract_id}}\"\r\n\t\t\t\t\t        data-duration=\"600\"\r\n\t\t\t\t\t        contextmenu=\"tsRemoveContractContext:{{contract.timesheet_contract_id}}\"\r\n\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t\r\n\t\t\t\t\t\t\t<div class=\"timesheetcard__remove h4rem-4px\" removecontractblock>\r\n\t\t\t\t\t\t\t\t<p class=\"tsremove\" removecontract><i class=\"fa-solid fa-trash\"></i> Удалить</p>\r\n\t\t\t\t\t\t\t\t<button class=\"tsclose\" closeremovecontract><i class=\"fa-solid fa-xmark\"></i></button>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\r\n\t\t\t\t\t\t\t<table>\r\n\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t<td><strong class=\"fz10px\">{{contract.object_number}}</strong></td>\r\n\t\t\t\t\t\t\t\t\t<td><p class=\"fz10px\">{{contract.title}}</p></td>\r\n\t\t\t\t\t\t\t\t\t<td>\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"scrollblock scrollblock-light h4rem fz10px\">{{contract.titul}}</div>\r\n\t\t\t\t\t\t\t\t\t</td>\r\n\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t</table>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\r\n\t\t\t\t\t\t<div class=\"timesheetcard__chatblock tchat\">\r\n\t\t\t\t\t\t\t<ul class=\"tchat__list\" tchat>\r\n\t\t\t\t\t\t\t\t<li\r\n\t\t\t\t\t\t\t\t\tddr-for=\"mess in contract.chat\"\r\n\t\t\t\t\t\t\t\t\tclass=\"tchat__message tmessage\"\r\n\t\t\t\t\t\t\t\t\tddr-class=\"{'tmessage_self': mess.self}\"\r\n\t\t\t\t\t\t\t\t\tonpointerdown=\"longPressStart(event)\"\r\n\t\t\t\t\t\t\t\t\tonpointermove=\"longPressMove(event)\"\r\n\t\t\t\t\t\t\t        onpointerup=\"longPressCancel(event)\"\r\n\t\t\t\t\t\t\t        onpointerleave=\"longPressCancel(event)\"\r\n\t\t\t\t\t\t\t        data-onhold=\"tsRemoveMessage:{{mess.id}}\"\r\n\t\t\t\t\t\t\t        data-duration=\"600\"\r\n\t\t\t\t\t\t\t        contextmenu=\"tsRemoveMessageContext:{{mess.id}}\"\r\n\t\t\t\t\t\t\t\t\tmessage\r\n\t\t\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t\t\r\n\t\t\t\t\t\t\t\t\t<div class=\"timesheetcard__remove h100\" removemessageblock>\r\n\t\t\t\t\t\t\t\t\t\t<p class=\"tsremove\" removemessage><i class=\"fa-solid fa-trash\"></i> Удалить</p>\r\n\t\t\t\t\t\t\t\t\t\t<button class=\"tsclose\" closeremovemessage><i class=\"fa-solid fa-xmark\"></i></button>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\r\n\t\t\t\t\t\t\t\t\t<div class=\"row justify-content-between mb2px\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-auto\"><strong class=\"tmessage__name\">{{mess.from.fname}} {{mess.from.sname}}</strong></div>\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-auto\"><small class=\"tmessage__date\">{{mess.created_at}}</small></div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t<p class=\"tmessage__message format\">{{mess.message}}</p>\r\n\t\t\t\t\t\t\t\t</li>\r\n\t\t\t\t\t\t\t</ul>\r\n\t\t\t\t\t\t\t\r\n\t\t\t\t\t\t\t<div class=\"tchat__form\" noswipe>\r\n\t\t\t\t\t\t\t\t<div class=\"tchat__input\" contenteditable placeholder=\"Сообщение...\" tchatmess ddr-action=\"setBtnStat|setToEnter:{{contract.timesheet_contract_id}}\"></div>\r\n\t\t\t\t\t\t\t\t<button class=\"tchat__btn\" ddr-click=\"teamAddComment:contract.timesheet_contract_id\" noswipe title=\"Отправить\" ddr-action=\"sendMess\" disabled><i class=\"fa fa-paper-plane\"></i></button>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\t\r\n\t\t\t\t\t</li>\r\n\t\t\t\t</ul>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n\t\t\r\n\t<div class=\"timesheetcard__bottom\">\r\n\t\t<div class=\"button small-button button-light\">\r\n\t\t\t<button class=\"pointer\" ddr-click=\"getTeamList:day\" noswipe>Добавить бригаду</button>\r\n\t\t</div>\r\n\t</div>\r\n\t\r\n\t<div class=\"timesheetcard__staffwrap\" staffwrap>\r\n\t\t<p class=\"timesheetcard__stafftitle\">Выберите Бригадира <i class=\"fa fa-close\" title=\"Отмена\"></i></p>\r\n\t\t<div stafflist></div>\r\n\t</div>\r\n</div>");
 
 /***/ }),
 
@@ -55038,7 +55038,7 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony default export */ __webpack_exports__["default"] = ("<div class=\"timesheetcard__team\" team>\t\r\n\t<div class=\"timesheetcard__search\" search>\r\n\t\t<div class=\"input normal-input normal-input-search normal-input_iconed w100\" style=\"box-shadow: 0 0 8px 0 #0000000a;\">\t\r\n\t\t\t<input type=\"search\" value=\"\" placeholder=\"Поиск...\" autocomplete=\"off\" inpgroup=\"normal\" searchinput ddr-input=\"teamSearchContracts\">\r\n\t\t\t<div class=\"postfix_icon\">\r\n\t\t\t\t<i class=\"fa-solid fa-magnifying-glass\"></i>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"normal-input__errorlabel noselect\" errorlabel=\"\"></div>\r\n\t\t\t<div class=\"timesheetcard__searchresutls searchresutls\"searchresutls></div>\r\n\t\t</div>\r\n\t</div>\r\n\t\r\n\t<div class=\"row justify-content-between align-items-center h3rem timesheetcard__panel\">\r\n\t\t<div class=\"col-auto\">\r\n\t\t\t<strong class=\"timesheetcard__master\">{{staffFullName}}</strong>\r\n\t\t</div>\r\n\t\t<div class=\"col-auto\">\r\n\t\t\t<button class=\"timesheetcard__btn\" ddr-click=\"teamOpenSearch:teamId,day\" noswipe title=\"Добавить договор\">\r\n\t\t\t\t<i class=\"fa-solid fa-plus\"></i>\r\n\t\t\t</button>\r\n\t\t</div>\r\n\t</div>\r\n\t\r\n\t<ul class=\"timesheetcard__contracts\" contractslist></ul>\r\n</div>");
+/* harmony default export */ __webpack_exports__["default"] = ("<div class=\"timesheetcard__team\" team>\t\r\n\t<div class=\"timesheetcard__search\" search>\r\n\t\t<div class=\"input normal-input normal-input-search normal-input_iconed w100\" style=\"box-shadow: 0 0 8px 0 #0000000a;\">\t\r\n\t\t\t<input type=\"search\" value=\"\" placeholder=\"Поиск...\" autocomplete=\"off\" inpgroup=\"normal\" searchinput ddr-input=\"teamSearchContracts\">\r\n\t\t\t<div class=\"postfix_icon\">\r\n\t\t\t\t<i class=\"fa-solid fa-magnifying-glass\"></i>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"normal-input__errorlabel noselect\" errorlabel=\"\"></div>\r\n\t\t\t<div class=\"timesheetcard__searchresutls searchresutls\"searchresutls></div>\r\n\t\t</div>\r\n\t</div>\r\n\t\r\n\t<div class=\"timesheetcard__remove-sticky\">\r\n\t\t<div class=\"timesheetcard__remove timesheetcard__remove-team h3rem\" removeteamblock>\r\n\t\t\t<p class=\"tsremove\" removeteam><i class=\"fa-solid fa-trash\"></i> Удалить</p>\r\n\t\t\t<button class=\"tsclose\" closeremoveteam><i class=\"fa-solid fa-xmark\"></i></button>\r\n\t\t</div>\r\n\t</div>\r\n\t\r\n\t<div class=\"row justify-content-between align-items-center h3rem timesheetcard__panel\"\r\n\t\tonpointerdown=\"longPressStart(event)\"\r\n\t\tonpointermove=\"longPressMove(event)\"\r\n        onpointerup=\"longPressCancel(event)\"\r\n        onpointerleave=\"longPressCancel(event)\"\r\n        data-onhold=\"tsRemoveTeam:{{teamId}}\"\r\n        data-duration=\"600\"\r\n        contextmenu=\"tsRemoveTeamContext:{{teamId}}\"\r\n        >\r\n\t\t<div class=\"col-auto\">\r\n\t\t\t<strong class=\"timesheetcard__master\">{{staffFullName}}</strong>\r\n\t\t</div>\r\n\t\t<div class=\"col-auto\">\r\n\t\t\t<button class=\"timesheetcard__btn\" ddr-click=\"teamOpenSearch:teamId,day\" noswipe title=\"Добавить договор\">\r\n\t\t\t\t<i class=\"fa-solid fa-plus\"></i>\r\n\t\t\t</button>\r\n\t\t</div>\r\n\t</div>\r\n\t\r\n\t<ul class=\"timesheetcard__contracts\" contractslist></ul>\r\n</div>");
 
 /***/ }),
 
@@ -60569,6 +60569,18 @@ var __webpack_exports__ = {};
 /*!******************************!*\
   !*** ./resources/js/site.js ***!
   \******************************/
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
 __webpack_require__(/*! ./bootstrap */ "./resources/js/bootstrap.js");
 
 __webpack_require__(/*! @plugins/notify.min */ "./resources/js/plugins/notify.min.js");
@@ -60636,6 +60648,73 @@ $.notify.defaults({
 // `scrollstop` event to 650ms (default is 250ms).
 
 $.event.special.scrollstop.latency = 20;
+var SWIPE_THRESHOLD = 15;
+
+window.longPressStart = function (event) {
+  // Игнорируем все, кроме касаний пальцем
+  if (event.pointerType !== 'touch') return;
+  var element = event.currentTarget;
+  clearTimeout(element._pressTimer); // Сбрасываем старый таймер на всякий случай
+  // --- НОВОЕ: Запоминаем начальные координаты ---
+
+  element._pressStartX = event.clientX;
+  element._pressStartY = event.clientY; // ---
+
+  var onHoldData = element.dataset.onhold;
+  var duration = parseInt(element.dataset.duration, 10) || 1000;
+  if (!onHoldData) return;
+  var actionName = onHoldData;
+  var extraArgs = [];
+  var separatorIndex = onHoldData.indexOf(':');
+
+  if (separatorIndex !== -1) {
+    actionName = onHoldData.substring(0, separatorIndex);
+    extraArgs = onHoldData.substring(separatorIndex + 1).split(',').map(function (arg) {
+      return arg.trim();
+    });
+  }
+
+  if (typeof $ !== 'undefined' && typeof $[actionName] === 'function') {
+    element._pressTimer = setTimeout(function () {
+      var _$;
+
+      var finalArgs = [element].concat(_toConsumableArray(extraArgs));
+
+      (_$ = $)[actionName].apply(_$, _toConsumableArray(finalArgs)); // Очищаем координаты после выполнения, чтобы избежать ложных срабатываний
+
+
+      delete element._pressStartX;
+      delete element._pressStartY;
+    }, duration);
+  } else {
+    console.error("\u041E\u0448\u0438\u0431\u043A\u0430: \u0444\u0443\u043D\u043A\u0446\u0438\u044F $.".concat(actionName, " \u043D\u0435 \u043D\u0430\u0439\u0434\u0435\u043D\u0430."));
+  }
+}; // --- НОВАЯ ФУНКЦИЯ ДЛЯ ОТСЛЕЖИВАНИЯ СВАЙПА ---
+
+
+window.longPressMove = function (event) {
+  var element = event.currentTarget; // Если начальные координаты не записаны (т.е. нажатие не началось), выходим
+
+  if (typeof element._pressStartX === 'undefined') return;
+  var deltaX = Math.abs(event.clientX - element._pressStartX);
+  var deltaY = Math.abs(event.clientY - element._pressStartY); // Если палец сдвинулся больше порога, отменяем долгое нажатие
+
+  if (deltaX > SWIPE_THRESHOLD || deltaY > SWIPE_THRESHOLD) {
+    //console.log('Обнаружен свайп, долгое нажатие отменено.');
+    longPressCancel(event);
+  }
+}; // ---
+
+
+window.longPressCancel = function (event) {
+  var element = event.currentTarget;
+  clearTimeout(element._pressTimer); // --- НОВОЕ: Очищаем сохраненные координаты при отмене ---
+  // Это важно, чтобы сбросить состояние для следующего нажатия
+
+  delete element._pressStartX;
+  delete element._pressStartY; // ---
+};
+
 $(function () {
   $('body').on('contextmenu', function (e) {
     e.preventDefault();

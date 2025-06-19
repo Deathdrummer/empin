@@ -10,7 +10,22 @@
 		</div>
 	</div>
 	
-	<div class="row justify-content-between align-items-center h3rem timesheetcard__panel">
+	<div class="timesheetcard__remove-sticky">
+		<div class="timesheetcard__remove timesheetcard__remove-team h3rem" removeteamblock>
+			<p class="tsremove" removeteam><i class="fa-solid fa-trash"></i> Удалить</p>
+			<button class="tsclose" closeremoveteam><i class="fa-solid fa-xmark"></i></button>
+		</div>
+	</div>
+	
+	<div class="row justify-content-between align-items-center h3rem timesheetcard__panel"
+		onpointerdown="longPressStart(event)"
+		onpointermove="longPressMove(event)"
+        onpointerup="longPressCancel(event)"
+        onpointerleave="longPressCancel(event)"
+        data-onhold="tsRemoveTeam:{{teamId}}"
+        data-duration="600"
+        contextmenu="tsRemoveTeamContext:{{teamId}}"
+        >
 		<div class="col-auto">
 			<strong class="timesheetcard__master">{{staffFullName}}</strong>
 		</div>
