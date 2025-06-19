@@ -87,8 +87,6 @@ class UploadFilesController extends Controller {
 			->offset($offset * $limit)
 			->get();
 			
-			toLog($contractfiles);
-		
 		if (!$contractfiles) return response()->json(false);
 		
 		
