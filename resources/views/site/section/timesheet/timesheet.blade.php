@@ -50,7 +50,7 @@
 		
 	
 	
-	
+
 	
 	
 	// получить список сотрудников для добавления бригады
@@ -317,6 +317,250 @@
 	
 	
 	
+	
+	
+	
+	
+	
+	
+	
+	
+	// ---------------------------------------------------------------------------------------------------------------- Удаление бригады
+	$.tsRemoveTeam = (item, id) => {
+		const tsCard = $(item).closest('[timesheetcard]'),
+			teamBlock = $(item).closest('[team]'),
+			removeTeamBlock = $(teamBlock).find('[removeteamblock]');
+		
+		$(tsCard).find('.timesheetcard__remove-visible').removeClass('timesheetcard__remove-visible');
+		
+		$(removeTeamBlock).addClass('timesheetcard__remove-visible');
+		
+		$(removeTeamBlock).find('[closeremoveteam]').one(tapEvent, () => {
+			$(removeTeamBlock).removeClass('timesheetcard__remove-visible');
+			$(removeTeamBlock).find('[removeteam]').off(tapEvent);
+		});
+		
+		$(removeTeamBlock).find('[removeteam]').one(tapEvent, async () => {
+			const {destroy} = $(teamBlock).ddrWait({iconHeight: '30px'});
+			const result = await removeTeam(id);
+			if (result) {
+				$(teamBlock).remove();
+				$.notify('Бригада успешно удалена!');
+				destroy();
+			} 
+		});
+	}
+	
+	
+	
+	
+	$.tsRemoveTeamContext = (item, id) => {
+		if (event.pointerType === 'touch') return;
+		return [
+			{
+				name: 'Удалить бригаду',
+				faIcon: 'fa-solid fa-trash',
+				onClick: async () => {
+					const teamBlock = $(item.target.selector).closest('[team]');
+					const {destroy} = $(teamBlock).ddrWait({iconHeight: '30px'});
+					const result = await removeTeam(id);
+					if (result) {
+						$(teamBlock).remove();
+						$.notify('Бригада успешно удалена!');
+						destroy();
+					} 
+				}
+			},
+		];
+	}
+	
+	
+	
+	let abortCtrlTeam;
+	async function removeTeam(teamId) {
+		if (abortCtrlTeam instanceof AbortController) abortCtrlTeam.abort();
+		abortCtrlTeam = new AbortController();
+		
+		const {data, error, status, headers} = await axiosQuery('delete', 'site/timesheet/team', {
+			id: Number(teamId)
+		}, 'json', abortCtrlTeam);
+		
+		if (error || !data) {
+			console.error(error);
+			$.notify(error?.message, 'error');
+			return false;
+		}
+		
+		return true;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	// ---------------------------------------------------------------------------------------------------------------- Удаление договора
+	$.tsRemoveContract = (item, tsContrId) => {
+		const tsCard = $(item).closest('[timesheetcard]'),
+			contract = $(item).closest('[contract]'),
+			contractBlock = $(contract).find('[contracttable]'),
+			removeContractBlock = $(contract).find('[removecontractblock]');
+		
+		$(tsCard).find('.timesheetcard__remove-visible').removeClass('timesheetcard__remove-visible');
+		
+		$(removeContractBlock).addClass('timesheetcard__remove-visible');
+		
+		$(removeContractBlock).find('[closeremovecontract]').one(tapEvent, () => {
+			$(removeContractBlock).removeClass('timesheetcard__remove-visible');
+			$(removeContractBlock).find('[removecontract]').off(tapEvent);
+		});
+		
+		$(removeContractBlock).find('[removecontract]').one(tapEvent, async () => {
+			const {destroy} = $(contract).ddrWait({iconHeight: '30px'});
+			const result = await removeContract(tsContrId);
+			if (result) {
+				$(contract).remove();
+				$.notify('Договор успешно удален!');
+				destroy();
+			} 
+		});
+	}
+	
+	
+	
+	
+	$.tsRemoveContractContext = (item, tsContrId) => {
+		if (event.pointerType === 'touch') return;
+		return [
+			{
+				name: 'Удалить договор',
+				faIcon: 'fa-solid fa-trash',
+				onClick: async () => {
+					const contract = $(item.target.selector).closest('[contract]'),
+						contractBlock = $(contract).find('[contracttable]');
+						
+					const {destroy} = $(contractBlock).ddrWait({iconHeight: '30px'});
+					const result = await removeContract(tsContrId);
+					if (result) {
+						$(contractBlock).remove();
+						$.notify('Договор успешно удален!');
+						destroy();
+					} 
+				}
+			},
+		];
+	}
+	
+	
+	
+	
+	let abortCtrlContract;
+	async function removeContract(tsContrId) {
+		if (abortCtrlContract instanceof AbortController) abortCtrlContract.abort();
+		abortCtrlContract = new AbortController();
+		
+		const {data, error, status, headers} = await axiosQuery('delete', 'site/timesheet/contract', {
+			timesheet_contract_id: Number(tsContrId)
+		}, 'json', abortCtrlContract);
+		
+		if (error || !data) {
+			console.error(error);
+			$.notify(error?.message, 'error');
+			return false;
+		}
+		
+		return true;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	// ---------------------------------------------------------------------------------------------------------------- Удаление сообщения
+	$.tsRemoveMessage = (item, tsMessId) => {
+		const tsCard = $(item).closest('[timesheetcard]'),
+			messageBlock = $(item).closest('[message]'),
+			removeMessageBlock = $(messageBlock).find('[removemessageblock]');
+		
+		$(tsCard).find('.timesheetcard__remove-visible').removeClass('timesheetcard__remove-visible');
+		
+		$(removeMessageBlock).addClass('timesheetcard__remove-visible');
+		
+		$(removeMessageBlock).find('[closeremovemessage]').one(tapEvent, () => {
+			$(removeMessageBlock).removeClass('timesheetcard__remove-visible');
+			$(removeMessageBlock).find('[removemessage]').off(tapEvent);
+		});
+		
+		$(removeMessageBlock).find('[removemessage]').one(tapEvent, async () => {
+			const {destroy} = $(messageBlock).ddrWait({iconHeight: '30px'});
+			const result = await removeMessage(tsMessId);
+			if (result) {
+				$(messageBlock).remove();
+				$.notify('Сообщение успешно удалено!');
+				destroy();
+			} 
+		});
+	}
+	
+	
+	
+	
+	$.tsRemoveMessageContext = (item, tsMessId) => {
+		if (event.pointerType === 'touch') return;
+		return [
+			{
+				name: 'Удалить договор',
+				faIcon: 'fa-solid fa-trash',
+				onClick: async () => {
+					const messageBlock = $(item.target.selector).closest('[message]');
+					const {destroy} = $(messageBlock).ddrWait({iconHeight: '30px'});
+					const result = await removeMessage(tsMessId);
+					if (result) {
+						$(messageBlock).remove();
+						$.notify('Сообщение успешно удалено!');
+						destroy();
+					} 
+				}
+			},
+		];
+	}
+	
+	
+	
+	
+	let abortCtrlMessage;
+	async function removeMessage(tsMessId) {
+		if (abortCtrlMessage instanceof AbortController) abortCtrlMessage.abort();
+		abortCtrlMessage = new AbortController();
+		
+		const {data, error, status, headers} = await axiosQuery('delete', 'site/timesheet/comment', {
+			mess_id: Number(tsMessId)
+		}, 'json', abortCtrlMessage);
+		
+		if (error || !data) {
+			console.error(error);
+			$.notify(error?.message, 'error');
+			return false;
+		}
+		
+		return true;
+	}
 	
 	
 	

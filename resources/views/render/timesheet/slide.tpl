@@ -18,7 +18,23 @@
 					</div>
 				</div>
 				
-				<div class="row justify-content-between align-items-center h3rem timesheetcard__panel">
+				<div class="timesheetcard__remove-sticky">
+					<div class="timesheetcard__remove timesheetcard__remove-team h3rem" removeteamblock>
+						<p class="tsremove" removeteam><i class="fa-solid fa-trash"></i> Удалить</p>
+						<button class="tsclose" closeremoveteam><i class="fa-solid fa-xmark"></i></button>
+					</div>
+				</div>
+					
+				
+				<div class="row justify-content-between align-items-center h3rem timesheetcard__panel"
+					onpointerdown="longPressStart(event)"
+					onpointermove="longPressMove(event)"
+			        onpointerup="longPressCancel(event)"
+			        onpointerleave="longPressCancel(event)"
+			        data-onhold="tsRemoveTeam:{{team.id}}"
+			        data-duration="600"
+			        contextmenu="tsRemoveTeamContext:{{team.id}}"
+			        >
 					<div class="col-auto">
 						<strong class="timesheetcard__master">{{team.master.full_name}}</strong>
 					</div>
@@ -31,7 +47,22 @@
 				
 				<ul ddr-if="team.contracts" class="timesheetcard__contracts" contractslist>
 					<li ddr-for="contract in team.contracts" contract>
-						<div class="table timesheetcard__table">
+						<div class="table timesheetcard__table"
+							contracttable
+							onpointerdown="longPressStart(event)"
+							onpointermove="longPressMove(event)"
+					        onpointerup="longPressCancel(event)"
+					        onpointerleave="longPressCancel(event)"
+					        data-onhold="tsRemoveContract:{{contract.timesheet_contract_id}}"
+					        data-duration="600"
+					        contextmenu="tsRemoveContractContext:{{contract.timesheet_contract_id}}"
+							>
+								
+							<div class="timesheetcard__remove h4rem-4px" removecontractblock>
+								<p class="tsremove" removecontract><i class="fa-solid fa-trash"></i> Удалить</p>
+								<button class="tsclose" closeremovecontract><i class="fa-solid fa-xmark"></i></button>
+							</div>
+							
 							<table>
 								<tr>
 									<td><strong class="fz10px">{{contract.object_number}}</strong></td>
@@ -42,9 +73,28 @@
 								</tr>
 							</table>
 						</div>
+						
 						<div class="timesheetcard__chatblock tchat">
 							<ul class="tchat__list" tchat>
-								<li ddr-for="mess in contract.chat" class="tchat__message tmessage" ddr-class="{'tmessage_self': mess.self}">
+								<li
+									ddr-for="mess in contract.chat"
+									class="tchat__message tmessage"
+									ddr-class="{'tmessage_self': mess.self}"
+									onpointerdown="longPressStart(event)"
+									onpointermove="longPressMove(event)"
+							        onpointerup="longPressCancel(event)"
+							        onpointerleave="longPressCancel(event)"
+							        data-onhold="tsRemoveMessage:{{mess.id}}"
+							        data-duration="600"
+							        contextmenu="tsRemoveMessageContext:{{mess.id}}"
+									message
+									>
+									
+									<div class="timesheetcard__remove h100" removemessageblock>
+										<p class="tsremove" removemessage><i class="fa-solid fa-trash"></i> Удалить</p>
+										<button class="tsclose" closeremovemessage><i class="fa-solid fa-xmark"></i></button>
+									</div>
+									
 									<div class="row justify-content-between mb2px">
 										<div class="col-auto"><strong class="tmessage__name">{{mess.from.fname}} {{mess.from.sname}}</strong></div>
 										<div class="col-auto"><small class="tmessage__date">{{mess.created_at}}</small></div>

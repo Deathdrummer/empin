@@ -8422,7 +8422,7 @@ section {
 .timesheetcard__panel {
   position: sticky;
   top: 0px;
-  z-index: 1;
+  z-index: 2;
   background-color: #fff;
   padding-left: 3px;
   padding-right: 3px;
@@ -8459,6 +8459,7 @@ section {
   display: inline-block;
   padding-left: 10px;
   padding-right: 10px;
+  transform: translateY(-3px);
 }
 .timesheetcard__content {
   flex: 1 0 auto;
@@ -8638,6 +8639,65 @@ section {
 .timesheetcard .searchresutls__table tr td:nth-child(2) {
   width: 90px;
 }
+.timesheetcard__remove {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  background-color: rgba(251, 226, 226, 0.6392156863);
+  backdrop-filter: blur(2px);
+  border-radius: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.16s;
+}
+.timesheetcard__remove-sticky {
+  position: sticky;
+  height: 0;
+  right: 0;
+  top: 0px;
+  z-index: 3;
+  width: 100%;
+}
+.timesheetcard__remove-team {
+  z-index: 3;
+  position: absolute;
+  inset: 0;
+}
+.timesheetcard__remove-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+.timesheetcard__remove .tsclose {
+  position: absolute;
+  right: 3px;
+  padding: 0;
+  margin: 0;
+  background: none;
+  border: none;
+  font-size: 16px;
+  line-height: 16px;
+  height: 20px;
+  padding: 2px 5px;
+  border-radius: 4px;
+  background: #d97979;
+}
+.timesheetcard__remove .tsclose i {
+  color: #fff;
+}
+.timesheetcard__remove .tsremove {
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: #d97979;
+  color: #fff;
+  font-size: 13px;
+}
+.timesheetcard__remove .tsremove i {
+  color: #fff;
+  font-size: 12px;
+}
 .timesheetcard__chat {
   margin-top: 1rem;
 }
@@ -8648,6 +8708,7 @@ section {
   margin-bottom: 3px;
 }
 .timesheetcard .tchat__message {
+  position: relative;
   background-color: rgba(255, 255, 255, 0.6588235294);
   border-radius: 5px;
   padding: 4px;

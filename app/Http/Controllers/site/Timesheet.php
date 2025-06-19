@@ -8,6 +8,7 @@ use App\Http\Resources\TimesheetTeamResource;
 use App\Models\Contract as ContractModel;
 use App\Models\Department;
 use App\Models\Staff;
+use App\Models\TimesheetChat;
 use App\Models\TimesheetContract;
 use App\Models\TimesheetTeam;
 use App\Services\Business\User as UserService;
@@ -78,6 +79,7 @@ class Timesheet extends Controller {
 		
 		
 		$teams = $teams->map(fn($group) => TimesheetTeamResource::collection($group)->resolve());
+		
 		
 		$daysData = [];
 		foreach ($indexes as $idx) {
@@ -158,6 +160,29 @@ class Timesheet extends Controller {
 	
 	
 	
+	/**
+	* 
+	* @param 
+	* @return 
+	*/
+	public function removeTeam(Request $request) {
+		$validFields = $request->validate([
+			'id' => 'required|integer',
+		]);
+		
+        $teamRecord = TimesheetTeam::find($validFields['id']);
+		
+        if (!$teamRecord) {
+            return response()->json(false);
+        }
+		
+        $teamRecord->delete();
+		
+        return response()->json(true);
+	}
+	
+	
+	
 	
 	
 	
@@ -183,6 +208,35 @@ class Timesheet extends Controller {
 		
 		return response()->json($contract->id);
 	}
+	
+	
+	
+	
+	
+	
+	/**
+	* 
+	* @param 
+	* @return 
+	*/
+	public function removeContract(Request $request) {
+		$validFields = $request->validate([
+			'timesheet_contract_id' => 'required|integer|exists:timesheet_contracts,id',
+		]);
+
+		$timesheetContract = TimesheetContract::find($validFields['timesheet_contract_id']);
+
+		if (!$timesheetContract) {
+			return response()->json(false);
+		}
+
+		$timesheetContract->delete();
+
+		return response()->json(true);
+	}
+	
+	
+	
 	
 	
 	
@@ -219,6 +273,33 @@ class Timesheet extends Controller {
 		
 		//return response()->json($comment);
 	}
+	
+	
+	
+	
+	/**
+	* 
+	* @param 
+	* @return 
+	*/
+	public function removeComment(Request $request) {
+		$validFields = $request->validate([
+			'mess_id' => 'required|integer|exists:timesheet_chat,id',
+		]);
+
+		$timesheetMess = TimesheetChat::find($validFields['mess_id']);
+
+		if (!$timesheetMess) {
+			return response()->json(false);
+		}
+
+		$timesheetMess->delete();
+
+		return response()->json(true);
+	}
+	
+	
+	
 	
 	
 	
