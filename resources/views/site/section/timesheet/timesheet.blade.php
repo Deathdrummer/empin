@@ -525,7 +525,7 @@
 		if (event.pointerType === 'touch') return;
 		return [
 			{
-				name: 'Удалить договор',
+				name: 'Удалить сообщение',
 				faIcon: 'fa-solid fa-trash',
 				onClick: async () => {
 					const messageBlock = $(item.target.selector).closest('[message]');
