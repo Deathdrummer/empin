@@ -275,6 +275,11 @@
 			fileNameOrig = d[1],
 			contractId = Number(d[2]); 
 		
+		if (!fileNameSys || !contractId) {
+			$.notify('Ошибка данных!', 'error');
+			return;
+		}
+		
 		openrowmenuTooltip = $(event.target).ddrTooltip({
 			//cls: 'w44rem',
 			placement: 'left-start',
@@ -290,6 +295,7 @@
 			onShow: async function({reference, popper, show, hide, destroy, waitDetroy, setContent, setData, setProps}) {
 
 				let content = '<ul>';
+					
 					content +=	'<li class="color-dark color-blue-hovered color-blue-active pointer" cfaction="download"><i class="fa-solid fa-download color-green fz16px"></i> Скачать</li>';
 					content +=	'<li class="mt3px color-dark color-red-hovered color-blue-active pointer" cfaction="remove"><i class="fa-solid fa-trash color-red fz16px"></i> Удалить</li>';
 					content += '</ul>';
@@ -670,10 +676,14 @@
 	
 	
 	async function downloadContractFile({fileNameSys = null, fileNameOrig = null, contractId = null}, cb) {
+		console.log(123);
 		if (!fileNameSys || !contractId) return;
 		$(this).setAttrib('disabled');
 
 		const {data, error, status, headers} = await axiosQuery('get', '/ajax/contracts_files', {filename: fileNameSys, contract_id: contractId}, 'blob');
+		
+		console.log({data, error, status, headers});
+		
 		if (error) {
 			$.notify('Не удалось загрузить данные! Возможно, не загружен файл шаблона.', 'error');
 			console.log(error?.message, error?.errors);
