@@ -1367,6 +1367,7 @@ class Contracts extends Controller {
 		
 		$tempVars = $templateProcessor->getVariables();
 		
+		
 		$hasEmptyVars = [];
 		
 		$setValuesData = [];
@@ -1375,6 +1376,8 @@ class Contracts extends Controller {
 			$removeSeparatorVariable = preg_replace('/#.+#/', '', $variable);
 			
 			foreach($buildContractsdata as $k => $buildContractdata) {
+				$hasEmptyVars = array_replace($hasEmptyVars, $this->_getEmptyDocxVars($buildContractdata, $tempVars));
+				
 				 $buildedVariable = preg_replace_callback('/\[([a-z_]+)\]/', function($matches) use($buildContractdata) {
 					return match(true) {
 						DdrDateTime::isValidDateTime($buildContractdata[$matches[1]] ?? '') => DdrDateTime::convertDateFormat($buildContractdata[$matches[1]]),
@@ -1434,6 +1437,8 @@ class Contracts extends Controller {
 		}
 		
 		
+		
+		
 		# для заголовков
 		$colums = ContractColums::getKeys();
 		$virtVars = VirtualVars::getKeys();
@@ -1449,11 +1454,6 @@ class Contracts extends Controller {
 		foreach ($virtVars as $virtVar) {
 			$varsTitlesMap['{'.$virtVar.'}'] = BusinessVirtualVars::run($virtVar, $buildContractsdata[0], $templateData['id']);
 		}
-		
-		
-		
-		
-		//$hasEmptyVars = $this->_getEptyVars($varsMap);
 		
 		$buildedExportFileName = str_replace(['\\', '/', ':', '*', '?', '"', '<', '>', '|'], '_', trim(Str::swap($varsTitlesMap, $templateData['export_name'] ?? $contractsData[0]['id'])));
 		$exportFilePath = "storage/{$buildedExportFileName}.{$templateData['file']['ext']}";
@@ -1730,6 +1730,51 @@ class Contracts extends Controller {
 		}, []); // Начальное значение - пустой массив
 		
 		return $finalKeys; 
+	}
+	
+	
+	
+	
+	
+	
+	/**
+	* 
+	* @param 
+	* @return 
+	*/
+	private function _getEmptyDocxVars($data, $keysToProcess) {
+		$cleanedKeys = array_map(function ($key) {
+			// Используем регулярное выражение, чтобы взять только ту часть строки,
+			// которая идет до одного из разделителей (||, ::, #)
+			if (preg_match('/^[^|:#]+/', $key, $matches)) {
+				return $matches[0];
+			}
+			return $key; // Возвращаем ключ как есть, если разделителей не найдено
+		}, $keysToProcess);
+		
+		$filteredVars = array_filter($cleanedKeys, function ($cleanedKey) use ($data) {
+			// Проверяем, существует ли такой ключ в основном массиве данных
+			if (!array_key_exists($cleanedKey, $data)) {
+				return false; // Если ключа нет, убираем его из результата
+			}
+
+			// Получаем значение, соответствующее этому ключу
+			$value = $data[$cleanedKey];
+
+			// Возвращаем true (оставить ключ), если значение null, '' или '-'
+			return $value === null || $value === '' || $value === '-';
+		});
+		
+		
+		
+		$result = array_combine(
+			$filteredVars,
+			array_map(function ($key) {
+				return ContractColums::hasKey($key) ? ContractColums::getValue($key) : '---';
+			}, $filteredVars)
+		);
+		
+		return $result;
 	}
 	
 	
