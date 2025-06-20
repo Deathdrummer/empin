@@ -1437,6 +1437,8 @@ class Contracts extends Controller {
 		}
 		
 		
+		
+		
 		# для заголовков
 		$colums = ContractColums::getKeys();
 		$virtVars = VirtualVars::getKeys();
@@ -1452,11 +1454,6 @@ class Contracts extends Controller {
 		foreach ($virtVars as $virtVar) {
 			$varsTitlesMap['{'.$virtVar.'}'] = BusinessVirtualVars::run($virtVar, $buildContractsdata[0], $templateData['id']);
 		}
-		
-		
-		
-		
-		//$hasEmptyVars = $this->_getEptyVars($varsMap);
 		
 		$buildedExportFileName = str_replace(['\\', '/', ':', '*', '?', '"', '<', '>', '|'], '_', trim(Str::swap($varsTitlesMap, $templateData['export_name'] ?? $contractsData[0]['id'])));
 		$exportFilePath = "storage/{$buildedExportFileName}.{$templateData['file']['ext']}";
