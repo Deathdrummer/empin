@@ -23,6 +23,7 @@ use App\Traits\Renderable;
 use App\Traits\Settingable;
 use Carbon\Carbon;
 use Error;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
@@ -1268,7 +1269,7 @@ class Contracts extends Controller {
 		if (!isset($templateData['file']['path']) || !isset($templateData['file']['ext'])) return response()->json(false);
 		
 		
-		[$exportFileName, $exportFilePath] = match($templateData['file']['ext']) {
+		[$exportFileName, $exportFilePath, $hasEmptyVars] = match($templateData['file']['ext']) {
 			'docx'	=> $this->_buildByDocxTemplate($contractsData, $templateData, $ranged),
 			'xlsx'	=> $this->_buildByXlsxTemplate($contractsData, $templateData, $ranged),
 			default	=> [null, null],
@@ -1279,7 +1280,10 @@ class Contracts extends Controller {
 			return false;
 		}
 		
-		return response()->download($exportFilePath, null, ['x-export-filename' => urlencode($exportFileName)])->deleteFileAfterSend();
+		return response()->download($exportFilePath, null, [
+			'x-export-filename' => urlencode($exportFileName),
+			'x-has-empty-vars' => json_encode($hasEmptyVars),
+		])->deleteFileAfterSend();
 	}
 	
 	
@@ -1316,6 +1320,33 @@ class Contracts extends Controller {
 	
 	
 	
+	/**
+	* 
+	* @param 
+	* @return 
+	*/
+	public function export_increment_count(Request $request):JsonResponse {
+		[
+			'template_id'	=> $templateId,
+		] = $request->validate([
+			'template_id'	=> 'required|numeric',
+		]);
+		
+		if (!$templateId) return response()->json(false);
+		$uploadСount = (int)$this->user->getSettings("upload-count.{$templateId}");
+		$stat = $this->user->setSetting("upload-count.{$templateId}", $uploadСount+1);
+		return response()->json($stat);
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	
@@ -1332,12 +1363,14 @@ class Contracts extends Controller {
 		
 		$templateProcessor = new TemplateProcessor('storage/'.$templateData['file']['path']);
 		
-		$buildContractsdata = $this->_buildContractsdata($contractsData);
+		$buildContractsdata = $this->_buildContractsdata($contractsData, false, $templateData['id']);
 		
 		$tempVars = $templateProcessor->getVariables();
 		
+		$hasEmptyVars = [];
 		
 		$setValuesData = [];
+		
 		foreach ($tempVars as $variable) {
 			$removeSeparatorVariable = preg_replace('/#.+#/', '', $variable);
 			
@@ -1414,8 +1447,13 @@ class Contracts extends Controller {
 		}
 		
 		foreach ($virtVars as $virtVar) {
-			$varsTitlesMap['{'.$virtVar.'}'] = BusinessVirtualVars::run($virtVar, $buildContractsdata[0]);
+			$varsTitlesMap['{'.$virtVar.'}'] = BusinessVirtualVars::run($virtVar, $buildContractsdata[0], $templateData['id']);
 		}
+		
+		
+		
+		
+		//$hasEmptyVars = $this->_getEptyVars($varsMap);
 		
 		$buildedExportFileName = str_replace(['\\', '/', ':', '*', '?', '"', '<', '>', '|'], '_', trim(Str::swap($varsTitlesMap, $templateData['export_name'] ?? $contractsData[0]['id'])));
 		$exportFilePath = "storage/{$buildedExportFileName}.{$templateData['file']['ext']}";
@@ -1423,7 +1461,7 @@ class Contracts extends Controller {
 		
 		$templateProcessor->saveAs($exportFilePath);
 		
-		return [$exportFileName, $exportFilePath];
+		return [$exportFileName, $exportFilePath, $hasEmptyVars];
 	}
 	
 	
@@ -1453,7 +1491,9 @@ class Contracts extends Controller {
 		
 		$variables = $this->_getXlsxVariables($spreadsheet, $sheetCount);
 		
-		$buildContractsdata = $this->_buildContractsdata($contractsData, $ranged);
+		$buildContractsdata = $this->_buildContractsdata($contractsData, $ranged, $templateData['id']);
+		
+		$hasEmptyVars = [];
 		
 		for ($i = 0; $i < $sheetCount; $i++) {
 			$sheet = $spreadsheet->getSheet($i);
@@ -1471,9 +1511,11 @@ class Contracts extends Controller {
 					$buildedVariable = preg_replace_callback('/\[([a-z_]+)\]/', function($matches) use($buildContractdata) {
 						return match(true) {
 							DdrDateTime::isValidDateTime($buildContractdata[$matches[1]] ?? '') => DdrDateTime::convertDateFormat($buildContractdata[$matches[1]]),
-							default	=> $buildContractdata[$matches[1]] ?? null,
+							default	=> $buildContractdata[$matches[1]] ?? '-',
 						};
 					}, $removeSeparatorVariable);
+					
+					
 					
 					
 					if (strpos($buildedVariable, '::') !== false) {
@@ -1484,7 +1526,7 @@ class Contracts extends Controller {
 						
 						$parsedData = match(true) {
 							DdrDateTime::isValidDateTime($buildContractdata[$parsedVar] ?? '')	=> DdrDateTime::convertDateFormat($buildContractdata[$parsedVar]),
-							default	=> $buildContractdata[$parsedVar] ?? '',
+							default	=> $buildContractdata[$parsedVar] ?? null,
 						};
 						
 						$varsMap['${'.$variable.'}'][$k] = sprintf($formatStr, $parsedData);
@@ -1504,7 +1546,7 @@ class Contracts extends Controller {
 					
 					if (!isset($buildContractdata[$variable])) continue;
 					
-					$varsMap['${'.$variable.'}'][$k] = $buildContractdata[$variable] ?? '';
+					$varsMap['${'.$variable.'}'][$k] = $buildContractdata[$variable] ?: '-';
 				}
 			}
 			
@@ -1517,7 +1559,7 @@ class Contracts extends Controller {
 				}
 			}
 			
-			
+			$hasEmptyVars = $this->_getEptyVars($varsMap);
 			
 			if ($ranged) {
 				$usedCells = [];
@@ -1563,8 +1605,9 @@ class Contracts extends Controller {
 			}
 			
 			foreach ($virtVars as $virtVar) {
-				$varsTitlesMap['{'.$virtVar.'}'] = BusinessVirtualVars::run($virtVar, $buildContractsdata[0]) ?? '';
+				$varsTitlesMap['{'.$virtVar.'}'] = BusinessVirtualVars::run($virtVar, $buildContractsdata[0], $templateData['id']) ?? '';
 			}
+			
 		}
 		
 		$buildedExportFileName = str_replace(['\\', '/', ':', '*', '?', '"', '<', '>', '|'], '_', trim(Str::swap($varsTitlesMap, $templateData['export_name'] ?? $contractsData[0]['id'])));
@@ -1574,7 +1617,8 @@ class Contracts extends Controller {
 		$writer = new Xlsx($spreadsheet);
 		$writer->save($exportFilePath);
 		
-		return [$exportFileName, $exportFilePath];
+		
+		return [$exportFileName, $exportFilePath, $hasEmptyVars];
 	}
 	
 	
@@ -1654,6 +1698,46 @@ class Contracts extends Controller {
 	
 	
 	
+	
+	/**
+	* 
+	* @param 
+	* @return 
+	*/
+	private function _getEptyVars($data):array|null {
+		// Шаг 1: Фильтрация и получение ключей
+		$emptyKeysFilter = array_keys(
+			array_filter($data, function ($value) {
+				return $value === null || $value === '' || $value === '-';
+			})
+		);
+
+		// Шаги 2 и 3 объединены для создания ассоциативного массива
+		$finalKeys = array_reduce($emptyKeysFilter, function ($carry, $rawKey) {
+			$cleanedKey = $rawKey; // Значение по умолчанию
+
+			// Очищаем ключ от лишних символов
+			if (preg_match('/^\$\{(.*?)(?:\|\|.*)?\}$/', $rawKey, $matches)) {
+				$cleanedKey = $matches[1];
+			}
+
+			// Проверяем наличие ключа в Enum и добавляем пару в массив
+			if (ContractColums::hasKey($cleanedKey)) {
+				$carry[$cleanedKey] = ContractColums::getValue($cleanedKey);
+			}
+
+			return $carry; // Возвращаем измененный массив на следующей итерации
+		}, []); // Начальное значение - пустой массив
+		
+		return $finalKeys; 
+	}
+	
+	
+	
+	
+	
+	
+	
 	/**
 	* 
 	* @param 
@@ -1693,7 +1777,7 @@ class Contracts extends Controller {
 	* @param 
 	* @return 
 	*/
-	private function _buildContractsdata($contractsData = null, $ranged = false) {
+	private function _buildContractsdata($contractsData = null, $ranged = false, $templateId = null) {
 		if ($contractsData?->isEmpty()) return false;
 
 		$virtVars = VirtualVars::getKeys();
@@ -1744,7 +1828,7 @@ class Contracts extends Controller {
 		
 		foreach ($virtVars as $virtVar) {
 			foreach ($buildedContractsData as $k => $buildedContractData) {
-				$buildedContractsData[$k][$virtVar] = BusinessVirtualVars::run($virtVar, $buildedContractData);
+				$buildedContractsData[$k][$virtVar] = BusinessVirtualVars::run($virtVar, $buildedContractData, $templateId);
 			}
 			
 		}

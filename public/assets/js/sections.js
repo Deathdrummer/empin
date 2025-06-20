@@ -400,6 +400,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
+function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
@@ -2769,9 +2771,9 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
       sort: 10,
       onClick: function onClick() {
         return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee21() {
-          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee21$(_context21) {
+          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee21$(_context22) {
             while (1) {
-              switch (_context21.prev = _context21.next) {
+              switch (_context22.prev = _context22.next) {
                 case 0:
                   ddrPopup({
                     title: 'Шаблоны для выгрузки',
@@ -2781,89 +2783,101 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                     var _ref29 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee20(_ref28) {
                       var state, wait, setTitle, setButtons, loadData, setHtml, setLHtml, dialog, close, onClose, onScroll, disableButtons, enableButtons, setWidth, _yield$axiosQuery16, data, error, status, headers;
 
-                      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee20$(_context20) {
+                      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee20$(_context21) {
                         while (1) {
-                          switch (_context20.prev = _context20.next) {
+                          switch (_context21.prev = _context21.next) {
                             case 0:
                               state = _ref28.state, wait = _ref28.wait, setTitle = _ref28.setTitle, setButtons = _ref28.setButtons, loadData = _ref28.loadData, setHtml = _ref28.setHtml, setLHtml = _ref28.setLHtml, dialog = _ref28.dialog, close = _ref28.close, onClose = _ref28.onClose, onScroll = _ref28.onScroll, disableButtons = _ref28.disableButtons, enableButtons = _ref28.enableButtons, setWidth = _ref28.setWidth;
                               //isClosed
                               wait();
-                              _context20.next = 4;
+                              _context21.next = 4;
                               return axiosQuery('get', 'site/contracts/export_act', {
                                 contract_id: contractId
                               });
 
                             case 4:
-                              _yield$axiosQuery16 = _context20.sent;
+                              _yield$axiosQuery16 = _context21.sent;
                               data = _yield$axiosQuery16.data;
                               error = _yield$axiosQuery16.error;
                               status = _yield$axiosQuery16.status;
                               headers = _yield$axiosQuery16.headers;
 
                               if (!error) {
-                                _context20.next = 14;
+                                _context21.next = 14;
                                 break;
                               }
 
                               $.notify('Не загрузить данные!', 'error');
                               console.log(error === null || error === void 0 ? void 0 : error.message, error === null || error === void 0 ? void 0 : error.errors);
                               wait(false);
-                              return _context20.abrupt("return");
+                              return _context21.abrupt("return");
 
                             case 14:
-                              _context20.next = 16;
+                              _context21.next = 16;
                               return setHtml(data);
 
                             case 16:
                               enableButtons(true);
                               $('[choosetemplateid]').on(tapEvent, /*#__PURE__*/function () {
                                 var _ref30 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee19(e) {
-                                  var templateId, ranged, _$$ddrWait, destroy, _yield$axiosQuery17, _data2, _error2, _status2, _headers2, _iteratorAbruptCompletion, _didIteratorError, _iteratorError, _iterator, _step, _contractId, _yield$axiosQuery18, _data3, _error3, _status3, _headers3;
+                                  var item, templateId, ranged, _yield$axiosQuery17, _data2, _error2, _status2, _headers2, _iteratorAbruptCompletion, _didIteratorError, _iteratorError, _loop, _iterator, _step, _ret;
 
-                                  return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee19$(_context19) {
+                                  return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee19$(_context20) {
                                     while (1) {
-                                      switch (_context19.prev = _context19.next) {
+                                      switch (_context20.prev = _context20.next) {
                                         case 0:
-                                          templateId = $(e.currentTarget).attr('choosetemplateid'), ranged = $(e.currentTarget).hasAttr('ranged'), _$$ddrWait = $('#contractsCard').ddrWait({
-                                            bgColor: '#ffffffe6',
-                                            iconHeight: '50px'
-                                          }), destroy = _$$ddrWait.destroy;
+                                          if (!($(e.currentTarget).attr('disabled') !== undefined)) {
+                                            _context20.next = 2;
+                                            break;
+                                          }
+
+                                          return _context20.abrupt("return");
+
+                                        case 2:
+                                          item = e.currentTarget, templateId = $(e.currentTarget).attr('choosetemplateid'), ranged = $(e.currentTarget).hasAttr('ranged');
+                                          /*{destroy, on, off} = $('#contractsCard').ddrWait({
+                                          	bgColor: '#ffffffe6',
+                                          	iconHeight: '50px',
+                                          });*/
+
+                                          $('[choosetemplateid].buttonslist__item-danger').find('[buttonslistquestion]').remove();
+                                          $('[choosetemplateid].buttonslist__item-danger').removeAttrib('disabled');
                                           onClose(function () {
-                                            destroy();
+                                            wait(false);
                                           });
 
                                           if (templateId) {
-                                            _context19.next = 5;
+                                            _context20.next = 9;
                                             break;
                                           }
 
                                           $.notify('Ошибка выгрузки! Шаблон не найден', 'error');
-                                          return _context19.abrupt("return");
+                                          return _context20.abrupt("return");
 
-                                        case 5:
+                                        case 9:
                                           wait();
 
                                           if (!ranged) {
-                                            _context19.next = 28;
+                                            _context20.next = 32;
                                             break;
                                           }
 
-                                          _context19.next = 9;
+                                          _context20.next = 13;
                                           return axiosQuery('post', 'site/contracts/export_act', {
                                             contract_id: selectedContracts.items,
                                             template_id: templateId,
                                             ranged: ranged
                                           }, 'blob');
 
-                                        case 9:
-                                          _yield$axiosQuery17 = _context19.sent;
+                                        case 13:
+                                          _yield$axiosQuery17 = _context20.sent;
                                           _data2 = _yield$axiosQuery17.data;
                                           _error2 = _yield$axiosQuery17.error;
                                           _status2 = _yield$axiosQuery17.status;
                                           _headers2 = _yield$axiosQuery17.headers;
 
                                           if (!_error2) {
-                                            _context19.next = 20;
+                                            _context20.next = 24;
                                             break;
                                           }
 
@@ -2871,143 +2885,206 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                                           console.log(_error2 === null || _error2 === void 0 ? void 0 : _error2.message, _error2 === null || _error2 === void 0 ? void 0 : _error2.errors);
                                           wait(false);
                                           destroy();
-                                          return _context19.abrupt("return");
+                                          return _context20.abrupt("return");
 
-                                        case 20:
+                                        case 24:
                                           if (_headers2['x-export-filename']) {
-                                            _context19.next = 25;
+                                            _context20.next = 29;
                                             break;
                                           }
 
                                           $.notify('Не удалось загрузить данные! Возможно, не загружен файл шаблона.', 'error');
                                           wait(false);
                                           destroy();
-                                          return _context19.abrupt("return");
+                                          return _context20.abrupt("return");
 
-                                        case 25:
-                                          $.ddrExport({
-                                            data: _data2,
-                                            headers: _headers2,
-                                            filename: _headers2['x-export-filename'] || _headers2['export-filename']
-                                          }, function () {
-                                            destroy();
-                                          });
-                                          _context19.next = 74;
+                                        case 29:
+                                          setExport(_headers2);
+                                          _context20.next = 63;
                                           break;
-
-                                        case 28:
-                                          _iteratorAbruptCompletion = false;
-                                          _didIteratorError = false;
-                                          _context19.prev = 30;
-                                          _iterator = _asyncIterator(selectedContracts.items);
 
                                         case 32:
-                                          _context19.next = 34;
+                                          _iteratorAbruptCompletion = false;
+                                          _didIteratorError = false;
+                                          _context20.prev = 34;
+                                          _loop = /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _loop() {
+                                            var contractId, _yield$axiosQuery18, data, error, status, headers, emptyVars, listItems, notificationMessage, setExport;
+
+                                            return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _loop$(_context19) {
+                                              while (1) {
+                                                switch (_context19.prev = _context19.next) {
+                                                  case 0:
+                                                    setExport = function _setExport(headers) {
+                                                      $.ddrExport({
+                                                        data: data,
+                                                        headers: headers,
+                                                        filename: headers['x-export-filename'] || headers['export-filename']
+                                                      }, function () {
+                                                        wait(false);
+                                                        axiosQuery('put', 'site/contracts/export_increment_count', {
+                                                          template_id: templateId
+                                                        });
+                                                      });
+                                                    };
+
+                                                    contractId = _step.value;
+                                                    _context19.next = 4;
+                                                    return axiosQuery('post', 'site/contracts/export_act', {
+                                                      contract_id: [contractId],
+                                                      template_id: templateId
+                                                    }, 'blob');
+
+                                                  case 4:
+                                                    _yield$axiosQuery18 = _context19.sent;
+                                                    data = _yield$axiosQuery18.data;
+                                                    error = _yield$axiosQuery18.error;
+                                                    status = _yield$axiosQuery18.status;
+                                                    headers = _yield$axiosQuery18.headers;
+
+                                                    if (!error) {
+                                                      _context19.next = 14;
+                                                      break;
+                                                    }
+
+                                                    $.notify('Не удалось загрузить данные! Возможно, не загружен файл шаблона.', 'error');
+                                                    console.log(error === null || error === void 0 ? void 0 : error.message, error === null || error === void 0 ? void 0 : error.errors);
+                                                    wait(false); //destroy();
+
+                                                    return _context19.abrupt("return", {
+                                                      v: void 0
+                                                    });
+
+                                                  case 14:
+                                                    if (headers['x-export-filename']) {
+                                                      _context19.next = 18;
+                                                      break;
+                                                    }
+
+                                                    $.notify('Не удалось загрузить данные! Возможно, не загружен файл шаблона.', 'error');
+                                                    wait(false); //destroy();
+
+                                                    return _context19.abrupt("return", {
+                                                      v: void 0
+                                                    });
+
+                                                  case 18:
+                                                    emptyVars = JSON.parse(headers['x-has-empty-vars']);
+
+                                                    if (emptyVars && Object.keys(emptyVars).length > 0) {
+                                                      listItems = Object.entries(emptyVars).map(function (_ref31) {
+                                                        var _ref32 = _slicedToArray(_ref31, 2),
+                                                            variable = _ref32[0],
+                                                            title = _ref32[1];
+
+                                                        return "".concat(title, " (").concat(variable, ")\n"); // Выводим только человекочитаемое название
+                                                      }).join('');
+                                                      notificationMessage = "\u0412 \u0448\u0430\u0431\u043B\u043E\u043D\u0435 \u0435\u0441\u0442\u044C \u043F\u0435\u0440\u0435\u043C\u0435\u043D\u043D\u044B\u0435 \u0441 \u043F\u0443\u0441\u0442\u044B\u043C\u0438 \u0437\u043D\u0430\u0447\u0435\u043D\u0438\u044F\u043C\u0438: \n\n\t\t\t\t\t\t\t\t\t        ".concat(listItems);
+                                                      $.notify(notificationMessage, 'info');
+                                                      $(item).append("<div class=\"buttonslist__question align-items-center justify-content-between\" buttonslistquestion>\n\t\t\t\t\t\t\t\t\t\t\t\t<p>\u041D\u0435\u043A\u043E\u0442\u043E\u0440\u043E\u0435 \u043F\u0435\u0440\u0435\u043C\u0435\u043D\u043D\u044B\u0435 \u0438\u043C\u0435\u044E\u0442 \u043F\u0443\u0441\u0442\u044B\u0435 \u0437\u043D\u0430\u0447\u0435\u043D\u0438\u044F. <br><strong>\u041F\u0440\u043E\u0434\u043E\u043B\u0436\u0438\u0442\u044C \u0432\u044B\u0433\u0440\u0443\u0437\u043A\u0443?</strong></p>\n\t\t\t\t\t\t\t\t\t\t\t\t<div class=\"ml1rem\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t<button class=\"success\" onclick=\"$.uploadTemplate('success')\"><i class=\"fa fa-fw fa-check\"></i></button>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<button class=\"cancel\" onclick=\"$.uploadTemplate('cancel')\"><i class=\"fa fa-fw fa-close\"></i></button>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t\t\t</div>");
+                                                      $(item).setAttrib('disabled');
+                                                      $(item).addClass('buttonslist__item-danger');
+                                                      wait(false);
+
+                                                      $.uploadTemplate = function (stat) {
+                                                        event.stopPropagation();
+
+                                                        if (stat == 'cancel') {
+                                                          $.notify('Выгрузка отменена!', 'info');
+                                                        } else if (stat == 'success') {
+                                                          wait(true);
+                                                          setExport(headers);
+                                                        }
+
+                                                        $(item).find('[buttonslistquestion]').remove();
+                                                        $(item).removeAttrib('disabled');
+                                                      };
+                                                    } else {
+                                                      setExport(headers);
+                                                    }
+
+                                                  case 20:
+                                                  case "end":
+                                                    return _context19.stop();
+                                                }
+                                              }
+                                            }, _loop);
+                                          });
+                                          _iterator = _asyncIterator(selectedContracts.items);
+
+                                        case 37:
+                                          _context20.next = 39;
                                           return _iterator.next();
 
-                                        case 34:
-                                          if (!(_iteratorAbruptCompletion = !(_step = _context19.sent).done)) {
-                                            _context19.next = 58;
+                                        case 39:
+                                          if (!(_iteratorAbruptCompletion = !(_step = _context20.sent).done)) {
+                                            _context20.next = 47;
                                             break;
                                           }
 
-                                          _contractId = _step.value;
-                                          _context19.next = 38;
-                                          return axiosQuery('post', 'site/contracts/export_act', {
-                                            contract_id: [_contractId],
-                                            template_id: templateId
-                                          }, 'blob');
+                                          return _context20.delegateYield(_loop(), "t0", 41);
 
-                                        case 38:
-                                          _yield$axiosQuery18 = _context19.sent;
-                                          _data3 = _yield$axiosQuery18.data;
-                                          _error3 = _yield$axiosQuery18.error;
-                                          _status3 = _yield$axiosQuery18.status;
-                                          _headers3 = _yield$axiosQuery18.headers;
+                                        case 41:
+                                          _ret = _context20.t0;
 
-                                          if (!_error3) {
-                                            _context19.next = 49;
+                                          if (!(_typeof(_ret) === "object")) {
+                                            _context20.next = 44;
                                             break;
                                           }
 
-                                          $.notify('Не удалось загрузить данные! Возможно, не загружен файл шаблона.', 'error');
-                                          console.log(_error3 === null || _error3 === void 0 ? void 0 : _error3.message, _error3 === null || _error3 === void 0 ? void 0 : _error3.errors);
-                                          wait(false);
-                                          destroy();
-                                          return _context19.abrupt("return");
+                                          return _context20.abrupt("return", _ret.v);
+
+                                        case 44:
+                                          _iteratorAbruptCompletion = false;
+                                          _context20.next = 37;
+                                          break;
+
+                                        case 47:
+                                          _context20.next = 53;
+                                          break;
 
                                         case 49:
-                                          if (_headers3['x-export-filename']) {
-                                            _context19.next = 54;
-                                            break;
-                                          }
-
-                                          $.notify('Не удалось загрузить данные! Возможно, не загружен файл шаблона.', 'error');
-                                          wait(false);
-                                          destroy();
-                                          return _context19.abrupt("return");
-
-                                        case 54:
-                                          $.ddrExport({
-                                            data: _data3,
-                                            headers: _headers3,
-                                            filename: _headers3['x-export-filename'] || _headers3['export-filename']
-                                          }, function () {
-                                            destroy();
-                                          });
-
-                                        case 55:
-                                          _iteratorAbruptCompletion = false;
-                                          _context19.next = 32;
-                                          break;
-
-                                        case 58:
-                                          _context19.next = 64;
-                                          break;
-
-                                        case 60:
-                                          _context19.prev = 60;
-                                          _context19.t0 = _context19["catch"](30);
+                                          _context20.prev = 49;
+                                          _context20.t1 = _context20["catch"](34);
                                           _didIteratorError = true;
-                                          _iteratorError = _context19.t0;
+                                          _iteratorError = _context20.t1;
 
-                                        case 64:
-                                          _context19.prev = 64;
-                                          _context19.prev = 65;
+                                        case 53:
+                                          _context20.prev = 53;
+                                          _context20.prev = 54;
 
                                           if (!(_iteratorAbruptCompletion && _iterator["return"] != null)) {
-                                            _context19.next = 69;
+                                            _context20.next = 58;
                                             break;
                                           }
 
-                                          _context19.next = 69;
+                                          _context20.next = 58;
                                           return _iterator["return"]();
 
-                                        case 69:
-                                          _context19.prev = 69;
+                                        case 58:
+                                          _context20.prev = 58;
 
                                           if (!_didIteratorError) {
-                                            _context19.next = 72;
+                                            _context20.next = 61;
                                             break;
                                           }
 
                                           throw _iteratorError;
 
-                                        case 72:
-                                          return _context19.finish(69);
+                                        case 61:
+                                          return _context20.finish(58);
 
-                                        case 73:
-                                          return _context19.finish(64);
+                                        case 62:
+                                          return _context20.finish(53);
 
-                                        case 74:
+                                        case 63:
                                           wait(false); //close();
 
-                                        case 75:
+                                        case 64:
                                         case "end":
-                                          return _context19.stop();
+                                          return _context20.stop();
                                       }
                                     }
-                                  }, _callee19, null, [[30, 60, 64, 74], [65,, 69, 73]]);
+                                  }, _callee19, null, [[34, 49, 53, 63], [54,, 58, 62]]);
                                 }));
 
                                 return function (_x6) {
@@ -3017,7 +3094,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
 
                             case 18:
                             case "end":
-                              return _context20.stop();
+                              return _context21.stop();
                           }
                         }
                       }, _callee20);
@@ -3030,7 +3107,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
 
                 case 1:
                 case "end":
-                  return _context21.stop();
+                  return _context22.stop();
               }
             }
           }, _callee21);
