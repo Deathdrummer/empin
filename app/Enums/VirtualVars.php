@@ -25,7 +25,6 @@ final class VirtualVars extends Enum {
 	
 	
 	
-	
 	const date_start_fyear			= 'Дата подписания договора (чч.мм.гг)';
 	const date_end_fyear 			= 'Дата окончания работ по договору (чч.мм.гг)';
 	const date_gen_start_fyear		= 'Дата подписания генподрядного договора (чч.мм.гг)';
@@ -48,7 +47,13 @@ final class VirtualVars extends Enum {
 	const date_buy_human 	 		= 'Дата закупки (чч месяц гггг)';
 	const date_close_human 	 		= 'Дата закрытия договора (чч месяц гггг)';
 	const date_send_action_human	= 'Дата подачи выполнения (чч месяц гггг)';
-		
+	
+	
+	const date_today				= 'Дата на момент выгрузки (чч мм гг)';
+	const date_today_human			= 'Дата на момент выгрузки (чч месяц гггг)';
+	
+	
+	const increment_count			= 'Порядковый номер выгрузки';	
 }
 
 

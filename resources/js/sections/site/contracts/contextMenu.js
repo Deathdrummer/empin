@@ -1836,16 +1836,21 @@ export function contextMenu(
 						
 						
 						$('[choosetemplateid]').on(tapEvent, async (e) => {
-							const templateId = $(e.currentTarget).attr('choosetemplateid'),
-								ranged = $(e.currentTarget).hasAttr('ranged'),
-								{destroy} = $('#contractsCard').ddrWait({
+							if ($(e.currentTarget).attr('disabled') !== undefined) return;
+							const item = e.currentTarget,
+								templateId = $(e.currentTarget).attr('choosetemplateid'),
+								ranged = $(e.currentTarget).hasAttr('ranged');
+								/*{destroy, on, off} = $('#contractsCard').ddrWait({
 									bgColor: '#ffffffe6',
 									iconHeight: '50px',
-								});
+								});*/
+							
+							$('[choosetemplateid].buttonslist__item-danger').find('[buttonslistquestion]').remove()
+							$('[choosetemplateid].buttonslist__item-danger').removeAttrib('disabled');
 								
-								onClose(() => {
-									destroy();
-								});
+							onClose(() => {
+								wait(false);
+							});
 							
 							if (!templateId) {
 								$.notify('Ошибка выгрузки! Шаблон не найден', 'error');
@@ -1872,13 +1877,7 @@ export function contextMenu(
 									return;
 								}
 								
-								$.ddrExport({
-									data,
-									headers,
-									filename: headers['x-export-filename'] || headers['export-filename']
-								}, () => {
-									destroy();
-								});
+								setExport(headers);
 								
 							} else {
 								for await (const contractId of selectedContracts.items) {
@@ -1888,24 +1887,76 @@ export function contextMenu(
 										$.notify('Не удалось загрузить данные! Возможно, не загружен файл шаблона.', 'error');
 										console.log(error?.message, error?.errors);
 										wait(false);
-										destroy();
+										//destroy();
 										return;
 									}
 									
 									if (!headers['x-export-filename']) {
 										$.notify('Не удалось загрузить данные! Возможно, не загружен файл шаблона.', 'error');
 										wait(false);
-										destroy();
+										//destroy();
 										return;
 									}
 									
-									$.ddrExport({
-										data,
-										headers,
-										filename: headers['x-export-filename'] || headers['export-filename']
-									}, () => {
-										destroy();
-									});
+									
+									const emptyVars = JSON.parse(headers['x-has-empty-vars']);
+									
+									if (emptyVars && Object.keys(emptyVars).length > 0) {
+									   const listItems = Object.entries(emptyVars).map(([variable, title]) => {
+									        return `${title} (${variable})\n`; // Выводим только человекочитаемое название
+									    }).join('');
+									    
+									    const notificationMessage = `В шаблоне есть переменные с пустыми значениями: \n
+									        ${listItems}`;
+										
+										$.notify(notificationMessage, 'info');
+										
+										$(item).append(`<div class="buttonslist__question align-items-center justify-content-between" buttonslistquestion>
+												<p>Некоторое переменные имеют пустые значения. <br><strong>Продолжить выгрузку?</strong></p>
+												<div class="ml1rem">
+													<button class="success" onclick="$.uploadTemplate('success')"><i class="fa fa-fw fa-check"></i></button>
+													<button class="cancel" onclick="$.uploadTemplate('cancel')"><i class="fa fa-fw fa-close"></i></button>
+												</div>
+											</div>`);
+										$(item).setAttrib('disabled');
+										$(item).addClass('buttonslist__item-danger');
+										wait(false);
+										
+										
+										$.uploadTemplate = (stat) => {
+											event.stopPropagation();
+											if (stat == 'cancel') {
+												
+												$.notify('Выгрузка отменена!', 'info');
+												
+											} else if (stat == 'success') {
+												wait(true);
+												setExport(headers);
+											}
+											
+											$(item).find('[buttonslistquestion]').remove();
+											$(item).removeAttrib('disabled');
+										}
+										
+										
+									} else {
+										setExport(headers);
+									}
+									
+									
+									
+									
+									function setExport(headers) {
+										$.ddrExport({
+											data,
+											headers,
+											filename: headers['x-export-filename'] || headers['export-filename']
+										}, () => {
+											wait(false);
+											axiosQuery('put', 'site/contracts/export_increment_count', {template_id: templateId});
+										});
+									}
+									
 								}
 							}
 							

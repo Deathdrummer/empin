@@ -1175,6 +1175,7 @@ section
 .buttonslist
 
 	&__item
+		position: relative
 		display: flex
 		align-items: center
 		padding-left: 15px
@@ -1197,6 +1198,65 @@ section
 
 		&:last-of-type
 			margin-bottom: 0
+	
+		&-danger
+			cursor: default
+			
+			
+	
+	
+	&__question
+		position: absolute
+		inset: 0
+		padding-left: 15px
+		padding-right: 15px
+		width: 100%
+		display: flex
+		align-items: center
+		justify-content: space-between
+		background-color: #ffe8e8 !important
+		border-radius: inherit
+		
+		p, strong
+			line-height: 1.2rem
+			color: #EB2324
+		
+		p
+			font-size: 13px
+		
+		
+		button
+			cursor: pointer
+			border-radius: 3px
+			border: none
+			transition: filter 0.16s
+			height: 22px
+			width: 24px
+			
+			&:hover
+				filter: brightness(1.1)
+			
+			&:active
+				filter: contrast(1.7)
+				transition: filter 0s
+			
+			
+			&.success
+				background: #74b148
+				
+				i
+					color: #fff
+					font-size: 13px
+				
+				
+			&.cancel
+				background: #ef8d8d
+				
+				i
+					color: #fff
+					font-size: 13px
+				
+				
 
 
 

@@ -1,6 +1,7 @@
 <?php namespace App\Services\Business;
 
 use App\Helpers\DdrDateTime;
+use Carbon\Carbon;
 use Illuminate\Support\Str;
 
 class VirtualVars {
@@ -13,14 +14,14 @@ class VirtualVars {
 	* @param 
 	* @return 
 	*/
-	public static function run($virtVar, $buildContractData) {
+	public static function run($virtVar, $buildContractData, $templateId = null) {
 		$varToCamel = Str::camel($virtVar);
 		
 		$instance = new self();
 		
 		if (!method_exists($instance, $varToCamel) || !is_callable([$instance, $varToCamel])) return null;
-        
-        return $instance->{$varToCamel}($buildContractData);
+		
+        return $instance->{$varToCamel}($buildContractData, $templateId);
 	}
 	
 	
@@ -335,7 +336,58 @@ class VirtualVars {
 	}
 	
 	
+	
+	
+	
+	
+	
+	/**
+	* 
+	* @param 
+	* @return 
+	*/
+	public function dateToday($buildContractData) {
+		return Carbon::now()->format('d.m.y');
+	}
+	
+	
+	
+	
+	/**
+	* 
+	* @param 
+	* @return 
+	*/
+	public function dateTodayHuman($buildContractData) {
+		return DdrDateTime::dateToHuman(Carbon::now());
+	}
+	
+	
+	
+	
+	
+	
+	/**
+	* 
+	* @param 
+	* @return 
+	*/
+	public function incrementCount($buildContractData, $templateId) {
+		if (!$templateId) return null;
+		
+		$userService = app(User::class);
+		
+		$uploadСount = (int)$userService->getSettings("upload-count.{$templateId}");
+		
+		return str_pad((string)$uploadСount, 3, '0', STR_PAD_LEFT);
+	}
 
+	
+	
+	
+	
+	
+	
 	
 	
 	
