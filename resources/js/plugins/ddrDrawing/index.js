@@ -7,6 +7,7 @@ let graph = null
 let paper = null
 let currentTool = 'select'
 
+
 /**
  * Инициализация плагина
  */
