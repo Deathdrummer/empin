@@ -86,6 +86,13 @@ Object.keys(ddrWraps).forEach(key => window[key] = ddrWraps[key]);
 
 
 
+import * as joint from '@joint/core';
+window.joint = joint;
+
+
+
+
+
 
 require('@/ref');
 require('@/functions');

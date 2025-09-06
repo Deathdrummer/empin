@@ -7,17 +7,18 @@
 			<div class="ddrtabs">
 				<div class="ddrtabs__nav">
 					<ul class="ddrtabsnav" ddrtabsnav>
-						<li class="ddrtabsnav__item ddrtabsnav__item_active" ddrtabsitem="systemTab1">Заголовки и названия</li>
+						<li class="ddrtabsnav__item" ddrtabsitem="systemTab1">Заголовки и названия</li>
 						<li class="ddrtabsnav__item" ddrtabsitem="systemTab2">Настройки страниц</li>
 						<li class="ddrtabsnav__item" ddrtabsitem="systemTab3">Размеры</li>
 						<li class="ddrtabsnav__item" ddrtabsitem="systemTab4">Договор</li>
 						<li class="ddrtabsnav__item" ddrtabsitem="systemTab5">Админ. панель</li>
 						<li class="ddrtabsnav__item" ddrtabsitem="systemTab6">ИИ-ассистент</li>
+						<li class="ddrtabsnav__item ddrtabsnav__item_active" ddrtabsitem="systemTab7">Чертежи</li>
 					</ul>
 				</div>
 				
 				<div class="ddrtabs__content ddrtabscontent" ddrtabscontent>
-					<div class="ddrtabscontent__item ddrtabscontent__item_visible" ddrtabscontentitem="systemTab1">
+					<div class="ddrtabscontent__item" ddrtabscontentitem="systemTab1">
 						<div class="row">
 							<div class="col-auto">
 								<x-input
@@ -386,6 +387,63 @@
 							</x-buttons-group>
 						</div>
 					</div>
+					
+					
+					
+					
+					<div class="ddrtabscontent__item ddrtabscontent__item_visible" ddrtabscontentitem="systemTab7">
+						<div class="ddrdrawing">
+							<div class="ddrdrawing__toolbar">
+								<div class="ddrdrawing__toolbar-section">
+									<div class="ddrdrawing__toolbar-group">
+										<button class="ddrdrawing__tool-btn" data-tool="rectangle" title="Прямоугольник">
+											<i class="fa-regular fa-square"></i>
+										</button>
+									</div>
+									
+									<div class="ddrdrawing__toolbar-group">
+										<button class="ddrdrawing__tool-btn" data-tool="undo" title="Отменить">
+											<i class="fa-solid fa-undo"></i>
+										</button>
+										<button class="ddrdrawing__tool-btn" data-tool="redo" title="Повторить">
+											<i class="fa-solid fa-redo"></i>
+										</button>
+									</div>
+									
+									<div class="ddrdrawing__toolbar-group">
+										<button class="ddrdrawing__tool-btn" data-tool="zoom-in" title="Увеличить">
+											<i class="fa-solid fa-search-plus"></i>
+										</button>
+										<button class="ddrdrawing__tool-btn" data-tool="zoom-out" title="Уменьшить">
+											<i class="fa-solid fa-search-minus"></i>
+										</button>
+										<button class="ddrdrawing__tool-btn" data-tool="zoom-fit" title="По размеру">
+											<i class="fa-solid fa-expand-arrows-alt"></i>
+										</button>
+									</div>
+									
+									<div class="ddrdrawing__toolbar-group">
+										<button class="ddrdrawing__tool-btn" data-tool="save" title="Сохранить">
+											<i class="fa-solid fa-save"></i>
+										</button>
+										<button class="ddrdrawing__tool-btn" data-tool="load" title="Загрузить">
+											<i class="fa-solid fa-folder-open"></i>
+										</button>
+										<button class="ddrdrawing__tool-btn" data-tool="export" title="Экспорт">
+											<i class="fa-solid fa-download"></i>
+										</button>
+									</div>
+								</div>
+							</div>
+							
+							<div class="ddrdrawing__canvas-container">
+								<div id="ddrDrawingCanvas" class="ddrdrawing__canvas"></div>
+							</div>
+						</div>
+					</div>
+					
+					
+					
 				</div>
 			</div>
 		</x-card>
@@ -398,6 +456,14 @@
 
 
 <script type="module">
+
+	const drawingInstance = ddrDrawing();
+	drawingInstance.init();
+	
+	
+
+
+
 	
 	let savePromptTOut;
 	$.updatePromptFile = (textarea, fileName) => {
@@ -673,21 +739,6 @@
 	
 	
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	$.openPopupWin = () => {
 		ddrPopup({
 			
@@ -725,5 +776,6 @@
 			//wait();
 		});
 	});*/
+
 </script>
 
