@@ -459,8 +459,6 @@
 
 	const drawingInstance = ddrDrawing();
 	drawingInstance.init();
-	
-	
 
 
 

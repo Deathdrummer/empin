@@ -34,18 +34,25 @@ resources/
 - **Паттерн плагина**: фабричная функция `ddrDrawing()` возвращает API
 - **Инициализация**: `drawingInstance.init()` в blade template (строка 331)
 
-### Архитектура
-```javascript
-// Проверка доступности JointJS
-if (typeof window.joint === 'undefined') {
-    console.error('JointJS library not found')
-    return
-}
-
-// Стандартные фигуры JointJS
-const rect = new window.joint.shapes.standard.Rectangle()
-const circle = new window.joint.shapes.standard.Ellipse()
+### Архитектура (рефакторенная)
 ```
+src/
+├── core/           # Основные классы
+│   ├── DrawingCanvas.js    # Управление холстом
+│   ├── ToolManager.js      # Менеджер инструментов  
+│   └── EventManager.js     # Централизация событий
+├── tools/          # Инструменты
+│   ├── BaseTool.js         # Базовый класс
+│   ├── SelectTool.js       # Инструмент выделения
+│   └── RectangleTool.js    # Создание прямоугольников
+├── ui/             # UI компоненты  
+│   └── ContextMenu.js      # Контекстное меню
+└── DrawingPlugin.js        # Главный класс
+```
+
+### План развития
+См. **ROADMAP.md** - детальный план реализации выносок, соединительных линий, направляющих, дополнительных фигур и других функций.
 
 ### Панель инструментов
 Кнопки используют `data-tool` атрибуты, обработка через `setTool(toolName)`. Каждый инструмент создания фигуры автоматически переключается на `select` после добавления.
+- КМ - контекстное меню
