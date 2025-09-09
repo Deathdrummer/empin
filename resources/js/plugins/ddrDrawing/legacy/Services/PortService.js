@@ -33,7 +33,10 @@ export class PortService {
 	 * Binds service to external events
 	 */
 	bindEventHandlers() {
-		this.eventBus.on('element:added', (event) => this.initializeElementPorts(event.element));
+		this.eventBus.on('element:added', (event) => {
+			this.initializeElementPorts(event.element);
+			this.bindElementPortWatcher(event.element);
+		});
 		this.eventBus.on('element:removed', (event) => this.cleanupElementPorts(event.element));
 		this.eventBus.on('link:connect', (event) => this.handleLinkConnect(event.link));
 		this.eventBus.on('link:disconnect', (event) => this.handleLinkDisconnect(event.link));
@@ -41,6 +44,32 @@ export class PortService {
 		this.eventBus.on('ports:hide', (event) => this.hideElementPorts(event.element));
 		this.eventBus.on('ports:add', (event) => this.addPortToElement(event.element, event.side));
 		this.eventBus.on('ports:remove', (event) => this.removePortFromElement(event.element, event.portId));
+	}
+
+	/**
+	 * Привязывает отслеживание изменений портов к элементу
+	 */
+	bindElementPortWatcher(element) {
+		// Отслеживаем изменения портов
+		element.on('change:ports', () => {
+			const elementId = element.id;
+			const visiblePorts = this.stateStore.get('ports.visible');
+			console.log(`🔄 change:ports событие для элемента ${elementId}`);
+			
+			// Если элемент не должен показывать порты - принудительно скрываем их
+			if (!visiblePorts.has(elementId)) {
+				console.log(`🚨 change:ports: Элемент ${elementId} НЕ в списке видимых - принудительно скрываем`);
+				setTimeout(() => {
+					console.log(`🔧 change:ports: Выполняем принудительное скрытие для ${elementId}`);
+					this.forceHideAllElementPorts(element);
+				}, 0);
+			} else {
+				console.log(`ℹ️ change:ports: Элемент ${elementId} в списке видимых - проверяем занятые порты`);
+				setTimeout(() => {
+					this.forceHideAllElementPorts(element);
+				}, 0);
+			}
+		});
 	}
 
 	/**
@@ -57,8 +86,10 @@ export class PortService {
 							stroke: '#31d0c6',
 							strokeWidth: 2,
 							fill: '#ffffff',
-							display: 'none',
-							'pointer-events': 'auto'
+							'fill-opacity': 0,
+							'stroke-opacity': 0,
+							opacity: 0,
+							'pointer-events': 'none'
 						}
 					},
 					markup: '<circle r="4" />'
@@ -82,8 +113,10 @@ export class PortService {
 							stroke: '#31d0c6',
 							strokeWidth: 2,
 							fill: '#ffffff',
-							display: 'none',
-							'pointer-events': 'auto'
+							'fill-opacity': 0,
+							'stroke-opacity': 0,
+							opacity: 0,
+							'pointer-events': 'none'
 						}
 					},
 					markup: '<circle r="4" />'
@@ -173,8 +206,22 @@ export class PortService {
 			magnet: true
 		});
 
+		console.log(`➕ addPortToElement: добавлен порт ${newPortId} к элементу ${elementId}`);
+		
 		this.redistributePortsOnSide(element, side);
 		this.updatePortVisuals(element);
+
+		// Принудительно скрываем все порты ПОСЛЕ того как JointJS закончит свои операции
+		const visiblePorts = this.stateStore.get('ports.visible');
+		console.log(`🔍 Элемент ${elementId} в списке видимых:`, visiblePorts.has(elementId));
+		
+		if (!visiblePorts.has(elementId)) {
+			console.log(`⏱️ Запланировано принудительное скрытие для элемента ${elementId}`);
+			setTimeout(() => {
+				console.log(`🔧 Выполняем принудительное скрытие для элемента ${elementId}`);
+				this.forceHideAllElementPorts(element);
+			}, 0);
+		}
 
 		portStates.set(elementId, elementPortState);
 		this.stateStore.set('ports.states', portStates);
@@ -333,15 +380,38 @@ export class PortService {
 
 		if (!elementPortState) return;
 
+		const visiblePorts = this.stateStore.get('ports.visible');
+		const shouldShowElement = visiblePorts.has(elementId);
+
 		Object.values(elementPortState).flat().forEach(port => {
 			if (port.occupied) {
+				// Занятый порт - ВСЕГДА скрыт, только цвета для дебага
 				element.portProp(port.id, 'attrs/circle/stroke', '#ff4444');
 				element.portProp(port.id, 'attrs/circle/strokeWidth', 3);
 				element.portProp(port.id, 'attrs/circle/fill', '#ffcccc');
+				// ПРИНУДИТЕЛЬНО СКРЫВАЕМ ЗАНЯТЫЕ ПОРТЫ
+				element.portProp(port.id, 'attrs/circle/fill-opacity', 0);
+				element.portProp(port.id, 'attrs/circle/stroke-opacity', 0);
+				element.portProp(port.id, 'attrs/circle/opacity', 0);
+				element.portProp(port.id, 'attrs/circle/pointer-events', 'none');
 			} else {
+				// Свободный порт
 				element.portProp(port.id, 'attrs/circle/stroke', '#31d0c6');
 				element.portProp(port.id, 'attrs/circle/strokeWidth', 2);
 				element.portProp(port.id, 'attrs/circle/fill', '#ffffff');
+				
+				// Показываем только если элемент должен показывать порты
+				if (shouldShowElement) {
+					element.portProp(port.id, 'attrs/circle/fill-opacity', 1);
+					element.portProp(port.id, 'attrs/circle/stroke-opacity', 1);
+					element.portProp(port.id, 'attrs/circle/opacity', 1);
+					element.portProp(port.id, 'attrs/circle/pointer-events', 'auto');
+				} else {
+					element.portProp(port.id, 'attrs/circle/fill-opacity', 0);
+					element.portProp(port.id, 'attrs/circle/stroke-opacity', 0);
+					element.portProp(port.id, 'attrs/circle/opacity', 0);
+					element.portProp(port.id, 'attrs/circle/pointer-events', 'none');
+				}
 			}
 		});
 	}
@@ -361,8 +431,25 @@ export class PortService {
 		}
 
 		const elementPortState = portStates.get(elementId);
+		console.log(`🔵 showElementPorts для элемента ${elementId}:`, elementPortState);
+		
 		Object.values(elementPortState).flat().forEach(port => {
-			element.portProp(port.id, 'attrs/circle/display', 'block');
+			console.log(`🔍 Порт ${port.id}: occupied=${port.occupied}`);
+			
+			// ЗАЕБАЛСЯ! ЗАНЯТЫЕ ПОРТЫ НЕ ПОКАЗЫВАЕМ НИКОГДА!
+			if (port.occupied) {
+				console.log(`🚫 СКРЫВАЕМ занятый порт ${port.id}`);
+				element.portProp(port.id, 'attrs/circle/fill-opacity', 0);
+				element.portProp(port.id, 'attrs/circle/stroke-opacity', 0);
+				element.portProp(port.id, 'attrs/circle/opacity', 0);
+				element.portProp(port.id, 'attrs/circle/pointer-events', 'none');
+			} else {
+				console.log(`👁️ ПОКАЗЫВАЕМ свободный порт ${port.id}`);
+				element.portProp(port.id, 'attrs/circle/fill-opacity', 1);
+				element.portProp(port.id, 'attrs/circle/stroke-opacity', 1);
+				element.portProp(port.id, 'attrs/circle/opacity', 1);
+				element.portProp(port.id, 'attrs/circle/pointer-events', 'auto');
+			}
 		});
 
 		visiblePorts.add(elementId);
@@ -386,13 +473,50 @@ export class PortService {
 		if (!elementPortState) return;
 
 		Object.values(elementPortState).flat().forEach(port => {
-			element.portProp(port.id, 'attrs/circle/display', 'none');
+			element.portProp(port.id, 'attrs/circle/fill-opacity', 0);
+			element.portProp(port.id, 'attrs/circle/stroke-opacity', 0);
+			element.portProp(port.id, 'attrs/circle/opacity', 0);
+			element.portProp(port.id, 'attrs/circle/pointer-events', 'none');
 		});
 
 		visiblePorts.delete(elementId);
 		this.stateStore.set('ports.visible', visiblePorts);
 
 		this.eventBus.emit('ports:element-ports-hidden', { element });
+	}
+
+	/**
+	 * Принудительно скрывает все порты элемента (для борьбы с JointJS глюками)
+	 */
+	forceHideAllElementPorts(element) {
+		if (!element) return;
+
+		const elementId = element.id;
+		const portStates = this.stateStore.get('ports.states');
+		const elementPortState = portStates.get(elementId);
+
+		if (!elementPortState) return;
+
+		// Проходим по всем портам и принудительно скрываем их
+		// Если элемент в списке видимых - показываем только свободные порты
+		const visiblePorts = this.stateStore.get('ports.visible');
+		const shouldShowElement = visiblePorts.has(elementId);
+		
+		Object.values(elementPortState).flat().forEach(port => {
+			if (shouldShowElement && !port.occupied) {
+				// Элемент должен показывать порты и этот порт свободен - показываем
+				element.portProp(port.id, 'attrs/circle/fill-opacity', 1);
+				element.portProp(port.id, 'attrs/circle/stroke-opacity', 1);
+				element.portProp(port.id, 'attrs/circle/opacity', 1);
+				element.portProp(port.id, 'attrs/circle/pointer-events', 'auto');
+			} else {
+				// Во всех остальных случаях - скрываем нахуй
+				element.portProp(port.id, 'attrs/circle/fill-opacity', 0);
+				element.portProp(port.id, 'attrs/circle/stroke-opacity', 0);
+				element.portProp(port.id, 'attrs/circle/opacity', 0);
+				element.portProp(port.id, 'attrs/circle/pointer-events', 'none');
+			}
+		});
 	}
 
 	/**

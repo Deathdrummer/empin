@@ -2,8 +2,12 @@
  * Контекстное меню
  */
 class ContextMenu {
-	constructor(canvas) {
+	constructor(canvas, eventManager) {
 		this.canvas = canvas
+		this.eventManager = eventManager
+		console.log('🔧 ContextMenu constructor:', { canvas, eventManager })
+		console.log('🔧 eventManager.eventBus:', eventManager?.eventBus)
+		this.eventBus = eventManager ? eventManager.eventBus : null
 		this.element = null
 		this.targetElement = null
 		this.menuItems = new Map()
@@ -178,6 +182,22 @@ class ContextMenu {
 	addPort(element, position) {
 		console.log('Adding port to element:', element.id, 'position:', position)
 		
+		// НОВАЯ ЛОГИКА: используем eventBus вместо прямого создания портов
+		console.log('🔄 Отправляем событие ports:add через eventBus')
+		console.log('🔧 this.eventBus:', this.eventBus)
+		
+		if (!this.eventBus) {
+			console.error('❌ eventBus недоступен! Используем старую логику.')
+			// Убираем return, чтобы выполнилась старая логика
+		} else {
+			this.eventBus.emit('ports:add', { 
+				element: element, 
+				side: position 
+			})
+			return // Больше ничего не делаем - PortService все сделает
+		}
+		
+		// СТАРАЯ ЛОГИКА (удалить позже):
 		// Получаем текущие порты элемента
 		const currentPorts = element.get('ports') || { items: [] }
 		
@@ -225,6 +245,63 @@ class ContextMenu {
 		
 		element.set('ports', updatedPorts)
 		console.log('Port added:', portId)
+		
+		// ХИТРАЯ ФИШКА: После добавления нового порта принудительно скрываем занятые порты
+		setTimeout(() => {
+			this.hideOccupiedPorts(element)
+		}, 0)
+	}
+
+	/**
+	 * Принудительно скрывает все занятые (подключенные к линкам) порты элемента
+	 */
+	hideOccupiedPorts(element) {
+		console.log('🔍 hideOccupiedPorts для элемента:', element.id)
+		
+		const graph = this.canvas.paper.model
+		const elementPorts = element.get('ports')?.items || []
+		
+		// Находим все линки, подключенные к этому элементу
+		const connectedLinks = graph.getConnectedLinks(element)
+		console.log('🔗 Подключенные линки:', connectedLinks.length)
+		
+		// Собираем ID занятых портов
+		const occupiedPortIds = new Set()
+		connectedLinks.forEach(link => {
+			const sourcePortId = link.get('source')?.port
+			const targetPortId = link.get('target')?.port
+			
+			if (sourcePortId && link.get('source')?.id === element.id) {
+				occupiedPortIds.add(sourcePortId)
+			}
+			if (targetPortId && link.get('target')?.id === element.id) {
+				occupiedPortIds.add(targetPortId)
+			}
+		})
+		
+		console.log('🚫 Занятые порты:', Array.from(occupiedPortIds))
+		
+		// Скрываем все занятые порты
+		occupiedPortIds.forEach(portId => {
+			console.log(`👻 Скрываем занятый порт: ${portId}`)
+			element.portProp(portId, 'attrs/portBody/opacity', 0)
+			element.portProp(portId, 'attrs/portBody/fill-opacity', 0)
+			element.portProp(portId, 'attrs/portBody/stroke-opacity', 0)
+			element.portProp(portId, 'attrs/portBody/pointer-events', 'none')
+		})
+		
+		// После добавления порта нужно пересчитать видимость портов
+		// Ищем EventManager через глобальный доступ к плагину
+		const pluginInstance = window.ddrDrawing?.getPlugin?.()
+		if (pluginInstance) {
+			const eventManager = pluginInstance.getEventManager()
+			if (eventManager && eventManager._hideOccupiedPorts) {
+				// Небольшая задержка чтобы DOM успел обновиться
+				setTimeout(() => {
+					eventManager._hideOccupiedPorts()
+				}, 50)
+			}
+		}
 	}
 
 	/**

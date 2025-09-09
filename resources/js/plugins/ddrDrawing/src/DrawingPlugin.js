@@ -32,7 +32,7 @@ class DrawingPlugin {
 			this.canvas = new DrawingCanvas(this.containerId)
 			this.eventManager = new EventManager(this.canvas)
 			this.toolManager = new ToolManager(this.canvas, this.eventManager)
-			this.contextMenu = new ContextMenu(this.canvas)
+			this.contextMenu = new ContextMenu(this.canvas, this.eventManager)
 
 			// Инициализируем компоненты
 			this.canvas.init()

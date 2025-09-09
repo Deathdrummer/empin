@@ -381,6 +381,27 @@ class EventManager {
 		console.log('Source:', linkView.model.source())
 		console.log('Target:', linkView.model.target())
 		
+		// Сохраняем информацию о занятых портах в модели элементов
+		const source = linkView.model.source()
+		const target = linkView.model.target()
+		
+		if (source.id && source.port) {
+			const sourceElement = this.canvas.getGraph().getCell(source.id)
+			if (sourceElement) {
+				this._markPortAsHidden(sourceElement, source.port)
+			}
+		}
+		
+		if (target.id && target.port) {
+			const targetElement = this.canvas.getGraph().getCell(target.id)
+			if (targetElement) {
+				this._markPortAsHidden(targetElement, target.port)
+			}
+		}
+		
+		// Скрываем занятые порты
+		this._hideOccupiedPorts()
+		
 		// Можно добавить логику уведомлений или валидации
 		this.emit('link-created', {
 			link: linkView.model,
@@ -395,8 +416,96 @@ class EventManager {
 	_handleLinkDisconnect(linkView) {
 		console.log('=== Link disconnected ===', linkView.model.id)
 		
+		// Показываем освободившиеся порты
+		this._hideOccupiedPorts()
+		
 		this.emit('link-removed', {
 			link: linkView.model
+		})
+	}
+
+	/**
+	 * Помечаем порт как скрытый в модели элемента
+	 */
+	_markPortAsHidden(element, portId) {
+		const hiddenPorts = element.get('hiddenPorts') || []
+		if (!hiddenPorts.includes(portId)) {
+			element.set('hiddenPorts', [...hiddenPorts, portId])
+			console.log('Marked port as hidden:', portId, 'for element:', element.id)
+		}
+	}
+
+	/**
+	 * Проверяем скрыт ли порт в модели элемента
+	 */
+	_isPortHidden(element, portId) {
+		const hiddenPorts = element.get('hiddenPorts') || []
+		return hiddenPorts.includes(portId)
+	}
+
+	/**
+	 * Скрытие занятых портов
+	 */
+	_hideOccupiedPorts() {
+		if (!this.canvas) return
+		
+		const graph = this.canvas.getGraph()
+		const paper = this.canvas.getPaper()
+		const links = graph.getLinks()
+		
+		// Собираем все занятые порты
+		const occupiedPorts = new Set()
+		links.forEach(link => {
+			const source = link.source()
+			const target = link.target()
+			
+			if (source.id && source.port) {
+				occupiedPorts.add(`${source.id}:${source.port}`)
+			}
+			if (target.id && target.port) {
+				occupiedPorts.add(`${target.id}:${target.port}`)
+			}
+		})
+		
+		console.log('Occupied ports:', Array.from(occupiedPorts))
+		
+		// Проходим по всем элементам и скрываем/показываем порты
+		graph.getElements().forEach(element => {
+			const elementView = paper.findViewByModel(element)
+			if (!elementView) return
+			
+			const ports = element.get('ports')
+			if (!ports || !ports.items) return
+			
+			ports.items.forEach(port => {
+				const portKey = `${element.id}:${port.id}`
+				const portElement = elementView.el.querySelector(`[port="${port.id}"]`)
+				
+				if (portElement) {
+					// Проверяем скрыт ли порт в модели элемента
+					const isHiddenInModel = this._isPortHidden(element, port.id)
+					
+					if (occupiedPorts.has(portKey)) {
+						// Скрываем занятый порт
+						portElement.style.display = 'none'
+						portElement.style.pointerEvents = 'none'
+						portElement.setAttribute('magnet', 'false')
+					} else if (isHiddenInModel) {
+						// Порт помечен как скрытый в модели - не показываем
+						portElement.style.display = 'none'
+						portElement.style.pointerEvents = 'none'
+						portElement.setAttribute('magnet', 'false')
+					} else {
+						// Показываем свободный порт
+						portElement.style.display = 'block'
+						portElement.setAttribute('fill', '#61cfff')
+						portElement.setAttribute('stroke', '#0088ff')
+						portElement.style.opacity = '0.8'
+						portElement.style.pointerEvents = 'all'
+						portElement.setAttribute('magnet', 'true')
+					}
+				}
+			})
 		})
 	}
 

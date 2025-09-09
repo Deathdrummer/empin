@@ -64,7 +64,7 @@ class DrawingCanvas {
 			background: {
 				color: '#fdfdfd'
 			},
-			// ВАЖНО: настройки интерактивности - блокируем движение элементов
+			// ВАЖНО: полностью блокируем движение элементов, но разрешаем создание связей
 			interactive: {
 				elementMove: false,  // Блокируем движение элементов
 				addLinkFromMagnet: true, // Разрешаем создание связей от портов
@@ -78,7 +78,7 @@ class DrawingCanvas {
 			},
 			// Разрешаем создание связей только через порты
 			linkPinning: false,
-			// Создаем стандартную связь без стрелок
+			// Создаем стандартную связь без стрелок с удлинением на радиус порта
 			defaultLink: () => {
 				return new window.joint.shapes.standard.Link({
 					attrs: {
@@ -93,7 +93,21 @@ class DrawingCanvas {
 			},
 			// Настройки магнитного поведения
 			magnetThreshold: 'onleave',
-			// Валидация подключений - только через порты с магнитами
+			markAvailable: true, // Показывать доступные порты
+			// Настройки по умолчанию для всех связей - убираем отступ
+			defaultConnectionPoint: {
+				name: 'boundary',
+				args: {
+					offset: -2.5,  // ОТРИЦАТЕЛЬНЫЙ отступ - заходим внутрь элемента
+					extrapolate: true
+				}
+			},
+			// Валидация магнитов - разрешаем активные порты
+			validateMagnet: (cellView, magnet) => {
+				console.log('=== validateMagnet ===', magnet.getAttribute('magnet'))
+				return magnet.getAttribute('magnet') === 'true'
+			},
+			// Валидация подключений - только через порты с магнитами  
 			validateConnection: (cellViewS, magnetS, cellViewT, magnetT, end, linkView) => {
 				console.log('=== validateConnection ===', { magnetS, magnetT })
 				
@@ -106,34 +120,6 @@ class DrawingCanvas {
 				// Не разрешаем подключение к одному элементу
 				if (cellViewS === cellViewT) {
 					console.log('Connection rejected: same element')
-					return false
-				}
-				
-				// Получаем ID портов
-				const sourcePortId = magnetS.getAttribute('port')
-				const targetPortId = magnetT.getAttribute('port')
-				const sourceElementId = cellViewS.model.id
-				const targetElementId = cellViewT.model.id
-				
-				// Проверяем дублирующиеся соединения
-				const existingLinks = this.graph.getLinks()
-				const isDuplicate = existingLinks.some(link => {
-					const linkSource = link.source()
-					const linkTarget = link.target()
-					
-					// Проверяем прямое и обратное соединение
-					return (linkSource.id === sourceElementId && 
-							linkSource.port === sourcePortId &&
-							linkTarget.id === targetElementId && 
-							linkTarget.port === targetPortId) ||
-						   (linkSource.id === targetElementId && 
-							linkSource.port === targetPortId &&
-							linkTarget.id === sourceElementId && 
-							linkTarget.port === sourcePortId)
-				})
-				
-				if (isDuplicate) {
-					console.log('Connection rejected: duplicate connection between these ports')
 					return false
 				}
 				
