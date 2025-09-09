@@ -95,6 +95,24 @@ class EventManager {
 			this._handleCellContextMenu(cellView, evt)
 		})
 		
+		// События портов для hover эффектов
+		paper.on('element:magnet:pointerenter', (elementView, evt) => {
+			this._handlePortMouseEnter(elementView, evt)
+		})
+		
+		paper.on('element:magnet:pointerleave', (elementView, evt) => {
+			this._handlePortMouseLeave(elementView, evt)
+		})
+		
+		// События создания связей
+		paper.on('link:connect', (linkView) => {
+			this._handleLinkConnect(linkView)
+		})
+		
+		paper.on('link:disconnect', (linkView) => {
+			this._handleLinkDisconnect(linkView)
+		})
+		
 		// Блокируем стандартное контекстное меню
 		paper.el.addEventListener('contextmenu', (evt) => {
 			evt.preventDefault()
@@ -321,6 +339,65 @@ class EventManager {
 		if (drawingTab && drawingTab.classList.contains('ddrtabscontent__item_visible')) {
 			setTimeout(() => this.canvas.updatePaperSize(), 100)
 		}
+	}
+
+	/**
+	 * Обработка наведения на порт
+	 */
+	_handlePortMouseEnter(elementView, evt) {
+		const magnet = evt.target
+		const portId = magnet.getAttribute('port')
+		
+		console.log('Port hover enter:', portId)
+		
+		// Подсвечиваем порт
+		magnet.setAttribute('fill', '#87d5ff')
+		magnet.setAttribute('opacity', '1.0')
+		magnet.setAttribute('r', '4')
+		magnet.setAttribute('stroke-width', '2')
+	}
+
+	/**
+	 * Обработка ухода курсора с порта
+	 */
+	_handlePortMouseLeave(elementView, evt) {
+		const magnet = evt.target
+		const portId = magnet.getAttribute('port')
+		
+		console.log('Port hover leave:', portId)
+		
+		// Возвращаем обычный стиль
+		magnet.setAttribute('fill', '#61cfff')
+		magnet.setAttribute('opacity', '0.8')
+		magnet.setAttribute('r', '3')
+		magnet.setAttribute('stroke-width', '1')
+	}
+
+	/**
+	 * Обработка создания связи
+	 */
+	_handleLinkConnect(linkView) {
+		console.log('=== Link connected ===', linkView.model.id)
+		console.log('Source:', linkView.model.source())
+		console.log('Target:', linkView.model.target())
+		
+		// Можно добавить логику уведомлений или валидации
+		this.emit('link-created', {
+			link: linkView.model,
+			source: linkView.model.source(),
+			target: linkView.model.target()
+		})
+	}
+
+	/**
+	 * Обработка удаления связи
+	 */
+	_handleLinkDisconnect(linkView) {
+		console.log('=== Link disconnected ===', linkView.model.id)
+		
+		this.emit('link-removed', {
+			link: linkView.model
+		})
 	}
 
 	/**

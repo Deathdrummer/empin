@@ -188,16 +188,27 @@ class ContextMenu {
 		const portNumber = existingPortsOfPosition.length + 1
 		const portId = `${position}${portNumber}`
 		
-		// Создаем новый порт
+		// Создаем новый порт с правильной структурой для JointJS v4
 		const newPort = {
 			id: portId,
 			group: position,
+			markup: [{
+				tagName: 'circle',
+				selector: 'portBody',
+				attributes: {
+					'port': portId  // ВАЖНО: добавляем ID порта в DOM атрибуты
+				}
+			}],
 			attrs: {
-				circle: {
-					fill: '#4CAF50',
-					stroke: '#2E7D32',
+				portBody: {
+					fill: '#61cfff',
+					stroke: '#0088ff',
 					strokeWidth: 1,
-					r: 3
+					r: 3,
+					magnet: true,
+					cursor: 'crosshair',
+					// Базовый стиль для hover эффектов
+					opacity: 0.8
 				}
 			}
 		}

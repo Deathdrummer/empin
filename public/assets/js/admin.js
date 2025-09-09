@@ -12131,6 +12131,9 @@ var pluginInstance = null;
 var ddrDrawing = function ddrDrawing() {
   return {
     init: function init() {
+      console.log('=== ddrDrawing.init() called ===');
+      console.log('File path: index.js (main entry point)');
+
       if (!pluginInstance) {
         pluginInstance = new _src_DrawingPlugin_js__WEBPACK_IMPORTED_MODULE_0__["default"]('#ddrDrawingCanvas');
       }
@@ -12255,7 +12258,8 @@ var DrawingPlugin = /*#__PURE__*/function () {
     key: "init",
     value: function init() {
       if (this.initialized) return;
-      console.log('Initializing DrawingPlugin');
+      console.log('=== Initializing DrawingPlugin ===');
+      console.log('File path: src/DrawingPlugin.js');
 
       try {
         // Создаем основные компоненты
@@ -12537,6 +12541,8 @@ var DrawingCanvas = /*#__PURE__*/function () {
   }, {
     key: "_createPaper",
     value: function _createPaper() {
+      var _this = this;
+
       this.paper = new window.joint.dia.Paper({
         el: this.container,
         model: this.graph,
@@ -12552,8 +12558,83 @@ var DrawingCanvas = /*#__PURE__*/function () {
         },
         background: {
           color: '#fdfdfd'
+        },
+        // ВАЖНО: настройки интерактивности - блокируем движение элементов
+        interactive: {
+          elementMove: false,
+          // Блокируем движение элементов
+          addLinkFromMagnet: true,
+          // Разрешаем создание связей от портов
+          linkMove: true,
+          vertexMove: true,
+          vertexAdd: true,
+          vertexRemove: true,
+          arrowheadMove: true,
+          labelMove: false,
+          useLinkTools: true
+        },
+        // Разрешаем создание связей только через порты
+        linkPinning: false,
+        // Создаем стандартную связь без стрелок
+        defaultLink: function defaultLink() {
+          return new window.joint.shapes.standard.Link({
+            attrs: {
+              line: {
+                stroke: '#666666',
+                strokeWidth: 1,
+                targetMarker: 'none',
+                // Убираем стрелку
+                sourceMarker: 'none' // Убираем стрелку с начала тоже
+
+              }
+            }
+          });
+        },
+        // Настройки магнитного поведения
+        magnetThreshold: 'onleave',
+        // Валидация подключений - только через порты с магнитами
+        validateConnection: function validateConnection(cellViewS, magnetS, cellViewT, magnetT, end, linkView) {
+          console.log('=== validateConnection ===', {
+            magnetS: magnetS,
+            magnetT: magnetT
+          }); // Проверяем что оба конца подключены к магнитам (портам)
+
+          if (!magnetS || !magnetT) {
+            console.log('Connection rejected: not connected to magnets');
+            return false;
+          } // Не разрешаем подключение к одному элементу
+
+
+          if (cellViewS === cellViewT) {
+            console.log('Connection rejected: same element');
+            return false;
+          } // Получаем ID портов
+
+
+          var sourcePortId = magnetS.getAttribute('port');
+          var targetPortId = magnetT.getAttribute('port');
+          var sourceElementId = cellViewS.model.id;
+          var targetElementId = cellViewT.model.id; // Проверяем дублирующиеся соединения
+
+          var existingLinks = _this.graph.getLinks();
+
+          var isDuplicate = existingLinks.some(function (link) {
+            var linkSource = link.source();
+            var linkTarget = link.target(); // Проверяем прямое и обратное соединение
+
+            return linkSource.id === sourceElementId && linkSource.port === sourcePortId && linkTarget.id === targetElementId && linkTarget.port === targetPortId || linkSource.id === targetElementId && linkSource.port === targetPortId && linkTarget.id === sourceElementId && linkTarget.port === sourcePortId;
+          });
+
+          if (isDuplicate) {
+            console.log('Connection rejected: duplicate connection between these ports');
+            return false;
+          }
+
+          console.log('Connection approved!');
+          return true;
         }
       });
+      console.log('=== Paper created with port-based linking enabled ===');
     }
     /**
      * Обновление размеров paper
@@ -12562,14 +12643,14 @@ var DrawingCanvas = /*#__PURE__*/function () {
   }, {
     key: "updatePaperSize",
     value: function updatePaperSize() {
-      var _this = this;
+      var _this2 = this;
 
       if (!this.paper) return;
       var container = this.paper.el;
 
       if (!container || !container.offsetParent) {
         setTimeout(function () {
-          return _this.updatePaperSize();
+          return _this2.updatePaperSize();
         }, 100);
         return;
       }
@@ -12587,10 +12668,10 @@ var DrawingCanvas = /*#__PURE__*/function () {
   }, {
     key: "_updatePaperSize",
     value: function _updatePaperSize() {
-      var _this2 = this;
+      var _this3 = this;
 
       setTimeout(function () {
-        return _this2.updatePaperSize();
+        return _this3.updatePaperSize();
       }, 50);
     }
     /**
@@ -12813,6 +12894,20 @@ var EventManager = /*#__PURE__*/function () {
       });
       paper.on('cell:contextmenu', function (cellView, evt) {
         _this3._handleCellContextMenu(cellView, evt);
+      }); // События портов для hover эффектов
+
+      paper.on('element:magnet:pointerenter', function (elementView, evt) {
+        _this3._handlePortMouseEnter(elementView, evt);
+      });
+      paper.on('element:magnet:pointerleave', function (elementView, evt) {
+        _this3._handlePortMouseLeave(elementView, evt);
+      }); // События создания связей
+
+      paper.on('link:connect', function (linkView) {
+        _this3._handleLinkConnect(linkView);
+      });
+      paper.on('link:disconnect', function (linkView) {
+        _this3._handleLinkDisconnect(linkView);
       }); // Блокируем стандартное контекстное меню
 
       paper.el.addEventListener('contextmenu', function (evt) {
@@ -13073,6 +13168,67 @@ var EventManager = /*#__PURE__*/function () {
           return _this6.canvas.updatePaperSize();
         }, 100);
       }
+    }
+    /**
+     * Обработка наведения на порт
+     */
+
+  }, {
+    key: "_handlePortMouseEnter",
+    value: function _handlePortMouseEnter(elementView, evt) {
+      var magnet = evt.target;
+      var portId = magnet.getAttribute('port');
+      console.log('Port hover enter:', portId); // Подсвечиваем порт
+
+      magnet.setAttribute('fill', '#87d5ff');
+      magnet.setAttribute('opacity', '1.0');
+      magnet.setAttribute('r', '4');
+      magnet.setAttribute('stroke-width', '2');
+    }
+    /**
+     * Обработка ухода курсора с порта
+     */
+
+  }, {
+    key: "_handlePortMouseLeave",
+    value: function _handlePortMouseLeave(elementView, evt) {
+      var magnet = evt.target;
+      var portId = magnet.getAttribute('port');
+      console.log('Port hover leave:', portId); // Возвращаем обычный стиль
+
+      magnet.setAttribute('fill', '#61cfff');
+      magnet.setAttribute('opacity', '0.8');
+      magnet.setAttribute('r', '3');
+      magnet.setAttribute('stroke-width', '1');
+    }
+    /**
+     * Обработка создания связи
+     */
+
+  }, {
+    key: "_handleLinkConnect",
+    value: function _handleLinkConnect(linkView) {
+      console.log('=== Link connected ===', linkView.model.id);
+      console.log('Source:', linkView.model.source());
+      console.log('Target:', linkView.model.target()); // Можно добавить логику уведомлений или валидации
+
+      this.emit('link-created', {
+        link: linkView.model,
+        source: linkView.model.source(),
+        target: linkView.model.target()
+      });
+    }
+    /**
+     * Обработка удаления связи
+     */
+
+  }, {
+    key: "_handleLinkDisconnect",
+    value: function _handleLinkDisconnect(linkView) {
+      console.log('=== Link disconnected ===', linkView.model.id);
+      this.emit('link-removed', {
+        link: linkView.model
+      });
     }
     /**
      * Простая система событий
@@ -13573,7 +13729,7 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 
 
 /**
- * Инструмент выделения и перемещения холста
+ * Инструмент выделения и перемещения элементов
  */
 
 var SelectTool = /*#__PURE__*/function (_BaseTool) {
@@ -13594,8 +13750,8 @@ var SelectTool = /*#__PURE__*/function (_BaseTool) {
   _createClass(SelectTool, [{
     key: "onActivate",
     value: function onActivate() {
-      // Устанавливаем курсор по умолчанию
       this.getPaper().el.style.cursor = 'default';
+      this.setupEvents();
       console.log('SelectTool активирован');
     }
     /**
@@ -13605,7 +13761,6 @@ var SelectTool = /*#__PURE__*/function (_BaseTool) {
   }, {
     key: "onDeactivate",
     value: function onDeactivate() {
-      // Сбрасываем курсор
       this.getPaper().el.style.cursor = 'default';
     }
     /**
@@ -13628,6 +13783,58 @@ var SelectTool = /*#__PURE__*/function (_BaseTool) {
   }, {
     key: "onElementClick",
     value: function onElementClick(element, event) {// Логика выделения элемента уже реализована в EventManager
+    }
+    /**
+     * Настройка событий
+     */
+
+  }, {
+    key: "setupEvents",
+    value: function setupEvents() {
+      var _this = this;
+
+      var paper = this.getPaper(); // Обработка кликов по элементам для перемещения
+
+      paper.on('element:pointerdown', function (elementView, evt) {
+        _this.setupElementDrag(elementView, evt);
+      });
+    }
+    /**
+     * Настройка перемещения элемента
+     */
+
+  }, {
+    key: "setupElementDrag",
+    value: function setupElementDrag(elementView, evt) {
+      var paper = this.getPaper();
+      var element = elementView.model;
+      var isDragging = false;
+      var startPoint = null;
+      var startPosition = null;
+
+      var onPointerMove = function onPointerMove(evt) {
+        if (!isDragging) return;
+        var currentPoint = paper.clientToLocalPoint(evt.clientX, evt.clientY);
+        var deltaX = currentPoint.x - startPoint.x;
+        var deltaY = currentPoint.y - startPoint.y;
+        element.set('position', {
+          x: startPosition.x + deltaX,
+          y: startPosition.y + deltaY
+        });
+      };
+
+      var onPointerUp = function onPointerUp() {
+        isDragging = false;
+        paper.el.removeEventListener('pointermove', onPointerMove);
+        paper.el.removeEventListener('pointerup', onPointerUp);
+      }; // Начинаем перетаскивание
+
+
+      startPoint = paper.clientToLocalPoint(evt.clientX, evt.clientY);
+      startPosition = element.get('position');
+      isDragging = true;
+      paper.el.addEventListener('pointermove', onPointerMove);
+      paper.el.addEventListener('pointerup', onPointerUp);
     }
   }]);
 
@@ -13913,17 +14120,29 @@ var ContextMenu = /*#__PURE__*/function () {
         return port.group === position;
       });
       var portNumber = existingPortsOfPosition.length + 1;
-      var portId = "".concat(position).concat(portNumber); // Создаем новый порт
+      var portId = "".concat(position).concat(portNumber); // Создаем новый порт с правильной структурой для JointJS v4
 
       var newPort = {
         id: portId,
         group: position,
+        markup: [{
+          tagName: 'circle',
+          selector: 'portBody',
+          attributes: {
+            'port': portId // ВАЖНО: добавляем ID порта в DOM атрибуты
+
+          }
+        }],
         attrs: {
-          circle: {
-            fill: '#4CAF50',
-            stroke: '#2E7D32',
+          portBody: {
+            fill: '#61cfff',
+            stroke: '#0088ff',
             strokeWidth: 1,
-            r: 3
+            r: 3,
+            magnet: true,
+            cursor: 'crosshair',
+            // Базовый стиль для hover эффектов
+            opacity: 0.8
           }
         }
       }; // Добавляем порт к элементу

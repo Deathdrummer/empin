@@ -13,7 +13,8 @@ let contextMenu = null
  * Инициализация плагина
  */
 function init() {
-	console.log('Initializing ddrDrawing')
+	console.log('=== OLD ddrDrawing initializing ===')
+	console.log('File path: index-old.js (LEGACY CODE)')
 	
 	// Проверяем JointJS
 	if (!window.joint) {

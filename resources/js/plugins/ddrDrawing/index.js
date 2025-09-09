@@ -8,6 +8,8 @@ let pluginInstance = null
  */
 const ddrDrawing = () => ({
 	init: () => {
+		console.log('=== ddrDrawing.init() called ===')
+		console.log('File path: index.js (main entry point)')
 		if (!pluginInstance) {
 			pluginInstance = new DrawingPlugin('#ddrDrawingCanvas')
 		}

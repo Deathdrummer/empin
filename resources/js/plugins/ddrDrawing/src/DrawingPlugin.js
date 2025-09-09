@@ -24,7 +24,8 @@ class DrawingPlugin {
 	init() {
 		if (this.initialized) return
 
-		console.log('Initializing DrawingPlugin')
+		console.log('=== Initializing DrawingPlugin ===')
+		console.log('File path: src/DrawingPlugin.js')
 
 		try {
 			// Создаем основные компоненты
@@ -70,6 +71,7 @@ class DrawingPlugin {
 		this.toolManager.registerTool('select', SelectTool)
 		this.toolManager.registerTool('rectangle', RectangleTool)
 	}
+
 
 	/**
 	 * Настройка обработчиков событий
@@ -126,6 +128,7 @@ class DrawingPlugin {
 	getContextMenu() {
 		return this.contextMenu
 	}
+
 
 	/**
 	 * Установить инструмент
