@@ -1213,4 +1213,36 @@ section
 	&__canvas
 		width: 100%
 		height: 100%
+
+// SVG порты - правильные селекторы
+.joint-port
+	transition: opacity 0.3s ease, visibility 0.3s ease
+	
+	// По умолчанию порты скрыты
+	opacity: 0
+	visibility: hidden
+	
+	&.port-visible
+		opacity: 1 !important
+		visibility: visible !important
+	
+	// Принудительно убираем любую прозрачность при наведении
+	circle[port]
+		opacity: 1 !important
+
+// Занятые порты всегда видны БЕЗ изменения позиции
+.joint-port.port-connected
+	opacity: 1 !important
+	visibility: visible !important
+	// Не применяем transform к занятым портам
+
+// Выделенный элемент - показываем только свободные порты
+.joint-element.selected .joint-port.port-visible
+	opacity: 1 !important
+	visibility: visible !important
+
+// Стили для режима создания связи - только свободные порты подсвечиваются
+.ddr-linking-mode .joint-port.port-visible
+	opacity: 1 !important
+	visibility: visible !important
 		position: relative

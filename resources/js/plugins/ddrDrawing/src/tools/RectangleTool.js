@@ -40,9 +40,10 @@ class RectangleTool extends BaseTool {
 	 * Создание прямоугольника
 	 */
 	createRectangle(x, y) {
-		// Привязываем к сетке
-		const snapX = Math.round(x / this.gridSize) * this.gridSize
-		const snapY = Math.round(y / this.gridSize) * this.gridSize
+		// Используем snap-to-grid из canvas
+		const snappedPos = this.canvas.snapToGrid(x, y)
+		const snapX = snappedPos.x
+		const snapY = snappedPos.y
 		
 		const rect = new window.joint.shapes.standard.Rectangle({
 			position: { x: snapX - 10, y: snapY - 10 },

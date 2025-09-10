@@ -53,7 +53,8 @@ class DrawingCanvas {
 			model: this.graph,
 			width: '100%',
 			height: '100%',
-			gridSize: 10,
+			gridSize: 1, // Пиксельная точность для плавного движения линий
+			drawGridSize: 10, // Визуальная сетка каждые 10px
 			drawGrid: {
 				name: 'dot',
 				args: {
@@ -64,9 +65,9 @@ class DrawingCanvas {
 			background: {
 				color: '#fdfdfd'
 			},
-			// ВАЖНО: полностью блокируем движение элементов, но разрешаем создание связей
+			// ВАЖНО: отключаем встроенное движение элементов, используем кастомную логику
 			interactive: {
-				elementMove: false,  // Блокируем движение элементов
+				elementMove: false,  // Отключаем встроенное движение - используем кастомную логику в SelectTool
 				addLinkFromMagnet: true, // Разрешаем создание связей от портов
 				linkMove: true,
 				vertexMove: true,
@@ -88,7 +89,7 @@ class DrawingCanvas {
 							targetMarker: 'none', // Убираем стрелку
 							sourceMarker: 'none'  // Убираем стрелку с начала тоже
 						}
-					}
+					},
 				})
 			},
 			// Настройки магнитного поведения
@@ -210,6 +211,25 @@ class DrawingCanvas {
 	 */
 	clientToLocalPoint(clientX, clientY) {
 		return this.paper ? this.paper.clientToLocalPoint(clientX, clientY) : { x: 0, y: 0 }
+	}
+
+	/**
+	 * Привязать точку к сетке с учетом масштаба
+	 */
+	snapToGrid(x, y, gridSize = 10) {
+		// Базовый размер сетки НЕ зависит от масштаба!
+		// JointJS clientToLocalPoint уже учитывает трансформации
+		return {
+			x: Math.round(x / gridSize) * gridSize,
+			y: Math.round(y / gridSize) * gridSize
+		}
+	}
+
+	/**
+	 * Получить размер сетки
+	 */
+	getGridSize() {
+		return this.paper ? this.paper.options.gridSize : 10
 	}
 }
 

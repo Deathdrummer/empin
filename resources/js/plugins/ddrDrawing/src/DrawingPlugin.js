@@ -2,6 +2,7 @@ import DrawingCanvas from './core/DrawingCanvas.js'
 import EventManager from './core/EventManager.js'
 import ToolManager from './core/ToolManager.js'
 import ContextMenu from './ui/ContextMenu.js'
+import PortService from './services/PortService.js'
 import SelectTool from './tools/SelectTool.js'
 import RectangleTool from './tools/RectangleTool.js'
 
@@ -15,6 +16,7 @@ class DrawingPlugin {
 		this.eventManager = null
 		this.toolManager = null
 		this.contextMenu = null
+		this.portService = null
 		this.initialized = false
 	}
 
@@ -33,10 +35,12 @@ class DrawingPlugin {
 			this.eventManager = new EventManager(this.canvas)
 			this.toolManager = new ToolManager(this.canvas, this.eventManager)
 			this.contextMenu = new ContextMenu(this.canvas, this.eventManager)
+			this.portService = new PortService(this.canvas, this.eventManager)
 
 			// Инициализируем компоненты
 			this.canvas.init()
 			this.contextMenu.init()
+			this.portService.init()
 			
 			// Устанавливаем связи
 			this.eventManager.setToolManager(this.toolManager)
@@ -129,6 +133,13 @@ class DrawingPlugin {
 		return this.contextMenu
 	}
 
+	/**
+	 * Получить сервис портов
+	 */
+	getPortService() {
+		return this.portService
+	}
+
 
 	/**
 	 * Установить инструмент
@@ -212,6 +223,10 @@ class DrawingPlugin {
 		
 		if (this.contextMenu) {
 			this.contextMenu.destroy()
+		}
+		
+		if (this.portService) {
+			this.portService.destroy()
 		}
 		
 		this.initialized = false

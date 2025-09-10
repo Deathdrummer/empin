@@ -368,7 +368,7 @@ class EventManager {
 		
 		// Возвращаем обычный стиль
 		magnet.setAttribute('fill', '#61cfff')
-		magnet.setAttribute('opacity', '0.8')
+		magnet.setAttribute('opacity', '1.0')
 		magnet.setAttribute('r', '3')
 		magnet.setAttribute('stroke-width', '1')
 	}
@@ -500,7 +500,7 @@ class EventManager {
 						portElement.style.display = 'block'
 						portElement.setAttribute('fill', '#61cfff')
 						portElement.setAttribute('stroke', '#0088ff')
-						portElement.style.opacity = '0.8'
+						portElement.style.opacity = '1.0'
 						portElement.style.pointerEvents = 'all'
 						portElement.setAttribute('magnet', 'true')
 					}

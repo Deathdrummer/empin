@@ -8231,5 +8231,33 @@ section {
 .ddrdrawing__context-menu-submenu:hover__canvas {
   width: 100%;
   height: 100%;
-  position: relative;
+}
+
+.joint-port {
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  opacity: 0;
+  visibility: hidden;
+}
+.joint-port.port-visible {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+.joint-port circle[port] {
+  opacity: 1 !important;
+}
+
+.joint-port.port-connected {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.joint-element.selected .joint-port.port-visible {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.ddr-linking-mode .joint-port.port-visible {
+  opacity: 1 !important;
+  visibility: visible !important;
+  visibility-position: relative;
 }

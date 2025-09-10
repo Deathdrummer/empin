@@ -6,8 +6,8 @@ class ContextMenu {
 		this.canvas = canvas
 		this.eventManager = eventManager
 		console.log('🔧 ContextMenu constructor:', { canvas, eventManager })
-		console.log('🔧 eventManager.eventBus:', eventManager?.eventBus)
-		this.eventBus = eventManager ? eventManager.eventBus : null
+		console.log('🔧 eventManager:', eventManager)
+		this.eventBus = eventManager // EventManager сам является event bus
 		this.element = null
 		this.targetElement = null
 		this.menuItems = new Map()
@@ -188,8 +188,9 @@ class ContextMenu {
 		
 		if (!this.eventBus) {
 			console.error('❌ eventBus недоступен! Используем старую логику.')
-			// Убираем return, чтобы выполнилась старая логика
+			// Fallback к старой логике только если eventBus реально недоступен
 		} else {
+			console.log('✅ Используем PortService через eventBus')
 			this.eventBus.emit('ports:add', { 
 				element: element, 
 				side: position 
@@ -226,9 +227,7 @@ class ContextMenu {
 					strokeWidth: 1,
 					r: 3,
 					magnet: true,
-					cursor: 'crosshair',
-					// Базовый стиль для hover эффектов
-					opacity: 0.8
+					cursor: 'crosshair'
 				}
 			}
 		}
