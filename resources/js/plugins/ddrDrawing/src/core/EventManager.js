@@ -1,3 +1,5 @@
+import logger from './Logger.js'
+
 /**
  * Менеджер событий для централизации обработки
  */
@@ -34,7 +36,7 @@ class EventManager {
 		this._setupCanvasEvents()
 		this._setupPaperEvents()
 		this._setupGlobalEvents()
-		console.log('EventManager initialized')
+		logger.log('EventManager initialized')
 	}
 
 	/**
@@ -158,7 +160,7 @@ class EventManager {
 	 * Обработка клика по инструменту
 	 */
 	_handleToolClick(tool) {
-		console.log('Tool clicked:', tool)
+		logger.log('Tool clicked:', tool)
 		
 		// Специальные инструменты
 		switch (tool) {
@@ -348,7 +350,7 @@ class EventManager {
 		const magnet = evt.target
 		const portId = magnet.getAttribute('port')
 		
-		console.log('Port hover enter:', portId)
+		logger.log('Port hover enter:', portId)
 		
 		// Подсвечиваем порт
 		magnet.setAttribute('fill', '#87d5ff')
@@ -364,7 +366,7 @@ class EventManager {
 		const magnet = evt.target
 		const portId = magnet.getAttribute('port')
 		
-		console.log('Port hover leave:', portId)
+		logger.log('Port hover leave:', portId)
 		
 		// Возвращаем обычный стиль
 		magnet.setAttribute('fill', '#61cfff')
@@ -377,9 +379,9 @@ class EventManager {
 	 * Обработка создания связи
 	 */
 	_handleLinkConnect(linkView) {
-		console.log('=== Link connected ===', linkView.model.id)
-		console.log('Source:', linkView.model.source())
-		console.log('Target:', linkView.model.target())
+		logger.log('=== Link connected ===', linkView.model.id)
+		logger.log('Source:', linkView.model.source())
+		logger.log('Target:', linkView.model.target())
 		
 		// Сохраняем информацию о занятых портах в модели элементов
 		const source = linkView.model.source()
@@ -414,7 +416,7 @@ class EventManager {
 	 * Обработка удаления связи
 	 */
 	_handleLinkDisconnect(linkView) {
-		console.log('=== Link disconnected ===', linkView.model.id)
+		logger.log('=== Link disconnected ===', linkView.model.id)
 		
 		// Показываем освободившиеся порты
 		this._hideOccupiedPorts()
@@ -431,7 +433,7 @@ class EventManager {
 		const hiddenPorts = element.get('hiddenPorts') || []
 		if (!hiddenPorts.includes(portId)) {
 			element.set('hiddenPorts', [...hiddenPorts, portId])
-			console.log('Marked port as hidden:', portId, 'for element:', element.id)
+			logger.log('Marked port as hidden:', portId, 'for element:', element.id)
 		}
 	}
 
@@ -467,7 +469,7 @@ class EventManager {
 			}
 		})
 		
-		console.log('Occupied ports:', Array.from(occupiedPorts))
+		logger.log('Occupied ports:', Array.from(occupiedPorts))
 		
 		// Проходим по всем элементам и скрываем/показываем порты
 		graph.getElements().forEach(element => {

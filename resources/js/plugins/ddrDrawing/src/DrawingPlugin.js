@@ -5,6 +5,7 @@ import ContextMenu from './ui/ContextMenu.js'
 import PortService from './services/PortService.js'
 import SelectTool from './tools/SelectTool.js'
 import RectangleTool from './tools/RectangleTool.js'
+import logger from './core/Logger.js'
 
 /**
  * Главный класс плагина рисования
@@ -26,8 +27,7 @@ class DrawingPlugin {
 	init() {
 		if (this.initialized) return
 
-		console.log('=== Initializing DrawingPlugin ===')
-		console.log('File path: src/DrawingPlugin.js')
+		logger.info('Initializing DrawingPlugin')
 
 		try {
 			// Создаем основные компоненты
@@ -60,10 +60,10 @@ class DrawingPlugin {
 			this.setupEventHandlers()
 
 			this.initialized = true
-			console.log('DrawingPlugin initialized successfully')
+			logger.info('DrawingPlugin initialized successfully')
 
 		} catch (error) {
-			console.error('Failed to initialize DrawingPlugin:', error)
+			logger.error('Failed to initialize DrawingPlugin:', error)
 			throw error
 		}
 	}
@@ -83,12 +83,12 @@ class DrawingPlugin {
 	setupEventHandlers() {
 		// Обработчики для специальных инструментов
 		this.eventManager.on('undo', () => {
-			console.log('Undo action')
+			logger.info('Undo action')
 			// TODO: Реализовать undo
 		})
 
 		this.eventManager.on('redo', () => {
-			console.log('Redo action')
+			logger.info('Redo action')
 			// TODO: Реализовать redo
 		})
 
@@ -230,7 +230,7 @@ class DrawingPlugin {
 		}
 		
 		this.initialized = false
-		console.log('DrawingPlugin destroyed')
+		logger.info('DrawingPlugin destroyed')
 	}
 }
 

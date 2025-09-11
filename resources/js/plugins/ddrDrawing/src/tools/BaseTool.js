@@ -1,3 +1,5 @@
+import logger from '../core/Logger.js'
+
 /**
  * Базовый класс для инструментов
  */
@@ -17,7 +19,7 @@ class BaseTool {
 		
 		this.active = true
 		this.onActivate()
-		console.log(`Tool ${this.name} activated`)
+		logger.log(`Tool ${this.name} activated`)
 	}
 
 	/**
@@ -28,7 +30,7 @@ class BaseTool {
 		
 		this.active = false
 		this.onDeactivate()
-		console.log(`Tool ${this.name} deactivated`)
+		logger.log(`Tool ${this.name} deactivated`)
 	}
 
 	/**

@@ -1,3 +1,5 @@
+import logger from './Logger.js'
+
 /**
  * Основной класс для управления холстом рисования
  */
@@ -16,7 +18,7 @@ class DrawingCanvas {
 	init() {
 		if (this.initialized) return
 
-		console.log('Initializing DrawingCanvas')
+		logger.info('Initializing DrawingCanvas')
 		
 		// Проверяем JointJS
 		if (!window.joint) {
@@ -34,7 +36,7 @@ class DrawingCanvas {
 		this._updatePaperSize()
 		
 		this.initialized = true
-		console.log('DrawingCanvas initialized')
+		logger.info('DrawingCanvas initialized')
 	}
 
 	/**
@@ -105,31 +107,31 @@ class DrawingCanvas {
 			},
 			// Валидация магнитов - разрешаем активные порты
 			validateMagnet: (cellView, magnet) => {
-				console.log('=== validateMagnet ===', magnet.getAttribute('magnet'))
+				logger.log('validateMagnet:', magnet.getAttribute('magnet'))
 				return magnet.getAttribute('magnet') === 'true'
 			},
 			// Валидация подключений - только через порты с магнитами  
 			validateConnection: (cellViewS, magnetS, cellViewT, magnetT, end, linkView) => {
-				console.log('=== validateConnection ===', { magnetS, magnetT })
+				logger.log('validateConnection:', { magnetS, magnetT })
 				
 				// Проверяем что оба конца подключены к магнитам (портам)
 				if (!magnetS || !magnetT) {
-					console.log('Connection rejected: not connected to magnets')
+					logger.log('Connection rejected: not connected to magnets')
 					return false
 				}
 				
 				// Не разрешаем подключение к одному элементу
 				if (cellViewS === cellViewT) {
-					console.log('Connection rejected: same element')
+					logger.log('Connection rejected: same element')
 					return false
 				}
 				
-				console.log('Connection approved!')
+				logger.log('Connection approved!')
 				return true
 			}
 		})
 		
-		console.log('=== Paper created with port-based linking enabled ===')
+		logger.info('Paper created with port-based linking enabled')
 	}
 
 	/**
@@ -147,7 +149,7 @@ class DrawingCanvas {
 		const containerWidth = container.offsetWidth
 		const containerHeight = container.offsetHeight
 		
-		console.log('Updating paper size:', containerWidth, 'x', containerHeight)
+		logger.log('Updating paper size:', containerWidth, 'x', containerHeight)
 		
 		this.paper.setDimensions(containerWidth, containerHeight)
 		this.paper.render()

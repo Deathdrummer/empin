@@ -12120,79 +12120,252 @@ window.ddrDatepicker = datepicker["default"];
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "DdrDrawing": function() { return /* binding */ DdrDrawing; },
+/* harmony export */   "ddrDrawing": function() { return /* binding */ ddrDrawing; }
+/* harmony export */ });
 /* harmony import */ var _src_DrawingPlugin_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./src/DrawingPlugin.js */ "./resources/js/plugins/ddrDrawing/src/DrawingPlugin.js");
- // Глобальная переменная для экземпляра плагина
+/* harmony import */ var _src_core_Logger_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./src/core/Logger.js */ "./resources/js/plugins/ddrDrawing/src/core/Logger.js");
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var pluginInstance = null;
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+
+
+
 /**
- * Фабричная функция для создания плагина (сохраняем API совместимость)
+ * Главный класс плагина рисования
  */
 
+var DdrDrawing = /*#__PURE__*/function () {
+  function DdrDrawing() {
+    var containerId = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '#ddrDrawingCanvas';
+
+    _classCallCheck(this, DdrDrawing);
+
+    this.containerId = containerId;
+    this.plugin = null;
+    this.initialized = false;
+  }
+  /**
+   * Инициализация плагина
+   */
+
+
+  _createClass(DdrDrawing, [{
+    key: "init",
+    value: function init() {
+      if (this.initialized) {
+        _src_core_Logger_js__WEBPACK_IMPORTED_MODULE_1__["default"].warn('Plugin already initialized');
+        return;
+      }
+
+      _src_core_Logger_js__WEBPACK_IMPORTED_MODULE_1__["default"].info('Initializing ddrDrawing plugin');
+
+      if (!this.plugin) {
+        this.plugin = new _src_DrawingPlugin_js__WEBPACK_IMPORTED_MODULE_0__["default"](this.containerId);
+      }
+
+      this.plugin.init();
+      this.initialized = true;
+    }
+    /**
+     * Установить инструмент
+     */
+
+  }, {
+    key: "setTool",
+    value: function setTool(toolName) {
+      if (!this.plugin) {
+        _src_core_Logger_js__WEBPACK_IMPORTED_MODULE_1__["default"].error('Plugin not initialized');
+        return false;
+      }
+
+      return this.plugin.setTool(toolName);
+    }
+    /**
+     * Создать прямоугольник
+     */
+
+  }, {
+    key: "createRectangle",
+    value: function createRectangle(x, y) {
+      if (!this.plugin) {
+        _src_core_Logger_js__WEBPACK_IMPORTED_MODULE_1__["default"].error('Plugin not initialized');
+        return;
+      }
+
+      return this.plugin.createRectangle(x, y);
+    }
+    /**
+     * Обновить размеры холста
+     */
+
+  }, {
+    key: "updatePaperSize",
+    value: function updatePaperSize() {
+      if (this.plugin) {
+        this.plugin.updatePaperSize();
+      }
+    }
+    /**
+     * Отменить действие
+     */
+
+  }, {
+    key: "undo",
+    value: function undo() {
+      _src_core_Logger_js__WEBPACK_IMPORTED_MODULE_1__["default"].info('Undo - to be implemented');
+    }
+    /**
+     * Повторить действие
+     */
+
+  }, {
+    key: "redo",
+    value: function redo() {
+      _src_core_Logger_js__WEBPACK_IMPORTED_MODULE_1__["default"].info('Redo - to be implemented');
+    }
+    /**
+     * Увеличить масштаб
+     */
+
+  }, {
+    key: "zoomIn",
+    value: function zoomIn() {
+      if (this.plugin) {
+        this.plugin.zoomIn();
+      }
+    }
+    /**
+     * Уменьшить масштаб
+     */
+
+  }, {
+    key: "zoomOut",
+    value: function zoomOut() {
+      if (this.plugin) {
+        this.plugin.zoomOut();
+      }
+    }
+    /**
+     * Подогнать масштаб
+     */
+
+  }, {
+    key: "zoomToFit",
+    value: function zoomToFit() {
+      if (this.plugin) {
+        this.plugin.zoomToFit();
+      }
+    } // API для расширенного доступа
+
+  }, {
+    key: "getPlugin",
+    value: function getPlugin() {
+      return this.plugin;
+    }
+  }, {
+    key: "getCanvas",
+    value: function getCanvas() {
+      return this.plugin ? this.plugin.getCanvas() : null;
+    }
+  }, {
+    key: "getToolManager",
+    value: function getToolManager() {
+      return this.plugin ? this.plugin.getToolManager() : null;
+    }
+  }, {
+    key: "getEventManager",
+    value: function getEventManager() {
+      return this.plugin ? this.plugin.getEventManager() : null;
+    }
+  }, {
+    key: "getContextMenu",
+    value: function getContextMenu() {
+      return this.plugin ? this.plugin.getContextMenu() : null;
+    }
+    /**
+     * Включить отладку
+     */
+
+  }, {
+    key: "enableDebug",
+    value: function enableDebug() {
+      var enabled = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+      _src_core_Logger_js__WEBPACK_IMPORTED_MODULE_1__["default"].setEnabled(enabled);
+    }
+    /**
+     * Уничтожить плагин
+     */
+
+  }, {
+    key: "destroy",
+    value: function destroy() {
+      if (this.plugin) {
+        this.plugin.destroy();
+        this.plugin = null;
+      }
+
+      this.initialized = false;
+    }
+  }]);
+
+  return DdrDrawing;
+}(); // Фабричная функция для обратной совместимости
+
+
 var ddrDrawing = function ddrDrawing() {
+  var instance = new DdrDrawing();
   return {
     init: function init() {
-      console.log('=== ddrDrawing.init() called ===');
-      console.log('File path: index.js (main entry point)');
-
-      if (!pluginInstance) {
-        pluginInstance = new _src_DrawingPlugin_js__WEBPACK_IMPORTED_MODULE_0__["default"]('#ddrDrawingCanvas');
-      }
-
-      pluginInstance.init();
+      return instance.init();
     },
     setTool: function setTool(toolName) {
-      if (pluginInstance) {
-        return pluginInstance.setTool(toolName);
-      }
-
-      return false;
+      return instance.setTool(toolName);
     },
     createRectangle: function createRectangle(x, y) {
-      if (pluginInstance) {
-        return pluginInstance.createRectangle(x, y);
-      }
+      return instance.createRectangle(x, y);
     },
     updatePaperSize: function updatePaperSize() {
-      if (pluginInstance) {
-        pluginInstance.updatePaperSize();
-      }
+      return instance.updatePaperSize();
     },
     undo: function undo() {
-      console.log('Undo - to be implemented');
+      return instance.undo();
     },
     redo: function redo() {
-      console.log('Redo - to be implemented');
+      return instance.redo();
     },
     zoomIn: function zoomIn() {
-      if (pluginInstance) {
-        pluginInstance.zoomIn();
-      }
+      return instance.zoomIn();
     },
     zoomOut: function zoomOut() {
-      if (pluginInstance) {
-        pluginInstance.zoomOut();
-      }
+      return instance.zoomOut();
     },
     zoomToFit: function zoomToFit() {
-      if (pluginInstance) {
-        pluginInstance.zoomToFit();
-      }
+      return instance.zoomToFit();
     },
-    // Новые методы для расширенного API
     getPlugin: function getPlugin() {
-      return pluginInstance;
+      return instance.getPlugin();
     },
     getCanvas: function getCanvas() {
-      return pluginInstance ? pluginInstance.getCanvas() : null;
+      return instance.getCanvas();
     },
     getToolManager: function getToolManager() {
-      return pluginInstance ? pluginInstance.getToolManager() : null;
+      return instance.getToolManager();
     },
     getEventManager: function getEventManager() {
-      return pluginInstance ? pluginInstance.getEventManager() : null;
+      return instance.getEventManager();
     },
     getContextMenu: function getContextMenu() {
-      return pluginInstance ? pluginInstance.getContextMenu() : null;
+      return instance.getContextMenu();
+    },
+    enableDebug: function enableDebug(enabled) {
+      return instance.enableDebug(enabled);
+    },
+    destroy: function destroy() {
+      return instance.destroy();
     }
   };
 }; // Глобальный доступ для обратной совместимости
@@ -12200,7 +12373,9 @@ var ddrDrawing = function ddrDrawing() {
 
 if (typeof window !== 'undefined') {
   window.ddrDrawing = ddrDrawing;
+  window.DdrDrawing = DdrDrawing; // Прямой доступ к классу
 }
+
 
 /* harmony default export */ __webpack_exports__["default"] = (ddrDrawing);
 
@@ -12221,11 +12396,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _services_PortService_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./services/PortService.js */ "./resources/js/plugins/ddrDrawing/src/services/PortService.js");
 /* harmony import */ var _tools_SelectTool_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./tools/SelectTool.js */ "./resources/js/plugins/ddrDrawing/src/tools/SelectTool.js");
 /* harmony import */ var _tools_RectangleTool_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./tools/RectangleTool.js */ "./resources/js/plugins/ddrDrawing/src/tools/RectangleTool.js");
+/* harmony import */ var _core_Logger_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./core/Logger.js */ "./resources/js/plugins/ddrDrawing/src/core/Logger.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+
 
 
 
@@ -12261,8 +12438,7 @@ var DrawingPlugin = /*#__PURE__*/function () {
     key: "init",
     value: function init() {
       if (this.initialized) return;
-      console.log('=== Initializing DrawingPlugin ===');
-      console.log('File path: src/DrawingPlugin.js');
+      _core_Logger_js__WEBPACK_IMPORTED_MODULE_7__["default"].info('Initializing DrawingPlugin');
 
       try {
         // Создаем основные компоненты
@@ -12288,9 +12464,9 @@ var DrawingPlugin = /*#__PURE__*/function () {
 
         this.setupEventHandlers();
         this.initialized = true;
-        console.log('DrawingPlugin initialized successfully');
+        _core_Logger_js__WEBPACK_IMPORTED_MODULE_7__["default"].info('DrawingPlugin initialized successfully');
       } catch (error) {
-        console.error('Failed to initialize DrawingPlugin:', error);
+        _core_Logger_js__WEBPACK_IMPORTED_MODULE_7__["default"].error('Failed to initialize DrawingPlugin:', error);
         throw error;
       }
     }
@@ -12315,10 +12491,10 @@ var DrawingPlugin = /*#__PURE__*/function () {
 
       // Обработчики для специальных инструментов
       this.eventManager.on('undo', function () {
-        console.log('Undo action'); // TODO: Реализовать undo
+        _core_Logger_js__WEBPACK_IMPORTED_MODULE_7__["default"].info('Undo action'); // TODO: Реализовать undo
       });
       this.eventManager.on('redo', function () {
-        console.log('Redo action'); // TODO: Реализовать redo
+        _core_Logger_js__WEBPACK_IMPORTED_MODULE_7__["default"].info('Redo action'); // TODO: Реализовать redo
       });
       this.eventManager.on('zoom-in', function () {
         _this.zoomIn();
@@ -12474,7 +12650,7 @@ var DrawingPlugin = /*#__PURE__*/function () {
       }
 
       this.initialized = false;
-      console.log('DrawingPlugin destroyed');
+      _core_Logger_js__WEBPACK_IMPORTED_MODULE_7__["default"].info('DrawingPlugin destroyed');
     }
   }]);
 
@@ -12493,15 +12669,18 @@ var DrawingPlugin = /*#__PURE__*/function () {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _Logger_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Logger.js */ "./resources/js/plugins/ddrDrawing/src/core/Logger.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
 
+
 /**
  * Основной класс для управления холстом рисования
  */
+
 var DrawingCanvas = /*#__PURE__*/function () {
   function DrawingCanvas(containerId) {
     _classCallCheck(this, DrawingCanvas);
@@ -12521,7 +12700,7 @@ var DrawingCanvas = /*#__PURE__*/function () {
     key: "init",
     value: function init() {
       if (this.initialized) return;
-      console.log('Initializing DrawingCanvas'); // Проверяем JointJS
+      _Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].info('Initializing DrawingCanvas'); // Проверяем JointJS
 
       if (!window.joint) {
         throw new Error('JointJS library not found');
@@ -12541,7 +12720,7 @@ var DrawingCanvas = /*#__PURE__*/function () {
       this._updatePaperSize();
 
       this.initialized = true;
-      console.log('DrawingCanvas initialized');
+      _Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].info('DrawingCanvas initialized');
     }
     /**
      * Создание графа
@@ -12624,32 +12803,32 @@ var DrawingCanvas = /*#__PURE__*/function () {
         },
         // Валидация магнитов - разрешаем активные порты
         validateMagnet: function validateMagnet(cellView, magnet) {
-          console.log('=== validateMagnet ===', magnet.getAttribute('magnet'));
+          _Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('validateMagnet:', magnet.getAttribute('magnet'));
           return magnet.getAttribute('magnet') === 'true';
         },
         // Валидация подключений - только через порты с магнитами  
         validateConnection: function validateConnection(cellViewS, magnetS, cellViewT, magnetT, end, linkView) {
-          console.log('=== validateConnection ===', {
+          _Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('validateConnection:', {
             magnetS: magnetS,
             magnetT: magnetT
           }); // Проверяем что оба конца подключены к магнитам (портам)
 
           if (!magnetS || !magnetT) {
-            console.log('Connection rejected: not connected to magnets');
+            _Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('Connection rejected: not connected to magnets');
             return false;
           } // Не разрешаем подключение к одному элементу
 
 
           if (cellViewS === cellViewT) {
-            console.log('Connection rejected: same element');
+            _Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('Connection rejected: same element');
             return false;
           }
 
-          console.log('Connection approved!');
+          _Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('Connection approved!');
           return true;
         }
       });
-      console.log('=== Paper created with port-based linking enabled ===');
+      _Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].info('Paper created with port-based linking enabled');
     }
     /**
      * Обновление размеров paper
@@ -12672,7 +12851,7 @@ var DrawingCanvas = /*#__PURE__*/function () {
 
       var containerWidth = container.offsetWidth;
       var containerHeight = container.offsetHeight;
-      console.log('Updating paper size:', containerWidth, 'x', containerHeight);
+      _Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('Updating paper size:', containerWidth, 'x', containerHeight);
       this.paper.setDimensions(containerWidth, containerHeight);
       this.paper.render();
     }
@@ -12803,6 +12982,7 @@ var DrawingCanvas = /*#__PURE__*/function () {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _Logger_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Logger.js */ "./resources/js/plugins/ddrDrawing/src/core/Logger.js");
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -12821,9 +13001,11 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
 
+
 /**
  * Менеджер событий для централизации обработки
  */
+
 var EventManager = /*#__PURE__*/function () {
   function EventManager(canvas) {
     _classCallCheck(this, EventManager);
@@ -12876,7 +13058,7 @@ var EventManager = /*#__PURE__*/function () {
 
       this._setupGlobalEvents();
 
-      console.log('EventManager initialized');
+      _Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('EventManager initialized');
     }
     /**
      * События панели инструментов
@@ -13011,7 +13193,7 @@ var EventManager = /*#__PURE__*/function () {
   }, {
     key: "_handleToolClick",
     value: function _handleToolClick(tool) {
-      console.log('Tool clicked:', tool); // Специальные инструменты
+      _Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('Tool clicked:', tool); // Специальные инструменты
 
       switch (tool) {
         case 'undo':
@@ -13229,7 +13411,7 @@ var EventManager = /*#__PURE__*/function () {
     value: function _handlePortMouseEnter(elementView, evt) {
       var magnet = evt.target;
       var portId = magnet.getAttribute('port');
-      console.log('Port hover enter:', portId); // Подсвечиваем порт
+      _Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('Port hover enter:', portId); // Подсвечиваем порт
 
       magnet.setAttribute('fill', '#87d5ff');
       magnet.setAttribute('opacity', '1.0');
@@ -13245,7 +13427,7 @@ var EventManager = /*#__PURE__*/function () {
     value: function _handlePortMouseLeave(elementView, evt) {
       var magnet = evt.target;
       var portId = magnet.getAttribute('port');
-      console.log('Port hover leave:', portId); // Возвращаем обычный стиль
+      _Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('Port hover leave:', portId); // Возвращаем обычный стиль
 
       magnet.setAttribute('fill', '#61cfff');
       magnet.setAttribute('opacity', '1.0');
@@ -13259,9 +13441,9 @@ var EventManager = /*#__PURE__*/function () {
   }, {
     key: "_handleLinkConnect",
     value: function _handleLinkConnect(linkView) {
-      console.log('=== Link connected ===', linkView.model.id);
-      console.log('Source:', linkView.model.source());
-      console.log('Target:', linkView.model.target()); // Сохраняем информацию о занятых портах в модели элементов
+      _Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('=== Link connected ===', linkView.model.id);
+      _Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('Source:', linkView.model.source());
+      _Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('Target:', linkView.model.target()); // Сохраняем информацию о занятых портах в модели элементов
 
       var source = linkView.model.source();
       var target = linkView.model.target();
@@ -13299,7 +13481,7 @@ var EventManager = /*#__PURE__*/function () {
   }, {
     key: "_handleLinkDisconnect",
     value: function _handleLinkDisconnect(linkView) {
-      console.log('=== Link disconnected ===', linkView.model.id); // Показываем освободившиеся порты
+      _Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('=== Link disconnected ===', linkView.model.id); // Показываем освободившиеся порты
 
       this._hideOccupiedPorts();
 
@@ -13318,7 +13500,7 @@ var EventManager = /*#__PURE__*/function () {
 
       if (!hiddenPorts.includes(portId)) {
         element.set('hiddenPorts', [].concat(_toConsumableArray(hiddenPorts), [portId]));
-        console.log('Marked port as hidden:', portId, 'for element:', element.id);
+        _Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('Marked port as hidden:', portId, 'for element:', element.id);
       }
     }
     /**
@@ -13358,7 +13540,7 @@ var EventManager = /*#__PURE__*/function () {
           occupiedPorts.add("".concat(target.id, ":").concat(target.port));
         }
       });
-      console.log('Occupied ports:', Array.from(occupiedPorts)); // Проходим по всем элементам и скрываем/показываем порты
+      _Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('Occupied ports:', Array.from(occupiedPorts)); // Проходим по всем элементам и скрываем/показываем порты
 
       graph.getElements().forEach(function (element) {
         var elementView = paper.findViewByModel(element);
@@ -13446,10 +13628,10 @@ var EventManager = /*#__PURE__*/function () {
 
 /***/ }),
 
-/***/ "./resources/js/plugins/ddrDrawing/src/core/ToolManager.js":
-/*!*****************************************************************!*\
-  !*** ./resources/js/plugins/ddrDrawing/src/core/ToolManager.js ***!
-  \*****************************************************************/
+/***/ "./resources/js/plugins/ddrDrawing/src/core/Logger.js":
+/*!************************************************************!*\
+  !*** ./resources/js/plugins/ddrDrawing/src/core/Logger.js ***!
+  \************************************************************/
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -13461,8 +13643,138 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
 
 /**
+ * Простой логгер для отладки плагина
+ */
+var Logger = /*#__PURE__*/function () {
+  function Logger() {
+    var enabled = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+
+    _classCallCheck(this, Logger);
+
+    this.enabled = enabled;
+    this.prefix = '[ddrDrawing]';
+  }
+  /**
+   * Включить/выключить логирование
+   */
+
+
+  _createClass(Logger, [{
+    key: "setEnabled",
+    value: function setEnabled(enabled) {
+      this.enabled = enabled;
+    }
+    /**
+     * Обычное сообщение
+     */
+
+  }, {
+    key: "log",
+    value: function log() {
+      if (this.enabled) {
+        var _console;
+
+        for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+          args[_key] = arguments[_key];
+        }
+
+        (_console = console).log.apply(_console, [this.prefix].concat(args));
+      }
+    }
+    /**
+     * Информационное сообщение
+     */
+
+  }, {
+    key: "info",
+    value: function info() {
+      if (this.enabled) {
+        var _console2;
+
+        for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+          args[_key2] = arguments[_key2];
+        }
+
+        (_console2 = console).info.apply(_console2, [this.prefix].concat(args));
+      }
+    }
+    /**
+     * Предупреждение
+     */
+
+  }, {
+    key: "warn",
+    value: function warn() {
+      if (this.enabled) {
+        var _console3;
+
+        for (var _len3 = arguments.length, args = new Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+          args[_key3] = arguments[_key3];
+        }
+
+        (_console3 = console).warn.apply(_console3, [this.prefix].concat(args));
+      }
+    }
+    /**
+     * Ошибка (показывается всегда)
+     */
+
+  }, {
+    key: "error",
+    value: function error() {
+      var _console4;
+
+      for (var _len4 = arguments.length, args = new Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
+        args[_key4] = arguments[_key4];
+      }
+
+      (_console4 = console).error.apply(_console4, [this.prefix].concat(args));
+    }
+    /**
+     * Групповое логирование
+     */
+
+  }, {
+    key: "group",
+    value: function group(label, callback) {
+      if (this.enabled) {
+        console.group(this.prefix, label);
+        callback();
+        console.groupEnd();
+      }
+    }
+  }]);
+
+  return Logger;
+}(); // Глобальный экземпляр логгера
+
+
+var logger = new Logger(false); // По умолчанию выключен
+
+/* harmony default export */ __webpack_exports__["default"] = (logger);
+
+/***/ }),
+
+/***/ "./resources/js/plugins/ddrDrawing/src/core/ToolManager.js":
+/*!*****************************************************************!*\
+  !*** ./resources/js/plugins/ddrDrawing/src/core/ToolManager.js ***!
+  \*****************************************************************/
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _Logger_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Logger.js */ "./resources/js/plugins/ddrDrawing/src/core/Logger.js");
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+
+
+/**
  * Менеджер инструментов
  */
+
 var ToolManager = /*#__PURE__*/function () {
   function ToolManager(canvas, eventManager) {
     _classCallCheck(this, ToolManager);
@@ -13482,7 +13794,7 @@ var ToolManager = /*#__PURE__*/function () {
     value: function registerTool(name, toolClass) {
       var tool = new toolClass(name, this.canvas, this.eventManager);
       this.tools.set(name, tool);
-      console.log("Tool ".concat(name, " registered"));
+      _Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log("Tool ".concat(name, " registered"));
     }
     /**
      * Активация инструмента
@@ -13494,7 +13806,7 @@ var ToolManager = /*#__PURE__*/function () {
       var tool = this.tools.get(name);
 
       if (!tool) {
-        console.error("Tool ".concat(name, " not found"));
+        _Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].error("Tool ".concat(name, " not found"));
         return false;
       } // Деактивируем текущий инструмент
 
@@ -13509,7 +13821,7 @@ var ToolManager = /*#__PURE__*/function () {
 
       this._updateToolbarUI(name);
 
-      console.log("Tool ".concat(name, " activated"));
+      _Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log("Tool ".concat(name, " activated"));
       return true;
     }
     /**
@@ -13610,6 +13922,7 @@ var ToolManager = /*#__PURE__*/function () {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../core/Logger.js */ "./resources/js/plugins/ddrDrawing/src/core/Logger.js");
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -13634,9 +13947,11 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
 
+
 /**
  * Сервис для управления портами элементов
  */
+
 var PortService = /*#__PURE__*/function () {
   function PortService(canvas, eventManager) {
     _classCallCheck(this, PortService);
@@ -13662,9 +13977,9 @@ var PortService = /*#__PURE__*/function () {
       this.graph = this.canvas.getGraph(); // Подписываемся на события добавления портов
 
       this.eventManager.on('ports:add', function (event) {
-        console.log('🎯 PortService received ports:add event:', event);
+        _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('🎯 PortService received ports:add event:', event);
         var data = event.detail;
-        console.log('🎯 Event data:', data);
+        _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('🎯 Event data:', data);
 
         _this.addPortToElement(data.element, data.side);
       }); // Обработчики для показа/скрытия портов
@@ -13675,7 +13990,7 @@ var PortService = /*#__PURE__*/function () {
 
       this.setupSelectionHandlers();
       this.initialized = true;
-      console.log('PortService initialized');
+      _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('PortService initialized');
     }
     /**
      * Настройка обработчиков выделения
@@ -13689,14 +14004,14 @@ var PortService = /*#__PURE__*/function () {
       // Показываем все порты когда элемент выделяется
       this.paper.on('cell:pointerdown', function (cellView) {
         if (cellView.model.isElement()) {
-          console.log('🎯 Element selected - showing all ports');
+          _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('🎯 Element selected - showing all ports');
 
           _this2.showAllPorts(cellView.model);
         }
       }); // Скрываем порты когда кликают по пустому месту (снимается выделение)
 
       this.paper.on('blank:pointerdown', function () {
-        console.log('🚫 Selection cleared - hiding all free ports'); // Убираем selected класс со всех элементов
+        _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('🚫 Selection cleared - hiding all free ports'); // Убираем selected класс со всех элементов
 
         _this2.paper.el.querySelectorAll('.joint-element.selected').forEach(function (el) {
           el.classList.remove('selected');
@@ -13707,13 +14022,13 @@ var PortService = /*#__PURE__*/function () {
 
       this.eventManager.on('element:selected', function (event) {
         var element = event.detail.element;
-        console.log('📍 Element selected via SelectTool - showing all ports');
+        _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('📍 Element selected via SelectTool - showing all ports');
 
         _this2.showAllPorts(element);
       });
       this.eventManager.on('element:deselected', function (event) {
         var element = event.detail.element;
-        console.log('📍 Element deselected via SelectTool - hiding free ports');
+        _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('📍 Element deselected via SelectTool - hiding free ports');
 
         _this2.hideFreePorts(element);
       });
@@ -13750,19 +14065,19 @@ var PortService = /*#__PURE__*/function () {
 
       // Показываем порты при наведении на элемент
       this.paper.on('element:mouseenter', function (elementView) {
-        console.log('🐭 element:mouseenter triggered for:', elementView.model.id);
+        _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('🐭 element:mouseenter triggered for:', elementView.model.id);
 
         _this3.showFreePorts(elementView.model);
       }); // Скрываем порты когда курсор покидает элемент
 
       this.paper.on('element:mouseleave', function (elementView) {
-        console.log('🐭 element:mouseleave triggered for:', elementView.model.id);
+        _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('🐭 element:mouseleave triggered for:', elementView.model.id);
 
         _this3.hideFreePorts(elementView.model);
       }); // Также скрываем при перетаскивании
 
       this.paper.on('element:pointermove', function (elementView) {
-        console.log('🐭 element:pointermove triggered for:', elementView.model.id);
+        _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('🐭 element:pointermove triggered for:', elementView.model.id);
 
         _this3.hideFreePorts(elementView.model);
       });
@@ -13776,26 +14091,26 @@ var PortService = /*#__PURE__*/function () {
     value: function showFreePorts(element) {
       var _this4 = this;
 
-      console.log('🎯 showFreePorts called for element:', element.id);
+      _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('🎯 showFreePorts called for element:', element.id);
       var ports = element.get('ports') || {
         items: []
       };
-      console.log('🎯 Element ports:', ports);
+      _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('🎯 Element ports:', ports);
       var freePorts = this.getFreePorts(element);
-      console.log('🎯 Free ports:', freePorts);
+      _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('🎯 Free ports:', freePorts);
       freePorts.forEach(function (port) {
         var _this4$paper$findView, _this4$paper$findView2, _this4$paper$findView3;
 
-        console.log('🎯 Processing port:', port.id); // Находим группу порта, а не circle
+        _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('🎯 Processing port:', port.id); // Находим группу порта, а не circle
 
         var portGroup = (_this4$paper$findView = _this4.paper.findViewByModel(element)) === null || _this4$paper$findView === void 0 ? void 0 : (_this4$paper$findView2 = _this4$paper$findView.el) === null || _this4$paper$findView2 === void 0 ? void 0 : (_this4$paper$findView3 = _this4$paper$findView2.querySelector("[port=\"".concat(port.id, "\"]"))) === null || _this4$paper$findView3 === void 0 ? void 0 : _this4$paper$findView3.closest('.joint-port');
-        console.log('🎯 Found port group:', portGroup);
+        _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('🎯 Found port group:', portGroup);
 
         if (portGroup) {
-          console.log('🎯 Current classes before:', portGroup.className);
+          _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('🎯 Current classes before:', portGroup.className);
           portGroup.classList.add('port-visible');
           portGroup.classList.remove('port-hidden');
-          console.log('🎯 Current classes after:', portGroup.className);
+          _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('🎯 Current classes after:', portGroup.className);
         }
       });
     }
@@ -13835,19 +14150,19 @@ var PortService = /*#__PURE__*/function () {
 
       // Показываем все свободные порты когда начинается создание связи
       this.paper.on('link:connect', function (linkView, evt, elementViewConnected, magnet, arrowhead) {
-        console.log('Link creation started - showing all free ports');
+        _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('Link creation started - showing all free ports');
 
         _this6.showAllFreePorts();
       }); // Также показываем при старте перетаскивания от порта
 
       this.paper.on('element:magnet:pointerdown', function (elementView, evt, magnet) {
-        console.log('Magnet drag started - showing all free ports');
+        _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('Magnet drag started - showing all free ports');
 
         _this6.showAllFreePorts();
       }); // Скрываем все порты когда связь создана или отменена
 
       this.paper.on('link:pointerup', function () {
-        console.log('Link creation ended - hiding all ports');
+        _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('Link creation ended - hiding all ports');
 
         _this6.hideAllFreePorts();
       }); // Скрываем при отмене создания связи
@@ -13924,17 +14239,17 @@ var PortService = /*#__PURE__*/function () {
     value: function addPortToElement(element, position) {
       var _this9 = this;
 
-      console.log('🔍 PortService.addPortToElement called:', {
+      _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('🔍 PortService.addPortToElement called:', {
         element: element,
         position: position
       });
 
       if (!element) {
-        console.error('❌ Element is undefined!');
+        _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].error('❌ Element is undefined!');
         return;
       }
 
-      console.log('Adding port to element:', element.id, 'position:', position); // Получаем текущие порты элемента
+      _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('Adding port to element:', element.id, 'position:', position); // Получаем текущие порты элемента
 
       var currentPorts = element.get('ports') || {
         items: []
@@ -13992,7 +14307,7 @@ var PortService = /*#__PURE__*/function () {
       });
 
       element.set('ports', updatedPorts);
-      console.log("Port ".concat(portId, " added to element ").concat(element.id)); // Скрываем все остальные свободные порты этого элемента
+      _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log("Port ".concat(portId, " added to element ").concat(element.id)); // Скрываем все остальные свободные порты этого элемента
 
       this.hideFreePorts(element); // Показываем новый порт с плавной анимацией
 
@@ -14003,11 +14318,11 @@ var PortService = /*#__PURE__*/function () {
         var newPortGroup = (_this9$paper$findView = _this9.paper.findViewByModel(element)) === null || _this9$paper$findView === void 0 ? void 0 : (_this9$paper$findView2 = _this9$paper$findView.el) === null || _this9$paper$findView2 === void 0 ? void 0 : (_this9$paper$findView3 = _this9$paper$findView2.querySelector("[port=\"".concat(portId, "\"]"))) === null || _this9$paper$findView3 === void 0 ? void 0 : _this9$paper$findView3.closest('.joint-port');
 
         if (newPortGroup) {
-          console.log("\uD83D\uDD0D Found port GROUP:", newPortGroup);
-          console.log("\uD83D\uDD0D Current classes:", newPortGroup.className);
+          _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log("\uD83D\uDD0D Found port GROUP:", newPortGroup);
+          _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log("\uD83D\uDD0D Current classes:", newPortGroup.className);
           newPortGroup.classList.remove('port-hidden');
           newPortGroup.classList.add('port-visible');
-          console.log("\u2728 Port ".concat(portId, " \u043F\u043E\u043A\u0430\u0437\u0430\u043D, classes after:"), newPortGroup.className); // Автоматически скрываем через 300ms
+          _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log("\u2728 Port ".concat(portId, " \u043F\u043E\u043A\u0430\u0437\u0430\u043D, classes after:"), newPortGroup.className); // Автоматически скрываем через 300ms
 
           setTimeout(function () {
             if (_this9.getFreePorts(element).some(function (port) {
@@ -14015,7 +14330,7 @@ var PortService = /*#__PURE__*/function () {
             })) {
               newPortGroup.classList.remove('port-visible');
               newPortGroup.classList.add('port-hidden');
-              console.log("\uD83C\uDF19 Port ".concat(portId, " \u0441\u043A\u0440\u044B\u0442, classes after:"), newPortGroup.className);
+              _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log("\uD83C\uDF19 Port ".concat(portId, " \u0441\u043A\u0440\u044B\u0442, classes after:"), newPortGroup.className);
             }
           }, 300);
         }
@@ -14046,7 +14361,7 @@ var PortService = /*#__PURE__*/function () {
       });
 
       element.set('ports', updatedPorts);
-      console.log("Port ".concat(portId, " removed from element ").concat(element.id)); // Эмитим событие об удалении порта
+      _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log("Port ".concat(portId, " removed from element ").concat(element.id)); // Эмитим событие об удалении порта
 
       this.eventManager.emit('ports:port-removed', {
         element: element,
@@ -14098,7 +14413,7 @@ var PortService = /*#__PURE__*/function () {
       }
 
       this.initialized = false;
-      console.log('PortService destroyed');
+      _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('PortService destroyed');
     }
   }]);
 
@@ -14117,15 +14432,18 @@ var PortService = /*#__PURE__*/function () {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../core/Logger.js */ "./resources/js/plugins/ddrDrawing/src/core/Logger.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
 
+
 /**
  * Базовый класс для инструментов
  */
+
 var BaseTool = /*#__PURE__*/function () {
   function BaseTool(name, canvas, eventManager) {
     _classCallCheck(this, BaseTool);
@@ -14146,7 +14464,7 @@ var BaseTool = /*#__PURE__*/function () {
       if (this.active) return;
       this.active = true;
       this.onActivate();
-      console.log("Tool ".concat(this.name, " activated"));
+      _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log("Tool ".concat(this.name, " activated"));
     }
     /**
      * Деактивация инструмента
@@ -14158,7 +14476,7 @@ var BaseTool = /*#__PURE__*/function () {
       if (!this.active) return;
       this.active = false;
       this.onDeactivate();
-      console.log("Tool ".concat(this.name, " deactivated"));
+      _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log("Tool ".concat(this.name, " deactivated"));
     }
     /**
      * Переопределяемый метод активации
@@ -14237,6 +14555,7 @@ var BaseTool = /*#__PURE__*/function () {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _BaseTool_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./BaseTool.js */ "./resources/js/plugins/ddrDrawing/src/tools/BaseTool.js");
+/* harmony import */ var _core_Logger_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../core/Logger.js */ "./resources/js/plugins/ddrDrawing/src/core/Logger.js");
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -14258,6 +14577,7 @@ function _assertThisInitialized(self) { if (self === void 0) { throw new Referen
 function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
 
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
 
 
 /**
@@ -14306,7 +14626,7 @@ var RectangleTool = /*#__PURE__*/function (_BaseTool) {
   }, {
     key: "onCanvasClick",
     value: function onCanvasClick(point, event) {
-      console.log('Creating rectangle at:', point);
+      _core_Logger_js__WEBPACK_IMPORTED_MODULE_1__["default"].log('Creating rectangle at:', point);
       this.createRectangle(point.x, point.y); // Автоматически переключаемся на инструмент выделения
 
       this.eventManager.emit('tool-auto-switch', 'select');
@@ -14340,7 +14660,7 @@ var RectangleTool = /*#__PURE__*/function (_BaseTool) {
         }
       });
       this.getGraph().addCell(rect);
-      console.log('Rectangle created at grid position:', snapX, snapY);
+      _core_Logger_js__WEBPACK_IMPORTED_MODULE_1__["default"].log('Rectangle created at grid position:', snapX, snapY);
       return rect;
     }
     /**
@@ -14379,6 +14699,7 @@ var RectangleTool = /*#__PURE__*/function (_BaseTool) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _BaseTool_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./BaseTool.js */ "./resources/js/plugins/ddrDrawing/src/tools/BaseTool.js");
+/* harmony import */ var _core_Logger_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../core/Logger.js */ "./resources/js/plugins/ddrDrawing/src/core/Logger.js");
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
@@ -14414,6 +14735,7 @@ function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Re
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
 
+
 /**
  * Инструмент выделения и перемещения элементов
  */
@@ -14438,7 +14760,7 @@ var SelectTool = /*#__PURE__*/function (_BaseTool) {
     value: function onActivate() {
       this.getPaper().el.style.cursor = 'default';
       this.setupEvents();
-      console.log('SelectTool активирован');
+      _core_Logger_js__WEBPACK_IMPORTED_MODULE_1__["default"].info('SelectTool activated');
     }
     /**
      * Деактивация инструмента
@@ -14553,7 +14875,7 @@ var SelectTool = /*#__PURE__*/function (_BaseTool) {
       link.set('vertices', newVertices); // Индекс новой вершины
 
       var vertexIndex = newVertices.length - 1;
-      console.log("\uD83C\uDFAF \u0414\u043E\u0431\u0430\u0432\u0438\u043B\u0438 vertex ".concat(vertexIndex, " \u0432 \u0442\u043E\u0447\u043A\u0435"), clickPoint);
+      _core_Logger_js__WEBPACK_IMPORTED_MODULE_1__["default"].log("\uD83C\uDFAF \u0414\u043E\u0431\u0430\u0432\u0438\u043B\u0438 vertex ".concat(vertexIndex, " \u0432 \u0442\u043E\u0447\u043A\u0435"), clickPoint);
       var isDragging = false;
       var startPoint = clickPoint;
 
@@ -14580,14 +14902,14 @@ var SelectTool = /*#__PURE__*/function (_BaseTool) {
         isDragging = false;
         paper.el.removeEventListener('pointermove', onPointerMove);
         paper.el.removeEventListener('pointerup', onPointerUp);
-        console.log('🏁 Vertex drag завершен');
+        _core_Logger_js__WEBPACK_IMPORTED_MODULE_1__["default"].log('🏁 Vertex drag завершен');
       }; // Начинаем перетаскивание сразу
 
 
       isDragging = true;
       paper.el.addEventListener('pointermove', onPointerMove);
       paper.el.addEventListener('pointerup', onPointerUp);
-      console.log("\uD83D\uDE80 \u041D\u0430\u0447\u0430\u043B\u0438 drag vertex ".concat(vertexIndex));
+      _core_Logger_js__WEBPACK_IMPORTED_MODULE_1__["default"].log("\uD83D\uDE80 \u041D\u0430\u0447\u0430\u043B\u0438 drag vertex ".concat(vertexIndex));
     }
   }]);
 
@@ -14606,6 +14928,7 @@ var SelectTool = /*#__PURE__*/function (_BaseTool) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../core/Logger.js */ "./resources/js/plugins/ddrDrawing/src/core/Logger.js");
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -14640,20 +14963,22 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
 
+
 /**
  * Контекстное меню
  */
+
 var ContextMenu = /*#__PURE__*/function () {
   function ContextMenu(canvas, eventManager) {
     _classCallCheck(this, ContextMenu);
 
     this.canvas = canvas;
     this.eventManager = eventManager;
-    console.log('🔧 ContextMenu constructor:', {
+    _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('🔧 ContextMenu constructor:', {
       canvas: canvas,
       eventManager: eventManager
     });
-    console.log('🔧 eventManager:', eventManager);
+    _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('🔧 eventManager:', eventManager);
     this.eventBus = eventManager; // EventManager сам является event bus
 
     this.element = null;
@@ -14672,7 +14997,7 @@ var ContextMenu = /*#__PURE__*/function () {
       this.createElement();
       this.setupDefaultItems();
       this.setupEvents();
-      console.log('ContextMenu initialized');
+      _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('ContextMenu initialized');
     }
     /**
      * Создание DOM элемента меню
@@ -14689,9 +15014,9 @@ var ContextMenu = /*#__PURE__*/function () {
 
       if (canvasContainerParent && canvasContainerParent.classList.contains('ddrdrawing__canvas-container')) {
         canvasContainerParent.appendChild(this.element);
-        console.log('Context menu created and added to canvas-container');
+        _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('Context menu created and added to canvas-container');
       } else {
-        console.error('Canvas container parent not found for context menu');
+        _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].error('Canvas container parent not found for context menu');
       }
     }
     /**
@@ -14830,7 +15155,7 @@ var ContextMenu = /*#__PURE__*/function () {
         var action = menuItem.getAttribute('data-action');
         var itemId = menuItem.getAttribute('data-item-id');
         var position = menuItem.getAttribute('data-position');
-        console.log('Context menu action:', action, 'Item:', itemId, 'Position:', position);
+        _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('Context menu action:', action, 'Item:', itemId, 'Position:', position);
 
         if (action && _this.targetElement) {
           _this.handleAction(action, {
@@ -14861,7 +15186,7 @@ var ContextMenu = /*#__PURE__*/function () {
           break;
 
         default:
-          console.warn('Unknown context menu action:', action);
+          _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].warn('Unknown context menu action:', action);
       }
     }
     /**
@@ -14873,15 +15198,15 @@ var ContextMenu = /*#__PURE__*/function () {
     value: function addPort(element, position) {
       var _this2 = this;
 
-      console.log('Adding port to element:', element.id, 'position:', position); // НОВАЯ ЛОГИКА: используем eventBus вместо прямого создания портов
+      _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('Adding port to element:', element.id, 'position:', position); // НОВАЯ ЛОГИКА: используем eventBus вместо прямого создания портов
 
-      console.log('🔄 Отправляем событие ports:add через eventBus');
-      console.log('🔧 this.eventBus:', this.eventBus);
+      _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('🔄 Отправляем событие ports:add через eventBus');
+      _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('🔧 this.eventBus:', this.eventBus);
 
       if (!this.eventBus) {
-        console.error('❌ eventBus недоступен! Используем старую логику.'); // Fallback к старой логике только если eventBus реально недоступен
+        _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].error('❌ eventBus недоступен! Используем старую логику.'); // Fallback к старой логике только если eventBus реально недоступен
       } else {
-        console.log('✅ Используем PortService через eventBus');
+        _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('✅ Используем PortService через eventBus');
         this.eventBus.emit('ports:add', {
           element: element,
           side: position
@@ -14930,7 +15255,7 @@ var ContextMenu = /*#__PURE__*/function () {
       });
 
       element.set('ports', updatedPorts);
-      console.log('Port added:', portId); // ХИТРАЯ ФИШКА: После добавления нового порта принудительно скрываем занятые порты
+      _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('Port added:', portId); // ХИТРАЯ ФИШКА: После добавления нового порта принудительно скрываем занятые порты
 
       setTimeout(function () {
         _this2.hideOccupiedPorts(element);
@@ -14945,12 +15270,12 @@ var ContextMenu = /*#__PURE__*/function () {
     value: function hideOccupiedPorts(element) {
       var _element$get, _window$ddrDrawing, _window$ddrDrawing$ge;
 
-      console.log('🔍 hideOccupiedPorts для элемента:', element.id);
+      _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('🔍 hideOccupiedPorts для элемента:', element.id);
       var graph = this.canvas.paper.model;
       var elementPorts = ((_element$get = element.get('ports')) === null || _element$get === void 0 ? void 0 : _element$get.items) || []; // Находим все линки, подключенные к этому элементу
 
       var connectedLinks = graph.getConnectedLinks(element);
-      console.log('🔗 Подключенные линки:', connectedLinks.length); // Собираем ID занятых портов
+      _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('🔗 Подключенные линки:', connectedLinks.length); // Собираем ID занятых портов
 
       var occupiedPortIds = new Set();
       connectedLinks.forEach(function (link) {
@@ -14967,10 +15292,10 @@ var ContextMenu = /*#__PURE__*/function () {
           occupiedPortIds.add(targetPortId);
         }
       });
-      console.log('🚫 Занятые порты:', Array.from(occupiedPortIds)); // Скрываем все занятые порты
+      _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('🚫 Занятые порты:', Array.from(occupiedPortIds)); // Скрываем все занятые порты
 
       occupiedPortIds.forEach(function (portId) {
-        console.log("\uD83D\uDC7B \u0421\u043A\u0440\u044B\u0432\u0430\u0435\u043C \u0437\u0430\u043D\u044F\u0442\u044B\u0439 \u043F\u043E\u0440\u0442: ".concat(portId));
+        _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log("\uD83D\uDC7B \u0421\u043A\u0440\u044B\u0432\u0430\u0435\u043C \u0437\u0430\u043D\u044F\u0442\u044B\u0439 \u043F\u043E\u0440\u0442: ".concat(portId));
         element.portProp(portId, 'attrs/portBody/opacity', 0);
         element.portProp(portId, 'attrs/portBody/fill-opacity', 0);
         element.portProp(portId, 'attrs/portBody/stroke-opacity', 0);
@@ -15031,11 +15356,11 @@ var ContextMenu = /*#__PURE__*/function () {
     key: "show",
     value: function show(x, y, element) {
       if (!this.element) {
-        console.error('Context menu element not found');
+        _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].error('Context menu element not found');
         return;
       }
 
-      console.log('Showing context menu at', x, y, 'for element', element ? element.id : 'none');
+      _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('Showing context menu at', x, y, 'for element', element ? element.id : 'none');
       this.element.style.left = x + 'px';
       this.element.style.top = y + 'px';
       this.element.style.display = 'block';

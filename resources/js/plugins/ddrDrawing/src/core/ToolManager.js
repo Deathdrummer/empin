@@ -1,3 +1,5 @@
+import logger from './Logger.js'
+
 /**
  * Менеджер инструментов
  */
@@ -15,7 +17,7 @@ class ToolManager {
 	registerTool(name, toolClass) {
 		const tool = new toolClass(name, this.canvas, this.eventManager)
 		this.tools.set(name, tool)
-		console.log(`Tool ${name} registered`)
+		logger.log(`Tool ${name} registered`)
 	}
 
 	/**
@@ -24,7 +26,7 @@ class ToolManager {
 	activateTool(name) {
 		const tool = this.tools.get(name)
 		if (!tool) {
-			console.error(`Tool ${name} not found`)
+			logger.error(`Tool ${name} not found`)
 			return false
 		}
 
@@ -40,7 +42,7 @@ class ToolManager {
 		// Обновляем UI
 		this._updateToolbarUI(name)
 
-		console.log(`Tool ${name} activated`)
+		logger.log(`Tool ${name} activated`)
 		return true
 	}
 

@@ -1,4 +1,5 @@
 import BaseTool from './BaseTool.js'
+import logger from '../core/Logger.js'
 
 /**
  * Инструмент выделения и перемещения элементов
@@ -14,7 +15,7 @@ class SelectTool extends BaseTool {
 	onActivate() {
 		this.getPaper().el.style.cursor = 'default'
 		this.setupEvents()
-		console.log('SelectTool активирован')
+		logger.info('SelectTool activated')
 	}
 
 	/**
@@ -121,7 +122,7 @@ class SelectTool extends BaseTool {
 		
 		// Индекс новой вершины
 		const vertexIndex = newVertices.length - 1
-		console.log(`🎯 Добавили vertex ${vertexIndex} в точке`, clickPoint)
+		logger.log(`🎯 Добавили vertex ${vertexIndex} в точке`, clickPoint)
 		
 		let isDragging = false
 		let startPoint = clickPoint
@@ -148,7 +149,7 @@ class SelectTool extends BaseTool {
 			isDragging = false
 			paper.el.removeEventListener('pointermove', onPointerMove)
 			paper.el.removeEventListener('pointerup', onPointerUp)
-			console.log('🏁 Vertex drag завершен')
+			logger.log('🏁 Vertex drag завершен')
 		}
 		
 		// Начинаем перетаскивание сразу
@@ -156,7 +157,7 @@ class SelectTool extends BaseTool {
 		paper.el.addEventListener('pointermove', onPointerMove)
 		paper.el.addEventListener('pointerup', onPointerUp)
 		
-		console.log(`🚀 Начали drag vertex ${vertexIndex}`)
+		logger.log(`🚀 Начали drag vertex ${vertexIndex}`)
 	}
 }
 

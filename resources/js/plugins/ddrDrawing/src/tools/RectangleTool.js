@@ -1,4 +1,5 @@
 import BaseTool from './BaseTool.js'
+import logger from '../core/Logger.js'
 
 /**
  * Инструмент создания прямоугольников
@@ -29,7 +30,7 @@ class RectangleTool extends BaseTool {
 	 * Обработка клика по холсту
 	 */
 	onCanvasClick(point, event) {
-		console.log('Creating rectangle at:', point)
+		logger.log('Creating rectangle at:', point)
 		this.createRectangle(point.x, point.y)
 		
 		// Автоматически переключаемся на инструмент выделения
@@ -58,7 +59,7 @@ class RectangleTool extends BaseTool {
 		})
 		
 		this.getGraph().addCell(rect)
-		console.log('Rectangle created at grid position:', snapX, snapY)
+		logger.log('Rectangle created at grid position:', snapX, snapY)
 		
 		return rect
 	}

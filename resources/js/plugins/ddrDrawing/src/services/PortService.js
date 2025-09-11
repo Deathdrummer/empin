@@ -1,3 +1,5 @@
+import logger from '../core/Logger.js'
+
 /**
  * Сервис для управления портами элементов
  */
@@ -21,9 +23,9 @@ class PortService {
 
 		// Подписываемся на события добавления портов
 		this.eventManager.on('ports:add', (event) => {
-			console.log('🎯 PortService received ports:add event:', event)
+			logger.log('🎯 PortService received ports:add event:', event)
 			const data = event.detail
-			console.log('🎯 Event data:', data)
+			logger.log('🎯 Event data:', data)
 			this.addPortToElement(data.element, data.side)
 		})
 
@@ -37,7 +39,7 @@ class PortService {
 		this.setupSelectionHandlers()
 
 		this.initialized = true
-		console.log('PortService initialized')
+		logger.log('PortService initialized')
 	}
 
 	/**
@@ -47,14 +49,14 @@ class PortService {
 		// Показываем все порты когда элемент выделяется
 		this.paper.on('cell:pointerdown', (cellView) => {
 			if (cellView.model.isElement()) {
-				console.log('🎯 Element selected - showing all ports')
+				logger.log('🎯 Element selected - showing all ports')
 				this.showAllPorts(cellView.model)
 			}
 		})
 
 		// Скрываем порты когда кликают по пустому месту (снимается выделение)
 		this.paper.on('blank:pointerdown', () => {
-			console.log('🚫 Selection cleared - hiding all free ports')
+			logger.log('🚫 Selection cleared - hiding all free ports')
 			// Убираем selected класс со всех элементов
 			this.paper.el.querySelectorAll('.joint-element.selected').forEach(el => {
 				el.classList.remove('selected')
@@ -65,13 +67,13 @@ class PortService {
 		// Также реагируем на события выделения от SelectTool
 		this.eventManager.on('element:selected', (event) => {
 			const element = event.detail.element
-			console.log('📍 Element selected via SelectTool - showing all ports')
+			logger.log('📍 Element selected via SelectTool - showing all ports')
 			this.showAllPorts(element)
 		})
 
 		this.eventManager.on('element:deselected', (event) => {
 			const element = event.detail.element
-			console.log('📍 Element deselected via SelectTool - hiding free ports')
+			logger.log('📍 Element deselected via SelectTool - hiding free ports')
 			this.hideFreePorts(element)
 		})
 	}
@@ -101,19 +103,19 @@ class PortService {
 	setupPortVisibility() {
 		// Показываем порты при наведении на элемент
 		this.paper.on('element:mouseenter', (elementView) => {
-			console.log('🐭 element:mouseenter triggered for:', elementView.model.id)
+			logger.log('🐭 element:mouseenter triggered for:', elementView.model.id)
 			this.showFreePorts(elementView.model)
 		})
 
 		// Скрываем порты когда курсор покидает элемент
 		this.paper.on('element:mouseleave', (elementView) => {
-			console.log('🐭 element:mouseleave triggered for:', elementView.model.id)
+			logger.log('🐭 element:mouseleave triggered for:', elementView.model.id)
 			this.hideFreePorts(elementView.model)
 		})
 
 		// Также скрываем при перетаскивании
 		this.paper.on('element:pointermove', (elementView) => {
-			console.log('🐭 element:pointermove triggered for:', elementView.model.id)
+			logger.log('🐭 element:pointermove triggered for:', elementView.model.id)
 			this.hideFreePorts(elementView.model)
 		})
 	}
@@ -122,24 +124,24 @@ class PortService {
 	 * Показать свободные порты элемента
 	 */
 	showFreePorts(element) {
-		console.log('🎯 showFreePorts called for element:', element.id)
+		logger.log('🎯 showFreePorts called for element:', element.id)
 		const ports = element.get('ports') || { items: [] }
-		console.log('🎯 Element ports:', ports)
+		logger.log('🎯 Element ports:', ports)
 		const freePorts = this.getFreePorts(element)
-		console.log('🎯 Free ports:', freePorts)
+		logger.log('🎯 Free ports:', freePorts)
 
 		freePorts.forEach(port => {
-			console.log('🎯 Processing port:', port.id)
+			logger.log('🎯 Processing port:', port.id)
 			// Находим группу порта, а не circle
 			const portGroup = this.paper.findViewByModel(element)
 				?.el?.querySelector(`[port="${port.id}"]`)?.closest('.joint-port')
 			
-			console.log('🎯 Found port group:', portGroup)
+			logger.log('🎯 Found port group:', portGroup)
 			if (portGroup) {
-				console.log('🎯 Current classes before:', portGroup.className)
+				logger.log('🎯 Current classes before:', portGroup.className)
 				portGroup.classList.add('port-visible')
 				portGroup.classList.remove('port-hidden')
-				console.log('🎯 Current classes after:', portGroup.className)
+				logger.log('🎯 Current classes after:', portGroup.className)
 			}
 		})
 	}
@@ -169,19 +171,19 @@ class PortService {
 	setupLinkCreation() {
 		// Показываем все свободные порты когда начинается создание связи
 		this.paper.on('link:connect', (linkView, evt, elementViewConnected, magnet, arrowhead) => {
-			console.log('Link creation started - showing all free ports')
+			logger.log('Link creation started - showing all free ports')
 			this.showAllFreePorts()
 		})
 
 		// Также показываем при старте перетаскивания от порта
 		this.paper.on('element:magnet:pointerdown', (elementView, evt, magnet) => {
-			console.log('Magnet drag started - showing all free ports')
+			logger.log('Magnet drag started - showing all free ports')
 			this.showAllFreePorts()
 		})
 
 		// Скрываем все порты когда связь создана или отменена
 		this.paper.on('link:pointerup', () => {
-			console.log('Link creation ended - hiding all ports')
+			logger.log('Link creation ended - hiding all ports')
 			this.hideAllFreePorts()
 		})
 
@@ -243,14 +245,14 @@ class PortService {
 	 * Добавить порт к элементу
 	 */
 	addPortToElement(element, position) {
-		console.log('🔍 PortService.addPortToElement called:', { element, position })
+		logger.log('🔍 PortService.addPortToElement called:', { element, position })
 		
 		if (!element) {
-			console.error('❌ Element is undefined!')
+			logger.error('❌ Element is undefined!')
 			return
 		}
 		
-		console.log('Adding port to element:', element.id, 'position:', position)
+		logger.log('Adding port to element:', element.id, 'position:', position)
 
 		// Получаем текущие порты элемента
 		const currentPorts = element.get('ports') || { items: [] }
@@ -313,7 +315,7 @@ class PortService {
 		}
 
 		element.set('ports', updatedPorts)
-		console.log(`Port ${portId} added to element ${element.id}`)
+		logger.log(`Port ${portId} added to element ${element.id}`)
 
 		// Скрываем все остальные свободные порты этого элемента
 		this.hideFreePorts(element)
@@ -325,19 +327,19 @@ class PortService {
 				?.el?.querySelector(`[port="${portId}"]`)?.closest('.joint-port')
 			
 			if (newPortGroup) {
-				console.log(`🔍 Found port GROUP:`, newPortGroup)
-				console.log(`🔍 Current classes:`, newPortGroup.className)
+				logger.log(`🔍 Found port GROUP:`, newPortGroup)
+				logger.log(`🔍 Current classes:`, newPortGroup.className)
 				
 				newPortGroup.classList.remove('port-hidden')
 				newPortGroup.classList.add('port-visible')
-				console.log(`✨ Port ${portId} показан, classes after:`, newPortGroup.className)
+				logger.log(`✨ Port ${portId} показан, classes after:`, newPortGroup.className)
 				
 				// Автоматически скрываем через 300ms
 				setTimeout(() => {
 					if (this.getFreePorts(element).some(port => port.id === portId)) {
 						newPortGroup.classList.remove('port-visible')
 						newPortGroup.classList.add('port-hidden')
-						console.log(`🌙 Port ${portId} скрыт, classes after:`, newPortGroup.className)
+						logger.log(`🌙 Port ${portId} скрыт, classes after:`, newPortGroup.className)
 					}
 				}, 300)
 			}
@@ -360,7 +362,7 @@ class PortService {
 		}
 
 		element.set('ports', updatedPorts)
-		console.log(`Port ${portId} removed from element ${element.id}`)
+		logger.log(`Port ${portId} removed from element ${element.id}`)
 
 		// Эмитим событие об удалении порта
 		this.eventManager.emit('ports:port-removed', { element, portId })
@@ -405,7 +407,7 @@ class PortService {
 		}
 
 		this.initialized = false
-		console.log('PortService destroyed')
+		logger.log('PortService destroyed')
 	}
 }
 

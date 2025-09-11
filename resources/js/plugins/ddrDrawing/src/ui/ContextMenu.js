@@ -1,3 +1,5 @@
+import logger from '../core/Logger.js'
+
 /**
  * Контекстное меню
  */
@@ -5,8 +7,8 @@ class ContextMenu {
 	constructor(canvas, eventManager) {
 		this.canvas = canvas
 		this.eventManager = eventManager
-		console.log('🔧 ContextMenu constructor:', { canvas, eventManager })
-		console.log('🔧 eventManager:', eventManager)
+		logger.log('🔧 ContextMenu constructor:', { canvas, eventManager })
+		logger.log('🔧 eventManager:', eventManager)
 		this.eventBus = eventManager // EventManager сам является event bus
 		this.element = null
 		this.targetElement = null
@@ -21,7 +23,7 @@ class ContextMenu {
 		this.createElement()
 		this.setupDefaultItems()
 		this.setupEvents()
-		console.log('ContextMenu initialized')
+		logger.log('ContextMenu initialized')
 	}
 
 	/**
@@ -37,9 +39,9 @@ class ContextMenu {
 		
 		if (canvasContainerParent && canvasContainerParent.classList.contains('ddrdrawing__canvas-container')) {
 			canvasContainerParent.appendChild(this.element)
-			console.log('Context menu created and added to canvas-container')
+			logger.log('Context menu created and added to canvas-container')
 		} else {
-			console.error('Canvas container parent not found for context menu')
+			logger.error('Canvas container parent not found for context menu')
 		}
 	}
 
@@ -146,7 +148,7 @@ class ContextMenu {
 			const itemId = menuItem.getAttribute('data-item-id')
 			const position = menuItem.getAttribute('data-position')
 			
-			console.log('Context menu action:', action, 'Item:', itemId, 'Position:', position)
+			logger.log('Context menu action:', action, 'Item:', itemId, 'Position:', position)
 			
 			if (action && this.targetElement) {
 				this.handleAction(action, {
@@ -172,7 +174,7 @@ class ContextMenu {
 				}
 				break
 			default:
-				console.warn('Unknown context menu action:', action)
+				logger.warn('Unknown context menu action:', action)
 		}
 	}
 
@@ -180,17 +182,17 @@ class ContextMenu {
 	 * Добавление порта к элементу
 	 */
 	addPort(element, position) {
-		console.log('Adding port to element:', element.id, 'position:', position)
+		logger.log('Adding port to element:', element.id, 'position:', position)
 		
 		// НОВАЯ ЛОГИКА: используем eventBus вместо прямого создания портов
-		console.log('🔄 Отправляем событие ports:add через eventBus')
-		console.log('🔧 this.eventBus:', this.eventBus)
+		logger.log('🔄 Отправляем событие ports:add через eventBus')
+		logger.log('🔧 this.eventBus:', this.eventBus)
 		
 		if (!this.eventBus) {
-			console.error('❌ eventBus недоступен! Используем старую логику.')
+			logger.error('❌ eventBus недоступен! Используем старую логику.')
 			// Fallback к старой логике только если eventBus реально недоступен
 		} else {
-			console.log('✅ Используем PortService через eventBus')
+			logger.log('✅ Используем PortService через eventBus')
 			this.eventBus.emit('ports:add', { 
 				element: element, 
 				side: position 
@@ -243,7 +245,7 @@ class ContextMenu {
 		}
 		
 		element.set('ports', updatedPorts)
-		console.log('Port added:', portId)
+		logger.log('Port added:', portId)
 		
 		// ХИТРАЯ ФИШКА: После добавления нового порта принудительно скрываем занятые порты
 		setTimeout(() => {
@@ -255,14 +257,14 @@ class ContextMenu {
 	 * Принудительно скрывает все занятые (подключенные к линкам) порты элемента
 	 */
 	hideOccupiedPorts(element) {
-		console.log('🔍 hideOccupiedPorts для элемента:', element.id)
+		logger.log('🔍 hideOccupiedPorts для элемента:', element.id)
 		
 		const graph = this.canvas.paper.model
 		const elementPorts = element.get('ports')?.items || []
 		
 		// Находим все линки, подключенные к этому элементу
 		const connectedLinks = graph.getConnectedLinks(element)
-		console.log('🔗 Подключенные линки:', connectedLinks.length)
+		logger.log('🔗 Подключенные линки:', connectedLinks.length)
 		
 		// Собираем ID занятых портов
 		const occupiedPortIds = new Set()
@@ -278,11 +280,11 @@ class ContextMenu {
 			}
 		})
 		
-		console.log('🚫 Занятые порты:', Array.from(occupiedPortIds))
+		logger.log('🚫 Занятые порты:', Array.from(occupiedPortIds))
 		
 		// Скрываем все занятые порты
 		occupiedPortIds.forEach(portId => {
-			console.log(`👻 Скрываем занятый порт: ${portId}`)
+			logger.log(`👻 Скрываем занятый порт: ${portId}`)
 			element.portProp(portId, 'attrs/portBody/opacity', 0)
 			element.portProp(portId, 'attrs/portBody/fill-opacity', 0)
 			element.portProp(portId, 'attrs/portBody/stroke-opacity', 0)
@@ -337,11 +339,11 @@ class ContextMenu {
 	 */
 	show(x, y, element) {
 		if (!this.element) {
-			console.error('Context menu element not found')
+			logger.error('Context menu element not found')
 			return
 		}
 		
-		console.log('Showing context menu at', x, y, 'for element', element ? element.id : 'none')
+		logger.log('Showing context menu at', x, y, 'for element', element ? element.id : 'none')
 		
 		this.element.style.left = x + 'px'
 		this.element.style.top = y + 'px'
