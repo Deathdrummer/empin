@@ -97,6 +97,11 @@ class EventManager {
 			this._handleCellContextMenu(cellView, evt)
 		})
 		
+		// Добавляем обработчик для линков
+		paper.on('link:contextmenu', (linkView, evt) => {
+			this._handleCellContextMenu(linkView, evt)
+		})
+		
 		// События портов для hover эффектов
 		paper.on('element:magnet:pointerenter', (elementView, evt) => {
 			this._handlePortMouseEnter(elementView, evt)

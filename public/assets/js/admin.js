@@ -12393,15 +12393,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _core_EventManager_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./core/EventManager.js */ "./resources/js/plugins/ddrDrawing/src/core/EventManager.js");
 /* harmony import */ var _core_ToolManager_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./core/ToolManager.js */ "./resources/js/plugins/ddrDrawing/src/core/ToolManager.js");
 /* harmony import */ var _ui_ContextMenu_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./ui/ContextMenu.js */ "./resources/js/plugins/ddrDrawing/src/ui/ContextMenu.js");
-/* harmony import */ var _services_PortService_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./services/PortService.js */ "./resources/js/plugins/ddrDrawing/src/services/PortService.js");
-/* harmony import */ var _tools_SelectTool_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./tools/SelectTool.js */ "./resources/js/plugins/ddrDrawing/src/tools/SelectTool.js");
-/* harmony import */ var _tools_RectangleTool_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./tools/RectangleTool.js */ "./resources/js/plugins/ddrDrawing/src/tools/RectangleTool.js");
-/* harmony import */ var _core_Logger_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./core/Logger.js */ "./resources/js/plugins/ddrDrawing/src/core/Logger.js");
+/* harmony import */ var _ui_LineStyleSelector_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./ui/LineStyleSelector.js */ "./resources/js/plugins/ddrDrawing/src/ui/LineStyleSelector.js");
+/* harmony import */ var _services_PortService_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./services/PortService.js */ "./resources/js/plugins/ddrDrawing/src/services/PortService.js");
+/* harmony import */ var _tools_SelectTool_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./tools/SelectTool.js */ "./resources/js/plugins/ddrDrawing/src/tools/SelectTool.js");
+/* harmony import */ var _tools_RectangleTool_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./tools/RectangleTool.js */ "./resources/js/plugins/ddrDrawing/src/tools/RectangleTool.js");
+/* harmony import */ var _core_Logger_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./core/Logger.js */ "./resources/js/plugins/ddrDrawing/src/core/Logger.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+
 
 
 
@@ -12426,6 +12428,7 @@ var DrawingPlugin = /*#__PURE__*/function () {
     this.eventManager = null;
     this.toolManager = null;
     this.contextMenu = null;
+    this.lineStyleSelector = null;
     this.portService = null;
     this.initialized = false;
   }
@@ -12438,7 +12441,7 @@ var DrawingPlugin = /*#__PURE__*/function () {
     key: "init",
     value: function init() {
       if (this.initialized) return;
-      _core_Logger_js__WEBPACK_IMPORTED_MODULE_7__["default"].info('Initializing DrawingPlugin');
+      _core_Logger_js__WEBPACK_IMPORTED_MODULE_8__["default"].info('Initializing DrawingPlugin');
 
       try {
         // Создаем основные компоненты
@@ -12446,14 +12449,17 @@ var DrawingPlugin = /*#__PURE__*/function () {
         this.eventManager = new _core_EventManager_js__WEBPACK_IMPORTED_MODULE_1__["default"](this.canvas);
         this.toolManager = new _core_ToolManager_js__WEBPACK_IMPORTED_MODULE_2__["default"](this.canvas, this.eventManager);
         this.contextMenu = new _ui_ContextMenu_js__WEBPACK_IMPORTED_MODULE_3__["default"](this.canvas, this.eventManager);
-        this.portService = new _services_PortService_js__WEBPACK_IMPORTED_MODULE_4__["default"](this.canvas, this.eventManager); // Инициализируем компоненты
+        this.lineStyleSelector = new _ui_LineStyleSelector_js__WEBPACK_IMPORTED_MODULE_4__["default"](this.canvas);
+        this.portService = new _services_PortService_js__WEBPACK_IMPORTED_MODULE_5__["default"](this.canvas, this.eventManager); // Инициализируем компоненты
 
         this.canvas.init();
         this.contextMenu.init();
+        this.lineStyleSelector.init();
         this.portService.init(); // Устанавливаем связи
 
         this.eventManager.setToolManager(this.toolManager);
-        this.eventManager.setContextMenu(this.contextMenu); // Регистрируем инструменты
+        this.eventManager.setContextMenu(this.contextMenu);
+        this.canvas.setLineStyleSelector(this.lineStyleSelector); // Регистрируем инструменты
 
         this.registerTools(); // Инициализируем менеджеры
 
@@ -12464,9 +12470,9 @@ var DrawingPlugin = /*#__PURE__*/function () {
 
         this.setupEventHandlers();
         this.initialized = true;
-        _core_Logger_js__WEBPACK_IMPORTED_MODULE_7__["default"].info('DrawingPlugin initialized successfully');
+        _core_Logger_js__WEBPACK_IMPORTED_MODULE_8__["default"].info('DrawingPlugin initialized successfully');
       } catch (error) {
-        _core_Logger_js__WEBPACK_IMPORTED_MODULE_7__["default"].error('Failed to initialize DrawingPlugin:', error);
+        _core_Logger_js__WEBPACK_IMPORTED_MODULE_8__["default"].error('Failed to initialize DrawingPlugin:', error);
         throw error;
       }
     }
@@ -12477,8 +12483,8 @@ var DrawingPlugin = /*#__PURE__*/function () {
   }, {
     key: "registerTools",
     value: function registerTools() {
-      this.toolManager.registerTool('select', _tools_SelectTool_js__WEBPACK_IMPORTED_MODULE_5__["default"]);
-      this.toolManager.registerTool('rectangle', _tools_RectangleTool_js__WEBPACK_IMPORTED_MODULE_6__["default"]);
+      this.toolManager.registerTool('select', _tools_SelectTool_js__WEBPACK_IMPORTED_MODULE_6__["default"]);
+      this.toolManager.registerTool('rectangle', _tools_RectangleTool_js__WEBPACK_IMPORTED_MODULE_7__["default"]);
     }
     /**
      * Настройка обработчиков событий
@@ -12491,10 +12497,10 @@ var DrawingPlugin = /*#__PURE__*/function () {
 
       // Обработчики для специальных инструментов
       this.eventManager.on('undo', function () {
-        _core_Logger_js__WEBPACK_IMPORTED_MODULE_7__["default"].info('Undo action'); // TODO: Реализовать undo
+        _core_Logger_js__WEBPACK_IMPORTED_MODULE_8__["default"].info('Undo action'); // TODO: Реализовать undo
       });
       this.eventManager.on('redo', function () {
-        _core_Logger_js__WEBPACK_IMPORTED_MODULE_7__["default"].info('Redo action'); // TODO: Реализовать redo
+        _core_Logger_js__WEBPACK_IMPORTED_MODULE_8__["default"].info('Redo action'); // TODO: Реализовать redo
       });
       this.eventManager.on('zoom-in', function () {
         _this.zoomIn();
@@ -12541,6 +12547,15 @@ var DrawingPlugin = /*#__PURE__*/function () {
     key: "getContextMenu",
     value: function getContextMenu() {
       return this.contextMenu;
+    }
+    /**
+     * Получить селектор стилей линий
+     */
+
+  }, {
+    key: "getLineStyleSelector",
+    value: function getLineStyleSelector() {
+      return this.lineStyleSelector;
     }
     /**
      * Получить сервис портов
@@ -12650,7 +12665,7 @@ var DrawingPlugin = /*#__PURE__*/function () {
       }
 
       this.initialized = false;
-      _core_Logger_js__WEBPACK_IMPORTED_MODULE_7__["default"].info('DrawingPlugin destroyed');
+      _core_Logger_js__WEBPACK_IMPORTED_MODULE_8__["default"].info('DrawingPlugin destroyed');
     }
   }]);
 
@@ -12670,11 +12685,13 @@ var DrawingPlugin = /*#__PURE__*/function () {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Logger_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Logger.js */ "./resources/js/plugins/ddrDrawing/src/core/Logger.js");
+/* harmony import */ var _LinkMetadata_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./LinkMetadata.js */ "./resources/js/plugins/ddrDrawing/src/core/LinkMetadata.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+
 
 
 /**
@@ -12689,14 +12706,25 @@ var DrawingCanvas = /*#__PURE__*/function () {
     this.container = null;
     this.graph = null;
     this.paper = null;
+    this.lineStyleSelector = null; // Будет установлен позже
+
     this.initialized = false;
   }
   /**
-   * Инициализация холста
+   * Установить селектор стилей линий
    */
 
 
   _createClass(DrawingCanvas, [{
+    key: "setLineStyleSelector",
+    value: function setLineStyleSelector(selector) {
+      this.lineStyleSelector = selector;
+    }
+    /**
+     * Инициализация холста
+     */
+
+  }, {
     key: "init",
     value: function init() {
       if (this.initialized) return;
@@ -12738,6 +12766,8 @@ var DrawingCanvas = /*#__PURE__*/function () {
   }, {
     key: "_createPaper",
     value: function _createPaper() {
+      var _this = this;
+
       this.paper = new window.joint.dia.Paper({
         el: this.container,
         model: this.graph,
@@ -12773,12 +12803,17 @@ var DrawingCanvas = /*#__PURE__*/function () {
         },
         // Разрешаем создание связей только через порты
         linkPinning: false,
-        // Создаем стандартную связь без стрелок с удлинением на радиус порта
+        // Создаем стандартную связь без стрелок с мета-информацией
         defaultLink: function defaultLink() {
-          return new window.joint.shapes.standard.Link({
+          // Получаем текущие настройки из селектора
+          var currentSettings = _this.lineStyleSelector ? _this.lineStyleSelector.getCurrentSettings() : {
+            color: '#666666',
+            lineStyle: _LinkMetadata_js__WEBPACK_IMPORTED_MODULE_1__.LineStyles.SOLID
+          };
+          var link = new window.joint.shapes.standard.Link({
             attrs: {
               line: {
-                stroke: '#666666',
+                stroke: currentSettings.color,
                 strokeWidth: 1,
                 targetMarker: 'none',
                 // Убираем стрелку
@@ -12786,7 +12821,14 @@ var DrawingCanvas = /*#__PURE__*/function () {
 
               }
             }
+          }); // Добавляем мета-информацию с текущими настройками
+
+          new _LinkMetadata_js__WEBPACK_IMPORTED_MODULE_1__.LinkMetadata(link, {
+            color: currentSettings.color,
+            lineStyle: currentSettings.lineStyle,
+            connectionType: _LinkMetadata_js__WEBPACK_IMPORTED_MODULE_1__.ConnectionTypes.SHAPE_TO_SHAPE
           });
+          return link;
         },
         // Настройки магнитного поведения
         magnetThreshold: 'onleave',
@@ -12827,8 +12869,52 @@ var DrawingCanvas = /*#__PURE__*/function () {
           _Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('Connection approved!');
           return true;
         }
+      }); // Обработчики событий для линков
+
+      this.graph.on('add', function (cell) {
+        if (cell.isLink()) {
+          _this._onLinkAdded(cell);
+        }
+      });
+      this.graph.on('change:vertices change:source change:target', function (link) {
+        if (link.isLink()) {
+          _this._onLinkChanged(link);
+        }
       });
       _Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].info('Paper created with port-based linking enabled');
+    }
+    /**
+     * Обработчик добавления линка
+     */
+
+  }, {
+    key: "_onLinkAdded",
+    value: function _onLinkAdded(link) {// Пока ничего не делаем - ждём полного подключения
+    }
+    /**
+     * Обработчик изменения линка
+     */
+
+  }, {
+    key: "_onLinkChanged",
+    value: function _onLinkChanged(link) {
+      // Проверяем, если линк полностью подключен к двум элементам
+      var source = link.source();
+      var target = link.target();
+
+      if (source.id && target.id) {
+        // Линк полностью подключен - определяем и выводим тип
+        var sourceElement = this.graph.getCell(source.id);
+        var targetElement = this.graph.getCell(target.id);
+        var connectionType = _LinkMetadata_js__WEBPACK_IMPORTED_MODULE_1__.LinkMetadata.detectConnectionType(sourceElement, targetElement); // Обновляем метаданные с правильным типом
+
+        var metadata = _LinkMetadata_js__WEBPACK_IMPORTED_MODULE_1__.LinkMetadata.fromLink(link);
+
+        if (metadata) {
+          metadata.setConnectionType(connectionType);
+          console.log('🔗 Тип соединения линии:', connectionType);
+        }
+      }
     }
     /**
      * Обновление размеров paper
@@ -12837,14 +12923,14 @@ var DrawingCanvas = /*#__PURE__*/function () {
   }, {
     key: "updatePaperSize",
     value: function updatePaperSize() {
-      var _this = this;
+      var _this2 = this;
 
       if (!this.paper) return;
       var container = this.paper.el;
 
       if (!container || !container.offsetParent) {
         setTimeout(function () {
-          return _this.updatePaperSize();
+          return _this2.updatePaperSize();
         }, 100);
         return;
       }
@@ -12862,10 +12948,10 @@ var DrawingCanvas = /*#__PURE__*/function () {
   }, {
     key: "_updatePaperSize",
     value: function _updatePaperSize() {
-      var _this2 = this;
+      var _this3 = this;
 
       setTimeout(function () {
-        return _this2.updatePaperSize();
+        return _this3.updatePaperSize();
       }, 50);
     }
     /**
@@ -13127,6 +13213,10 @@ var EventManager = /*#__PURE__*/function () {
       });
       paper.on('cell:contextmenu', function (cellView, evt) {
         _this3._handleCellContextMenu(cellView, evt);
+      }); // Добавляем обработчик для линков
+
+      paper.on('link:contextmenu', function (linkView, evt) {
+        _this3._handleCellContextMenu(linkView, evt);
       }); // События портов для hover эффектов
 
       paper.on('element:magnet:pointerenter', function (elementView, evt) {
@@ -13625,6 +13715,172 @@ var EventManager = /*#__PURE__*/function () {
 }();
 
 /* harmony default export */ __webpack_exports__["default"] = (EventManager);
+
+/***/ }),
+
+/***/ "./resources/js/plugins/ddrDrawing/src/core/LinkMetadata.js":
+/*!******************************************************************!*\
+  !*** ./resources/js/plugins/ddrDrawing/src/core/LinkMetadata.js ***!
+  \******************************************************************/
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "ConnectionTypes": function() { return /* binding */ ConnectionTypes; },
+/* harmony export */   "LineColors": function() { return /* binding */ LineColors; },
+/* harmony export */   "LineStylePatterns": function() { return /* binding */ LineStylePatterns; },
+/* harmony export */   "LineStyles": function() { return /* binding */ LineStyles; },
+/* harmony export */   "LinkMetadata": function() { return /* binding */ LinkMetadata; }
+/* harmony export */ });
+var _LineStylePatterns;
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+var LineStyles = {
+  SOLID: 'solid',
+  DASHED: 'dashed',
+  DOTTED: 'dotted',
+  DASH_DOT: 'dash-dot',
+  DASH_DOT_DOT: 'dash-dot-dot',
+  LONG_DASH: 'long-dash',
+  SHORT_DASH: 'short-dash'
+};
+var LineColors = {
+  GRAY: '#666666',
+  LIGHT_GRAY: '#999999',
+  RED: '#ff0000',
+  BLUE: '#0066cc',
+  GREEN: '#00aa00',
+  YELLOW: '#ffaa00'
+};
+var ConnectionTypes = {
+  SHAPE_TO_SHAPE: 'shape-to-shape',
+  SHAPE_TO_CALLOUT: 'shape-to-callout',
+  SHAPE_TO_ANNOTATION: 'shape-to-annotation',
+  SHAPE_TO_DIMENSION: 'shape-to-dimension',
+  SHAPE_TO_PORT: 'shape-to-port',
+  PORT_TO_PORT: 'port-to-port',
+  CUSTOM: 'custom'
+};
+var LineStylePatterns = (_LineStylePatterns = {}, _defineProperty(_LineStylePatterns, LineStyles.SOLID, ''), _defineProperty(_LineStylePatterns, LineStyles.DASHED, '10 5'), _defineProperty(_LineStylePatterns, LineStyles.DOTTED, '2 2'), _defineProperty(_LineStylePatterns, LineStyles.DASH_DOT, '10 5 2 5'), _defineProperty(_LineStylePatterns, LineStyles.DASH_DOT_DOT, '10 5 2 5 2 5'), _defineProperty(_LineStylePatterns, LineStyles.LONG_DASH, '15 5'), _defineProperty(_LineStylePatterns, LineStyles.SHORT_DASH, '5 3'), _LineStylePatterns);
+var LinkMetadata = /*#__PURE__*/function () {
+  function LinkMetadata(link) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+    _classCallCheck(this, LinkMetadata);
+
+    this.link = link;
+    var defaults = {
+      color: LineColors.GRAY,
+      lineStyle: LineStyles.SOLID,
+      connectionType: ConnectionTypes.SHAPE_TO_SHAPE,
+      length: null,
+      // Длина задается вручную
+      metadata: {}
+    };
+    this.data = _objectSpread(_objectSpread({}, defaults), options);
+    this.applyToLink();
+  }
+
+  _createClass(LinkMetadata, [{
+    key: "applyToLink",
+    value: function applyToLink() {
+      this.link.prop('metadata', this.data);
+      this.link.attr('line/stroke', this.data.color);
+      this.link.attr('line/strokeDasharray', LineStylePatterns[this.data.lineStyle]);
+      this.link.attr('line/targetMarker/fill', this.data.color);
+
+      if (this.data.length) {
+        this.link.prop('metadata/length', this.data.length);
+      }
+    }
+  }, {
+    key: "setColor",
+    value: function setColor(color) {
+      this.data.color = color;
+      this.link.attr('line/stroke', color);
+      this.link.attr('line/targetMarker/fill', color);
+      this.link.prop('metadata/color', color);
+    }
+  }, {
+    key: "setLineStyle",
+    value: function setLineStyle(style) {
+      if (!LineStyles[style.toUpperCase()]) {
+        console.warn("Unknown line style: ".concat(style));
+        return;
+      }
+
+      this.data.lineStyle = style;
+      this.link.attr('line/strokeDasharray', LineStylePatterns[style]);
+      this.link.prop('metadata/lineStyle', style);
+    }
+  }, {
+    key: "setConnectionType",
+    value: function setConnectionType(type) {
+      this.data.connectionType = type;
+      this.link.prop('metadata/connectionType', type);
+    }
+  }, {
+    key: "setLength",
+    value: function setLength(length) {
+      this.data.length = length;
+      this.link.prop('metadata/length', length);
+    }
+  }, {
+    key: "getMetadata",
+    value: function getMetadata() {
+      return _objectSpread({}, this.data);
+    }
+  }], [{
+    key: "fromLink",
+    value: function fromLink(link) {
+      var existingMetadata = link.prop('metadata');
+
+      if (existingMetadata) {
+        return new LinkMetadata(link, existingMetadata);
+      }
+
+      return new LinkMetadata(link);
+    }
+  }, {
+    key: "detectConnectionType",
+    value: function detectConnectionType(sourceElement, targetElement) {
+      if (!sourceElement || !targetElement) {
+        return ConnectionTypes.CUSTOM;
+      }
+
+      var sourceType = sourceElement.get('type');
+      var targetType = targetElement.get('type');
+
+      if (sourceType !== null && sourceType !== void 0 && sourceType.includes('Callout') || targetType !== null && targetType !== void 0 && targetType.includes('Callout')) {
+        return ConnectionTypes.SHAPE_TO_CALLOUT;
+      }
+
+      if (sourceType !== null && sourceType !== void 0 && sourceType.includes('Annotation') || targetType !== null && targetType !== void 0 && targetType.includes('Annotation')) {
+        return ConnectionTypes.SHAPE_TO_ANNOTATION;
+      }
+
+      if (sourceType !== null && sourceType !== void 0 && sourceType.includes('Dimension') || targetType !== null && targetType !== void 0 && targetType.includes('Dimension')) {
+        return ConnectionTypes.SHAPE_TO_DIMENSION;
+      }
+
+      return ConnectionTypes.SHAPE_TO_SHAPE;
+    }
+  }]);
+
+  return LinkMetadata;
+}();
 
 /***/ }),
 
@@ -15360,7 +15616,9 @@ var ContextMenu = /*#__PURE__*/function () {
         return;
       }
 
-      _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('Showing context menu at', x, y, 'for element', element ? element.id : 'none');
+      _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('Showing context menu at', x, y, 'for element', element ? element.id : 'none'); // Убрал динамическое скрытие - пусть все пункты будут видны всегда
+      // this.updateMenuForElement(element)
+
       this.element.style.left = x + 'px';
       this.element.style.top = y + 'px';
       this.element.style.display = 'block';
@@ -15370,6 +15628,66 @@ var ContextMenu = /*#__PURE__*/function () {
       this.element.style.border = '1px solid #ccc';
       this.targetElement = element;
       this.isVisible = true;
+    }
+    /**
+     * Обновление меню для конкретного элемента
+     */
+
+  }, {
+    key: "updateMenuForElement",
+    value: function updateMenuForElement(element) {
+      // Скрываем только корневые элементы меню (не трогаем элементы в подменю)
+      var rootMenuItems = this.element.querySelectorAll(':scope > .ddrdrawing__context-menu-item');
+      rootMenuItems.forEach(function (item) {
+        item.style.display = 'none';
+      });
+
+      if (!element) {
+        // Если нет элемента - показываем все корневые элементы
+        rootMenuItems.forEach(function (item) {
+          item.style.display = '';
+        });
+        return;
+      } // Показываем только релевантные пункты
+
+
+      if (element.isLink && element.isLink()) {
+        // Для линков показываем стили и цвета
+        this.showMenuItems(['line-style', 'line-color', 'set-nominal-length', 'show-link-info']);
+      } else {
+        // Для фигур показываем порты
+        this.showMenuItems(['add-port']);
+      }
+    }
+    /**
+     * Показать указанные пункты меню
+     */
+
+  }, {
+    key: "showMenuItems",
+    value: function showMenuItems(itemIds) {
+      var _this3 = this;
+
+      itemIds.forEach(function (id) {
+        // Для групп
+        var groupItem = _this3.element.querySelector("[data-group=\"".concat(id, "\"]"));
+
+        if (groupItem) {
+          groupItem.style.display = ''; // Убеждаемся что элементы в подменю тоже видны
+
+          var submenuItems = groupItem.querySelectorAll('.ddrdrawing__context-menu-item');
+          submenuItems.forEach(function (item) {
+            item.style.display = '';
+          });
+        } // Для одиночных пунктов
+
+
+        var menuItem = _this3.element.querySelector("[data-item-id=\"".concat(id, "\"]"));
+
+        if (menuItem && !menuItem.closest('.ddrdrawing__context-menu-submenu')) {
+          menuItem.style.display = '';
+        }
+      });
     }
     /**
      * Скрыть меню
@@ -15414,6 +15732,182 @@ var ContextMenu = /*#__PURE__*/function () {
 }();
 
 /* harmony default export */ __webpack_exports__["default"] = (ContextMenu);
+
+/***/ }),
+
+/***/ "./resources/js/plugins/ddrDrawing/src/ui/LineStyleSelector.js":
+/*!*********************************************************************!*\
+  !*** ./resources/js/plugins/ddrDrawing/src/ui/LineStyleSelector.js ***!
+  \*********************************************************************/
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../core/Logger.js */ "./resources/js/plugins/ddrDrawing/src/core/Logger.js");
+/* harmony import */ var _core_LinkMetadata_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../core/LinkMetadata.js */ "./resources/js/plugins/ddrDrawing/src/core/LinkMetadata.js");
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+
+
+
+/**
+ * Компонент для выбора стиля линий
+ */
+
+var LineStyleSelector = /*#__PURE__*/function () {
+  function LineStyleSelector(canvas) {
+    _classCallCheck(this, LineStyleSelector);
+
+    this.canvas = canvas;
+    this.currentColor = _core_LinkMetadata_js__WEBPACK_IMPORTED_MODULE_1__.LineColors.GRAY;
+    this.currentStyle = _core_LinkMetadata_js__WEBPACK_IMPORTED_MODULE_1__.LineStyles.SOLID;
+    this.colorSelect = null;
+    this.styleSelect = null;
+  }
+  /**
+   * Инициализация
+   */
+
+
+  _createClass(LineStyleSelector, [{
+    key: "init",
+    value: function init() {
+      this.createSelectors();
+      this.setupEvents();
+      _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('LineStyleSelector initialized');
+    }
+    /**
+     * Создание выпадающих списков
+     */
+
+  }, {
+    key: "createSelectors",
+    value: function createSelectors() {
+      var toolbarSection = document.querySelector('.ddrdrawing__toolbar-section');
+
+      if (!toolbarSection) {
+        _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].error('Toolbar section not found for LineStyleSelector');
+        return;
+      } // Создаем группу для селекторов в стиле остальных групп
+
+
+      var selectorGroup = document.createElement('div');
+      selectorGroup.className = 'ddrdrawing__toolbar-group'; // Контейнер для цвета
+
+      var colorContainer = document.createElement('div');
+      colorContainer.className = 'ddrdrawing__select-container';
+      var colorLabel = document.createElement('span');
+      colorLabel.textContent = 'Цвет:';
+      colorLabel.className = 'ddrdrawing__select-label';
+      this.colorSelect = document.createElement('select');
+      this.colorSelect.className = 'ddrdrawing__select';
+      this.colorSelect.innerHTML = "\n\t\t\t<option value=\"".concat(_core_LinkMetadata_js__WEBPACK_IMPORTED_MODULE_1__.LineColors.GRAY, "\">\u0421\u0435\u0440\u044B\u0439</option>\n\t\t\t<option value=\"").concat(_core_LinkMetadata_js__WEBPACK_IMPORTED_MODULE_1__.LineColors.LIGHT_GRAY, "\">\u0421\u0432\u0435\u0442\u043B\u043E-\u0441\u0435\u0440\u044B\u0439</option>\n\t\t\t<option value=\"").concat(_core_LinkMetadata_js__WEBPACK_IMPORTED_MODULE_1__.LineColors.RED, "\">\u041A\u0440\u0430\u0441\u043D\u044B\u0439</option>\n\t\t\t<option value=\"").concat(_core_LinkMetadata_js__WEBPACK_IMPORTED_MODULE_1__.LineColors.BLUE, "\">\u0421\u0438\u043D\u0438\u0439</option>\n\t\t\t<option value=\"").concat(_core_LinkMetadata_js__WEBPACK_IMPORTED_MODULE_1__.LineColors.GREEN, "\">\u0417\u0435\u043B\u0435\u043D\u044B\u0439</option>\n\t\t\t<option value=\"").concat(_core_LinkMetadata_js__WEBPACK_IMPORTED_MODULE_1__.LineColors.YELLOW, "\">\u0416\u0435\u043B\u0442\u044B\u0439</option>\n\t\t");
+      colorContainer.appendChild(colorLabel);
+      colorContainer.appendChild(this.colorSelect); // Контейнер для стиля
+
+      var styleContainer = document.createElement('div');
+      styleContainer.className = 'ddrdrawing__select-container';
+      var styleLabel = document.createElement('span');
+      styleLabel.textContent = 'Линия:';
+      styleLabel.className = 'ddrdrawing__select-label';
+      this.styleSelect = document.createElement('select');
+      this.styleSelect.className = 'ddrdrawing__select';
+      this.styleSelect.innerHTML = "\n\t\t\t<option value=\"".concat(_core_LinkMetadata_js__WEBPACK_IMPORTED_MODULE_1__.LineStyles.SOLID, "\">\u0421\u043F\u043B\u043E\u0448\u043D\u0430\u044F</option>\n\t\t\t<option value=\"").concat(_core_LinkMetadata_js__WEBPACK_IMPORTED_MODULE_1__.LineStyles.DASHED, "\">\u0428\u0442\u0440\u0438\u0445\u043E\u0432\u0430\u044F</option>\n\t\t\t<option value=\"").concat(_core_LinkMetadata_js__WEBPACK_IMPORTED_MODULE_1__.LineStyles.DOTTED, "\">\u0422\u043E\u0447\u0435\u0447\u043D\u0430\u044F</option>\n\t\t\t<option value=\"").concat(_core_LinkMetadata_js__WEBPACK_IMPORTED_MODULE_1__.LineStyles.DASH_DOT, "\">\u0428\u0442\u0440\u0438\u0445-\u0442\u043E\u0447\u043A\u0430</option>\n\t\t\t<option value=\"").concat(_core_LinkMetadata_js__WEBPACK_IMPORTED_MODULE_1__.LineStyles.DASH_DOT_DOT, "\">\u0428\u0442\u0440\u0438\u0445-\u0434\u0432\u0435 \u0442\u043E\u0447\u043A\u0438</option>\n\t\t\t<option value=\"").concat(_core_LinkMetadata_js__WEBPACK_IMPORTED_MODULE_1__.LineStyles.LONG_DASH, "\">\u0414\u043B\u0438\u043D\u043D\u044B\u0439 \u0448\u0442\u0440\u0438\u0445</option>\n\t\t\t<option value=\"").concat(_core_LinkMetadata_js__WEBPACK_IMPORTED_MODULE_1__.LineStyles.SHORT_DASH, "\">\u041A\u043E\u0440\u043E\u0442\u043A\u0438\u0439 \u0448\u0442\u0440\u0438\u0445</option>\n\t\t");
+      styleContainer.appendChild(styleLabel);
+      styleContainer.appendChild(this.styleSelect); // Добавляем контейнеры в группу
+
+      selectorGroup.appendChild(colorContainer);
+      selectorGroup.appendChild(styleContainer); // Добавляем группу в тулбар
+
+      toolbarSection.appendChild(selectorGroup);
+    }
+    /**
+     * Настройка событий
+     */
+
+  }, {
+    key: "setupEvents",
+    value: function setupEvents() {
+      var _this = this;
+
+      if (this.colorSelect) {
+        this.colorSelect.addEventListener('change', function (e) {
+          _this.currentColor = e.target.value;
+          _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('Line color changed to:', _this.currentColor);
+
+          _this.updateSelectedLinks();
+        });
+      }
+
+      if (this.styleSelect) {
+        this.styleSelect.addEventListener('change', function (e) {
+          _this.currentStyle = e.target.value;
+          _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('Line style changed to:', _this.currentStyle);
+
+          _this.updateSelectedLinks();
+        });
+      }
+    }
+    /**
+     * Обновление выбранных линков
+     */
+
+  }, {
+    key: "updateSelectedLinks",
+    value: function updateSelectedLinks() {
+      var _this2 = this;
+
+      var graph = this.canvas.getGraph();
+      if (!graph) return; // Получаем все выделенные линки
+
+      var links = graph.getLinks();
+      links.forEach(function (link) {
+        if (link.get('selected')) {
+          // Импортируем LinkMetadata динамически
+          Promise.resolve(/*! import() */).then(__webpack_require__.bind(__webpack_require__, /*! ../core/LinkMetadata.js */ "./resources/js/plugins/ddrDrawing/src/core/LinkMetadata.js")).then(function (_ref) {
+            var LinkMetadata = _ref.LinkMetadata;
+            var metadata = LinkMetadata.fromLink(link);
+
+            if (metadata) {
+              metadata.setColor(_this2.currentColor);
+              metadata.setLineStyle(_this2.currentStyle);
+            }
+          });
+        }
+      });
+    }
+    /**
+     * Получить текущие настройки
+     */
+
+  }, {
+    key: "getCurrentSettings",
+    value: function getCurrentSettings() {
+      return {
+        color: this.currentColor,
+        lineStyle: this.currentStyle
+      };
+    }
+    /**
+     * Очистка
+     */
+
+  }, {
+    key: "destroy",
+    value: function destroy() {
+      if (this.colorSelect && this.colorSelect.parentNode) {
+        this.colorSelect.parentNode.remove();
+      }
+    }
+  }]);
+
+  return LineStyleSelector;
+}();
+
+/* harmony default export */ __webpack_exports__["default"] = (LineStyleSelector);
 
 /***/ }),
 

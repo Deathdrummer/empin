@@ -1,4 +1,5 @@
 import logger from './Logger.js'
+import { LinkMetadata, LineStyles, ConnectionTypes } from './LinkMetadata.js'
 
 /**
  * Основной класс для управления холстом рисования
@@ -9,7 +10,15 @@ class DrawingCanvas {
 		this.container = null
 		this.graph = null
 		this.paper = null
+		this.lineStyleSelector = null // Будет установлен позже
 		this.initialized = false
+	}
+	
+	/**
+	 * Установить селектор стилей линий
+	 */
+	setLineStyleSelector(selector) {
+		this.lineStyleSelector = selector
 	}
 
 	/**
@@ -81,18 +90,32 @@ class DrawingCanvas {
 			},
 			// Разрешаем создание связей только через порты
 			linkPinning: false,
-			// Создаем стандартную связь без стрелок с удлинением на радиус порта
+			// Создаем стандартную связь без стрелок с мета-информацией
 			defaultLink: () => {
-				return new window.joint.shapes.standard.Link({
+				// Получаем текущие настройки из селектора
+				const currentSettings = this.lineStyleSelector ? 
+					this.lineStyleSelector.getCurrentSettings() : 
+					{ color: '#666666', lineStyle: LineStyles.SOLID }
+				
+				const link = new window.joint.shapes.standard.Link({
 					attrs: {
 						line: {
-							stroke: '#666666',
+							stroke: currentSettings.color,
 							strokeWidth: 1,
 							targetMarker: 'none', // Убираем стрелку
 							sourceMarker: 'none'  // Убираем стрелку с начала тоже
 						}
 					},
 				})
+				
+				// Добавляем мета-информацию с текущими настройками
+				new LinkMetadata(link, {
+					color: currentSettings.color,
+					lineStyle: currentSettings.lineStyle,
+					connectionType: ConnectionTypes.SHAPE_TO_SHAPE
+				})
+				
+				return link
 			},
 			// Настройки магнитного поведения
 			magnetThreshold: 'onleave',
@@ -131,7 +154,50 @@ class DrawingCanvas {
 			}
 		})
 		
+		// Обработчики событий для линков
+		this.graph.on('add', (cell) => {
+			if (cell.isLink()) {
+				this._onLinkAdded(cell)
+			}
+		})
+		
+		this.graph.on('change:vertices change:source change:target', (link) => {
+			if (link.isLink()) {
+				this._onLinkChanged(link)
+			}
+		})
+		
 		logger.info('Paper created with port-based linking enabled')
+	}
+	
+	/**
+	 * Обработчик добавления линка
+	 */
+	_onLinkAdded(link) {
+		// Пока ничего не делаем - ждём полного подключения
+	}
+	
+	/**
+	 * Обработчик изменения линка
+	 */
+	_onLinkChanged(link) {
+		// Проверяем, если линк полностью подключен к двум элементам
+		const source = link.source()
+		const target = link.target()
+		
+		if (source.id && target.id) {
+			// Линк полностью подключен - определяем и выводим тип
+			const sourceElement = this.graph.getCell(source.id)
+			const targetElement = this.graph.getCell(target.id)
+			const connectionType = LinkMetadata.detectConnectionType(sourceElement, targetElement)
+			
+			// Обновляем метаданные с правильным типом
+			const metadata = LinkMetadata.fromLink(link)
+			if (metadata) {
+				metadata.setConnectionType(connectionType)
+				console.log('🔗 Тип соединения линии:', connectionType)
+			}
+		}
 	}
 
 	/**

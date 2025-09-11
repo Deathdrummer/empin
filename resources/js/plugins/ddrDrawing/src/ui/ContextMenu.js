@@ -345,6 +345,9 @@ class ContextMenu {
 		
 		logger.log('Showing context menu at', x, y, 'for element', element ? element.id : 'none')
 		
+		// Убрал динамическое скрытие - пусть все пункты будут видны всегда
+		// this.updateMenuForElement(element)
+		
 		this.element.style.left = x + 'px'
 		this.element.style.top = y + 'px'
 		this.element.style.display = 'block'
@@ -355,6 +358,58 @@ class ContextMenu {
 		
 		this.targetElement = element
 		this.isVisible = true
+	}
+	
+	/**
+	 * Обновление меню для конкретного элемента
+	 */
+	updateMenuForElement(element) {
+		// Скрываем только корневые элементы меню (не трогаем элементы в подменю)
+		const rootMenuItems = this.element.querySelectorAll(':scope > .ddrdrawing__context-menu-item')
+		rootMenuItems.forEach(item => {
+			item.style.display = 'none'
+		})
+		
+		if (!element) {
+			// Если нет элемента - показываем все корневые элементы
+			rootMenuItems.forEach(item => {
+				item.style.display = ''
+			})
+			return
+		}
+		
+		// Показываем только релевантные пункты
+		if (element.isLink && element.isLink()) {
+			// Для линков показываем стили и цвета
+			this.showMenuItems(['line-style', 'line-color', 'set-nominal-length', 'show-link-info'])
+		} else {
+			// Для фигур показываем порты
+			this.showMenuItems(['add-port'])
+		}
+	}
+	
+	/**
+	 * Показать указанные пункты меню
+	 */
+	showMenuItems(itemIds) {
+		itemIds.forEach(id => {
+			// Для групп
+			const groupItem = this.element.querySelector(`[data-group="${id}"]`)
+			if (groupItem) {
+				groupItem.style.display = ''
+				// Убеждаемся что элементы в подменю тоже видны
+				const submenuItems = groupItem.querySelectorAll('.ddrdrawing__context-menu-item')
+				submenuItems.forEach(item => {
+					item.style.display = ''
+				})
+			}
+			
+			// Для одиночных пунктов
+			const menuItem = this.element.querySelector(`[data-item-id="${id}"]`)
+			if (menuItem && !menuItem.closest('.ddrdrawing__context-menu-submenu')) {
+				menuItem.style.display = ''
+			}
+		})
 	}
 
 	/**

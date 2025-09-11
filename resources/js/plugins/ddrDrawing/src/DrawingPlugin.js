@@ -2,6 +2,7 @@ import DrawingCanvas from './core/DrawingCanvas.js'
 import EventManager from './core/EventManager.js'
 import ToolManager from './core/ToolManager.js'
 import ContextMenu from './ui/ContextMenu.js'
+import LineStyleSelector from './ui/LineStyleSelector.js'
 import PortService from './services/PortService.js'
 import SelectTool from './tools/SelectTool.js'
 import RectangleTool from './tools/RectangleTool.js'
@@ -17,6 +18,7 @@ class DrawingPlugin {
 		this.eventManager = null
 		this.toolManager = null
 		this.contextMenu = null
+		this.lineStyleSelector = null
 		this.portService = null
 		this.initialized = false
 	}
@@ -35,16 +37,19 @@ class DrawingPlugin {
 			this.eventManager = new EventManager(this.canvas)
 			this.toolManager = new ToolManager(this.canvas, this.eventManager)
 			this.contextMenu = new ContextMenu(this.canvas, this.eventManager)
+			this.lineStyleSelector = new LineStyleSelector(this.canvas)
 			this.portService = new PortService(this.canvas, this.eventManager)
 
 			// Инициализируем компоненты
 			this.canvas.init()
 			this.contextMenu.init()
+			this.lineStyleSelector.init()
 			this.portService.init()
 			
 			// Устанавливаем связи
 			this.eventManager.setToolManager(this.toolManager)
 			this.eventManager.setContextMenu(this.contextMenu)
+			this.canvas.setLineStyleSelector(this.lineStyleSelector)
 			
 			// Регистрируем инструменты
 			this.registerTools()
@@ -131,6 +136,13 @@ class DrawingPlugin {
 	 */
 	getContextMenu() {
 		return this.contextMenu
+	}
+	
+	/**
+	 * Получить селектор стилей линий
+	 */
+	getLineStyleSelector() {
+		return this.lineStyleSelector
 	}
 
 	/**
