@@ -189,6 +189,8 @@ class AutoCADController extends Controller
         try {
 			
             $cadDirectory = $user->getSettings('contracts.local_path_to_cad_files');
+			
+			echo $cadDirectory;
 
             if (!$cadDirectory) {
                 return response()->json([
@@ -281,6 +283,8 @@ class AutoCADController extends Controller
 			$user = app(UserService::class);
             $filename = $request->input('filename');
             $cadDirectory = $user->getSettings('contracts.local_path_to_cad_files');
+			
+			echo $cadDirectory;
 
             if (!$cadDirectory) {
                 return response()->json([
