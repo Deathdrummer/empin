@@ -480,9 +480,9 @@
 	
 	
 	
+	let setToutHandler;
 	
-	
-	$.setUserSetting = async (setting, inpType) => {
+	$.setUserSetting = async (setting, inpType, timeout = false) => {
 		const input = event.target;
 		
 		let value = null;
@@ -501,6 +501,23 @@
 			break;
 		}
 		
+		clearTimeout(setToutHandler);
+		
+		if (timeout) {
+			setToutHandler = setTimeout(() => {
+				_saveUserSetting(input, inpType, setting, value);
+			}, timeout);
+		} else {
+			_saveUserSetting(input, inpType, setting, value)
+		}
+		
+	}
+	
+	
+	
+	
+	
+	async function _saveUserSetting(input, inpType, setting, value) {
 		$(input).ddrInputs('disable');
 		
 		const {data, error, status, headers} = await axiosQuery('post', 'site/contracts/settings', {setting, value});
@@ -516,8 +533,9 @@
 		}
 		
 		$(input).ddrInputs('enable');
+		
+		if (inpType == 'text') $(input).focus();
 	}
-	
 	
 	
 </script>

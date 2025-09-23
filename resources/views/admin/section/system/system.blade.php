@@ -13,7 +13,8 @@
 						<li class="ddrtabsnav__item" ddrtabsitem="systemTab4">Договор</li>
 						<li class="ddrtabsnav__item" ddrtabsitem="systemTab5">Админ. панель</li>
 						<li class="ddrtabsnav__item" ddrtabsitem="systemTab6">ИИ-ассистент</li>
-						<li class="ddrtabsnav__item ddrtabsnav__item_active" ddrtabsitem="systemTab7">Чертежи</li>
+						<li class="ddrtabsnav__item" ddrtabsitem="systemTab7">Чертежи</li>
+						<li class="ddrtabsnav__item ddrtabsnav__item_active" ddrtabsitem="systemTab8">AutoCAD</li>
 					</ul>
 				</div>
 				
@@ -391,7 +392,7 @@
 					
 					
 					
-					<div class="ddrtabscontent__item ddrtabscontent__item_visible" ddrtabscontentitem="systemTab7">
+					<div class="ddrtabscontent__item" ddrtabscontentitem="systemTab7">
 						<div class="ddrdrawing">
 							<div class="ddrdrawing__toolbar">
 								<div class="ddrdrawing__toolbar-section">
@@ -444,6 +445,110 @@
 					
 					
 					
+					
+					<div class="ddrtabscontent__item ddrtabscontent__item_visible" ddrtabscontentitem="systemTab8">
+						{{-- тут разметка для autoCAD --}}
+						<div class="autocad-converter">
+							<div class="autocad-converter__header">
+								<h3 class="autocad-converter__title">Конвертер AutoCAD файлов</h3>
+								<p class="autocad-converter__description">
+									Выберите файл из локальной папки для конвертации в JSON формат
+								</p>
+							</div>
+
+							<div class="autocad-converter__workspace">
+								<!-- Левая колонка - список файлов -->
+								<div class="autocad-converter__left-panel">
+									<div class="autocad-converter__files" id="autocadFilesList">
+										<div class="autocad-converter__files-loading" id="autocadFilesLoading">
+											<i class="fa-solid fa-spinner fa-spin"></i>
+											<span>Загрузка списка файлов...</span>
+										</div>
+
+										<div class="autocad-converter__files-content" id="autocadFilesContent" style="display: none;">
+											<div class="autocad-converter__files-header">
+												<h4>CAD файлы в папке:</h4>
+												<button class="btn btn--small btn--secondary" id="autocadRefreshFiles">
+													<i class="fa-solid fa-refresh"></i>
+													Обновить
+												</button>
+											</div>
+											<div class="autocad-converter__files-list" id="autocadFilesListContainer">
+												<!-- Список файлов будет вставлен через JS -->
+											</div>
+										</div>
+
+										<div class="autocad-converter__files-error" id="autocadFilesError" style="display: none;">
+											<i class="fa-solid fa-exclamation-triangle"></i>
+											<span id="autocadFilesErrorText">Ошибка загрузки файлов</span>
+											<button class="btn btn--small btn--primary" id="autocadRetryFiles">Повторить</button>
+										</div>
+									</div>
+								</div>
+
+								<!-- Правая колонка - результат конвертации -->
+								<div class="autocad-converter__right-panel">
+									<div class="autocad-converter__result-area">
+										<div class="autocad-converter__placeholder" id="autocadPlaceholder">
+											<i class="fa-solid fa-mouse-pointer"></i>
+											<p>Выберите файл для конвертации</p>
+											<span>Результат конвертации появится здесь</span>
+										</div>
+
+										<div class="autocad-converter__processing" id="autocadProcessing" style="display: none;">
+											<div class="autocad-converter__processing-content">
+												<i class="fa-solid fa-cogs fa-spin"></i>
+												<h4>Обработка файла</h4>
+												<div class="autocad-converter__progress">
+													<div class="autocad-converter__progress-bar" id="autocadProgressBar"></div>
+												</div>
+												<p class="autocad-converter__progress-text" id="autocadProgressText">Обработка файла...</p>
+											</div>
+										</div>
+
+										<div class="autocad-converter__result" id="autocadResult" style="display: none;">
+											<div class="autocad-converter__result-header">
+												<h4>Результат конвертации</h4>
+												<div class="autocad-converter__result-actions">
+													<button class="btn btn--small btn--secondary" id="autocadViewJson">
+														<i class="fa-solid fa-eye"></i>
+														JSON
+													</button>
+													<button class="btn btn--small btn--secondary" id="autocadDownloadJson">
+														<i class="fa-solid fa-download"></i>
+														Скачать
+													</button>
+													<button class="btn btn--small btn--primary" id="autocadSendToAI">
+														<i class="fa-solid fa-robot"></i>
+														В ИИ
+													</button>
+												</div>
+											</div>
+
+											<div class="autocad-converter__stats">
+												<h5>Статистика файла:</h5>
+												<div class="autocad-converter__stats-grid" id="autocadStats">
+													<!-- Статистика будет вставлена через JS -->
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="autocad-converter__json-preview" id="autocadJsonPreview" style="display: none;">
+								<div class="autocad-converter__json-header">
+									<h4>Предварительный просмотр JSON:</h4>
+									<button class="autocad-converter__close-preview" id="autocadClosePreview">
+										<i class="fa-solid fa-times"></i>
+									</button>
+								</div>
+								<pre class="autocad-converter__json-content" id="autocadJsonContent"></pre>
+							</div>
+						</div>
+					</div>
+					
+					
 				</div>
 			</div>
 		</x-card>
@@ -459,6 +564,293 @@
 
 	const drawingInstance = ddrDrawing();
 	drawingInstance.init();
+
+	// AutoCAD Converter
+	class AutoCADConverter {
+		constructor() {
+			this.initElements();
+			this.bindEvents();
+			this.currentData = null;
+			this.files = [];
+			this.activeFileItem = null;
+			this.loadFiles();
+		}
+
+		initElements() {
+			this.filesLoading = document.getElementById('autocadFilesLoading');
+			this.filesContent = document.getElementById('autocadFilesContent');
+			this.filesError = document.getElementById('autocadFilesError');
+			this.filesErrorText = document.getElementById('autocadFilesErrorText');
+			this.filesListContainer = document.getElementById('autocadFilesListContainer');
+			this.refreshBtn = document.getElementById('autocadRefreshFiles');
+			this.retryBtn = document.getElementById('autocadRetryFiles');
+			this.placeholder = document.getElementById('autocadPlaceholder');
+			this.processing = document.getElementById('autocadProcessing');
+			this.progressBar = document.getElementById('autocadProgressBar');
+			this.progressText = document.getElementById('autocadProgressText');
+			this.result = document.getElementById('autocadResult');
+			this.stats = document.getElementById('autocadStats');
+			this.viewJsonBtn = document.getElementById('autocadViewJson');
+			this.downloadJsonBtn = document.getElementById('autocadDownloadJson');
+			this.sendToAIBtn = document.getElementById('autocadSendToAI');
+			this.jsonPreview = document.getElementById('autocadJsonPreview');
+			this.jsonContent = document.getElementById('autocadJsonContent');
+			this.closePreviewBtn = document.getElementById('autocadClosePreview');
+		}
+
+		bindEvents() {
+			this.refreshBtn?.addEventListener('click', () => this.loadFiles());
+			this.retryBtn?.addEventListener('click', () => this.loadFiles());
+			this.viewJsonBtn?.addEventListener('click', () => this.showJsonPreview());
+			this.downloadJsonBtn?.addEventListener('click', () => this.downloadJson());
+			this.sendToAIBtn?.addEventListener('click', () => this.sendToAI());
+			this.closePreviewBtn?.addEventListener('click', () => this.hideJsonPreview());
+
+			// ESC to close preview
+			document.addEventListener('keydown', (e) => {
+				if (e.key === 'Escape' && this.jsonPreview.style.display !== 'none') {
+					this.hideJsonPreview();
+				}
+			});
+		}
+
+		async loadFiles() {
+			this.showLoading();
+
+			try {
+				const response = await fetch('/ajax/autocad/files', {
+					method: 'GET',
+					headers: {
+						'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+					}
+				});
+
+				const result = await response.json();
+
+				if (!result.success) {
+					throw new Error(result.message || 'Ошибка загрузки файлов');
+				}
+
+				this.files = result.files;
+				this.showFiles();
+
+			} catch (error) {
+				console.error('Ошибка загрузки файлов:', error);
+				this.showError(error.message);
+			}
+		}
+
+		showLoading() {
+			this.filesLoading.style.display = 'block';
+			this.filesContent.style.display = 'none';
+			this.filesError.style.display = 'none';
+		}
+
+		showFiles() {
+			this.filesLoading.style.display = 'none';
+			this.filesError.style.display = 'none';
+
+			if (this.files.length === 0) {
+				this.filesListContainer.innerHTML = '<div class="autocad-converter__no-files">Файлы не найдены</div>';
+			} else {
+				this.renderFilesList();
+			}
+
+			this.filesContent.style.display = 'block';
+		}
+
+		showError(message) {
+			this.filesLoading.style.display = 'none';
+			this.filesContent.style.display = 'none';
+			this.filesErrorText.textContent = message;
+			this.filesError.style.display = 'block';
+		}
+
+		renderFilesList() {
+			const filesHtml = this.files.map(file => `
+				<div class="autocad-converter__file-item" data-filename="${file.name}">
+					<div class="autocad-converter__file-info">
+						<div class="autocad-converter__file-name">
+							<i class="fa-solid fa-file-${file.extension === 'dwg' ? 'code' : 'lines'} autocad-converter__file-icon"></i>
+							<span class="autocad-converter__file-title">${file.basename}</span>
+							<span class="autocad-converter__file-ext">.${file.extension}</span>
+						</div>
+						<div class="autocad-converter__file-meta">
+							<span class="autocad-converter__file-size">${file.size_human}</span>
+							<span class="autocad-converter__file-date">${new Date(file.modified).toLocaleDateString('ru-RU')}</span>
+						</div>
+					</div>
+					<div class="autocad-converter__file-actions">
+						<button class="btn btn--small btn--primary autocad-converter__convert-btn" data-filename="${file.name}">
+							<i class="fa-solid fa-cogs"></i>
+							Конвертировать
+						</button>
+					</div>
+				</div>
+			`).join('');
+
+			this.filesListContainer.innerHTML = filesHtml;
+
+			// Привязываем события к кнопкам и элементам файлов
+			this.filesListContainer.querySelectorAll('.autocad-converter__convert-btn').forEach(btn => {
+				btn.addEventListener('click', (e) => {
+					e.stopPropagation();
+					const filename = e.target.closest('.autocad-converter__convert-btn').dataset.filename;
+					this.setActiveFile(e.target.closest('.autocad-converter__file-item'));
+					this.convertFile(filename);
+				});
+			});
+
+			// Добавляем клик по элементу файла для выделения
+			this.filesListContainer.querySelectorAll('.autocad-converter__file-item').forEach(item => {
+				item.addEventListener('click', (e) => {
+					this.setActiveFile(item);
+				});
+			});
+		}
+
+		setActiveFile(fileItem) {
+			// Убираем выделение с предыдущего файла
+			if (this.activeFileItem) {
+				this.activeFileItem.classList.remove('autocad-converter__file-item--active');
+			}
+
+			// Выделяем новый файл
+			this.activeFileItem = fileItem;
+			if (fileItem) {
+				fileItem.classList.add('autocad-converter__file-item--active');
+			}
+		}
+
+		async convertFile(filename) {
+			this.showProcessing();
+
+			try {
+				this.updateProgress(30, 'Подготовка к обработке...');
+
+				const response = await fetch('/ajax/autocad/convert-local', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+						'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+					},
+					body: JSON.stringify({ filename })
+				});
+
+				this.updateProgress(80, 'Обработка файла...');
+
+				const result = await response.json();
+
+				if (!result.success) {
+					throw new Error(result.message || 'Ошибка обработки файла');
+				}
+
+				this.updateProgress(100, 'Обработка завершена!');
+
+				setTimeout(() => {
+					this.showResult(result);
+				}, 500);
+
+			} catch (error) {
+				console.error('Ошибка обработки файла:', error);
+				this.showProcessingError(error.message);
+			}
+		}
+
+		showProcessing() {
+			this.placeholder.style.display = 'none';
+			this.result.style.display = 'none';
+			this.processing.style.display = 'block';
+			this.updateProgress(0, 'Начало обработки...');
+		}
+
+		updateProgress(percent, text) {
+			this.progressBar.style.width = percent + '%';
+			this.progressText.textContent = text;
+		}
+
+		showResult(result) {
+			this.currentData = result;
+			this.processing.style.display = 'none';
+			this.placeholder.style.display = 'none';
+
+			// Заполняем статистику
+			this.renderStats(result.data);
+
+			this.result.style.display = 'block';
+		}
+
+		renderStats(data) {
+			const stats = data.stats || {};
+			const statsHtml = `
+				<div class="autocad-converter__stat-item">
+					<strong>${stats.entitiesCount || 0}</strong>
+					<span>Объектов на чертеже</span>
+				</div>
+				<div class="autocad-converter__stat-item">
+					<strong>${stats.layersCount || 0}</strong>
+					<span>Слоев</span>
+				</div>
+				<div class="autocad-converter__stat-item">
+					<strong>${stats.version || 'Неизвестно'}</strong>
+					<span>Версия DXF</span>
+				</div>
+				<div class="autocad-converter__stat-item">
+					<strong>${stats.units || 'Не указано'}</strong>
+					<span>Единицы измерения</span>
+				</div>
+			`;
+			this.stats.innerHTML = statsHtml;
+		}
+
+		showProcessingError(message) {
+			this.processing.style.display = 'none';
+			this.placeholder.style.display = 'block';
+			alert('Ошибка: ' + message);
+		}
+
+		showJsonPreview() {
+			if (!this.currentData) return;
+
+			const jsonString = JSON.stringify(this.currentData.data, null, 2);
+			this.jsonContent.textContent = jsonString;
+			this.jsonPreview.style.display = 'flex';
+		}
+
+		hideJsonPreview() {
+			this.jsonPreview.style.display = 'none';
+		}
+
+		downloadJson() {
+			if (!this.currentData) return;
+
+			const jsonString = JSON.stringify(this.currentData.data, null, 2);
+			const blob = new Blob([jsonString], { type: 'application/json' });
+			const url = URL.createObjectURL(blob);
+
+			const a = document.createElement('a');
+			a.href = url;
+			a.download = 'autocad-data.json';
+			document.body.appendChild(a);
+			a.click();
+			document.body.removeChild(a);
+			URL.revokeObjectURL(url);
+		}
+
+		sendToAI() {
+			if (!this.currentData) return;
+
+			alert('Функция отправки ИИ-ассистенту будет реализована позже');
+
+			console.log('Данные для ИИ:', {
+				stats: this.currentData.data.stats,
+				entities: this.currentData.data.entities?.slice(0, 10)
+			});
+		}
+	}
+
+	// Инициализация AutoCAD конвертера
+	const autocadConverter = new AutoCADConverter();
 
 
 

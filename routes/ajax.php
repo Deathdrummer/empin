@@ -4,6 +4,7 @@ use App\Enums\ContractColums;
 use App\Enums\VirtualVars;
 use App\Http\Controllers\admin\Acts;
 use App\Http\Controllers\AssistentFilesController;
+use App\Http\Controllers\AutoCADController;
 use App\Http\Controllers\ContractsFilesController;
 use App\Http\Controllers\crud\Admins;
 use App\Http\Controllers\crud\Contracts;
@@ -319,3 +320,10 @@ Route::get('/siteparser/get_subjects', [SiteParserController::class, 'get_subjec
 Route::get('/siteparser/import_form', [SiteParserController::class, 'import_form']);
 Route::post('/siteparser/import_form', [SiteParserController::class, 'import_data']);
 Route::post('/siteparser/set_stat', [SiteParserController::class, 'set_stat']);
+
+
+// AutoCAD
+Route::post('/autocad/convert', [AutoCADController::class, 'convertToJson']);
+Route::get('/autocad/files', [AutoCADController::class, 'getLocalFiles']);
+Route::post('/autocad/convert-local', [AutoCADController::class, 'convertLocalFile']);
+Route::get('/autocad/check-quota', [AutoCADController::class, 'checkApiQuota']);
