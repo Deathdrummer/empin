@@ -481,7 +481,26 @@
 										<div class="autocad-converter__files-error" id="autocadFilesError" style="display: none;">
 											<i class="fa-solid fa-exclamation-triangle"></i>
 											<span id="autocadFilesErrorText">Ошибка загрузки файлов</span>
-											<button class="btn btn--small btn--primary" id="autocadRetryFiles">Повторить</button>
+											<div class="autocad-converter__error-actions">
+												<button class="btn btn--small btn--primary" id="autocadRetryFiles">Повторить</button>
+												<button class="btn btn--small btn--secondary" id="autocadShowUpload">Загрузить файл</button>
+											</div>
+										</div>
+
+										<div class="autocad-converter__upload-fallback" id="autocadUploadFallback" style="display: none;">
+											<div class="autocad-converter__upload-area" id="autocadUploadArea">
+												<div class="autocad-converter__upload-content">
+													<i class="fa-solid fa-file-upload autocad-converter__upload-icon"></i>
+													<p class="autocad-converter__upload-text">
+														Перетащите DWG или DXF файл сюда или
+														<button class="autocad-converter__browse-btn" id="autocadBrowseBtn">выберите файл</button>
+													</p>
+													<p class="autocad-converter__upload-hint">
+														Поддерживаемые форматы: .dwg, .dxf | Максимальный размер: 100MB
+													</p>
+												</div>
+												<input type="file" id="autocadFileInput" accept=".dwg,.dxf" style="display: none;">
+											</div>
 										</div>
 									</div>
 								</div>
@@ -584,6 +603,11 @@
 			this.filesListContainer = document.getElementById('autocadFilesListContainer');
 			this.refreshBtn = document.getElementById('autocadRefreshFiles');
 			this.retryBtn = document.getElementById('autocadRetryFiles');
+			this.showUploadBtn = document.getElementById('autocadShowUpload');
+			this.uploadFallback = document.getElementById('autocadUploadFallback');
+			this.uploadArea = document.getElementById('autocadUploadArea');
+			this.fileInput = document.getElementById('autocadFileInput');
+			this.browseBtn = document.getElementById('autocadBrowseBtn');
 			this.placeholder = document.getElementById('autocadPlaceholder');
 			this.processing = document.getElementById('autocadProcessing');
 			this.progressBar = document.getElementById('autocadProgressBar');
@@ -601,10 +625,45 @@
 		bindEvents() {
 			this.refreshBtn?.addEventListener('click', () => this.loadFiles());
 			this.retryBtn?.addEventListener('click', () => this.loadFiles());
+			this.showUploadBtn?.addEventListener('click', () => this.showUploadFallback());
 			this.viewJsonBtn?.addEventListener('click', () => this.showJsonPreview());
 			this.downloadJsonBtn?.addEventListener('click', () => this.downloadJson());
 			this.sendToAIBtn?.addEventListener('click', () => this.sendToAI());
 			this.closePreviewBtn?.addEventListener('click', () => this.hideJsonPreview());
+
+			// Upload fallback events
+			this.uploadArea?.addEventListener('dragover', (e) => {
+				e.preventDefault();
+				this.uploadArea.classList.add('drag-over');
+			});
+
+			this.uploadArea?.addEventListener('dragleave', () => {
+				this.uploadArea.classList.remove('drag-over');
+			});
+
+			this.uploadArea?.addEventListener('drop', (e) => {
+				e.preventDefault();
+				this.uploadArea.classList.remove('drag-over');
+				const files = e.dataTransfer.files;
+				if (files.length > 0) {
+					this.handleUploadedFile(files[0]);
+				}
+			});
+
+			this.uploadArea?.addEventListener('click', () => {
+				this.fileInput.click();
+			});
+
+			this.browseBtn?.addEventListener('click', (e) => {
+				e.stopPropagation();
+				this.fileInput.click();
+			});
+
+			this.fileInput?.addEventListener('change', (e) => {
+				if (e.target.files.length > 0) {
+					this.handleUploadedFile(e.target.files[0]);
+				}
+			});
 
 			// ESC to close preview
 			document.addEventListener('keydown', (e) => {

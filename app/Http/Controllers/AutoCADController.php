@@ -190,46 +190,71 @@ class AutoCADController extends Controller
 			
             $cadDirectory = $user->getSettings('cad.local_path_to_cad_files');
 
-            if (!is_dir($cadDirectory)) {
+            if (!$cadDirectory) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Папка с CAD файлами не найдена: ' . $cadDirectory
+                    'message' => 'Не настроена папка с CAD файлами. Обратитесь к администратору.'
                 ], 404);
             }
 
-            $files = [];
-            $iterator = new \DirectoryIterator($cadDirectory);
+            // Проверяем тип источника файлов
+            if (str_starts_with($cadDirectory, 'https://disk.yandex.ru/')) {
+                // Это Yandex.Disk - работаем через API
+                $files = $this->parseYandexDiskFolder($cadDirectory);
+                $sourceType = 'yandex_disk';
+                $directory = $cadDirectory;
+            } else {
+                // Это локальная папка
+                if (!is_dir($cadDirectory)) {
+                    // Попытаемся создать папку автоматически
+                    if (!mkdir($cadDirectory, 0755, true)) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'Папка с CAD файлами не найдена и не может быть создана: ' . $cadDirectory
+                        ], 404);
+                    }
 
-            foreach ($iterator as $fileInfo) {
-                if ($fileInfo->isDot()) continue;
+                    Log::info('AutoCAD: Создана папка для CAD файлов', ['path' => $cadDirectory]);
+                }
 
-                $extension = strtolower($fileInfo->getExtension());
-                if (!in_array($extension, ['dwg', 'dxf'])) continue;
+                $files = [];
+                $iterator = new \DirectoryIterator($cadDirectory);
 
-                $filepath = $fileInfo->getPathname();
-                $filesize = $fileInfo->getSize();
+                foreach ($iterator as $fileInfo) {
+                    if ($fileInfo->isDot()) continue;
 
-                $files[] = [
-                    'name' => $fileInfo->getFilename(),
-                    'basename' => $fileInfo->getBasename('.' . $extension),
-                    'extension' => $extension,
-                    'size' => $filesize,
-                    'size_human' => $this->formatFileSize($filesize),
-                    'modified' => date('Y-m-d H:i:s', $fileInfo->getMTime()),
-                    'path' => $filepath
-                ];
+                    $extension = strtolower($fileInfo->getExtension());
+                    if (!in_array($extension, ['dwg', 'dxf'])) continue;
+
+                    $filepath = $fileInfo->getPathname();
+                    $filesize = $fileInfo->getSize();
+
+                    $files[] = [
+                        'name' => $fileInfo->getFilename(),
+                        'basename' => $fileInfo->getBasename('.' . $extension),
+                        'extension' => $extension,
+                        'size' => $filesize,
+                        'size_human' => $this->formatFileSize($filesize),
+                        'modified' => date('Y-m-d H:i:s', $fileInfo->getMTime()),
+                        'path' => $filepath
+                    ];
+                }
+
+                // Сортировка по имени
+                usort($files, function($a, $b) {
+                    return strcmp($a['name'], $b['name']);
+                });
+
+                $sourceType = 'local_directory';
+                $directory = $cadDirectory;
             }
-
-            // Сортировка по имени
-            usort($files, function($a, $b) {
-                return strcmp($a['name'], $b['name']);
-            });
 
             return response()->json([
                 'success' => true,
                 'files' => $files,
                 'count' => count($files),
-                'directory' => $cadDirectory
+                'directory' => $directory,
+                'source_type' => $sourceType
             ]);
 
         } catch (\Exception $e) {
@@ -256,20 +281,11 @@ class AutoCADController extends Controller
 			$user = app(UserService::class);
             $filename = $request->input('filename');
             $cadDirectory = $user->getSettings('cad.local_path_to_cad_files');
-            $filepath = $cadDirectory . DIRECTORY_SEPARATOR . $filename;
 
-            // Проверка безопасности пути
-            if (!str_starts_with(realpath($filepath), realpath($cadDirectory))) {
+            if (!$cadDirectory) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Недопустимый путь к файлу'
-                ], 403);
-            }
-
-            if (!file_exists($filepath)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Файл не найден: ' . $filename
+                    'message' => 'Не настроена папка с CAD файлами. Обратитесь к администратору.'
                 ], 404);
             }
 
@@ -281,14 +297,44 @@ class AutoCADController extends Controller
                 ], 422);
             }
 
-            Log::info('AutoCAD: Начинаем обработку локального файла', [
+            Log::info('AutoCAD: Начинаем обработку файла', [
                 'filename' => $filename,
                 'extension' => $extension,
-                'path' => $filepath
+                'source' => $cadDirectory
             ]);
 
-            // Читаем содержимое файла
-            $fileContent = file_get_contents($filepath);
+            // Проверяем тип источника и получаем содержимое файла
+            if (str_starts_with($cadDirectory, 'https://disk.yandex.ru/')) {
+                // Это Yandex.Disk - скачиваем файл
+                $fileContent = $this->downloadFileFromYandexDisk($cadDirectory, $filename);
+                if (!$fileContent) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Не удалось скачать файл из Yandex.Disk: ' . $filename
+                    ], 404);
+                }
+            } else {
+                // Это локальная папка
+                $filepath = $cadDirectory . DIRECTORY_SEPARATOR . $filename;
+
+                // Проверка безопасности пути
+                if (!str_starts_with(realpath($filepath), realpath($cadDirectory))) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Недопустимый путь к файлу'
+                    ], 403);
+                }
+
+                if (!file_exists($filepath)) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Файл не найден: ' . $filename
+                    ], 404);
+                }
+
+                // Читаем содержимое файла
+                $fileContent = file_get_contents($filepath);
+            }
 
             if ($extension === 'dxf') {
                 $result = $this->processDxfFile($filename, $fileContent);
@@ -317,6 +363,127 @@ class AutoCADController extends Controller
                 'success' => false,
                 'message' => 'Ошибка обработки файла: ' . $e->getMessage()
             ], 500);
+        }
+    }
+
+    /**
+     * Парсинг файлов из Yandex.Disk публичной папки
+     */
+    private function parseYandexDiskFolder($publicUrl)
+    {
+        try {
+            $apiUrl = 'https://cloud-api.yandex.net/v1/disk/public/resources?public_key=' . urlencode($publicUrl);
+
+            $context = stream_context_create([
+                'http' => [
+                    'timeout' => 30,
+                    'user_agent' => 'AutoCAD Converter/1.0'
+                ]
+            ]);
+
+            $response = file_get_contents($apiUrl, false, $context);
+
+            if (!$response) {
+                throw new \Exception('Не удалось получить данные из Yandex.Disk');
+            }
+
+            $data = json_decode($response, true);
+
+            if (!$data || !isset($data['_embedded']['items'])) {
+                throw new \Exception('Неверный формат ответа от Yandex.Disk API');
+            }
+
+            $files = [];
+            foreach ($data['_embedded']['items'] as $item) {
+                // Пропускаем папки
+                if ($item['type'] !== 'file') {
+                    continue;
+                }
+
+                $extension = strtolower(pathinfo($item['name'], PATHINFO_EXTENSION));
+
+                // Фильтруем только CAD файлы
+                if (!in_array($extension, ['dwg', 'dxf'])) {
+                    continue;
+                }
+
+                $files[] = [
+                    'name' => $item['name'],
+                    'basename' => pathinfo($item['name'], PATHINFO_FILENAME),
+                    'extension' => $extension,
+                    'size' => $item['size'],
+                    'size_human' => $this->formatFileSize($item['size']),
+                    'modified' => $item['modified'],
+                    'download_url' => $item['file'], // Прямая ссылка на скачивание
+                    'path' => $publicUrl // Сохраняем исходную ссылку
+                ];
+            }
+
+            // Сортировка по имени
+            usort($files, function($a, $b) {
+                return strcmp($a['name'], $b['name']);
+            });
+
+            return $files;
+
+        } catch (\Exception $e) {
+            Log::error('AutoCAD: Ошибка парсинга Yandex.Disk', [
+                'url' => $publicUrl,
+                'error' => $e->getMessage()
+            ]);
+            throw $e;
+        }
+    }
+
+    /**
+     * Скачивание файла из Yandex.Disk
+     */
+    private function downloadFileFromYandexDisk($publicUrl, $filename)
+    {
+        try {
+            // Сначала получаем список файлов чтобы найти прямую ссылку на скачивание
+            $files = $this->parseYandexDiskFolder($publicUrl);
+
+            $downloadUrl = null;
+            foreach ($files as $file) {
+                if ($file['name'] === $filename) {
+                    $downloadUrl = $file['download_url'];
+                    break;
+                }
+            }
+
+            if (!$downloadUrl) {
+                throw new \Exception('Файл не найден в Yandex.Disk: ' . $filename);
+            }
+
+            // Скачиваем файл по прямой ссылке
+            $context = stream_context_create([
+                'http' => [
+                    'timeout' => 60, // Увеличенный таймаут для больших файлов
+                    'user_agent' => 'AutoCAD Converter/1.0'
+                ]
+            ]);
+
+            $fileContent = file_get_contents($downloadUrl, false, $context);
+
+            if (!$fileContent) {
+                throw new \Exception('Не удалось скачать файл с Yandex.Disk');
+            }
+
+            Log::info('AutoCAD: Файл успешно скачан с Yandex.Disk', [
+                'filename' => $filename,
+                'size' => strlen($fileContent)
+            ]);
+
+            return $fileContent;
+
+        } catch (\Exception $e) {
+            Log::error('AutoCAD: Ошибка скачивания файла с Yandex.Disk', [
+                'filename' => $filename,
+                'url' => $publicUrl,
+                'error' => $e->getMessage()
+            ]);
+            return false;
         }
     }
 
