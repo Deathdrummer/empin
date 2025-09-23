@@ -199,6 +199,13 @@ class AutoCADController extends Controller
                 ], 404);
             }
 
+            // DEBUG: Логируем каждый запрос списка файлов
+            Log::info('AutoCAD: Запрос списка файлов', [
+                'timestamp' => time(),
+                'directory' => $cadDirectory,
+                'request_id' => uniqid()
+            ]);
+
             // Проверяем тип источника файлов
             if (str_starts_with($cadDirectory, 'https://disk.yandex.ru/')) {
                 // Это Yandex.Disk - работаем через API
