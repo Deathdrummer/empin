@@ -30,7 +30,7 @@
 				<x-input
 					type="url"
 					class="w100"
-					oninput="$.setUserSetting('cad.local_path_to_cad_files', 'text', 500)"
+					oninput="$.setUserSetting('contracts.local_path_to_cad_files', 'text', 500)"
 					:value="$settings['local_path_to_cad_files'] ?? false"
 					placeholder="Введите путь" />	
 				</td>
