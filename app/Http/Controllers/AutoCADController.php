@@ -376,12 +376,20 @@ class AutoCADController extends Controller
     private function parseYandexDiskFolder($publicUrl)
     {
         try {
-            $apiUrl = 'https://cloud-api.yandex.net/v1/disk/public/resources?public_key=' . urlencode($publicUrl);
+            // Добавляем timestamp и случайный параметр для обхода кеша
+            $timestamp = time();
+            $random = mt_rand(1000, 9999);
+            $apiUrl = 'https://cloud-api.yandex.net/v1/disk/public/resources?public_key=' . urlencode($publicUrl) . '&_t=' . $timestamp . '&_r=' . $random;
 
             $context = stream_context_create([
                 'http' => [
                     'timeout' => 30,
-                    'user_agent' => 'AutoCAD Converter/1.0'
+                    'user_agent' => 'AutoCAD Converter/1.0',
+                    'header' => [
+                        'Cache-Control: no-cache, no-store, must-revalidate',
+                        'Pragma: no-cache',
+                        'Expires: 0'
+                    ]
                 ]
             ]);
 
@@ -460,15 +468,22 @@ class AutoCADController extends Controller
                 throw new \Exception('Файл не найден в Yandex.Disk: ' . $filename);
             }
 
-            // Скачиваем файл по прямой ссылке
+            // Скачиваем файл по прямой ссылке с антикеш параметрами
+            $downloadUrlWithCache = $downloadUrl . (strpos($downloadUrl, '?') !== false ? '&' : '?') . '_t=' . time();
+
             $context = stream_context_create([
                 'http' => [
                     'timeout' => 60, // Увеличенный таймаут для больших файлов
-                    'user_agent' => 'AutoCAD Converter/1.0'
+                    'user_agent' => 'AutoCAD Converter/1.0',
+                    'header' => [
+                        'Cache-Control: no-cache, no-store, must-revalidate',
+                        'Pragma: no-cache',
+                        'Expires: 0'
+                    ]
                 ]
             ]);
 
-            $fileContent = file_get_contents($downloadUrl, false, $context);
+            $fileContent = file_get_contents($downloadUrlWithCache, false, $context);
 
             if (!$fileContent) {
                 throw new \Exception('Не удалось скачать файл с Yandex.Disk');
