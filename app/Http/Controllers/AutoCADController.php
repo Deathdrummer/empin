@@ -190,7 +190,7 @@ class AutoCADController extends Controller
 			
             $cadDirectory = $user->getSettings('contracts.local_path_to_cad_files');
 			
-			echo $cadDirectory;
+			toLog($cadDirectory);
 
             if (!$cadDirectory) {
                 return response()->json([
@@ -284,7 +284,7 @@ class AutoCADController extends Controller
             $filename = $request->input('filename');
             $cadDirectory = $user->getSettings('contracts.local_path_to_cad_files');
 			
-			echo $cadDirectory;
+			toLog($cadDirectory);
 
             if (!$cadDirectory) {
                 return response()->json([
