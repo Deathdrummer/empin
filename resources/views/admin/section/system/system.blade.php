@@ -451,9 +451,10 @@
 						<div class="autocad-converter">
 							<div class="autocad-converter__header">
 								<h3 class="autocad-converter__title">Конвертер AutoCAD файлов</h3>
-								<p class="autocad-converter__description">
-									Выберите файл из локальной папки для конвертации в JSON формат
-								</p>
+								<div class="autocad-converter__settings-hint">
+									<p><strong>Настройка папки с файлами:</strong> Укажите путь к папке с CAD файлами в <a href="/contracts#settings" target="_blank">настройках договоров</a> в поле "Локальное расположение файлов чертежей"</p>
+									<p><strong>Пример пути:</strong> <code>C:\Users\deathdrumer\Desktop\cad</code></p>
+								</div>
 							</div>
 
 							<div class="autocad-converter__workspace">
@@ -468,10 +469,14 @@
 										<div class="autocad-converter__files-content" id="autocadFilesContent" style="display: none;">
 											<div class="autocad-converter__files-header">
 												<h4>CAD файлы в папке:</h4>
-												<button class="btn btn--small btn--secondary" id="autocadRefreshFiles">
-													<i class="fa-solid fa-refresh"></i>
-													Обновить
-												</button>
+												<div class="autocad-converter__files-actions">
+													<x-buttons-group group="small">
+														<x-button id="autocadRefreshFiles" variant="neutral">
+															<i class="fa-solid fa-refresh"></i>
+															Обновить
+														</x-button>
+													</x-buttons-group>
+												</div>
 											</div>
 											<div class="autocad-converter__files-list" id="autocadFilesListContainer">
 												<!-- Список файлов будет вставлен через JS -->
@@ -482,8 +487,10 @@
 											<i class="fa-solid fa-exclamation-triangle"></i>
 											<span id="autocadFilesErrorText">Ошибка загрузки файлов</span>
 											<div class="autocad-converter__error-actions">
-												<button class="btn btn--small btn--primary" id="autocadRetryFiles">Повторить</button>
-												<button class="btn btn--small btn--secondary" id="autocadShowUpload">Загрузить файл</button>
+												<x-buttons-group group="small">
+													<x-button id="autocadRetryFiles" variant="blue">Повторить</x-button>
+													<x-button id="autocadShowUpload" variant="gray">Загрузить файл</x-button>
+												</x-buttons-group>
 											</div>
 										</div>
 
@@ -529,18 +536,20 @@
 											<div class="autocad-converter__result-header">
 												<h4>Результат конвертации</h4>
 												<div class="autocad-converter__result-actions">
-													<button class="btn btn--small btn--secondary" id="autocadViewJson">
-														<i class="fa-solid fa-eye"></i>
-														JSON
-													</button>
-													<button class="btn btn--small btn--secondary" id="autocadDownloadJson">
-														<i class="fa-solid fa-download"></i>
-														Скачать
-													</button>
-													<button class="btn btn--small btn--primary" id="autocadSendToAI">
-														<i class="fa-solid fa-robot"></i>
-														В ИИ
-													</button>
+													<x-buttons-group group="small">
+														<x-button id="autocadViewJson" variant="neutral">
+															<i class="fa-solid fa-eye"></i>
+															JSON
+														</x-button>
+														<x-button id="autocadDownloadJson" variant="gray">
+															<i class="fa-solid fa-download"></i>
+															Скачать
+														</x-button>
+														<x-button id="autocadSendToAI" variant="green">
+															<i class="fa-solid fa-robot"></i>
+															В ИИ
+														</x-button>
+													</x-buttons-group>
 												</div>
 											</div>
 
@@ -680,6 +689,8 @@
 				const response = await fetch('/ajax/autocad/files', {
 					method: 'GET',
 					headers: {
+						'Accept': 'application/json',
+						'X-Requested-With': 'XMLHttpRequest',
 						'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
 					}
 				});
@@ -698,6 +709,7 @@
 				this.showError(error.message);
 			}
 		}
+
 
 		showLoading() {
 			this.filesLoading.style.display = 'block';
@@ -740,10 +752,12 @@
 						</div>
 					</div>
 					<div class="autocad-converter__file-actions">
-						<button class="btn btn--small btn--primary autocad-converter__convert-btn" data-filename="${file.name}">
-							<i class="fa-solid fa-cogs"></i>
-							Конвертировать
-						</button>
+						<div class="small-button button-blue">
+							<button class="noselect autocad-converter__convert-btn" data-filename="${file.name}" inpgroup="small">
+								<i class="fa-solid fa-cogs"></i>
+								Конвертировать
+							</button>
+						</div>
 					</div>
 				</div>
 			`).join('');
@@ -790,7 +804,9 @@
 				const response = await fetch('/ajax/autocad/convert-local', {
 					method: 'POST',
 					headers: {
+						'Accept': 'application/json',
 						'Content-Type': 'application/json',
+						'X-Requested-With': 'XMLHttpRequest',
 						'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
 					},
 					body: JSON.stringify({ filename })

@@ -1,0 +1,11 @@
+{
+  "name": "autocad-converter",
+  "version": "1.0.0",
+  "description": "AutoCAD DXF/DWG converter for Laravel",
+  "dependencies": {
+    "dxf-parser": "^1.1.2"
+  },
+  "engines": {
+    "node": ">=12.0.0"
+  }
+}

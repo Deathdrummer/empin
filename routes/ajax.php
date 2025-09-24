@@ -323,7 +323,10 @@ Route::post('/siteparser/set_stat', [SiteParserController::class, 'set_stat']);
 
 
 // AutoCAD
-Route::post('/autocad/convert', [AutoCADController::class, 'convertToJson']);
-Route::get('/autocad/files', [AutoCADController::class, 'getLocalFiles']);
-Route::post('/autocad/convert-local', [AutoCADController::class, 'convertLocalFile']);
-Route::get('/autocad/check-quota', [AutoCADController::class, 'checkApiQuota']);
+Route::middleware(['isajax:admin', 'lang'])->group(function() {
+	Route::post('/autocad/convert', [AutoCADController::class, 'convertToJson']);
+	Route::get('/autocad/files', [AutoCADController::class, 'getLocalFiles']);
+	Route::post('/autocad/convert-local', [AutoCADController::class, 'convertLocalFile']);
+	Route::get('/autocad/check-quota', [AutoCADController::class, 'checkApiQuota']);
+	Route::post('/autocad/force-refresh', [AutoCADController::class, 'forceRefreshCache']);
+});
