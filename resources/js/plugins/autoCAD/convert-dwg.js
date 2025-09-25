@@ -33,15 +33,8 @@ async function convertDwgToDxf(dwgPath, dxfPath) {
         // Создаем конвертер
         const converter = new AsposeCadConverter(clientId, clientSecret);
 
-        // Проверяем доступность API перед конвертацией
-        try {
-            const quotaCheck = await converter.checkApiQuota();
-            if (!quotaCheck.available) {
-                throw new Error(`API недоступен: ${quotaCheck.message}`);
-            }
-        } catch (apiError) {
-            throw new Error(`Ошибка проверки API: ${apiError.message}`);
-        }
+        // Инициализируем API без предварительной проверки
+        await converter.initialize();
 
         // Читаем DWG файл
         const dwgBuffer = fs.readFileSync(dwgPath);
@@ -72,9 +65,16 @@ async function convertDwgToDxf(dwgPath, dxfPath) {
         process.stdout.write(JSON.stringify(successResult));
 
     } catch (error) {
+        let userMessage = error.message;
+
+        // Переводим техническую ошибку в понятную пользователю
+        if (error.message.includes('getFilesList') || error.message.includes('API недоступен')) {
+            userMessage = 'Сервис конвертации DWG временно недоступен. API ключи истекли или исчерпана квота. Попробуйте конвертировать DWG в DXF с помощью AutoCAD и загрузить DXF файл.';
+        }
+
         const errorResult = {
             success: false,
-            message: `Ошибка конвертации DWG: ${error.message}`
+            message: userMessage
         };
 
         process.stdout.write(JSON.stringify(errorResult));
