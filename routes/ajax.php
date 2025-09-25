@@ -329,4 +329,5 @@ Route::middleware(['isajax:admin', 'lang'])->group(function() {
 	Route::post('/autocad/convert-local', [AutoCADController::class, 'convertLocalFile']);
 	Route::get('/autocad/check-quota', [AutoCADController::class, 'checkApiQuota']);
 	Route::post('/autocad/force-refresh', [AutoCADController::class, 'forceRefreshCache']);
+	Route::get('/autocad/test-nodejs', [AutoCADController::class, 'testNodeJs']);
 });

@@ -82,20 +82,44 @@ class AutoCADController extends Controller
                 escapeshellarg($tempFile)
             );
 
-            $output = shell_exec($command . ' 2>nul');
+            Log::info('AutoCAD: Executing DXF processing command', [
+                'command' => $command,
+                'temp_file' => $tempFile,
+                'temp_file_exists' => file_exists($tempFile),
+                'temp_file_size' => file_exists($tempFile) ? filesize($tempFile) : 0
+            ]);
+
+            // Выполняем команду и захватываем STDERR
+            $output = shell_exec($command . ' 2>&1');
+
+            Log::info('AutoCAD: Node.js script output', [
+                'output' => $output,
+                'output_length' => strlen($output ?? '')
+            ]);
 
             if (!$output) {
-                throw new \Exception('Не удалось выполнить обработку DXF файла');
+                throw new \Exception('Не удалось выполнить обработку DXF файла - нет вывода от Node.js скрипта');
+            }
+
+            // Проверяем на ошибки в выводе
+            if (strpos($output, 'Error:') !== false || strpos($output, 'ERROR') !== false) {
+                throw new \Exception('Node.js скрипт завершился с ошибкой: ' . $output);
             }
 
             $result = json_decode($output, true);
 
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new \Exception('Ошибка парсинга JSON от Node.js: ' . json_last_error_msg() . '. Вывод: ' . $output);
+            }
+
             if (!$result || !isset($result['success'])) {
-                throw new \Exception('Ошибка парсинга DXF: ' . $output);
+                throw new \Exception('Некорректный формат ответа от Node.js скрипта. Вывод: ' . $output);
             }
 
             if (!$result['success']) {
-                throw new \Exception($result['message'] ?? 'Неизвестная ошибка обработки DXF');
+                $errorMessage = $result['message'] ?? 'Неизвестная ошибка обработки DXF';
+                $debugging = isset($result['debugging']) ? json_encode($result['debugging']) : '';
+                throw new \Exception($errorMessage . ($debugging ? ' Debug: ' . $debugging : ''));
             }
 
             return $result;
@@ -128,10 +152,22 @@ class AutoCADController extends Controller
                 escapeshellarg($tempDxfFile)
             );
 
-            $output = shell_exec($command . ' 2>nul');
+            Log::info('AutoCAD: Executing DWG conversion command', [
+                'command' => $command,
+                'dwg_file' => $tempDwgFile,
+                'dxf_file' => $tempDxfFile,
+                'dwg_size' => filesize($tempDwgFile)
+            ]);
+
+            $output = shell_exec($command . ' 2>&1');
+
+            Log::info('AutoCAD: DWG conversion output', [
+                'output' => $output,
+                'output_length' => strlen($output ?? '')
+            ]);
 
             if (!$output) {
-                throw new \Exception('Не удалось выполнить конвертацию DWG файла');
+                throw new \Exception('Не удалось выполнить конвертацию DWG файла - нет вывода от Node.js скрипта');
             }
 
             // Извлекаем только JSON из вывода (последняя строка)
@@ -1669,6 +1705,80 @@ class AutoCADController extends Controller
                 'error' => $e->getMessage()
             ]);
             throw $e;
+        }
+    }
+
+    /**
+     * Диагностика работы Node.js и зависимостей
+     */
+    public function testNodeJs(Request $request)
+    {
+        try {
+            $results = [
+                'environment' => [],
+                'node_test' => [],
+                'dependencies' => [],
+                'scripts' => []
+            ];
+
+            // 1. Проверка окружения
+            $results['environment']['php_version'] = phpversion();
+            $results['environment']['os'] = php_uname();
+            $results['environment']['temp_dir'] = sys_get_temp_dir();
+
+            // 2. Тест Node.js
+            $nodeCommand = '"C:\Program Files\nodejs\node.exe" --version';
+            $nodeVersion = shell_exec($nodeCommand . ' 2>&1');
+            $results['node_test']['version_command'] = $nodeCommand;
+            $results['node_test']['version_output'] = trim($nodeVersion ?? 'No output');
+            $results['node_test']['version_available'] = !empty($nodeVersion) && strpos($nodeVersion, 'v') === 0;
+
+            // 3. Тест npm зависимостей
+            $checkDeps = [
+                'dxf-parser' => 'require("dxf-parser")',
+                'aspose-cad' => 'require("@asposecloud/aspose-cad-cloud")'
+            ];
+
+            foreach ($checkDeps as $name => $requireCode) {
+                $testCommand = sprintf(
+                    '"C:\Program Files\nodejs\node.exe" -e "%s; console.log(\'OK\')"',
+                    addslashes($requireCode)
+                );
+
+                $testOutput = shell_exec($testCommand . ' 2>&1');
+                $results['dependencies'][$name] = [
+                    'command' => $testCommand,
+                    'output' => trim($testOutput ?? 'No output'),
+                    'available' => strpos($testOutput ?? '', 'OK') !== false
+                ];
+            }
+
+            // 4. Тест скриптов
+            $scripts = [
+                'process-dxf.js' => resource_path('js/plugins/autoCAD/process-dxf.js'),
+                'convert-dwg.js' => resource_path('js/plugins/autoCAD/convert-dwg.js')
+            ];
+
+            foreach ($scripts as $name => $path) {
+                $results['scripts'][$name] = [
+                    'path' => $path,
+                    'exists' => file_exists($path),
+                    'readable' => is_readable($path),
+                    'size' => file_exists($path) ? filesize($path) : 0
+                ];
+            }
+
+            return response()->json([
+                'success' => true,
+                'results' => $results
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ], 500);
         }
     }
 }
