@@ -668,11 +668,31 @@ class AutoCADController extends Controller
             // Ограничиваем размер данных для JSON ответа - сохраняем исходную структуру
             $responseData = $result;
 
-            // Ограничиваем количество entities
-            if (isset($result['entities']) && count($result['entities']) > 10) {
-                $responseData['entities'] = array_slice($result['entities'], 0, 10); // Только первые 10 объектов
+            // Ограничиваем количество entities - проверяем разные возможные структуры
+            $entities = null;
+            if (isset($result['entities'])) {
+                $entities = $result['entities'];
+            } elseif (isset($result['data']['entities'])) {
+                $entities = $result['data']['entities'];
+            } elseif (isset($result['data']['entitiesByType'])) {
+                // Если entities сгруппированы по типам, берем первые из каждого типа
+                $entities = [];
+                foreach ($result['data']['entitiesByType'] as $type => $typeEntities) {
+                    $entities = array_merge($entities, array_slice($typeEntities, 0, 2));
+                    if (count($entities) >= 10) break;
+                }
+            }
+
+            if ($entities && count($entities) > 10) {
+                $responseData['entities'] = array_slice($entities, 0, 10);
                 $responseData['metadata']['entities_truncated'] = true;
-                $responseData['metadata']['total_entities'] = count($result['entities']);
+                $responseData['metadata']['total_entities'] = count($entities);
+            } elseif ($entities) {
+                $responseData['entities'] = $entities;
+            } else {
+                // Если entities не найдены, создаем пустой массив
+                $responseData['entities'] = [];
+                $responseData['metadata']['entities_found'] = false;
             }
 
             // Удаляем массивные данные которые могут быть слишком большими
