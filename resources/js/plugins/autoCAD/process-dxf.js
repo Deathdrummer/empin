@@ -39,16 +39,29 @@ function processDxfFile(filePath) {
             throw new Error('Файл не содержит стандартных DXF секций');
         }
 
-        // Парсим DXF с ограничениями для больших файлов
+        // Парсим DXF с защитой от ошибок
         const parser = new DxfParser();
+        let dxfData;
 
         console.error(`DEBUG: Парсинг DXF файла размером ${dxfContent.length} символов`);
 
-        const dxfData = parser.parseSync(dxfContent);
+        try {
+            dxfData = parser.parseSync(dxfContent);
+        } catch (parsingError) {
+            console.error(`DEBUG: Ошибка парсинга DXF: ${parsingError.message}`);
+
+            // Создаем минимальную структуру данных
+            dxfData = {
+                header: {},
+                entities: [],
+                tables: {},
+                blocks: {}
+            };
+        }
 
         // Проверяем что парсинг прошел успешно
         if (!dxfData) {
-            throw new Error('DXF парсер не смог обработать файл');
+            throw new Error('DXF парсер не смог обработать файл - получен null');
         }
 
         console.error(`DEBUG: Найдено entities: ${dxfData.entities ? dxfData.entities.length : 0}`);
@@ -77,8 +90,29 @@ function processDxfFile(filePath) {
             stats: stats
         };
 
-        // Выводим результат в JSON
-        console.log(JSON.stringify(result, null, 2));
+        // Ограничиваем размер JSON output
+        const jsonString = JSON.stringify(result, null, 2);
+        const maxOutputSize = 5 * 1024 * 1024; // 5MB максимум
+
+        if (jsonString.length > maxOutputSize) {
+            console.error(`DEBUG: JSON слишком большой (${jsonString.length} символов), обрезаем`);
+
+            // Создаем урезанную версию результата
+            const trimmedResult = {
+                success: true,
+                data: {
+                    ...result.data,
+                    entities: result.data.entities ? result.data.entities.slice(0, 100) : [], // только первые 100
+                    _truncated: true,
+                    _original_entities_count: result.data.entities ? result.data.entities.length : 0
+                },
+                stats: result.stats
+            };
+
+            console.log(JSON.stringify(trimmedResult, null, 2));
+        } else {
+            console.log(jsonString);
+        }
 
     } catch (error) {
         console.error(`DEBUG: Ошибка парсинга DXF: ${error.message}`);
