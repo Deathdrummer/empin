@@ -11,6 +11,36 @@ use App\Services\Business\User as UserService;
 class AutoCADController extends Controller
 {
     /**
+     * Получение пути к Node.js в зависимости от ОС
+     */
+    private function getNodeJsPath()
+    {
+        if (PHP_OS_FAMILY === 'Windows') {
+            return '"C:\Program Files\nodejs\node.exe"';
+        } else {
+            // Linux/Unix - пробуем разные варианты
+            $possiblePaths = ['/usr/bin/node', '/usr/local/bin/node', 'node'];
+
+            foreach ($possiblePaths as $path) {
+                if ($path === 'node') {
+                    // Проверяем через which
+                    $result = shell_exec('which node 2>/dev/null');
+                    if (!empty(trim($result))) {
+                        return 'node';
+                    }
+                } else {
+                    // Проверяем существование файла
+                    if (file_exists($path)) {
+                        return $path;
+                    }
+                }
+            }
+
+            // По умолчанию просто node (надеемся что в PATH)
+            return 'node';
+        }
+    }
+    /**
      * Конвертация DWG в JSON через Node.js процессор
      */
     public function convertToJson(Request $request)
@@ -77,7 +107,8 @@ class AutoCADController extends Controller
         try {
             // Запускаем Node.js скрипт для обработки DXF
             $command = sprintf(
-                '"C:\Program Files\nodejs\node.exe" %s %s',
+                '%s %s %s',
+                $this->getNodeJsPath(),
                 escapeshellarg(resource_path('js/plugins/autoCAD/process-dxf.js')),
                 escapeshellarg($tempFile)
             );
@@ -146,7 +177,8 @@ class AutoCADController extends Controller
         try {
             // Запускаем Node.js скрипт для конвертации DWG → DXF
             $command = sprintf(
-                '"C:\Program Files\nodejs\node.exe" %s %s %s',
+                '%s %s %s %s',
+                $this->getNodeJsPath(),
                 escapeshellarg(resource_path('js/plugins/autoCAD/convert-dwg.js')),
                 escapeshellarg($tempDwgFile),
                 escapeshellarg($tempDxfFile)
@@ -911,11 +943,13 @@ class AutoCADController extends Controller
         try {
             // Запускаем Node.js скрипт для проверки квоты
             $command = sprintf(
-                '"C:\Program Files\nodejs\node.exe" %s',
+                '%s %s',
+                $this->getNodeJsPath(),
                 escapeshellarg(resource_path('js/plugins/autoCAD/check-quota.js'))
             );
 
-            $output = shell_exec($command . ' 2>nul');
+            $errorRedirect = (PHP_OS_FAMILY === 'Windows') ? '2>nul' : '2>/dev/null';
+            $output = shell_exec($command . ' ' . $errorRedirect);
             $result = json_decode($output, true);
 
             return response()->json($result);
@@ -1727,7 +1761,7 @@ class AutoCADController extends Controller
             $results['environment']['temp_dir'] = sys_get_temp_dir();
 
             // 2. Тест Node.js
-            $nodeCommand = '"C:\Program Files\nodejs\node.exe" --version';
+            $nodeCommand = $this->getNodeJsPath() . ' --version';
             $nodeVersion = shell_exec($nodeCommand . ' 2>&1');
             $results['node_test']['version_command'] = $nodeCommand;
             $results['node_test']['version_output'] = trim($nodeVersion ?? 'No output');
@@ -1741,7 +1775,8 @@ class AutoCADController extends Controller
 
             foreach ($checkDeps as $name => $requireCode) {
                 $testCommand = sprintf(
-                    '"C:\Program Files\nodejs\node.exe" -e "%s; console.log(\'OK\')"',
+                    '%s -e "%s; console.log(\'OK\')"',
+                    $this->getNodeJsPath(),
                     addslashes($requireCode)
                 );
 
