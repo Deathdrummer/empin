@@ -60,12 +60,7 @@ class AutoCADController extends Controller
      */
     public function convertToJson(Request $request)
     {
-        // Принудительное логирование начала выполнения
-        Log::info('AutoCAD: convertToJson START', [
-            'timestamp' => now()->toISOString(),
-            'memory_usage' => memory_get_usage(true),
-            'request_size' => $request->header('content-length', 'unknown')
-        ]);
+        // Начинаем обработку файла
 
         try {
             // Валидация запроса
@@ -77,11 +72,7 @@ class AutoCADController extends Controller
             $filename = $file->getClientOriginalName();
             $extension = strtolower($file->getClientOriginalExtension());
 
-            Log::info('AutoCAD: File info', [
-                'filename' => $filename,
-                'extension' => $extension,
-                'size' => $file->getSize()
-            ]);
+            // Обрабатываем файл: {$filename}
 
             // Проверка расширения файла
             if (!in_array($extension, ['dwg', 'dxf'])) {
@@ -154,9 +145,7 @@ class AutoCADController extends Controller
                 escapeshellarg($tempFile)
             );
 
-            Log::info('AutoCAD: Processing DXF file', [
-                'temp_file_size' => file_exists($tempFile) ? filesize($tempFile) : 0
-            ]);
+            // Обработка DXF файла
 
             // Выполняем команду и захватываем STDERR с таймаутом
             // Динамический таймаут в зависимости от размера файла
@@ -173,10 +162,7 @@ class AutoCADController extends Controller
             exec($command . ' 2>&1', $outputArray, $returnCode);
             $output = implode("\n", $outputArray);
 
-            Log::info('AutoCAD: Node.js script completed', [
-                'return_code' => $returnCode,
-                'output_size' => strlen($output ?? '')
-            ]);
+            // Node.js скрипт завершен
 
             if ($returnCode !== 0) {
                 throw new \Exception('Node.js скрипт завершился с ошибкой (код: ' . $returnCode . '): ' . $output);
@@ -214,9 +200,7 @@ class AutoCADController extends Controller
 
             $jsonOutput = implode("\n", $jsonLines);
 
-            Log::info('AutoCAD: JSON extracted successfully', [
-                'json_length' => strlen($jsonOutput)
-            ]);
+            // JSON извлечен успешно
 
             if (empty($jsonOutput)) {
                 throw new \Exception('Не удалось извлечь JSON из вывода Node.js. Полный вывод: ' . $output);
@@ -269,12 +253,7 @@ class AutoCADController extends Controller
                 escapeshellarg($tempDxfFile)
             );
 
-            Log::info('AutoCAD: Executing DWG conversion command', [
-                'command' => $command,
-                'dwg_file' => $tempDwgFile,
-                'dxf_file' => $tempDxfFile,
-                'dwg_size' => filesize($tempDwgFile)
-            ]);
+            // Конвертация DWG в DXF
 
             // Устанавливаем таймаут для длительных операций с Aspose API
             set_time_limit(120); // 2 минуты для конвертации DWG
@@ -285,11 +264,7 @@ class AutoCADController extends Controller
 
             $output = implode("\n", $outputArray);
 
-            Log::info('AutoCAD: DWG conversion completed', [
-                'return_code' => $returnCode,
-                'execution_time' => $executionTime . 's',
-                'output_size' => strlen($output ?? '')
-            ]);
+            // Конвертация DWG завершена
 
             if ($returnCode !== 0) {
                 throw new \Exception("Ошибка выполнения Node.js скрипта конвертации DWG (код: {$returnCode}). Вывод: " . $output);
@@ -1654,9 +1629,7 @@ class AutoCADController extends Controller
     private function parseLocalCADServer($apiUrl)
     {
         try {
-            Log::info('AutoCAD: Запрос к локальному CAD серверу', [
-                'url' => $apiUrl
-            ]);
+            // Запрос к CAD серверу
 
             $context = stream_context_create([
                 'http' => [
@@ -1685,10 +1658,7 @@ class AutoCADController extends Controller
                 throw new \Exception('Ошибка локального сервера: ' . ($data['message'] ?? 'Unknown error'));
             }
 
-            Log::info('AutoCAD: Локальный CAD сервер ответил', [
-                'files_count' => $data['count'] ?? 0,
-                'source_type' => $data['source_type'] ?? 'unknown'
-            ]);
+            // CAD сервер ответил
 
             // Возвращаем файлы в том же формате что и другие источники
             return $data['files'] ?? [];
@@ -1709,10 +1679,7 @@ class AutoCADController extends Controller
     private function downloadFileFromLocalCADServer($filename, $downloadUrl)
     {
         try {
-            Log::info('AutoCAD: Скачивание файла с локального CAD сервера', [
-                'filename' => $filename,
-                'url' => $downloadUrl
-            ]);
+            // Скачивание файла с CAD сервера
 
             $context = stream_context_create([
                 'http' => [
@@ -1727,10 +1694,7 @@ class AutoCADController extends Controller
                 throw new \Exception('Не удалось скачать файл с локального сервера');
             }
 
-            Log::info('AutoCAD: Файл успешно скачан с локального CAD сервера', [
-                'filename' => $filename,
-                'size' => strlen($fileContent)
-            ]);
+            // Файл скачан успешно
 
             return $fileContent;
 
