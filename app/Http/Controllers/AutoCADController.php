@@ -214,8 +214,7 @@ class AutoCADController extends Controller
 
             $jsonOutput = implode("\n", $jsonLines);
 
-            Log::info('AutoCAD: Extracted JSON', [
-                'json_output' => $jsonOutput,
+            Log::info('AutoCAD: JSON extracted successfully', [
                 'json_length' => strlen($jsonOutput)
             ]);
 
