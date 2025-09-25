@@ -357,8 +357,11 @@ class AutoCADController extends Controller
                 $files = $this->parsePCloudFolder($cadDirectory);
                 $sourceType = 'pcloud';
                 $directory = $cadDirectory;
-            } elseif (preg_match('/^https?:\/\/[\d\.\w\-]+:\d+\/?$/', $cadDirectory) || preg_match('/^https:\/\/[\w\d\-]+\.lhr\.life\/?$/', $cadDirectory)) {
-                // Это локальный CAD Share сервер или localhost.run туннель
+            } elseif (preg_match('/^https?:\/\/[\d\.\w\-]+:\d+\/?$/', $cadDirectory) ||
+                      preg_match('/^https:\/\/[\w\d\-]+\.lhr\.life\/?$/', $cadDirectory) ||
+                      preg_match('/^https?:\/\/[\w\d\-]+\.a\.free\.pinggy\.link\/?$/', $cadDirectory) ||
+                      preg_match('/^https?:\/\/[\w\d\-]+\.a\.pinggy\.io\/?$/', $cadDirectory)) {
+                // Это локальный CAD Share сервер, localhost.run туннель, или Pinggy туннель
                 $apiUrl = rtrim($cadDirectory, '/') . '/ajax/autocad/files';
                 $files = $this->parseLocalCADServer($apiUrl);
                 $sourceType = 'local_cad_server';
@@ -1160,7 +1163,10 @@ class AutoCADController extends Controller
             return 'pcloud';
         }
 
-        if (preg_match('/^https?:\/\/[\d\.\w\-]+:\d+\/?$/', $path) || preg_match('/^https:\/\/[\w\d\-]+\.lhr\.life\/?$/', $path)) {
+        if (preg_match('/^https?:\/\/[\d\.\w\-]+:\d+\/?$/', $path) ||
+            preg_match('/^https:\/\/[\w\d\-]+\.lhr\.life\/?$/', $path) ||
+            preg_match('/^https?:\/\/[\w\d\-]+\.a\.free\.pinggy\.link\/?$/', $path) ||
+            preg_match('/^https?:\/\/[\w\d\-]+\.a\.pinggy\.io\/?$/', $path)) {
             return 'local_cad_server';
         }
 
