@@ -259,12 +259,25 @@ class AutoCADController extends Controller
                 'dwg_size' => filesize($tempDwgFile)
             ]);
 
-            $output = shell_exec($command . ' 2>&1');
+            // Устанавливаем таймаут для длительных операций с Aspose API
+            set_time_limit(120); // 2 минуты для конвертации DWG
+
+            $startTime = microtime(true);
+            exec($command . ' 2>&1', $outputArray, $returnCode);
+            $executionTime = microtime(true) - $startTime;
+
+            $output = implode("\n", $outputArray);
 
             Log::info('AutoCAD: DWG conversion output', [
                 'output' => $output,
-                'output_length' => strlen($output ?? '')
+                'output_length' => strlen($output ?? ''),
+                'return_code' => $returnCode,
+                'execution_time' => $executionTime . 's'
             ]);
+
+            if ($returnCode !== 0) {
+                throw new \Exception("Ошибка выполнения Node.js скрипта конвертации DWG (код: {$returnCode}). Вывод: " . $output);
+            }
 
             if (!$output) {
                 throw new \Exception('Не удалось выполнить конвертацию DWG файла - нет вывода от Node.js скрипта');
