@@ -217,12 +217,13 @@ class AutoCADController extends Controller
                 $files = $this->parsePCloudFolder($cadDirectory);
                 $sourceType = 'pcloud';
                 $directory = $cadDirectory;
-            } elseif (preg_match('/^https?:\/\/[\d\.]+:\d+\/api\/files$/', $cadDirectory)) {
-                // Это локальный CAD Share сервер
-                $files = $this->parseLocalCADServer($cadDirectory);
+            } elseif (preg_match('/^https?:\/\/[\d\.\w\-]+:\d+\/?$/', $cadDirectory) || preg_match('/^https:\/\/[\w\d\-]+\.lhr\.life\/?$/', $cadDirectory)) {
+                // Это локальный CAD Share сервер или localhost.run туннель
+                $apiUrl = rtrim($cadDirectory, '/') . '/ajax/autocad/files';
+                $files = $this->parseLocalCADServer($apiUrl);
                 $sourceType = 'local_cad_server';
                 $directory = $cadDirectory;
-            } elseif (preg_match('/^https?:\/\/[\d\.]+:\d+\/?$/', $cadDirectory)) {
+            } elseif (preg_match('/^https?:\/\/[\d\.]+:\d+\/(?!ajax)/', $cadDirectory)) {
                 // Это Tiny Web Server или простой HTTP сервер
                 $files = $this->parseTinyWebServer($cadDirectory);
                 $sourceType = 'tiny_web_server';
@@ -369,7 +370,8 @@ class AutoCADController extends Controller
 
                 case 'local_cad_server':
                     // Это локальный CAD Share сервер - скачиваем файл
-                    $files = $this->parseLocalCADServer($cadDirectory);
+                    $apiUrl = rtrim($cadDirectory, '/') . '/ajax/autocad/files';
+                    $files = $this->parseLocalCADServer($apiUrl);
                     $targetFile = null;
 
                     foreach ($files as $file) {
@@ -386,7 +388,8 @@ class AutoCADController extends Controller
                         ], 404);
                     }
 
-                    $fileContent = $this->downloadFileFromLocalCADServer($filename, $targetFile['download_url']);
+                    $downloadUrl = rtrim($cadDirectory, '/') . '/' . $targetFile['download_url'];
+                    $fileContent = $this->downloadFileFromLocalCADServer($filename, $downloadUrl);
                     if (!$fileContent) {
                         return response()->json([
                             'success' => false,
@@ -969,11 +972,11 @@ class AutoCADController extends Controller
             return 'pcloud';
         }
 
-        if (preg_match('/^https?:\/\/[\d\.]+:\d+\/api\/files$/', $path)) {
+        if (preg_match('/^https?:\/\/[\d\.\w\-]+:\d+\/?$/', $path) || preg_match('/^https:\/\/[\w\d\-]+\.lhr\.life\/?$/', $path)) {
             return 'local_cad_server';
         }
 
-        if (preg_match('/^https?:\/\/[\d\.]+:\d+\/?$/', $path)) {
+        if (preg_match('/^https?:\/\/[\d\.]+:\d+\/(?!ajax)/', $path)) {
             return 'tiny_web_server';
         }
 
