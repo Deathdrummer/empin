@@ -162,7 +162,14 @@ class AutoCADController extends Controller
             ]);
 
             // Выполняем команду и захватываем STDERR с таймаутом
-            set_time_limit(300); // 5 минут для PHP скрипта
+            // Динамический таймаут в зависимости от размера файла
+            $fileSize = filesize($tempFile);
+            if ($fileSize > 5 * 1024 * 1024) { // файлы больше 5MB
+                set_time_limit(600); // 10 минут для больших файлов
+                ini_set('memory_limit', '512M'); // увеличиваем память
+            } else {
+                set_time_limit(300); // 5 минут для обычных файлов
+            }
 
             $output = '';
             $returnCode = 0;

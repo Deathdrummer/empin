@@ -39,9 +39,22 @@ function processDxfFile(filePath) {
             throw new Error('Файл не содержит стандартных DXF секций');
         }
 
-        // Парсим DXF
+        // Парсим DXF с ограничениями для больших файлов
         const parser = new DxfParser();
+
+        console.error(`DEBUG: Начинаем парсинг DXF, размер контента: ${dxfContent.length} символов`);
+        const parseStart = Date.now();
+
         const dxfData = parser.parseSync(dxfContent);
+
+        const parseTime = Date.now() - parseStart;
+        console.error(`DEBUG: Парсинг завершен за ${parseTime}мс`);
+
+        // Ограничиваем количество entities для больших файлов
+        if (dxfData.entities && dxfData.entities.length > 10000) {
+            console.error(`DEBUG: Слишком много entities (${dxfData.entities.length}), ограничиваем до 10000`);
+            dxfData.entities = dxfData.entities.slice(0, 10000);
+        }
 
         // Обогащаем данные
         const enrichedData = enrichDxfData(dxfData);
