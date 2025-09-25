@@ -60,6 +60,13 @@ class AutoCADController extends Controller
      */
     public function convertToJson(Request $request)
     {
+        // Принудительное логирование начала выполнения
+        Log::info('AutoCAD: convertToJson START', [
+            'timestamp' => now()->toISOString(),
+            'memory_usage' => memory_get_usage(true),
+            'request_size' => $request->header('content-length', 'unknown')
+        ]);
+
         try {
             // Валидация запроса
             $request->validate([
@@ -69,6 +76,12 @@ class AutoCADController extends Controller
             $file = $request->file('file');
             $filename = $file->getClientOriginalName();
             $extension = strtolower($file->getClientOriginalExtension());
+
+            Log::info('AutoCAD: File info', [
+                'filename' => $filename,
+                'extension' => $extension,
+                'size' => $file->getSize()
+            ]);
 
             // Проверка расширения файла
             if (!in_array($extension, ['dwg', 'dxf'])) {
@@ -110,7 +123,10 @@ class AutoCADController extends Controller
         } catch (\Exception $e) {
             Log::error('AutoCAD: Ошибка обработки файла', [
                 'error' => $e->getMessage(),
-                'file' => $request->file('file')?->getClientOriginalName()
+                'trace' => $e->getTraceAsString(),
+                'file' => $request->file('file')?->getClientOriginalName(),
+                'line' => $e->getLine(),
+                'code' => $e->getCode()
             ]);
 
             return response()->json([

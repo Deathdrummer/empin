@@ -33,6 +33,16 @@ async function convertDwgToDxf(dwgPath, dxfPath) {
         // Создаем конвертер
         const converter = new AsposeCadConverter(clientId, clientSecret);
 
+        // Проверяем доступность API перед конвертацией
+        try {
+            const quotaCheck = await converter.checkApiQuota();
+            if (!quotaCheck.available) {
+                throw new Error(`API недоступен: ${quotaCheck.message}`);
+            }
+        } catch (apiError) {
+            throw new Error(`Ошибка проверки API: ${apiError.message}`);
+        }
+
         // Читаем DWG файл
         const dwgBuffer = fs.readFileSync(dwgPath);
 
