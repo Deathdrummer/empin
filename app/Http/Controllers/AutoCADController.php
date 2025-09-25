@@ -154,10 +154,7 @@ class AutoCADController extends Controller
                 escapeshellarg($tempFile)
             );
 
-            Log::info('AutoCAD: Executing DXF processing command', [
-                'command' => $command,
-                'temp_file' => $tempFile,
-                'temp_file_exists' => file_exists($tempFile),
+            Log::info('AutoCAD: Processing DXF file', [
                 'temp_file_size' => file_exists($tempFile) ? filesize($tempFile) : 0
             ]);
 
@@ -176,11 +173,9 @@ class AutoCADController extends Controller
             exec($command . ' 2>&1', $outputArray, $returnCode);
             $output = implode("\n", $outputArray);
 
-            Log::info('AutoCAD: Node.js script output', [
-                'output' => $output,
-                'output_length' => strlen($output ?? ''),
+            Log::info('AutoCAD: Node.js script completed', [
                 'return_code' => $returnCode,
-                'output_lines' => count($outputArray)
+                'output_size' => strlen($output ?? '')
             ]);
 
             if ($returnCode !== 0) {
@@ -291,11 +286,10 @@ class AutoCADController extends Controller
 
             $output = implode("\n", $outputArray);
 
-            Log::info('AutoCAD: DWG conversion output', [
-                'output' => $output,
-                'output_length' => strlen($output ?? ''),
+            Log::info('AutoCAD: DWG conversion completed', [
                 'return_code' => $returnCode,
-                'execution_time' => $executionTime . 's'
+                'execution_time' => $executionTime . 's',
+                'output_size' => strlen($output ?? '')
             ]);
 
             if ($returnCode !== 0) {
