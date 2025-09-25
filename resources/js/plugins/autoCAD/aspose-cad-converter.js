@@ -1,4 +1,10 @@
-const { CadApi } = require('@asposecloud/aspose-cad-cloud');
+// Проверяем доступность модуля
+let CadApi;
+try {
+    ({ CadApi } = require('@asposecloud/aspose-cad-cloud'));
+} catch (error) {
+    throw new Error('Модуль @asposecloud/aspose-cad-cloud не найден. Выполните: npm install');
+}
 
 /**
  * Класс для работы с Aspose.CAD Cloud API

@@ -40,6 +40,21 @@ class AutoCADController extends Controller
             return 'node';
         }
     }
+
+    /**
+     * Проверка доступности Aspose.CAD модуля
+     */
+    private function checkAsposeCadAvailability()
+    {
+        $command = sprintf(
+            '%s -e "try { require(\'@asposecloud/aspose-cad-cloud\'); console.log(\'OK\'); } catch(e) { process.exit(1); }"',
+            $this->getNodeJsPath()
+        );
+
+        $output = shell_exec($command . ' 2>/dev/null');
+        return trim($output ?? '') === 'OK';
+    }
+
     /**
      * Конвертация DWG в JSON через Node.js процессор
      */
@@ -72,6 +87,16 @@ class AutoCADController extends Controller
                 $result = $this->processDxfFile($filename, $fileContent);
             } else {
                 // Обработка DWG файла через Aspose.CAD
+                // Сначала проверяем доступность модулей
+                if (!$this->checkAsposeCadAvailability()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Конвертация DWG файлов недоступна: не установлены необходимые Node.js модули. Попробуйте загрузить файл в формате DXF или обратитесь к администратору.',
+                        'error_type' => 'missing_dependencies',
+                        'suggestion' => 'Используйте формат DXF вместо DWG для быстрой обработки.'
+                    ], 503);
+                }
+
                 $result = $this->processDwgFile($filename, $fileContent);
             }
 

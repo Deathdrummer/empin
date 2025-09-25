@@ -1,7 +1,23 @@
 #!/usr/bin/env node
 
 const fs = require('fs');
-const AsposeCadConverter = require('./aspose-cad-converter');
+
+// Проверяем доступность Aspose.CAD модуля
+let AsposeCadConverter;
+try {
+    AsposeCadConverter = require('./aspose-cad-converter');
+} catch (error) {
+    console.error('ОШИБКА: Модуль @asposecloud/aspose-cad-cloud не найден.');
+    console.error('Выполните: npm install');
+
+    const errorResult = {
+        success: false,
+        message: 'Модуль @asposecloud/aspose-cad-cloud не установлен на сервере. Обратитесь к администратору для установки npm зависимостей.'
+    };
+
+    process.stdout.write(JSON.stringify(errorResult));
+    process.exit(1);
+}
 
 /**
  * Серверный скрипт для конвертации DWG в DXF через Aspose.CAD
