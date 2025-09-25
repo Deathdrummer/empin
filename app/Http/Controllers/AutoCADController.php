@@ -120,13 +120,24 @@ class AutoCADController extends Controller
                 'temp_file_size' => file_exists($tempFile) ? filesize($tempFile) : 0
             ]);
 
-            // Выполняем команду и захватываем STDERR
-            $output = shell_exec($command . ' 2>&1');
+            // Выполняем команду и захватываем STDERR с таймаутом
+            set_time_limit(300); // 5 минут для PHP скрипта
+
+            $output = '';
+            $returnCode = 0;
+            exec($command . ' 2>&1', $outputArray, $returnCode);
+            $output = implode("\n", $outputArray);
 
             Log::info('AutoCAD: Node.js script output', [
                 'output' => $output,
-                'output_length' => strlen($output ?? '')
+                'output_length' => strlen($output ?? ''),
+                'return_code' => $returnCode,
+                'output_lines' => count($outputArray)
             ]);
+
+            if ($returnCode !== 0) {
+                throw new \Exception('Node.js скрипт завершился с ошибкой (код: ' . $returnCode . '): ' . $output);
+            }
 
             if (!$output) {
                 throw new \Exception('Не удалось выполнить обработку DXF файла - нет вывода от Node.js скрипта');
@@ -137,10 +148,42 @@ class AutoCADController extends Controller
                 throw new \Exception('Node.js скрипт завершился с ошибкой: ' . $output);
             }
 
-            $result = json_decode($output, true);
+            // Извлекаем JSON из вывода (последние строки после DEBUG сообщений)
+            $lines = explode("\n", $output);
+            $jsonLines = [];
+            $jsonStarted = false;
+
+            foreach ($lines as $line) {
+                // Пропускаем DEBUG сообщения в STDERR
+                if (str_starts_with($line, 'DEBUG:')) {
+                    continue;
+                }
+
+                // Начинаем сбор JSON когда встретим {
+                if (!$jsonStarted && str_starts_with(trim($line), '{')) {
+                    $jsonStarted = true;
+                }
+
+                if ($jsonStarted) {
+                    $jsonLines[] = $line;
+                }
+            }
+
+            $jsonOutput = implode("\n", $jsonLines);
+
+            Log::info('AutoCAD: Extracted JSON', [
+                'json_output' => $jsonOutput,
+                'json_length' => strlen($jsonOutput)
+            ]);
+
+            if (empty($jsonOutput)) {
+                throw new \Exception('Не удалось извлечь JSON из вывода Node.js. Полный вывод: ' . $output);
+            }
+
+            $result = json_decode($jsonOutput, true);
 
             if (json_last_error() !== JSON_ERROR_NONE) {
-                throw new \Exception('Ошибка парсинга JSON от Node.js: ' . json_last_error_msg() . '. Вывод: ' . $output);
+                throw new \Exception('Ошибка парсинга JSON от Node.js: ' . json_last_error_msg() . '. JSON: ' . $jsonOutput);
             }
 
             if (!$result || !isset($result['success'])) {
@@ -563,8 +606,34 @@ class AutoCADController extends Controller
 
             // Ограничиваем размер данных для JSON ответа - сохраняем исходную структуру
             $responseData = $result;
+
+            // Ограничиваем количество entities
             if (isset($result['entities']) && count($result['entities']) > 10) {
                 $responseData['entities'] = array_slice($result['entities'], 0, 10); // Только первые 10 объектов
+                $responseData['metadata']['entities_truncated'] = true;
+                $responseData['metadata']['total_entities'] = count($result['entities']);
+            }
+
+            // Удаляем массивные данные которые могут быть слишком большими
+            if (isset($responseData['entitiesByType'])) {
+                unset($responseData['entitiesByType']); // Это дублирует entities
+            }
+
+            // Ограничиваем длину JSON до 1MB
+            $jsonString = json_encode($responseData);
+            if (strlen($jsonString) > 1024 * 1024) { // 1MB
+                // Еще больше урезаем данные
+                $responseData['entities'] = array_slice($responseData['entities'], 0, 5);
+                $responseData['metadata']['entities_truncated'] = true;
+                $responseData['metadata']['response_size_limited'] = true;
+
+                // Убираем детальные данные
+                foreach ($responseData['entities'] as &$entity) {
+                    if (isset($entity['vertices']) && count($entity['vertices']) > 20) {
+                        $entity['vertices'] = array_slice($entity['vertices'], 0, 20);
+                        $entity['vertices_truncated'] = true;
+                    }
+                }
             }
 
 
