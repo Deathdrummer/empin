@@ -10,8 +10,34 @@ const DxfParser = require('dxf-parser');
 
 function processDxfFile(filePath) {
     try {
-        // Читаем DXF файл
-        const dxfContent = fs.readFileSync(filePath, 'utf8');
+        // Получаем информацию о файле
+        const fileStats = fs.statSync(filePath);
+        console.error(`DEBUG: Обрабатывается файл: ${filePath}, размер: ${fileStats.size} байт`);
+
+        // Пробуем разные кодировки
+        let dxfContent;
+        let encoding = 'utf8';
+
+        try {
+            dxfContent = fs.readFileSync(filePath, 'utf8');
+        } catch (encodingError) {
+            console.error('DEBUG: Ошибка UTF-8, пробуем latin1');
+            try {
+                dxfContent = fs.readFileSync(filePath, 'latin1');
+                encoding = 'latin1';
+            } catch (latin1Error) {
+                console.error('DEBUG: Ошибка latin1, пробуем ascii');
+                dxfContent = fs.readFileSync(filePath, 'ascii');
+                encoding = 'ascii';
+            }
+        }
+
+        console.error(`DEBUG: Файл прочитан в кодировке: ${encoding}, длина контента: ${dxfContent.length}`);
+
+        // Проверяем что файл похож на DXF
+        if (!dxfContent.includes('SECTION') && !dxfContent.includes('ENTITIES')) {
+            throw new Error('Файл не содержит стандартных DXF секций');
+        }
 
         // Парсим DXF
         const parser = new DxfParser();
@@ -33,9 +59,27 @@ function processDxfFile(filePath) {
         console.log(JSON.stringify(result, null, 2));
 
     } catch (error) {
+        console.error(`DEBUG: Ошибка парсинга DXF: ${error.message}`);
+
+        // Детальная диагностика ошибки
+        let detailedMessage = error.message;
+
+        if (error.message.includes('Unexpected end of input')) {
+            detailedMessage = 'DXF файл поврежден или неполный. Возможно, проблема с конвертацией из DWG.';
+        } else if (error.message.includes('Group code does not have a defined type')) {
+            detailedMessage = 'DXF файл содержит некорректные коды групп. Возможно, неподдерживаемая версия формата.';
+        } else if (error.message.includes('SECTION') || error.message.includes('ENTITIES')) {
+            detailedMessage = 'DXF файл не содержит обязательных секций или имеет некорректную структуру.';
+        }
+
         const errorResult = {
             success: false,
-            message: `Ошибка обработки DXF: ${error.message}`
+            message: `Ошибка обработки DXF: ${detailedMessage}`,
+            originalError: error.message,
+            debugging: {
+                errorType: error.constructor.name,
+                stack: error.stack ? error.stack.split('\n')[0] : 'No stack trace'
+            }
         };
 
         console.log(JSON.stringify(errorResult));
