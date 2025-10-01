@@ -9080,9 +9080,337 @@ window.capitalFirstLetter = function () {
 /*!***********************************************!*\
   !*** ./resources/js/plugins/autoCAD/index.js ***!
   \***********************************************/
-/***/ (function() {
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "AutoCADConverter": function() { return /* binding */ AutoCADConverter; },
+/* harmony export */   "initAutoCADConverter": function() { return /* binding */ initAutoCADConverter; }
+/* harmony export */ });
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
 
 
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+
+// AutoCAD DWG to JSON Converter
+var AutoCADConverter = /*#__PURE__*/function () {
+  function AutoCADConverter() {
+    _classCallCheck(this, AutoCADConverter);
+
+    this.dropzone = document.getElementById('autocadDropzone');
+    this.fileInput = document.getElementById('autocadFileInput');
+    this.statusArea = document.getElementById('autocadStatus');
+    this.init();
+  }
+
+  _createClass(AutoCADConverter, [{
+    key: "init",
+    value: function init() {
+      var _this = this;
+
+      if (!this.dropzone) return; // Drag and drop handlers
+
+      this.dropzone.addEventListener('dragover', this.handleDragOver.bind(this));
+      this.dropzone.addEventListener('dragleave', this.handleDragLeave.bind(this));
+      this.dropzone.addEventListener('drop', this.handleDrop.bind(this));
+      this.dropzone.addEventListener('click', function () {
+        var _this$fileInput;
+
+        return (_this$fileInput = _this.fileInput) === null || _this$fileInput === void 0 ? void 0 : _this$fileInput.click();
+      }); // File input handler
+
+      if (this.fileInput) {
+        this.fileInput.addEventListener('change', this.handleFileSelect.bind(this));
+      }
+    }
+  }, {
+    key: "handleDragOver",
+    value: function handleDragOver(e) {
+      e.preventDefault();
+      this.dropzone.classList.add('dragover');
+    }
+  }, {
+    key: "handleDragLeave",
+    value: function handleDragLeave(e) {
+      e.preventDefault();
+      this.dropzone.classList.remove('dragover');
+    }
+  }, {
+    key: "handleDrop",
+    value: function handleDrop(e) {
+      e.preventDefault();
+      this.dropzone.classList.remove('dragover');
+      var files = Array.from(e.dataTransfer.files).filter(function (file) {
+        return file.name.toLowerCase().endsWith('.dxf');
+      });
+
+      if (files.length === 0) {
+        this.showStatus('Выберите только DXF файлы', 'error');
+        return;
+      }
+
+      this.processFiles(files);
+    }
+  }, {
+    key: "handleFileSelect",
+    value: function handleFileSelect(e) {
+      var files = Array.from(e.target.files);
+      this.processFiles(files);
+    }
+  }, {
+    key: "processFiles",
+    value: function () {
+      var _processFiles = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee(files) {
+        var _iterator, _step, file;
+
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                _iterator = _createForOfIteratorHelper(files);
+                _context.prev = 1;
+
+                _iterator.s();
+
+              case 3:
+                if ((_step = _iterator.n()).done) {
+                  _context.next = 9;
+                  break;
+                }
+
+                file = _step.value;
+                _context.next = 7;
+                return this.convertFile(file);
+
+              case 7:
+                _context.next = 3;
+                break;
+
+              case 9:
+                _context.next = 14;
+                break;
+
+              case 11:
+                _context.prev = 11;
+                _context.t0 = _context["catch"](1);
+
+                _iterator.e(_context.t0);
+
+              case 14:
+                _context.prev = 14;
+
+                _iterator.f();
+
+                return _context.finish(14);
+
+              case 17:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee, this, [[1, 11, 14, 17]]);
+      }));
+
+      function processFiles(_x) {
+        return _processFiles.apply(this, arguments);
+      }
+
+      return processFiles;
+    }()
+  }, {
+    key: "convertFile",
+    value: function () {
+      var _convertFile = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee2(file) {
+        var fileItem, _document$querySelect, formData, response, result;
+
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                fileItem = this.addFileToList(file);
+                _context2.prev = 1;
+                this.updateFileStatusWithProgress(fileItem, 'Загрузка файла...', 'processing', 10);
+                formData = new FormData();
+                formData.append('file', file);
+                formData.append('filename', file.name);
+                console.log('🚀 Отправляем файл:', file.name);
+                this.updateFileStatusWithProgress(fileItem, 'Парсинг DXF файла...', 'processing', 30);
+                _context2.next = 10;
+                return fetch('/ajax/autocad/convert', {
+                  method: 'POST',
+                  headers: {
+                    'X-CSRF-TOKEN': ((_document$querySelect = document.querySelector('meta[name="csrf-token"]')) === null || _document$querySelect === void 0 ? void 0 : _document$querySelect.getAttribute('content')) || '',
+                    'X-Requested-With': 'XMLHttpRequest'
+                  },
+                  body: formData
+                });
+
+              case 10:
+                response = _context2.sent;
+                this.updateFileStatusWithProgress(fileItem, 'Обработка ответа...', 'processing', 90);
+                _context2.next = 14;
+                return response.json();
+
+              case 14:
+                result = _context2.sent;
+
+                if (!result.success) {
+                  _context2.next = 20;
+                  break;
+                }
+
+                this.updateFileStatusWithProgress(fileItem, 'Парсинг завершен', 'success', 100);
+                this.showJsonResult(file.name, result.data);
+                _context2.next = 21;
+                break;
+
+              case 20:
+                throw new Error(result.message || 'Ошибка конвертации');
+
+              case 21:
+                _context2.next = 27;
+                break;
+
+              case 23:
+                _context2.prev = 23;
+                _context2.t0 = _context2["catch"](1);
+                console.error('Ошибка конвертации:', _context2.t0);
+                this.updateFileStatus(fileItem, "\u041E\u0448\u0438\u0431\u043A\u0430: ".concat(_context2.t0.message), 'error');
+
+              case 27:
+              case "end":
+                return _context2.stop();
+            }
+          }
+        }, _callee2, this, [[1, 23]]);
+      }));
+
+      function convertFile(_x2) {
+        return _convertFile.apply(this, arguments);
+      }
+
+      return convertFile;
+    }()
+  }, {
+    key: "addFileToList",
+    value: function addFileToList(file) {
+      var fileItem = document.createElement('div');
+      fileItem.className = 'autocad-file-item';
+      fileItem.innerHTML = "\n            <div class=\"autocad-file-info\">\n                <span class=\"autocad-file-name\">".concat(file.name, "</span>\n                <span class=\"autocad-file-size\">(").concat(this.formatFileSize(file.size), ")</span>\n            </div>\n            <div class=\"autocad-file-status\">\u041E\u0436\u0438\u0434\u0430\u043D\u0438\u0435...</div>\n        ");
+      this.statusArea.appendChild(fileItem);
+      return fileItem;
+    }
+  }, {
+    key: "updateFileStatus",
+    value: function updateFileStatus(fileItem, status) {
+      var type = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'info';
+      var statusElement = fileItem.querySelector('.autocad-file-status');
+      statusElement.textContent = status;
+      statusElement.className = "autocad-file-status status-".concat(type);
+    }
+  }, {
+    key: "updateFileStatusWithProgress",
+    value: function updateFileStatusWithProgress(fileItem, status) {
+      var type = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'info';
+      var progress = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
+      var statusElement = fileItem.querySelector('.autocad-file-status');
+      statusElement.className = "autocad-file-status status-".concat(type);
+
+      if (type === 'processing') {
+        statusElement.innerHTML = "\n                <div class=\"autocad-progress-container\">\n                    <div class=\"autocad-progress-text\">".concat(status, "</div>\n                    <div class=\"autocad-progress-bar\">\n                        <div class=\"autocad-progress-fill\" style=\"width: ").concat(progress, "%\"></div>\n                    </div>\n                    <div class=\"autocad-progress-percent\">").concat(progress, "%</div>\n                </div>\n            ");
+      } else {
+        statusElement.textContent = status;
+      }
+    }
+  }, {
+    key: "showJsonResult",
+    value: function showJsonResult(filename, jsonData) {
+      var _jsonData$entities;
+
+      var resultArea = document.createElement('div');
+      resultArea.className = 'autocad-json-result';
+      resultArea.innerHTML = "\n            <h4>\u0420\u0435\u0437\u0443\u043B\u044C\u0442\u0430\u0442 \u043A\u043E\u043D\u0432\u0435\u0440\u0442\u0430\u0446\u0438\u0438: ".concat(filename, "</h4>\n            <div class=\"autocad-json-stats\">\n                <span>\u0421\u0443\u0449\u043D\u043E\u0441\u0442\u0435\u0439: ").concat(((_jsonData$entities = jsonData.entities) === null || _jsonData$entities === void 0 ? void 0 : _jsonData$entities.length) || 0, "</span>\n                <button onclick=\"this.parentElement.nextElementSibling.style.display = this.parentElement.nextElementSibling.style.display === 'none' ? 'block' : 'none'\">\n                    \u041F\u043E\u043A\u0430\u0437\u0430\u0442\u044C/\u0421\u043A\u0440\u044B\u0442\u044C JSON\n                </button>\n                <button onclick=\"autoCADConverter.downloadJson('").concat(filename, "', arguments[0])\" data-json='").concat(JSON.stringify(jsonData), "'>\n                    \u0421\u043A\u0430\u0447\u0430\u0442\u044C JSON\n                </button>\n            </div>\n            <pre class=\"autocad-json-content\" style=\"display: none;\">").concat(JSON.stringify(jsonData, null, 2), "</pre>\n        ");
+      this.statusArea.appendChild(resultArea);
+    }
+  }, {
+    key: "downloadJson",
+    value: function downloadJson(filename, buttonElement) {
+      var jsonData = JSON.parse(buttonElement.dataset.json);
+      var blob = new Blob([JSON.stringify(jsonData, null, 2)], {
+        type: 'application/json'
+      });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = filename.replace('.dwg', '.json');
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+  }, {
+    key: "showStatus",
+    value: function showStatus(message) {
+      var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'info';
+      var statusDiv = document.createElement('div');
+      statusDiv.className = "autocad-status-message status-".concat(type);
+      statusDiv.textContent = message;
+      this.statusArea.insertBefore(statusDiv, this.statusArea.firstChild); // Удаляем сообщение через 5 секунд
+
+      setTimeout(function () {
+        if (statusDiv.parentNode) {
+          statusDiv.parentNode.removeChild(statusDiv);
+        }
+      }, 5000);
+    }
+  }, {
+    key: "formatFileSize",
+    value: function formatFileSize(bytes) {
+      var sizes = ['Bytes', 'KB', 'MB', 'GB'];
+      if (bytes === 0) return '0 Bytes';
+      var i = Math.floor(Math.log(bytes) / Math.log(1024));
+      return Math.round(bytes / Math.pow(1024, i) * 100) / 100 + ' ' + sizes[i];
+    }
+  }]);
+
+  return AutoCADConverter;
+}(); // Создаем функцию для инициализации
+
+
+function initAutoCADConverter() {
+  return new AutoCADConverter();
+} // Глобальный доступ для обратной совместимости
+
+
+if (typeof window !== 'undefined') {
+  window.autoCADConverter = initAutoCADConverter;
+  window.AutoCADConverter = AutoCADConverter; // Прямой доступ к классу
+}
+
+
+/* harmony default export */ __webpack_exports__["default"] = (initAutoCADConverter); // Инициализируем конвертер при загрузке DOM
+
+document.addEventListener('DOMContentLoaded', function () {
+  if (document.getElementById('autocadDropzone')) {
+    window.autoCADConverterInstance = new AutoCADConverter();
+  }
+});
 
 /***/ }),
 

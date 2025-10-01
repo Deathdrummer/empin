@@ -8296,3 +8296,279 @@ section {
   visibility: visible !important;
   visibility-position: relative;
 }
+
+.autocad-converter {
+  padding: 2rem;
+  background-color: #fff;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.autocad-dropzone {
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  padding: 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background-color: #fafafa;
+}
+.autocad-dropzone.dragover {
+  border-color: #007bff;
+  background-color: #f0f8ff;
+}
+.autocad-dropzone__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.autocad-dropzone__icon {
+  font-size: 3rem;
+  color: #ccc;
+  margin-bottom: 1rem;
+}
+.autocad-dropzone__text {
+  color: #666;
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.autocad-files-list {
+  margin-top: 2rem;
+}
+.autocad-files-list__title {
+  font-size: 1.2rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.autocad-file-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  margin-bottom: 0.5rem;
+  background-color: #fafafa;
+}
+.autocad-file-item__info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.autocad-file-item__name {
+  font-weight: 500;
+  color: #333;
+}
+.autocad-file-item__size {
+  color: #666;
+  font-size: 0.9rem;
+}
+.autocad-file-item__status {
+  font-size: 0.9rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+}
+.autocad-file-item__status.status-processing {
+  background-color: #fff3cd;
+  color: #856404;
+}
+.autocad-file-item__status.status-success {
+  background-color: #d4edda;
+  color: #155724;
+}
+.autocad-file-item__status.status-error {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.autocad-progress-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  width: 100%;
+}
+
+.autocad-progress-text {
+  font-size: 0.9rem;
+  color: #856404;
+  font-weight: 500;
+}
+
+.autocad-progress-bar {
+  width: 100%;
+  height: 6px;
+  background-color: #e9ecef;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.autocad-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #28a745, #20c997);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.autocad-progress-percent {
+  font-size: 0.8rem;
+  color: #666;
+  text-align: right;
+}
+
+.autocad-local-files {
+  margin-top: 2rem;
+}
+.autocad-local-files__title {
+  font-size: 1.2rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.autocad-local-file {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  margin-bottom: 0.5rem;
+  background-color: #f8f9fa;
+}
+.autocad-local-file .file-name {
+  font-weight: 500;
+  color: #333;
+  flex: 1;
+}
+.autocad-local-file .file-type {
+  color: #666;
+  font-size: 0.9rem;
+  margin-right: 1rem;
+}
+.autocad-local-file .btn-convert {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.3s ease;
+}
+.autocad-local-file .btn-convert:hover {
+  background-color: #0056b3;
+}
+
+.autocad-status {
+  margin-top: 2rem;
+}
+
+.autocad-status-message {
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  margin-bottom: 0.5rem;
+}
+.autocad-status-message.status-info {
+  background-color: #d1ecf1;
+  color: #0c5460;
+  border-left: 4px solid #bee5eb;
+}
+.autocad-status-message.status-processing {
+  background-color: #fff3cd;
+  color: #856404;
+  border-left: 4px solid #ffeaa7;
+}
+.autocad-status-message.status-success {
+  background-color: #d4edda;
+  color: #155724;
+  border-left: 4px solid #c3e6cb;
+}
+.autocad-status-message.status-error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border-left: 4px solid #f5c6cb;
+}
+
+.autocad-json-result {
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  background-color: #f8f9fa;
+}
+.autocad-json-result h4 {
+  margin: 0 0 1rem 0;
+  color: #333;
+  font-size: 1.1rem;
+}
+.autocad-json-result__stats {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+.autocad-json-result__stats span {
+  color: #666;
+  font-size: 0.9rem;
+}
+.autocad-json-result__stats button {
+  background-color: #6c757d;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.3s ease;
+}
+.autocad-json-result__stats button:hover {
+  background-color: #5a6268;
+}
+.autocad-json-result__stats button:first-of-type {
+  background-color: #007bff;
+}
+.autocad-json-result__stats button:first-of-type:hover {
+  background-color: #0056b3;
+}
+
+.autocad-json-content {
+  background-color: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 1rem;
+  font-family: "Courier New", monospace;
+  font-size: 0.8rem;
+  max-height: 400px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  color: #333;
+}
+
+.autocad-controls {
+  margin-top: 1rem;
+  display: flex;
+  gap: 1rem;
+}
+.autocad-controls__btn {
+  background-color: #28a745;
+  color: #fff;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+}
+.autocad-controls__btn:hover {
+  background-color: #218838;
+}
+.autocad-controls__btn--secondary {
+  background-color: #6c757d;
+}
+.autocad-controls__btn--secondary:hover {
+  background-color: #5a6268;
+}

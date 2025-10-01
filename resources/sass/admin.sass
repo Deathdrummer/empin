@@ -1300,3 +1300,264 @@ section
 
 
 //-- Здесь стили для autoCAD
+
+.autocad-converter
+	padding: 2rem
+	background-color: #fff
+	border-radius: 8px
+	margin-bottom: 1rem
+
+.autocad-dropzone
+	border: 2px dashed #ccc
+	border-radius: 8px
+	padding: 2rem
+	text-align: center
+	cursor: pointer
+	transition: all 0.3s ease
+	background-color: #fafafa
+
+	&.dragover
+		border-color: #007bff
+		background-color: #f0f8ff
+
+	&__content
+		display: flex
+		flex-direction: column
+		align-items: center
+		justify-content: center
+
+	&__icon
+		font-size: 3rem
+		color: #ccc
+		margin-bottom: 1rem
+
+	&__text
+		color: #666
+		font-size: 1.1rem
+		margin: 0
+
+.autocad-files-list
+	margin-top: 2rem
+
+	&__title
+		font-size: 1.2rem
+		font-weight: 500
+		margin-bottom: 1rem
+		color: #333
+
+.autocad-file-item
+	display: flex
+	justify-content: space-between
+	align-items: center
+	padding: 0.75rem 1rem
+	border: 1px solid #e0e0e0
+	border-radius: 6px
+	margin-bottom: 0.5rem
+	background-color: #fafafa
+
+	&__info
+		display: flex
+		align-items: center
+		gap: 0.5rem
+
+	&__name
+		font-weight: 500
+		color: #333
+
+	&__size
+		color: #666
+		font-size: 0.9rem
+
+	&__status
+		font-size: 0.9rem
+		padding: 0.25rem 0.75rem
+		border-radius: 4px
+
+		&.status-processing
+			background-color: #fff3cd
+			color: #856404
+
+		&.status-success
+			background-color: #d4edda
+			color: #155724
+
+		&.status-error
+			background-color: #f8d7da
+			color: #721c24
+
+// Стили для прогресс-бара
+.autocad-progress-container
+	display: flex
+	flex-direction: column
+	gap: 0.25rem
+	width: 100%
+
+.autocad-progress-text
+	font-size: 0.9rem
+	color: #856404
+	font-weight: 500
+
+.autocad-progress-bar
+	width: 100%
+	height: 6px
+	background-color: #e9ecef
+	border-radius: 3px
+	overflow: hidden
+
+.autocad-progress-fill
+	height: 100%
+	background: linear-gradient(90deg, #28a745, #20c997)
+	border-radius: 3px
+	transition: width 0.3s ease
+
+.autocad-progress-percent
+	font-size: 0.8rem
+	color: #666
+	text-align: right
+
+.autocad-local-files
+	margin-top: 2rem
+
+	&__title
+		font-size: 1.2rem
+		font-weight: 500
+		margin-bottom: 1rem
+		color: #333
+
+.autocad-local-file
+	display: flex
+	justify-content: space-between
+	align-items: center
+	padding: 0.75rem 1rem
+	border: 1px solid #e0e0e0
+	border-radius: 6px
+	margin-bottom: 0.5rem
+	background-color: #f8f9fa
+
+	.file-name
+		font-weight: 500
+		color: #333
+		flex: 1
+
+	.file-type
+		color: #666
+		font-size: 0.9rem
+		margin-right: 1rem
+
+	.btn-convert
+		background-color: #007bff
+		color: #fff
+		border: none
+		padding: 0.5rem 1rem
+		border-radius: 4px
+		cursor: pointer
+		font-size: 0.9rem
+		transition: background-color 0.3s ease
+
+		&:hover
+			background-color: #0056b3
+
+.autocad-status
+	margin-top: 2rem
+
+.autocad-status-message
+	padding: 0.75rem 1rem
+	border-radius: 6px
+	margin-bottom: 0.5rem
+
+	&.status-info
+		background-color: #d1ecf1
+		color: #0c5460
+		border-left: 4px solid #bee5eb
+
+	&.status-processing
+		background-color: #fff3cd
+		color: #856404
+		border-left: 4px solid #ffeaa7
+
+	&.status-success
+		background-color: #d4edda
+		color: #155724
+		border-left: 4px solid #c3e6cb
+
+	&.status-error
+		background-color: #f8d7da
+		color: #721c24
+		border-left: 4px solid #f5c6cb
+
+.autocad-json-result
+	margin-top: 1rem
+	padding: 1rem
+	border: 1px solid #e0e0e0
+	border-radius: 6px
+	background-color: #f8f9fa
+
+	h4
+		margin: 0 0 1rem 0
+		color: #333
+		font-size: 1.1rem
+
+	&__stats
+		display: flex
+		gap: 1rem
+		align-items: center
+		margin-bottom: 1rem
+
+		span
+			color: #666
+			font-size: 0.9rem
+
+		button
+			background-color: #6c757d
+			color: #fff
+			border: none
+			padding: 0.5rem 1rem
+			border-radius: 4px
+			cursor: pointer
+			font-size: 0.9rem
+			transition: background-color 0.3s ease
+
+			&:hover
+				background-color: #5a6268
+
+			&:first-of-type
+				background-color: #007bff
+
+				&:hover
+					background-color: #0056b3
+
+.autocad-json-content
+	background-color: #fff
+	border: 1px solid #e0e0e0
+	border-radius: 4px
+	padding: 1rem
+	font-family: 'Courier New', monospace
+	font-size: 0.8rem
+	max-height: 400px
+	overflow-y: auto
+	white-space: pre-wrap
+	color: #333
+
+.autocad-controls
+	margin-top: 1rem
+	display: flex
+	gap: 1rem
+
+	&__btn
+		background-color: #28a745
+		color: #fff
+		border: none
+		padding: 0.75rem 1.5rem
+		border-radius: 4px
+		cursor: pointer
+		font-size: 1rem
+		transition: background-color 0.3s ease
+
+		&:hover
+			background-color: #218838
+
+		&--secondary
+			background-color: #6c757d
+
+			&:hover
+				background-color: #5a6268

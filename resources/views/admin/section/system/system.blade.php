@@ -448,6 +448,32 @@
 					
 					<div class="ddrtabscontent__item ddrtabscontent__item_visible" ddrtabscontentitem="systemTab8">
 						{{-- тут разметка для autoCAD --}}
+						<div class="autocad-converter">
+							<div class="row gy-30">
+								<!-- Загрузка файлов -->
+								<div class="col-12">
+									<h3 class="mb-3">Конвертер AutoCAD файлов</h3>
+									<p class="color-gray mb-3">Загрузите DXF файлы для конвертации в JSON формат</p>
+
+									<div class="autocad-dropzone" id="autocadDropzone">
+										<div class="autocad-dropzone__content">
+											<i class="fa-solid fa-cloud-upload-alt autocad-dropzone__icon"></i>
+											<p class="autocad-dropzone__text">Перетащите DXF файлы сюда или нажмите для выбора</p>
+											<p class="autocad-dropzone__hint">Поддерживаются файлы .dxf до 100 МБ</p>
+										</div>
+									</div>
+
+									<input type="file" id="autocadFileInput" multiple accept=".dxf" style="display: none;">
+								</div>
+
+								<!-- Статус обработки -->
+								<div class="col-12">
+									<div class="autocad-status" id="autocadStatus">
+										<!-- Результаты обработки появятся здесь -->
+									</div>
+								</div>
+							</div>
+						</div>
 					</div>
 					
 					
@@ -466,6 +492,10 @@
 
 	const drawingInstance = ddrDrawing();
 	drawingInstance.init();
+
+	// Инициализируем AutoCAD конвертер
+	const autoCADInstance = autoCADConverter();
+	// autoCADInstance уже инициализируется автоматически
 	
 	
 	
