@@ -349,8 +349,8 @@
 							class="w100"
 							rows="10"
 							group="normal"
-							{{-- action="updatePromptFile:'{{$prompt_file_name}}'" --}}
-							{{-- :value="$prompt_file_data" --}}
+							action="updatePromptFile:'{{$prompt_file_name}}'"
+							:value="$prompt_file_data"
 							/>
 						
 						<div class="h3rem"></div>

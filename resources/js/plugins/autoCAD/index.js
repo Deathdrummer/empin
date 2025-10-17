@@ -148,33 +148,39 @@ class AutoCADConverter {
             <h4>Результат конвертации: ${filename}</h4>
             <div class="autocad-json-stats">
                 <span>Сущностей: ${jsonData.entities?.length || 0}</span>
-                <button onclick="this.parentElement.nextElementSibling.style.display = this.parentElement.nextElementSibling.style.display === 'none' ? 'block' : 'none'">
+                <button class="autocad-toggle-json">
                     Показать/Скрыть JSON
                 </button>
-                <button onclick="autoCADConverter.downloadJson('${filename}', arguments[0])" data-json='${JSON.stringify(jsonData)}'>
+                <button class="autocad-download-json" data-filename="${filename}">
                     Скачать JSON
                 </button>
             </div>
             <pre class="autocad-json-content" style="display: none;">${JSON.stringify(jsonData, null, 2)}</pre>
         `;
 
+        // Обработчик для переключения отображения JSON
+        const toggleBtn = resultArea.querySelector('.autocad-toggle-json');
+        const jsonContent = resultArea.querySelector('.autocad-json-content');
+        toggleBtn.addEventListener('click', () => {
+            jsonContent.style.display = jsonContent.style.display === 'none' ? 'block' : 'none';
+        });
+
+        // Обработчик для скачивания JSON
+        const downloadBtn = resultArea.querySelector('.autocad-download-json');
+        downloadBtn.addEventListener('click', () => {
+            const blob = new Blob([JSON.stringify(jsonData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename.replace(/\.(dwg|dxf)$/i, '.json');
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+
         this.statusArea.appendChild(resultArea);
     }
-
-    downloadJson(filename, buttonElement) {
-        const jsonData = JSON.parse(buttonElement.dataset.json);
-        const blob = new Blob([JSON.stringify(jsonData, null, 2)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename.replace('.dwg', '.json');
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-    }
-
 
     showStatus(message, type = 'info') {
         const statusDiv = document.createElement('div');

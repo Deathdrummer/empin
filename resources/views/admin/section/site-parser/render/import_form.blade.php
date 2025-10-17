@@ -1,8 +1,22 @@
 <div id="importPreserForm">
 	<div class="row row-cols-1 gy-30">
 		<div class="col">
-			<p class="mb10px fz16px">Выбрать файл</p>
-			<x-button group="large" variant="blue" id="parserAddFile"><i class="fa-solid fa-fw fa-file-csv"></i></x-button>
+			<p class="mb10px fz16px">Загрузить базу</p>
+			
+			
+			<div class="row">
+				<div class="col-auto">
+					<p>Разделитель:</p>
+					<x-select group="large" :options="['|', '.', ',', ';']" id="parserSeparator" class="w100" />
+				</div>
+				<div class="col-auto">
+					<p>Выбрать CSV файл:</p>
+					<x-button group="large" variant="blue" id="parserAddFile"><i class="fa-solid fa-fw fa-file-csv"></i></x-button>
+				</div>
+				
+			</div>
+			
+			
 			{{-- <x-textarea
 				group="normal"
 				class="w100 mb1rem"
@@ -26,37 +40,37 @@
 						<tbody>
 							<tr>
 								<td class="h-end"><p class="color-gray-600 fz12px mb4px">Название компании</p></td>
-								<td><x-select name="colums[company]" tag="titlesselect" class="w100" /></td>
+								<td><x-select :options="null" name="colums[company]" tag="titlesselect" class="w100" /></td>
 								<td class="text-center"><x-checkbox name="required[company]"/></td>
 							</tr>
 							<tr>
 								<td class="h-end"><p class="color-gray-600 fz12px mb4px">Сайт</p></td>
-								<td><x-select name="colums[site]" tag="titlesselect" class="w100" /></td>
+								<td><x-select :options="null" name="colums[site]" tag="titlesselect" class="w100" /></td>
 								<td class="text-center"><x-checkbox name="required[site]"/></td>
 							</tr>
 							<tr>
 								<td class="h-end"><p class="color-gray-600 fz12px mb4px">Тематика</p></td>
-								<td><x-select name="colums[subject]" tag="titlesselect" class="w100" /></td>
+								<td><x-select :options="null" name="colums[subject]" tag="titlesselect" class="w100" /></td>
 								<td class="text-center"><x-checkbox name="required[subject]"/></td>
 							</tr>
 							<tr>
 								<td class="h-end"><p class="color-gray-600 fz12px mb4px">Whatsapp</p></td>
-								<td><x-select name="colums[whatsapp]" tag="titlesselect" class="w100" /></td>
+								<td><x-select :options="null" name="colums[whatsapp]" tag="titlesselect" class="w100" /></td>
 								<td class="text-center"><x-checkbox name="required[whatsapp]"/></td>
 							</tr>
 							<tr>
 								<td class="h-end"><p class="color-gray-600 fz12px mb4px">Telegram</p></td>
-								<td><x-select name="colums[telegram]" tag="titlesselect" class="w100" /></td>
+								<td><x-select :options="null" name="colums[telegram]" tag="titlesselect" class="w100" /></td>
 								<td class="text-center"><x-checkbox name="required[telegram]"/></td>
 							</tr>
 							<tr>
 								<td class="h-end"><p class="color-gray-600 fz12px mb4px">Телефон</p></td>
-								<td><x-select name="colums[phone]" tag="titlesselect" class="w100" /></td>
+								<td><x-select :options="null" name="colums[phone]" tag="titlesselect" class="w100" /></td>
 								<td class="text-center"><x-checkbox name="required[phone]"/></td>
 							</tr>
 							<tr>
 								<td class="h-end"><p class="color-gray-600 fz12px mb4px">E-mail</p></td>
-								<td><x-select name="colums[email]" tag="titlesselect" class="w100" /></td>
+								<td><x-select :options="null" name="colums[email]" tag="titlesselect" class="w100" /></td>
 								<td class="text-center"><x-checkbox name="required[email]"/></td>
 							</tr>
 						</tbody>

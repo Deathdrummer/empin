@@ -6,12 +6,12 @@ import DdrFiles from './ddrFiles';
 
 
 $.ddrChooseFiles = function(params = {}) {
-	const chooseParams = _.pick(params, ['multiple', 'init', 'preload', 'callback', 'done', 'fail']);
-	
+	const chooseParams = _.pick(params, ['multiple', 'accept', 'init', 'preload', 'callback', 'done', 'fail']);
+
 	const files = ref({});
-	
+
 	new DdrFiles(true, files).choose(chooseParams);
-	
+
 	return methodsObj(files);
 }
 
@@ -69,7 +69,7 @@ $.ddrFiles = function(params = {}) {
 	
 	
 	const {chooseSelector, dropSelector} = _.pick(params, ['chooseSelector', 'dropSelector']);
-	const chooseParams = _.pick(params, ['multiple', 'init', 'preload', 'callback', 'done', 'fail']);
+	const chooseParams = _.pick(params, ['multiple', 'accept', 'init', 'preload', 'callback', 'done', 'fail']);
 	const dropParams = _.pick(params, ['dragover', 'dragleave', 'drop', 'init', 'preload', 'callback', 'done', 'fail']);
 	
 	const files = ref({});

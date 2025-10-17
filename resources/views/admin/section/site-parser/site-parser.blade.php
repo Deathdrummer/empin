@@ -455,6 +455,7 @@
 				wait();
 				
 				const importdata = $('#importDataInput').val();
+				const separator = $('#parserSeparator').val();
 				
 				const inputsData = $('#importPreserForm').ddrForm({fields: {importdata}});
 				
@@ -471,10 +472,13 @@
 				
 				formData.append('importdata', importdata);
 				formData.append('importfile', fileToParse);
+				formData.append('separator', separator);
 				
 				
 				const {data, error, status, headers} = await axiosQuery('post', 'ajax/siteparser/import_form', formData, 'text', null, {'Content-Type': 'multipart/form-data'});
+				
 				console.log({data, error, status, headers});
+				
 				if (error) {
 					$.notify('Ошибка импорта данных!', 'error');
 					console.log(error);
@@ -497,14 +501,16 @@
 			function parserAddFile(wait, on, off) {
 				$.ddrChooseFiles({
 					//multiple,
+					accept: '.csv',
 					init(...data) {
 						on();
 					},
 					//preload,
 					async callback({file, name, ext, size, type, isImage, key}) {
 						let success = true,
-							fileSize = (size / 1024 / 1024).toFixed(2);
-						
+							fileSize = (size / 1024 / 1024).toFixed(2),
+							separator = $('#parserSeparator').val();
+							
 						if (fileSize > 100) {
 							$.notify(`Размер файла превышает максимально допустимый в ${fileSize}мб!`, 'error');
 							success = false;
@@ -515,11 +521,14 @@
 							success = false;
 						}
 						
-						if (!success) return;
+						if (!success) {
+							off();
+							return;
+						}
 						
 						fileToParse = file;
 						
-						const titles = getTitles(await readFile(fileToParse));
+						const titles = getTitles(await readFile(fileToParse), separator);
 						if (!titles) {
 							off();
 							$('[titlesselect]').html([setDisabledOption()]);
@@ -560,13 +569,13 @@
 	
 	
 	
-	function getTitles(str = null) {
+	function getTitles(str = null, separator = '|') {
 		if (!str) return false;
 		
 		const titlesStr = str.substr(0, str.indexOf("\n"));
 		if (!titlesStr) return false;
 		
-		return titlesStr.split('|');
+		return titlesStr.split(separator);
 	}
 	
 	

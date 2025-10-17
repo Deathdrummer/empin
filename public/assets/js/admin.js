@@ -9345,24 +9345,29 @@ var AutoCADConverter = /*#__PURE__*/function () {
 
       var resultArea = document.createElement('div');
       resultArea.className = 'autocad-json-result';
-      resultArea.innerHTML = "\n            <h4>\u0420\u0435\u0437\u0443\u043B\u044C\u0442\u0430\u0442 \u043A\u043E\u043D\u0432\u0435\u0440\u0442\u0430\u0446\u0438\u0438: ".concat(filename, "</h4>\n            <div class=\"autocad-json-stats\">\n                <span>\u0421\u0443\u0449\u043D\u043E\u0441\u0442\u0435\u0439: ").concat(((_jsonData$entities = jsonData.entities) === null || _jsonData$entities === void 0 ? void 0 : _jsonData$entities.length) || 0, "</span>\n                <button onclick=\"this.parentElement.nextElementSibling.style.display = this.parentElement.nextElementSibling.style.display === 'none' ? 'block' : 'none'\">\n                    \u041F\u043E\u043A\u0430\u0437\u0430\u0442\u044C/\u0421\u043A\u0440\u044B\u0442\u044C JSON\n                </button>\n                <button onclick=\"autoCADConverter.downloadJson('").concat(filename, "', arguments[0])\" data-json='").concat(JSON.stringify(jsonData), "'>\n                    \u0421\u043A\u0430\u0447\u0430\u0442\u044C JSON\n                </button>\n            </div>\n            <pre class=\"autocad-json-content\" style=\"display: none;\">").concat(JSON.stringify(jsonData, null, 2), "</pre>\n        ");
-      this.statusArea.appendChild(resultArea);
-    }
-  }, {
-    key: "downloadJson",
-    value: function downloadJson(filename, buttonElement) {
-      var jsonData = JSON.parse(buttonElement.dataset.json);
-      var blob = new Blob([JSON.stringify(jsonData, null, 2)], {
-        type: 'application/json'
+      resultArea.innerHTML = "\n            <h4>\u0420\u0435\u0437\u0443\u043B\u044C\u0442\u0430\u0442 \u043A\u043E\u043D\u0432\u0435\u0440\u0442\u0430\u0446\u0438\u0438: ".concat(filename, "</h4>\n            <div class=\"autocad-json-stats\">\n                <span>\u0421\u0443\u0449\u043D\u043E\u0441\u0442\u0435\u0439: ").concat(((_jsonData$entities = jsonData.entities) === null || _jsonData$entities === void 0 ? void 0 : _jsonData$entities.length) || 0, "</span>\n                <button class=\"autocad-toggle-json\">\n                    \u041F\u043E\u043A\u0430\u0437\u0430\u0442\u044C/\u0421\u043A\u0440\u044B\u0442\u044C JSON\n                </button>\n                <button class=\"autocad-download-json\" data-filename=\"").concat(filename, "\">\n                    \u0421\u043A\u0430\u0447\u0430\u0442\u044C JSON\n                </button>\n            </div>\n            <pre class=\"autocad-json-content\" style=\"display: none;\">").concat(JSON.stringify(jsonData, null, 2), "</pre>\n        "); // Обработчик для переключения отображения JSON
+
+      var toggleBtn = resultArea.querySelector('.autocad-toggle-json');
+      var jsonContent = resultArea.querySelector('.autocad-json-content');
+      toggleBtn.addEventListener('click', function () {
+        jsonContent.style.display = jsonContent.style.display === 'none' ? 'block' : 'none';
+      }); // Обработчик для скачивания JSON
+
+      var downloadBtn = resultArea.querySelector('.autocad-download-json');
+      downloadBtn.addEventListener('click', function () {
+        var blob = new Blob([JSON.stringify(jsonData, null, 2)], {
+          type: 'application/json'
+        });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = filename.replace(/\.(dwg|dxf)$/i, '.json');
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
       });
-      var url = URL.createObjectURL(blob);
-      var a = document.createElement('a');
-      a.href = url;
-      a.download = filename.replace('.dwg', '.json');
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      this.statusArea.appendChild(resultArea);
     }
   }, {
     key: "showStatus",
@@ -16313,11 +16318,12 @@ var DdrFiles = /*#__PURE__*/function () {
       var getAddedFiles = this.getAddedFiles;
       var loadFiles = this.loadFiles.bind(this); // bind потому что в функции loadFiles идет обращение к контексту, но он там потерян, так как вызов идет отсюда, то есть уже 3 вложенности функций
 
-      var loadFilesParams = _.omit(params, ['multiple']);
+      var loadFilesParams = _.omit(params, ['multiple', 'accept']);
 
       var input = document.createElement('input');
       input.type = 'file';
       input.multiple = (params === null || params === void 0 ? void 0 : params.multiple) || false;
+      if (params !== null && params !== void 0 && params.accept) input.accept = params.accept;
 
       input.oninput = function (e) {
         var files = getAddedFiles(e);
@@ -16343,12 +16349,13 @@ var DdrFiles = /*#__PURE__*/function () {
 
       var selector = this.selector || forcedSelector;
 
-      var loadFilesParams = _.omit(params, ['multiple']);
+      var loadFilesParams = _.omit(params, ['multiple', 'accept']);
 
       $(selector).on(tapEvent, function () {
         var input = document.createElement('input');
         input.type = 'file';
         input.multiple = (params === null || params === void 0 ? void 0 : params.multiple) || false;
+        if (params !== null && params !== void 0 && params.accept) input.accept = params.accept;
 
         input.oninput = function (e) {
           var files = getAddedFiles(e);
@@ -16709,7 +16716,7 @@ __webpack_require__.r(__webpack_exports__);
 $.ddrChooseFiles = function () {
   var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-  var chooseParams = _.pick(params, ['multiple', 'init', 'preload', 'callback', 'done', 'fail']);
+  var chooseParams = _.pick(params, ['multiple', 'accept', 'init', 'preload', 'callback', 'done', 'fail']);
 
   var files = ref({});
   new _ddrFiles__WEBPACK_IMPORTED_MODULE_0__["default"](true, files).choose(chooseParams);
@@ -16770,7 +16777,7 @@ $.ddrFiles = function () {
       chooseSelector = _$pick2.chooseSelector,
       dropSelector = _$pick2.dropSelector;
 
-  var chooseParams = _.pick(params, ['multiple', 'init', 'preload', 'callback', 'done', 'fail']);
+  var chooseParams = _.pick(params, ['multiple', 'accept', 'init', 'preload', 'callback', 'done', 'fail']);
 
   var dropParams = _.pick(params, ['dragover', 'dragleave', 'drop', 'init', 'preload', 'callback', 'done', 'fail']);
 

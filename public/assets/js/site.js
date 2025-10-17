@@ -12797,11 +12797,12 @@ var DdrFiles = /*#__PURE__*/function () {
       var getAddedFiles = this.getAddedFiles;
       var loadFiles = this.loadFiles.bind(this); // bind потому что в функции loadFiles идет обращение к контексту, но он там потерян, так как вызов идет отсюда, то есть уже 3 вложенности функций
 
-      var loadFilesParams = _.omit(params, ['multiple']);
+      var loadFilesParams = _.omit(params, ['multiple', 'accept']);
 
       var input = document.createElement('input');
       input.type = 'file';
       input.multiple = (params === null || params === void 0 ? void 0 : params.multiple) || false;
+      if (params !== null && params !== void 0 && params.accept) input.accept = params.accept;
 
       input.oninput = function (e) {
         var files = getAddedFiles(e);
@@ -12827,12 +12828,13 @@ var DdrFiles = /*#__PURE__*/function () {
 
       var selector = this.selector || forcedSelector;
 
-      var loadFilesParams = _.omit(params, ['multiple']);
+      var loadFilesParams = _.omit(params, ['multiple', 'accept']);
 
       $(selector).on(tapEvent, function () {
         var input = document.createElement('input');
         input.type = 'file';
         input.multiple = (params === null || params === void 0 ? void 0 : params.multiple) || false;
+        if (params !== null && params !== void 0 && params.accept) input.accept = params.accept;
 
         input.oninput = function (e) {
           var files = getAddedFiles(e);
@@ -13193,7 +13195,7 @@ __webpack_require__.r(__webpack_exports__);
 $.ddrChooseFiles = function () {
   var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-  var chooseParams = _.pick(params, ['multiple', 'init', 'preload', 'callback', 'done', 'fail']);
+  var chooseParams = _.pick(params, ['multiple', 'accept', 'init', 'preload', 'callback', 'done', 'fail']);
 
   var files = ref({});
   new _ddrFiles__WEBPACK_IMPORTED_MODULE_0__["default"](true, files).choose(chooseParams);
@@ -13254,7 +13256,7 @@ $.ddrFiles = function () {
       chooseSelector = _$pick2.chooseSelector,
       dropSelector = _$pick2.dropSelector;
 
-  var chooseParams = _.pick(params, ['multiple', 'init', 'preload', 'callback', 'done', 'fail']);
+  var chooseParams = _.pick(params, ['multiple', 'accept', 'init', 'preload', 'callback', 'done', 'fail']);
 
   var dropParams = _.pick(params, ['dragover', 'dragleave', 'drop', 'init', 'preload', 'callback', 'done', 'fail']);
 
