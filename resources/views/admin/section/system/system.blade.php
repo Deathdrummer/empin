@@ -353,11 +353,20 @@
 							:value="$prompt_file_data"
 							/>
 						
+						
+						<div class="h3rem"></div>
+						
+						
+						<x-buttons-group group="normal" class="mb20px">
+							<x-button variant="purple" action="callAi">Вызвать Ai</x-button>
+						</x-buttons-group>
+						
+						
 						<div class="h3rem"></div>
 							
 						<p class="color-gray mb1rem">Файлы:</p>
 						
-						{{-- <p class="format">{{$answer}}</p> --}}
+						<p class="format" answer>---</p>
 						
 						<div class="assistentfiles__scrollblock">
 							<div class="assistentfiles__dropfiles" id="assistentDropFiles">
@@ -499,8 +508,23 @@
 	
 	
 	
+	$.callAi = async (btn) => {
+		$(btn).ddrInputs('disable');
+		$('[answer]').text('генерация данных...');
+		const {data, error, status, headers} = await axiosQuery('post', '/ajax/ai');
+		
+		if (error) {
+			$.notify(error.message);
+			console.log(error);
+			return;
+		}
+		
+		$('[answer]').html(data.answer);
+		$(btn).ddrInputs('enable');
+		console.log({data, error, status, headers});
+	}
 	
-	
+		
 
 	
 	let savePromptTOut;

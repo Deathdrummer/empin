@@ -198,6 +198,10 @@ Route::middleware(['lang', 'auth:admin', 'isajax:admin'])->post('/get_section', 
 	
 	switch ($section) {
 		case 'system':
+			$planPromptPath = 'prompts/plan.txt';
+			$settingsData['prompt_file_name'] = 'plan.txt';
+			$settingsData['prompt_file_data'] = Storage::exists($planPromptPath) ? Storage::get($planPromptPath) : '';
+		
 			$files = null;
 			if ($assistentfiles = AssistentFile::get()) {
 				$files = $assistentfiles->filter(function($row) {
@@ -218,30 +222,6 @@ Route::middleware(['lang', 'auth:admin', 'isajax:admin'])->post('/get_section', 
 			}
 		
 			$settingsData['files'] = $files;
-			
-			
-			$planPromptPath = 'prompts/plan.txt';
-			$settingsData['prompt_file_name'] = 'plan.txt';
-			$settingsData['prompt_file_data'] = Storage::exists($planPromptPath) ? Storage::get($planPromptPath) : '';
-			
-			/* 
-			//--------------------------------------------------------------------------------
-			
-			
-			//$image = asset('assets/images/ampin.jpeg');
-			
-			
-			$assistentService = app()->make(VisionAssistantService::class);
-			
-			$list = $assistentService->listAssistants();
-			
-			$assistent = $assistentService->use($list['data'][0]['id'], 'prompts/plan.txt', 'assistent');
-			
-			$question = 'привет';
-			
-
-			$settingsData['answer'] = $assistent->ask($question);
-			 */
 			
 			break;
 		

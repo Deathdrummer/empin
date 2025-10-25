@@ -3,6 +3,7 @@
 use App\Enums\ContractColums;
 use App\Enums\VirtualVars;
 use App\Http\Controllers\admin\Acts;
+use App\Http\Controllers\AiAssistantController;
 use App\Http\Controllers\AssistentFilesController;
 use App\Http\Controllers\AutoCADController;
 use App\Http\Controllers\ContractsFilesController;
@@ -324,3 +325,11 @@ Route::post('/siteparser/set_stat', [SiteParserController::class, 'set_stat']);
 
 // AutoCAD
 Route::middleware(['isajax:admin', 'lang'])->post('/autocad/convert', [AutoCADController::class, 'convertToJson']);
+
+
+
+
+
+
+# ИИ-ассистент
+Route::post('/ai', [AiAssistantController::class, 'index']);

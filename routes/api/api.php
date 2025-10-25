@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\api\AuthController;
+use App\Http\Controllers\api\TimesheetApiController;
 use App\Http\Controllers\SettingsController;
 use Illuminate\Support\Facades\Route;
 
@@ -22,7 +24,27 @@ use Illuminate\Support\Facades\Route;
 
 
 
-// регистрация, авторизация, выход
+// Авторизация (без защиты)
+Route::controller(AuthController::class)->prefix('auth')->group(function() {
+	Route::post('/login', 'login');
+	Route::post('/logout', 'logout')->middleware('auth:sanctum');
+	Route::get('/me', 'me')->middleware('auth:sanctum');
+});
+
+// Timesheet API (требует авторизацию)
+Route::controller(TimesheetApiController::class)->prefix('timesheet')->middleware('auth:sanctum')->group(function() {
+	Route::post('/slides', 'getSlidesData');
+	Route::get('/staff', 'getStaff');
+	Route::get('/contracts/search', 'contractsList');
+	Route::post('/team', 'addTeam');
+	Route::delete('/team/{id}', 'removeTeam');
+	Route::post('/contract', 'addContract');
+	Route::delete('/contract/{id}', 'removeContract');
+	Route::post('/comment', 'addComment');
+	Route::delete('/comment/{id}', 'removeComment');
+});
+
+// Settings API
 Route::controller(SettingsController::class)/* ->middleware(['lang', 'auth:admin', 'isajax:admin']) */->group(function() {
 	Route::post('/settings', 'get');
 	Route::put('/settings', 'set');
