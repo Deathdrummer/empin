@@ -15,6 +15,11 @@ class Authenticate extends Middleware
      */
     protected function redirectTo($request)
     {
+		// Для API запросов не редиректим, вернется 401
+		if ($request->is('api/*')) {
+			return null;
+		}
+
 		session(['auth_redirect' => URL::current()]);
         if (!$request->expectsJson()) {
 			return $request->is('admin/*') ? route('admin') : route('site');
