@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Session\TokenMismatchException;
+use Illuminate\Auth\AuthenticationException;
 use App\Services\Locale;
 use Throwable;
 
@@ -64,6 +65,15 @@ class Handler extends ExceptionHandler {
      * Throwable $e
      */
 	public function render($request, Throwable $e) {
+		// Для API запросов возвращаем JSON с корректным статусом
+		if ($request->is('api/*')) {
+			if ($e instanceof AuthenticationException) {
+				return response()->json([
+					'message' => 'Unauthenticated.'
+				], 401);
+			}
+		}
+
 		$details = parent::render($request, $e);
 		if ($this->isHttpException($e) && !$request->expectsJson()) {
 			return $details;
