@@ -94,6 +94,13 @@ class TimesheetApiController extends Controller {
      * @return \Illuminate\Http\JsonResponse
      */
     public function addTeam(Request $request) {
+        // Проверка прав
+        if (!$request->user()->can('mobile-app-can-create-team:site')) {
+            return response()->json([
+                'error' => 'У вас нет прав для добавления бригады'
+            ], 403);
+        }
+
         $validFields = $request->validate([
             'staff_id' => 'required|integer',
             'day' => 'required|date',
