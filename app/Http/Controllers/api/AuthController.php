@@ -34,6 +34,9 @@ class AuthController extends Controller {
         // Создаем новый токен
         $token = $user->createToken('mobile-app')->plainTextToken;
 
+        // Получаем все права пользователя через Spatie
+        $permissions = $user->getAllPermissions()->pluck('name')->toArray();
+
         return response()->json([
             'token' => $token,
             'user' => [
@@ -41,6 +44,7 @@ class AuthController extends Controller {
                 'email' => $user->email,
                 'full_name' => $user->full_name,
                 'staff_id' => $user->staff_id,
+                'permissions' => $permissions,
             ],
         ]);
     }
@@ -68,12 +72,16 @@ class AuthController extends Controller {
     public function me(Request $request) {
         $user = $request->user();
 
+        // Получаем все права пользователя через Spatie
+        $permissions = $user->getAllPermissions()->pluck('name')->toArray();
+
         return response()->json([
             'id' => $user->id,
             'email' => $user->email,
             'full_name' => $user->full_name,
             'staff_id' => $user->staff_id,
             'department_id' => $user->department_id,
+            'permissions' => $permissions,
         ]);
     }
 }
