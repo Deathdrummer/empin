@@ -56,9 +56,9 @@ class Timesheet extends Controller {
 	
 	
 	/**
-	* 
-	* @param 
-	* @return 
+	*
+	* @param
+	* @return
 	*/
 	public function getSlidesData(Request $request) {
 		[
@@ -67,7 +67,7 @@ class Timesheet extends Controller {
 			'indexes'	=> 'required|array',
 			'indexes.*' => 'integer',
 		]);
-		
+
 		$indexes = array_map('intval', $indexes);
 
 		$teams = TimesheetTeam::getByDaysIndexes($indexes)
@@ -76,17 +76,17 @@ class Timesheet extends Controller {
 			->with('contracts.chat.profile')
 			->get()
 			->groupBy(fn($team) => $team->day instanceof Carbon ? $team->day->toDateString() : $team->day);
-		
-		
+
+
 		$teams = $teams->map(fn($group) => TimesheetTeamResource::collection($group)->resolve());
-		
-		
+
+
 		$daysData = [];
 		foreach ($indexes as $idx) {
 			$dateObj = DdrDateTime::getOffsetDate($idx);
 			$day = $dateObj->toDateString();
 			$weekDayNum = (int)DdrDateTime::numOfWeek($dateObj);
-			
+
 			$daysData[] = [
 				'index'		=> (int)$idx,
 				'weekDay'	=> DdrDateTime::dayOfWeek($dateObj),
@@ -97,8 +97,50 @@ class Timesheet extends Controller {
 				'teams' 	=> $teams[$day] ?? null,
 			];
 		}
-		
+
 		return response()->json($daysData);
+	}
+
+
+
+
+	/**
+	* Получить данные для одного дня
+	* @param
+	* @return
+	*/
+	public function getSlideData(Request $request) {
+		[
+			'index'	=> $index,
+		] = $request->validate([
+			'index' => 'required|integer',
+		]);
+
+		$index = (int)$index;
+
+		$dateObj = DdrDateTime::getOffsetDate($index);
+		$day = $dateObj->toDateString();
+		$weekDayNum = (int)DdrDateTime::numOfWeek($dateObj);
+
+		$teams = TimesheetTeam::getByDaysIndexes([$index])
+			->with('profile')
+			->with('contracts.contract')
+			->with('contracts.chat.profile')
+			->get();
+
+		$teamsData = TimesheetTeamResource::collection($teams)->resolve();
+
+		$dayData = [
+			'index'		=> $index,
+			'weekDay'	=> DdrDateTime::dayOfWeek($dateObj),
+			'humanDate'	=> DdrDateTime::dateToHuman($dateObj, 'ru'),
+			'day'		=> $day,
+			'isWeekEnd'	=> in_array($weekDayNum, [6,7]),
+			'isToday'	=> $index == 0,
+			'teams' 	=> $teamsData,
+		];
+
+		return response()->json($dayData);
 	}
 	
 	

@@ -34,6 +34,7 @@ Route::controller(AuthController::class)->prefix('auth')->group(function() {
 // Timesheet API (требует авторизацию)
 Route::controller(TimesheetApiController::class)->prefix('timesheet')->middleware('auth:sanctum')->group(function() {
 	Route::post('/slides', 'getSlidesData');
+	Route::post('/slide', 'getSlideData');
 	Route::get('/staff', 'getStaff');
 	Route::get('/contracts/search', 'contractsList');
 	Route::post('/team', 'addTeam');

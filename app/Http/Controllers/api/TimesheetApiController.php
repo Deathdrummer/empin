@@ -62,6 +62,46 @@ class TimesheetApiController extends Controller {
     }
 
     /**
+     * Получить данные для одного дня
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getSlideData(Request $request) {
+        [
+            'index' => $index,
+        ] = $request->validate([
+            'index' => 'required|integer',
+        ]);
+
+        $index = (int)$index;
+
+        $dateObj = DdrDateTime::getOffsetDate($index);
+        $day = $dateObj->toDateString();
+        $weekDayNum = (int)DdrDateTime::numOfWeek($dateObj);
+
+        $teams = TimesheetTeam::getByDaysIndexes([$index])
+            ->with('profile')
+            ->with('contracts.contract')
+            ->with('contracts.chat.profile')
+            ->get();
+
+        $teamsData = TimesheetTeamResource::collection($teams)->resolve();
+
+        $dayData = [
+            'index' => $index,
+            'weekDay' => DdrDateTime::dayOfWeek($dateObj),
+            'humanDate' => DdrDateTime::dateToHuman($dateObj, 'ru'),
+            'day' => $day,
+            'isWeekEnd' => in_array($weekDayNum, [6,7]),
+            'isToday' => $index == 0,
+            'teams' => $teamsData,
+        ];
+
+        return response()->json($dayData);
+    }
+
+    /**
      * Поиск контрактов
      *
      * @param Request $request
