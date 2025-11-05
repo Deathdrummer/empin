@@ -10,7 +10,13 @@ class TimesheetChatResource extends JsonResource {
      * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
      */
     public function toArray($request) {
-        $currentUser = auth('site')->user();
+        $currentUser = $request->user();
+
+        // Получаем ID пользователя-автора через связь
+        $authorUserId = $this->profile?->registred?->id;
+
+        // Сравниваем ID пользователей
+        $isSelf = $currentUser && $authorUserId ? ($authorUserId === $currentUser->id) : false;
 
         return [
             'id'        => $this->id,
@@ -18,9 +24,15 @@ class TimesheetChatResource extends JsonResource {
             'message'   => $this->message,
             'created_at'=> $this->created_at->translatedFormat('d F Y г. в H:i'),
             'updated_at'=> $this->updated_at,
-			'self'		=> $currentUser ? ($this->from_id === $currentUser->staff_id) : false,
+			'self'		=> $isSelf,
+            'API_VERSION' => 'v2.0', // ВРЕМЕННАЯ МЕТКА
+            // DEBUG info
+            'debug_author_user_id' => $authorUserId,
+            'debug_current_user_id' => $currentUser?->id,
+            'debug_has_user' => $currentUser !== null,
 			'from' 	=> $this->profile ? [
-							'id'		=> $this->from_id,
+							'id'		=> $authorUserId, // user_id вместо staff_id
+							'staff_id'  => $this->from_id, // staff_id для справки
 							'full_name' => $this->profile->full_name,
 							'sname' 	=> $this->profile->sname,
 							'fname' 	=> $this->profile->fname,

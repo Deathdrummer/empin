@@ -35,7 +35,7 @@ class TimesheetApiController extends Controller {
         $teams = TimesheetTeam::getByDaysIndexes($indexes)
             ->with('profile')
             ->with('contracts.contract')
-            ->with('contracts.chat.profile')
+            ->with('contracts.chat.profile.registred')
             ->get()
             ->groupBy(fn($team) => $team->day instanceof Carbon ? $team->day->toDateString() : $team->day);
 
@@ -83,7 +83,7 @@ class TimesheetApiController extends Controller {
         $teams = TimesheetTeam::getByDaysIndexes([$index])
             ->with('profile')
             ->with('contracts.contract')
-            ->with('contracts.chat.profile')
+            ->with('contracts.chat.profile.registred')
             ->get();
 
         $teamsData = TimesheetTeamResource::collection($teams)->resolve();
@@ -239,7 +239,7 @@ class TimesheetApiController extends Controller {
             'message' => $message,
         ]);
 
-        $comment->load('profile');
+        $comment->load('profile.registred');
 
         return new TimesheetChatResource($comment);
     }
