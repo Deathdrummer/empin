@@ -245,6 +245,39 @@ class TimesheetApiController extends Controller {
     }
 
     /**
+     * Обновить комментарий
+     *
+     * @param Request $request
+     * @param int $id
+     * @return TimesheetChatResource|\Illuminate\Http\JsonResponse
+     */
+    public function updateComment(Request $request, $id) {
+        [
+            'message' => $message,
+        ] = $request->validate([
+            'message' => 'required|string',
+        ]);
+
+        $timesheetMess = TimesheetChat::find($id);
+
+        if (!$timesheetMess) {
+            return response()->json(['error' => 'Comment not found'], 404);
+        }
+
+        // Проверяем, что пользователь - автор комментария
+        if ($timesheetMess->from_id !== $request->user()->staff_id) {
+            return response()->json(['error' => 'У вас нет прав для редактирования этого комментария'], 403);
+        }
+
+        $timesheetMess->message = $message;
+        $timesheetMess->save();
+
+        $timesheetMess->load('profile.registred');
+
+        return new TimesheetChatResource($timesheetMess);
+    }
+
+    /**
      * Удалить комментарий
      *
      * @param int $id
