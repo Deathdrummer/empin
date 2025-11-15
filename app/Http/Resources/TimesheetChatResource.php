@@ -22,7 +22,7 @@ class TimesheetChatResource extends JsonResource {
             'id'        => $this->id,
             'day'       => $this->day,
             'message'   => $this->message,
-            'created_at'=> $this->created_at->translatedFormat('d F Y г. в H:i'),
+            'created_at'=> $this->created_at->toIso8601String(),
             'updated_at'=> $this->updated_at,
 			'self'		=> $isSelf,
             'API_VERSION' => 'v2.0', // ВРЕМЕННАЯ МЕТКА
