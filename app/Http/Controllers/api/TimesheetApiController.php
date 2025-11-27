@@ -60,6 +60,7 @@ class TimesheetApiController extends Controller {
 
         return response()->json($daysData);
     }
+	
 
     /**
      * Получить данные для одного дня
