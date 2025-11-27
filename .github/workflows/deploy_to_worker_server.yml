@@ -48,6 +48,10 @@ jobs:
           . ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }}:${{ env.SERVER_PATH }}
 
       # Post-deployment commands
-      - name: Run post-deployment commands
+      - name: Clear optimization cache
         run: |
-          ssh ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }} "cd ${{ env.SERVER_PATH }} && php artisan optimize:clear && php artisan storage:link --force"
+          ssh ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }} "cd ${{ env.SERVER_PATH }} && php artisan optimize:clear"
+
+      - name: Create storage link
+        run: |
+          ssh ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }} "cd ${{ env.SERVER_PATH }} && php artisan storage:link --force"
