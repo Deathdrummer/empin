@@ -42,8 +42,9 @@ Route::controller(TimesheetApiController::class)->prefix('timesheet')->middlewar
 	Route::post('/contract', 'addContract');
 	Route::delete('/contract/{id}', 'removeContract');
 	Route::post('/comment', 'addComment');
-	Route::put('/comment/{id}', 'updateComment');
-	Route::delete('/comment/{id}', 'removeComment');
+	Route::post('/comment/reaction', 'toggleReaction');
+	Route::put('/comment/{id}', 'updateComment')->where('id', '[0-9]+');
+	Route::delete('/comment/{id}', 'removeComment')->where('id', '[0-9]+');
 });
 
 // Settings API

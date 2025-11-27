@@ -223,9 +223,11 @@ class TimesheetApiController extends Controller {
         [
             'timesheet_contract_id' => $timesheetContractId,
             'message' => $message,
+            'reply_to_id' => $replyToId,
         ] = $request->validate([
             'timesheet_contract_id' => 'required|integer',
             'message' => 'required|string',
+            'reply_to_id' => 'nullable|integer',
         ]);
 
         $contract = TimesheetContract::find($timesheetContractId);
@@ -237,6 +239,7 @@ class TimesheetApiController extends Controller {
         $comment = $contract->chat()->create([
             'from_id' => $request->user()->staff_id,
             'message' => $message,
+            'reply_to_id' => $replyToId,
         ]);
 
         $comment->load('profile.registred');
@@ -307,5 +310,58 @@ class TimesheetApiController extends Controller {
             ->get();
 
         return response()->json($staff);
+    }
+
+    /**
+     * Добавить/удалить реакцию на комментарий (toggle)
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function toggleReaction(Request $request) {
+        [
+            'comment_id' => $commentId,
+            'emoji' => $emoji,
+        ] = $request->validate([
+            'comment_id' => 'required|integer',
+            'emoji' => 'required|string',
+        ]);
+
+        $comment = TimesheetChat::find($commentId);
+
+        if (!$comment) {
+            return response()->json(['error' => 'Comment not found'], 404);
+        }
+
+        $userId = $request->user()->id;
+        $reactions = $comment->reactions ?? [];
+
+        // Проверяем, есть ли уже реакция от этого пользователя с таким же эмодзи
+        $reactionIndex = null;
+        foreach ($reactions as $index => $reaction) {
+            if ($reaction['user_id'] == $userId && $reaction['emoji'] === $emoji) {
+                $reactionIndex = $index;
+                break;
+            }
+        }
+
+        if ($reactionIndex !== null) {
+            // Удаляем существующую реакцию
+            array_splice($reactions, $reactionIndex, 1);
+        } else {
+            // Добавляем новую реакцию
+            $reactions[] = [
+                'user_id' => $userId,
+                'emoji' => $emoji,
+            ];
+        }
+
+        $comment->reactions = $reactions;
+        $comment->save();
+
+        return response()->json([
+            'success' => true,
+            'reactions' => $reactions,
+        ]);
     }
 }
