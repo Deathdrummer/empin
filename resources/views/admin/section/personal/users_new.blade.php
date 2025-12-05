@@ -537,14 +537,37 @@
 				
 			});
 		}
-		
-		
-		
-		
-		
-		
-		
-		
+
+
+
+
+
+
+		$.usersNewLoginAs = (btn, userId) => {
+			let usersNewCardWait = $('#usersNewCard').ddrWait({
+				iconHeight: '26px',
+				bgColor: '#ffffff91'
+			});
+
+			query({
+				method: 'post',
+				route: 'login_as_user',
+				data: {user_id: userId},
+			}, (data, container, {error, status, headers}) => {
+				if (error) {
+					usersNewCardWait.destroy();
+					$.notify(error.message, 'error');
+				}
+
+				if (data) {
+					usersNewCardWait.destroy();
+					window.open('/', '_blank');
+				}
+			});
+		}
+
+
+
 		$.setRoleAction = (select, userId) => {
 			const roleId = $(select).val();
 			
