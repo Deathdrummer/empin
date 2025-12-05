@@ -107,11 +107,13 @@
 				onclick="$.usersNewSendEmail(this, {{$id}});"
 				title="{{!is_null($registred['temporary_password']) ? 'Выслать доступ сотруднику' : 'Выслать доступ повторно'}}"
 				></i>
-			<i
-				class="fa-solid fa-fw fa-right-to-bracket ml10px fz18px color-blue-600 color-hovered-darken pointer"
-				onclick="$.usersNewLoginAs(this, {{$id}});"
-				title="Войти от имени сотрудника"
-				></i>
+			@if(auth('admin')->user()?->is_main_admin && Str::contains(url()->current(), '/admin'))
+				<i
+					class="fa-solid fa-fw fa-right-to-bracket ml10px fz18px color-blue-600 color-hovered-darken pointer"
+					onclick="$.usersNewLoginAs(this, {{$id}});"
+					title="Войти от имени сотрудника"
+					></i>
+			@endif
 		</div>
 	@endif
 </div>
