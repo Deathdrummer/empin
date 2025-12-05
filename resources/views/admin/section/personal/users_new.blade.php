@@ -217,6 +217,7 @@
 				
 				show(userId, (data, container, {error, status, headers}) => {
 					$('#usersNewCard').card('setData', data);
+					$('#loginIsOwnerUser').removeAttrib('hidden');
 					destroyWait();
 				});
 				
