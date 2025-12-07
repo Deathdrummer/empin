@@ -33,7 +33,8 @@
 				>
 				<i class="fa-solid fa-list"></i>
 			</x-button>
-
+			
+			@cando('selections-make-all-items:site')
 			<x-button
 				variant="purple"
 				action="selectionBuildList:{{$id}},{{$subscribed_read ? 0 : 1}},1"
@@ -42,7 +43,7 @@
 				>
 				<i class="fa-solid fa-list-check"></i>
 			</x-button>
-			
+			@endcando
 			<x-button
 				:enabled="$contracts_count ?? false"
 			 	variant="blue"
