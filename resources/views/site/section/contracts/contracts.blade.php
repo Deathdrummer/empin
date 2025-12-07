@@ -2836,6 +2836,7 @@
 		if (abortCtrl instanceof AbortController) abortCtrl.abort();
 		let {
 			init,
+			all,
 			withCounts,
 			//canEditSelection,
 			append,
@@ -2843,6 +2844,7 @@
 			callback
 		} = _.assign({
 			init: false,
+			all: false,
 			withCounts: false,
 			//canEditSelection: null,
 			append: false,
@@ -2895,6 +2897,7 @@
 		params['sort_order'] = sortOrder;
 		params['limit'] = limit;
 		params['offset'] = localOffset != null ? localOffset : offset;
+		params['all'] = all ? 1 : 0;
 		params['append'] = append ? 1 : 0;
 		params['search'] = search;
 		params['filter'] = columnFilter.length ? JSON.stringify(columnFilter) : null;

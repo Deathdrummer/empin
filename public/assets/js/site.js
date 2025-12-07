@@ -24340,6 +24340,7 @@ function selectionsList(selection, editSelection, _clearCounts, getList, canEdit
 
                   $.selectionBuildList = function (btn, id) {
                     var canEdit = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+                    var all = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
                     $('[selectionsbtn]').ddrInputs('disable');
                     close();
                     selection.value = id;
@@ -24351,6 +24352,7 @@ function selectionsList(selection, editSelection, _clearCounts, getList, canEdit
 
                     getList({
                       //canEditSelection: canEdit,
+                      all: all,
                       withCounts: true,
                       callback: function callback() {
                         $('#currentSelectionTitle').text(selectionTitle);

@@ -29,8 +29,19 @@
 				variant="green"
 				action="selectionBuildList:{{$id}},{{$subscribed_read ? 0 : 1}}"
 				:enabled="$contracts_count ?? false"
-				title="Сформировать список подборки"
-				>Сформировать</x-button>
+				title="Сформировать список подборки (частично)"
+				>
+				<i class="fa-solid fa-list"></i>
+			</x-button>
+
+			<x-button
+				variant="purple"
+				action="selectionBuildList:{{$id}},{{$subscribed_read ? 0 : 1}},1"
+				:enabled="$contracts_count ?? false"
+				title="Сформировать список подборки (все записи)"
+				>
+				<i class="fa-solid fa-list-check"></i>
+			</x-button>
 			
 			<x-button
 				:enabled="$contracts_count ?? false"
