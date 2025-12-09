@@ -298,7 +298,8 @@
 		lastChoosedRow 			= ref(null),
 		totalCount 				= null,
 		sendMessStat 			= ref(false),
-		hidelights				= ref(null);
+		hidelights				= ref(null),
+		doScroll				= ref(true);
 
 
 
@@ -2825,7 +2826,21 @@
 
 
 
-
+	$(document).on('keypress', (e) =>{
+		const {
+			isShiftKey,
+			isCtrlKey,
+			isCommandKey,
+			isAltKey,
+			isOptionKey,
+			noKeys,
+			isActiveKey
+			} = metaKeys(e);
+		
+		if ((isCommandKey || isCtrlKey) && isShiftKey && e.keyCode == 12) {
+			getList({dSroll: false, all: 1});
+		}
+	});
 
 
 
@@ -2841,6 +2856,7 @@
 			//canEditSelection,
 			append,
 			offset: localOffset,
+			dSroll,
 			callback
 		} = _.assign({
 			init: false,
@@ -2849,12 +2865,16 @@
 			//canEditSelection: null,
 			append: false,
 			offset: null,
+			dSroll: true,
 			callback: false
 		}, settings),
 			params = {},
 			listWait;
-
-
+		
+		
+		doScroll.value = (doScroll.value == true && dSroll == false) ? false : true;
+		
+		
 		if (currentList == -1 || currentList > 0) {
 			searchWithArchive = false;
 			$('#searchWithArchive').ddrInputs('disable');
@@ -2892,7 +2912,7 @@
 		} else {
 			params['archive'] = currentList == -1 ? 1 : (searchWithArchive ? null : 0);
 		}
-
+		
 		params['sort_field'] = sortField;
 		params['sort_order'] = sortOrder;
 		params['limit'] = limit;
@@ -2978,7 +2998,7 @@
 				}
 			}
 
-			const showTotal = headers && headers['x-count-contracts-current'] && ((params['offset'] + params['limit'] >= totalCount) || (totalCount <= params['limit']));
+			const showTotal = all || (headers && headers['x-count-contracts-current'] && ((params['offset'] + params['limit'] >= totalCount) || (totalCount <= params['limit'])));
 
 			showTotalFn(showTotal, totalCount);
 
@@ -3205,6 +3225,7 @@
 	let lastLoadCount = null;
 
 	$.doScrollStart = (target) => {
+		if (doScroll.value == false) return;
 		let localOffset = offset - limit * countShownLoadings;
 		if (localOffset < 0) return;
 		getList({
@@ -3220,6 +3241,7 @@
 	}
 
 	$.doScrollEnd = (target) => {
+		if (doScroll.value == false) return;
 		if ($('#contractsList').children('[ddrtabletr]').length < limit) return;
 		offset += limit;
 

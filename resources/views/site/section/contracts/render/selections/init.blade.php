@@ -28,7 +28,7 @@
 			<x-table.td class="w6rem">
 				<strong class="d-block fz12px lh90">Кол-во договоров</strong>
 			</x-table.td>
-			<x-table.td class="w10rem h-center">
+			<x-table.td class="w8rem h-center">
 				<strong class="d-block fz12px lh90">Действия со списками</strong>
 			</x-table.td>
 			<x-table.td class="w7rem h-center" title="Отправить сообщение в чаты договоров подборки">

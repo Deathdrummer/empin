@@ -34,16 +34,6 @@
 				<i class="fa-solid fa-list"></i>
 			</x-button>
 			
-			@cando('selections-make-all-items:site')
-			<x-button
-				variant="purple"
-				action="selectionBuildList:{{$id}},{{$subscribed_read ? 0 : 1}},1"
-				:enabled="$contracts_count ?? false"
-				title="Сформировать список подборки (все записи)"
-				>
-				<i class="fa-solid fa-list-check"></i>
-			</x-button>
-			@endcando
 			<x-button
 				:enabled="$contracts_count ?? false"
 			 	variant="blue"
