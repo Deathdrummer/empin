@@ -2818,14 +2818,7 @@
 
 
 
-
-
-
-
-
-
-
-
+	//-------------------------------------------------- Выгрузить все записи
 	$(document).on('keypress', (e) =>{
 		const {
 			isShiftKey,
@@ -2838,7 +2831,19 @@
 			} = metaKeys(e);
 		
 		if ((isCommandKey || isCtrlKey) && isShiftKey && e.keyCode == 12) {
-			getList({dSroll: false, all: 1});
+			ddrPopup({
+				title: 'Вывести все записи',
+				width: 400,
+				buttons: ['Закрыть', {title: 'Вывести', variant: 'blue', action: 'loadAllItens'}],
+				html: '<p class="green">Вы действительно хотите вывести все записи?</p>'
+			}).then(({state/* isClosed */, wait, setTitle, setButtons, loadData, setHtml, setLHtml, dialog, close, onScroll, disableButtons, enableButtons, setWidth}) => {
+				$.loadAllItens = () => {
+					wait();
+					getList({dSroll: false, all: 1, callback: function() {
+						close();
+					}});
+				} 
+			});
 		}
 	});
 
