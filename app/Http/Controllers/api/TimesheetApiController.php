@@ -23,16 +23,40 @@ class TimesheetApiController extends Controller {
      * @return \Illuminate\Http\JsonResponse
      */
     public function getSlidesData(Request $request) {
-        [
-            'indexes' => $indexes,
-        ] = $request->validate([
+        $validated = $request->validate([
             'indexes' => 'required|array',
             'indexes.*' => 'integer',
+            'filters' => 'nullable|array',
+            'filters.teams' => 'nullable|array',
+            'filters.teams.*' => 'integer',
+            'filters.contracts' => 'nullable|array',
+            'filters.contracts.*' => 'integer',
         ]);
 
-        $indexes = array_map('intval', $indexes);
+        $indexes = array_map('intval', $validated['indexes']);
+        $filters = $validated['filters'] ?? null;
 
-        $teams = TimesheetTeam::getByDaysIndexes($indexes)
+        // Логируем для отладки
+        \Log::info('=== getSlidesData ===', [
+            'indexes_count' => count($indexes),
+            'filters' => $filters,
+        ]);
+
+        $query = TimesheetTeam::getByDaysIndexes($indexes);
+
+        // Применяем фильтр по командам (мастерам)
+        if (!empty($filters['teams'])) {
+            $query->whereIn('staff_id', $filters['teams']);
+        }
+
+        // Применяем фильтр по контрактам
+        if (!empty($filters['contracts'])) {
+            $query->whereHas('contracts', function($q) use ($filters) {
+                $q->whereIn('contract_id', $filters['contracts']);
+            });
+        }
+
+        $teams = $query
             ->with('profile')
             ->with('contracts.contract')
             ->with('contracts.chat.profile.registred')
