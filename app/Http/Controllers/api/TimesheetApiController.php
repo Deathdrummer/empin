@@ -58,6 +58,12 @@ class TimesheetApiController extends Controller {
 
         $teams = $query
             ->with('profile')
+            ->with(['contracts' => function($q) use ($filters) {
+                // Фильтруем контракты если указан фильтр
+                if (!empty($filters['contracts'])) {
+                    $q->whereIn('contract_id', $filters['contracts']);
+                }
+            }])
             ->with('contracts.contract')
             ->with('contracts.chat.profile.registred')
             ->get()
@@ -71,6 +77,11 @@ class TimesheetApiController extends Controller {
             $day = $dateObj->toDateString();
             $weekDayNum = (int)DdrDateTime::numOfWeek($dateObj);
 
+            // Пропускаем дни без команд если применена фильтрация
+            if (!empty($filters) && (!isset($teams[$day]) || empty($teams[$day]))) {
+                continue;
+            }
+
             $daysData[] = [
                 'index' => (int)$idx,
                 'weekDay' => DdrDateTime::dayOfWeek($dateObj),
@@ -81,6 +92,10 @@ class TimesheetApiController extends Controller {
                 'teams' => $teams[$day] ?? null,
             ];
         }
+
+        \Log::info('=== getSlidesData RESULT ===', [
+            'total_days_returned' => count($daysData),
+        ]);
 
         return response()->json($daysData);
     }
