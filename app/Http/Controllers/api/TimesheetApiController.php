@@ -25,53 +25,17 @@ class TimesheetApiController extends Controller {
     public function getSlidesData(Request $request) {
         [
             'indexes' => $indexes,
-            'filters' => $filters,
         ] = $request->validate([
             'indexes' => 'required|array',
             'indexes.*' => 'integer',
-            'filters' => 'nullable|array',
-            'filters.teams' => 'nullable|array',
-            'filters.teams.*' => 'integer',
-            'filters.contracts' => 'nullable|array',
-            'filters.contracts.*' => 'integer',
         ]);
 
         $indexes = array_map('intval', $indexes);
 
-        $query = TimesheetTeam::getByDaysIndexes($indexes);
-
-        // Применяем фильтры если они переданы
-        if (!empty($filters)) {
-            // Фильтр по бригадам (staff_id)
-            if (!empty($filters['teams'])) {
-                $query->whereIn('staff_id', $filters['teams']);
-            }
-
-            // Фильтр по контрактам
-            if (!empty($filters['contracts'])) {
-                $query->whereHas('contracts', function($q) use ($filters) {
-                    $q->whereIn('contract_id', $filters['contracts']);
-                });
-            }
-        }
-
-        // Eager loading с учетом фильтров по контрактам
-        $query->with('profile');
-
-        if (!empty($filters['contracts'])) {
-            // Загружаем только отфильтрованные контракты
-            $query->with(['contracts' => function($q) use ($filters) {
-                $q->whereIn('contract_id', $filters['contracts']);
-            }]);
-            $query->with('contracts.contract');
-            $query->with('contracts.chat.profile.registred');
-        } else {
-            // Загружаем все контракты
-            $query->with('contracts.contract');
-            $query->with('contracts.chat.profile.registred');
-        }
-
-        $teams = $query
+        $teams = TimesheetTeam::getByDaysIndexes($indexes)
+            ->with('profile')
+            ->with('contracts.contract')
+            ->with('contracts.chat.profile.registred')
             ->get()
             ->groupBy(fn($team) => $team->day instanceof Carbon ? $team->day->toDateString() : $team->day);
 
