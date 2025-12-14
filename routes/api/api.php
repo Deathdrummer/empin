@@ -36,6 +36,7 @@ Route::controller(TimesheetApiController::class)->prefix('timesheet')->middlewar
 	Route::post('/slides', 'getSlidesData');
 	Route::post('/slide', 'getSlideData');
 	Route::get('/staff', 'getStaff');
+	Route::get('/filter-options', 'getFilterOptions');
 	Route::get('/contracts/search', 'contractsList');
 	Route::post('/team', 'addTeam');
 	Route::delete('/team/{id}', 'removeTeam');

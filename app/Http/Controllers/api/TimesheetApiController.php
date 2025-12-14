@@ -353,6 +353,57 @@ class TimesheetApiController extends Controller {
     }
 
     /**
+     * Получить все уникальные команды и контракты для фильтров
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getFilterOptions() {
+        // Получаем все уникальные мастера (команды)
+        $teams = TimesheetTeam::select('staff_id')
+            ->with(['profile:id,sname,fname,mname'])
+            ->distinct()
+            ->get()
+            ->map(function($team) {
+                if ($team->profile) {
+                    return [
+                        'id' => $team->staff_id,
+                        'name' => trim("{$team->profile->sname} {$team->profile->fname} {$team->profile->mname}"),
+                    ];
+                }
+                return null;
+            })
+            ->filter()
+            ->values()
+            ->sortBy('name', SORT_NATURAL | SORT_FLAG_CASE)
+            ->values();
+
+        // Получаем все уникальные контракты
+        $contracts = TimesheetContract::select('contract_id')
+            ->with(['contract:id,title,titul,object_number'])
+            ->distinct()
+            ->get()
+            ->map(function($tc) {
+                if ($tc->contract) {
+                    return [
+                        'id' => $tc->contract_id,
+                        'name' => $tc->contract->title ?: $tc->contract->titul,
+                        'object_number' => $tc->contract->object_number,
+                    ];
+                }
+                return null;
+            })
+            ->filter()
+            ->values()
+            ->sortBy('name', SORT_NATURAL | SORT_FLAG_CASE)
+            ->values();
+
+        return response()->json([
+            'teams' => $teams,
+            'contracts' => $contracts,
+        ]);
+    }
+
+    /**
      * Добавить/удалить реакцию на комментарий (toggle)
      *
      * @param Request $request
