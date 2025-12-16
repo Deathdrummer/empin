@@ -67,21 +67,35 @@ class TimesheetApiController extends Controller {
         }
 
         $teams = $query
-            ->with('profile')
-            ->with(['contracts' => function($q) use ($hasContractsFilter, $filters) {
-                // Фильтруем контракты если указан фильтр
-                if ($hasContractsFilter) {
-                    $q->whereIn('contract_id', $filters['contracts']);
-                }
-            }])
-            ->with('contracts.contract')
-            ->with('contracts.chat.profile.registred')
+            ->with([
+                'profile',
+                'contracts' => function($q) use ($hasContractsFilter, $filters) {
+                    // Фильтруем контракты если указан фильтр
+                    if ($hasContractsFilter) {
+                        $q->whereIn('contract_id', $filters['contracts']);
+                    }
+                },
+                'contracts.contract',
+                'contracts.chat.profile.registred',
+            ])
             ->get();
 
         \Log::info('Teams loaded', [
             'total_teams' => $teams->count(),
             'team_days' => $teams->pluck('day')->unique()->values()->toArray(),
         ]);
+
+        // Логируем количество контрактов для каждой команды (для проверки фильтрации)
+        if ($hasContractsFilter) {
+            foreach ($teams as $team) {
+                \Log::info('Team contracts after filter', [
+                    'team_id' => $team->id,
+                    'staff_id' => $team->staff_id,
+                    'contracts_count' => $team->contracts->count(),
+                    'contract_ids' => $team->contracts->pluck('contract_id')->toArray(),
+                ]);
+            }
+        }
 
         $teams = $teams->groupBy(fn($team) => $team->day instanceof Carbon ? $team->day->toDateString() : $team->day);
 
