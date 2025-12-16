@@ -83,11 +83,8 @@ class TimesheetApiController extends Controller {
             $day = $dateObj->toDateString();
             $weekDayNum = (int)DdrDateTime::numOfWeek($dateObj);
 
-            // Пропускаем дни без команд если применена фильтрация
-            if ($hasActiveFilters && (!isset($teams[$day]) || empty($teams[$day]))) {
-                continue;
-            }
-
+            // ИСПРАВЛЕНО: Возвращаем все дни диапазона, даже если нет совпадений по фильтру
+            // Это необходимо для корректной работы свайпа на клиенте
             $daysData[] = [
                 'index' => (int)$idx,
                 'weekDay' => DdrDateTime::dayOfWeek($dateObj),
