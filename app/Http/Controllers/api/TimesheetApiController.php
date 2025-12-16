@@ -36,21 +36,27 @@ class TimesheetApiController extends Controller {
         $indexes = array_map('intval', $validated['indexes']);
         $filters = $validated['filters'] ?? null;
 
+        // Проверяем наличие активных фильтров
+        $hasTeamsFilter = !empty($filters['teams']) && is_array($filters['teams']);
+        $hasContractsFilter = !empty($filters['contracts']) && is_array($filters['contracts']);
+        $hasActiveFilters = $hasTeamsFilter || $hasContractsFilter;
+
         // Логируем для отладки
         \Log::info('=== getSlidesData ===', [
             'indexes_count' => count($indexes),
             'filters' => $filters,
+            'hasActiveFilters' => $hasActiveFilters,
         ]);
 
         $query = TimesheetTeam::getByDaysIndexes($indexes);
 
         // Применяем фильтр по командам (мастерам)
-        if (!empty($filters['teams'])) {
+        if ($hasTeamsFilter) {
             $query->whereIn('staff_id', $filters['teams']);
         }
 
         // Применяем фильтр по контрактам
-        if (!empty($filters['contracts'])) {
+        if ($hasContractsFilter) {
             $query->whereHas('contracts', function($q) use ($filters) {
                 $q->whereIn('contract_id', $filters['contracts']);
             });
@@ -58,9 +64,9 @@ class TimesheetApiController extends Controller {
 
         $teams = $query
             ->with('profile')
-            ->with(['contracts' => function($q) use ($filters) {
+            ->with(['contracts' => function($q) use ($hasContractsFilter, $filters) {
                 // Фильтруем контракты если указан фильтр
-                if (!empty($filters['contracts'])) {
+                if ($hasContractsFilter) {
                     $q->whereIn('contract_id', $filters['contracts']);
                 }
             }])
@@ -78,7 +84,7 @@ class TimesheetApiController extends Controller {
             $weekDayNum = (int)DdrDateTime::numOfWeek($dateObj);
 
             // Пропускаем дни без команд если применена фильтрация
-            if (!empty($filters) && (!isset($teams[$day]) || empty($teams[$day]))) {
+            if ($hasActiveFilters && (!isset($teams[$day]) || empty($teams[$day]))) {
                 continue;
             }
 
@@ -358,44 +364,53 @@ class TimesheetApiController extends Controller {
      * @return \Illuminate\Http\JsonResponse
      */
     public function getFilterOptions() {
-        // Получаем все уникальные мастера (команды)
-        $teams = TimesheetTeam::select('staff_id')
-            ->with(['profile:id,sname,fname,mname'])
-            ->distinct()
+        \Log::info('=== getFilterOptions START ===');
+
+        // Получаем все уникальные staff_id из TimesheetTeam
+        $uniqueStaffIds = TimesheetTeam::select('staff_id')
+            ->groupBy('staff_id')
+            ->pluck('staff_id');
+
+        \Log::info('Unique staff IDs found:', ['count' => $uniqueStaffIds->count()]);
+
+        // Загружаем профили для уникальных staff_id
+        $teams = Staff::select(['id', 'sname', 'fname', 'mname'])
+            ->whereIn('id', $uniqueStaffIds)
             ->get()
-            ->map(function($team) {
-                if ($team->profile) {
-                    return [
-                        'id' => $team->staff_id,
-                        'name' => trim("{$team->profile->sname} {$team->profile->fname} {$team->profile->mname}"),
-                    ];
-                }
-                return null;
+            ->map(function($staff) {
+                return [
+                    'id' => $staff->id,
+                    'name' => trim("{$staff->sname} {$staff->fname} {$staff->mname}"),
+                ];
             })
-            ->filter()
-            ->values()
             ->sortBy('name', SORT_NATURAL | SORT_FLAG_CASE)
             ->values();
 
-        // Получаем все уникальные контракты
-        $contracts = TimesheetContract::select('contract_id')
-            ->with(['contract:id,title,titul,object_number'])
-            ->distinct()
+        // Получаем все уникальные contract_id из TimesheetContract
+        $uniqueContractIds = TimesheetContract::select('contract_id')
+            ->groupBy('contract_id')
+            ->pluck('contract_id');
+
+        \Log::info('Unique contract IDs found:', ['count' => $uniqueContractIds->count()]);
+
+        // Загружаем контракты для уникальных contract_id
+        $contracts = ContractModel::select(['id', 'title', 'titul', 'object_number'])
+            ->whereIn('id', $uniqueContractIds)
             ->get()
-            ->map(function($tc) {
-                if ($tc->contract) {
-                    return [
-                        'id' => $tc->contract_id,
-                        'name' => $tc->contract->title ?: $tc->contract->titul,
-                        'object_number' => $tc->contract->object_number,
-                    ];
-                }
-                return null;
+            ->map(function($contract) {
+                return [
+                    'id' => $contract->id,
+                    'name' => $contract->title ?: $contract->titul,
+                    'object_number' => $contract->object_number,
+                ];
             })
-            ->filter()
-            ->values()
             ->sortBy('name', SORT_NATURAL | SORT_FLAG_CASE)
             ->values();
+
+        \Log::info('=== getFilterOptions RESULT ===', [
+            'teams_count' => $teams->count(),
+            'contracts_count' => $contracts->count(),
+        ]);
 
         return response()->json([
             'teams' => $teams,
