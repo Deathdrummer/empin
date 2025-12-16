@@ -42,10 +42,12 @@ class TimesheetApiController extends Controller {
         $hasActiveFilters = $hasTeamsFilter || $hasContractsFilter;
 
         // Логируем для отладки
-        \Log::info('=== getSlidesData ===', [
+        \Log::info('=== getSlidesData START ===', [
             'indexes_count' => count($indexes),
+            'indexes_range' => count($indexes) > 0 ? (min($indexes) . '..' . max($indexes)) : 'empty',
             'filters' => $filters,
-            'hasActiveFilters' => $hasActiveFilters,
+            'hasTeamsFilter' => $hasTeamsFilter,
+            'hasContractsFilter' => $hasContractsFilter,
         ]);
 
         $query = TimesheetTeam::getByDaysIndexes($indexes);
@@ -53,6 +55,7 @@ class TimesheetApiController extends Controller {
         // Применяем фильтр по командам (мастерам)
         if ($hasTeamsFilter) {
             $query->whereIn('staff_id', $filters['teams']);
+            \Log::info('Applied teams filter', ['staff_ids' => $filters['teams']]);
         }
 
         // Применяем фильтр по контрактам
@@ -60,6 +63,7 @@ class TimesheetApiController extends Controller {
             $query->whereHas('contracts', function($q) use ($filters) {
                 $q->whereIn('contract_id', $filters['contracts']);
             });
+            \Log::info('Applied contracts filter (whereHas)', ['contract_ids' => $filters['contracts']]);
         }
 
         $teams = $query
@@ -72,10 +76,21 @@ class TimesheetApiController extends Controller {
             }])
             ->with('contracts.contract')
             ->with('contracts.chat.profile.registred')
-            ->get()
-            ->groupBy(fn($team) => $team->day instanceof Carbon ? $team->day->toDateString() : $team->day);
+            ->get();
+
+        \Log::info('Teams loaded', [
+            'total_teams' => $teams->count(),
+            'team_days' => $teams->pluck('day')->unique()->values()->toArray(),
+        ]);
+
+        $teams = $teams->groupBy(fn($team) => $team->day instanceof Carbon ? $team->day->toDateString() : $team->day);
 
         $teams = $teams->map(fn($group) => TimesheetTeamResource::collection($group)->resolve());
+
+        \Log::info('Teams grouped by day', [
+            'days_with_teams' => array_keys($teams->toArray()),
+            'days_count' => $teams->count(),
+        ]);
 
         $daysData = [];
         foreach ($indexes as $idx) {
@@ -83,8 +98,11 @@ class TimesheetApiController extends Controller {
             $day = $dateObj->toDateString();
             $weekDayNum = (int)DdrDateTime::numOfWeek($dateObj);
 
-            // ИСПРАВЛЕНО: Возвращаем все дни диапазона, даже если нет совпадений по фильтру
-            // Это необходимо для корректной работы свайпа на клиенте
+            // При фильтрации показываем ТОЛЬКО дни с совпадениями
+            if ($hasActiveFilters && (!isset($teams[$day]) || empty($teams[$day]))) {
+                continue;
+            }
+
             $daysData[] = [
                 'index' => (int)$idx,
                 'weekDay' => DdrDateTime::dayOfWeek($dateObj),
