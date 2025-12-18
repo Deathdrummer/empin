@@ -114,8 +114,19 @@ class TimesheetApiController extends Controller {
 
             // При фильтрации показываем ТОЛЬКО дни с совпадениями
             if ($hasActiveFilters && (!isset($teams[$day]) || empty($teams[$day]))) {
+                \Log::info('Day excluded from results', [
+                    'day' => $day,
+                    'index' => $idx,
+                    'reason' => !isset($teams[$day]) ? 'not in grouped teams' : 'empty teams array',
+                ]);
                 continue;
             }
+
+            \Log::info('Day included in results', [
+                'day' => $day,
+                'index' => $idx,
+                'teams_count' => isset($teams[$day]) ? count($teams[$day]) : 0,
+            ]);
 
             $daysData[] = [
                 'index' => (int)$idx,
@@ -402,6 +413,7 @@ class TimesheetApiController extends Controller {
             ->selectRaw('MAX(timesheet_teams.created_at) as last_added')
             ->groupBy('staff.id', 'staff.sname', 'staff.fname', 'staff.mname')
             ->orderByRaw('DATE(last_added) DESC, last_added DESC')
+            ->limit(1000)
             ->get()
             ->map(function($staff) {
                 return [
@@ -419,6 +431,7 @@ class TimesheetApiController extends Controller {
             ->selectRaw('MAX(timesheet_contracts.created_at) as last_added')
             ->groupBy('contracts.id', 'contracts.title', 'contracts.titul', 'contracts.object_number')
             ->orderByRaw('DATE(last_added) DESC, last_added DESC')
+            ->limit(1000)
             ->get()
             ->map(function($contract) {
                 return [
