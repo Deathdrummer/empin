@@ -395,36 +395,30 @@ class TimesheetApiController extends Controller {
     public function getFilterOptions() {
         \Log::info('=== getFilterOptions START ===');
 
-        // Получаем все уникальные staff_id из TimesheetTeam
-        $uniqueStaffIds = TimesheetTeam::select('staff_id')
-            ->groupBy('staff_id')
-            ->pluck('staff_id');
-
-        \Log::info('Unique staff IDs found:', ['count' => $uniqueStaffIds->count()]);
-
-        // Загружаем профили для уникальных staff_id
-        $teams = Staff::select(['id', 'sname', 'fname', 'mname'])
-            ->whereIn('id', $uniqueStaffIds)
+        // Получаем бригады с сортировкой по дню добавления
+        // Сначала группируем по дню (DATE), затем внутри дня - по времени (DESC)
+        $teams = Staff::select(['staff.id', 'staff.sname', 'staff.fname', 'staff.mname'])
+            ->join('timesheet_teams', 'staff.id', '=', 'timesheet_teams.staff_id')
+            ->selectRaw('MAX(timesheet_teams.created_at) as last_added')
+            ->groupBy('staff.id', 'staff.sname', 'staff.fname', 'staff.mname')
+            ->orderByRaw('DATE(last_added) DESC, last_added DESC')
             ->get()
             ->map(function($staff) {
                 return [
                     'id' => $staff->id,
                     'name' => trim("{$staff->sname} {$staff->fname} {$staff->mname}"),
                 ];
-            })
-            ->sortBy('name', SORT_NATURAL | SORT_FLAG_CASE)
-            ->values();
+            });
 
-        // Получаем все уникальные contract_id из TimesheetContract
-        $uniqueContractIds = TimesheetContract::select('contract_id')
-            ->groupBy('contract_id')
-            ->pluck('contract_id');
+        \Log::info('Teams loaded with date sorting:', ['count' => $teams->count()]);
 
-        \Log::info('Unique contract IDs found:', ['count' => $uniqueContractIds->count()]);
-
-        // Загружаем контракты для уникальных contract_id
-        $contracts = ContractModel::select(['id', 'title', 'titul', 'object_number'])
-            ->whereIn('id', $uniqueContractIds)
+        // Получаем объекты с сортировкой по дню добавления
+        // Сначала группируем по дню (DATE), затем внутри дня - по времени (DESC)
+        $contracts = ContractModel::select(['contracts.id', 'contracts.title', 'contracts.titul', 'contracts.object_number'])
+            ->join('timesheet_contracts', 'contracts.id', '=', 'timesheet_contracts.contract_id')
+            ->selectRaw('MAX(timesheet_contracts.created_at) as last_added')
+            ->groupBy('contracts.id', 'contracts.title', 'contracts.titul', 'contracts.object_number')
+            ->orderByRaw('DATE(last_added) DESC, last_added DESC')
             ->get()
             ->map(function($contract) {
                 return [
@@ -432,9 +426,9 @@ class TimesheetApiController extends Controller {
                     'name' => $contract->title ?: $contract->titul,
                     'object_number' => $contract->object_number,
                 ];
-            })
-            ->sortBy('name', SORT_NATURAL | SORT_FLAG_CASE)
-            ->values();
+            });
+
+        \Log::info('Contracts loaded with date sorting:', ['count' => $contracts->count()]);
 
         \Log::info('=== getFilterOptions RESULT ===', [
             'teams_count' => $teams->count(),
