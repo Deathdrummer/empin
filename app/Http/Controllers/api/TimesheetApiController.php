@@ -455,6 +455,89 @@ class TimesheetApiController extends Controller {
     }
 
     /**
+     * Поиск бригад для фильтров
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function searchTeams(Request $request) {
+        [
+            'search' => $search,
+        ] = $request->validate([
+            'search' => 'nullable|string',
+        ]);
+
+        $query = Staff::select(['staff.id', 'staff.sname', 'staff.fname', 'staff.mname'])
+            ->join('timesheet_teams', 'staff.id', '=', 'timesheet_teams.staff_id')
+            ->selectRaw('MAX(timesheet_teams.created_at) as last_added')
+            ->groupBy('staff.id', 'staff.sname', 'staff.fname', 'staff.mname');
+
+        // Применяем поиск если указан
+        if (!empty($search)) {
+            $query->where(function($q) use ($search) {
+                $q->where('staff.sname', 'like', '%'.$search.'%')
+                  ->orWhere('staff.fname', 'like', '%'.$search.'%')
+                  ->orWhere('staff.mname', 'like', '%'.$search.'%');
+            });
+        }
+
+        $teams = $query
+            ->orderByRaw('DATE(last_added) DESC, last_added DESC')
+            ->limit(1000)
+            ->get()
+            ->map(function($staff) {
+                return [
+                    'id' => $staff->id,
+                    'name' => trim("{$staff->sname} {$staff->fname} {$staff->mname}"),
+                ];
+            });
+
+        return response()->json($teams);
+    }
+
+    /**
+     * Поиск контрактов для фильтров
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function searchContracts(Request $request) {
+        [
+            'search' => $search,
+        ] = $request->validate([
+            'search' => 'nullable|string',
+        ]);
+
+        $query = ContractModel::select(['contracts.id', 'contracts.title', 'contracts.titul', 'contracts.object_number'])
+            ->join('timesheet_contracts', 'contracts.id', '=', 'timesheet_contracts.contract_id')
+            ->selectRaw('MAX(timesheet_contracts.created_at) as last_added')
+            ->groupBy('contracts.id', 'contracts.title', 'contracts.titul', 'contracts.object_number');
+
+        // Применяем поиск если указан
+        if (!empty($search)) {
+            $query->where(function($q) use ($search) {
+                $q->where('contracts.object_number', 'like', '%'.$search.'%')
+                  ->orWhere('contracts.title', 'like', '%'.$search.'%')
+                  ->orWhere('contracts.titul', 'like', '%'.$search.'%');
+            });
+        }
+
+        $contracts = $query
+            ->orderByRaw('DATE(last_added) DESC, last_added DESC')
+            ->limit(1000)
+            ->get()
+            ->map(function($contract) {
+                return [
+                    'id' => $contract->id,
+                    'name' => $contract->title ?: $contract->titul,
+                    'object_number' => $contract->object_number,
+                ];
+            });
+
+        return response()->json($contracts);
+    }
+
+    /**
      * Добавить/удалить реакцию на комментарий (toggle)
      *
      * @param Request $request
