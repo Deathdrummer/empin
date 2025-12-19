@@ -39,6 +39,7 @@ Route::controller(TimesheetApiController::class)->prefix('timesheet')->middlewar
 	Route::get('/filter-options', 'getFilterOptions');
 	Route::get('/filter-options/teams/search', 'searchTeams');
 	Route::get('/filter-options/contracts/search', 'searchContracts');
+	Route::get('/filter-options/contracts/search-all', 'searchAllContracts');
 	Route::get('/contracts/search', 'contractsList');
 	Route::post('/team', 'addTeam');
 	Route::delete('/team/{id}', 'removeTeam');

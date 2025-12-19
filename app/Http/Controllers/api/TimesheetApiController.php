@@ -589,4 +589,47 @@ class TimesheetApiController extends Controller {
             'reactions' => $reactions,
         ]);
     }
+
+    /**
+     * Поиск ВСЕХ контрактов (включая не добавленные в бригады)
+     * с пометкой о присутствии в табеле
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function searchAllContracts(Request $request) {
+        [
+            'search' => $search,
+        ] = $request->validate([
+            'search' => 'nullable|string',
+        ]);
+
+        // Получаем ID всех контрактов, которые присутствуют в табеле
+        $contractsInTeams = TimesheetContract::select('contract_id')
+            ->distinct()
+            ->pluck('contract_id')
+            ->toArray();
+
+        // Ищем ВСЕ контракты в БД по object_number
+        $query = ContractModel::select(['id', 'title', 'titul', 'object_number']);
+
+        // Применяем поиск только по object_number (номер объекта)
+        if (!empty($search)) {
+            $query->where('object_number', 'like', '%'.$search.'%');
+        }
+
+        $contracts = $query
+            ->limit(1000)
+            ->get()
+            ->map(function($contract) use ($contractsInTeams) {
+                return [
+                    'id' => $contract->id,
+                    'name' => $contract->title ?: $contract->titul,
+                    'object_number' => $contract->object_number,
+                    'in_teams' => in_array($contract->id, $contractsInTeams), // Присутствует ли в бригадах
+                ];
+            });
+
+        return response()->json($contracts);
+    }
 }
