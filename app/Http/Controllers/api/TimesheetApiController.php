@@ -438,6 +438,7 @@ class TimesheetApiController extends Controller {
                     'id' => $contract->id,
                     'name' => $contract->title ?: $contract->titul,
                     'object_number' => $contract->object_number,
+                    'in_teams' => true, // Все объекты из этого метода присутствуют в бригадах
                 ];
             });
 
@@ -531,6 +532,7 @@ class TimesheetApiController extends Controller {
                     'id' => $contract->id,
                     'name' => $contract->title ?: $contract->titul,
                     'object_number' => $contract->object_number,
+                    'in_teams' => true, // Все объекты из этого метода присутствуют в бригадах
                 ];
             });
 
