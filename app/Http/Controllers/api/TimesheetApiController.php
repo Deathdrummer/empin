@@ -314,6 +314,7 @@ class TimesheetApiController extends Controller {
             'timesheet_contract_id' => 'required|integer',
             'message' => 'required|string',
             'reply_to_id' => 'nullable|integer',
+            'media' => 'nullable|file|mimes:jpeg,jpg,png,gif,mp4,mov,avi|max:51200', // max 50MB
         ]);
 
         $contract = TimesheetContract::find($timesheetContractId);
@@ -322,10 +323,45 @@ class TimesheetApiController extends Controller {
             return response()->json(['error' => 'Contract not found'], 404);
         }
 
+        // Обработка медиа файла
+        $mediaData = null;
+        if ($request->hasFile('media')) {
+            $file = $request->file('media');
+            $extension = $file->getClientOriginalExtension();
+            $mimeType = $file->getMimeType();
+            $size = $file->getSize();
+            $originalFilename = $file->getClientOriginalName();
+
+            // Генерируем уникальное имя файла
+            $filename = uniqid() . '_' . time() . '.' . $extension;
+
+            // Создаем директорию если не существует
+            $uploadPath = public_path('uploads/timesheet/comments');
+            if (!file_exists($uploadPath)) {
+                mkdir($uploadPath, 0755, true);
+            }
+
+            // Сохраняем файл
+            $file->move($uploadPath, $filename);
+
+            // Определяем тип медиа (image или video)
+            $type = str_starts_with($mimeType, 'image/') ? 'image' : 'video';
+
+            // Формируем данные о медиа
+            $mediaData = [
+                'path' => '/uploads/timesheet/comments/' . $filename,
+                'type' => $type,
+                'mime_type' => $mimeType,
+                'size' => $size,
+                'filename' => $originalFilename,
+            ];
+        }
+
         $comment = $contract->chat()->create([
             'from_id' => $request->user()->staff_id,
             'message' => $message,
             'reply_to_id' => $replyToId,
+            'media' => $mediaData,
         ]);
 
         $comment->load('profile.registred');

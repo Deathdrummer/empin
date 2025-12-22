@@ -59,6 +59,7 @@ class TimesheetChat extends Model {
      */
 	protected $casts = [
 		'reactions' => 'array',
+		'media' => 'array',
 	];
 	
 	
