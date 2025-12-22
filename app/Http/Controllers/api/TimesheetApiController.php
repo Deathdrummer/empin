@@ -335,29 +335,19 @@ class TimesheetApiController extends Controller {
         if ($request->hasFile('media')) {
             \Log::info('📎 [BACKEND] Media file detected');
             $file = $request->file('media');
-            $extension = $file->getClientOriginalExtension();
             $mimeType = $file->getMimeType();
             $size = $file->getSize();
             $originalFilename = $file->getClientOriginalName();
 
-            // Генерируем уникальное имя файла
-            $filename = uniqid() . '_' . time() . '.' . $extension;
-
-            // Создаем директорию если не существует
-            $uploadPath = public_path('uploads/timesheet/comments');
-            if (!file_exists($uploadPath)) {
-                mkdir($uploadPath, 0755, true);
-            }
-
-            // Сохраняем файл
-            $file->move($uploadPath, $filename);
+            // Сохраняем файл через Storage API в storage/app/public/timesheet/comments/
+            $storagePath = $file->store('timesheet/comments', 'public');
 
             // Определяем тип медиа (image или video)
             $type = str_starts_with($mimeType, 'image/') ? 'image' : 'video';
 
             // Формируем данные о медиа
             $mediaData = [
-                'path' => '/uploads/timesheet/comments/' . $filename,
+                'path' => '/storage/' . $storagePath, // Путь для доступа через веб
                 'type' => $type,
                 'mime_type' => $mimeType,
                 'size' => $size,
@@ -365,7 +355,8 @@ class TimesheetApiController extends Controller {
             ];
 
             \Log::info('📎 [BACKEND] Media saved successfully', [
-                'path' => $mediaData['path'],
+                'storage_path' => $storagePath,
+                'public_path' => $mediaData['path'],
                 'type' => $type,
                 'size' => $size,
             ]);
