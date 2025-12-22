@@ -313,16 +313,16 @@ class TimesheetApiController extends Controller {
             'content_type' => $request->header('Content-Type'),
         ]);
 
-        [
-            'timesheet_contract_id' => $timesheetContractId,
-            'message' => $message,
-            'reply_to_id' => $replyToId,
-        ] = $request->validate([
+        $validated = $request->validate([
             'timesheet_contract_id' => 'required|integer',
             'message' => 'required|string',
             'reply_to_id' => 'nullable|integer',
             'media' => 'nullable|file|mimes:jpeg,jpg,png,gif,mp4,mov,avi|max:51200', // max 50MB
         ]);
+
+        $timesheetContractId = $validated['timesheet_contract_id'];
+        $message = $validated['message'];
+        $replyToId = $validated['reply_to_id'] ?? null;
 
         $contract = TimesheetContract::find($timesheetContractId);
 
