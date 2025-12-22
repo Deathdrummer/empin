@@ -47,6 +47,7 @@ class TimesheetChatResource extends JsonResource {
 			'self'		=> $isSelf,
             'reactions' => array_values($groupedReactions),
             'reply_to_id' => $this->reply_to_id,
+            'media'     => $this->media,
             'API_VERSION' => 'v2.0', // ВРЕМЕННАЯ МЕТКА
             // DEBUG info
             'debug_author_user_id' => $authorUserId,
