@@ -42,7 +42,7 @@ class TimesheetApiController extends Controller {
         $hasActiveFilters = $hasTeamsFilter || $hasContractsFilter;
 
         $query = TimesheetTeam::getByDaysIndexes($indexes);
-
+		
         // Применяем фильтр по командам (мастерам)
         if ($hasTeamsFilter) {
             $query->whereIn('staff_id', $filters['teams']);
