@@ -306,6 +306,13 @@ class TimesheetApiController extends Controller {
      * @return TimesheetChatResource
      */
     public function addComment(Request $request) {
+        \Log::info('📎 [BACKEND] addComment called', [
+            'all_input' => $request->all(),
+            'files' => $request->allFiles(),
+            'has_file_media' => $request->hasFile('media'),
+            'content_type' => $request->header('Content-Type'),
+        ]);
+
         [
             'timesheet_contract_id' => $timesheetContractId,
             'message' => $message,
@@ -326,6 +333,7 @@ class TimesheetApiController extends Controller {
         // Обработка медиа файла
         $mediaData = null;
         if ($request->hasFile('media')) {
+            \Log::info('📎 [BACKEND] Media file detected');
             $file = $request->file('media');
             $extension = $file->getClientOriginalExtension();
             $mimeType = $file->getMimeType();
@@ -355,6 +363,14 @@ class TimesheetApiController extends Controller {
                 'size' => $size,
                 'filename' => $originalFilename,
             ];
+
+            \Log::info('📎 [BACKEND] Media saved successfully', [
+                'path' => $mediaData['path'],
+                'type' => $type,
+                'size' => $size,
+            ]);
+        } else {
+            \Log::info('⚠️ [BACKEND] No media file in request');
         }
 
         $comment = $contract->chat()->create([
@@ -362,6 +378,11 @@ class TimesheetApiController extends Controller {
             'message' => $message,
             'reply_to_id' => $replyToId,
             'media' => $mediaData,
+        ]);
+
+        \Log::info('✅ [BACKEND] Comment created', [
+            'comment_id' => $comment->id,
+            'has_media' => $mediaData !== null,
         ]);
 
         $comment->load('profile.registred');
