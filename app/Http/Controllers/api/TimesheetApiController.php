@@ -13,6 +13,7 @@ use App\Models\TimesheetContract;
 use App\Models\TimesheetTeam;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class TimesheetApiController extends Controller {
 
@@ -278,7 +279,6 @@ class TimesheetApiController extends Controller {
         // Обработка медиа файла
         $mediaData = null;
         if ($request->hasFile('media')) {
-            \Log::info('📎 [BACKEND] Media file detected');
             $file = $request->file('media');
             $mimeType = $file->getMimeType();
             $size = $file->getSize();
@@ -298,15 +298,6 @@ class TimesheetApiController extends Controller {
                 'size' => $size,
                 'filename' => $originalFilename,
             ];
-
-            \Log::info('📎 [BACKEND] Media saved successfully', [
-                'storage_path' => $storagePath,
-                'public_path' => $mediaData['path'],
-                'type' => $type,
-                'size' => $size,
-            ]);
-        } else {
-            \Log::info('⚠️ [BACKEND] No media file in request');
         }
 
         $comment = $contract->chat()->create([
@@ -314,11 +305,6 @@ class TimesheetApiController extends Controller {
             'message' => $message,
             'reply_to_id' => $replyToId,
             'media' => $mediaData,
-        ]);
-
-        \Log::info('✅ [BACKEND] Comment created', [
-            'comment_id' => $comment->id,
-            'has_media' => $mediaData !== null,
         ]);
 
         $comment->load('profile.registred');
@@ -370,6 +356,17 @@ class TimesheetApiController extends Controller {
 
         if (!$timesheetMess) {
             return response()->json(['success' => false], 404);
+        }
+
+        // Удаляем медиа файл если он есть
+        if ($timesheetMess->media && isset($timesheetMess->media['path'])) {
+            $filePath = $timesheetMess->media['path'];
+            // Убираем префикс /storage/ чтобы получить путь в storage/app/public/
+            $storageFilePath = str_replace('/storage/', '', $filePath);
+
+            if (Storage::disk('public')->exists($storageFilePath)) {
+                Storage::disk('public')->delete($storageFilePath);
+            }
         }
 
         $timesheetMess->delete();
