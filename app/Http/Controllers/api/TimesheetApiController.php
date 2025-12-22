@@ -306,13 +306,6 @@ class TimesheetApiController extends Controller {
      * @return TimesheetChatResource
      */
     public function addComment(Request $request) {
-        \Log::info('📎 [BACKEND] addComment called', [
-            'all_input' => $request->all(),
-            'files' => $request->allFiles(),
-            'has_file_media' => $request->hasFile('media'),
-            'content_type' => $request->header('Content-Type'),
-        ]);
-
         $validated = $request->validate([
             'timesheet_contract_id' => 'required|integer',
             'message' => 'required|string',
