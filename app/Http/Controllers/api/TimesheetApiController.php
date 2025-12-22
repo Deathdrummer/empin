@@ -41,21 +41,11 @@ class TimesheetApiController extends Controller {
         $hasContractsFilter = !empty($filters['contracts']) && is_array($filters['contracts']);
         $hasActiveFilters = $hasTeamsFilter || $hasContractsFilter;
 
-        // Логируем для отладки
-        \Log::info('=== getSlidesData START ===', [
-            'indexes_count' => count($indexes),
-            'indexes_range' => count($indexes) > 0 ? (min($indexes) . '..' . max($indexes)) : 'empty',
-            'filters' => $filters,
-            'hasTeamsFilter' => $hasTeamsFilter,
-            'hasContractsFilter' => $hasContractsFilter,
-        ]);
-
         $query = TimesheetTeam::getByDaysIndexes($indexes);
 
         // Применяем фильтр по командам (мастерам)
         if ($hasTeamsFilter) {
             $query->whereIn('staff_id', $filters['teams']);
-            \Log::info('Applied teams filter', ['staff_ids' => $filters['teams']]);
         }
 
         // Применяем фильтр по контрактам
@@ -63,7 +53,6 @@ class TimesheetApiController extends Controller {
             $query->whereHas('contracts', function($q) use ($filters) {
                 $q->whereIn('contract_id', $filters['contracts']);
             });
-            \Log::info('Applied contracts filter (whereHas)', ['contract_ids' => $filters['contracts']]);
         }
 
         $teams = $query
@@ -80,31 +69,9 @@ class TimesheetApiController extends Controller {
             ])
             ->get();
 
-        \Log::info('Teams loaded', [
-            'total_teams' => $teams->count(),
-            'team_days' => $teams->pluck('day')->unique()->values()->toArray(),
-        ]);
-
-        // Логируем количество контрактов для каждой команды (для проверки фильтрации)
-        if ($hasContractsFilter) {
-            foreach ($teams as $team) {
-                \Log::info('Team contracts after filter', [
-                    'team_id' => $team->id,
-                    'staff_id' => $team->staff_id,
-                    'contracts_count' => $team->contracts->count(),
-                    'contract_ids' => $team->contracts->pluck('contract_id')->toArray(),
-                ]);
-            }
-        }
-
         $teams = $teams->groupBy(fn($team) => $team->day instanceof Carbon ? $team->day->toDateString() : $team->day);
 
         $teams = $teams->map(fn($group) => TimesheetTeamResource::collection($group)->resolve());
-
-        \Log::info('Teams grouped by day', [
-            'days_with_teams' => array_keys($teams->toArray()),
-            'days_count' => $teams->count(),
-        ]);
 
         $daysData = [];
         foreach ($indexes as $idx) {
@@ -114,19 +81,8 @@ class TimesheetApiController extends Controller {
 
             // При фильтрации показываем ТОЛЬКО дни с совпадениями
             if ($hasActiveFilters && (!isset($teams[$day]) || empty($teams[$day]))) {
-                \Log::info('Day excluded from results', [
-                    'day' => $day,
-                    'index' => $idx,
-                    'reason' => !isset($teams[$day]) ? 'not in grouped teams' : 'empty teams array',
-                ]);
                 continue;
             }
-
-            \Log::info('Day included in results', [
-                'day' => $day,
-                'index' => $idx,
-                'teams_count' => isset($teams[$day]) ? count($teams[$day]) : 0,
-            ]);
 
             $daysData[] = [
                 'index' => (int)$idx,
@@ -138,10 +94,6 @@ class TimesheetApiController extends Controller {
                 'teams' => $teams[$day] ?? null,
             ];
         }
-
-        \Log::info('=== getSlidesData RESULT ===', [
-            'total_days_returned' => count($daysData),
-        ]);
 
         return response()->json($daysData);
     }
@@ -445,8 +397,6 @@ class TimesheetApiController extends Controller {
      * @return \Illuminate\Http\JsonResponse
      */
     public function getFilterOptions() {
-        \Log::info('=== getFilterOptions START ===');
-
         // Получаем бригады с сортировкой по дню добавления
         // Сначала группируем по дню (DATE), затем внутри дня - по времени (DESC)
         $teams = Staff::select(['staff.id', 'staff.sname', 'staff.fname', 'staff.mname'])
@@ -462,8 +412,6 @@ class TimesheetApiController extends Controller {
                     'name' => trim("{$staff->sname} {$staff->fname} {$staff->mname}"),
                 ];
             });
-
-        \Log::info('Teams loaded with date sorting:', ['count' => $teams->count()]);
 
         // Получаем объекты с сортировкой по дню добавления
         // Сначала группируем по дню (DATE), затем внутри дня - по времени (DESC)
@@ -482,13 +430,6 @@ class TimesheetApiController extends Controller {
                     'in_teams' => true, // Все объекты из этого метода присутствуют в бригадах
                 ];
             });
-
-        \Log::info('Contracts loaded with date sorting:', ['count' => $contracts->count()]);
-
-        \Log::info('=== getFilterOptions RESULT ===', [
-            'teams_count' => $teams->count(),
-            'contracts_count' => $contracts->count(),
-        ]);
 
         return response()->json([
             'teams' => $teams,
