@@ -42,7 +42,19 @@ jobs:
           --exclude=/.gitconfig \
           --exclude=/public/build \
           --exclude=/public/hot \
+          --exclude=/public/storage \
+          --exclude=/public/assistent \
+          --exclude=/public/prompts \
           --exclude=/storage \
           -rc \
           --delete \
           . ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }}:${{ env.SERVER_PATH }}
+
+      # Run post-deployment commands
+      - name: Run artisan commands
+        run: |
+          ssh ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }} << 'ENDSSH'
+            cd ${{ env.SERVER_PATH }}
+            php artisan optimize:clear
+            php artisan storage:link
+          ENDSSH
