@@ -263,7 +263,8 @@ class TimesheetApiController extends Controller {
             'timesheet_contract_id' => 'required|integer',
             'message' => 'required|string',
             'reply_to_id' => 'nullable|integer',
-            'media' => 'nullable|file|mimes:jpeg,jpg,png,gif,mp4,mov,avi|max:51200', // max 50MB
+            'media' => 'nullable|array', // Принимаем массив файлов
+            'media.*' => 'file|mimes:jpeg,jpg,png,gif,mp4,mov,avi|max:51200', // max 50MB на файл
         ]);
 
         $timesheetContractId = $validated['timesheet_contract_id'];
@@ -276,35 +277,38 @@ class TimesheetApiController extends Controller {
             return response()->json(['error' => 'Contract not found'], 404);
         }
 
-        // Обработка медиа файла
-        $mediaData = null;
+        // Обработка медиа файлов
+        $mediaArray = [];
         if ($request->hasFile('media')) {
-            $file = $request->file('media');
-            $mimeType = $file->getMimeType();
-            $size = $file->getSize();
-            $originalFilename = $file->getClientOriginalName();
+            $files = $request->file('media');
 
-            // Сохраняем файл через Storage API в storage/app/public/timesheet/comments/
-            $storagePath = $file->store('timesheet/comments', 'public');
+            foreach ($files as $file) {
+                $mimeType = $file->getMimeType();
+                $size = $file->getSize();
+                $originalFilename = $file->getClientOriginalName();
 
-            // Определяем тип медиа (image или video)
-            $type = str_starts_with($mimeType, 'image/') ? 'image' : 'video';
+                // Сохраняем файл через Storage API в storage/app/public/timesheet/comments/
+                $storagePath = $file->store('timesheet/comments', 'public');
 
-            // Формируем данные о медиа
-            $mediaData = [
-                'path' => '/storage/' . $storagePath, // Путь для доступа через веб
-                'type' => $type,
-                'mime_type' => $mimeType,
-                'size' => $size,
-                'filename' => $originalFilename,
-            ];
+                // Определяем тип медиа (image или video)
+                $type = str_starts_with($mimeType, 'image/') ? 'image' : 'video';
+
+                // Формируем данные о медиа
+                $mediaArray[] = [
+                    'path' => '/storage/' . $storagePath, // Путь для доступа через веб
+                    'type' => $type,
+                    'mime_type' => $mimeType,
+                    'size' => $size,
+                    'filename' => $originalFilename,
+                ];
+            }
         }
 
         $comment = $contract->chat()->create([
             'from_id' => $request->user()->staff_id,
             'message' => $message,
             'reply_to_id' => $replyToId,
-            'media' => $mediaData,
+            'media' => !empty($mediaArray) ? $mediaArray : null,
         ]);
 
         $comment->load('profile.registred');
@@ -358,14 +362,32 @@ class TimesheetApiController extends Controller {
             return response()->json(['success' => false], 404);
         }
 
-        // Удаляем медиа файл если он есть
-        if ($timesheetMess->media && isset($timesheetMess->media['path'])) {
-            $filePath = $timesheetMess->media['path'];
-            // Убираем префикс /storage/ чтобы получить путь в storage/app/public/
-            $storageFilePath = str_replace('/storage/', '', $filePath);
+        // Удаляем медиа файлы если они есть
+        if ($timesheetMess->media) {
+            // Поддержка старого формата (одно медиа как объект) и нового (массив медиа)
+            $mediaArray = [];
+            if (is_array($timesheetMess->media)) {
+                // Проверяем, является ли это массивом медиа или одним объектом медиа
+                if (isset($timesheetMess->media['path'])) {
+                    // Старый формат - одно медиа
+                    $mediaArray = [$timesheetMess->media];
+                } else {
+                    // Новый формат - массив медиа
+                    $mediaArray = $timesheetMess->media;
+                }
+            }
 
-            if (Storage::disk('public')->exists($storageFilePath)) {
-                Storage::disk('public')->delete($storageFilePath);
+            // Удаляем все файлы
+            foreach ($mediaArray as $media) {
+                if (isset($media['path'])) {
+                    $filePath = $media['path'];
+                    // Убираем префикс /storage/ чтобы получить путь в storage/app/public/
+                    $storageFilePath = str_replace('/storage/', '', $filePath);
+
+                    if (Storage::disk('public')->exists($storageFilePath)) {
+                        Storage::disk('public')->delete($storageFilePath);
+                    }
+                }
             }
         }
 
