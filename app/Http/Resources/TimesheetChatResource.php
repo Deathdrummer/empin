@@ -38,6 +38,30 @@ class TimesheetChatResource extends JsonResource {
             }
         }
 
+        // Обрабатываем media - добавляем отсутствующие поля
+        $mediaWithDefaults = null;
+        if ($this->media) {
+            $mediaWithDefaults = array_map(function($m) {
+                // Если name отсутствует - извлекаем из path
+                if (empty($m['name']) && !empty($m['path'])) {
+                    $pathWithoutQuery = explode('?', $m['path'])[0];
+                    $fileName = basename($pathWithoutQuery);
+                    $m['name'] = $fileName ?: null;
+                }
+
+                // Если size отсутствует - пытаемся получить из файла
+                if (empty($m['size']) && !empty($m['path'])) {
+                    $storagePath = str_replace('/storage/', '', $m['path']);
+                    $fullPath = storage_path('app/public/' . $storagePath);
+                    if (file_exists($fullPath)) {
+                        $m['size'] = filesize($fullPath);
+                    }
+                }
+
+                return $m;
+            }, $this->media);
+        }
+
         return [
             'id'        => $this->id,
             'day'       => $this->day,
@@ -47,7 +71,7 @@ class TimesheetChatResource extends JsonResource {
 			'self'		=> $isSelf,
             'reactions' => array_values($groupedReactions),
             'reply_to_id' => $this->reply_to_id,
-            'media'     => $this->media,
+            'media'     => $mediaWithDefaults,
             'API_VERSION' => 'v2.0', // ВРЕМЕННАЯ МЕТКА
             // DEBUG info
             'debug_author_user_id' => $authorUserId,
