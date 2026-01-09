@@ -41,23 +41,24 @@ class TimesheetChatResource extends JsonResource {
         // Обрабатываем media - добавляем отсутствующие поля
         $mediaWithDefaults = null;
         if ($this->media) {
-            \Log::info('[TimesheetChatResource] Original media', [
-                'comment_id' => $this->id,
-                'media' => $this->media
-            ]);
-
             $mediaWithDefaults = array_map(function($m) {
-                $original = $m;
+                // Если name отсутствует - извлекаем из filename или path
+                if (empty($m['name'])) {
+                    // Проверяем старое поле filename
+                    if (!empty($m['filename'])) {
+                        $m['name'] = $m['filename'];
+                    }
+                    // Извлекаем из path
+                    elseif (!empty($m['path'])) {
+                        $pathWithoutQuery = explode('?', $m['path'])[0];
+                        $fileName = basename($pathWithoutQuery);
+                        $m['name'] = $fileName ?: null;
+                    }
+                }
 
-                // Если name отсутствует - извлекаем из path
-                if (empty($m['name']) && !empty($m['path'])) {
-                    $pathWithoutQuery = explode('?', $m['path'])[0];
-                    $fileName = basename($pathWithoutQuery);
-                    $m['name'] = $fileName ?: null;
-                    \Log::info('[TimesheetChatResource] Name extracted', [
-                        'path' => $m['path'],
-                        'name' => $m['name']
-                    ]);
+                // Декодируем URL-encoded имя
+                if (!empty($m['name']) && strpos($m['name'], '%') !== false) {
+                    $m['name'] = urldecode($m['name']);
                 }
 
                 // Если size отсутствует - пытаемся получить из файла
@@ -66,29 +67,16 @@ class TimesheetChatResource extends JsonResource {
                     $fullPath = storage_path('app/public/' . $storagePath);
                     if (file_exists($fullPath)) {
                         $m['size'] = filesize($fullPath);
-                        \Log::info('[TimesheetChatResource] Size extracted', [
-                            'path' => $fullPath,
-                            'size' => $m['size']
-                        ]);
                     } else {
                         \Log::warning('[TimesheetChatResource] File not found', [
+                            'comment_id' => $this->id,
                             'path' => $fullPath
                         ]);
                     }
                 }
 
-                \Log::info('[TimesheetChatResource] Item processed', [
-                    'original' => $original,
-                    'processed' => $m
-                ]);
-
                 return $m;
             }, $this->media);
-
-            \Log::info('[TimesheetChatResource] Final media', [
-                'comment_id' => $this->id,
-                'media' => $mediaWithDefaults
-            ]);
         }
 
         return [
