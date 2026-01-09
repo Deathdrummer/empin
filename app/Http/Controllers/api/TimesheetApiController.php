@@ -261,15 +261,20 @@ class TimesheetApiController extends Controller {
     public function addComment(Request $request) {
         $validated = $request->validate([
             'timesheet_contract_id' => 'required|integer',
-            'message' => 'required|string',
+            'message' => 'nullable|string',
             'reply_to_id' => 'nullable|integer',
             'media' => 'nullable|array', // Принимаем массив файлов
             'media.*' => 'file|mimes:jpeg,jpg,png,gif,mp4,mov,avi|max:51200', // max 50MB на файл
         ]);
 
         $timesheetContractId = $validated['timesheet_contract_id'];
-        $message = $validated['message'];
+        $message = $validated['message'] ?? '';
         $replyToId = $validated['reply_to_id'] ?? null;
+
+        // Проверяем, что есть хотя бы сообщение или медиа
+        if (empty(trim($message)) && !$request->hasFile('media')) {
+            return response()->json(['error' => 'Необходимо указать текст комментария или прикрепить медиа'], 422);
+        }
 
         $contract = TimesheetContract::find($timesheetContractId);
 
