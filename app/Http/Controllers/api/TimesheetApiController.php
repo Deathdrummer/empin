@@ -264,7 +264,7 @@ class TimesheetApiController extends Controller {
             'message' => 'nullable|string',
             'reply_to_id' => 'nullable|integer',
             'media' => 'nullable|array', // Принимаем массив файлов
-            'media.*' => 'file|mimes:jpeg,jpg,png,gif,mp4,mov,avi|max:51200', // max 50MB на файл
+            'media.*' => 'file|mimes:jpeg,jpg,png,gif,bmp,webp,mp4,mov,avi,mkv,pdf,doc,docx,xls,xlsx,ppt,pptx,zip,rar,7z,txt,csv,mp3,wav,ogg,aac,flac,m4a|max:51200', // max 50MB на файл
         ]);
 
         $timesheetContractId = $validated['timesheet_contract_id'];
@@ -295,8 +295,33 @@ class TimesheetApiController extends Controller {
                 // Сохраняем файл через Storage API в storage/app/public/timesheet/comments/
                 $storagePath = $file->store('timesheet/comments', 'public');
 
-                // Определяем тип медиа (image или video)
-                $type = str_starts_with($mimeType, 'image/') ? 'image' : 'video';
+                // Определяем тип медиа по MIME типу
+                $type = 'file'; // По умолчанию
+                if (str_starts_with($mimeType, 'image/')) {
+                    $type = 'image';
+                } elseif (str_starts_with($mimeType, 'video/')) {
+                    $type = 'video';
+                } elseif (str_starts_with($mimeType, 'audio/')) {
+                    $type = 'audio';
+                } elseif (in_array($mimeType, [
+                    'application/pdf',
+                    'application/msword',
+                    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                    'application/vnd.ms-excel',
+                    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                    'application/vnd.ms-powerpoint',
+                    'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+                    'text/plain',
+                    'text/csv',
+                ])) {
+                    $type = 'document';
+                } elseif (in_array($mimeType, [
+                    'application/zip',
+                    'application/x-rar-compressed',
+                    'application/x-7z-compressed',
+                ])) {
+                    $type = 'archive';
+                }
 
                 // Формируем данные о медиа
                 $mediaArray[] = [
@@ -304,7 +329,7 @@ class TimesheetApiController extends Controller {
                     'type' => $type,
                     'mime_type' => $mimeType,
                     'size' => $size,
-                    'filename' => $originalFilename,
+                    'name' => $originalFilename,
                 ];
             }
         }
