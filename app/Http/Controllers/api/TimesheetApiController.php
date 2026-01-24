@@ -259,15 +259,6 @@ class TimesheetApiController extends Controller {
      * @return TimesheetChatResource
      */
     public function addComment(Request $request) {
-        // DEBUG: Логируем все данные запроса
-        \Log::info('[addComment] REQUEST START', [
-            'all_data' => $request->all(),
-            'has_file_media' => $request->hasFile('media'),
-            'has_file_media_array' => $request->hasFile('media.0'),
-            'files' => $request->allFiles(),
-            'content_type' => $request->header('Content-Type'),
-        ]);
-
         $validated = $request->validate([
             'timesheet_contract_id' => 'required|integer',
             'message' => 'nullable|string',
@@ -275,8 +266,6 @@ class TimesheetApiController extends Controller {
             'media' => 'nullable|array', // Принимаем массив файлов
             'media.*' => 'file|mimes:jpeg,jpg,png,gif,bmp,webp,mp4,mov,avi,mkv,pdf,doc,docx,xls,xlsx,ppt,pptx,zip,rar,7z,txt,csv,mp3,wav,ogg,aac,flac,m4a|max:51200', // max 50MB на файл
         ]);
-
-        \Log::info('[addComment] VALIDATION PASSED', ['validated' => $validated]);
 
         $timesheetContractId = $validated['timesheet_contract_id'];
         $message = $validated['message'] ?? '';
