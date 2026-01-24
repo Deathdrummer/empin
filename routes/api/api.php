@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\api\AuthController;
+use App\Http\Controllers\api\MessengerApiController;
 use App\Http\Controllers\api\TimesheetApiController;
 use App\Http\Controllers\SettingsController;
 use Illuminate\Support\Facades\Route;
@@ -50,6 +51,16 @@ Route::controller(TimesheetApiController::class)->prefix('timesheet')->middlewar
 	Route::post('/comment/reaction', 'toggleReaction');
 	Route::put('/comment/{id}', 'updateComment')->where('id', '[0-9]+');
 	Route::delete('/comment/{id}', 'removeComment')->where('id', '[0-9]+');
+});
+
+// Messenger API (требует авторизацию)
+Route::controller(MessengerApiController::class)->prefix('messenger')->middleware('auth:sanctum')->group(function() {
+	Route::post('/chat', 'getOrCreateChat');
+	Route::post('/chat/messages', 'getMessages');
+	Route::post('/message', 'addMessage');
+	Route::put('/message/{id}', 'updateMessage');
+	Route::delete('/message/{id}', 'removeMessage');
+	Route::post('/message/reaction', 'toggleReaction');
 });
 
 // Settings API
