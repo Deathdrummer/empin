@@ -447,6 +447,7 @@ class TimesheetApiController extends Controller {
      */
     public function getAllStaff() {
         $staff = Staff::select(['id', 'sname', 'fname', 'mname'])
+            ->distinct()
             ->orderBy('sname')
             ->orderBy('fname')
             ->get();
