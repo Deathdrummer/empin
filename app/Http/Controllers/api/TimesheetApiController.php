@@ -446,10 +446,14 @@ class TimesheetApiController extends Controller {
      * @return \Illuminate\Http\JsonResponse
      */
     public function getAllStaff() {
-        $staff = Staff::select(['id', 'sname', 'fname', 'mname'])
-            ->distinct()
-            ->orderBy('sname')
-            ->orderBy('fname')
+        $staff = Staff::selectRaw('
+                MIN(id) as id,
+                TRIM(sname) as sname,
+                TRIM(fname) as fname,
+                TRIM(mname) as mname
+            ')
+            ->groupByRaw('TRIM(sname), TRIM(fname), TRIM(mname)')
+            ->orderByRaw('TRIM(sname), TRIM(fname)')
             ->get();
 
         return response()->json($staff);
