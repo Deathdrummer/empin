@@ -4,6 +4,11 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class MessengerMessageResource extends JsonResource {
     /**
+     * Отключаем обертку "data" для одиночных ресурсов
+     */
+    public static $wrap = null;
+
+    /**
      * Transform the resource into an array.
      *
      * @param  \Illuminate\Http\Request  $request
