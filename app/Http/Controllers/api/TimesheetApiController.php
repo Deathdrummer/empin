@@ -446,12 +446,17 @@ class TimesheetApiController extends Controller {
      * @return \Illuminate\Http\JsonResponse
      */
     public function getAllStaff() {
+        $count = Staff::count();
         $staff = Staff::select(['id', 'sname', 'fname', 'mname'])
             ->orderBy('sname')
             ->orderBy('fname')
             ->get();
 
-        return response()->json($staff);
+        return response()->json([
+            'debug_total_count' => $count,
+            'debug_result_count' => $staff->count(),
+            'data' => $staff
+        ]);
     }
 
     /**
