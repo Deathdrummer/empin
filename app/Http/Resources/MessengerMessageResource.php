@@ -15,26 +15,6 @@ class MessengerMessageResource extends JsonResource {
         // Определяем является ли текущий пользователь автором сообщения
         $isSelf = $currentUser && $this->from_id ? ($this->from_id === $currentUser->staff_id) : false;
 
-        // Группируем реакции по эмодзи и добавляем информацию о текущем пользователе
-        $groupedReactions = [];
-        $reactions = $this->reactions ?? [];
-        $currentUserId = $currentUser?->id;
-
-        foreach ($reactions as $reaction) {
-            $emoji = $reaction['emoji'];
-            if (!isset($groupedReactions[$emoji])) {
-                $groupedReactions[$emoji] = [
-                    'emoji' => $emoji,
-                    'count' => 0,
-                    'isOwn' => false,
-                ];
-            }
-            $groupedReactions[$emoji]['count']++;
-            if ($currentUserId && $reaction['user_id'] == $currentUserId) {
-                $groupedReactions[$emoji]['isOwn'] = true;
-            }
-        }
-
         // Обрабатываем media - добавляем отсутствующие поля
         $mediaWithDefaults = null;
         if ($this->media) {
@@ -86,7 +66,7 @@ class MessengerMessageResource extends JsonResource {
                             ] : null,
             'message'     => $this->message,
             'reply_to_id' => $this->reply_to_id,
-            'reactions'   => array_values($groupedReactions),
+            'reactions'   => $this->reactions ?? [],
             'media'       => $mediaWithDefaults,
             'self'        => $isSelf,
             'created_at'  => $this->created_at->toIso8601String(),
