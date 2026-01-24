@@ -441,6 +441,20 @@ class TimesheetApiController extends Controller {
     }
 
     /**
+     * Получить ВСЕХ сотрудников (для мессенджера)
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getAllStaff() {
+        $staff = Staff::select(['id', 'sname', 'fname', 'mname'])
+            ->orderBy('sname')
+            ->orderBy('fname')
+            ->get();
+
+        return response()->json($staff);
+    }
+
+    /**
      * Получить все уникальные команды и контракты для фильтров
      *
      * @return \Illuminate\Http\JsonResponse

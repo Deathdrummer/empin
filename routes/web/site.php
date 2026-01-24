@@ -395,6 +395,7 @@ Route::prefix('site')->middleware(['lang', 'isajax:site'])->group(function() {
 	Route::delete('/timesheet/comment', [Timesheet::class, 'removeComment']);
 	
 	Route::get('/timesheet/staff', [Timesheet::class, 'getStaff']);
+	Route::get('/timesheet/all-staff', [Timesheet::class, 'getAllStaff']);
 	
 	
 	
