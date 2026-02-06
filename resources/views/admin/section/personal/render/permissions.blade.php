@@ -57,7 +57,7 @@
 <script type="module">
 
 if ($('[permid="382"]').is(':checked')) {
-	$('[pgroupid="{{$groupId}}"]').find('input[checkbox]').setAttrib('disabled');
+	$('[pgroupid="5"]').find('input[checkbox]').setAttrib('disabled');
 }
 
 </script>
