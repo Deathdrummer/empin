@@ -57,6 +57,7 @@
 <script type="module">
 
 if ($('[permid="382"]').is(':checked')) {
+	console.log($('[pgroupid="5"]').find('input[checkbox]').length);
 	$('[pgroupid="5"]').find('input[checkbox]').setAttrib('disabled');
 }
 
