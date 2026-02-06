@@ -13766,7 +13766,7 @@ var DdrInput = /*#__PURE__*/function () {
       var _item$tagName, _item$type, _item$type$toLowerCas;
 
       var tag = item === null || item === void 0 ? void 0 : (_item$tagName = item.tagName) === null || _item$tagName === void 0 ? void 0 : _item$tagName.toLowerCase(),
-          type = $(item).attr('tagname') !== 'undefined' ? $(item).attr('tagname') : typeof $(item).attr('contenteditable') !== 'undefined' ? 'contenteditable' : item !== null && item !== void 0 && item.type ? item === null || item === void 0 ? void 0 : (_item$type = item.type) === null || _item$type === void 0 ? void 0 : (_item$type$toLowerCas = _item$type.toLowerCase()) === null || _item$type$toLowerCas === void 0 ? void 0 : _item$type$toLowerCas.replace('select-one', 'select') : null,
+          type = typeof $(item).attr('tagname') !== 'undefined' ? $(item).attr('tagname') : typeof $(item).attr('contenteditable') !== 'undefined' ? 'contenteditable' : item !== null && item !== void 0 && item.type ? item === null || item === void 0 ? void 0 : (_item$type = item.type) === null || _item$type === void 0 ? void 0 : (_item$type$toLowerCas = _item$type.toLowerCase()) === null || _item$type$toLowerCas === void 0 ? void 0 : _item$type$toLowerCas.replace('select-one', 'select') : null,
           group = typeof $(item).attr('inpgroup') !== 'undefined' ? $(item).attr('inpgroup') + '-' : '',
           wrapperClass = findWrapByInputType.indexOf(type) !== -1 ? group + type : group + tag,
           wrapperSelector = $(item).closest('.' + wrapperClass).length ? $(item).closest('.' + wrapperClass) : false;
@@ -13952,16 +13952,10 @@ var DdrInput = /*#__PURE__*/function () {
             group = _ref3.group,
             wrapperClass = _ref3.wrapperClass,
             wrapperSelector = _ref3.wrapperSelector;
-        console.log({
-          item: item,
-          tag: tag,
-          type: type,
-          group: group,
-          wrapperClass: wrapperClass,
-          wrapperSelector: wrapperSelector
-        });
 
+        //console.log({item, tag, type, group, wrapperClass, wrapperSelector});
         if (wrapperSelector) {
+          console.log(12312312312312312);
           if ($(wrapperSelector).hasClass(wrapperClass + '_disabled') === false) $(wrapperSelector).addClass(wrapperClass + '_disabled');
 
           if (type === 'contenteditable') {

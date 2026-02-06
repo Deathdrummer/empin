@@ -90,7 +90,7 @@ class DdrInput {
 		let allData = [];
 		items.each(function(k, item) {
 			let tag = item?.tagName?.toLowerCase(),
-				type = $(item).attr('tagname') !== 'undefined' ? $(item).attr('tagname') : (typeof $(item).attr('contenteditable') !== 'undefined' ? 'contenteditable' : (item?.type ? item?.type?.toLowerCase()?.replace('select-one', 'select') : null)),
+				type = typeof $(item).attr('tagname') !== 'undefined' ? $(item).attr('tagname') : (typeof $(item).attr('contenteditable') !== 'undefined' ? 'contenteditable' : (item?.type ? item?.type?.toLowerCase()?.replace('select-one', 'select') : null)),
 				group = typeof $(item).attr('inpgroup') !== 'undefined' ? $(item).attr('inpgroup')+'-' : '',
 				wrapperClass = findWrapByInputType.indexOf(type) !== -1 ? group+type : group+tag,
 				wrapperSelector = $(item).closest('.'+wrapperClass).length ? $(item).closest('.'+wrapperClass) : false;
@@ -228,9 +228,10 @@ class DdrInput {
 		
 		this.inputs.forEach(({item, tag, type, group, wrapperClass, wrapperSelector}) => {
 			
-			console.log({item, tag, type, group, wrapperClass, wrapperSelector});
+			//console.log({item, tag, type, group, wrapperClass, wrapperSelector});
 			
 			if (wrapperSelector) {
+				console.log(12312312312312312);
 				if ($(wrapperSelector).hasClass(wrapperClass+'_disabled') === false) $(wrapperSelector).addClass(wrapperClass+'_disabled');
 				if (type === 'contenteditable') {
 					$(item).attr('contenteditable', false);

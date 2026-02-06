@@ -692,6 +692,12 @@
 							disabled: true
 						}, optionSelector, 'replace');
 					}
+					
+					if (permissionId == 382) {
+						$('[pgroupid="5"]').find('[permid]').each(function() {
+							$(this).ddrInputs(checkStat ? 'disable' : 'enable');
+						});
+					}
 				});
 			}
 		}
