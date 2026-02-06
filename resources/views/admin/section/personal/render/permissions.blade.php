@@ -26,6 +26,7 @@
 							'ddrtabscontent__item_visible' => $loop->first
 						])
 						ddrtabscontentitem="permissionsTab{{$groupData['id'] ?? null}}"
+						pgroupid="{{$groupId}}"
 						>
 						@isset($permissions[$groupData['id']])
 							<div class="row row-cols-2 gx-20">
@@ -35,6 +36,7 @@
 											label="{{$item['title'] ?? 'Без названия'}}"
 											:checked="in_array($item['id'], $user_permissions) ?? false"
 											action="setPermissionToUser:{{$user ?? null}},{{$item['id'] ?? null}}"
+											tag="permid:{{$item['id'] ?? null}}"
 											/>
 									</div>
 								@endforeach
@@ -48,3 +50,14 @@
 		</div>
 	@endif
 </x-input-group>
+
+
+
+
+<script type="module">
+
+if ($('[permid="382"]').is(':checked')) {
+	$('[pgroupid="{{$groupId}}"]').find('input[checkbox]').setAttrib('disabled');
+}
+
+</script>
