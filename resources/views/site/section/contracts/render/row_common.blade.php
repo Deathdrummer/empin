@@ -55,7 +55,7 @@
 	@endif
 	
 	@if($column == 'title' && auth('site')->user()->can('contract-col-title:site'))
-		<x-table.td class="breakword h-start" commonlist :contextedit="(auth('site')->user()->can('contract-can-edit-cell:site') || auth('site')->user()->can('edit:title:site')) ? $id.','.$column.',1' : false" style="background-color: {{$selected_color.'75' ?? ''}};">
+		<x-table.td class="breakword h-start" commonlist :contextedit="(auth('site')->user()->can('contract-can-edit-cell::site') || auth('site')->user()->can('edit:title:site')) ? $id.','.$column.',1' : false" style="background-color: {{$selected_color.'75' ?? ''}};">
 			<div class="scrollblock-hidden maxh4rem-6px pr3px">
 				<p class="fz12px lh100 mt2px mb2px" edittedplace="-">{{Str::of($title ?? '-')->limit(60, '...')}}</p>
 			</div>
