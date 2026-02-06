@@ -285,7 +285,7 @@
 		canCreateSelect 		= '{{Auth::guard('site')->user()->can('contract-create-select::site')}}',
 		canRemoveSelect 		= '{{Auth::guard('site')->user()->can('contract-remove-select::site')}}',
 		canChooseEmployee 		= '{{Auth::guard('site')->user()->can('contract-choose-employee:site')}}',
-		canEditCell 			= '{{Auth::guard('site')->user()->can('contract-can-edit-cell::site')}}',
+		canEditCell 			= true, //'{{Auth::guard('site')->user()->can('contract-can-edit-cell::site')}}',
 		offset 					= 0,
 		search 					= null,
 		columnFilter 			= [], // поиск по значению из столбца
