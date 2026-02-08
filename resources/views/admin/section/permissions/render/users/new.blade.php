@@ -18,6 +18,15 @@
 				/>
 		</td>
 		<td>
+			<x-input
+				name="sort"
+				type="number"
+				class="w100"
+				placeholder="Сортировка"
+				v
+				/>
+		</td>
+		<td>
 			<x-select name="group" class="w100" :options="$data['permissions_groups']"/>
 		</td> 
 		<td></td>
