@@ -732,7 +732,7 @@ export function contextMenu(
 					
 					
 					
-					const {data: list, error, status, headers} = await axiosQuery('post', 'site/contracts/step_checkbox', {
+					const {data, error, status, headers} = await axiosQuery('post', 'site/contracts/step_checkbox', {
 						contractId, 
 						departmentId,
 						stepId,
@@ -746,6 +746,8 @@ export function contextMenu(
 						waitCell.destroy();
 						return;
 					}
+					
+					const list = data[stepId] || data;
 					
 					// canCreateCheckbox canRemoveCheckbox
 					if (list) {

@@ -21998,7 +21998,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
       sort: 1,
       onClick: function onClick() {
         return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee3() {
-          var cell, edited, attrData, _pregSplit5, _pregSplit6, _pregSplit6$, contractId, _pregSplit6$2, departmentId, _pregSplit6$3, stepId, waitCell, _yield$axiosQuery3, list, error, status, headers, randId, listHtml, editedSelect;
+          var cell, edited, attrData, _pregSplit5, _pregSplit6, _pregSplit6$, contractId, _pregSplit6$2, departmentId, _pregSplit6$3, stepId, waitCell, _yield$axiosQuery3, data, error, status, headers, list, randId, listHtml, editedSelect;
 
           return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee3$(_context3) {
             while (1) {
@@ -22022,7 +22022,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
 
                 case 7:
                   _yield$axiosQuery3 = _context3.sent;
-                  list = _yield$axiosQuery3.data;
+                  data = _yield$axiosQuery3.data;
                   error = _yield$axiosQuery3.error;
                   status = _yield$axiosQuery3.status;
                   headers = _yield$axiosQuery3.headers;
@@ -22038,7 +22038,8 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                   return _context3.abrupt("return");
 
                 case 17:
-                  // canCreateCheckbox canRemoveCheckbox
+                  list = data[stepId] || data; // canCreateCheckbox canRemoveCheckbox
+
                   if (list) {
                     if (!hasSelect) {
                       if (edited && canChooseEmployee) {
@@ -22071,7 +22072,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                     waitCell.destroy();
                   }
 
-                case 18:
+                case 19:
                 case "end":
                   return _context3.stop();
               }
