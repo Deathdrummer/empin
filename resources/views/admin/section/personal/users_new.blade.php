@@ -694,7 +694,7 @@
 					}
 					
 					if (permissionId == 382) {
-						$('[pgroupid="5"]').find('[permid]').each(function() {
+						$('[pgroupid="4"]').find('[permid]').each(function() {
 							$(this).ddrInputs(checkStat ? 'disable' : 'enable');
 						});
 					}

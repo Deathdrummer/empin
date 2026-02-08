@@ -61,7 +61,7 @@
 <script type="module">
 
 if ($('[permid="382"]').is(':checked')) {
-	$('[pgroupid="5"]').find('[permid]').ddrInputs('disable');
+	$('[pgroupid="4"]').find('[permid]').ddrInputs('disable');
 }
 
 </script>
