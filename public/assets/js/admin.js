@@ -17648,9 +17648,7 @@ var DdrInput = /*#__PURE__*/function () {
             wrapperClass = _ref3.wrapperClass,
             wrapperSelector = _ref3.wrapperSelector;
 
-        //console.log({item, tag, type, group, wrapperClass, wrapperSelector});
         if (wrapperSelector) {
-          console.log(12312312312312312);
           if ($(wrapperSelector).hasClass(wrapperClass + '_disabled') === false) $(wrapperSelector).addClass(wrapperClass + '_disabled');
 
           if (type === 'contenteditable') {

@@ -228,10 +228,7 @@ class DdrInput {
 		
 		this.inputs.forEach(({item, tag, type, group, wrapperClass, wrapperSelector}) => {
 			
-			//console.log({item, tag, type, group, wrapperClass, wrapperSelector});
-			
 			if (wrapperSelector) {
-				console.log(12312312312312312);
 				if ($(wrapperSelector).hasClass(wrapperClass+'_disabled') === false) $(wrapperSelector).addClass(wrapperClass+'_disabled');
 				if (type === 'contenteditable') {
 					$(item).attr('contenteditable', false);
