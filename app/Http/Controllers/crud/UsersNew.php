@@ -506,15 +506,24 @@ class UsersNew extends Controller {
 		
 		if (!$user = User::fromStaff($valid['user'])->first()) return response()->json(false);
 		
-		$allPermissions = Permission::where('guard_name', $valid['guard'])
+		$this->addSettingToGlobalData('permissions_groups:groups', 'id', null, 'group:'.$valid['guard']);
+		
+		$allPermissionsGroups = Permission::where('guard_name', $valid['guard'])
 			->whereNot('group', null)
 			->get()
 			->sortBy('sort', SORT_NATURAL)
 			->groupBy('group');
 		
+		foreach ($allPermissionsGroups as $group => $items) {
+			$allPermissionsGroups[$group] = $items->chunk(ceil($items->count() / ($this->data['groups'][$group]['cols_count'] ?? 2)));
+		}
+		
+		$allPermissions = $allPermissionsGroups;
+		
+		
 		$userPermissions = $user->getAllPermissions()->pluck('id')->toArray();
 		
-		$this->addSettingToGlobalData('permissions_groups:groups', 'id', null, 'group:'.$valid['guard']);
+		
 		
 		usort($this->data['groups'], function($a, $b) {
 			if (!isset($a['sort']) || !isset($b['sort'])) return 0;

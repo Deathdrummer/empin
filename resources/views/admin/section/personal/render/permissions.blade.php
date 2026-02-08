@@ -29,15 +29,19 @@
 						pgroupid="{{$groupId}}"
 						>
 						@isset($permissions[$groupData['id']])
-							<div class="row row-cols-2 gx-20">
-								@foreach($permissions[$groupData['id']] as $item)
-									<div class="col mb10px">
-										<x-checkbox
-											label="{{$item['title'] ?? 'Без названия'}}"
-											:checked="in_array($item['id'], $user_permissions) ?? false"
-											action="setPermissionToUser:{{$user ?? null}},{{$item['id'] ?? null}}"
-											tag="permid:{{$item['id'] ?? null}}"
-											/>
+							<div class="row gx-20">
+								@foreach($permissions[$groupData['id']] as $chunk)
+									<div class="col">
+										@foreach($chunk as $item)
+											<div class="mb10px">
+												<x-checkbox
+													label="{{ $item['title'] ?? 'Без названия' }}"
+													:checked="in_array($item['id'], $user_permissions) ?? false"
+													action="setPermissionToUser:{{ $user ?? null }},{{ $item['id'] ?? null }}"
+													tag="permid:{{ $item['id'] ?? null }}"
+												/>
+											</div>
+										@endforeach
 									</div>
 								@endforeach
 							</div>
