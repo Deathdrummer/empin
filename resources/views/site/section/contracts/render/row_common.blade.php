@@ -495,6 +495,38 @@
 			<p class="fz12px" edittedplace="-">{{!isset($power) || $power == 0 ? '-' : $power}}</p>
 		</x-table.td>
 	@endif
+	
+	@if($column == 'tu' && auth('site')->user()->can('contract-col-tu:site'))
+		<x-table.td class="breakword h-center" commonlist :contextedit="(auth('site')->user()->can('contract-can-edit-cell::site') || auth('site')->user()->can('edit:tu:site')) ? $id.','.$column.',1' : false" style="background-color: {{$selected_color.'75' ?? ''}};">
+			<div class="scrollblock-hidden maxh4rem-6px pr3px">
+				<p class="fz12px lh100 mt2px mb2px" edittedplace="-">{{$tu ?? '-'}}</p>
+			</div>
+		</x-table.td>
+	@endif
+	
+	@if($column == 'inv_num_dmnt_tmg' && auth('site')->user()->can('contract-col-inv_num_dmnt_tmg:site'))
+		<x-table.td class="breakword h-center" commonlist :contextedit="(auth('site')->user()->can('contract-can-edit-cell::site') || auth('site')->user()->can('edit:inv_num_dmnt_tmg:site')) ? $id.','.$column.',1' : false" style="background-color: {{$selected_color.'75' ?? ''}};">
+			<div class="scrollblock-hidden maxh4rem-6px pr3px">
+				<p class="fz12px lh100 mt2px mb2px" edittedplace="-">{{$inv_num_dmnt_tmg ?? '-'}}</p>
+			</div>
+		</x-table.td>
+	@endif
+	
+	@if($column == 'fab_num_dmnt_tmg' && auth('site')->user()->can('contract-col-fab_num_dmnt_tmg:site'))
+		<x-table.td class="breakword h-center" commonlist :contextedit="(auth('site')->user()->can('contract-can-edit-cell::site') || auth('site')->user()->can('edit:fab_num_dmnt_tmg:site')) ? $id.','.$column.',1' : false" style="background-color: {{$selected_color.'75' ?? ''}};">
+			<div class="scrollblock-hidden maxh4rem-6px pr3px">
+				<p class="fz12px lh100 mt2px mb2px" edittedplace="-">{{$fab_num_dmnt_tmg ?? '-'}}</p>
+			</div>
+		</x-table.td>
+	@endif
+	
+	@if($column == 'fab_num_mont_tmg' && auth('site')->user()->can('contract-col-fab_num_mont_tmg:site'))
+		<x-table.td class="breakword h-center" commonlist :contextedit="(auth('site')->user()->can('contract-can-edit-cell::site') || auth('site')->user()->can('edit:fab_num_mont_tmg:site')) ? $id.','.$column.',1' : false" style="background-color: {{$selected_color.'75' ?? ''}};">
+			<div class="scrollblock-hidden maxh4rem-6px pr3px">
+				<p class="fz12px lh100 mt2px mb2px" edittedplace="-">{{$fab_num_mont_tmg ?? '-'}}</p>
+			</div>
+		</x-table.td>
+	@endif
 @empty	
 @endforelse
 

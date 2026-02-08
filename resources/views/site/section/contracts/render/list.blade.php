@@ -666,6 +666,50 @@
 									</x-table.td>
 								@endif
 								
+								@if($column == 'tu' && auth('site')->user()->can('contract-col-tu:site'))
+									<x-table.td
+										style="width:{{isset($listWidth['tu']) ? $listWidth['tu'] : '100'}}px;"
+										class="sort{{$sortField == 'tu' ? ' sort-'.$sortOrder : ''}}"
+										onclick="$.sorting(this, 'tu')"
+										noscroll
+										ddrtabletdmain
+										><strong class="fz10px lh90 d-block text-center wodrbreak">ТУ</strong>
+									</x-table.td>
+								@endif
+								
+								@if($column == 'inv_num_dmnt_tmg' && auth('site')->user()->can('contract-col-inv_num_dmnt_tmg:site'))
+									<x-table.td
+										style="width:{{isset($listWidth['inv_num_dmnt_tmg']) ? $listWidth['inv_num_dmnt_tmg'] : '100'}}px;"
+										class="sort{{$sortField == 'inv_num_dmnt_tmg' ? ' sort-'.$sortOrder : ''}}"
+										onclick="$.sorting(this, 'inv_num_dmnt_tmg')"
+										noscroll
+										ddrtabletdmain
+										><strong class="fz10px lh90 d-block text-center wodrbreak">Инвентарный номер демонтируемого ТМГ</strong>
+									</x-table.td>
+								@endif
+								
+								@if($column == 'fab_num_dmnt_tmg' && auth('site')->user()->can('contract-col-fab_num_dmnt_tmg:site'))
+									<x-table.td
+										style="width:{{isset($listWidth['fab_num_dmnt_tmg']) ? $listWidth['fab_num_dmnt_tmg'] : '100'}}px;"
+										class="sort{{$sortField == 'fab_num_dmnt_tmg' ? ' sort-'.$sortOrder : ''}}"
+										onclick="$.sorting(this, 'fab_num_dmnt_tmg')"
+										noscroll
+										ddrtabletdmain
+										><strong class="fz10px lh90 d-block text-center wodrbreak">Заводской номер демонтируемого ТМГ</strong>
+									</x-table.td>
+								@endif
+								
+								@if($column == 'fab_num_mont_tmg' && auth('site')->user()->can('contract-col-fab_num_mont_tmg:site'))
+									<x-table.td
+										style="width:{{isset($listWidth['fab_num_mont_tmg']) ? $listWidth['fab_num_mont_tmg'] : '100'}}px;"
+										class="sort{{$sortField == 'fab_num_mont_tmg' ? ' sort-'.$sortOrder : ''}}"
+										onclick="$.sorting(this, 'fab_num_mont_tmg')"
+										noscroll
+										ddrtabletdmain
+										><strong class="fz10px lh90 d-block text-center wodrbreak">Заводской номер монтируемого ТМГ</strong>
+									</x-table.td>
+								@endif
+								
 							@empty	
 							@endforelse
 

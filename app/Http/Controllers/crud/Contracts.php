@@ -206,6 +206,7 @@ class Contracts extends Controller {
 			'archive_dir' 		=> 'nullable|string',
 			'departments' 		=> 'array|exclude',
 			'power' 			=> 'nullable|numeric',
+			'tu' 				=> 'nullable|string',
 			'_sort'				=> 'exclude|regex:/[0-9]+/'
 		]);
 		
@@ -377,6 +378,10 @@ class Contracts extends Controller {
 			'archive_dir' 		=> 'nullable|string',
 			'departments' 		=> 'array|exclude',
 			'power' 			=> 'nullable|numeric',
+			'tu' 				=> 'nullable|string',
+			'inv_num_dmnt_tmg'	=> 'nullable|string',
+			'fab_num_dmnt_tmg'	=> 'nullable|string',
+			'fab_num_mont_tmg'	=> 'nullable|string',
 			'views'				=> 'string|required|exclude'
 		]);
 		
