@@ -22595,7 +22595,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
       }
     }, {
       name: hasCheckbox && canRemoveCheckbox ? 'Удалить чекбокс' : !hasCheckbox && canCreateCheckbox ? 'Добавить чекбокс' : '',
-      visible: isDeptCheckbox && !isArchive && (!hasCheckbox && canCreateCheckbox || hasCheckbox && canRemoveCheckbox) && !selectedTextCell && canAddItem,
+      visible: isDeptCheckbox && !isArchive && (!hasCheckbox && canCreateCheckbox || hasCheckbox && canRemoveCheckbox) && !selectedTextCell,
       sort: 1,
       onClick: function onClick() {
         return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee2() {
@@ -22669,7 +22669,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
       }
     }, {
       name: hasSelect && canRemoveSelect ? 'Удалить вып. список' : !hasSelect && canCreateSelect ? 'Добавить вып. список' : '',
-      visible: isDeptSelect && !isArchive && (!hasSelect && canCreateSelect || hasSelect && canRemoveSelect) && !selectedTextCell && canAddItem,
+      visible: isDeptSelect && !isArchive && (!hasSelect && canCreateSelect || hasSelect && canRemoveSelect) && !selectedTextCell,
       sort: 1,
       onClick: function onClick() {
         return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee3() {

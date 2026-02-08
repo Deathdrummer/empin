@@ -661,7 +661,7 @@ export function contextMenu(
 				}
 			}, {
 				name: hasCheckbox && canRemoveCheckbox ? 'Удалить чекбокс' : (!hasCheckbox && canCreateCheckbox ? 'Добавить чекбокс' : ''),
-				visible: isDeptCheckbox && !isArchive && ((!hasCheckbox && canCreateCheckbox) || (hasCheckbox && canRemoveCheckbox)) && !selectedTextCell && canAddItem,
+				visible: isDeptCheckbox && !isArchive && ((!hasCheckbox && canCreateCheckbox) || (hasCheckbox && canRemoveCheckbox)) && !selectedTextCell,
 				sort: 1,
 				async onClick() {	
 					const cell = $(target.pointer).closest('[ddrtabletd]');
@@ -716,7 +716,7 @@ export function contextMenu(
 				}
 			}, {
 				name: hasSelect && canRemoveSelect ? 'Удалить вып. список' : (!hasSelect && canCreateSelect ? 'Добавить вып. список' : ''),
-				visible: isDeptSelect && !isArchive && ((!hasSelect && canCreateSelect) || (hasSelect && canRemoveSelect)) && !selectedTextCell && canAddItem,
+				visible: isDeptSelect && !isArchive && ((!hasSelect && canCreateSelect) || (hasSelect && canRemoveSelect)) && !selectedTextCell,
 				sort: 1,
 				async onClick() {	
 					const cell = $(target.pointer).closest('[ddrtabletd]');
