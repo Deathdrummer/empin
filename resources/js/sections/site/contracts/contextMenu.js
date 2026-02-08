@@ -57,9 +57,9 @@ export function contextMenu(
 		
 		
 		// можно ли добавлять элементы у этапа
-		const canAddItem = $(target.pointer).closest('[ddrtabletd]').attr('canadditem') === 1 ? true : false;
+		const canAddItem = $(target.pointer).closest('[ddrtabletd]').attr('canadditem') == 1 ? true : false;
 		
-		console.log(canAddItem);
+		console.log($(target.pointer).closest('[ddrtabletd]').attr('canadditem'), canAddItem);
 		
 		// Если это оин пункт "копировать"
 		if ((selectedTextCell || $(target.pointer).closest('[ddrtabletd]').hasClass('selected')) || !!$(target.pointer).closest('[ddrtabletd]').find('[edittedplace]').hasClass('select-text')) {

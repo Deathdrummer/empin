@@ -21188,8 +21188,8 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
     var allPinned;
     var pinnedInSelected = {}; // можно ли добавлять элементы у этапа
 
-    var canAddItem = $(target.pointer).closest('[ddrtabletd]').attr('canadditem') === 1 ? true : false;
-    console.log(canAddItem); // Если это оин пункт "копировать"
+    var canAddItem = $(target.pointer).closest('[ddrtabletd]').attr('canadditem') == 1 ? true : false;
+    console.log($(target.pointer).closest('[ddrtabletd]').attr('canadditem'), canAddItem); // Если это оин пункт "копировать"
 
     if (selectedTextCell || $(target.pointer).closest('[ddrtabletd]').hasClass('selected') || !!$(target.pointer).closest('[ddrtabletd]').find('[edittedplace]').hasClass('select-text')) {
       setStyle({
