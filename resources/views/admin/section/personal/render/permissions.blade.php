@@ -12,7 +12,7 @@
 							])
 							ddrtabsitem="permissionsTab{{$groupData['id'] ?? null}}"
 							>
-							<span>{{$groupData['name'] ?? 'Без названия'}}</span>
+							<span class="format">{{$groupData['name'] ?? 'Без названия'}}</span>
 						</li>
 					@endforeach
 				</ul>

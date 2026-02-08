@@ -647,7 +647,7 @@
 				close,
 				onCancel,
 			} = await ddrPopup({
-				title: 'Права доступа <br><span class="fz13px color-gray" style="position: absolute; transform: translateX(-50%);">'+pseudoname+'</span> ', // заголовок,
+				title: 'Права доступа <br><span class="fz13px color-gray" style="position: absolute; transform: translateX(-50%);">'+pseudoname+' 123</span> ', // заголовок,
 				url: 'ajax/users_new/permissions',
 				params: {row, view: 'admin.section.personal.render.permissions', user: userId, guard: 'site'},
 				width: 1000, // ширина окна
