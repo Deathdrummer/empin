@@ -16,6 +16,7 @@
 					{{-- onmouseenter="{{isset($contract['departments'][$dept['id']]['steps'][$step['id']]['has_comment']) && $contract['departments'][$dept['id']]['steps'][$step['id']]['has_comment'] ? '$.commentsTooltip(event);' : ''}}" --}}
 					{{-- onmouseleave="$.commentsTooltipLeave();" --}}
 					edited="{{$edited}}"
+					:canadditem="auth('site')->user()->can('step:'.$step['id'].':site') ? 1 : 0"
 					>
 					
 					@if(isset($contract['departments'][$dept['id']]['steps'][$step['id']]['has_comment']) && $contract['departments'][$dept['id']]['steps'][$step['id']]['has_comment'])
@@ -46,6 +47,7 @@
 					{{-- @if(!$contractdata[$contract['id']][$dept['id']][$step['id']]['data'] ?? true)
 					style="background-color: {{$contract['departments'][$dept['id']]['steps'][$step['id']]['color']}};"
 					@endif --}}
+					:canadditem="auth('site')->user()->can('step:'.$step['id'].':site') ? 1 : 0"
 					>
 					@if($edited)
 						<x-textarea
@@ -68,6 +70,7 @@
 					@endif --}}
 					deptselect="{{$contract['id']}},{{$dept['id']}},{{$step['id']}}"
 					edited="{{$edited}}"
+					:canadditem="auth('site')->user()->can('step:'.$step['id'].':site') ? 1 : 0"
 					>
 					@if($edited && auth('site')->user()->can('contract-choose-employee:site'))
 						{{-- contractId departmentId stepId stepType --}}
@@ -100,6 +103,7 @@
 					style="background-color: {{$contract['departments'][$dept['id']]['steps'][$step['id']]['color']}};"
 					@endif --}}
 					class="h-end"
+					:canadditem="auth('site')->user()->can('step:'.$step['id'].':site') ? 1 : 0"
 					>
 					@if($edited)
 						<x-input
@@ -125,6 +129,7 @@
 						deptlights="{{$contract['id']}},{{$dept['id']}},{{$step['id']}}"
 						color="{{$contractdata[$contract['id']][$dept['id']][$step['id']]['data'] ?? null}}"
 						class="h-center"
+						:canadditem="auth('site')->user()->can('step:'.$step['id'].':site') ? 1 : 0"
 						>
 				  		@isset($contractdata[$contract['id']][$dept['id']][$step['id']]['data'])
 					  		<div
@@ -138,6 +143,7 @@
 				@else
 					<x-table.td
 						class="h-center"
+						:canadditem="auth('site')->user()->can('step:'.$step['id'].':site') ? 1 : 0"
 						>
 				  		@isset($contractdata[$contract['id']][$dept['id']][$step['id']]['data'])
 					  		<div
@@ -157,6 +163,7 @@
 					{{-- onmouseenter="{{isset($contract['departments'][$dept['id']]['steps'][$step['id']]['has_comment']) && $contract['departments'][$dept['id']]['steps'][$step['id']]['has_comment'] ? '$.commentsTooltip(event);' : ''}}"
 					onmouseleave="$.commentsTooltipLeave();" --}}
 					edited="{{$edited}}"
+					:canadditem="auth('site')->user()->can('step:'.$step['id'].':site') ? 1 : 0"
 					>
 					@if(isset($contract['departments'][$dept['id']]['steps'][$step['id']]['has_comment']) && $contract['departments'][$dept['id']]['steps'][$step['id']]['has_comment'])
 						<div class="trangled trangled-top-right"></div>
@@ -169,6 +176,7 @@
 					{{-- onmouseenter="{{isset($contract['departments'][$dept['id']]['steps'][$step['id']]['has_comment']) && $contract['departments'][$dept['id']]['steps'][$step['id']]['has_comment'] ? '$.commentsTooltip(event);' : ''}}"
 					onmouseleave="$.commentsTooltipLeave();" --}}
 					edited="{{$edited}}"
+					:canadditem="auth('site')->user()->can('step:'.$step['id'].':site') ? 1 : 0"
 					>
 					@if(isset($contract['departments'][$dept['id']]['steps'][$step['id']]['has_comment']) && $contract['departments'][$dept['id']]['steps'][$step['id']]['has_comment'])
 						<div class="trangled trangled-top-right"></div>

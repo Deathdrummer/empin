@@ -21186,7 +21186,9 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
     var calcPrices;
     var calcDates;
     var allPinned;
-    var pinnedInSelected = {}; // Если это оин пункт "копировать"
+    var pinnedInSelected = {}; // можно ли добавлять элементы у этапа
+
+    var canAddItem = $(target.pointer).closest('[ddrtabletd]').attr('canadditem') === 1 ? true : false; // Если это оин пункт "копировать"
 
     if (selectedTextCell || $(target.pointer).closest('[ddrtabletd]').hasClass('selected') || !!$(target.pointer).closest('[ddrtabletd]').find('[edittedplace]').hasClass('select-text')) {
       setStyle({
@@ -21920,7 +21922,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
       }
     }, {
       name: hasCheckbox && canRemoveCheckbox ? 'Удалить чекбокс' : !hasCheckbox && canCreateCheckbox ? 'Добавить чекбокс' : '',
-      visible: isDeptCheckbox && !isArchive && (!hasCheckbox && canCreateCheckbox || hasCheckbox && canRemoveCheckbox) && !selectedTextCell,
+      visible: isDeptCheckbox && !isArchive && (!hasCheckbox && canCreateCheckbox || hasCheckbox && canRemoveCheckbox) && !selectedTextCell && canAddItem,
       sort: 1,
       onClick: function onClick() {
         return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee2() {
@@ -21994,7 +21996,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
       }
     }, {
       name: hasSelect && canRemoveSelect ? 'Удалить вып. список' : !hasSelect && canCreateSelect ? 'Добавить вып. список' : '',
-      visible: isDeptSelect && !isArchive && (!hasSelect && canCreateSelect || hasSelect && canRemoveSelect) && !selectedTextCell,
+      visible: isDeptSelect && !isArchive && (!hasSelect && canCreateSelect || hasSelect && canRemoveSelect) && !selectedTextCell && canAddItem,
       sort: 1,
       onClick: function onClick() {
         return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee3() {
