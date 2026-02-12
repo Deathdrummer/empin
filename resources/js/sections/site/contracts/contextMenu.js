@@ -715,8 +715,8 @@ export function contextMenu(
 					}
 				}
 			}, {
-				name: hasSelect && canRemoveSelect ? 'Удалить вып. список' : (!hasSelect && canCreateSelect ? 'Добавить вып. список' : ''),
-				visible: isDeptSelect && !isArchive && ((!hasSelect && canCreateSelect) || (hasSelect && canRemoveSelect)) && !selectedTextCell && canAddItem,
+				name: hasSelect && (canRemoveSelect || canAddItem) ? 'Удалить вып. список' : (!hasSelect && (canCreateSelect || canAddItem) ? 'Добавить вып. список' : ''),
+				visible: isDeptSelect && !isArchive && ((!hasSelect && (canCreateSelect || canAddItem)) || (hasSelect && (canRemoveSelect || canAddItem))) && !selectedTextCell,
 				sort: 1,
 				async onClick() {	
 					const cell = $(target.pointer).closest('[ddrtabletd]');

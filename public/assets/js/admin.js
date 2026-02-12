@@ -22666,8 +22666,8 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
         }))();
       }
     }, {
-      name: hasSelect && canRemoveSelect ? 'Удалить вып. список' : !hasSelect && canCreateSelect ? 'Добавить вып. список' : '',
-      visible: isDeptSelect && !isArchive && (!hasSelect && canCreateSelect || hasSelect && canRemoveSelect) && !selectedTextCell && canAddItem,
+      name: hasSelect && (canRemoveSelect || canAddItem) ? 'Удалить вып. список' : !hasSelect && (canCreateSelect || canAddItem) ? 'Добавить вып. список' : '',
+      visible: isDeptSelect && !isArchive && (!hasSelect && (canCreateSelect || canAddItem) || hasSelect && (canRemoveSelect || canAddItem)) && !selectedTextCell,
       sort: 1,
       onClick: function onClick() {
         return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee3() {
