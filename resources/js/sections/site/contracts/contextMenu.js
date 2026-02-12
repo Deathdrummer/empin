@@ -660,8 +660,8 @@ export function contextMenu(
 					});
 				}
 			}, {
-				name: hasCheckbox && canRemoveCheckbox ? 'Удалить чекбокс' : (!hasCheckbox && canCreateCheckbox ? 'Добавить чекбокс' : ''),
-				visible: isDeptCheckbox && !isArchive && ((!hasCheckbox && canCreateCheckbox) || (hasCheckbox && canRemoveCheckbox)) && !selectedTextCell && canAddItem,
+				name: hasCheckbox && (canRemoveCheckbox || canAddItem) ? 'Удалить чекбокс' : (!hasCheckbox && (canCreateCheckbox || canAddItem) ? 'Добавить чекбокс' : ''),
+				visible: isDeptCheckbox && !isArchive && ((!hasCheckbox && (canCreateCheckbox || canAddItem)) || (hasCheckbox && (canRemoveCheckbox || canAddItem))) && !selectedTextCell,
 				sort: 1,
 				async onClick() {	
 					const cell = $(target.pointer).closest('[ddrtabletd]');
