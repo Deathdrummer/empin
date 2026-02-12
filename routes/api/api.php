@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\api\AuthController;
 use App\Http\Controllers\api\MessengerApiController;
+use App\Http\Controllers\Api\MessengerCallController;
 use App\Http\Controllers\api\TimesheetApiController;
 use App\Http\Controllers\SettingsController;
 use Illuminate\Support\Facades\Route;
@@ -61,6 +62,17 @@ Route::controller(MessengerApiController::class)->prefix('messenger')->middlewar
 	Route::put('/message/{id}', 'updateMessage');
 	Route::delete('/message/{id}', 'removeMessage');
 	Route::post('/message/reaction', 'toggleReaction');
+});
+
+// Messenger Calls API (требует авторизацию)
+Route::prefix('messenger/calls')->middleware('auth:sanctum')->group(function() {
+	Route::post('/initiate', [MessengerCallController::class, 'initiate']);
+	Route::post('/{id}/accept', [MessengerCallController::class, 'accept']);
+	Route::post('/{id}/reject', [MessengerCallController::class, 'reject']);
+	Route::post('/{id}/cancel', [MessengerCallController::class, 'cancel']);
+	Route::post('/{id}/end', [MessengerCallController::class, 'end']);
+	Route::get('/history', [MessengerCallController::class, 'history']);
+	Route::get('/{id}', [MessengerCallController::class, 'show']);
 });
 
 // Settings API
