@@ -83,7 +83,7 @@ class Handler extends ExceptionHandler {
 			$errData = $details->getData();
 			$errData->status = $details->getStatusCode();
             $errData->message = __('errors.'.$errData->status) ?: $details->message;
-			return response()->json($errData);
+			return response()->json($errData, $errData->status);
 		}
 		return $details;
 		// !env('APP_DEBUG', false)
