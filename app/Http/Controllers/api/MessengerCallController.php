@@ -5,19 +5,21 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\MessengerCall;
 use App\Models\Staff;
+use App\Services\LiveKitService;
 use App\Services\PushNotificationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class MessengerCallController extends Controller
 {
     protected PushNotificationService $pushService;
+    protected LiveKitService $liveKit;
 
-    public function __construct(PushNotificationService $pushService)
+    public function __construct(PushNotificationService $pushService, LiveKitService $liveKit)
     {
         $this->pushService = $pushService;
+        $this->liveKit = $liveKit;
     }
 
     /**
@@ -37,8 +39,8 @@ class MessengerCallController extends Controller
             return response()->json(['message' => 'Cannot call yourself'], 422);
         }
 
-        // Генерация session_id (пока UUID, позже заменим на VideoSDK API)
-        $sessionId = Str::uuid()->toString();
+        // Генерация имени комнаты LiveKit
+        $roomName = LiveKitService::generateRoomName();
 
         // Создание записи звонка
         $call = MessengerCall::create([
@@ -46,14 +48,15 @@ class MessengerCallController extends Controller
             'callee_id' => $calleeId,
             'call_type' => 'audio',
             'status' => 'initiated',
-            'session_id' => $sessionId,
+            'session_id' => $roomName,
         ]);
 
         // Загрузка данных callee и caller
         $call->load(['callee', 'caller']);
 
-        // TODO: Генерация VideoSDK токенов (после получения API ключа)
-        $token = 'temporary_token_placeholder';
+        // Генерация LiveKit JWT токена для caller
+        $callerIdentity = (string) $callerId;
+        $token = $this->liveKit->generateToken($roomName, $callerIdentity);
 
         // Отправка push-уведомления callee
         $this->pushService->sendIncomingCallNotification(
@@ -63,10 +66,11 @@ class MessengerCallController extends Controller
         );
 
         return response()->json([
-            'call_id' => $call->id,
-            'session_id' => $sessionId,
-            'token' => $token,
-            'callee' => $call->callee,
+            'call_id'     => $call->id,
+            'room_name'   => $roomName,
+            'token'       => $token,
+            'livekit_url' => $this->liveKit->getUrl(),
+            'callee'      => $call->callee,
         ]);
     }
 
@@ -94,13 +98,15 @@ class MessengerCallController extends Controller
             'started_at' => now(),
         ]);
 
-        // TODO: Генерация VideoSDK токена для callee
-        $token = 'temporary_token_placeholder';
+        // Генерация LiveKit JWT токена для callee
+        $calleeIdentity = (string) $call->callee_id;
+        $token = $this->liveKit->generateToken($call->session_id, $calleeIdentity);
 
         return response()->json([
-            'call' => $call,
-            'session_id' => $call->session_id,
-            'token' => $token,
+            'call'        => $call,
+            'room_name'   => $call->session_id,
+            'token'       => $token,
+            'livekit_url' => $this->liveKit->getUrl(),
         ]);
     }
 
