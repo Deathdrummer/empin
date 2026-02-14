@@ -203,6 +203,38 @@ class MessengerCallController extends Controller
     }
 
     /**
+     * Проверка входящих звонков (polling, временно до FCM)
+     */
+    public function pending(Request $request): JsonResponse
+    {
+        $userId = $request->user()->id;
+
+        $call = MessengerCall::where('callee_id', $userId)
+            ->whereIn('status', ['initiated', 'ringing'])
+            ->with('caller')
+            ->latest()
+            ->first();
+
+        if (!$call) {
+            return response()->json(['call' => null]);
+        }
+
+        // Обновляем статус на ringing при первом обнаружении
+        if ($call->status === 'initiated') {
+            $call->update(['status' => 'ringing']);
+        }
+
+        return response()->json([
+            'call' => [
+                'id' => $call->id,
+                'caller' => $call->caller,
+                'call_type' => $call->call_type,
+                'created_at' => $call->created_at,
+            ],
+        ]);
+    }
+
+    /**
      * История звонков
      */
     public function history(Request $request): JsonResponse

@@ -71,6 +71,7 @@ Route::prefix('messenger/calls')->middleware('auth:sanctum')->group(function() {
 	Route::post('/{id}/reject', [MessengerCallController::class, 'reject']);
 	Route::post('/{id}/cancel', [MessengerCallController::class, 'cancel']);
 	Route::post('/{id}/end', [MessengerCallController::class, 'end']);
+	Route::get('/pending', [MessengerCallController::class, 'pending']);
 	Route::get('/history', [MessengerCallController::class, 'history']);
 	Route::get('/{id}', [MessengerCallController::class, 'show']);
 });
