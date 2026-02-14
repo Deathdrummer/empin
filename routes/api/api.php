@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\api\AuthController;
 use App\Http\Controllers\api\MessengerApiController;
-use App\Http\Controllers\Api\MessengerCallController;
+use App\Http\Controllers\api\MessengerCallController;
 use App\Http\Controllers\api\TimesheetApiController;
 use App\Http\Controllers\SettingsController;
 use Illuminate\Support\Facades\Route;
