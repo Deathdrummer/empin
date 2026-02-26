@@ -33,7 +33,9 @@ class LiveKitService
             'exp' => $now + $ttl,
             'iss' => $this->apiKey,
             'sub' => $identity,
+            'jti' => $identity,
             'nbf' => $now,
+            'iat' => $now,
             'video' => [
                 'room'         => $roomName,
                 'roomJoin'     => true,

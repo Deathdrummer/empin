@@ -31,8 +31,15 @@ class MessengerCallController extends Controller
             'callee_id' => 'required|exists:staff,id',
         ]);
 
-        $callerId = $request->user()->id;
+        $callerId = $request->user()->staff_id;
         $calleeId = $validated['callee_id'];
+
+        \Log::debug('[CALL initiate]', [
+            'user_id'   => $request->user()->id,
+            'staff_id'  => $request->user()->staff_id,
+            'caller_id' => $callerId,
+            'callee_id' => $calleeId,
+        ]);
 
         // Проверка: нельзя позвонить самому себе
         if ($callerId === $calleeId) {
@@ -89,7 +96,7 @@ class MessengerCallController extends Controller
             return response()->json(['message' => 'Call cannot be accepted'], 422);
         }
 
-        if ($call->callee_id !== $request->user()->id) {
+        if ($call->callee_id !== $request->user()->staff_id) {
             return response()->json(['message' => 'Forbidden'], 403);
         }
 
@@ -121,7 +128,7 @@ class MessengerCallController extends Controller
             return response()->json(['message' => 'Call not found'], 404);
         }
 
-        if ($call->callee_id !== $request->user()->id) {
+        if ($call->callee_id !== $request->user()->staff_id) {
             return response()->json(['message' => 'Forbidden'], 403);
         }
 
@@ -148,7 +155,7 @@ class MessengerCallController extends Controller
             return response()->json(['message' => 'Active call cannot be cancelled, use end instead'], 422);
         }
 
-        if ($call->caller_id !== $request->user()->id) {
+        if ($call->caller_id !== $request->user()->staff_id) {
             return response()->json(['message' => 'Forbidden'], 403);
         }
 
@@ -171,7 +178,7 @@ class MessengerCallController extends Controller
             return response()->json(['message' => 'Call not found'], 404);
         }
 
-        $userId = $request->user()->id;
+        $userId = $request->user()->staff_id;
 
         if ($call->caller_id !== $userId && $call->callee_id !== $userId) {
             return response()->json(['message' => 'Forbidden'], 403);
@@ -207,13 +214,20 @@ class MessengerCallController extends Controller
      */
     public function pending(Request $request): JsonResponse
     {
-        $userId = $request->user()->id;
+        $userId = $request->user()->staff_id;
+
+        \Log::debug('[CALL pending]', [
+            'user_id'  => $request->user()->id,
+            'staff_id' => $userId,
+        ]);
 
         $call = MessengerCall::where('callee_id', $userId)
             ->whereIn('status', ['initiated', 'ringing'])
             ->with('caller')
             ->latest()
             ->first();
+
+        \Log::debug('[CALL pending result]', ['found' => (bool)$call, 'call_id' => $call?->id]);
 
         if (!$call) {
             return response()->json(['call' => null]);
@@ -247,7 +261,7 @@ class MessengerCallController extends Controller
 
         $type = $validated['type'] ?? 'all';
         $perPage = $validated['per_page'] ?? 20;
-        $userId = $request->user()->id;
+        $userId = $request->user()->staff_id;
 
         $query = MessengerCall::query()
             ->forUser($userId)
@@ -291,7 +305,7 @@ class MessengerCallController extends Controller
             return response()->json(['message' => 'Call not found'], 404);
         }
 
-        $userId = $request->user()->id;
+        $userId = $request->user()->staff_id;
 
         if ($call->caller_id !== $userId && $call->callee_id !== $userId) {
             return response()->json(['message' => 'Forbidden'], 403);
