@@ -23,6 +23,26 @@ class MessengerCallController extends Controller
     }
 
     /**
+     * Зарегистрировать Expo push token устройства
+     */
+    public function registerPushToken(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'token' => 'required|string|max:200',
+        ]);
+
+        $staff = Staff::find($request->user()->staff_id);
+
+        if (!$staff) {
+            return response()->json(['message' => 'Staff not found'], 404);
+        }
+
+        $staff->update(['expo_push_token' => $validated['token']]);
+
+        return response()->json(['success' => true]);
+    }
+
+    /**
      * Инициировать звонок
      */
     public function initiate(Request $request): JsonResponse
@@ -164,6 +184,10 @@ class MessengerCallController extends Controller
             'ended_at' => now(),
         ]);
 
+        // Уведомляем callee, что звонок отменён
+        $call->load('callee');
+        $this->pushService->sendCallCancelledNotification($call->callee, $call->id);
+
         return response()->json(['success' => true]);
     }
 
@@ -196,15 +220,22 @@ class MessengerCallController extends Controller
             }
         }
 
+        $wasActive = $call->status === 'active';
+
         $call->update([
             'status' => $status,
             'ended_at' => now(),
         ]);
 
         // Вычисление длительности для активных звонков
-        if ($call->status === 'active') {
+        if ($wasActive) {
             $call->calculateDuration();
         }
+
+        // Уведомляем другого участника о завершении
+        $call->load(['caller', 'callee']);
+        $otherParty = ($userId === $call->caller_id) ? $call->callee : $call->caller;
+        $this->pushService->sendCallCancelledNotification($otherParty, $call->id);
 
         return response()->json(['call' => $call]);
     }

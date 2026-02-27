@@ -3,116 +3,117 @@
 namespace App\Services;
 
 use App\Models\Staff;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class PushNotificationService
 {
+    private const EXPO_PUSH_URL = 'https://exp.host/--/api/v2/push/send';
+
     /**
      * Отправить push-уведомление о входящем звонке
-     *
-     * @param Staff $callee Принимающий звонок
-     * @param Staff $caller Звонящий пользователь
-     * @param int $callId ID звонка
-     * @return bool
      */
     public function sendIncomingCallNotification(Staff $callee, Staff $caller, int $callId): bool
     {
-        try {
-            // TODO: Реализовать отправку через FCM после настройки Firebase
-            // Требуется:
-            // 1. FCM Server Key / Service Account
-            // 2. Device tokens пользователей в БД
-            // 3. Интеграция kreait/firebase-php или HTTP API
+        $token = $callee->expo_push_token ?? null;
 
-            $payload = [
-                'type' => 'incoming_call',
-                'call_id' => $callId,
-                'caller_id' => $caller->id,
-                'caller_name' => $caller->name ?? 'Unknown',
-                'caller_avatar' => $caller->avatar ?? null,
-            ];
-
-            $title = 'Входящий звонок';
-            $body = ($caller->name ?? 'Unknown') . ' звонит вам';
-
-            // Заглушка для логирования
-            Log::info('Push notification would be sent', [
-                'callee_id' => $callee->id,
-                'caller_id' => $caller->id,
-                'call_id' => $callId,
-                'payload' => $payload,
-            ]);
-
-            // Пример отправки через FCM HTTP API (закомментировано):
-            /*
-            $fcmToken = $callee->fcm_token; // Предполагается поле fcm_token в таблице staff
-
-            if (!$fcmToken) {
-                Log::warning('FCM token not found for user', ['user_id' => $callee->id]);
-                return false;
-            }
-
-            $response = Http::withHeaders([
-                'Authorization' => 'key=' . config('services.fcm.server_key'),
-                'Content-Type' => 'application/json',
-            ])->timeout(5)->post('https://fcm.googleapis.com/fcm/send', [
-                'to' => $fcmToken,
-                'priority' => 'high',
-                'time_to_live' => 30,
-                'notification' => [
-                    'title' => $title,
-                    'body' => $body,
-                    'sound' => 'default',
-                ],
-                'data' => $payload,
-            ]);
-
-            return $response->successful();
-            */
-
-            return true; // Временно возвращаем true (заглушка)
-        } catch (\Exception $e) {
-            Log::error('Failed to send push notification', [
-                'error' => $e->getMessage(),
-                'callee_id' => $callee->id,
-                'caller_id' => $caller->id,
-                'call_id' => $callId,
-            ]);
-
+        if (!$token) {
+            Log::warning('[Push] No expo_push_token for callee', ['callee_id' => $callee->id]);
             return false;
         }
+
+        $callerName = trim("{$caller->sname} {$caller->fname}");
+
+        return $this->send($token, [
+            'title'     => 'Входящий звонок',
+            'body'      => "{$callerName} звонит вам",
+            'data'      => [
+                'type'         => 'incoming_call',
+                'call_id'      => $callId,
+                'caller_id'    => $caller->id,
+                'caller_name'  => $callerName,
+            ],
+            'sound'     => 'default',
+            'priority'  => 'high',
+            'channelId' => 'calls',
+        ]);
     }
 
     /**
-     * Отправить уведомление об отмене звонка
-     *
-     * @param Staff $callee
-     * @param int $callId
-     * @return bool
+     * Отправить уведомление об отмене/завершении звонка
      */
     public function sendCallCancelledNotification(Staff $callee, int $callId): bool
     {
+        $token = $callee->expo_push_token ?? null;
+
+        if (!$token) {
+            return false;
+        }
+
+        return $this->send($token, [
+            'title'     => 'Звонок завершён',
+            'body'      => 'Звонящий отключился',
+            'data'      => [
+                'type'    => 'call_cancelled',
+                'call_id' => $callId,
+            ],
+            'sound'     => null,
+            'priority'  => 'high',
+            'channelId' => 'calls',
+        ]);
+    }
+
+    /**
+     * Отправить уведомление об активном звонке (звонок принят)
+     */
+    public function sendCallAcceptedNotification(Staff $caller, int $callId): bool
+    {
+        $token = $caller->expo_push_token ?? null;
+
+        if (!$token) {
+            return false;
+        }
+
+        return $this->send($token, [
+            'title'     => null,
+            'body'      => null,
+            'data'      => [
+                'type'    => 'call_accepted',
+                'call_id' => $callId,
+            ],
+            'priority'  => 'high',
+            'channelId' => 'calls',
+        ]);
+    }
+
+    /**
+     * Базовый метод отправки через Expo Push API
+     */
+    private function send(string $token, array $payload): bool
+    {
         try {
-            $payload = [
-                'type' => 'call_cancelled',
-                'call_id' => $callId,
-            ];
+            $response = Http::withHeaders([
+                'Accept'       => 'application/json',
+                'Content-Type' => 'application/json',
+            ])->timeout(5)->post(self::EXPO_PUSH_URL, [$payload + ['to' => $token]]);
 
-            Log::info('Call cancelled notification would be sent', [
-                'callee_id' => $callee->id,
-                'call_id' => $callId,
-            ]);
+            $body = $response->json();
 
-            // TODO: Реализовать через FCM
+            if (!$response->successful()) {
+                Log::error('[Push] Expo API error', ['status' => $response->status(), 'body' => $body]);
+                return false;
+            }
+
+            // Expo возвращает массив результатов
+            $result = $body['data'][0] ?? null;
+            if ($result && $result['status'] === 'error') {
+                Log::error('[Push] Expo delivery error', ['result' => $result, 'token' => $token]);
+                return false;
+            }
 
             return true;
         } catch (\Exception $e) {
-            Log::error('Failed to send call cancelled notification', [
-                'error' => $e->getMessage(),
-                'callee_id' => $callee->id,
-                'call_id' => $callId,
-            ]);
-
+            Log::error('[Push] Failed to send', ['error' => $e->getMessage(), 'token' => $token]);
             return false;
         }
     }
