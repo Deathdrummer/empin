@@ -77,11 +77,14 @@ class LiveKitService
         try {
             $token = $this->generateAdminToken();
 
+            // $this->url — WebSocket URL (wss://...), Room Service API требует HTTP(S)
+            $httpUrl = str_replace(['wss://', 'ws://'], ['https://', 'http://'], rtrim($this->url, '/'));
+
             Http::withHeaders([
                 'Authorization' => "Bearer {$token}",
                 'Content-Type'  => 'application/json',
             ])->post(
-                rtrim($this->url, '/') . '/twirp/livekit.RoomService/DeleteRoom',
+                $httpUrl . '/twirp/livekit.RoomService/DeleteRoom',
                 ['room' => $roomName]
             );
         } catch (\Throwable $e) {
