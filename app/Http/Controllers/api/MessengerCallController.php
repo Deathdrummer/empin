@@ -232,6 +232,11 @@ class MessengerCallController extends Controller
             $call->calculateDuration();
         }
 
+        // Закрываем LiveKit комнату — все участники получат сигнал мгновенно (без ~15с ICE timeout)
+        if ($call->session_id) {
+            $this->liveKit->deleteRoom($call->session_id);
+        }
+
         // Уведомляем другого участника о завершении
         $call->load(['caller', 'callee']);
         $otherParty = ($userId === $call->caller_id) ? $call->callee : $call->caller;
