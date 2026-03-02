@@ -37,4 +37,9 @@ return [
         'url'        => env('LIVEKIT_URL', 'wss://'),
     ],
 
+    'agora' => [
+        'app_id'          => env('AGORA_APP_ID'),
+        'app_certificate' => env('AGORA_APP_CERTIFICATE'),
+    ],
+
 ];

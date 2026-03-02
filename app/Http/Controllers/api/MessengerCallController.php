@@ -5,7 +5,7 @@ namespace App\Http\Controllers\api;
 use App\Http\Controllers\Controller;
 use App\Models\MessengerCall;
 use App\Models\Staff;
-use App\Services\LiveKitService;
+use App\Services\AgoraService;
 use App\Services\PushNotificationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -14,12 +14,12 @@ use Illuminate\Validation\ValidationException;
 class MessengerCallController extends Controller
 {
     protected PushNotificationService $pushService;
-    protected LiveKitService $liveKit;
+    protected AgoraService $agora;
 
-    public function __construct(PushNotificationService $pushService, LiveKitService $liveKit)
+    public function __construct(PushNotificationService $pushService, AgoraService $agora)
     {
         $this->pushService = $pushService;
-        $this->liveKit = $liveKit;
+        $this->agora = $agora;
     }
 
     /**
@@ -66,8 +66,8 @@ class MessengerCallController extends Controller
             return response()->json(['message' => 'Cannot call yourself'], 422);
         }
 
-        // Генерация имени комнаты LiveKit
-        $roomName = LiveKitService::generateRoomName();
+        // Генерация имени канала Agora
+        $channelName = AgoraService::generateChannelName();
 
         // Создание записи звонка
         $call = MessengerCall::create([
@@ -75,15 +75,14 @@ class MessengerCallController extends Controller
             'callee_id' => $calleeId,
             'call_type' => 'audio',
             'status' => 'initiated',
-            'session_id' => $roomName,
+            'session_id' => $channelName,
         ]);
 
         // Загрузка данных callee и caller
         $call->load(['callee', 'caller']);
 
-        // Генерация LiveKit JWT токена для caller
-        $callerIdentity = (string) $callerId;
-        $token = $this->liveKit->generateToken($roomName, $callerIdentity);
+        // Генерация Agora токена для caller
+        $token = $this->agora->generateToken($channelName, $callerId);
 
         // Отправка push-уведомления callee
         $this->pushService->sendIncomingCallNotification(
@@ -93,11 +92,12 @@ class MessengerCallController extends Controller
         );
 
         return response()->json([
-            'call_id'     => $call->id,
-            'room_name'   => $roomName,
-            'token'       => $token,
-            'livekit_url' => $this->liveKit->getUrl(),
-            'callee'      => $call->callee,
+            'call_id'      => $call->id,
+            'channel_name' => $channelName,
+            'token'        => $token,
+            'uid'          => $callerId,
+            'agora_app_id' => $this->agora->getAppId(),
+            'callee'       => $call->callee,
         ]);
     }
 
@@ -125,15 +125,15 @@ class MessengerCallController extends Controller
             'started_at' => now(),
         ]);
 
-        // Генерация LiveKit JWT токена для callee
-        $calleeIdentity = (string) $call->callee_id;
-        $token = $this->liveKit->generateToken($call->session_id, $calleeIdentity);
+        // Генерация Agora токена для callee
+        $token = $this->agora->generateToken($call->session_id, $call->callee_id);
 
         return response()->json([
-            'call'        => $call,
-            'room_name'   => $call->session_id,
-            'token'       => $token,
-            'livekit_url' => $this->liveKit->getUrl(),
+            'call'         => $call,
+            'channel_name' => $call->session_id,
+            'token'        => $token,
+            'uid'          => $call->callee_id,
+            'agora_app_id' => $this->agora->getAppId(),
         ]);
     }
 
@@ -232,10 +232,8 @@ class MessengerCallController extends Controller
             $call->calculateDuration();
         }
 
-        // Закрываем LiveKit комнату — все участники получат сигнал мгновенно (без ~15с ICE timeout)
-        if ($call->session_id) {
-            $this->liveKit->deleteRoom($call->session_id);
-        }
+        // Agora каналы закрываются автоматически когда все участники уходят.
+        // Явное удаление не требуется.
 
         // Уведомляем другого участника о завершении
         $call->load(['caller', 'callee']);
