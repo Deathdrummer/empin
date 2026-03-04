@@ -185,7 +185,7 @@ class Department {
 		
 		$usersService = app()->make(BusinessUser::class);
 		
-		$depsUsers = $usersService->get(fields: ['department_id', 'full_name', 'working'], registred: $registred, departments: $depsIds, workStat: $workStat);
+		$depsUsers = $usersService->get(fields: ['department_id', 'full_name', 'working'], registred: $registred, departments: $depsIds, workStat: $workStat, keyBy: 'staff_id');
 		
 		$staffLists = ListUser::getStaffLists();
 		
@@ -196,6 +196,8 @@ class Department {
 				$result[$user['department_id']][$lId][] = $this->_buildUserArray($user, $userFields);
 			}
 		});
+		
+		toLog($result);
 		
 		return $result;
 	}
