@@ -24,16 +24,15 @@ class PushNotificationService
 
         $callerName = trim("{$caller->sname} {$caller->fname}");
 
+        // Data-only: без title/body/sound — иначе Android обработает FCM нативно
+        // и JS background task не запустится (displayNotification не вызовется)
         return $this->send($token, [
-            'title'     => 'Входящий звонок',
-            'body'      => "{$callerName} звонит вам",
             'data'      => [
                 'type'         => 'incoming_call',
                 'call_id'      => $callId,
                 'caller_id'    => $caller->id,
                 'caller_name'  => $callerName,
             ],
-            'sound'     => 'default',
             'priority'  => 'high',
             'channelId' => 'calls',
         ]);
