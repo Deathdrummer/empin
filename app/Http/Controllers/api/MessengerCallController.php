@@ -157,6 +157,10 @@ class MessengerCallController extends Controller
             'ended_at' => now(),
         ]);
 
+        // Уведомляем звонящего что звонок отклонён — без этого он ждёт весь таймаут
+        $call->load('caller');
+        $this->pushService->sendCallCancelledNotification($call->caller, $call->id);
+
         return response()->json(['success' => true]);
     }
 

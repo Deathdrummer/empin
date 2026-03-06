@@ -49,14 +49,13 @@ class PushNotificationService
             return false;
         }
 
+        // Data-only: без title/body — иначе Expo перехватит как notification message
+        // и Firebase onMessage не сработает в foreground
         return $this->send($token, [
-            'title'     => 'Звонок завершён',
-            'body'      => 'Звонящий отключился',
             'data'      => [
                 'type'    => 'call_cancelled',
                 'call_id' => $callId,
             ],
-            'sound'     => null,
             'priority'  => 'high',
             'channelId' => 'calls',
         ]);
