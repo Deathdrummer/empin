@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers\api;
 
+use App\Events\CallAccepted;
+use App\Events\CallCancelled;
+use App\Events\CallEnded;
+use App\Events\CallRejected;
 use App\Http\Controllers\Controller;
 use App\Models\MessengerCall;
 use App\Models\Staff;
@@ -128,6 +132,9 @@ class MessengerCallController extends Controller
         // Генерация Agora токена для callee
         $token = $this->agora->generateToken($call->session_id, $call->callee_id);
 
+        // WebSocket: уведомляем caller что звонок принят
+        broadcast(new CallAccepted($call->id, $call->caller_id));
+
         return response()->json([
             'call'         => $call,
             'channel_name' => $call->session_id,
@@ -157,9 +164,8 @@ class MessengerCallController extends Controller
             'ended_at' => now(),
         ]);
 
-        // Уведомляем звонящего что звонок отклонён — без этого он ждёт весь таймаут
-        $call->load('caller');
-        $this->pushService->sendCallCancelledNotification($call->caller, $call->id);
+        // WebSocket: уведомляем caller что звонок отклонён
+        broadcast(new CallRejected($call->id, $call->caller_id));
 
         return response()->json(['success' => true]);
     }
@@ -188,9 +194,8 @@ class MessengerCallController extends Controller
             'ended_at' => now(),
         ]);
 
-        // Уведомляем callee, что звонок отменён
-        $call->load('callee');
-        $this->pushService->sendCallCancelledNotification($call->callee, $call->id);
+        // WebSocket: уведомляем callee что звонок отменён
+        broadcast(new CallCancelled($call->id, $call->callee_id));
 
         return response()->json(['success' => true]);
     }
@@ -239,10 +244,10 @@ class MessengerCallController extends Controller
         // Agora каналы закрываются автоматически когда все участники уходят.
         // Явное удаление не требуется.
 
-        // Уведомляем другого участника о завершении
+        // WebSocket: уведомляем другого участника о завершении
         $call->load(['caller', 'callee']);
         $otherParty = ($userId === $call->caller_id) ? $call->callee : $call->caller;
-        $this->pushService->sendCallCancelledNotification($otherParty, $call->id);
+        broadcast(new CallEnded($call->id, $otherParty->id));
 
         return response()->json(['call' => $call]);
     }
