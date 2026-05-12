@@ -197,8 +197,6 @@ class Department {
 			}
 		});
 		
-		toLog($result);
-		
 		return $result;
 	}
 	

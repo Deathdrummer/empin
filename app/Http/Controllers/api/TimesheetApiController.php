@@ -264,7 +264,7 @@ class TimesheetApiController extends Controller {
             'message' => 'nullable|string',
             'reply_to_id' => 'nullable|integer',
             'media' => 'nullable|array', // Принимаем массив файлов
-            'media.*' => 'file|mimes:jpeg,jpg,png,gif,bmp,webp,mp4,mov,avi,mkv,pdf,doc,docx,xls,xlsx,ppt,pptx,zip,rar,7z,txt,csv,mp3,wav,ogg,aac,flac,m4a|max:51200', // max 50MB на файл
+            'media.*' => 'file|mimes:jpeg,jpg,png,gif,bmp,webp,mp4,mov,avi,mkv,pdf,doc,docx,xls,xlsx,ppt,pptx,zip,rar,7z,txt,csv,mp3,wav,ogg,aac,flac,m4a|max:307200', // max 300MB на файл
         ]);
 
         $timesheetContractId = $validated['timesheet_contract_id'];
