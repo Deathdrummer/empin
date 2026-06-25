@@ -1,4 +1,4 @@
-<section>
+﻿<section>
 	<x-settings>
 		<x-card
 			loading="{{__('ui.loading')}}"
@@ -13,7 +13,9 @@
 						<li class="ddrtabsnav__item" ddrtabsitem="systemTab4">Договор</li>
 						<li class="ddrtabsnav__item" ddrtabsitem="systemTab5">Админ. панель</li>
 						<li class="ddrtabsnav__item" ddrtabsitem="systemTab6">ИИ-ассистент</li>
-						<li class="ddrtabsnav__item ddrtabsnav__item_active" ddrtabsitem="systemTab7">Чертежи</li>
+						<li class="ddrtabsnav__item" ddrtabsitem="systemTab7">Чертежи</li>
+						<li class="ddrtabsnav__item ddrtabsnav__item_active" ddrtabsitem="systemTab8">AutoCAD</li>
+						<li class="ddrtabsnav__item" ddrtabsitem="systemTab9">Мобильное приложение</li>
 					</ul>
 				</div>
 				
@@ -348,15 +350,24 @@
 							class="w100"
 							rows="10"
 							group="normal"
-							{{-- action="updatePromptFile:'{{$prompt_file_name}}'" --}}
-							{{-- :value="$prompt_file_data" --}}
+							action="updatePromptFile:'{{$prompt_file_name}}'"
+							:value="$prompt_file_data"
 							/>
+						
+						
+						<div class="h3rem"></div>
+						
+						
+						<x-buttons-group group="normal" class="mb20px">
+							<x-button variant="purple" action="callAi">Вызвать Ai</x-button>
+						</x-buttons-group>
+						
 						
 						<div class="h3rem"></div>
 							
 						<p class="color-gray mb1rem">Файлы:</p>
 						
-						{{-- <p class="format">{{$answer}}</p> --}}
+						<p class="format" answer>---</p>
 						
 						<div class="assistentfiles__scrollblock">
 							<div class="assistentfiles__dropfiles" id="assistentDropFiles">
@@ -391,7 +402,7 @@
 					
 					
 					
-					<div class="ddrtabscontent__item ddrtabscontent__item_visible" ddrtabscontentitem="systemTab7">
+					<div class="ddrtabscontent__item" ddrtabscontentitem="systemTab7">
 						<div class="ddrdrawing">
 							<div class="ddrdrawing__toolbar">
 								<div class="ddrdrawing__toolbar-section">
@@ -444,6 +455,47 @@
 					
 					
 					
+					
+					<div class="ddrtabscontent__item ddrtabscontent__item_visible" ddrtabscontentitem="systemTab8">
+						{{-- тут разметка для autoCAD --}}
+						<div class="autocad-converter">
+							<div class="row gy-30">
+								<!-- Загрузка файлов -->
+								<div class="col-12">
+									<h3 class="mb-3">Конвертер AutoCAD файлов</h3>
+									<p class="color-gray mb-3">Загрузите DXF файлы для конвертации в JSON формат</p>
+
+									<div class="autocad-dropzone" id="autocadDropzone">
+										<div class="autocad-dropzone__content">
+											<i class="fa-solid fa-cloud-upload-alt autocad-dropzone__icon"></i>
+											<p class="autocad-dropzone__text">Перетащите DXF файлы сюда или нажмите для выбора</p>
+											<p class="autocad-dropzone__hint">Поддерживаются файлы .dxf до 100 МБ</p>
+										</div>
+									</div>
+
+									<input type="file" id="autocadFileInput" multiple accept=".dxf" style="display: none;">
+								</div>
+
+								<!-- Статус обработки -->
+								<div class="col-12">
+									<div class="autocad-status" id="autocadStatus">
+										<!-- Результаты обработки появятся здесь -->
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					
+					
+				<div class="ddrtabscontent__item" ddrtabscontentitem="systemTab9">
+					<p class="color-gray mb1rem">Текст политики конфиденциальности:</p>
+					<x-textarea
+						class="w100"
+						rows="20"
+						group="normal"
+						setting="app_privacy_policy"
+						/>
+				</div>
 				</div>
 			</div>
 		</x-card>
@@ -459,10 +511,30 @@
 
 	const drawingInstance = ddrDrawing();
 	drawingInstance.init();
+
+	// Инициализируем AutoCAD конвертер
+	const autoCADInstance = autoCADConverter();
+	// autoCADInstance уже инициализируется автоматически
 	
 	
-
-
+	
+	$.callAi = async (btn) => {
+		$(btn).ddrInputs('disable');
+		$('[answer]').text('генерация данных...');
+		const {data, error, status, headers} = await axiosQuery('post', '/ajax/ai');
+		
+		if (error) {
+			$.notify(error.message);
+			console.log(error);
+			return;
+		}
+		
+		$('[answer]').html(data.answer);
+		$(btn).ddrInputs('enable');
+		console.log({data, error, status, headers});
+	}
+	
+		
 
 	
 	let savePromptTOut;

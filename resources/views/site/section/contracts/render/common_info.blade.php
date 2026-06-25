@@ -466,15 +466,57 @@
 						</td>
 					</tr>
 				@endcando
+				
+				@cando('contract-col-tu:site')
+					<tr>
+						<td>
+							<p class="color-gray-500 format" noselect data="ТУ:"></p>
+						</td>
+						<td>
+							<p class="breakword select-text" tripleselect>{{$contract['tu'] ?? '-'}}</p>
+						</td>
+					</tr>
+				@endcando
+				
+				@cando('contract-col-inv_num_dmnt_tmg:site')
+					<tr>
+						<td>
+							<p class="color-gray-500 format" noselect data="Инвентарный номер демонтируемого ТМГ:"></p>
+						</td>
+						<td>
+							<p class="breakword select-text" tripleselect>{{$contract['inv_num_dmnt_tmg'] ?? '-'}}</p>
+						</td>
+					</tr>
+				@endcando
+				
+				@cando('contract-col-tu:site')
+					<tr>
+						<td>
+							<p class="color-gray-500 format" noselect data="Заводской номер демонтируемого ТМГ:"></p>
+						</td>
+						<td>
+							<p class="breakword select-text" tripleselect>{{$contract['fab_num_dmnt_tmg'] ?? '-'}}</p>
+						</td>
+					</tr>
+				@endcando
+				
+				@cando('contract-col-tu:site')
+					<tr>
+						<td>
+							<p class="color-gray-500 format" noselect data="Заводской номер монтируемого ТМГ:"></p>
+						</td>
+						<td>
+							<p class="breakword select-text" tripleselect>{{$contract['fab_num_mont_tmg'] ?? '-'}}</p>
+						</td>
+					</tr>
+				@endcando
 			</tbody>
 		</table>
 	</div>
 		
 
 
-	<div class="
-		commoninfo__line
-		"></div>
+	<div class="commoninfo__line"></div>
 		
 
 

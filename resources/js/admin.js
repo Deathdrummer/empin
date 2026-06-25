@@ -19,6 +19,7 @@ require('@plugins/ddrCalc');
 require('@plugins/ddrFiles');
 require('@plugins/blockTable');
 require('@plugins/ddrDrawing');
+require('@plugins/autoCAD');
 
 
 

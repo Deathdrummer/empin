@@ -29,7 +29,8 @@ jobs:
         run: ssh-keyscan -H ${{ env.SERVER_HOST }} >> ~/.ssh/known_hosts
       
       # Deploy
-      - run: |
+      - name: Sync files to server
+        run: |
           rsync \
           --exclude=/node_modules/ \
           --exclude=/vendor/ \
@@ -41,7 +42,19 @@ jobs:
           --exclude=/.gitconfig \
           --exclude=/public/build \
           --exclude=/public/hot \
+          --exclude=/public/storage \
+          --exclude=/public/assistent \
+          --exclude=/public/prompts \
           --exclude=/storage \
           -rc \
           --delete \
           . ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }}:${{ env.SERVER_PATH }}
+
+      # Run post-deployment commands
+      - name: Run artisan commands
+        run: |
+          ssh ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }} << 'ENDSSH'
+            cd ${{ env.SERVER_PATH }}
+            php artisan optimize:clear
+            php artisan storage:link
+          ENDSSH

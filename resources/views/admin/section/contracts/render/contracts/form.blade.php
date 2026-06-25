@@ -291,6 +291,16 @@
 					<label class="form__label color-dark">Дата закупки</label>
 					<x-datepicker name="date_buy" date="{{$date_buy ?? null}}" id="dateBuyField" class="w100" disabled="{{$without_buy ?? null}}" />
 				</div>
+				
+				<div class="form__item">
+					<label class="form__label color-dark">ТУ</label>
+					<x-input name="tu" value="{{$tu ?? null}}" class="w100" />
+				</div>
+				
+				<div class="form__item">
+					<label class="form__label color-dark">Инвентарный номер демонтируемого ТМГ</label>
+					<x-input name="inv_num_dmnt_tmg" value="{{$inv_num_dmnt_tmg ?? null}}" class="w100" />
+				</div>
 			</div>
 			
 			<div class="col-5 mt-n1">
@@ -302,6 +312,16 @@
 				<div class="form__item">
 					<label class="form__label color-dark">Дата закрытия договора</label>
 					<x-datepicker name="date_close" date="{{$date_close ?? null}}" class="w100" />	
+				</div>
+				
+				<div class="form__item">
+					<label class="form__label color-dark">Заводской номер демонтируемого ТМГ</label>
+					<x-input name="fab_num_dmnt_tmg" value="{{$fab_num_dmnt_tmg ?? null}}" class="w100" />
+				</div>
+				
+				<div class="form__item">
+					<label class="form__label color-dark">Заводской номер монтируемого ТМГ</label>
+					<x-input name="fab_num_mont_tmg" value="{{$fab_num_mont_tmg ?? null}}" class="w100" />
 				</div>
 			</div>
 			

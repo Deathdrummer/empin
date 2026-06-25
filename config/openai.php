@@ -27,7 +27,7 @@ return [
 
     'request_timeout' => env('OPENAI_REQUEST_TIMEOUT', 30),
 
-	'image_files'         => [
+	/* 'image_files'         => [
 		'file-SecP2YtZHu4ZVGNsZJyTdQ',
 		'file-X5jo5Tw9Y4dYE8MHbJKcev',
 		'file-3TH7YpJALtHxo4nUHmAtGa',
@@ -48,7 +48,7 @@ return [
 		'file-6Gj2RDkfM67VCccJSYg9qQ',
 		'file-XmhGp2feuNVAtzfzRf5q8Y',
 		'file-MUDQYg9cbXTiK2YXRUZk56',
-	],
+	], */
 	
 	'instruction' => '',
 	

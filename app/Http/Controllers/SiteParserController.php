@@ -111,7 +111,7 @@ class SiteParserController extends Controller {
 	* @return 
 	*/
 	public function import_form() {
-		getSiteScreenshotJob::dispatch('https://yandex.ru');
+		//getSiteScreenshotJob::dispatch('https://yandex.ru');
 		return $this->render('import_form');
 	}
 	
@@ -128,6 +128,7 @@ class SiteParserController extends Controller {
 		$data = $request->input('importdata');
 		$file = $request->file('importfile');
 		$colums = $request->input('colums');
+		$separator = $request->input('separator');
 		$required = $request->input('required');
 		
 		$content = $file?->path() ? file_get_contents($file->path()) : $data;
@@ -136,7 +137,7 @@ class SiteParserController extends Controller {
 		
 		//$titles = $this->_getTitles($data, $colums);
 		
-		$rows = $this->_parseData($content, $colums, $required);
+		$rows = $this->_parseData($content, $colums, $required, $separator);
 		
 		$stat = $this->_insertRows($rows->toArray());
 		
@@ -210,7 +211,7 @@ class SiteParserController extends Controller {
 	* @param 
 	* @return 
 	*/
-	private function _parseData($data = null, $colums = null, $required = null) {
+	private function _parseData($data = null, $colums = null, $required = null, $separator = '|') {
 		if (!$data || !$colums) return false;
 		
 		$rows = splitString($data, "\n");
@@ -219,20 +220,24 @@ class SiteParserController extends Controller {
 		
 		$existingSubjects = $this->_getExistingSubjects();
 		
-		return collect($rows)->filter(function($item) use($colums, $required) {
+		toLog($rows[0]);
+		exit;
+		
+		
+		return collect($rows)->filter(function($item) use($colums, $required, $separator) {
 			if (empty($required)) return true;
 			
-			$row = splitString($item, '|');
+			$row = splitString($item, $separator);
 			
 			$filterStat = true;
 			foreach ($required as $col => $stat) {
 				if ($stat == 0) continue;
-				if (empty($row[$colums[$col]]))$filterStat = false;
+				if (empty($row[$colums[$col]])) $filterStat = false;
 			}
 			
 			return $filterStat; 
-		})->map(function($item) use($colums, &$existingSubjects) {
-			$row = splitString($item, '|');
+		})->map(function($item) use($colums, &$existingSubjects, $separator) {
+			$row = splitString($item, $separator);
 			
 			$buildedRow = [];
 			foreach ($colums as $col => $pos) {

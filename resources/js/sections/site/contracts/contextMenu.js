@@ -56,6 +56,10 @@ export function contextMenu(
 		let pinnedInSelected = {};
 		
 		
+		// можно ли добавлять элементы у этапа
+		const canAddItem = $(target.pointer).closest('[ddrtabletd]').attr('canadditem') == 1 ? true : false;
+		
+		
 		// Если это оин пункт "копировать"
 		if ((selectedTextCell || $(target.pointer).closest('[ddrtabletd]').hasClass('selected')) || !!$(target.pointer).closest('[ddrtabletd]').find('[edittedplace]').hasClass('select-text')) {
 			setStyle({
@@ -656,8 +660,8 @@ export function contextMenu(
 					});
 				}
 			}, {
-				name: hasCheckbox && canRemoveCheckbox ? 'Удалить чекбокс' : (!hasCheckbox && canCreateCheckbox ? 'Добавить чекбокс' : ''),
-				visible: isDeptCheckbox && !isArchive && ((!hasCheckbox && canCreateCheckbox) || (hasCheckbox && canRemoveCheckbox)) && !selectedTextCell,
+				name: hasCheckbox && (canRemoveCheckbox || canAddItem) ? 'Удалить чекбокс' : (!hasCheckbox && (canCreateCheckbox || canAddItem) ? 'Добавить чекбокс' : ''),
+				visible: isDeptCheckbox && !isArchive && ((!hasCheckbox && (canCreateCheckbox || canAddItem)) || (hasCheckbox && (canRemoveCheckbox || canAddItem))) && !selectedTextCell,
 				sort: 1,
 				async onClick() {	
 					const cell = $(target.pointer).closest('[ddrtabletd]');
@@ -711,8 +715,8 @@ export function contextMenu(
 					}
 				}
 			}, {
-				name: hasSelect && canRemoveSelect ? 'Удалить вып. список' : (!hasSelect && canCreateSelect ? 'Добавить вып. список' : ''),
-				visible: isDeptSelect && !isArchive && ((!hasSelect && canCreateSelect) || (hasSelect && canRemoveSelect)) && !selectedTextCell,
+				name: hasSelect && (canRemoveSelect || canAddItem) ? 'Удалить вып. список' : (!hasSelect && (canCreateSelect || canAddItem) ? 'Добавить вып. список' : ''),
+				visible: isDeptSelect && !isArchive && ((!hasSelect && (canCreateSelect || canAddItem)) || (hasSelect && (canRemoveSelect || canAddItem))) && !selectedTextCell,
 				sort: 1,
 				async onClick() {	
 					const cell = $(target.pointer).closest('[ddrtabletd]');
@@ -728,7 +732,7 @@ export function contextMenu(
 					
 					
 					
-					const {data: list, error, status, headers} = await axiosQuery('post', 'site/contracts/step_checkbox', {
+					const {data, error, status, headers} = await axiosQuery('post', 'site/contracts/step_checkbox', {
 						contractId, 
 						departmentId,
 						stepId,
@@ -742,6 +746,8 @@ export function contextMenu(
 						waitCell.destroy();
 						return;
 					}
+					
+					const list = data[stepId] || data;
 					
 					// canCreateCheckbox canRemoveCheckbox
 					if (list) {

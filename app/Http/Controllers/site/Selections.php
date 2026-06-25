@@ -501,6 +501,7 @@ class Selections extends Controller {
 		if (isset($subscribed[$secondaryPermission]) && in_array($userId, (array)$subscribed[$secondaryPermission])) {
 			$index = array_search($userId, $subscribed[$secondaryPermission]);
 			unset($subscribed[$secondaryPermission][$index]);
+			$subscribed[$secondaryPermission] = array_values($subscribed[$secondaryPermission]); // Переиндексация
 			if (empty($subscribed[$secondaryPermission])) unset($subscribed[$secondaryPermission]);
 		} 
 		

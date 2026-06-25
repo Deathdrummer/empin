@@ -24,12 +24,13 @@ export default class DdrFiles { // 29.07.23
 		const getAddedFiles = this.getAddedFiles;
 		const loadFiles = this.loadFiles.bind(this); // bind потому что в функции loadFiles идет обращение к контексту, но он там потерян, так как вызов идет отсюда, то есть уже 3 вложенности функций
 		
-		const loadFilesParams = _.omit(params, ['multiple']);
-		
+		const loadFilesParams = _.omit(params, ['multiple', 'accept']);
+
 		const input = document.createElement('input');
 		input.type = 'file';
 		input.multiple = params?.multiple || false;
-		
+		if (params?.accept) input.accept = params.accept;
+
 		input.oninput = e => {
 			const files = getAddedFiles(e);
 			loadFiles(files, loadFilesParams);
@@ -52,13 +53,14 @@ export default class DdrFiles { // 29.07.23
 		const loadFiles = this.loadFiles.bind(this); // bind потому что в функции loadFiles идет обращение к контексту, но он там потерян, так как вызов идет отсюда, то есть уже 3 вложенности функций
 		const selector = this.selector || forcedSelector;
 		
-		const loadFilesParams = _.omit(params, ['multiple']);
-		
+		const loadFilesParams = _.omit(params, ['multiple', 'accept']);
+
 		$(selector).on(tapEvent, () => {
 			const input = document.createElement('input');
 			input.type = 'file';
 			input.multiple = params?.multiple || false;
-			
+			if (params?.accept) input.accept = params.accept;
+
 			input.oninput = e => {
 				const files = getAddedFiles(e);
 				loadFiles(files, loadFilesParams);

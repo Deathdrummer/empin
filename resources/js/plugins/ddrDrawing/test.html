@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ddrDrawing Test</title>
+    <style>
+        #container { width: 800px; height: 600px; border: 1px solid #ccc; }
+        .controls { margin: 10px 0; }
+        button { margin: 5px; padding: 8px 12px; }
+        .active { background: #007cff; color: white; }
+    </style>
+</head>
+<body>
+    <h2>ddrDrawing Refactored Test</h2>
+    
+    <div class="controls">
+        <button data-tool="select">Select</button>
+        <button data-tool="rectangle">Rectangle</button>
+        <button onclick="drawing.enableDebug(true)">Enable Debug</button>
+        <button onclick="drawing.enableDebug(false)">Disable Debug</button>
+        <button onclick="drawing.zoomIn()">Zoom In</button>
+        <button onclick="drawing.zoomOut()">Zoom Out</button>
+        <button onclick="drawing.zoomToFit()">Zoom Fit</button>
+    </div>
+    
+    <div id="container">
+        <div id="ddrDrawingCanvas" style="width: 100%; height: 100%;"></div>
+    </div>
+
+    <!-- JointJS -->
+    <script src="https://cdn.jsdelivr.net/npm/jointjs@4.1.3/dist/joint.min.js"></script>
+    
+    <script type="module">
+        import { DdrDrawing } from './index.js'
+        
+        // Создаем экземпляр через класс
+        const drawing = new DdrDrawing('#ddrDrawingCanvas')
+        window.drawing = drawing // для тестирования из консоли
+        
+        // Инициализируем
+        drawing.init()
+        
+        // Включаем отладку для демо
+        drawing.enableDebug(true)
+        
+        // Обработчики кнопок
+        document.querySelectorAll('[data-tool]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tool = btn.getAttribute('data-tool')
+                drawing.setTool(tool)
+                
+                // Обновляем UI
+                document.querySelectorAll('[data-tool]').forEach(b => b.classList.remove('active'))
+                btn.classList.add('active')
+            })
+        })
+        
+        // Устанавливаем select по умолчанию
+        document.querySelector('[data-tool="select"]').classList.add('active')
+        
+        console.log('✓ Test page initialized')
+        console.log('API available:', Object.keys(drawing))
+    </script>
+</body>
+</html>

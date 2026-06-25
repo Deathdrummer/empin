@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Services\Business\Department as BusinessDepartment;
 use App\Traits\HasCrudController;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
@@ -358,20 +359,30 @@ class UsersNew extends Controller {
 		$stat = Mail::to($user->email)->send(new UserCreated(['email' => $user->email]));
 		return response()->json($stat);
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+	public function login_as_user(Request $request) {
+		$userId = $request->input('user_id');
+		if (!$userId) {
+			return response()->json(['message' => 'Не указан ID пользователя']);
+		}
+		
+		$user = User::where('staff_id', $userId)->first();
+		if (!$user) {
+			return response()->json(['message' => 'Пользователь не найден']);
+		}
+		
+		// Авторизация от имени пользователя
+		Auth::guard('site')->login($user);
+
+		return response()->json(['success' => true]);
+	}
+
+
+
+
+
+
 	//----------------------------------------------------------------------------------------------------------- РЕГИСТРАЦИЯ ПОЛЬЗОВАТЕЛЯ
 	
 	
@@ -495,15 +506,24 @@ class UsersNew extends Controller {
 		
 		if (!$user = User::fromStaff($valid['user'])->first()) return response()->json(false);
 		
-		$allPermissions = Permission::where('guard_name', $valid['guard'])
+		$this->addSettingToGlobalData('permissions_groups:groups', 'id', null, 'group:'.$valid['guard']);
+		
+		$allPermissionsGroups = Permission::where('guard_name', $valid['guard'])
 			->whereNot('group', null)
 			->get()
 			->sortBy('sort', SORT_NATURAL)
 			->groupBy('group');
 		
+		foreach ($allPermissionsGroups as $group => $items) {
+			$allPermissionsGroups[$group] = $items->chunk(ceil($items->count() / ($this->data['groups'][$group]['cols_count'] ?? 2)));
+		}
+		
+		$allPermissions = $allPermissionsGroups;
+		
+		
 		$userPermissions = $user->getAllPermissions()->pluck('id')->toArray();
 		
-		$this->addSettingToGlobalData('permissions_groups:groups', 'id', null, 'group:'.$valid['guard']);
+		
 		
 		usort($this->data['groups'], function($a, $b) {
 			if (!isset($a['sort']) || !isset($b['sort'])) return 0;

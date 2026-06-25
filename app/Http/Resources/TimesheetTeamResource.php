@@ -14,7 +14,9 @@ class TimesheetTeamResource extends JsonResource {
 			'id'	=> $this->id,
 			'master' => $this->profile ? [
 				'id' => $this->staff_id,
-				'full_name' => $this->profile->full_name,
+				'sname' => $this->profile->sname,
+				'fname' => $this->profile->fname,
+				'mname' => $this->profile->mname,
 			] : null,
 			'contracts' => TimesheetContractResource::collection($this->contracts)->resolve(),
 		];

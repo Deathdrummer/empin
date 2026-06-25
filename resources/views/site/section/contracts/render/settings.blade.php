@@ -25,6 +25,16 @@
 					<x-checkbox onchange="$.setUserSetting('contracts.show_archive_selections_in_object_number', 'checkbox')" :checked="$settings['show_archive_selections_in_object_number'] ?? false" />
 				</td>
 			</tr>
+			<tr class="h5rem">
+				<td colspan="2"><p class="mb-4px">Локальное расположение файлов чертежей:</p>
+				<x-input
+					type="url"
+					class="w100"
+					oninput="$.setUserSetting('contracts.local_path_to_cad_files', 'text', 500)"
+					:value="$settings['local_path_to_cad_files'] ?? false"
+					placeholder="Введите путь" />	
+				</td>
+			</tr>
 		</table>
 	</div>
 </x-input-group>

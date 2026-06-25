@@ -1093,7 +1093,7 @@ section
 		background: #f5f5f5
 		border-bottom: 1px solid #e0e0e0
 		padding: 6px
-		min-height: 60px
+		min-height: 40px
 		flex-shrink: 0
 
 	&__toolbar-section
@@ -1107,14 +1107,46 @@ section
 		padding: 4px
 		background: #ffffff
 		border-radius: 6px
+	
+	&__select-container
+		display: flex
+		align-items: center
+		gap: 6px
+		margin-right: 8px
+		
+		&:last-child
+			margin-right: 0
+	
+	&__select-label
+		font-size: 12px
+		color: #666
+		white-space: nowrap
+	
+	&__select
+		padding: 0 8px
+		border: 1px solid #ccc
+		border-radius: 4px
+		background: white
+		font-size: 12px
+		cursor: pointer
+		outline: none
+		min-width: 80px
+		height: 28px
+		
+		&:hover
+			border-color: #999
+			
+		&:focus
+			border-color: #007acc
+			box-shadow: 0 0 0 2px rgba(0, 122, 204, 0.2)
 		border: 1px solid #e0e0e0
 
 	&__tool-btn
 		display: flex
 		align-items: center
 		justify-content: center
-		width: 36px
-		height: 36px
+		width: 28px
+		height: 28px
 		background: transparent
 		border: none
 		border-radius: 4px
@@ -1148,10 +1180,384 @@ section
 	&__canvas-container
 		flex: 1
 		position: relative
-		overflow: hidden
-		background: #fafafa
+	
+	&__context-menu
+		position: absolute
+		background: #ffffff
+		border: 1px solid #e0e0e0
+		border-radius: 6px
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15)
+		z-index: 1000
+		display: none
+		min-width: 180px
+		
+	&__context-menu-item
+		padding: 8px 12px
+		cursor: pointer
+		color: #333
+		font-size: 14px
+		display: flex
+		align-items: center
+		justify-content: space-between
+		transition: background-color 0.2s ease
+		
+		&:hover
+			background: #f5f5f5
+			
+		&:first-child
+			border-top-left-radius: 6px
+			border-top-right-radius: 6px
+			
+		i
+			color: #666
+			font-size: 12px
+			
+	&__context-menu-parent
+		position: relative
+		
+	&__context-menu-submenu
+		display: none
+		position: absolute
+		left: 100%
+		top: 0
+		background: #ffffff
+		border: 1px solid #e0e0e0
+		border-radius: 6px
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15)
+		min-width: 120px
+		z-index: 1001
+		
+		.ddrdrawing__context-menu-item
+			padding: 8px 12px
+			
+			&:first-child
+				border-top-left-radius: 6px
+				border-top-right-radius: 6px
+			&:last-child
+				border-bottom-left-radius: 6px
+				border-bottom-right-radius: 6px
+
+// Показываем подменю при наведении на родительский элемент
+.ddrdrawing__context-menu-parent:hover .ddrdrawing__context-menu-submenu
+	display: block !important
+
+// Сохраняем подменю видимым при наведении на само подменю  
+.ddrdrawing__context-menu-submenu:hover
+	display: block !important
 
 	&__canvas
 		width: 100%
 		height: 100%
+
+// SVG порты - правильные селекторы
+.joint-port
+	transition: opacity 0.3s ease, visibility 0.3s ease
+	
+	// По умолчанию порты скрыты
+	opacity: 0
+	visibility: hidden
+	
+	&.port-visible
+		opacity: 1 !important
+		visibility: visible !important
+	
+	// Принудительно убираем любую прозрачность при наведении
+	circle[port]
+		opacity: 1 !important
+
+// Занятые порты всегда видны БЕЗ изменения позиции
+.joint-port.port-connected
+	opacity: 1 !important
+	visibility: visible !important
+	// Не применяем transform к занятым портам
+
+// Выделенный элемент - показываем только свободные порты
+.joint-element.selected .joint-port.port-visible
+	opacity: 1 !important
+	visibility: visible !important
+
+// Стили для режима создания связи - только свободные порты подсвечиваются
+.ddr-linking-mode .joint-port.port-visible
+	opacity: 1 !important
+	visibility: visible !important
 		position: relative
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//-- Здесь стили для autoCAD
+
+.autocad-converter
+	padding: 2rem
+	background-color: #fff
+	border-radius: 8px
+	margin-bottom: 1rem
+
+.autocad-dropzone
+	border: 2px dashed #ccc
+	border-radius: 8px
+	padding: 2rem
+	text-align: center
+	cursor: pointer
+	transition: all 0.3s ease
+	background-color: #fafafa
+
+	&.dragover
+		border-color: #007bff
+		background-color: #f0f8ff
+
+	&__content
+		display: flex
+		flex-direction: column
+		align-items: center
+		justify-content: center
+
+	&__icon
+		font-size: 3rem
+		color: #ccc
+		margin-bottom: 1rem
+
+	&__text
+		color: #666
+		font-size: 1.1rem
+		margin: 0
+
+.autocad-files-list
+	margin-top: 2rem
+
+	&__title
+		font-size: 1.2rem
+		font-weight: 500
+		margin-bottom: 1rem
+		color: #333
+
+.autocad-file-item
+	display: flex
+	justify-content: space-between
+	align-items: center
+	padding: 0.75rem 1rem
+	border: 1px solid #e0e0e0
+	border-radius: 6px
+	margin-bottom: 0.5rem
+	background-color: #fafafa
+
+	&__info
+		display: flex
+		align-items: center
+		gap: 0.5rem
+
+	&__name
+		font-weight: 500
+		color: #333
+
+	&__size
+		color: #666
+		font-size: 0.9rem
+
+	&__status
+		font-size: 0.9rem
+		padding: 0.25rem 0.75rem
+		border-radius: 4px
+
+		&.status-processing
+			background-color: #fff3cd
+			color: #856404
+
+		&.status-success
+			background-color: #d4edda
+			color: #155724
+
+		&.status-error
+			background-color: #f8d7da
+			color: #721c24
+
+// Стили для прогресс-бара
+.autocad-progress-container
+	display: flex
+	flex-direction: column
+	gap: 0.25rem
+	width: 100%
+
+.autocad-progress-text
+	font-size: 0.9rem
+	color: #856404
+	font-weight: 500
+
+.autocad-progress-bar
+	width: 100%
+	height: 6px
+	background-color: #e9ecef
+	border-radius: 3px
+	overflow: hidden
+
+.autocad-progress-fill
+	height: 100%
+	background: linear-gradient(90deg, #28a745, #20c997)
+	border-radius: 3px
+	transition: width 0.3s ease
+
+.autocad-progress-percent
+	font-size: 0.8rem
+	color: #666
+	text-align: right
+
+.autocad-local-files
+	margin-top: 2rem
+
+	&__title
+		font-size: 1.2rem
+		font-weight: 500
+		margin-bottom: 1rem
+		color: #333
+
+.autocad-local-file
+	display: flex
+	justify-content: space-between
+	align-items: center
+	padding: 0.75rem 1rem
+	border: 1px solid #e0e0e0
+	border-radius: 6px
+	margin-bottom: 0.5rem
+	background-color: #f8f9fa
+
+	.file-name
+		font-weight: 500
+		color: #333
+		flex: 1
+
+	.file-type
+		color: #666
+		font-size: 0.9rem
+		margin-right: 1rem
+
+	.btn-convert
+		background-color: #007bff
+		color: #fff
+		border: none
+		padding: 0.5rem 1rem
+		border-radius: 4px
+		cursor: pointer
+		font-size: 0.9rem
+		transition: background-color 0.3s ease
+
+		&:hover
+			background-color: #0056b3
+
+.autocad-status
+	margin-top: 2rem
+
+.autocad-status-message
+	padding: 0.75rem 1rem
+	border-radius: 6px
+	margin-bottom: 0.5rem
+
+	&.status-info
+		background-color: #d1ecf1
+		color: #0c5460
+		border-left: 4px solid #bee5eb
+
+	&.status-processing
+		background-color: #fff3cd
+		color: #856404
+		border-left: 4px solid #ffeaa7
+
+	&.status-success
+		background-color: #d4edda
+		color: #155724
+		border-left: 4px solid #c3e6cb
+
+	&.status-error
+		background-color: #f8d7da
+		color: #721c24
+		border-left: 4px solid #f5c6cb
+
+.autocad-json-result
+	margin-top: 1rem
+	padding: 1rem
+	border: 1px solid #e0e0e0
+	border-radius: 6px
+	background-color: #f8f9fa
+
+	h4
+		margin: 0 0 1rem 0
+		color: #333
+		font-size: 1.1rem
+
+	&__stats
+		display: flex
+		gap: 1rem
+		align-items: center
+		margin-bottom: 1rem
+
+		span
+			color: #666
+			font-size: 0.9rem
+
+		button
+			background-color: #6c757d
+			color: #fff
+			border: none
+			padding: 0.5rem 1rem
+			border-radius: 4px
+			cursor: pointer
+			font-size: 0.9rem
+			transition: background-color 0.3s ease
+
+			&:hover
+				background-color: #5a6268
+
+			&:first-of-type
+				background-color: #007bff
+
+				&:hover
+					background-color: #0056b3
+
+.autocad-json-content
+	background-color: #fff
+	border: 1px solid #e0e0e0
+	border-radius: 4px
+	padding: 1rem
+	font-family: 'Courier New', monospace
+	font-size: 0.8rem
+	max-height: 400px
+	overflow-y: auto
+	white-space: pre-wrap
+	color: #333
+
+.autocad-controls
+	margin-top: 1rem
+	display: flex
+	gap: 1rem
+
+	&__btn
+		background-color: #28a745
+		color: #fff
+		border: none
+		padding: 0.75rem 1.5rem
+		border-radius: 4px
+		cursor: pointer
+		font-size: 1rem
+		transition: background-color 0.3s ease
+
+		&:hover
+			background-color: #218838
+
+		&--secondary
+			background-color: #6c757d
+
+			&:hover
+				background-color: #5a6268

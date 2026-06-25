@@ -185,7 +185,7 @@ class Department {
 		
 		$usersService = app()->make(BusinessUser::class);
 		
-		$depsUsers = $usersService->get(fields: ['department_id', 'full_name', 'working'], registred: $registred, departments: $depsIds, workStat: $workStat);
+		$depsUsers = $usersService->get(fields: ['department_id', 'full_name', 'working'], registred: $registred, departments: $depsIds, workStat: $workStat, keyBy: 'staff_id');
 		
 		$staffLists = ListUser::getStaffLists();
 		

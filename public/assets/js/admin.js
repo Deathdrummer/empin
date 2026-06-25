@@ -5377,6 +5377,8 @@ __webpack_require__(/*! @plugins/blockTable */ "./resources/js/plugins/blockTabl
 
 __webpack_require__(/*! @plugins/ddrDrawing */ "./resources/js/plugins/ddrDrawing/index.js");
 
+__webpack_require__(/*! @plugins/autoCAD */ "./resources/js/plugins/autoCAD/index.js");
+
 $.notify.defaults({
   clickToHide: true,
   autoHide: true,
@@ -9074,6 +9076,349 @@ window.capitalFirstLetter = function () {
 
 /***/ }),
 
+/***/ "./resources/js/plugins/autoCAD/index.js":
+/*!***********************************************!*\
+  !*** ./resources/js/plugins/autoCAD/index.js ***!
+  \***********************************************/
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "AutoCADConverter": function() { return /* binding */ AutoCADConverter; },
+/* harmony export */   "initAutoCADConverter": function() { return /* binding */ initAutoCADConverter; }
+/* harmony export */ });
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
+
+
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+
+// AutoCAD DWG to JSON Converter
+var AutoCADConverter = /*#__PURE__*/function () {
+  function AutoCADConverter() {
+    _classCallCheck(this, AutoCADConverter);
+
+    this.dropzone = document.getElementById('autocadDropzone');
+    this.fileInput = document.getElementById('autocadFileInput');
+    this.statusArea = document.getElementById('autocadStatus');
+    this.init();
+  }
+
+  _createClass(AutoCADConverter, [{
+    key: "init",
+    value: function init() {
+      var _this = this;
+
+      if (!this.dropzone) return; // Drag and drop handlers
+
+      this.dropzone.addEventListener('dragover', this.handleDragOver.bind(this));
+      this.dropzone.addEventListener('dragleave', this.handleDragLeave.bind(this));
+      this.dropzone.addEventListener('drop', this.handleDrop.bind(this));
+      this.dropzone.addEventListener('click', function () {
+        var _this$fileInput;
+
+        return (_this$fileInput = _this.fileInput) === null || _this$fileInput === void 0 ? void 0 : _this$fileInput.click();
+      }); // File input handler
+
+      if (this.fileInput) {
+        this.fileInput.addEventListener('change', this.handleFileSelect.bind(this));
+      }
+    }
+  }, {
+    key: "handleDragOver",
+    value: function handleDragOver(e) {
+      e.preventDefault();
+      this.dropzone.classList.add('dragover');
+    }
+  }, {
+    key: "handleDragLeave",
+    value: function handleDragLeave(e) {
+      e.preventDefault();
+      this.dropzone.classList.remove('dragover');
+    }
+  }, {
+    key: "handleDrop",
+    value: function handleDrop(e) {
+      e.preventDefault();
+      this.dropzone.classList.remove('dragover');
+      var files = Array.from(e.dataTransfer.files).filter(function (file) {
+        return file.name.toLowerCase().endsWith('.dxf');
+      });
+
+      if (files.length === 0) {
+        this.showStatus('Выберите только DXF файлы', 'error');
+        return;
+      }
+
+      this.processFiles(files);
+    }
+  }, {
+    key: "handleFileSelect",
+    value: function handleFileSelect(e) {
+      var files = Array.from(e.target.files);
+      this.processFiles(files);
+    }
+  }, {
+    key: "processFiles",
+    value: function () {
+      var _processFiles = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee(files) {
+        var _iterator, _step, file;
+
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                _iterator = _createForOfIteratorHelper(files);
+                _context.prev = 1;
+
+                _iterator.s();
+
+              case 3:
+                if ((_step = _iterator.n()).done) {
+                  _context.next = 9;
+                  break;
+                }
+
+                file = _step.value;
+                _context.next = 7;
+                return this.convertFile(file);
+
+              case 7:
+                _context.next = 3;
+                break;
+
+              case 9:
+                _context.next = 14;
+                break;
+
+              case 11:
+                _context.prev = 11;
+                _context.t0 = _context["catch"](1);
+
+                _iterator.e(_context.t0);
+
+              case 14:
+                _context.prev = 14;
+
+                _iterator.f();
+
+                return _context.finish(14);
+
+              case 17:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee, this, [[1, 11, 14, 17]]);
+      }));
+
+      function processFiles(_x) {
+        return _processFiles.apply(this, arguments);
+      }
+
+      return processFiles;
+    }()
+  }, {
+    key: "convertFile",
+    value: function () {
+      var _convertFile = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee2(file) {
+        var fileItem, _document$querySelect, formData, response, result;
+
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                fileItem = this.addFileToList(file);
+                _context2.prev = 1;
+                this.updateFileStatusWithProgress(fileItem, 'Загрузка файла...', 'processing', 10);
+                formData = new FormData();
+                formData.append('file', file);
+                formData.append('filename', file.name);
+                console.log('🚀 Отправляем файл:', file.name);
+                this.updateFileStatusWithProgress(fileItem, 'Парсинг DXF файла...', 'processing', 30);
+                _context2.next = 10;
+                return fetch('/ajax/autocad/convert', {
+                  method: 'POST',
+                  headers: {
+                    'X-CSRF-TOKEN': ((_document$querySelect = document.querySelector('meta[name="csrf-token"]')) === null || _document$querySelect === void 0 ? void 0 : _document$querySelect.getAttribute('content')) || '',
+                    'X-Requested-With': 'XMLHttpRequest'
+                  },
+                  body: formData
+                });
+
+              case 10:
+                response = _context2.sent;
+                this.updateFileStatusWithProgress(fileItem, 'Обработка ответа...', 'processing', 90);
+                _context2.next = 14;
+                return response.json();
+
+              case 14:
+                result = _context2.sent;
+
+                if (!result.success) {
+                  _context2.next = 20;
+                  break;
+                }
+
+                this.updateFileStatusWithProgress(fileItem, 'Парсинг завершен', 'success', 100);
+                this.showJsonResult(file.name, result.data);
+                _context2.next = 21;
+                break;
+
+              case 20:
+                throw new Error(result.message || 'Ошибка конвертации');
+
+              case 21:
+                _context2.next = 27;
+                break;
+
+              case 23:
+                _context2.prev = 23;
+                _context2.t0 = _context2["catch"](1);
+                console.error('Ошибка конвертации:', _context2.t0);
+                this.updateFileStatus(fileItem, "\u041E\u0448\u0438\u0431\u043A\u0430: ".concat(_context2.t0.message), 'error');
+
+              case 27:
+              case "end":
+                return _context2.stop();
+            }
+          }
+        }, _callee2, this, [[1, 23]]);
+      }));
+
+      function convertFile(_x2) {
+        return _convertFile.apply(this, arguments);
+      }
+
+      return convertFile;
+    }()
+  }, {
+    key: "addFileToList",
+    value: function addFileToList(file) {
+      var fileItem = document.createElement('div');
+      fileItem.className = 'autocad-file-item';
+      fileItem.innerHTML = "\n            <div class=\"autocad-file-info\">\n                <span class=\"autocad-file-name\">".concat(file.name, "</span>\n                <span class=\"autocad-file-size\">(").concat(this.formatFileSize(file.size), ")</span>\n            </div>\n            <div class=\"autocad-file-status\">\u041E\u0436\u0438\u0434\u0430\u043D\u0438\u0435...</div>\n        ");
+      this.statusArea.appendChild(fileItem);
+      return fileItem;
+    }
+  }, {
+    key: "updateFileStatus",
+    value: function updateFileStatus(fileItem, status) {
+      var type = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'info';
+      var statusElement = fileItem.querySelector('.autocad-file-status');
+      statusElement.textContent = status;
+      statusElement.className = "autocad-file-status status-".concat(type);
+    }
+  }, {
+    key: "updateFileStatusWithProgress",
+    value: function updateFileStatusWithProgress(fileItem, status) {
+      var type = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'info';
+      var progress = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
+      var statusElement = fileItem.querySelector('.autocad-file-status');
+      statusElement.className = "autocad-file-status status-".concat(type);
+
+      if (type === 'processing') {
+        statusElement.innerHTML = "\n                <div class=\"autocad-progress-container\">\n                    <div class=\"autocad-progress-text\">".concat(status, "</div>\n                    <div class=\"autocad-progress-bar\">\n                        <div class=\"autocad-progress-fill\" style=\"width: ").concat(progress, "%\"></div>\n                    </div>\n                    <div class=\"autocad-progress-percent\">").concat(progress, "%</div>\n                </div>\n            ");
+      } else {
+        statusElement.textContent = status;
+      }
+    }
+  }, {
+    key: "showJsonResult",
+    value: function showJsonResult(filename, jsonData) {
+      var _jsonData$entities;
+
+      var resultArea = document.createElement('div');
+      resultArea.className = 'autocad-json-result';
+      resultArea.innerHTML = "\n            <h4>\u0420\u0435\u0437\u0443\u043B\u044C\u0442\u0430\u0442 \u043A\u043E\u043D\u0432\u0435\u0440\u0442\u0430\u0446\u0438\u0438: ".concat(filename, "</h4>\n            <div class=\"autocad-json-stats\">\n                <span>\u0421\u0443\u0449\u043D\u043E\u0441\u0442\u0435\u0439: ").concat(((_jsonData$entities = jsonData.entities) === null || _jsonData$entities === void 0 ? void 0 : _jsonData$entities.length) || 0, "</span>\n                <button class=\"autocad-toggle-json\">\n                    \u041F\u043E\u043A\u0430\u0437\u0430\u0442\u044C/\u0421\u043A\u0440\u044B\u0442\u044C JSON\n                </button>\n                <button class=\"autocad-download-json\" data-filename=\"").concat(filename, "\">\n                    \u0421\u043A\u0430\u0447\u0430\u0442\u044C JSON\n                </button>\n            </div>\n            <pre class=\"autocad-json-content\" style=\"display: none;\">").concat(JSON.stringify(jsonData, null, 2), "</pre>\n        "); // Обработчик для переключения отображения JSON
+
+      var toggleBtn = resultArea.querySelector('.autocad-toggle-json');
+      var jsonContent = resultArea.querySelector('.autocad-json-content');
+      toggleBtn.addEventListener('click', function () {
+        jsonContent.style.display = jsonContent.style.display === 'none' ? 'block' : 'none';
+      }); // Обработчик для скачивания JSON
+
+      var downloadBtn = resultArea.querySelector('.autocad-download-json');
+      downloadBtn.addEventListener('click', function () {
+        var blob = new Blob([JSON.stringify(jsonData, null, 2)], {
+          type: 'application/json'
+        });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = filename.replace(/\.(dwg|dxf)$/i, '.json');
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      });
+      this.statusArea.appendChild(resultArea);
+    }
+  }, {
+    key: "showStatus",
+    value: function showStatus(message) {
+      var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'info';
+      var statusDiv = document.createElement('div');
+      statusDiv.className = "autocad-status-message status-".concat(type);
+      statusDiv.textContent = message;
+      this.statusArea.insertBefore(statusDiv, this.statusArea.firstChild); // Удаляем сообщение через 5 секунд
+
+      setTimeout(function () {
+        if (statusDiv.parentNode) {
+          statusDiv.parentNode.removeChild(statusDiv);
+        }
+      }, 5000);
+    }
+  }, {
+    key: "formatFileSize",
+    value: function formatFileSize(bytes) {
+      var sizes = ['Bytes', 'KB', 'MB', 'GB'];
+      if (bytes === 0) return '0 Bytes';
+      var i = Math.floor(Math.log(bytes) / Math.log(1024));
+      return Math.round(bytes / Math.pow(1024, i) * 100) / 100 + ' ' + sizes[i];
+    }
+  }]);
+
+  return AutoCADConverter;
+}(); // Создаем функцию для инициализации
+
+
+function initAutoCADConverter() {
+  return new AutoCADConverter();
+} // Глобальный доступ для обратной совместимости
+
+
+if (typeof window !== 'undefined') {
+  window.autoCADConverter = initAutoCADConverter;
+  window.AutoCADConverter = AutoCADConverter; // Прямой доступ к классу
+}
+
+
+/* harmony default export */ __webpack_exports__["default"] = (initAutoCADConverter); // Инициализируем конвертер при загрузке DOM
+
+document.addEventListener('DOMContentLoaded', function () {
+  if (document.getElementById('autocadDropzone')) {
+    window.autoCADConverterInstance = new AutoCADConverter();
+  }
+});
+
+/***/ }),
+
 /***/ "./resources/js/plugins/axiosQuery.js":
 /*!********************************************!*\
   !*** ./resources/js/plugins/axiosQuery.js ***!
@@ -12116,360 +12461,3798 @@ window.ddrDatepicker = datepicker["default"];
 /*!**************************************************!*\
   !*** ./resources/js/plugins/ddrDrawing/index.js ***!
   \**************************************************/
-/***/ (function() {
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "DdrDrawing": function() { return /* binding */ DdrDrawing; },
+/* harmony export */   "ddrDrawing": function() { return /* binding */ ddrDrawing; }
+/* harmony export */ });
+/* harmony import */ var _src_DrawingPlugin_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./src/DrawingPlugin.js */ "./resources/js/plugins/ddrDrawing/src/DrawingPlugin.js");
+/* harmony import */ var _src_core_Logger_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./src/core/Logger.js */ "./resources/js/plugins/ddrDrawing/src/core/Logger.js");
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+
+
 
 /**
- * ddrDrawing Plugin
- * Простая реализация плагина для рисования на JointJS
- */
-var graph = null;
-var paper = null;
-var currentTool = 'select';
-/**
- * Инициализация плагина
+ * Главный класс плагина рисования
  */
 
-function init() {
-  console.log('Initializing ddrDrawing'); // Проверяем JointJS
+var DdrDrawing = /*#__PURE__*/function () {
+  function DdrDrawing() {
+    var containerId = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '#ddrDrawingCanvas';
 
-  if (!window.joint) {
-    console.error('JointJS not found');
-    return;
-  } // Находим контейнер
+    _classCallCheck(this, DdrDrawing);
 
-
-  var container = document.querySelector('#ddrDrawingCanvas');
-
-  if (!container) {
-    console.error('Canvas container not found');
-    return;
+    this.containerId = containerId;
+    this.plugin = null;
+    this.initialized = false;
   }
+  /**
+   * Инициализация плагина
+   */
 
-  console.log('Creating graph and paper'); // Создаем граф
 
-  graph = new window.joint.dia.Graph(); // Создаем paper
-
-  paper = new window.joint.dia.Paper({
-    el: container,
-    model: graph,
-    width: '100%',
-    height: '100%',
-    gridSize: 10,
-    drawGrid: {
-      name: 'dot',
-      args: {
-        color: '#cccccc',
-        thickness: 1
+  _createClass(DdrDrawing, [{
+    key: "init",
+    value: function init() {
+      if (this.initialized) {
+        _src_core_Logger_js__WEBPACK_IMPORTED_MODULE_1__["default"].warn('Plugin already initialized');
+        return;
       }
-    },
-    background: {
-      color: '#fdfdfd'
+
+      _src_core_Logger_js__WEBPACK_IMPORTED_MODULE_1__["default"].info('Initializing ddrDrawing plugin');
+
+      if (!this.plugin) {
+        this.plugin = new _src_DrawingPlugin_js__WEBPACK_IMPORTED_MODULE_0__["default"](this.containerId);
+      }
+
+      this.plugin.init();
+      this.initialized = true;
     }
-  }); // События
+    /**
+     * Установить инструмент
+     */
 
-  setupEvents(); // Настройка стилей для интерактивности
+  }, {
+    key: "setTool",
+    value: function setTool(toolName) {
+      if (!this.plugin) {
+        _src_core_Logger_js__WEBPACK_IMPORTED_MODULE_1__["default"].error('Plugin not initialized');
+        return false;
+      }
 
-  setupInteractiveStyles();
-  console.log('ddrDrawing initialized');
-}
-/**
- * Настройка событий
- */
-
-
-function setupEvents() {
-  console.log('Setting up events'); // События кнопок
-
-  document.addEventListener('click', function (e) {
-    var btn = e.target.closest('.ddrdrawing__tool-btn');
-
-    if (btn) {
-      var tool = btn.getAttribute('data-tool');
-      console.log('Button clicked:', tool);
-      setTool(tool);
+      return this.plugin.setTool(toolName);
     }
-  }); // Масштабирование колесом мыши
+    /**
+     * Создать прямоугольник
+     */
 
-  paper.el.addEventListener('wheel', function (evt) {
-    evt.preventDefault();
-    var currentScale = paper.scale();
-    var scaleFactor = evt.deltaY > 0 ? 0.9 : 1.1;
-    var newScale = currentScale.sx * scaleFactor; // Ограничиваем масштаб
+  }, {
+    key: "createRectangle",
+    value: function createRectangle(x, y) {
+      if (!this.plugin) {
+        _src_core_Logger_js__WEBPACK_IMPORTED_MODULE_1__["default"].error('Plugin not initialized');
+        return;
+      }
 
-    if (newScale > 0.1 && newScale < 5) {
-      // Получаем позицию курсора относительно холста
-      var rect = paper.el.getBoundingClientRect();
-      var mouseX = evt.clientX - rect.left;
-      var mouseY = evt.clientY - rect.top; // Получаем текущую трансформацию
-
-      var currentTransform = paper.matrix();
-      var currentTx = currentTransform.e;
-      var currentTy = currentTransform.f; // Вычисляем точку в локальных координатах до масштабирования
-
-      var localBeforeX = (mouseX - currentTx) / currentScale.sx;
-      var localBeforeY = (mouseY - currentTy) / currentScale.sy; // Применяем новый масштаб
-
-      paper.scale(newScale, newScale); // Вычисляем новую позицию трансляции, чтобы курсор остался на месте
-
-      var newTx = mouseX - localBeforeX * newScale;
-      var newTy = mouseY - localBeforeY * newScale; // Применяем трансляцию
-
-      paper.translate(newTx, newTy);
+      return this.plugin.createRectangle(x, y);
     }
-  }); // Переменные для перетаскивания
+    /**
+     * Обновить размеры холста
+     */
 
-  var isDragging = false;
-  var dragStart = {
-    x: 0,
-    y: 0
-  };
-  var startTranslate = {
-    tx: 0,
-    ty: 0
-  }; // Перемещение холста
-
-  paper.on('blank:pointerdown', function (evt) {
-    console.log('Canvas clicked, current tool:', currentTool);
-
-    if (currentTool === 'rectangle') {
-      var point = paper.clientToLocalPoint(evt.clientX, evt.clientY);
-      console.log('Creating rectangle at:', point);
-      createRectangle(point.x, point.y);
-      setTool('select');
-    } else if (currentTool === 'select') {
-      // Начинаем перетаскивание
-      isDragging = true;
-      dragStart = {
-        x: evt.clientX,
-        y: evt.clientY
-      };
-      var currentTransform = paper.matrix();
-      startTranslate = {
-        tx: currentTransform.e,
-        ty: currentTransform.f
-      };
-      paper.el.style.cursor = 'grabbing';
-    }
-  }); // Обработка перемещения мыши
-
-  document.addEventListener('pointermove', function (evt) {
-    if (isDragging && currentTool === 'select') {
-      var deltaX = evt.clientX - dragStart.x;
-      var deltaY = evt.clientY - dragStart.y;
-      var newTranslateX = startTranslate.tx + deltaX;
-      var newTranslateY = startTranslate.ty + deltaY;
-      paper.translate(newTranslateX, newTranslateY);
-    }
-  }); // Завершение перетаскивания
-
-  document.addEventListener('pointerup', function () {
-    if (isDragging) {
-      isDragging = false;
-      paper.el.style.cursor = 'default';
-    }
-  });
-}
-/**
- * Настройка интерактивных стилей для элементов
- */
-
-
-function setupInteractiveStyles() {
-  // События для изменения стилей при взаимодействии
-  paper.on('cell:mouseenter', function (cellView) {
-    // При наведении - серый цвет (только если не выделен)
-    if (!cellView.model.get('selected')) {
-      cellView.model.attr('body/stroke', '#8b8b8b');
-    }
-  });
-  paper.on('cell:mouseleave', function (cellView) {
-    // Возвращаем исходный цвет, если элемент не выделен
-    if (!cellView.model.get('selected')) {
-      cellView.model.attr('body/stroke', '#cfcccc');
-    }
-  }); // События выделения/снятия выделения
-
-  paper.on('cell:pointerdown', function (cellView) {
-    // Снимаем выделение со всех элементов
-    graph.getCells().forEach(function (cell) {
-      cell.set('selected', false);
-      cell.attr('body/stroke', '#cfcccc');
-    }); // Выделяем текущий элемент
-
-    cellView.model.set('selected', true);
-    cellView.model.attr('body/stroke', '#00deff');
-  }); // Снятие выделения при клике по пустому месту
-
-  paper.on('blank:pointerdown', function (evt) {
-    // Проверяем, что это не создание фигуры
-    if (currentTool === 'select') {
-      graph.getCells().forEach(function (cell) {
-        cell.set('selected', false);
-        cell.attr('body/stroke', '#cfcccc');
-      });
-    }
-  });
-}
-/**
- * Установка инструмента
- */
-
-
-function setTool(tool) {
-  console.log('Setting tool:', tool); // Убираем активный класс
-
-  document.querySelectorAll('.ddrdrawing__tool-btn').forEach(function (btn) {
-    btn.classList.remove('active');
-  }); // Добавляем активный класс
-
-  var btn = document.querySelector("[data-tool=\"".concat(tool, "\"]"));
-
-  if (btn) {
-    btn.classList.add('active');
-  }
-
-  currentTool = tool; // Обработка инструментов
-
-  switch (tool) {
-    case 'undo':
-      undo();
-      setTool('select');
-      break;
-
-    case 'redo':
-      redo();
-      setTool('select');
-      break;
-
-    case 'zoom-in':
-      zoomIn();
-      setTool('select');
-      break;
-
-    case 'zoom-out':
-      zoomOut();
-      setTool('select');
-      break;
-
-    case 'zoom-fit':
-      zoomToFit();
-      setTool('select');
-      break;
-  }
-}
-/**
- * Создание прямоугольника
- */
-
-
-function createRectangle(x, y) {
-  // Привязываем к сетке (gridSize = 10)
-  var gridSize = 10;
-  var snapX = Math.round(x / gridSize) * gridSize;
-  var snapY = Math.round(y / gridSize) * gridSize;
-  var rect = new window.joint.shapes.standard.Rectangle({
-    position: {
-      x: snapX - 10,
-      y: snapY - 10
-    },
-    size: {
-      width: 20,
-      height: 20
-    },
-    attrs: {
-      body: {
-        fill: '#ffffff',
-        stroke: '#cfcccc',
-        strokeWidth: 1
+  }, {
+    key: "updatePaperSize",
+    value: function updatePaperSize() {
+      if (this.plugin) {
+        this.plugin.updatePaperSize();
       }
     }
-  });
-  graph.addCell(rect);
-  console.log('Rectangle created at grid position:', snapX, snapY);
-}
-/**
- * Отмена
- */
+    /**
+     * Отменить действие
+     */
 
+  }, {
+    key: "undo",
+    value: function undo() {
+      _src_core_Logger_js__WEBPACK_IMPORTED_MODULE_1__["default"].info('Undo - to be implemented');
+    }
+    /**
+     * Повторить действие
+     */
 
-function undo() {
-  console.log('Undo');
-}
-/**
- * Повтор
- */
+  }, {
+    key: "redo",
+    value: function redo() {
+      _src_core_Logger_js__WEBPACK_IMPORTED_MODULE_1__["default"].info('Redo - to be implemented');
+    }
+    /**
+     * Увеличить масштаб
+     */
 
+  }, {
+    key: "zoomIn",
+    value: function zoomIn() {
+      if (this.plugin) {
+        this.plugin.zoomIn();
+      }
+    }
+    /**
+     * Уменьшить масштаб
+     */
 
-function redo() {
-  console.log('Redo');
-}
-/**
- * Увеличение масштаба
- */
+  }, {
+    key: "zoomOut",
+    value: function zoomOut() {
+      if (this.plugin) {
+        this.plugin.zoomOut();
+      }
+    }
+    /**
+     * Подогнать масштаб
+     */
 
+  }, {
+    key: "zoomToFit",
+    value: function zoomToFit() {
+      if (this.plugin) {
+        this.plugin.zoomToFit();
+      }
+    } // API для расширенного доступа
 
-function zoomIn() {
-  if (paper) {
-    var scale = paper.scale();
-    paper.scale(scale.sx * 1.2, scale.sy * 1.2);
-  }
-}
-/**
- * Уменьшение масштаба
- */
+  }, {
+    key: "getPlugin",
+    value: function getPlugin() {
+      return this.plugin;
+    }
+  }, {
+    key: "getCanvas",
+    value: function getCanvas() {
+      return this.plugin ? this.plugin.getCanvas() : null;
+    }
+  }, {
+    key: "getToolManager",
+    value: function getToolManager() {
+      return this.plugin ? this.plugin.getToolManager() : null;
+    }
+  }, {
+    key: "getEventManager",
+    value: function getEventManager() {
+      return this.plugin ? this.plugin.getEventManager() : null;
+    }
+  }, {
+    key: "getContextMenu",
+    value: function getContextMenu() {
+      return this.plugin ? this.plugin.getContextMenu() : null;
+    }
+    /**
+     * Включить отладку
+     */
 
+  }, {
+    key: "enableDebug",
+    value: function enableDebug() {
+      var enabled = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+      _src_core_Logger_js__WEBPACK_IMPORTED_MODULE_1__["default"].setEnabled(enabled);
+    }
+    /**
+     * Уничтожить плагин
+     */
 
-function zoomOut() {
-  if (paper) {
-    var scale = paper.scale();
-    paper.scale(scale.sx * 0.8, scale.sy * 0.8);
-  }
-}
-/**
- * Подгонка по размеру (100%)
- */
+  }, {
+    key: "destroy",
+    value: function destroy() {
+      if (this.plugin) {
+        this.plugin.destroy();
+        this.plugin = null;
+      }
 
+      this.initialized = false;
+    }
+  }]);
 
-function zoomToFit() {
-  if (paper) {
-    // Получаем размеры холста
-    var paperRect = paper.el.getBoundingClientRect();
-    var centerX = paperRect.width / 2;
-    var centerY = paperRect.height / 2; // Получаем текущую трансформацию
-
-    var currentTransform = paper.matrix();
-    var currentScale = paper.scale(); // Вычисляем текущий центр в локальных координатах
-
-    var localCenterX = (centerX - currentTransform.e) / currentScale.sx;
-    var localCenterY = (centerY - currentTransform.f) / currentScale.sy; // Устанавливаем масштаб 100%
-
-    paper.scale(1, 1); // Вычисляем новую позицию трансляции, чтобы центр остался на месте
-
-    var newTx = centerX - localCenterX * 1;
-    var newTy = centerY - localCenterY * 1; // Применяем трансляцию
-
-    paper.translate(newTx, newTy);
-  }
-} // Экспорт
+  return DdrDrawing;
+}(); // Фабричная функция для обратной совместимости
 
 
 var ddrDrawing = function ddrDrawing() {
+  var instance = new DdrDrawing();
   return {
-    init: init,
-    setTool: setTool,
-    createRectangle: createRectangle,
-    undo: undo,
-    redo: redo,
-    zoomIn: zoomIn,
-    zoomOut: zoomOut,
-    zoomToFit: zoomToFit
+    init: function init() {
+      return instance.init();
+    },
+    setTool: function setTool(toolName) {
+      return instance.setTool(toolName);
+    },
+    createRectangle: function createRectangle(x, y) {
+      return instance.createRectangle(x, y);
+    },
+    updatePaperSize: function updatePaperSize() {
+      return instance.updatePaperSize();
+    },
+    undo: function undo() {
+      return instance.undo();
+    },
+    redo: function redo() {
+      return instance.redo();
+    },
+    zoomIn: function zoomIn() {
+      return instance.zoomIn();
+    },
+    zoomOut: function zoomOut() {
+      return instance.zoomOut();
+    },
+    zoomToFit: function zoomToFit() {
+      return instance.zoomToFit();
+    },
+    getPlugin: function getPlugin() {
+      return instance.getPlugin();
+    },
+    getCanvas: function getCanvas() {
+      return instance.getCanvas();
+    },
+    getToolManager: function getToolManager() {
+      return instance.getToolManager();
+    },
+    getEventManager: function getEventManager() {
+      return instance.getEventManager();
+    },
+    getContextMenu: function getContextMenu() {
+      return instance.getContextMenu();
+    },
+    enableDebug: function enableDebug(enabled) {
+      return instance.enableDebug(enabled);
+    },
+    destroy: function destroy() {
+      return instance.destroy();
+    }
   };
-}; // Глобальный доступ
+}; // Глобальный доступ для обратной совместимости
 
 
 if (typeof window !== 'undefined') {
   window.ddrDrawing = ddrDrawing;
+  window.DdrDrawing = DdrDrawing; // Прямой доступ к классу
 }
+
+
+/* harmony default export */ __webpack_exports__["default"] = (ddrDrawing);
+
+/***/ }),
+
+/***/ "./resources/js/plugins/ddrDrawing/src/DrawingPlugin.js":
+/*!**************************************************************!*\
+  !*** ./resources/js/plugins/ddrDrawing/src/DrawingPlugin.js ***!
+  \**************************************************************/
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _core_DrawingCanvas_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./core/DrawingCanvas.js */ "./resources/js/plugins/ddrDrawing/src/core/DrawingCanvas.js");
+/* harmony import */ var _core_EventManager_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./core/EventManager.js */ "./resources/js/plugins/ddrDrawing/src/core/EventManager.js");
+/* harmony import */ var _core_ToolManager_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./core/ToolManager.js */ "./resources/js/plugins/ddrDrawing/src/core/ToolManager.js");
+/* harmony import */ var _ui_ContextMenu_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./ui/ContextMenu.js */ "./resources/js/plugins/ddrDrawing/src/ui/ContextMenu.js");
+/* harmony import */ var _ui_LineStyleSelector_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./ui/LineStyleSelector.js */ "./resources/js/plugins/ddrDrawing/src/ui/LineStyleSelector.js");
+/* harmony import */ var _services_PortService_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./services/PortService.js */ "./resources/js/plugins/ddrDrawing/src/services/PortService.js");
+/* harmony import */ var _tools_SelectTool_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./tools/SelectTool.js */ "./resources/js/plugins/ddrDrawing/src/tools/SelectTool.js");
+/* harmony import */ var _tools_RectangleTool_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./tools/RectangleTool.js */ "./resources/js/plugins/ddrDrawing/src/tools/RectangleTool.js");
+/* harmony import */ var _core_Logger_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./core/Logger.js */ "./resources/js/plugins/ddrDrawing/src/core/Logger.js");
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+
+
+
+
+
+
+
+
+
+
+/**
+ * Главный класс плагина рисования
+ */
+
+var DrawingPlugin = /*#__PURE__*/function () {
+  function DrawingPlugin() {
+    var containerId = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '#ddrDrawingCanvas';
+
+    _classCallCheck(this, DrawingPlugin);
+
+    this.containerId = containerId;
+    this.canvas = null;
+    this.eventManager = null;
+    this.toolManager = null;
+    this.contextMenu = null;
+    this.lineStyleSelector = null;
+    this.portService = null;
+    this.initialized = false;
+  }
+  /**
+   * Инициализация плагина
+   */
+
+
+  _createClass(DrawingPlugin, [{
+    key: "init",
+    value: function init() {
+      if (this.initialized) return;
+      _core_Logger_js__WEBPACK_IMPORTED_MODULE_8__["default"].info('Initializing DrawingPlugin');
+
+      try {
+        // Создаем основные компоненты
+        this.canvas = new _core_DrawingCanvas_js__WEBPACK_IMPORTED_MODULE_0__["default"](this.containerId);
+        this.eventManager = new _core_EventManager_js__WEBPACK_IMPORTED_MODULE_1__["default"](this.canvas);
+        this.toolManager = new _core_ToolManager_js__WEBPACK_IMPORTED_MODULE_2__["default"](this.canvas, this.eventManager);
+        this.contextMenu = new _ui_ContextMenu_js__WEBPACK_IMPORTED_MODULE_3__["default"](this.canvas, this.eventManager);
+        this.lineStyleSelector = new _ui_LineStyleSelector_js__WEBPACK_IMPORTED_MODULE_4__["default"](this.canvas);
+        this.portService = new _services_PortService_js__WEBPACK_IMPORTED_MODULE_5__["default"](this.canvas, this.eventManager); // Инициализируем компоненты
+
+        this.canvas.init();
+        this.contextMenu.init();
+        this.lineStyleSelector.init();
+        this.portService.init(); // Устанавливаем связи
+
+        this.eventManager.setToolManager(this.toolManager);
+        this.eventManager.setContextMenu(this.contextMenu);
+        this.canvas.setLineStyleSelector(this.lineStyleSelector); // Регистрируем инструменты
+
+        this.registerTools(); // Инициализируем менеджеры
+
+        this.toolManager.init();
+        this.eventManager.init(); // Устанавливаем инструмент по умолчанию
+
+        this.toolManager.activateTool('select'); // Настраиваем обработчики специальных событий
+
+        this.setupEventHandlers();
+        this.initialized = true;
+        _core_Logger_js__WEBPACK_IMPORTED_MODULE_8__["default"].info('DrawingPlugin initialized successfully');
+      } catch (error) {
+        _core_Logger_js__WEBPACK_IMPORTED_MODULE_8__["default"].error('Failed to initialize DrawingPlugin:', error);
+        throw error;
+      }
+    }
+    /**
+     * Регистрация инструментов
+     */
+
+  }, {
+    key: "registerTools",
+    value: function registerTools() {
+      this.toolManager.registerTool('select', _tools_SelectTool_js__WEBPACK_IMPORTED_MODULE_6__["default"]);
+      this.toolManager.registerTool('rectangle', _tools_RectangleTool_js__WEBPACK_IMPORTED_MODULE_7__["default"]);
+    }
+    /**
+     * Настройка обработчиков событий
+     */
+
+  }, {
+    key: "setupEventHandlers",
+    value: function setupEventHandlers() {
+      var _this = this;
+
+      // Обработчики для специальных инструментов
+      this.eventManager.on('undo', function () {
+        _core_Logger_js__WEBPACK_IMPORTED_MODULE_8__["default"].info('Undo action'); // TODO: Реализовать undo
+      });
+      this.eventManager.on('redo', function () {
+        _core_Logger_js__WEBPACK_IMPORTED_MODULE_8__["default"].info('Redo action'); // TODO: Реализовать redo
+      });
+      this.eventManager.on('zoom-in', function () {
+        _this.zoomIn();
+      });
+      this.eventManager.on('zoom-out', function () {
+        _this.zoomOut();
+      });
+      this.eventManager.on('zoom-fit', function () {
+        _this.zoomToFit();
+      });
+    }
+    /**
+     * Получить canvas
+     */
+
+  }, {
+    key: "getCanvas",
+    value: function getCanvas() {
+      return this.canvas;
+    }
+    /**
+     * Получить менеджер инструментов
+     */
+
+  }, {
+    key: "getToolManager",
+    value: function getToolManager() {
+      return this.toolManager;
+    }
+    /**
+     * Получить менеджер событий
+     */
+
+  }, {
+    key: "getEventManager",
+    value: function getEventManager() {
+      return this.eventManager;
+    }
+    /**
+     * Получить контекстное меню
+     */
+
+  }, {
+    key: "getContextMenu",
+    value: function getContextMenu() {
+      return this.contextMenu;
+    }
+    /**
+     * Получить селектор стилей линий
+     */
+
+  }, {
+    key: "getLineStyleSelector",
+    value: function getLineStyleSelector() {
+      return this.lineStyleSelector;
+    }
+    /**
+     * Получить сервис портов
+     */
+
+  }, {
+    key: "getPortService",
+    value: function getPortService() {
+      return this.portService;
+    }
+    /**
+     * Установить инструмент
+     */
+
+  }, {
+    key: "setTool",
+    value: function setTool(toolName) {
+      return this.toolManager.activateTool(toolName);
+    }
+    /**
+     * Увеличение масштаба
+     */
+
+  }, {
+    key: "zoomIn",
+    value: function zoomIn() {
+      if (this.canvas) {
+        var scale = this.canvas.getScale();
+        this.canvas.setScale(scale.sx * 1.2);
+      }
+    }
+    /**
+     * Уменьшение масштаба
+     */
+
+  }, {
+    key: "zoomOut",
+    value: function zoomOut() {
+      if (this.canvas) {
+        var scale = this.canvas.getScale();
+        this.canvas.setScale(scale.sx * 0.8);
+      }
+    }
+    /**
+     * Подгонка по размеру (100%)
+     */
+
+  }, {
+    key: "zoomToFit",
+    value: function zoomToFit() {
+      if (this.canvas) {
+        var paper = this.canvas.getPaper();
+        var paperRect = paper.el.getBoundingClientRect();
+        var centerX = paperRect.width / 2;
+        var centerY = paperRect.height / 2;
+        var currentTransform = this.canvas.getMatrix();
+        var currentScale = this.canvas.getScale();
+        var localCenterX = (centerX - currentTransform.e) / currentScale.sx;
+        var localCenterY = (centerY - currentTransform.f) / currentScale.sy;
+        this.canvas.setScale(1);
+        var newTx = centerX - localCenterX * 1;
+        var newTy = centerY - localCenterY * 1;
+        this.canvas.setTranslation(newTx, newTy);
+      }
+    }
+    /**
+     * Обновление размеров paper
+     */
+
+  }, {
+    key: "updatePaperSize",
+    value: function updatePaperSize() {
+      if (this.canvas) {
+        this.canvas.updatePaperSize();
+      }
+    }
+    /**
+     * Создание прямоугольника (для обратной совместимости)
+     */
+
+  }, {
+    key: "createRectangle",
+    value: function createRectangle(x, y) {
+      var rectangleTool = this.toolManager.getTool('rectangle');
+
+      if (rectangleTool) {
+        return rectangleTool.createRectangle(x, y);
+      }
+    }
+    /**
+     * Очистка и уничтожение плагина
+     */
+
+  }, {
+    key: "destroy",
+    value: function destroy() {
+      if (this.eventManager) {
+        this.eventManager.destroy();
+      }
+
+      if (this.contextMenu) {
+        this.contextMenu.destroy();
+      }
+
+      if (this.portService) {
+        this.portService.destroy();
+      }
+
+      this.initialized = false;
+      _core_Logger_js__WEBPACK_IMPORTED_MODULE_8__["default"].info('DrawingPlugin destroyed');
+    }
+  }]);
+
+  return DrawingPlugin;
+}();
+
+/* harmony default export */ __webpack_exports__["default"] = (DrawingPlugin);
+
+/***/ }),
+
+/***/ "./resources/js/plugins/ddrDrawing/src/core/DrawingCanvas.js":
+/*!*******************************************************************!*\
+  !*** ./resources/js/plugins/ddrDrawing/src/core/DrawingCanvas.js ***!
+  \*******************************************************************/
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _Logger_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Logger.js */ "./resources/js/plugins/ddrDrawing/src/core/Logger.js");
+/* harmony import */ var _LinkMetadata_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./LinkMetadata.js */ "./resources/js/plugins/ddrDrawing/src/core/LinkMetadata.js");
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+
+
+
+/**
+ * Основной класс для управления холстом рисования
+ */
+
+var DrawingCanvas = /*#__PURE__*/function () {
+  function DrawingCanvas(containerId) {
+    _classCallCheck(this, DrawingCanvas);
+
+    this.containerId = containerId;
+    this.container = null;
+    this.graph = null;
+    this.paper = null;
+    this.lineStyleSelector = null; // Будет установлен позже
+
+    this.initialized = false;
+  }
+  /**
+   * Установить селектор стилей линий
+   */
+
+
+  _createClass(DrawingCanvas, [{
+    key: "setLineStyleSelector",
+    value: function setLineStyleSelector(selector) {
+      this.lineStyleSelector = selector;
+    }
+    /**
+     * Инициализация холста
+     */
+
+  }, {
+    key: "init",
+    value: function init() {
+      if (this.initialized) return;
+      _Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].info('Initializing DrawingCanvas'); // Проверяем JointJS
+
+      if (!window.joint) {
+        throw new Error('JointJS library not found');
+      } // Находим контейнер
+
+
+      this.container = document.querySelector(this.containerId);
+
+      if (!this.container) {
+        throw new Error("Canvas container ".concat(this.containerId, " not found"));
+      }
+
+      this._createGraph();
+
+      this._createPaper();
+
+      this._updatePaperSize();
+
+      this.initialized = true;
+      _Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].info('DrawingCanvas initialized');
+    }
+    /**
+     * Создание графа
+     */
+
+  }, {
+    key: "_createGraph",
+    value: function _createGraph() {
+      this.graph = new window.joint.dia.Graph();
+    }
+    /**
+     * Создание paper
+     */
+
+  }, {
+    key: "_createPaper",
+    value: function _createPaper() {
+      var _this = this;
+
+      this.paper = new window.joint.dia.Paper({
+        el: this.container,
+        model: this.graph,
+        width: '100%',
+        height: '100%',
+        gridSize: 1,
+        // Пиксельная точность для плавного движения линий
+        drawGridSize: 10,
+        // Визуальная сетка каждые 10px
+        drawGrid: {
+          name: 'dot',
+          args: {
+            color: '#cccccc',
+            thickness: 1
+          }
+        },
+        background: {
+          color: '#fdfdfd'
+        },
+        // ВАЖНО: отключаем встроенное движение элементов, используем кастомную логику
+        interactive: {
+          elementMove: false,
+          // Отключаем встроенное движение - используем кастомную логику в SelectTool
+          addLinkFromMagnet: true,
+          // Разрешаем создание связей от портов
+          linkMove: true,
+          vertexMove: true,
+          vertexAdd: true,
+          vertexRemove: true,
+          arrowheadMove: true,
+          labelMove: false,
+          useLinkTools: true
+        },
+        // Разрешаем создание связей только через порты
+        linkPinning: false,
+        // Создаем стандартную связь без стрелок с мета-информацией
+        defaultLink: function defaultLink() {
+          // Получаем текущие настройки из селектора
+          var currentSettings = _this.lineStyleSelector ? _this.lineStyleSelector.getCurrentSettings() : {
+            color: '#666666',
+            lineStyle: _LinkMetadata_js__WEBPACK_IMPORTED_MODULE_1__.LineStyles.SOLID
+          };
+          var link = new window.joint.shapes.standard.Link({
+            attrs: {
+              line: {
+                stroke: currentSettings.color,
+                strokeWidth: 1,
+                targetMarker: 'none',
+                // Убираем стрелку
+                sourceMarker: 'none' // Убираем стрелку с начала тоже
+
+              }
+            }
+          }); // Добавляем мета-информацию с текущими настройками
+
+          new _LinkMetadata_js__WEBPACK_IMPORTED_MODULE_1__.LinkMetadata(link, {
+            color: currentSettings.color,
+            lineStyle: currentSettings.lineStyle,
+            connectionType: _LinkMetadata_js__WEBPACK_IMPORTED_MODULE_1__.ConnectionTypes.SHAPE_TO_SHAPE
+          });
+          return link;
+        },
+        // Настройки магнитного поведения
+        magnetThreshold: 'onleave',
+        markAvailable: true,
+        // Показывать доступные порты
+        // Настройки по умолчанию для всех связей - убираем отступ
+        defaultConnectionPoint: {
+          name: 'boundary',
+          args: {
+            offset: -2.5,
+            // ОТРИЦАТЕЛЬНЫЙ отступ - заходим внутрь элемента
+            extrapolate: true
+          }
+        },
+        // Валидация магнитов - разрешаем активные порты
+        validateMagnet: function validateMagnet(cellView, magnet) {
+          _Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('validateMagnet:', magnet.getAttribute('magnet'));
+          return magnet.getAttribute('magnet') === 'true';
+        },
+        // Валидация подключений - только через порты с магнитами  
+        validateConnection: function validateConnection(cellViewS, magnetS, cellViewT, magnetT, end, linkView) {
+          _Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('validateConnection:', {
+            magnetS: magnetS,
+            magnetT: magnetT
+          }); // Проверяем что оба конца подключены к магнитам (портам)
+
+          if (!magnetS || !magnetT) {
+            _Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('Connection rejected: not connected to magnets');
+            return false;
+          } // Не разрешаем подключение к одному элементу
+
+
+          if (cellViewS === cellViewT) {
+            _Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('Connection rejected: same element');
+            return false;
+          }
+
+          _Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('Connection approved!');
+          return true;
+        }
+      }); // Обработчики событий для линков
+
+      this.graph.on('add', function (cell) {
+        if (cell.isLink()) {
+          _this._onLinkAdded(cell);
+        }
+      });
+      this.graph.on('change:vertices change:source change:target', function (link) {
+        if (link.isLink()) {
+          _this._onLinkChanged(link);
+        }
+      });
+      _Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].info('Paper created with port-based linking enabled');
+    }
+    /**
+     * Обработчик добавления линка
+     */
+
+  }, {
+    key: "_onLinkAdded",
+    value: function _onLinkAdded(link) {// Пока ничего не делаем - ждём полного подключения
+    }
+    /**
+     * Обработчик изменения линка
+     */
+
+  }, {
+    key: "_onLinkChanged",
+    value: function _onLinkChanged(link) {
+      // Проверяем, если линк полностью подключен к двум элементам
+      var source = link.source();
+      var target = link.target();
+
+      if (source.id && target.id) {
+        // Линк полностью подключен - определяем и выводим тип
+        var sourceElement = this.graph.getCell(source.id);
+        var targetElement = this.graph.getCell(target.id);
+        var connectionType = _LinkMetadata_js__WEBPACK_IMPORTED_MODULE_1__.LinkMetadata.detectConnectionType(sourceElement, targetElement); // Обновляем метаданные с правильным типом
+
+        var metadata = _LinkMetadata_js__WEBPACK_IMPORTED_MODULE_1__.LinkMetadata.fromLink(link);
+
+        if (metadata) {
+          metadata.setConnectionType(connectionType);
+          console.log('🔗 Тип соединения линии:', connectionType);
+        }
+      }
+    }
+    /**
+     * Обновление размеров paper
+     */
+
+  }, {
+    key: "updatePaperSize",
+    value: function updatePaperSize() {
+      var _this2 = this;
+
+      if (!this.paper) return;
+      var container = this.paper.el;
+
+      if (!container || !container.offsetParent) {
+        setTimeout(function () {
+          return _this2.updatePaperSize();
+        }, 100);
+        return;
+      }
+
+      var containerWidth = container.offsetWidth;
+      var containerHeight = container.offsetHeight;
+      _Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('Updating paper size:', containerWidth, 'x', containerHeight);
+      this.paper.setDimensions(containerWidth, containerHeight);
+      this.paper.render();
+    }
+    /**
+     * Приватный метод для немедленного обновления размеров
+     */
+
+  }, {
+    key: "_updatePaperSize",
+    value: function _updatePaperSize() {
+      var _this3 = this;
+
+      setTimeout(function () {
+        return _this3.updatePaperSize();
+      }, 50);
+    }
+    /**
+     * Получить граф
+     */
+
+  }, {
+    key: "getGraph",
+    value: function getGraph() {
+      return this.graph;
+    }
+    /**
+     * Получить paper
+     */
+
+  }, {
+    key: "getPaper",
+    value: function getPaper() {
+      return this.paper;
+    }
+    /**
+     * Установить масштаб
+     */
+
+  }, {
+    key: "setScale",
+    value: function setScale(scale) {
+      if (this.paper) {
+        this.paper.scale(scale, scale);
+      }
+    }
+    /**
+     * Получить текущий масштаб
+     */
+
+  }, {
+    key: "getScale",
+    value: function getScale() {
+      return this.paper ? this.paper.scale() : {
+        sx: 1,
+        sy: 1
+      };
+    }
+    /**
+     * Установить трансляцию
+     */
+
+  }, {
+    key: "setTranslation",
+    value: function setTranslation(tx, ty) {
+      if (this.paper) {
+        this.paper.translate(tx, ty);
+      }
+    }
+    /**
+     * Получить текущую трансформацию
+     */
+
+  }, {
+    key: "getMatrix",
+    value: function getMatrix() {
+      return this.paper ? this.paper.matrix() : null;
+    }
+    /**
+     * Преобразовать координаты клиента в локальные
+     */
+
+  }, {
+    key: "clientToLocalPoint",
+    value: function clientToLocalPoint(clientX, clientY) {
+      return this.paper ? this.paper.clientToLocalPoint(clientX, clientY) : {
+        x: 0,
+        y: 0
+      };
+    }
+    /**
+     * Привязать точку к сетке с учетом масштаба
+     */
+
+  }, {
+    key: "snapToGrid",
+    value: function snapToGrid(x, y) {
+      var gridSize = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 10;
+      // Базовый размер сетки НЕ зависит от масштаба!
+      // JointJS clientToLocalPoint уже учитывает трансформации
+      return {
+        x: Math.round(x / gridSize) * gridSize,
+        y: Math.round(y / gridSize) * gridSize
+      };
+    }
+    /**
+     * Получить размер сетки
+     */
+
+  }, {
+    key: "getGridSize",
+    value: function getGridSize() {
+      return this.paper ? this.paper.options.gridSize : 10;
+    }
+  }]);
+
+  return DrawingCanvas;
+}();
+
+/* harmony default export */ __webpack_exports__["default"] = (DrawingCanvas);
+
+/***/ }),
+
+/***/ "./resources/js/plugins/ddrDrawing/src/core/EventManager.js":
+/*!******************************************************************!*\
+  !*** ./resources/js/plugins/ddrDrawing/src/core/EventManager.js ***!
+  \******************************************************************/
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _Logger_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Logger.js */ "./resources/js/plugins/ddrDrawing/src/core/Logger.js");
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+
+
+/**
+ * Менеджер событий для централизации обработки
+ */
+
+var EventManager = /*#__PURE__*/function () {
+  function EventManager(canvas) {
+    _classCallCheck(this, EventManager);
+
+    this.canvas = canvas;
+    this.toolManager = null;
+    this.contextMenu = null;
+    this.isDragging = false;
+    this.dragStart = {
+      x: 0,
+      y: 0
+    };
+    this.startTranslate = {
+      tx: 0,
+      ty: 0
+    };
+    this.eventHandlers = new Map();
+  }
+  /**
+   * Установка менеджера инструментов
+   */
+
+
+  _createClass(EventManager, [{
+    key: "setToolManager",
+    value: function setToolManager(toolManager) {
+      this.toolManager = toolManager;
+    }
+    /**
+     * Установка контекстного меню
+     */
+
+  }, {
+    key: "setContextMenu",
+    value: function setContextMenu(contextMenu) {
+      this.contextMenu = contextMenu;
+    }
+    /**
+     * Инициализация событий
+     */
+
+  }, {
+    key: "init",
+    value: function init() {
+      this._setupToolbarEvents();
+
+      this._setupCanvasEvents();
+
+      this._setupPaperEvents();
+
+      this._setupGlobalEvents();
+
+      _Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('EventManager initialized');
+    }
+    /**
+     * События панели инструментов
+     */
+
+  }, {
+    key: "_setupToolbarEvents",
+    value: function _setupToolbarEvents() {
+      var _this = this;
+
+      var toolHandler = function toolHandler(e) {
+        var btn = e.target.closest('.ddrdrawing__tool-btn');
+
+        if (btn) {
+          var tool = btn.getAttribute('data-tool');
+
+          _this._handleToolClick(tool);
+        }
+      };
+
+      document.addEventListener('click', toolHandler);
+      this.eventHandlers.set('toolbar', toolHandler);
+    }
+    /**
+     * События холста
+     */
+
+  }, {
+    key: "_setupCanvasEvents",
+    value: function _setupCanvasEvents() {
+      var _this2 = this;
+
+      var paper = this.canvas.getPaper(); // Масштабирование колесом мыши
+
+      var wheelHandler = function wheelHandler(evt) {
+        evt.preventDefault();
+
+        _this2._handleWheel(evt);
+      };
+
+      paper.el.addEventListener('wheel', wheelHandler); // Клик по пустому месту
+
+      paper.on('blank:pointerdown', function (evt) {
+        _this2._handleCanvasPointerDown(evt);
+      });
+    }
+    /**
+     * События элементов
+     */
+
+  }, {
+    key: "_setupPaperEvents",
+    value: function _setupPaperEvents() {
+      var _this3 = this;
+
+      var paper = this.canvas.getPaper(); // События элементов
+
+      paper.on('cell:mouseenter', function (cellView) {
+        _this3._handleCellMouseEnter(cellView);
+      });
+      paper.on('cell:mouseleave', function (cellView) {
+        _this3._handleCellMouseLeave(cellView);
+      });
+      paper.on('cell:pointerdown', function (cellView, evt) {
+        _this3._handleCellPointerDown(cellView, evt);
+      });
+      paper.on('cell:contextmenu', function (cellView, evt) {
+        _this3._handleCellContextMenu(cellView, evt);
+      }); // Добавляем обработчик для линков
+
+      paper.on('link:contextmenu', function (linkView, evt) {
+        _this3._handleCellContextMenu(linkView, evt);
+      }); // События портов для hover эффектов
+
+      paper.on('element:magnet:pointerenter', function (elementView, evt) {
+        _this3._handlePortMouseEnter(elementView, evt);
+      });
+      paper.on('element:magnet:pointerleave', function (elementView, evt) {
+        _this3._handlePortMouseLeave(elementView, evt);
+      }); // События создания связей
+
+      paper.on('link:connect', function (linkView) {
+        _this3._handleLinkConnect(linkView);
+      });
+      paper.on('link:disconnect', function (linkView) {
+        _this3._handleLinkDisconnect(linkView);
+      }); // Блокируем стандартное контекстное меню
+
+      paper.el.addEventListener('contextmenu', function (evt) {
+        evt.preventDefault();
+      });
+    }
+    /**
+     * Глобальные события
+     */
+
+  }, {
+    key: "_setupGlobalEvents",
+    value: function _setupGlobalEvents() {
+      var _this4 = this;
+
+      // Перемещение мыши
+      var moveHandler = function moveHandler(evt) {
+        _this4._handlePointerMove(evt);
+      };
+
+      document.addEventListener('pointermove', moveHandler); // Завершение перетаскивания
+
+      var upHandler = function upHandler(evt) {
+        _this4._handlePointerUp(evt);
+      };
+
+      document.addEventListener('pointerup', upHandler); // Объединенный обработчик кликов
+
+      var clickHandler = function clickHandler(e) {
+        _this4._handleGlobalClick(e);
+      };
+
+      document.addEventListener('click', clickHandler); // Изменение размера окна
+
+      var resizeHandler = function resizeHandler() {
+        _this4._handleWindowResize();
+      };
+
+      window.addEventListener('resize', resizeHandler); // Сохраняем обработчики для cleanup
+
+      this.eventHandlers.set('move', moveHandler);
+      this.eventHandlers.set('up', upHandler);
+      this.eventHandlers.set('click', clickHandler);
+      this.eventHandlers.set('resize', resizeHandler);
+    }
+    /**
+     * Обработка клика по инструменту
+     */
+
+  }, {
+    key: "_handleToolClick",
+    value: function _handleToolClick(tool) {
+      _Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('Tool clicked:', tool); // Специальные инструменты
+
+      switch (tool) {
+        case 'undo':
+          this.emit('undo');
+          this.toolManager.activateTool('select');
+          break;
+
+        case 'redo':
+          this.emit('redo');
+          this.toolManager.activateTool('select');
+          break;
+
+        case 'zoom-in':
+          this.emit('zoom-in');
+          this.toolManager.activateTool('select');
+          break;
+
+        case 'zoom-out':
+          this.emit('zoom-out');
+          this.toolManager.activateTool('select');
+          break;
+
+        case 'zoom-fit':
+          this.emit('zoom-fit');
+          this.toolManager.activateTool('select');
+          break;
+
+        default:
+          this.toolManager.activateTool(tool);
+      }
+    }
+    /**
+     * Обработка колеса мыши
+     */
+
+  }, {
+    key: "_handleWheel",
+    value: function _handleWheel(evt) {
+      var currentScale = this.canvas.getScale();
+      var scaleFactor = evt.deltaY > 0 ? 0.9 : 1.1;
+      var newScale = currentScale.sx * scaleFactor;
+
+      if (newScale > 0.1 && newScale < 5) {
+        var rect = this.canvas.getPaper().el.getBoundingClientRect();
+        var mouseX = evt.clientX - rect.left;
+        var mouseY = evt.clientY - rect.top;
+        var currentTransform = this.canvas.getMatrix();
+        var currentTx = currentTransform.e;
+        var currentTy = currentTransform.f;
+        var localBeforeX = (mouseX - currentTx) / currentScale.sx;
+        var localBeforeY = (mouseY - currentTy) / currentScale.sy;
+        this.canvas.setScale(newScale);
+        var newTx = mouseX - localBeforeX * newScale;
+        var newTy = mouseY - localBeforeY * newScale;
+        this.canvas.setTranslation(newTx, newTy);
+      }
+    }
+    /**
+     * Обработка клика по холсту
+     */
+
+  }, {
+    key: "_handleCanvasPointerDown",
+    value: function _handleCanvasPointerDown(evt) {
+      var point = this.canvas.clientToLocalPoint(evt.clientX, evt.clientY); // Передаем событие текущему инструменту
+
+      if (this.toolManager) {
+        this.toolManager.handleCanvasClick(point, evt);
+      } // Логика перетаскивания для select tool
+
+
+      var currentTool = this.toolManager.getCurrentTool();
+
+      if (currentTool && currentTool.name === 'select') {
+        this.isDragging = true;
+        this.dragStart = {
+          x: evt.clientX,
+          y: evt.clientY
+        };
+        var currentTransform = this.canvas.getMatrix();
+        this.startTranslate = {
+          tx: currentTransform.e,
+          ty: currentTransform.f
+        };
+        this.canvas.getPaper().el.style.cursor = 'grabbing';
+      }
+    }
+    /**
+     * События элементов
+     */
+
+  }, {
+    key: "_handleCellMouseEnter",
+    value: function _handleCellMouseEnter(cellView) {
+      if (!cellView.model.get('selected')) {
+        cellView.model.attr('body/stroke', '#8b8b8b');
+      }
+    }
+  }, {
+    key: "_handleCellMouseLeave",
+    value: function _handleCellMouseLeave(cellView) {
+      if (!cellView.model.get('selected')) {
+        cellView.model.attr('body/stroke', '#cfcccc');
+      }
+    }
+  }, {
+    key: "_handleCellPointerDown",
+    value: function _handleCellPointerDown(cellView, evt) {
+      // Снимаем выделение со всех элементов
+      this.canvas.getGraph().getCells().forEach(function (cell) {
+        cell.set('selected', false);
+        cell.attr('body/stroke', '#cfcccc');
+      }); // Выделяем текущий элемент
+
+      cellView.model.set('selected', true);
+      cellView.model.attr('body/stroke', '#00deff'); // Передаем событие инструменту
+
+      if (this.toolManager) {
+        this.toolManager.handleElementClick(cellView.model, cellView);
+      }
+    }
+  }, {
+    key: "_handleCellContextMenu",
+    value: function _handleCellContextMenu(cellView, evt) {
+      evt.preventDefault();
+
+      if (this.contextMenu) {
+        var canvasContainer = document.querySelector('#ddrDrawingCanvas');
+        var canvasContainerParent = canvasContainer.parentElement;
+        var containerRect = canvasContainerParent.getBoundingClientRect();
+        var x = evt.clientX - containerRect.left;
+        var y = evt.clientY - containerRect.top;
+        this.contextMenu.show(x, y, cellView.model);
+      }
+    }
+    /**
+     * Обработка движения мыши
+     */
+
+  }, {
+    key: "_handlePointerMove",
+    value: function _handlePointerMove(evt) {
+      var currentTool = this.toolManager ? this.toolManager.getCurrentTool() : null;
+
+      if (this.isDragging && currentTool && currentTool.name === 'select') {
+        var deltaX = evt.clientX - this.dragStart.x;
+        var deltaY = evt.clientY - this.dragStart.y;
+        var newTranslateX = this.startTranslate.tx + deltaX;
+        var newTranslateY = this.startTranslate.ty + deltaY;
+        this.canvas.setTranslation(newTranslateX, newTranslateY);
+      }
+    }
+    /**
+     * Завершение перетаскивания
+     */
+
+  }, {
+    key: "_handlePointerUp",
+    value: function _handlePointerUp() {
+      if (this.isDragging) {
+        this.isDragging = false;
+        this.canvas.getPaper().el.style.cursor = 'default';
+      }
+    }
+    /**
+     * Глобальный обработчик кликов
+     */
+
+  }, {
+    key: "_handleGlobalClick",
+    value: function _handleGlobalClick(e) {
+      var _this5 = this;
+
+      // Обработка переключения вкладок
+      var tabItem = e.target.closest('[ddrtabsitem]');
+
+      if (tabItem) {
+        var tabId = tabItem.getAttribute('ddrtabsitem');
+
+        if (tabId === 'systemTab7') {
+          setTimeout(function () {
+            return _this5.canvas.updatePaperSize();
+          }, 100);
+        }
+      } // Скрытие контекстного меню
+
+
+      if (!e.target.closest('.ddrdrawing__context-menu') && this.contextMenu) {
+        this.contextMenu.hide();
+      }
+    }
+    /**
+     * Обработка изменения размера окна
+     */
+
+  }, {
+    key: "_handleWindowResize",
+    value: function _handleWindowResize() {
+      var _this6 = this;
+
+      var drawingTab = document.querySelector('[ddrtabscontentitem="systemTab7"]');
+
+      if (drawingTab && drawingTab.classList.contains('ddrtabscontent__item_visible')) {
+        setTimeout(function () {
+          return _this6.canvas.updatePaperSize();
+        }, 100);
+      }
+    }
+    /**
+     * Обработка наведения на порт
+     */
+
+  }, {
+    key: "_handlePortMouseEnter",
+    value: function _handlePortMouseEnter(elementView, evt) {
+      var magnet = evt.target;
+      var portId = magnet.getAttribute('port');
+      _Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('Port hover enter:', portId); // Подсвечиваем порт
+
+      magnet.setAttribute('fill', '#87d5ff');
+      magnet.setAttribute('opacity', '1.0');
+      magnet.setAttribute('r', '4');
+      magnet.setAttribute('stroke-width', '2');
+    }
+    /**
+     * Обработка ухода курсора с порта
+     */
+
+  }, {
+    key: "_handlePortMouseLeave",
+    value: function _handlePortMouseLeave(elementView, evt) {
+      var magnet = evt.target;
+      var portId = magnet.getAttribute('port');
+      _Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('Port hover leave:', portId); // Возвращаем обычный стиль
+
+      magnet.setAttribute('fill', '#61cfff');
+      magnet.setAttribute('opacity', '1.0');
+      magnet.setAttribute('r', '3');
+      magnet.setAttribute('stroke-width', '1');
+    }
+    /**
+     * Обработка создания связи
+     */
+
+  }, {
+    key: "_handleLinkConnect",
+    value: function _handleLinkConnect(linkView) {
+      _Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('=== Link connected ===', linkView.model.id);
+      _Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('Source:', linkView.model.source());
+      _Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('Target:', linkView.model.target()); // Сохраняем информацию о занятых портах в модели элементов
+
+      var source = linkView.model.source();
+      var target = linkView.model.target();
+
+      if (source.id && source.port) {
+        var sourceElement = this.canvas.getGraph().getCell(source.id);
+
+        if (sourceElement) {
+          this._markPortAsHidden(sourceElement, source.port);
+        }
+      }
+
+      if (target.id && target.port) {
+        var targetElement = this.canvas.getGraph().getCell(target.id);
+
+        if (targetElement) {
+          this._markPortAsHidden(targetElement, target.port);
+        }
+      } // Скрываем занятые порты
+
+
+      this._hideOccupiedPorts(); // Можно добавить логику уведомлений или валидации
+
+
+      this.emit('link-created', {
+        link: linkView.model,
+        source: linkView.model.source(),
+        target: linkView.model.target()
+      });
+    }
+    /**
+     * Обработка удаления связи
+     */
+
+  }, {
+    key: "_handleLinkDisconnect",
+    value: function _handleLinkDisconnect(linkView) {
+      _Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('=== Link disconnected ===', linkView.model.id); // Показываем освободившиеся порты
+
+      this._hideOccupiedPorts();
+
+      this.emit('link-removed', {
+        link: linkView.model
+      });
+    }
+    /**
+     * Помечаем порт как скрытый в модели элемента
+     */
+
+  }, {
+    key: "_markPortAsHidden",
+    value: function _markPortAsHidden(element, portId) {
+      var hiddenPorts = element.get('hiddenPorts') || [];
+
+      if (!hiddenPorts.includes(portId)) {
+        element.set('hiddenPorts', [].concat(_toConsumableArray(hiddenPorts), [portId]));
+        _Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('Marked port as hidden:', portId, 'for element:', element.id);
+      }
+    }
+    /**
+     * Проверяем скрыт ли порт в модели элемента
+     */
+
+  }, {
+    key: "_isPortHidden",
+    value: function _isPortHidden(element, portId) {
+      var hiddenPorts = element.get('hiddenPorts') || [];
+      return hiddenPorts.includes(portId);
+    }
+    /**
+     * Скрытие занятых портов
+     */
+
+  }, {
+    key: "_hideOccupiedPorts",
+    value: function _hideOccupiedPorts() {
+      var _this7 = this;
+
+      if (!this.canvas) return;
+      var graph = this.canvas.getGraph();
+      var paper = this.canvas.getPaper();
+      var links = graph.getLinks(); // Собираем все занятые порты
+
+      var occupiedPorts = new Set();
+      links.forEach(function (link) {
+        var source = link.source();
+        var target = link.target();
+
+        if (source.id && source.port) {
+          occupiedPorts.add("".concat(source.id, ":").concat(source.port));
+        }
+
+        if (target.id && target.port) {
+          occupiedPorts.add("".concat(target.id, ":").concat(target.port));
+        }
+      });
+      _Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('Occupied ports:', Array.from(occupiedPorts)); // Проходим по всем элементам и скрываем/показываем порты
+
+      graph.getElements().forEach(function (element) {
+        var elementView = paper.findViewByModel(element);
+        if (!elementView) return;
+        var ports = element.get('ports');
+        if (!ports || !ports.items) return;
+        ports.items.forEach(function (port) {
+          var portKey = "".concat(element.id, ":").concat(port.id);
+          var portElement = elementView.el.querySelector("[port=\"".concat(port.id, "\"]"));
+
+          if (portElement) {
+            // Проверяем скрыт ли порт в модели элемента
+            var isHiddenInModel = _this7._isPortHidden(element, port.id);
+
+            if (occupiedPorts.has(portKey)) {
+              // Скрываем занятый порт
+              portElement.style.display = 'none';
+              portElement.style.pointerEvents = 'none';
+              portElement.setAttribute('magnet', 'false');
+            } else if (isHiddenInModel) {
+              // Порт помечен как скрытый в модели - не показываем
+              portElement.style.display = 'none';
+              portElement.style.pointerEvents = 'none';
+              portElement.setAttribute('magnet', 'false');
+            } else {
+              // Показываем свободный порт
+              portElement.style.display = 'block';
+              portElement.setAttribute('fill', '#61cfff');
+              portElement.setAttribute('stroke', '#0088ff');
+              portElement.style.opacity = '1.0';
+              portElement.style.pointerEvents = 'all';
+              portElement.setAttribute('magnet', 'true');
+            }
+          }
+        });
+      });
+    }
+    /**
+     * Простая система событий
+     */
+
+  }, {
+    key: "emit",
+    value: function emit(eventName, data) {
+      var event = new CustomEvent("ddr-drawing:".concat(eventName), {
+        detail: data
+      });
+      document.dispatchEvent(event);
+    }
+    /**
+     * Подписка на события
+     */
+
+  }, {
+    key: "on",
+    value: function on(eventName, callback) {
+      document.addEventListener("ddr-drawing:".concat(eventName), callback);
+    }
+    /**
+     * Очистка событий
+     */
+
+  }, {
+    key: "destroy",
+    value: function destroy() {
+      this.eventHandlers.forEach(function (handler, type) {
+        if (type === 'toolbar' || type === 'click') {
+          document.removeEventListener('click', handler);
+        } else if (type === 'move') {
+          document.removeEventListener('pointermove', handler);
+        } else if (type === 'up') {
+          document.removeEventListener('pointerup', handler);
+        } else if (type === 'resize') {
+          window.removeEventListener('resize', handler);
+        }
+      });
+      this.eventHandlers.clear();
+    }
+  }]);
+
+  return EventManager;
+}();
+
+/* harmony default export */ __webpack_exports__["default"] = (EventManager);
+
+/***/ }),
+
+/***/ "./resources/js/plugins/ddrDrawing/src/core/LinkMetadata.js":
+/*!******************************************************************!*\
+  !*** ./resources/js/plugins/ddrDrawing/src/core/LinkMetadata.js ***!
+  \******************************************************************/
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "ConnectionTypes": function() { return /* binding */ ConnectionTypes; },
+/* harmony export */   "LineColors": function() { return /* binding */ LineColors; },
+/* harmony export */   "LineStylePatterns": function() { return /* binding */ LineStylePatterns; },
+/* harmony export */   "LineStyles": function() { return /* binding */ LineStyles; },
+/* harmony export */   "LinkMetadata": function() { return /* binding */ LinkMetadata; }
+/* harmony export */ });
+var _LineStylePatterns;
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+var LineStyles = {
+  SOLID: 'solid',
+  DASHED: 'dashed',
+  DOTTED: 'dotted',
+  DASH_DOT: 'dash-dot',
+  DASH_DOT_DOT: 'dash-dot-dot',
+  LONG_DASH: 'long-dash',
+  SHORT_DASH: 'short-dash'
+};
+var LineColors = {
+  GRAY: '#666666',
+  LIGHT_GRAY: '#999999',
+  RED: '#ff0000',
+  BLUE: '#0066cc',
+  GREEN: '#00aa00',
+  YELLOW: '#ffaa00'
+};
+var ConnectionTypes = {
+  SHAPE_TO_SHAPE: 'shape-to-shape',
+  SHAPE_TO_CALLOUT: 'shape-to-callout',
+  SHAPE_TO_ANNOTATION: 'shape-to-annotation',
+  SHAPE_TO_DIMENSION: 'shape-to-dimension',
+  SHAPE_TO_PORT: 'shape-to-port',
+  PORT_TO_PORT: 'port-to-port',
+  CUSTOM: 'custom'
+};
+var LineStylePatterns = (_LineStylePatterns = {}, _defineProperty(_LineStylePatterns, LineStyles.SOLID, ''), _defineProperty(_LineStylePatterns, LineStyles.DASHED, '10 5'), _defineProperty(_LineStylePatterns, LineStyles.DOTTED, '2 2'), _defineProperty(_LineStylePatterns, LineStyles.DASH_DOT, '10 5 2 5'), _defineProperty(_LineStylePatterns, LineStyles.DASH_DOT_DOT, '10 5 2 5 2 5'), _defineProperty(_LineStylePatterns, LineStyles.LONG_DASH, '15 5'), _defineProperty(_LineStylePatterns, LineStyles.SHORT_DASH, '5 3'), _LineStylePatterns);
+var LinkMetadata = /*#__PURE__*/function () {
+  function LinkMetadata(link) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+    _classCallCheck(this, LinkMetadata);
+
+    this.link = link;
+    var defaults = {
+      color: LineColors.GRAY,
+      lineStyle: LineStyles.SOLID,
+      connectionType: ConnectionTypes.SHAPE_TO_SHAPE,
+      length: null,
+      // Длина задается вручную
+      metadata: {}
+    };
+    this.data = _objectSpread(_objectSpread({}, defaults), options);
+    this.applyToLink();
+  }
+
+  _createClass(LinkMetadata, [{
+    key: "applyToLink",
+    value: function applyToLink() {
+      this.link.prop('metadata', this.data);
+      this.link.attr('line/stroke', this.data.color);
+      this.link.attr('line/strokeDasharray', LineStylePatterns[this.data.lineStyle]);
+      this.link.attr('line/targetMarker/fill', this.data.color);
+
+      if (this.data.length) {
+        this.link.prop('metadata/length', this.data.length);
+      }
+    }
+  }, {
+    key: "setColor",
+    value: function setColor(color) {
+      this.data.color = color;
+      this.link.attr('line/stroke', color);
+      this.link.attr('line/targetMarker/fill', color);
+      this.link.prop('metadata/color', color);
+    }
+  }, {
+    key: "setLineStyle",
+    value: function setLineStyle(style) {
+      if (!LineStyles[style.toUpperCase()]) {
+        console.warn("Unknown line style: ".concat(style));
+        return;
+      }
+
+      this.data.lineStyle = style;
+      this.link.attr('line/strokeDasharray', LineStylePatterns[style]);
+      this.link.prop('metadata/lineStyle', style);
+    }
+  }, {
+    key: "setConnectionType",
+    value: function setConnectionType(type) {
+      this.data.connectionType = type;
+      this.link.prop('metadata/connectionType', type);
+    }
+  }, {
+    key: "setLength",
+    value: function setLength(length) {
+      this.data.length = length;
+      this.link.prop('metadata/length', length);
+    }
+  }, {
+    key: "getMetadata",
+    value: function getMetadata() {
+      return _objectSpread({}, this.data);
+    }
+  }], [{
+    key: "fromLink",
+    value: function fromLink(link) {
+      var existingMetadata = link.prop('metadata');
+
+      if (existingMetadata) {
+        return new LinkMetadata(link, existingMetadata);
+      }
+
+      return new LinkMetadata(link);
+    }
+  }, {
+    key: "detectConnectionType",
+    value: function detectConnectionType(sourceElement, targetElement) {
+      if (!sourceElement || !targetElement) {
+        return ConnectionTypes.CUSTOM;
+      }
+
+      var sourceType = sourceElement.get('type');
+      var targetType = targetElement.get('type');
+
+      if (sourceType !== null && sourceType !== void 0 && sourceType.includes('Callout') || targetType !== null && targetType !== void 0 && targetType.includes('Callout')) {
+        return ConnectionTypes.SHAPE_TO_CALLOUT;
+      }
+
+      if (sourceType !== null && sourceType !== void 0 && sourceType.includes('Annotation') || targetType !== null && targetType !== void 0 && targetType.includes('Annotation')) {
+        return ConnectionTypes.SHAPE_TO_ANNOTATION;
+      }
+
+      if (sourceType !== null && sourceType !== void 0 && sourceType.includes('Dimension') || targetType !== null && targetType !== void 0 && targetType.includes('Dimension')) {
+        return ConnectionTypes.SHAPE_TO_DIMENSION;
+      }
+
+      return ConnectionTypes.SHAPE_TO_SHAPE;
+    }
+  }]);
+
+  return LinkMetadata;
+}();
+
+/***/ }),
+
+/***/ "./resources/js/plugins/ddrDrawing/src/core/Logger.js":
+/*!************************************************************!*\
+  !*** ./resources/js/plugins/ddrDrawing/src/core/Logger.js ***!
+  \************************************************************/
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+
+/**
+ * Простой логгер для отладки плагина
+ */
+var Logger = /*#__PURE__*/function () {
+  function Logger() {
+    var enabled = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+
+    _classCallCheck(this, Logger);
+
+    this.enabled = enabled;
+    this.prefix = '[ddrDrawing]';
+  }
+  /**
+   * Включить/выключить логирование
+   */
+
+
+  _createClass(Logger, [{
+    key: "setEnabled",
+    value: function setEnabled(enabled) {
+      this.enabled = enabled;
+    }
+    /**
+     * Обычное сообщение
+     */
+
+  }, {
+    key: "log",
+    value: function log() {
+      if (this.enabled) {
+        var _console;
+
+        for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+          args[_key] = arguments[_key];
+        }
+
+        (_console = console).log.apply(_console, [this.prefix].concat(args));
+      }
+    }
+    /**
+     * Информационное сообщение
+     */
+
+  }, {
+    key: "info",
+    value: function info() {
+      if (this.enabled) {
+        var _console2;
+
+        for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+          args[_key2] = arguments[_key2];
+        }
+
+        (_console2 = console).info.apply(_console2, [this.prefix].concat(args));
+      }
+    }
+    /**
+     * Предупреждение
+     */
+
+  }, {
+    key: "warn",
+    value: function warn() {
+      if (this.enabled) {
+        var _console3;
+
+        for (var _len3 = arguments.length, args = new Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+          args[_key3] = arguments[_key3];
+        }
+
+        (_console3 = console).warn.apply(_console3, [this.prefix].concat(args));
+      }
+    }
+    /**
+     * Ошибка (показывается всегда)
+     */
+
+  }, {
+    key: "error",
+    value: function error() {
+      var _console4;
+
+      for (var _len4 = arguments.length, args = new Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
+        args[_key4] = arguments[_key4];
+      }
+
+      (_console4 = console).error.apply(_console4, [this.prefix].concat(args));
+    }
+    /**
+     * Групповое логирование
+     */
+
+  }, {
+    key: "group",
+    value: function group(label, callback) {
+      if (this.enabled) {
+        console.group(this.prefix, label);
+        callback();
+        console.groupEnd();
+      }
+    }
+  }]);
+
+  return Logger;
+}(); // Глобальный экземпляр логгера
+
+
+var logger = new Logger(false); // По умолчанию выключен
+
+/* harmony default export */ __webpack_exports__["default"] = (logger);
+
+/***/ }),
+
+/***/ "./resources/js/plugins/ddrDrawing/src/core/ToolManager.js":
+/*!*****************************************************************!*\
+  !*** ./resources/js/plugins/ddrDrawing/src/core/ToolManager.js ***!
+  \*****************************************************************/
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _Logger_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Logger.js */ "./resources/js/plugins/ddrDrawing/src/core/Logger.js");
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+
+
+/**
+ * Менеджер инструментов
+ */
+
+var ToolManager = /*#__PURE__*/function () {
+  function ToolManager(canvas, eventManager) {
+    _classCallCheck(this, ToolManager);
+
+    this.canvas = canvas;
+    this.eventManager = eventManager;
+    this.tools = new Map();
+    this.currentTool = null;
+  }
+  /**
+   * Регистрация инструмента
+   */
+
+
+  _createClass(ToolManager, [{
+    key: "registerTool",
+    value: function registerTool(name, toolClass) {
+      var tool = new toolClass(name, this.canvas, this.eventManager);
+      this.tools.set(name, tool);
+      _Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log("Tool ".concat(name, " registered"));
+    }
+    /**
+     * Активация инструмента
+     */
+
+  }, {
+    key: "activateTool",
+    value: function activateTool(name) {
+      var tool = this.tools.get(name);
+
+      if (!tool) {
+        _Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].error("Tool ".concat(name, " not found"));
+        return false;
+      } // Деактивируем текущий инструмент
+
+
+      if (this.currentTool && this.currentTool !== tool) {
+        this.currentTool.deactivate();
+      } // Активируем новый инструмент
+
+
+      tool.activate();
+      this.currentTool = tool; // Обновляем UI
+
+      this._updateToolbarUI(name);
+
+      _Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log("Tool ".concat(name, " activated"));
+      return true;
+    }
+    /**
+     * Получить текущий инструмент
+     */
+
+  }, {
+    key: "getCurrentTool",
+    value: function getCurrentTool() {
+      return this.currentTool;
+    }
+    /**
+     * Получить инструмент по имени
+     */
+
+  }, {
+    key: "getTool",
+    value: function getTool(name) {
+      return this.tools.get(name);
+    }
+    /**
+     * Получить все инструменты
+     */
+
+  }, {
+    key: "getAllTools",
+    value: function getAllTools() {
+      return Array.from(this.tools.values());
+    }
+    /**
+     * Обработка клика по холсту
+     */
+
+  }, {
+    key: "handleCanvasClick",
+    value: function handleCanvasClick(point, event) {
+      if (this.currentTool) {
+        this.currentTool.onCanvasClick(point, event);
+      }
+    }
+    /**
+     * Обработка клика по элементу
+     */
+
+  }, {
+    key: "handleElementClick",
+    value: function handleElementClick(element, event) {
+      if (this.currentTool) {
+        this.currentTool.onElementClick(element, event);
+      }
+    }
+    /**
+     * Инициализация
+     */
+
+  }, {
+    key: "init",
+    value: function init() {
+      var _this = this;
+
+      // Подписываемся на событие автопереключения инструментов
+      this.eventManager.on('tool-auto-switch', function (e) {
+        _this.activateTool(e.detail);
+      });
+    }
+    /**
+     * Обновление UI панели инструментов
+     */
+
+  }, {
+    key: "_updateToolbarUI",
+    value: function _updateToolbarUI(activeTool) {
+      // Убираем активный класс со всех кнопок
+      document.querySelectorAll('.ddrdrawing__tool-btn').forEach(function (btn) {
+        btn.classList.remove('active');
+      }); // Добавляем активный класс к текущему инструменту
+
+      var activeBtn = document.querySelector("[data-tool=\"".concat(activeTool, "\"]"));
+
+      if (activeBtn) {
+        activeBtn.classList.add('active');
+      }
+    }
+  }]);
+
+  return ToolManager;
+}();
+
+/* harmony default export */ __webpack_exports__["default"] = (ToolManager);
+
+/***/ }),
+
+/***/ "./resources/js/plugins/ddrDrawing/src/services/PortService.js":
+/*!*********************************************************************!*\
+  !*** ./resources/js/plugins/ddrDrawing/src/services/PortService.js ***!
+  \*********************************************************************/
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../core/Logger.js */ "./resources/js/plugins/ddrDrawing/src/core/Logger.js");
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+
+
+/**
+ * Сервис для управления портами элементов
+ */
+
+var PortService = /*#__PURE__*/function () {
+  function PortService(canvas, eventManager) {
+    _classCallCheck(this, PortService);
+
+    this.canvas = canvas;
+    this.eventManager = eventManager;
+    this.paper = null;
+    this.graph = null;
+    this.initialized = false;
+  }
+  /**
+   * Инициализация сервиса
+   */
+
+
+  _createClass(PortService, [{
+    key: "init",
+    value: function init() {
+      var _this = this;
+
+      if (this.initialized) return;
+      this.paper = this.canvas.getPaper();
+      this.graph = this.canvas.getGraph(); // Подписываемся на события добавления портов
+
+      this.eventManager.on('ports:add', function (event) {
+        _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('🎯 PortService received ports:add event:', event);
+        var data = event.detail;
+        _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('🎯 Event data:', data);
+
+        _this.addPortToElement(data.element, data.side);
+      }); // Обработчики для показа/скрытия портов
+
+      this.setupPortVisibility(); // Обработчики для создания связей
+
+      this.setupLinkCreation(); // Обработчики для выделения элементов
+
+      this.setupSelectionHandlers();
+      this.initialized = true;
+      _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('PortService initialized');
+    }
+    /**
+     * Настройка обработчиков выделения
+     */
+
+  }, {
+    key: "setupSelectionHandlers",
+    value: function setupSelectionHandlers() {
+      var _this2 = this;
+
+      // Показываем все порты когда элемент выделяется
+      this.paper.on('cell:pointerdown', function (cellView) {
+        if (cellView.model.isElement()) {
+          _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('🎯 Element selected - showing all ports');
+
+          _this2.showAllPorts(cellView.model);
+        }
+      }); // Скрываем порты когда кликают по пустому месту (снимается выделение)
+
+      this.paper.on('blank:pointerdown', function () {
+        _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('🚫 Selection cleared - hiding all free ports'); // Убираем selected класс со всех элементов
+
+        _this2.paper.el.querySelectorAll('.joint-element.selected').forEach(function (el) {
+          el.classList.remove('selected');
+        });
+
+        _this2.hideAllFreePorts();
+      }); // Также реагируем на события выделения от SelectTool
+
+      this.eventManager.on('element:selected', function (event) {
+        var element = event.detail.element;
+        _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('📍 Element selected via SelectTool - showing all ports');
+
+        _this2.showAllPorts(element);
+      });
+      this.eventManager.on('element:deselected', function (event) {
+        var element = event.detail.element;
+        _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('📍 Element deselected via SelectTool - hiding free ports');
+
+        _this2.hideFreePorts(element);
+      });
+    }
+    /**
+     * Показать только СВОБОДНЫЕ порты элемента при выделении
+     */
+
+  }, {
+    key: "showAllPorts",
+    value: function showAllPorts(element) {
+      // Сначала убираем selected класс с всех элементов
+      this.paper.el.querySelectorAll('.joint-element.selected').forEach(function (el) {
+        el.classList.remove('selected');
+      }); // Добавляем selected класс к текущему элементу
+
+      var elementView = this.paper.findViewByModel(element);
+
+      if (elementView) {
+        elementView.el.classList.add('selected');
+      } // Показываем только свободные порты
+
+
+      this.showFreePorts(element);
+    }
+    /**
+     * Настройка видимости портов
+     */
+
+  }, {
+    key: "setupPortVisibility",
+    value: function setupPortVisibility() {
+      var _this3 = this;
+
+      // Показываем порты при наведении на элемент
+      this.paper.on('element:mouseenter', function (elementView) {
+        _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('🐭 element:mouseenter triggered for:', elementView.model.id);
+
+        _this3.showFreePorts(elementView.model);
+      }); // Скрываем порты когда курсор покидает элемент
+
+      this.paper.on('element:mouseleave', function (elementView) {
+        _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('🐭 element:mouseleave triggered for:', elementView.model.id);
+
+        _this3.hideFreePorts(elementView.model);
+      }); // Также скрываем при перетаскивании
+
+      this.paper.on('element:pointermove', function (elementView) {
+        _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('🐭 element:pointermove triggered for:', elementView.model.id);
+
+        _this3.hideFreePorts(elementView.model);
+      });
+    }
+    /**
+     * Показать свободные порты элемента
+     */
+
+  }, {
+    key: "showFreePorts",
+    value: function showFreePorts(element) {
+      var _this4 = this;
+
+      _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('🎯 showFreePorts called for element:', element.id);
+      var ports = element.get('ports') || {
+        items: []
+      };
+      _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('🎯 Element ports:', ports);
+      var freePorts = this.getFreePorts(element);
+      _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('🎯 Free ports:', freePorts);
+      freePorts.forEach(function (port) {
+        var _this4$paper$findView, _this4$paper$findView2, _this4$paper$findView3;
+
+        _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('🎯 Processing port:', port.id); // Находим группу порта, а не circle
+
+        var portGroup = (_this4$paper$findView = _this4.paper.findViewByModel(element)) === null || _this4$paper$findView === void 0 ? void 0 : (_this4$paper$findView2 = _this4$paper$findView.el) === null || _this4$paper$findView2 === void 0 ? void 0 : (_this4$paper$findView3 = _this4$paper$findView2.querySelector("[port=\"".concat(port.id, "\"]"))) === null || _this4$paper$findView3 === void 0 ? void 0 : _this4$paper$findView3.closest('.joint-port');
+        _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('🎯 Found port group:', portGroup);
+
+        if (portGroup) {
+          _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('🎯 Current classes before:', portGroup.className);
+          portGroup.classList.add('port-visible');
+          portGroup.classList.remove('port-hidden');
+          _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('🎯 Current classes after:', portGroup.className);
+        }
+      });
+    }
+    /**
+     * Скрыть свободные порты элемента
+     */
+
+  }, {
+    key: "hideFreePorts",
+    value: function hideFreePorts(element) {
+      var _this5 = this;
+
+      var ports = element.get('ports') || {
+        items: []
+      };
+      var freePorts = this.getFreePorts(element);
+      freePorts.forEach(function (port) {
+        var _this5$paper$findView, _this5$paper$findView2, _this5$paper$findView3;
+
+        // Находим группу порта, а не circle
+        var portGroup = (_this5$paper$findView = _this5.paper.findViewByModel(element)) === null || _this5$paper$findView === void 0 ? void 0 : (_this5$paper$findView2 = _this5$paper$findView.el) === null || _this5$paper$findView2 === void 0 ? void 0 : (_this5$paper$findView3 = _this5$paper$findView2.querySelector("[port=\"".concat(port.id, "\"]"))) === null || _this5$paper$findView3 === void 0 ? void 0 : _this5$paper$findView3.closest('.joint-port');
+
+        if (portGroup) {
+          portGroup.classList.remove('port-visible');
+          portGroup.classList.add('port-hidden');
+        }
+      });
+    }
+    /**
+     * Настройка обработчиков для создания связей
+     */
+
+  }, {
+    key: "setupLinkCreation",
+    value: function setupLinkCreation() {
+      var _this6 = this;
+
+      // Показываем все свободные порты когда начинается создание связи
+      this.paper.on('link:connect', function (linkView, evt, elementViewConnected, magnet, arrowhead) {
+        _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('Link creation started - showing all free ports');
+
+        _this6.showAllFreePorts();
+      }); // Также показываем при старте перетаскивания от порта
+
+      this.paper.on('element:magnet:pointerdown', function (elementView, evt, magnet) {
+        _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('Magnet drag started - showing all free ports');
+
+        _this6.showAllFreePorts();
+      }); // Скрываем все порты когда связь создана или отменена
+
+      this.paper.on('link:pointerup', function () {
+        _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('Link creation ended - hiding all ports');
+
+        _this6.hideAllFreePorts();
+      }); // Скрываем при отмене создания связи
+
+      this.paper.on('blank:pointerdown', function () {
+        _this6.hideAllFreePorts();
+      });
+    }
+    /**
+     * Показать все свободные порты на холсте
+     */
+
+  }, {
+    key: "showAllFreePorts",
+    value: function showAllFreePorts() {
+      var _this7 = this;
+
+      // Добавляем CSS класс для активного режима создания связи
+      this.paper.el.classList.add('ddr-linking-mode');
+      this.graph.getElements().forEach(function (element) {
+        _this7.showFreePorts(element);
+      });
+    }
+    /**
+     * Скрыть все свободные порты на холсте
+     */
+
+  }, {
+    key: "hideAllFreePorts",
+    value: function hideAllFreePorts() {
+      var _this8 = this;
+
+      // Убираем CSS класс режима создания связи
+      this.paper.el.classList.remove('ddr-linking-mode');
+      this.graph.getElements().forEach(function (element) {
+        _this8.hideFreePorts(element);
+      });
+    }
+    /**
+     * Получить список свободных портов элемента
+     */
+
+  }, {
+    key: "getFreePorts",
+    value: function getFreePorts(element) {
+      var ports = element.get('ports') || {
+        items: []
+      };
+      var connectedPortIds = new Set(); // Собираем ID всех подключенных портов
+
+      this.graph.getLinks().forEach(function (link) {
+        var source = link.get('source');
+        var target = link.get('target');
+
+        if (source.id === element.id && source.port) {
+          connectedPortIds.add(source.port);
+        }
+
+        if (target.id === element.id && target.port) {
+          connectedPortIds.add(target.port);
+        }
+      }); // Возвращаем только свободные порты
+
+      return ports.items.filter(function (port) {
+        return !connectedPortIds.has(port.id);
+      });
+    }
+    /**
+     * Добавить порт к элементу
+     */
+
+  }, {
+    key: "addPortToElement",
+    value: function addPortToElement(element, position) {
+      var _this9 = this;
+
+      _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('🔍 PortService.addPortToElement called:', {
+        element: element,
+        position: position
+      });
+
+      if (!element) {
+        _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].error('❌ Element is undefined!');
+        return;
+      }
+
+      _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('Adding port to element:', element.id, 'position:', position); // Получаем текущие порты элемента
+
+      var currentPorts = element.get('ports') || {
+        items: []
+      }; // Определяем следующий ID порта для данной позиции
+
+      var existingPortsOfPosition = currentPorts.items.filter(function (port) {
+        return port.group === position;
+      });
+      var portNumber = existingPortsOfPosition.length + 1;
+      var portId = "".concat(position).concat(portNumber); // Создаем новый порт с правильной структурой для JointJS v4
+
+      var newPort = {
+        id: portId,
+        group: position,
+        markup: [{
+          tagName: 'circle',
+          selector: 'portBody',
+          attributes: {
+            'port': portId,
+            'class': 'port-hidden' // Новый порт скрыт по умолчанию
+
+          }
+        }],
+        attrs: {
+          portBody: {
+            fill: '#61cfff',
+            stroke: '#0088ff',
+            strokeWidth: 1,
+            r: 3,
+            magnet: true,
+            cursor: 'crosshair'
+          }
+        }
+      }; // Добавляем порт к элементу
+
+      var updatedPorts = _objectSpread(_objectSpread({}, currentPorts), {}, {
+        items: [].concat(_toConsumableArray(currentPorts.items), [newPort]),
+        groups: _objectSpread(_objectSpread({}, currentPorts.groups), {}, _defineProperty({}, position, {
+          position: position,
+          markup: [{
+            tagName: 'circle',
+            selector: 'portBody'
+          }],
+          attrs: {
+            portBody: {
+              fill: '#61cfff',
+              stroke: '#0088ff',
+              strokeWidth: 1,
+              r: 3,
+              magnet: true,
+              cursor: 'crosshair'
+            }
+          }
+        }))
+      });
+
+      element.set('ports', updatedPorts);
+      _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log("Port ".concat(portId, " added to element ").concat(element.id)); // Скрываем все остальные свободные порты этого элемента
+
+      this.hideFreePorts(element); // Показываем новый порт с плавной анимацией
+
+      setTimeout(function () {
+        var _this9$paper$findView, _this9$paper$findView2, _this9$paper$findView3;
+
+        // Находим группу порта, а не circle
+        var newPortGroup = (_this9$paper$findView = _this9.paper.findViewByModel(element)) === null || _this9$paper$findView === void 0 ? void 0 : (_this9$paper$findView2 = _this9$paper$findView.el) === null || _this9$paper$findView2 === void 0 ? void 0 : (_this9$paper$findView3 = _this9$paper$findView2.querySelector("[port=\"".concat(portId, "\"]"))) === null || _this9$paper$findView3 === void 0 ? void 0 : _this9$paper$findView3.closest('.joint-port');
+
+        if (newPortGroup) {
+          _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log("\uD83D\uDD0D Found port GROUP:", newPortGroup);
+          _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log("\uD83D\uDD0D Current classes:", newPortGroup.className);
+          newPortGroup.classList.remove('port-hidden');
+          newPortGroup.classList.add('port-visible');
+          _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log("\u2728 Port ".concat(portId, " \u043F\u043E\u043A\u0430\u0437\u0430\u043D, classes after:"), newPortGroup.className); // Автоматически скрываем через 300ms
+
+          setTimeout(function () {
+            if (_this9.getFreePorts(element).some(function (port) {
+              return port.id === portId;
+            })) {
+              newPortGroup.classList.remove('port-visible');
+              newPortGroup.classList.add('port-hidden');
+              _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log("\uD83C\uDF19 Port ".concat(portId, " \u0441\u043A\u0440\u044B\u0442, classes after:"), newPortGroup.className);
+            }
+          }, 300);
+        }
+      }, 100); // Эмитим событие о добавлении порта
+
+      this.eventManager.emit('ports:port-added', {
+        element: element,
+        side: position,
+        portId: portId
+      });
+    }
+    /**
+     * Удалить порт из элемента
+     */
+
+  }, {
+    key: "removePortFromElement",
+    value: function removePortFromElement(element, portId) {
+      var currentPorts = element.get('ports') || {
+        items: []
+      };
+      var updatedItems = currentPorts.items.filter(function (port) {
+        return port.id !== portId;
+      });
+
+      var updatedPorts = _objectSpread(_objectSpread({}, currentPorts), {}, {
+        items: updatedItems
+      });
+
+      element.set('ports', updatedPorts);
+      _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log("Port ".concat(portId, " removed from element ").concat(element.id)); // Эмитим событие об удалении порта
+
+      this.eventManager.emit('ports:port-removed', {
+        element: element,
+        portId: portId
+      });
+    }
+    /**
+     * Получить все порты элемента
+     */
+
+  }, {
+    key: "getElementPorts",
+    value: function getElementPorts(element) {
+      var ports = element.get('ports') || {
+        items: []
+      };
+      return ports.items;
+    }
+    /**
+     * Проверить, есть ли у элемента порты
+     */
+
+  }, {
+    key: "hasFreePorts",
+    value: function hasFreePorts(element) {
+      return this.getFreePorts(element).length > 0;
+    }
+    /**
+     * Очистка сервиса
+     */
+
+  }, {
+    key: "destroy",
+    value: function destroy() {
+      if (this.paper) {
+        // Обычные события видимости портов
+        this.paper.off('element:mouseenter');
+        this.paper.off('element:mouseleave');
+        this.paper.off('element:pointermove'); // События создания связей
+
+        this.paper.off('link:connect');
+        this.paper.off('element:magnet:pointerdown');
+        this.paper.off('link:pointerup');
+        this.paper.off('blank:pointerdown'); // События выделения
+
+        this.paper.off('cell:pointerdown'); // Убираем CSS класс если остался
+
+        this.paper.el.classList.remove('ddr-linking-mode');
+      }
+
+      this.initialized = false;
+      _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('PortService destroyed');
+    }
+  }]);
+
+  return PortService;
+}();
+
+/* harmony default export */ __webpack_exports__["default"] = (PortService);
+
+/***/ }),
+
+/***/ "./resources/js/plugins/ddrDrawing/src/tools/BaseTool.js":
+/*!***************************************************************!*\
+  !*** ./resources/js/plugins/ddrDrawing/src/tools/BaseTool.js ***!
+  \***************************************************************/
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../core/Logger.js */ "./resources/js/plugins/ddrDrawing/src/core/Logger.js");
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+
+
+/**
+ * Базовый класс для инструментов
+ */
+
+var BaseTool = /*#__PURE__*/function () {
+  function BaseTool(name, canvas, eventManager) {
+    _classCallCheck(this, BaseTool);
+
+    this.name = name;
+    this.canvas = canvas;
+    this.eventManager = eventManager;
+    this.active = false;
+  }
+  /**
+   * Активация инструмента
+   */
+
+
+  _createClass(BaseTool, [{
+    key: "activate",
+    value: function activate() {
+      if (this.active) return;
+      this.active = true;
+      this.onActivate();
+      _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log("Tool ".concat(this.name, " activated"));
+    }
+    /**
+     * Деактивация инструмента
+     */
+
+  }, {
+    key: "deactivate",
+    value: function deactivate() {
+      if (!this.active) return;
+      this.active = false;
+      this.onDeactivate();
+      _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log("Tool ".concat(this.name, " deactivated"));
+    }
+    /**
+     * Переопределяемый метод активации
+     */
+
+  }, {
+    key: "onActivate",
+    value: function onActivate() {// Переопределить в наследниках
+    }
+    /**
+     * Переопределяемый метод деактивации
+     */
+
+  }, {
+    key: "onDeactivate",
+    value: function onDeactivate() {// Переопределить в наследниках
+    }
+    /**
+     * Обработка клика по холсту
+     */
+
+  }, {
+    key: "onCanvasClick",
+    value: function onCanvasClick(point, event) {// Переопределить в наследниках
+    }
+    /**
+     * Обработка клика по элементу
+     */
+
+  }, {
+    key: "onElementClick",
+    value: function onElementClick(element, event) {// Переопределить в наследниках
+    }
+    /**
+     * Получить canvas
+     */
+
+  }, {
+    key: "getCanvas",
+    value: function getCanvas() {
+      return this.canvas;
+    }
+    /**
+     * Получить paper
+     */
+
+  }, {
+    key: "getPaper",
+    value: function getPaper() {
+      return this.canvas.getPaper();
+    }
+    /**
+     * Получить graph
+     */
+
+  }, {
+    key: "getGraph",
+    value: function getGraph() {
+      return this.canvas.getGraph();
+    }
+  }]);
+
+  return BaseTool;
+}();
+
+/* harmony default export */ __webpack_exports__["default"] = (BaseTool);
+
+/***/ }),
+
+/***/ "./resources/js/plugins/ddrDrawing/src/tools/RectangleTool.js":
+/*!********************************************************************!*\
+  !*** ./resources/js/plugins/ddrDrawing/src/tools/RectangleTool.js ***!
+  \********************************************************************/
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _BaseTool_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./BaseTool.js */ "./resources/js/plugins/ddrDrawing/src/tools/BaseTool.js");
+/* harmony import */ var _core_Logger_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../core/Logger.js */ "./resources/js/plugins/ddrDrawing/src/core/Logger.js");
+function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); Object.defineProperty(subClass, "prototype", { writable: false }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } else if (call !== void 0) { throw new TypeError("Derived constructors may only return object or undefined"); } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+
+
+/**
+ * Инструмент создания прямоугольников
+ */
+
+var RectangleTool = /*#__PURE__*/function (_BaseTool) {
+  _inherits(RectangleTool, _BaseTool);
+
+  var _super = _createSuper(RectangleTool);
+
+  function RectangleTool(name, canvas, eventManager) {
+    var _this;
+
+    _classCallCheck(this, RectangleTool);
+
+    _this = _super.call(this, name, canvas, eventManager);
+    _this.gridSize = 10;
+    return _this;
+  }
+  /**
+   * Активация инструмента
+   */
+
+
+  _createClass(RectangleTool, [{
+    key: "onActivate",
+    value: function onActivate() {
+      // Меняем курсор на перекрестие
+      this.getPaper().el.style.cursor = 'crosshair';
+    }
+    /**
+     * Деактивация инструмента
+     */
+
+  }, {
+    key: "onDeactivate",
+    value: function onDeactivate() {
+      // Сбрасываем курсор
+      this.getPaper().el.style.cursor = 'default';
+    }
+    /**
+     * Обработка клика по холсту
+     */
+
+  }, {
+    key: "onCanvasClick",
+    value: function onCanvasClick(point, event) {
+      _core_Logger_js__WEBPACK_IMPORTED_MODULE_1__["default"].log('Creating rectangle at:', point);
+      this.createRectangle(point.x, point.y); // Автоматически переключаемся на инструмент выделения
+
+      this.eventManager.emit('tool-auto-switch', 'select');
+    }
+    /**
+     * Создание прямоугольника
+     */
+
+  }, {
+    key: "createRectangle",
+    value: function createRectangle(x, y) {
+      // Используем snap-to-grid из canvas
+      var snappedPos = this.canvas.snapToGrid(x, y);
+      var snapX = snappedPos.x;
+      var snapY = snappedPos.y;
+      var rect = new window.joint.shapes.standard.Rectangle({
+        position: {
+          x: snapX - 10,
+          y: snapY - 10
+        },
+        size: {
+          width: 20,
+          height: 20
+        },
+        attrs: {
+          body: {
+            fill: '#ffffff',
+            stroke: '#cfcccc',
+            strokeWidth: 1
+          }
+        }
+      });
+      this.getGraph().addCell(rect);
+      _core_Logger_js__WEBPACK_IMPORTED_MODULE_1__["default"].log('Rectangle created at grid position:', snapX, snapY);
+      return rect;
+    }
+    /**
+     * Установка размера сетки
+     */
+
+  }, {
+    key: "setGridSize",
+    value: function setGridSize(size) {
+      this.gridSize = size;
+    }
+    /**
+     * Получение размера сетки
+     */
+
+  }, {
+    key: "getGridSize",
+    value: function getGridSize() {
+      return this.gridSize;
+    }
+  }]);
+
+  return RectangleTool;
+}(_BaseTool_js__WEBPACK_IMPORTED_MODULE_0__["default"]);
+
+/* harmony default export */ __webpack_exports__["default"] = (RectangleTool);
+
+/***/ }),
+
+/***/ "./resources/js/plugins/ddrDrawing/src/tools/SelectTool.js":
+/*!*****************************************************************!*\
+  !*** ./resources/js/plugins/ddrDrawing/src/tools/SelectTool.js ***!
+  \*****************************************************************/
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _BaseTool_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./BaseTool.js */ "./resources/js/plugins/ddrDrawing/src/tools/BaseTool.js");
+/* harmony import */ var _core_Logger_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../core/Logger.js */ "./resources/js/plugins/ddrDrawing/src/core/Logger.js");
+function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); Object.defineProperty(subClass, "prototype", { writable: false }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } else if (call !== void 0) { throw new TypeError("Derived constructors may only return object or undefined"); } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+
+
+/**
+ * Инструмент выделения и перемещения элементов
+ */
+
+var SelectTool = /*#__PURE__*/function (_BaseTool) {
+  _inherits(SelectTool, _BaseTool);
+
+  var _super = _createSuper(SelectTool);
+
+  function SelectTool(name, canvas, eventManager) {
+    _classCallCheck(this, SelectTool);
+
+    return _super.call(this, name, canvas, eventManager);
+  }
+  /**
+   * Активация инструмента
+   */
+
+
+  _createClass(SelectTool, [{
+    key: "onActivate",
+    value: function onActivate() {
+      this.getPaper().el.style.cursor = 'default';
+      this.setupEvents();
+      _core_Logger_js__WEBPACK_IMPORTED_MODULE_1__["default"].info('SelectTool activated');
+    }
+    /**
+     * Деактивация инструмента
+     */
+
+  }, {
+    key: "onDeactivate",
+    value: function onDeactivate() {
+      this.getPaper().el.style.cursor = 'default';
+    }
+    /**
+     * Обработка клика по холсту
+     */
+
+  }, {
+    key: "onCanvasClick",
+    value: function onCanvasClick(point, event) {
+      // Снимаем выделение со всех элементов при клике по пустому месту
+      this.getGraph().getCells().forEach(function (cell) {
+        cell.set('selected', false);
+        cell.attr('body/stroke', '#cfcccc');
+      });
+    }
+    /**
+     * Обработка клика по элементу
+     */
+
+  }, {
+    key: "onElementClick",
+    value: function onElementClick(element, event) {// Логика выделения элемента уже реализована в EventManager
+    }
+    /**
+     * Настройка событий
+     */
+
+  }, {
+    key: "setupEvents",
+    value: function setupEvents() {
+      var _this = this;
+
+      var paper = this.getPaper(); // Обработка кликов по элементам для перемещения
+
+      paper.on('element:pointerdown', function (elementView, evt) {
+        _this.setupElementDrag(elementView, evt);
+      }); // Временно отключаем кастомный vertex drag чтобы не конфликтовать
+      // paper.on('link:pointerdown', (linkView, evt) => {
+      //	this.setupLinkVertexDrag(linkView, evt)
+      // })
+    }
+    /**
+     * Настройка перемещения элемента
+     */
+
+  }, {
+    key: "setupElementDrag",
+    value: function setupElementDrag(elementView, evt) {
+      var _this2 = this;
+
+      var paper = this.getPaper();
+      var element = elementView.model;
+      var isDragging = false;
+      var startPoint = null;
+      var startPosition = null;
+
+      var onPointerMove = function onPointerMove(evt) {
+        if (!isDragging) return;
+        var currentPoint = paper.clientToLocalPoint(evt.clientX, evt.clientY);
+        var deltaX = currentPoint.x - startPoint.x;
+        var deltaY = currentPoint.y - startPoint.y; // Используем snap-to-grid из canvas
+
+        var snappedPos = _this2.canvas.snapToGrid(startPosition.x + deltaX, startPosition.y + deltaY);
+
+        var newX = snappedPos.x;
+        var newY = snappedPos.y;
+        element.set('position', {
+          x: newX,
+          y: newY
+        });
+      };
+
+      var onPointerUp = function onPointerUp() {
+        isDragging = false;
+        paper.el.removeEventListener('pointermove', onPointerMove);
+        paper.el.removeEventListener('pointerup', onPointerUp);
+      }; // Начинаем перетаскивание
+
+
+      startPoint = paper.clientToLocalPoint(evt.clientX, evt.clientY);
+      startPosition = element.get('position');
+      isDragging = true;
+      paper.el.addEventListener('pointermove', onPointerMove);
+      paper.el.addEventListener('pointerup', onPointerUp);
+    }
+    /**
+     * Настройка кастомного перемещения vertices БЕЗ привязки к сетке
+     * Точно так же как у квадратов - через прямую манипуляцию координат
+     */
+
+  }, {
+    key: "setupLinkVertexDrag",
+    value: function setupLinkVertexDrag(linkView, evt) {
+      var paper = this.getPaper();
+      var link = linkView.model; // Получаем точку клика
+
+      var clickPoint = paper.clientToLocalPoint(evt.clientX, evt.clientY); // Добавляем vertex в точке клика
+
+      var currentVertices = link.get('vertices') || [];
+      var newVertices = [].concat(_toConsumableArray(currentVertices), [{
+        x: clickPoint.x,
+        y: clickPoint.y
+      }]);
+      link.set('vertices', newVertices); // Индекс новой вершины
+
+      var vertexIndex = newVertices.length - 1;
+      _core_Logger_js__WEBPACK_IMPORTED_MODULE_1__["default"].log("\uD83C\uDFAF \u0414\u043E\u0431\u0430\u0432\u0438\u043B\u0438 vertex ".concat(vertexIndex, " \u0432 \u0442\u043E\u0447\u043A\u0435"), clickPoint);
+      var isDragging = false;
+      var startPoint = clickPoint;
+
+      var onPointerMove = function onPointerMove(moveEvt) {
+        if (!isDragging) return;
+        var currentPoint = paper.clientToLocalPoint(moveEvt.clientX, moveEvt.clientY); // КЛЮЧЕВОЕ ОТЛИЧИЕ: Прямая манипуляция vertices БЕЗ snap!
+
+        var vertices = link.get('vertices');
+        var updatedVertices = vertices.map(function (vertex, index) {
+          if (index === vertexIndex) {
+            return {
+              x: currentPoint.x,
+              y: currentPoint.y
+            };
+          }
+
+          return vertex;
+        }); // Используем link.set() как у квадратов element.set()!
+
+        link.set('vertices', updatedVertices);
+      };
+
+      var onPointerUp = function onPointerUp() {
+        isDragging = false;
+        paper.el.removeEventListener('pointermove', onPointerMove);
+        paper.el.removeEventListener('pointerup', onPointerUp);
+        _core_Logger_js__WEBPACK_IMPORTED_MODULE_1__["default"].log('🏁 Vertex drag завершен');
+      }; // Начинаем перетаскивание сразу
+
+
+      isDragging = true;
+      paper.el.addEventListener('pointermove', onPointerMove);
+      paper.el.addEventListener('pointerup', onPointerUp);
+      _core_Logger_js__WEBPACK_IMPORTED_MODULE_1__["default"].log("\uD83D\uDE80 \u041D\u0430\u0447\u0430\u043B\u0438 drag vertex ".concat(vertexIndex));
+    }
+  }]);
+
+  return SelectTool;
+}(_BaseTool_js__WEBPACK_IMPORTED_MODULE_0__["default"]);
+
+/* harmony default export */ __webpack_exports__["default"] = (SelectTool);
+
+/***/ }),
+
+/***/ "./resources/js/plugins/ddrDrawing/src/ui/ContextMenu.js":
+/*!***************************************************************!*\
+  !*** ./resources/js/plugins/ddrDrawing/src/ui/ContextMenu.js ***!
+  \***************************************************************/
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../core/Logger.js */ "./resources/js/plugins/ddrDrawing/src/core/Logger.js");
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"]; if (_i == null) return; var _arr = []; var _n = true; var _d = false; var _s, _e; try { for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e2) { throw _e2; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e3) { didErr = true; err = _e3; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+
+
+/**
+ * Контекстное меню
+ */
+
+var ContextMenu = /*#__PURE__*/function () {
+  function ContextMenu(canvas, eventManager) {
+    _classCallCheck(this, ContextMenu);
+
+    this.canvas = canvas;
+    this.eventManager = eventManager;
+    _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('🔧 ContextMenu constructor:', {
+      canvas: canvas,
+      eventManager: eventManager
+    });
+    _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('🔧 eventManager:', eventManager);
+    this.eventBus = eventManager; // EventManager сам является event bus
+
+    this.element = null;
+    this.targetElement = null;
+    this.menuItems = new Map();
+    this.isVisible = false;
+  }
+  /**
+   * Инициализация
+   */
+
+
+  _createClass(ContextMenu, [{
+    key: "init",
+    value: function init() {
+      this.createElement();
+      this.setupDefaultItems();
+      this.setupEvents();
+      _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('ContextMenu initialized');
+    }
+    /**
+     * Создание DOM элемента меню
+     */
+
+  }, {
+    key: "createElement",
+    value: function createElement() {
+      this.element = document.createElement('div');
+      this.element.className = 'ddrdrawing__context-menu'; // Добавляем в контейнер canvas-container для правильного позиционирования
+
+      var canvasContainer = document.querySelector('#ddrDrawingCanvas');
+      var canvasContainerParent = canvasContainer ? canvasContainer.parentElement : null;
+
+      if (canvasContainerParent && canvasContainerParent.classList.contains('ddrdrawing__canvas-container')) {
+        canvasContainerParent.appendChild(this.element);
+        _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('Context menu created and added to canvas-container');
+      } else {
+        _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].error('Canvas container parent not found for context menu');
+      }
+    }
+    /**
+     * Настройка стандартных пунктов меню
+     */
+
+  }, {
+    key: "setupDefaultItems",
+    value: function setupDefaultItems() {
+      // Добавляем группу портов
+      this.addMenuGroup('add-port', 'Добавить порт', [{
+        id: 'add-port-top',
+        label: 'сверху',
+        action: 'add-port',
+        data: {
+          position: 'top'
+        }
+      }, {
+        id: 'add-port-right',
+        label: 'справа',
+        action: 'add-port',
+        data: {
+          position: 'right'
+        }
+      }, {
+        id: 'add-port-bottom',
+        label: 'снизу',
+        action: 'add-port',
+        data: {
+          position: 'bottom'
+        }
+      }, {
+        id: 'add-port-left',
+        label: 'слева',
+        action: 'add-port',
+        data: {
+          position: 'left'
+        }
+      }]);
+      this.render();
+    }
+    /**
+     * Добавление группы пунктов меню
+     */
+
+  }, {
+    key: "addMenuGroup",
+    value: function addMenuGroup(groupId, groupLabel, items) {
+      this.menuItems.set(groupId, {
+        type: 'group',
+        label: groupLabel,
+        items: items
+      });
+    }
+    /**
+     * Добавление одиночного пункта меню
+     */
+
+  }, {
+    key: "addMenuItem",
+    value: function addMenuItem(id, label, action) {
+      var data = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+      this.menuItems.set(id, {
+        type: 'item',
+        label: label,
+        action: action,
+        data: data
+      });
+    }
+    /**
+     * Рендер меню
+     */
+
+  }, {
+    key: "render",
+    value: function render() {
+      var html = '';
+
+      var _iterator = _createForOfIteratorHelper(this.menuItems),
+          _step;
+
+      try {
+        for (_iterator.s(); !(_step = _iterator.n()).done;) {
+          var _step$value = _slicedToArray(_step.value, 2),
+              key = _step$value[0],
+              menuItem = _step$value[1];
+
+          if (menuItem.type === 'group') {
+            html += this.renderGroup(key, menuItem);
+          } else {
+            html += this.renderItem(key, menuItem);
+          }
+        }
+      } catch (err) {
+        _iterator.e(err);
+      } finally {
+        _iterator.f();
+      }
+
+      this.element.innerHTML = html;
+    }
+    /**
+     * Рендер группы
+     */
+
+  }, {
+    key: "renderGroup",
+    value: function renderGroup(groupId, group) {
+      var submenuHtml = '';
+      group.items.forEach(function (item) {
+        submenuHtml += "\n\t\t\t\t<div class=\"ddrdrawing__context-menu-item\" data-action=\"".concat(item.action, "\" data-item-id=\"").concat(item.id, "\" data-position=\"").concat(item.data.position || '', "\">\n\t\t\t\t\t<span>").concat(item.label, "</span>\n\t\t\t\t</div>\n\t\t\t");
+      });
+      return "\n\t\t\t<div class=\"ddrdrawing__context-menu-item ddrdrawing__context-menu-parent\" data-group=\"".concat(groupId, "\">\n\t\t\t\t<span>").concat(group.label, "</span>\n\t\t\t\t<i class=\"fa-solid fa-chevron-right\"></i>\n\t\t\t\t<div class=\"ddrdrawing__context-menu-submenu\">\n\t\t\t\t\t").concat(submenuHtml, "\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t");
+    }
+    /**
+     * Рендер пункта
+     */
+
+  }, {
+    key: "renderItem",
+    value: function renderItem(itemId, item) {
+      return "\n\t\t\t<div class=\"ddrdrawing__context-menu-item\" data-action=\"".concat(item.action, "\" data-item-id=\"").concat(itemId, "\">\n\t\t\t\t<span>").concat(item.label, "</span>\n\t\t\t</div>\n\t\t");
+    }
+    /**
+     * Настройка событий
+     */
+
+  }, {
+    key: "setupEvents",
+    value: function setupEvents() {
+      var _this = this;
+
+      this.element.addEventListener('click', function (e) {
+        var menuItem = e.target.closest('.ddrdrawing__context-menu-item');
+        if (!menuItem) return;
+        var action = menuItem.getAttribute('data-action');
+        var itemId = menuItem.getAttribute('data-item-id');
+        var position = menuItem.getAttribute('data-position');
+        _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('Context menu action:', action, 'Item:', itemId, 'Position:', position);
+
+        if (action && _this.targetElement) {
+          _this.handleAction(action, {
+            element: _this.targetElement,
+            position: position,
+            itemId: itemId
+          });
+        }
+
+        _this.hide();
+
+        e.stopPropagation();
+      });
+    }
+    /**
+     * Обработка действий меню
+     */
+
+  }, {
+    key: "handleAction",
+    value: function handleAction(action, data) {
+      switch (action) {
+        case 'add-port':
+          if (data.element && data.position) {
+            this.addPort(data.element, data.position);
+          }
+
+          break;
+
+        default:
+          _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].warn('Unknown context menu action:', action);
+      }
+    }
+    /**
+     * Добавление порта к элементу
+     */
+
+  }, {
+    key: "addPort",
+    value: function addPort(element, position) {
+      var _this2 = this;
+
+      _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('Adding port to element:', element.id, 'position:', position); // НОВАЯ ЛОГИКА: используем eventBus вместо прямого создания портов
+
+      _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('🔄 Отправляем событие ports:add через eventBus');
+      _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('🔧 this.eventBus:', this.eventBus);
+
+      if (!this.eventBus) {
+        _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].error('❌ eventBus недоступен! Используем старую логику.'); // Fallback к старой логике только если eventBus реально недоступен
+      } else {
+        _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('✅ Используем PortService через eventBus');
+        this.eventBus.emit('ports:add', {
+          element: element,
+          side: position
+        });
+        return; // Больше ничего не делаем - PortService все сделает
+      } // СТАРАЯ ЛОГИКА (удалить позже):
+      // Получаем текущие порты элемента
+
+
+      var currentPorts = element.get('ports') || {
+        items: []
+      }; // Определяем следующий ID порта для данной позиции
+
+      var existingPortsOfPosition = currentPorts.items.filter(function (port) {
+        return port.group === position;
+      });
+      var portNumber = existingPortsOfPosition.length + 1;
+      var portId = "".concat(position).concat(portNumber); // Создаем новый порт с правильной структурой для JointJS v4
+
+      var newPort = {
+        id: portId,
+        group: position,
+        markup: [{
+          tagName: 'circle',
+          selector: 'portBody',
+          attributes: {
+            'port': portId // ВАЖНО: добавляем ID порта в DOM атрибуты
+
+          }
+        }],
+        attrs: {
+          portBody: {
+            fill: '#61cfff',
+            stroke: '#0088ff',
+            strokeWidth: 1,
+            r: 3,
+            magnet: true,
+            cursor: 'crosshair'
+          }
+        }
+      }; // Добавляем порт к элементу
+
+      var updatedPorts = _objectSpread(_objectSpread({}, currentPorts), {}, {
+        items: [].concat(_toConsumableArray(currentPorts.items), [newPort]),
+        groups: _objectSpread(_objectSpread({}, currentPorts.groups), {}, _defineProperty({}, position, this.getPortGroupConfig(position)))
+      });
+
+      element.set('ports', updatedPorts);
+      _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('Port added:', portId); // ХИТРАЯ ФИШКА: После добавления нового порта принудительно скрываем занятые порты
+
+      setTimeout(function () {
+        _this2.hideOccupiedPorts(element);
+      }, 0);
+    }
+    /**
+     * Принудительно скрывает все занятые (подключенные к линкам) порты элемента
+     */
+
+  }, {
+    key: "hideOccupiedPorts",
+    value: function hideOccupiedPorts(element) {
+      var _element$get, _window$ddrDrawing, _window$ddrDrawing$ge;
+
+      _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('🔍 hideOccupiedPorts для элемента:', element.id);
+      var graph = this.canvas.paper.model;
+      var elementPorts = ((_element$get = element.get('ports')) === null || _element$get === void 0 ? void 0 : _element$get.items) || []; // Находим все линки, подключенные к этому элементу
+
+      var connectedLinks = graph.getConnectedLinks(element);
+      _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('🔗 Подключенные линки:', connectedLinks.length); // Собираем ID занятых портов
+
+      var occupiedPortIds = new Set();
+      connectedLinks.forEach(function (link) {
+        var _link$get, _link$get2, _link$get3, _link$get4;
+
+        var sourcePortId = (_link$get = link.get('source')) === null || _link$get === void 0 ? void 0 : _link$get.port;
+        var targetPortId = (_link$get2 = link.get('target')) === null || _link$get2 === void 0 ? void 0 : _link$get2.port;
+
+        if (sourcePortId && ((_link$get3 = link.get('source')) === null || _link$get3 === void 0 ? void 0 : _link$get3.id) === element.id) {
+          occupiedPortIds.add(sourcePortId);
+        }
+
+        if (targetPortId && ((_link$get4 = link.get('target')) === null || _link$get4 === void 0 ? void 0 : _link$get4.id) === element.id) {
+          occupiedPortIds.add(targetPortId);
+        }
+      });
+      _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('🚫 Занятые порты:', Array.from(occupiedPortIds)); // Скрываем все занятые порты
+
+      occupiedPortIds.forEach(function (portId) {
+        _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log("\uD83D\uDC7B \u0421\u043A\u0440\u044B\u0432\u0430\u0435\u043C \u0437\u0430\u043D\u044F\u0442\u044B\u0439 \u043F\u043E\u0440\u0442: ".concat(portId));
+        element.portProp(portId, 'attrs/portBody/opacity', 0);
+        element.portProp(portId, 'attrs/portBody/fill-opacity', 0);
+        element.portProp(portId, 'attrs/portBody/stroke-opacity', 0);
+        element.portProp(portId, 'attrs/portBody/pointer-events', 'none');
+      }); // После добавления порта нужно пересчитать видимость портов
+      // Ищем EventManager через глобальный доступ к плагину
+
+      var pluginInstance = (_window$ddrDrawing = window.ddrDrawing) === null || _window$ddrDrawing === void 0 ? void 0 : (_window$ddrDrawing$ge = _window$ddrDrawing.getPlugin) === null || _window$ddrDrawing$ge === void 0 ? void 0 : _window$ddrDrawing$ge.call(_window$ddrDrawing);
+
+      if (pluginInstance) {
+        var eventManager = pluginInstance.getEventManager();
+
+        if (eventManager && eventManager._hideOccupiedPorts) {
+          // Небольшая задержка чтобы DOM успел обновиться
+          setTimeout(function () {
+            eventManager._hideOccupiedPorts();
+          }, 50);
+        }
+      }
+    }
+    /**
+     * Получение конфигурации группы портов
+     */
+
+  }, {
+    key: "getPortGroupConfig",
+    value: function getPortGroupConfig(position) {
+      var baseConfig = {
+        attrs: {
+          circle: {
+            fill: '#4CAF50',
+            stroke: '#2E7D32',
+            strokeWidth: 1,
+            r: 3
+          }
+        }
+      };
+      return _objectSpread({
+        position: {
+          name: position,
+          args: {
+            // Настройки распределения:
+            start: 0.3,
+            // отступ от начала (10%)
+            end: 0.7,
+            // отступ от конца (90%)
+            step: 10 // фиксированный шаг в px
+
+          }
+        }
+      }, baseConfig);
+    }
+    /**
+     * Показать меню
+     */
+
+  }, {
+    key: "show",
+    value: function show(x, y, element) {
+      if (!this.element) {
+        _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].error('Context menu element not found');
+        return;
+      }
+
+      _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('Showing context menu at', x, y, 'for element', element ? element.id : 'none'); // Убрал динамическое скрытие - пусть все пункты будут видны всегда
+      // this.updateMenuForElement(element)
+
+      this.element.style.left = x + 'px';
+      this.element.style.top = y + 'px';
+      this.element.style.display = 'block';
+      this.element.style.position = 'absolute';
+      this.element.style.zIndex = '9999';
+      this.element.style.backgroundColor = 'white';
+      this.element.style.border = '1px solid #ccc';
+      this.targetElement = element;
+      this.isVisible = true;
+    }
+    /**
+     * Обновление меню для конкретного элемента
+     */
+
+  }, {
+    key: "updateMenuForElement",
+    value: function updateMenuForElement(element) {
+      // Скрываем только корневые элементы меню (не трогаем элементы в подменю)
+      var rootMenuItems = this.element.querySelectorAll(':scope > .ddrdrawing__context-menu-item');
+      rootMenuItems.forEach(function (item) {
+        item.style.display = 'none';
+      });
+
+      if (!element) {
+        // Если нет элемента - показываем все корневые элементы
+        rootMenuItems.forEach(function (item) {
+          item.style.display = '';
+        });
+        return;
+      } // Показываем только релевантные пункты
+
+
+      if (element.isLink && element.isLink()) {
+        // Для линков показываем стили и цвета
+        this.showMenuItems(['line-style', 'line-color', 'set-nominal-length', 'show-link-info']);
+      } else {
+        // Для фигур показываем порты
+        this.showMenuItems(['add-port']);
+      }
+    }
+    /**
+     * Показать указанные пункты меню
+     */
+
+  }, {
+    key: "showMenuItems",
+    value: function showMenuItems(itemIds) {
+      var _this3 = this;
+
+      itemIds.forEach(function (id) {
+        // Для групп
+        var groupItem = _this3.element.querySelector("[data-group=\"".concat(id, "\"]"));
+
+        if (groupItem) {
+          groupItem.style.display = ''; // Убеждаемся что элементы в подменю тоже видны
+
+          var submenuItems = groupItem.querySelectorAll('.ddrdrawing__context-menu-item');
+          submenuItems.forEach(function (item) {
+            item.style.display = '';
+          });
+        } // Для одиночных пунктов
+
+
+        var menuItem = _this3.element.querySelector("[data-item-id=\"".concat(id, "\"]"));
+
+        if (menuItem && !menuItem.closest('.ddrdrawing__context-menu-submenu')) {
+          menuItem.style.display = '';
+        }
+      });
+    }
+    /**
+     * Скрыть меню
+     */
+
+  }, {
+    key: "hide",
+    value: function hide() {
+      if (this.element) {
+        this.element.style.display = 'none';
+        this.isVisible = false;
+        this.targetElement = null;
+      }
+    }
+    /**
+     * Проверка видимости
+     */
+
+  }, {
+    key: "isMenuVisible",
+    value: function isMenuVisible() {
+      return this.isVisible;
+    }
+    /**
+     * Очистка
+     */
+
+  }, {
+    key: "destroy",
+    value: function destroy() {
+      if (this.element && this.element.parentNode) {
+        this.element.parentNode.removeChild(this.element);
+      }
+
+      this.menuItems.clear();
+      this.targetElement = null;
+      this.isVisible = false;
+    }
+  }]);
+
+  return ContextMenu;
+}();
+
+/* harmony default export */ __webpack_exports__["default"] = (ContextMenu);
+
+/***/ }),
+
+/***/ "./resources/js/plugins/ddrDrawing/src/ui/LineStyleSelector.js":
+/*!*********************************************************************!*\
+  !*** ./resources/js/plugins/ddrDrawing/src/ui/LineStyleSelector.js ***!
+  \*********************************************************************/
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../core/Logger.js */ "./resources/js/plugins/ddrDrawing/src/core/Logger.js");
+/* harmony import */ var _core_LinkMetadata_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../core/LinkMetadata.js */ "./resources/js/plugins/ddrDrawing/src/core/LinkMetadata.js");
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+
+
+
+/**
+ * Компонент для выбора стиля линий
+ */
+
+var LineStyleSelector = /*#__PURE__*/function () {
+  function LineStyleSelector(canvas) {
+    _classCallCheck(this, LineStyleSelector);
+
+    this.canvas = canvas;
+    this.currentColor = _core_LinkMetadata_js__WEBPACK_IMPORTED_MODULE_1__.LineColors.GRAY;
+    this.currentStyle = _core_LinkMetadata_js__WEBPACK_IMPORTED_MODULE_1__.LineStyles.SOLID;
+    this.colorSelect = null;
+    this.styleSelect = null;
+  }
+  /**
+   * Инициализация
+   */
+
+
+  _createClass(LineStyleSelector, [{
+    key: "init",
+    value: function init() {
+      this.createSelectors();
+      this.setupEvents();
+      _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('LineStyleSelector initialized');
+    }
+    /**
+     * Создание выпадающих списков
+     */
+
+  }, {
+    key: "createSelectors",
+    value: function createSelectors() {
+      var toolbarSection = document.querySelector('.ddrdrawing__toolbar-section');
+
+      if (!toolbarSection) {
+        _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].error('Toolbar section not found for LineStyleSelector');
+        return;
+      } // Создаем группу для селекторов в стиле остальных групп
+
+
+      var selectorGroup = document.createElement('div');
+      selectorGroup.className = 'ddrdrawing__toolbar-group'; // Контейнер для цвета
+
+      var colorContainer = document.createElement('div');
+      colorContainer.className = 'ddrdrawing__select-container';
+      var colorLabel = document.createElement('span');
+      colorLabel.textContent = 'Цвет:';
+      colorLabel.className = 'ddrdrawing__select-label';
+      this.colorSelect = document.createElement('select');
+      this.colorSelect.className = 'ddrdrawing__select';
+      this.colorSelect.innerHTML = "\n\t\t\t<option value=\"".concat(_core_LinkMetadata_js__WEBPACK_IMPORTED_MODULE_1__.LineColors.GRAY, "\">\u0421\u0435\u0440\u044B\u0439</option>\n\t\t\t<option value=\"").concat(_core_LinkMetadata_js__WEBPACK_IMPORTED_MODULE_1__.LineColors.LIGHT_GRAY, "\">\u0421\u0432\u0435\u0442\u043B\u043E-\u0441\u0435\u0440\u044B\u0439</option>\n\t\t\t<option value=\"").concat(_core_LinkMetadata_js__WEBPACK_IMPORTED_MODULE_1__.LineColors.RED, "\">\u041A\u0440\u0430\u0441\u043D\u044B\u0439</option>\n\t\t\t<option value=\"").concat(_core_LinkMetadata_js__WEBPACK_IMPORTED_MODULE_1__.LineColors.BLUE, "\">\u0421\u0438\u043D\u0438\u0439</option>\n\t\t\t<option value=\"").concat(_core_LinkMetadata_js__WEBPACK_IMPORTED_MODULE_1__.LineColors.GREEN, "\">\u0417\u0435\u043B\u0435\u043D\u044B\u0439</option>\n\t\t\t<option value=\"").concat(_core_LinkMetadata_js__WEBPACK_IMPORTED_MODULE_1__.LineColors.YELLOW, "\">\u0416\u0435\u043B\u0442\u044B\u0439</option>\n\t\t");
+      colorContainer.appendChild(colorLabel);
+      colorContainer.appendChild(this.colorSelect); // Контейнер для стиля
+
+      var styleContainer = document.createElement('div');
+      styleContainer.className = 'ddrdrawing__select-container';
+      var styleLabel = document.createElement('span');
+      styleLabel.textContent = 'Линия:';
+      styleLabel.className = 'ddrdrawing__select-label';
+      this.styleSelect = document.createElement('select');
+      this.styleSelect.className = 'ddrdrawing__select';
+      this.styleSelect.innerHTML = "\n\t\t\t<option value=\"".concat(_core_LinkMetadata_js__WEBPACK_IMPORTED_MODULE_1__.LineStyles.SOLID, "\">\u0421\u043F\u043B\u043E\u0448\u043D\u0430\u044F</option>\n\t\t\t<option value=\"").concat(_core_LinkMetadata_js__WEBPACK_IMPORTED_MODULE_1__.LineStyles.DASHED, "\">\u0428\u0442\u0440\u0438\u0445\u043E\u0432\u0430\u044F</option>\n\t\t\t<option value=\"").concat(_core_LinkMetadata_js__WEBPACK_IMPORTED_MODULE_1__.LineStyles.DOTTED, "\">\u0422\u043E\u0447\u0435\u0447\u043D\u0430\u044F</option>\n\t\t\t<option value=\"").concat(_core_LinkMetadata_js__WEBPACK_IMPORTED_MODULE_1__.LineStyles.DASH_DOT, "\">\u0428\u0442\u0440\u0438\u0445-\u0442\u043E\u0447\u043A\u0430</option>\n\t\t\t<option value=\"").concat(_core_LinkMetadata_js__WEBPACK_IMPORTED_MODULE_1__.LineStyles.DASH_DOT_DOT, "\">\u0428\u0442\u0440\u0438\u0445-\u0434\u0432\u0435 \u0442\u043E\u0447\u043A\u0438</option>\n\t\t\t<option value=\"").concat(_core_LinkMetadata_js__WEBPACK_IMPORTED_MODULE_1__.LineStyles.LONG_DASH, "\">\u0414\u043B\u0438\u043D\u043D\u044B\u0439 \u0448\u0442\u0440\u0438\u0445</option>\n\t\t\t<option value=\"").concat(_core_LinkMetadata_js__WEBPACK_IMPORTED_MODULE_1__.LineStyles.SHORT_DASH, "\">\u041A\u043E\u0440\u043E\u0442\u043A\u0438\u0439 \u0448\u0442\u0440\u0438\u0445</option>\n\t\t");
+      styleContainer.appendChild(styleLabel);
+      styleContainer.appendChild(this.styleSelect); // Добавляем контейнеры в группу
+
+      selectorGroup.appendChild(colorContainer);
+      selectorGroup.appendChild(styleContainer); // Добавляем группу в тулбар
+
+      toolbarSection.appendChild(selectorGroup);
+    }
+    /**
+     * Настройка событий
+     */
+
+  }, {
+    key: "setupEvents",
+    value: function setupEvents() {
+      var _this = this;
+
+      if (this.colorSelect) {
+        this.colorSelect.addEventListener('change', function (e) {
+          _this.currentColor = e.target.value;
+          _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('Line color changed to:', _this.currentColor);
+
+          _this.updateSelectedLinks();
+        });
+      }
+
+      if (this.styleSelect) {
+        this.styleSelect.addEventListener('change', function (e) {
+          _this.currentStyle = e.target.value;
+          _core_Logger_js__WEBPACK_IMPORTED_MODULE_0__["default"].log('Line style changed to:', _this.currentStyle);
+
+          _this.updateSelectedLinks();
+        });
+      }
+    }
+    /**
+     * Обновление выбранных линков
+     */
+
+  }, {
+    key: "updateSelectedLinks",
+    value: function updateSelectedLinks() {
+      var _this2 = this;
+
+      var graph = this.canvas.getGraph();
+      if (!graph) return; // Получаем все выделенные линки
+
+      var links = graph.getLinks();
+      links.forEach(function (link) {
+        if (link.get('selected')) {
+          // Импортируем LinkMetadata динамически
+          Promise.resolve(/*! import() */).then(__webpack_require__.bind(__webpack_require__, /*! ../core/LinkMetadata.js */ "./resources/js/plugins/ddrDrawing/src/core/LinkMetadata.js")).then(function (_ref) {
+            var LinkMetadata = _ref.LinkMetadata;
+            var metadata = LinkMetadata.fromLink(link);
+
+            if (metadata) {
+              metadata.setColor(_this2.currentColor);
+              metadata.setLineStyle(_this2.currentStyle);
+            }
+          });
+        }
+      });
+    }
+    /**
+     * Получить текущие настройки
+     */
+
+  }, {
+    key: "getCurrentSettings",
+    value: function getCurrentSettings() {
+      return {
+        color: this.currentColor,
+        lineStyle: this.currentStyle
+      };
+    }
+    /**
+     * Очистка
+     */
+
+  }, {
+    key: "destroy",
+    value: function destroy() {
+      if (this.colorSelect && this.colorSelect.parentNode) {
+        this.colorSelect.parentNode.remove();
+      }
+    }
+  }]);
+
+  return LineStyleSelector;
+}();
+
+/* harmony default export */ __webpack_exports__["default"] = (LineStyleSelector);
 
 /***/ }),
 
@@ -12535,11 +16318,12 @@ var DdrFiles = /*#__PURE__*/function () {
       var getAddedFiles = this.getAddedFiles;
       var loadFiles = this.loadFiles.bind(this); // bind потому что в функции loadFiles идет обращение к контексту, но он там потерян, так как вызов идет отсюда, то есть уже 3 вложенности функций
 
-      var loadFilesParams = _.omit(params, ['multiple']);
+      var loadFilesParams = _.omit(params, ['multiple', 'accept']);
 
       var input = document.createElement('input');
       input.type = 'file';
       input.multiple = (params === null || params === void 0 ? void 0 : params.multiple) || false;
+      if (params !== null && params !== void 0 && params.accept) input.accept = params.accept;
 
       input.oninput = function (e) {
         var files = getAddedFiles(e);
@@ -12565,12 +16349,13 @@ var DdrFiles = /*#__PURE__*/function () {
 
       var selector = this.selector || forcedSelector;
 
-      var loadFilesParams = _.omit(params, ['multiple']);
+      var loadFilesParams = _.omit(params, ['multiple', 'accept']);
 
       $(selector).on(tapEvent, function () {
         var input = document.createElement('input');
         input.type = 'file';
         input.multiple = (params === null || params === void 0 ? void 0 : params.multiple) || false;
+        if (params !== null && params !== void 0 && params.accept) input.accept = params.accept;
 
         input.oninput = function (e) {
           var files = getAddedFiles(e);
@@ -12931,7 +16716,7 @@ __webpack_require__.r(__webpack_exports__);
 $.ddrChooseFiles = function () {
   var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-  var chooseParams = _.pick(params, ['multiple', 'init', 'preload', 'callback', 'done', 'fail']);
+  var chooseParams = _.pick(params, ['multiple', 'accept', 'init', 'preload', 'callback', 'done', 'fail']);
 
   var files = ref({});
   new _ddrFiles__WEBPACK_IMPORTED_MODULE_0__["default"](true, files).choose(chooseParams);
@@ -12992,7 +16777,7 @@ $.ddrFiles = function () {
       chooseSelector = _$pick2.chooseSelector,
       dropSelector = _$pick2.dropSelector;
 
-  var chooseParams = _.pick(params, ['multiple', 'init', 'preload', 'callback', 'done', 'fail']);
+  var chooseParams = _.pick(params, ['multiple', 'accept', 'init', 'preload', 'callback', 'done', 'fail']);
 
   var dropParams = _.pick(params, ['dragover', 'dragleave', 'drop', 'init', 'preload', 'callback', 'done', 'fail']);
 
@@ -13676,7 +17461,7 @@ var DdrInput = /*#__PURE__*/function () {
       var _item$tagName, _item$type, _item$type$toLowerCas;
 
       var tag = item === null || item === void 0 ? void 0 : (_item$tagName = item.tagName) === null || _item$tagName === void 0 ? void 0 : _item$tagName.toLowerCase(),
-          type = $(item).attr('tagname') !== 'undefined' ? $(item).attr('tagname') : typeof $(item).attr('contenteditable') !== 'undefined' ? 'contenteditable' : item !== null && item !== void 0 && item.type ? item === null || item === void 0 ? void 0 : (_item$type = item.type) === null || _item$type === void 0 ? void 0 : (_item$type$toLowerCas = _item$type.toLowerCase()) === null || _item$type$toLowerCas === void 0 ? void 0 : _item$type$toLowerCas.replace('select-one', 'select') : null,
+          type = typeof $(item).attr('tagname') !== 'undefined' ? $(item).attr('tagname') : typeof $(item).attr('contenteditable') !== 'undefined' ? 'contenteditable' : item !== null && item !== void 0 && item.type ? item === null || item === void 0 ? void 0 : (_item$type = item.type) === null || _item$type === void 0 ? void 0 : (_item$type$toLowerCas = _item$type.toLowerCase()) === null || _item$type$toLowerCas === void 0 ? void 0 : _item$type$toLowerCas.replace('select-one', 'select') : null,
           group = typeof $(item).attr('inpgroup') !== 'undefined' ? $(item).attr('inpgroup') + '-' : '',
           wrapperClass = findWrapByInputType.indexOf(type) !== -1 ? group + type : group + tag,
           wrapperSelector = $(item).closest('.' + wrapperClass).length ? $(item).closest('.' + wrapperClass) : false;
@@ -13862,14 +17647,6 @@ var DdrInput = /*#__PURE__*/function () {
             group = _ref3.group,
             wrapperClass = _ref3.wrapperClass,
             wrapperSelector = _ref3.wrapperSelector;
-        console.log({
-          item: item,
-          tag: tag,
-          type: type,
-          group: group,
-          wrapperClass: wrapperClass,
-          wrapperSelector: wrapperSelector
-        });
 
         if (wrapperSelector) {
           if ($(wrapperSelector).hasClass(wrapperClass + '_disabled') === false) $(wrapperSelector).addClass(wrapperClass + '_disabled');
@@ -18080,7 +21857,9 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
     var calcPrices;
     var calcDates;
     var allPinned;
-    var pinnedInSelected = {}; // Если это оин пункт "копировать"
+    var pinnedInSelected = {}; // можно ли добавлять элементы у этапа
+
+    var canAddItem = $(target.pointer).closest('[ddrtabletd]').attr('canadditem') == 1 ? true : false; // Если это оин пункт "копировать"
 
     if (selectedTextCell || $(target.pointer).closest('[ddrtabletd]').hasClass('selected') || !!$(target.pointer).closest('[ddrtabletd]').find('[edittedplace]').hasClass('select-text')) {
       setStyle({
@@ -18813,8 +22592,8 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
         });
       }
     }, {
-      name: hasCheckbox && canRemoveCheckbox ? 'Удалить чекбокс' : !hasCheckbox && canCreateCheckbox ? 'Добавить чекбокс' : '',
-      visible: isDeptCheckbox && !isArchive && (!hasCheckbox && canCreateCheckbox || hasCheckbox && canRemoveCheckbox) && !selectedTextCell,
+      name: hasCheckbox && (canRemoveCheckbox || canAddItem) ? 'Удалить чекбокс' : !hasCheckbox && (canCreateCheckbox || canAddItem) ? 'Добавить чекбокс' : '',
+      visible: isDeptCheckbox && !isArchive && (!hasCheckbox && (canCreateCheckbox || canAddItem) || hasCheckbox && (canRemoveCheckbox || canAddItem)) && !selectedTextCell,
       sort: 1,
       onClick: function onClick() {
         return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee2() {
@@ -18887,12 +22666,12 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
         }))();
       }
     }, {
-      name: hasSelect && canRemoveSelect ? 'Удалить вып. список' : !hasSelect && canCreateSelect ? 'Добавить вып. список' : '',
-      visible: isDeptSelect && !isArchive && (!hasSelect && canCreateSelect || hasSelect && canRemoveSelect) && !selectedTextCell,
+      name: hasSelect && (canRemoveSelect || canAddItem) ? 'Удалить вып. список' : !hasSelect && (canCreateSelect || canAddItem) ? 'Добавить вып. список' : '',
+      visible: isDeptSelect && !isArchive && (!hasSelect && (canCreateSelect || canAddItem) || hasSelect && (canRemoveSelect || canAddItem)) && !selectedTextCell,
       sort: 1,
       onClick: function onClick() {
         return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee3() {
-          var cell, edited, attrData, _pregSplit5, _pregSplit6, _pregSplit6$, contractId, _pregSplit6$2, departmentId, _pregSplit6$3, stepId, waitCell, _yield$axiosQuery3, list, error, status, headers, randId, listHtml, editedSelect;
+          var cell, edited, attrData, _pregSplit5, _pregSplit6, _pregSplit6$, contractId, _pregSplit6$2, departmentId, _pregSplit6$3, stepId, waitCell, _yield$axiosQuery3, data, error, status, headers, list, randId, listHtml, editedSelect;
 
           return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee3$(_context3) {
             while (1) {
@@ -18916,7 +22695,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
 
                 case 7:
                   _yield$axiosQuery3 = _context3.sent;
-                  list = _yield$axiosQuery3.data;
+                  data = _yield$axiosQuery3.data;
                   error = _yield$axiosQuery3.error;
                   status = _yield$axiosQuery3.status;
                   headers = _yield$axiosQuery3.headers;
@@ -18932,7 +22711,8 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                   return _context3.abrupt("return");
 
                 case 17:
-                  // canCreateCheckbox canRemoveCheckbox
+                  list = data[stepId] || data; // canCreateCheckbox canRemoveCheckbox
+
                   if (list) {
                     if (!hasSelect) {
                       if (edited && canChooseEmployee) {
@@ -18965,7 +22745,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                     waitCell.destroy();
                   }
 
-                case 18:
+                case 19:
                 case "end":
                   return _context3.stop();
               }
@@ -21228,6 +25008,7 @@ function selectionsList(selection, editSelection, _clearCounts, getList, canEdit
 
                   $.selectionBuildList = function (btn, id) {
                     var canEdit = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+                    var all = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
                     $('[selectionsbtn]').ddrInputs('disable');
                     close();
                     selection.value = id;
@@ -21239,6 +25020,7 @@ function selectionsList(selection, editSelection, _clearCounts, getList, canEdit
 
                     getList({
                       //canEditSelection: canEdit,
+                      all: all,
                       withCounts: true,
                       callback: function callback() {
                         $('#currentSelectionTitle').text(selectionTitle);

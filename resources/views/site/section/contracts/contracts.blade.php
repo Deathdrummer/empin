@@ -285,7 +285,7 @@
 		canCreateSelect 		= '{{Auth::guard('site')->user()->can('contract-create-select::site')}}',
 		canRemoveSelect 		= '{{Auth::guard('site')->user()->can('contract-remove-select::site')}}',
 		canChooseEmployee 		= '{{Auth::guard('site')->user()->can('contract-choose-employee:site')}}',
-		canEditCell 			= '{{Auth::guard('site')->user()->can('contract-can-edit-cell::site')}}',
+		canEditCell 			= true, //'{{Auth::guard('site')->user()->can('contract-can-edit-cell::site')}}',
 		offset 					= 0,
 		search 					= null,
 		columnFilter 			= [], // поиск по значению из столбца
@@ -298,7 +298,8 @@
 		lastChoosedRow 			= ref(null),
 		totalCount 				= null,
 		sendMessStat 			= ref(false),
-		hidelights				= ref(null);
+		hidelights				= ref(null),
+		doScroll				= ref(true);
 
 
 
@@ -2817,15 +2818,34 @@
 
 
 
-
-
-
-
-
-
-
-
-
+	//-------------------------------------------------- Выгрузить все записи
+	$(document).on('keypress', (e) =>{
+		const {
+			isShiftKey,
+			isCtrlKey,
+			isCommandKey,
+			isAltKey,
+			isOptionKey,
+			noKeys,
+			isActiveKey
+			} = metaKeys(e);
+		
+		if ((isCommandKey || isCtrlKey) && isShiftKey && e.keyCode == 12) {
+			ddrPopup({
+				title: 'Вывести все записи',
+				width: 400,
+				buttons: ['Закрыть', {title: 'Вывести', variant: 'blue', action: 'loadAllItens'}],
+				html: '<p class="green">Вы действительно хотите вывести все записи?</p>'
+			}).then(({state/* isClosed */, wait, setTitle, setButtons, loadData, setHtml, setLHtml, dialog, close, onScroll, disableButtons, enableButtons, setWidth}) => {
+				$.loadAllItens = () => {
+					wait();
+					getList({dSroll: false, all: 1, callback: function() {
+						close();
+					}});
+				} 
+			});
+		}
+	});
 
 
 
@@ -2836,23 +2856,30 @@
 		if (abortCtrl instanceof AbortController) abortCtrl.abort();
 		let {
 			init,
+			all,
 			withCounts,
 			//canEditSelection,
 			append,
 			offset: localOffset,
+			dSroll,
 			callback
 		} = _.assign({
 			init: false,
+			all: false,
 			withCounts: false,
 			//canEditSelection: null,
 			append: false,
 			offset: null,
+			dSroll: true,
 			callback: false
 		}, settings),
 			params = {},
 			listWait;
-
-
+		
+		
+		doScroll.value = (doScroll.value == true && dSroll == false) ? false : true;
+		
+		
 		if (currentList == -1 || currentList > 0) {
 			searchWithArchive = false;
 			$('#searchWithArchive').ddrInputs('disable');
@@ -2890,11 +2917,12 @@
 		} else {
 			params['archive'] = currentList == -1 ? 1 : (searchWithArchive ? null : 0);
 		}
-
+		
 		params['sort_field'] = sortField;
 		params['sort_order'] = sortOrder;
 		params['limit'] = limit;
 		params['offset'] = localOffset != null ? localOffset : offset;
+		params['all'] = all ? 1 : 0;
 		params['append'] = append ? 1 : 0;
 		params['search'] = search;
 		params['filter'] = columnFilter.length ? JSON.stringify(columnFilter) : null;
@@ -2975,7 +3003,7 @@
 				}
 			}
 
-			const showTotal = headers && headers['x-count-contracts-current'] && ((params['offset'] + params['limit'] >= totalCount) || (totalCount <= params['limit']));
+			const showTotal = all || (headers && headers['x-count-contracts-current'] && ((params['offset'] + params['limit'] >= totalCount) || (totalCount <= params['limit'])));
 
 			showTotalFn(showTotal, totalCount);
 
@@ -3202,6 +3230,7 @@
 	let lastLoadCount = null;
 
 	$.doScrollStart = (target) => {
+		if (doScroll.value == false) return;
 		let localOffset = offset - limit * countShownLoadings;
 		if (localOffset < 0) return;
 		getList({
@@ -3217,6 +3246,7 @@
 	}
 
 	$.doScrollEnd = (target) => {
+		if (doScroll.value == false) return;
 		if ($('#contractsList').children('[ddrtabletr]').length < limit) return;
 		offset += limit;
 

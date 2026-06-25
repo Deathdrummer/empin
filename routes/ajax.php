@@ -3,7 +3,9 @@
 use App\Enums\ContractColums;
 use App\Enums\VirtualVars;
 use App\Http\Controllers\admin\Acts;
+use App\Http\Controllers\AiAssistantController;
 use App\Http\Controllers\AssistentFilesController;
+use App\Http\Controllers\AutoCADController;
 use App\Http\Controllers\ContractsFilesController;
 use App\Http\Controllers\crud\Admins;
 use App\Http\Controllers\crud\Contracts;
@@ -138,6 +140,7 @@ Route::delete('users_new/reg_staff_to_user', [UsersNew::class, 'unreg_user_from_
 Route::get('users_new/change_user_email', [UsersNew::class, 'get_user_email']);
 Route::post('users_new/change_user_email', [UsersNew::class, 'change_user_email']);
 Route::post('/users_new/send_email', [UsersNew::class, 'send_email']);
+Route::post('/users_new/login_as_user', [UsersNew::class, 'login_as_user']);
 
 Route::post('/users_new/set_role', [UsersNew::class, 'set_role']);
 Route::post('/users_new/set_department', [UsersNew::class, 'set_department']);
@@ -319,3 +322,15 @@ Route::get('/siteparser/get_subjects', [SiteParserController::class, 'get_subjec
 Route::get('/siteparser/import_form', [SiteParserController::class, 'import_form']);
 Route::post('/siteparser/import_form', [SiteParserController::class, 'import_data']);
 Route::post('/siteparser/set_stat', [SiteParserController::class, 'set_stat']);
+
+
+// AutoCAD
+Route::middleware(['isajax:admin', 'lang'])->post('/autocad/convert', [AutoCADController::class, 'convertToJson']);
+
+
+
+
+
+
+# ИИ-ассистент
+Route::post('/ai', [AiAssistantController::class, 'index']);

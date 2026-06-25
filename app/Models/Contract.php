@@ -92,6 +92,10 @@ class Contract extends Model {
 		'power',
 		'archive',
 		'archive_dir',
+		'tu',
+		'inv_num_dmnt_tmg',
+		'fab_num_dmnt_tmg',
+		'fab_num_mont_tmg',
 		'_sort'
 	];
 	

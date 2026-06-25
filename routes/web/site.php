@@ -21,6 +21,14 @@ use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
 
 
+// Политика конфиденциальности — публичная, без авторизации
+Route::get('/politics', function (Settings $settings) {
+    return view('site.politics', [
+        'text' => $settings->get('app_privacy_policy') ?? '',
+    ]);
+});
+
+
 
 
 // регистрация, авторизация, выход

@@ -217,6 +217,7 @@
 				
 				show(userId, (data, container, {error, status, headers}) => {
 					$('#usersNewCard').card('setData', data);
+					$('#loginIsOwnerUser').removeAttrib('hidden');
 					destroyWait();
 				});
 				
@@ -537,14 +538,37 @@
 				
 			});
 		}
-		
-		
-		
-		
-		
-		
-		
-		
+
+
+
+
+
+
+		$.usersNewLoginAs = (btn, userId) => {
+			let usersNewCardWait = $('#usersNewCard').ddrWait({
+				iconHeight: '26px',
+				bgColor: '#ffffff91'
+			});
+
+			query({
+				method: 'post',
+				route: 'login_as_user',
+				data: {user_id: userId},
+			}, (data, container, {error, status, headers}) => {
+				if (error) {
+					usersNewCardWait.destroy();
+					$.notify(error.message, 'error');
+				}
+
+				if (data) {
+					usersNewCardWait.destroy();
+					window.open('/', '_blank');
+				}
+			});
+		}
+
+
+
 		$.setRoleAction = (select, userId) => {
 			const roleId = $(select).val();
 			
@@ -667,6 +691,12 @@
 							selected: true,
 							disabled: true
 						}, optionSelector, 'replace');
+					}
+					
+					if (permissionId == 382) {
+						$('[pgroupid="3"]').find('[permid]').each(function() {
+							$(this).ddrInputs(checkStat ? 'disable' : 'enable');
+						});
 					}
 				});
 			}

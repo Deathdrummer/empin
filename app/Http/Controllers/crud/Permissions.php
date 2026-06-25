@@ -189,6 +189,7 @@ class Permissions extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id) {
+
 		$validFields = $request->validate([
 			'title'	=> [
         		'string',
@@ -197,6 +198,7 @@ class Permissions extends Controller {
 			],
 			'group'	=> 'required|numeric',
 			'guard'	=> 'required|string|exclude',
+			'sort'	=> 'required|regex:/[0-9]+/'
 		]);
 		
 		$guard = $request->input('guard');

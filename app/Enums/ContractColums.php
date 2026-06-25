@@ -60,6 +60,11 @@ final class ContractColums extends Enum {
 	const period 			= 'Срок исполнения договора';
 	const power 			= 'Мощность кВт';
 	const archive 			= 'В архиве';
+	
+	const tu 				= 'ТУ';
+	const inv_num_dmnt_tmg 	= 'Инвентарный номер демонтируемого ТМГ';
+	const fab_num_dmnt_tmg 	= 'Заводской номер демонтируемого ТМГ';
+	const fab_num_mont_tmg 	= 'Заводской номер монтируемого ТМГ';
 }
 
 

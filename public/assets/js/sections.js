@@ -466,7 +466,9 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
     var calcPrices;
     var calcDates;
     var allPinned;
-    var pinnedInSelected = {}; // Если это оин пункт "копировать"
+    var pinnedInSelected = {}; // можно ли добавлять элементы у этапа
+
+    var canAddItem = $(target.pointer).closest('[ddrtabletd]').attr('canadditem') == 1 ? true : false; // Если это оин пункт "копировать"
 
     if (selectedTextCell || $(target.pointer).closest('[ddrtabletd]').hasClass('selected') || !!$(target.pointer).closest('[ddrtabletd]').find('[edittedplace]').hasClass('select-text')) {
       setStyle({
@@ -1199,8 +1201,8 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
         });
       }
     }, {
-      name: hasCheckbox && canRemoveCheckbox ? 'Удалить чекбокс' : !hasCheckbox && canCreateCheckbox ? 'Добавить чекбокс' : '',
-      visible: isDeptCheckbox && !isArchive && (!hasCheckbox && canCreateCheckbox || hasCheckbox && canRemoveCheckbox) && !selectedTextCell,
+      name: hasCheckbox && (canRemoveCheckbox || canAddItem) ? 'Удалить чекбокс' : !hasCheckbox && (canCreateCheckbox || canAddItem) ? 'Добавить чекбокс' : '',
+      visible: isDeptCheckbox && !isArchive && (!hasCheckbox && (canCreateCheckbox || canAddItem) || hasCheckbox && (canRemoveCheckbox || canAddItem)) && !selectedTextCell,
       sort: 1,
       onClick: function onClick() {
         return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee2() {
@@ -1273,12 +1275,12 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
         }))();
       }
     }, {
-      name: hasSelect && canRemoveSelect ? 'Удалить вып. список' : !hasSelect && canCreateSelect ? 'Добавить вып. список' : '',
-      visible: isDeptSelect && !isArchive && (!hasSelect && canCreateSelect || hasSelect && canRemoveSelect) && !selectedTextCell,
+      name: hasSelect && (canRemoveSelect || canAddItem) ? 'Удалить вып. список' : !hasSelect && (canCreateSelect || canAddItem) ? 'Добавить вып. список' : '',
+      visible: isDeptSelect && !isArchive && (!hasSelect && (canCreateSelect || canAddItem) || hasSelect && (canRemoveSelect || canAddItem)) && !selectedTextCell,
       sort: 1,
       onClick: function onClick() {
         return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee3() {
-          var cell, edited, attrData, _pregSplit5, _pregSplit6, _pregSplit6$, contractId, _pregSplit6$2, departmentId, _pregSplit6$3, stepId, waitCell, _yield$axiosQuery3, list, error, status, headers, randId, listHtml, editedSelect;
+          var cell, edited, attrData, _pregSplit5, _pregSplit6, _pregSplit6$, contractId, _pregSplit6$2, departmentId, _pregSplit6$3, stepId, waitCell, _yield$axiosQuery3, data, error, status, headers, list, randId, listHtml, editedSelect;
 
           return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee3$(_context3) {
             while (1) {
@@ -1302,7 +1304,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
 
                 case 7:
                   _yield$axiosQuery3 = _context3.sent;
-                  list = _yield$axiosQuery3.data;
+                  data = _yield$axiosQuery3.data;
                   error = _yield$axiosQuery3.error;
                   status = _yield$axiosQuery3.status;
                   headers = _yield$axiosQuery3.headers;
@@ -1318,7 +1320,8 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                   return _context3.abrupt("return");
 
                 case 17:
-                  // canCreateCheckbox canRemoveCheckbox
+                  list = data[stepId] || data; // canCreateCheckbox canRemoveCheckbox
+
                   if (list) {
                     if (!hasSelect) {
                       if (edited && canChooseEmployee) {
@@ -1351,7 +1354,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                     waitCell.destroy();
                   }
 
-                case 18:
+                case 19:
                 case "end":
                   return _context3.stop();
               }
@@ -3614,6 +3617,7 @@ function selectionsList(selection, editSelection, _clearCounts, getList, canEdit
 
                   $.selectionBuildList = function (btn, id) {
                     var canEdit = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+                    var all = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
                     $('[selectionsbtn]').ddrInputs('disable');
                     close();
                     selection.value = id;
@@ -3625,6 +3629,7 @@ function selectionsList(selection, editSelection, _clearCounts, getList, canEdit
 
                     getList({
                       //canEditSelection: canEdit,
+                      all: all,
                       withCounts: true,
                       callback: function callback() {
                         $('#currentSelectionTitle').text(selectionTitle);

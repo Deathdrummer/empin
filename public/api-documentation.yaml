@@ -1,0 +1,635 @@
+openapi: 3.0.3
+info:
+  title: Timesheet API
+  description: API для мобильного приложения управления табелем учета рабочего времени
+  version: 1.0.0
+  contact:
+    name: API Support
+
+servers:
+  - url: http://your-domain.com/api
+    description: Production server
+  - url: http://localhost/api
+    description: Development server
+
+tags:
+  - name: Authentication
+    description: Операции авторизации
+  - name: Timesheet
+    description: Операции с табелем учета времени
+
+paths:
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: Авторизация пользователя
+      description: Вход в систему с получением Bearer токена
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: user@example.com
+                password:
+                  type: string
+                  format: password
+                  example: password123
+      responses:
+        '200':
+          description: Успешная авторизация
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    description: Bearer токен для последующих запросов
+                    example: 1|abcdef123456...
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      email:
+                        type: string
+                        example: user@example.com
+                      full_name:
+                        type: string
+                        example: Иванов Иван Иванович
+                      staff_id:
+                        type: integer
+                        example: 42
+        '422':
+          description: Неверные учетные данные
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+
+  /auth/logout:
+    post:
+      tags:
+        - Authentication
+      summary: Выход из системы
+      description: Удаление текущего токена
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Успешный выход
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Successfully logged out
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /auth/me:
+    get:
+      tags:
+        - Authentication
+      summary: Получить данные текущего пользователя
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Данные пользователя
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 1
+                  email:
+                    type: string
+                    example: user@example.com
+                  full_name:
+                    type: string
+                    example: Иванов Иван Иванович
+                  staff_id:
+                    type: integer
+                    example: 42
+                  department_id:
+                    type: integer
+                    nullable: true
+                    example: 5
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /timesheet/slides:
+    post:
+      tags:
+        - Timesheet
+      summary: Получить данные слайдов по дням
+      description: Возвращает информацию о командах и контрактах для указанных дней
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - indexes
+              properties:
+                indexes:
+                  type: array
+                  description: Массив индексов дней (0 = сегодня, -1 = вчера, 1 = завтра)
+                  items:
+                    type: integer
+                  example: [-1, 0, 1]
+      responses:
+        '200':
+          description: Данные по дням
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DayData'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /timesheet/staff:
+    get:
+      tags:
+        - Timesheet
+      summary: Получить список сотрудников
+      description: Список всех сотрудников для добавления в табель
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Список сотрудников
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Staff'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /timesheet/contracts/search:
+    get:
+      tags:
+        - Timesheet
+      summary: Поиск контрактов
+      description: Поиск контрактов по строке запроса
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: search
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Строка поиска
+          example: объект
+      responses:
+        '200':
+          description: Найденные контракты (максимум 50)
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Contract'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /timesheet/team:
+    post:
+      tags:
+        - Timesheet
+      summary: Добавить сотрудника в команду на день
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - staff_id
+                - day
+              properties:
+                staff_id:
+                  type: integer
+                  example: 42
+                day:
+                  type: string
+                  format: date
+                  example: '2025-10-25'
+      responses:
+        '200':
+          description: ID созданной записи
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 123
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /timesheet/team/{id}:
+    delete:
+      tags:
+        - Timesheet
+      summary: Удалить сотрудника из команды
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID записи команды
+      responses:
+        '200':
+          description: Результат операции
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+        '404':
+          description: Запись не найдена
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /timesheet/contract:
+    post:
+      tags:
+        - Timesheet
+      summary: Добавить контракт к команде
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - contract_id
+                - team_id
+              properties:
+                contract_id:
+                  type: integer
+                  example: 15
+                team_id:
+                  type: integer
+                  example: 123
+      responses:
+        '200':
+          description: ID созданной записи
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 456
+        '404':
+          description: Команда не найдена
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Team not found
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /timesheet/contract/{id}:
+    delete:
+      tags:
+        - Timesheet
+      summary: Удалить контракт из команды
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID записи контракта в табеле
+      responses:
+        '200':
+          description: Результат операции
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+        '404':
+          description: Запись не найдена
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /timesheet/comment:
+    post:
+      tags:
+        - Timesheet
+      summary: Добавить комментарий к контракту
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - timesheet_contract_id
+                - message
+              properties:
+                timesheet_contract_id:
+                  type: integer
+                  example: 456
+                message:
+                  type: string
+                  example: Выполнено 50%
+      responses:
+        '200':
+          description: Созданный комментарий
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        '404':
+          description: Контракт не найден
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /timesheet/comment/{id}:
+    delete:
+      tags:
+        - Timesheet
+      summary: Удалить комментарий
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID комментария
+      responses:
+        '200':
+          description: Результат операции
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+        '404':
+          description: Комментарий не найден
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: Sanctum Token
+      description: 'Используйте токен полученный при авторизации. Формат: Bearer {token}'
+
+  responses:
+    UnauthorizedError:
+      description: Токен не указан или недействителен
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: Unauthenticated.
+
+  schemas:
+    ValidationError:
+      type: object
+      properties:
+        message:
+          type: string
+          example: The given data was invalid.
+        errors:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+
+    Staff:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 42
+        sname:
+          type: string
+          example: Иванов
+        fname:
+          type: string
+          example: Иван
+        mname:
+          type: string
+          example: Иванович
+
+    Contract:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 15
+        object_number:
+          type: string
+          example: ОБ-2025-001
+        title:
+          type: string
+          example: Строительство объекта
+        titul:
+          type: string
+          nullable: true
+          example: Титул 1
+
+    DayData:
+      type: object
+      properties:
+        index:
+          type: integer
+          description: Индекс дня относительно сегодня
+          example: 0
+        weekDay:
+          type: string
+          example: Понедельник
+        humanDate:
+          type: string
+          example: 25 октября 2025 г.
+        day:
+          type: string
+          format: date
+          example: '2025-10-25'
+        isWeekEnd:
+          type: boolean
+          example: false
+        isToday:
+          type: boolean
+          example: true
+        teams:
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/Team'
+
+    Team:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 123
+        master:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: integer
+              example: 42
+            full_name:
+              type: string
+              example: Иванов Иван Иванович
+        contracts:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimesheetContract'
+
+    TimesheetContract:
+      type: object
+      properties:
+        timesheet_contract_id:
+          type: integer
+          example: 456
+        contract_id:
+          type: integer
+          example: 15
+        done:
+          type: boolean
+          nullable: true
+          example: false
+        created_at:
+          type: string
+          format: date-time
+          example: '2025-10-25T10:00:00.000000Z'
+        updated_at:
+          type: string
+          format: date-time
+          example: '2025-10-25T15:30:00.000000Z'
+        object_number:
+          type: string
+          nullable: true
+          example: ОБ-2025-001
+        title:
+          type: string
+          nullable: true
+          example: Строительство объекта
+        titul:
+          type: string
+          nullable: true
+          example: Титул 1
+        chat:
+          type: array
+          items:
+            $ref: '#/components/schemas/Comment'
+
+    Comment:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 789
+        day:
+          type: string
+          nullable: true
+        message:
+          type: string
+          example: Выполнено 50%
+        created_at:
+          type: string
+          example: 25 октября 2025 г. в 15:30
+        updated_at:
+          type: string
+          format: date-time
+        self:
+          type: boolean
+          description: Является ли комментарий от текущего пользователя
+          example: true
+        from:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: integer
+              example: 42
+            full_name:
+              type: string
+              example: Иванов Иван Иванович
+            sname:
+              type: string
+              example: Иванов
+            fname:
+              type: string
+              example: Иван
+            mname:
+              type: string
+              example: Иванович
+
+security:
+  - bearerAuth: []

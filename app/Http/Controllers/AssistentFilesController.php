@@ -1,6 +1,7 @@
 <?php namespace App\Http\Controllers;
 
 use App\Models\AssistentFile;
+use App\Services\VisionAssistantService;
 use Carbon\Carbon;
 use Error;
 use Illuminate\Http\Request;
@@ -38,7 +39,10 @@ class AssistentFilesController extends Controller {
 			'size' 			=> $size,
 			'upload_date'	=> Carbon::now(),
 		]);
-		
+
+		// Очищаем кеш OpenAI, чтобы новый файл автоматически загрузился при следующем запросе
+		VisionAssistantService::clearCache();
+
 		return response()->json(['filename' => $uniqueFileName]);
 	}
 	
@@ -67,7 +71,10 @@ class AssistentFilesController extends Controller {
 				
 				if (!$isDeleted) return response()->json(['is_deleted' => $isDeleted]);
 			}
-			
+
+			// Очищаем кеш OpenAI после удаления файлов
+			VisionAssistantService::clearCache();
+
 		} else {
 			[
 				'filename_sys'	=> $filenameSys,
@@ -81,8 +88,11 @@ class AssistentFilesController extends Controller {
 					$stat = AssistentFile::where('filename_sys', $filenameSys)->delete();
 				}
 			}
+
+			// Очищаем кеш OpenAI после удаления файла
+			VisionAssistantService::clearCache();
 		}
-		
+
 		return response()->json(['is_deleted' => $isDeleted]);
 	}
 	

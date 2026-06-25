@@ -10,15 +10,93 @@ class TimesheetChatResource extends JsonResource {
      * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
      */
     public function toArray($request) {
+        $currentUser = $request->user();
+
+        // Получаем ID пользователя-автора через связь
+        $authorUserId = $this->profile?->registred?->id;
+
+        // Сравниваем ID пользователей
+        $isSelf = $currentUser && $authorUserId ? ($authorUserId === $currentUser->id) : false;
+
+        // Группируем реакции по эмодзи и добавляем информацию о текущем пользователе
+        $groupedReactions = [];
+        $reactions = $this->reactions ?? [];
+        $currentUserId = $currentUser?->id;
+
+        foreach ($reactions as $reaction) {
+            $emoji = $reaction['emoji'];
+            if (!isset($groupedReactions[$emoji])) {
+                $groupedReactions[$emoji] = [
+                    'emoji' => $emoji,
+                    'count' => 0,
+                    'isOwn' => false,
+                ];
+            }
+            $groupedReactions[$emoji]['count']++;
+            if ($currentUserId && $reaction['user_id'] == $currentUserId) {
+                $groupedReactions[$emoji]['isOwn'] = true;
+            }
+        }
+
+        // Обрабатываем media - добавляем отсутствующие поля
+        $mediaWithDefaults = null;
+        if ($this->media) {
+            $mediaWithDefaults = array_map(function($m) {
+                // Если name отсутствует - извлекаем из filename или path
+                if (empty($m['name'])) {
+                    // Проверяем старое поле filename
+                    if (!empty($m['filename'])) {
+                        $m['name'] = $m['filename'];
+                    }
+                    // Извлекаем из path
+                    elseif (!empty($m['path'])) {
+                        $pathWithoutQuery = explode('?', $m['path'])[0];
+                        $fileName = basename($pathWithoutQuery);
+                        $m['name'] = $fileName ?: null;
+                    }
+                }
+
+                // Декодируем URL-encoded имя
+                if (!empty($m['name']) && strpos($m['name'], '%') !== false) {
+                    $m['name'] = urldecode($m['name']);
+                }
+
+                // Если size отсутствует - пытаемся получить из файла
+                if (empty($m['size']) && !empty($m['path'])) {
+                    $storagePath = str_replace('/storage/', '', $m['path']);
+                    $fullPath = storage_path('app/public/' . $storagePath);
+                    if (file_exists($fullPath)) {
+                        $m['size'] = filesize($fullPath);
+                    } else {
+                        \Log::warning('[TimesheetChatResource] File not found', [
+                            'comment_id' => $this->id,
+                            'path' => $fullPath
+                        ]);
+                    }
+                }
+
+                return $m;
+            }, $this->media);
+        }
+
         return [
             'id'        => $this->id,
             'day'       => $this->day,
             'message'   => $this->message,
-            'created_at'=> $this->created_at->translatedFormat('d F Y г. в H:i'),
+            'created_at'=> $this->created_at->toIso8601String(),
             'updated_at'=> $this->updated_at,
-			'self'		=> $this->from_id === auth('site')->user()->staff_id,
+			'self'		=> $isSelf,
+            'reactions' => array_values($groupedReactions),
+            'reply_to_id' => $this->reply_to_id,
+            'media'     => $mediaWithDefaults,
+            'API_VERSION' => 'v2.0', // ВРЕМЕННАЯ МЕТКА
+            // DEBUG info
+            'debug_author_user_id' => $authorUserId,
+            'debug_current_user_id' => $currentUser?->id,
+            'debug_has_user' => $currentUser !== null,
 			'from' 	=> $this->profile ? [
-							'id'		=> $this->from_id,
+							'id'		=> $authorUserId, // user_id вместо staff_id
+							'staff_id'  => $this->from_id, // staff_id для справки
 							'full_name' => $this->profile->full_name,
 							'sname' 	=> $this->profile->sname,
 							'fname' 	=> $this->profile->fname,

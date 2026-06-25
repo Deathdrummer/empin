@@ -57,7 +57,10 @@ class TimesheetChat extends Model {
 	 *
      * @var array
      */
-	protected $casts = [];
+	protected $casts = [
+		'reactions' => 'array',
+		'media' => 'array',
+	];
 	
 	
 	
@@ -68,5 +71,13 @@ class TimesheetChat extends Model {
     	return $this->belongsTo(Staff::class, 'from_id')
 			->select(['id', 'sname', 'fname', 'mname']);
 	}
-	
+
+	public function replyTo():BelongsTo {
+    	return $this->belongsTo(TimesheetChat::class, 'reply_to_id');
+	}
+
+	public function replies() {
+    	return $this->hasMany(TimesheetChat::class, 'reply_to_id');
+	}
+
 }

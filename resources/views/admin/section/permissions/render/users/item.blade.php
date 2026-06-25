@@ -9,7 +9,10 @@
 		</td>
 		<td>
 			<x-select name="group" class="w100" :options="$data['permissions_groups']" value="{{$group}}" />
-		</td> 
+		</td>
+		<td>
+			<x-input name="sort" type="number" class="w100" value="{{$sort}}" placeholder="Сортировка" showrows />
+		</td>
 		<td></td>
 		<td class="center">
 			<x-buttons-group group="small" w="3rem">

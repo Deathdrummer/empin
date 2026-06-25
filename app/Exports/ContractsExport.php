@@ -300,6 +300,10 @@ class ContractsExport extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBinder i
 			'contractor' 		=> ['width' => 20, 'type' => 'text'],
 			'power' 			=> ['width' => 10, 'type' => 'number'],
 			'archive_dir' 		=> ['width' => 30, 'type' => 'text'],
+			'tu' 				=> ['width' => 30, 'type' => 'text'],
+			'inv_num_dmnt_tmg'	=> ['width' => 30, 'type' => 'text'],
+			'fab_num_dmnt_tmg'	=> ['width' => 30, 'type' => 'text'],
+			'fab_num_mont_tmg'	=> ['width' => 30, 'type' => 'text'],
 		];
 		
 		

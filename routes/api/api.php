@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\Controllers\api\AuthController;
+use App\Http\Controllers\api\MessengerApiController;
+use App\Http\Controllers\api\MessengerCallController;
+use App\Http\Controllers\api\TimesheetApiController;
 use App\Http\Controllers\SettingsController;
 use Illuminate\Support\Facades\Route;
 
@@ -22,7 +26,58 @@ use Illuminate\Support\Facades\Route;
 
 
 
-// регистрация, авторизация, выход
+// Авторизация (без защиты)
+Route::controller(AuthController::class)->prefix('auth')->group(function() {
+	Route::post('/login', 'login');
+	Route::post('/logout', 'logout')->middleware('auth:sanctum');
+	Route::get('/me', 'me')->middleware('auth:sanctum');
+});
+
+// Timesheet API (требует авторизацию)
+Route::controller(TimesheetApiController::class)->prefix('timesheet')->middleware('auth:sanctum')->group(function() {
+	Route::post('/slides', 'getSlidesData');
+	Route::post('/slide', 'getSlideData');
+	Route::get('/staff', 'getStaff');
+	Route::get('/all-staff', 'getAllStaff');
+	Route::get('/filter-options', 'getFilterOptions');
+	Route::get('/filter-options/teams/search', 'searchTeams');
+	Route::get('/filter-options/contracts/search', 'searchContracts');
+	Route::get('/filter-options/contracts/search-all', 'searchAllContracts');
+	Route::get('/contracts/search', 'contractsList');
+	Route::post('/team', 'addTeam');
+	Route::delete('/team/{id}', 'removeTeam');
+	Route::post('/contract', 'addContract');
+	Route::delete('/contract/{id}', 'removeContract');
+	Route::post('/comment', 'addComment');
+	Route::post('/comment/reaction', 'toggleReaction');
+	Route::put('/comment/{id}', 'updateComment')->where('id', '[0-9]+');
+	Route::delete('/comment/{id}', 'removeComment')->where('id', '[0-9]+');
+});
+
+// Messenger API (требует авторизацию)
+Route::controller(MessengerApiController::class)->prefix('messenger')->middleware('auth:sanctum')->group(function() {
+	Route::post('/chat', 'getOrCreateChat');
+	Route::post('/chat/messages', 'getMessages');
+	Route::post('/message', 'addMessage');
+	Route::put('/message/{id}', 'updateMessage');
+	Route::delete('/message/{id}', 'removeMessage');
+	Route::post('/message/reaction', 'toggleReaction');
+});
+
+// Messenger Calls API (требует авторизацию)
+Route::prefix('messenger/calls')->middleware('auth:sanctum')->group(function() {
+	Route::post('/push-token', [MessengerCallController::class, 'registerPushToken']);
+	Route::post('/initiate', [MessengerCallController::class, 'initiate']);
+	Route::post('/{id}/accept', [MessengerCallController::class, 'accept']);
+	Route::post('/{id}/reject', [MessengerCallController::class, 'reject']);
+	Route::post('/{id}/cancel', [MessengerCallController::class, 'cancel']);
+	Route::post('/{id}/end', [MessengerCallController::class, 'end']);
+	Route::get('/pending', [MessengerCallController::class, 'pending']);
+	Route::get('/history', [MessengerCallController::class, 'history']);
+	Route::get('/{id}', [MessengerCallController::class, 'show']);
+});
+
+// Settings API
 Route::controller(SettingsController::class)/* ->middleware(['lang', 'auth:admin', 'isajax:admin']) */->group(function() {
 	Route::post('/settings', 'get');
 	Route::put('/settings', 'set');

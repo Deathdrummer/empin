@@ -12797,11 +12797,12 @@ var DdrFiles = /*#__PURE__*/function () {
       var getAddedFiles = this.getAddedFiles;
       var loadFiles = this.loadFiles.bind(this); // bind потому что в функции loadFiles идет обращение к контексту, но он там потерян, так как вызов идет отсюда, то есть уже 3 вложенности функций
 
-      var loadFilesParams = _.omit(params, ['multiple']);
+      var loadFilesParams = _.omit(params, ['multiple', 'accept']);
 
       var input = document.createElement('input');
       input.type = 'file';
       input.multiple = (params === null || params === void 0 ? void 0 : params.multiple) || false;
+      if (params !== null && params !== void 0 && params.accept) input.accept = params.accept;
 
       input.oninput = function (e) {
         var files = getAddedFiles(e);
@@ -12827,12 +12828,13 @@ var DdrFiles = /*#__PURE__*/function () {
 
       var selector = this.selector || forcedSelector;
 
-      var loadFilesParams = _.omit(params, ['multiple']);
+      var loadFilesParams = _.omit(params, ['multiple', 'accept']);
 
       $(selector).on(tapEvent, function () {
         var input = document.createElement('input');
         input.type = 'file';
         input.multiple = (params === null || params === void 0 ? void 0 : params.multiple) || false;
+        if (params !== null && params !== void 0 && params.accept) input.accept = params.accept;
 
         input.oninput = function (e) {
           var files = getAddedFiles(e);
@@ -13193,7 +13195,7 @@ __webpack_require__.r(__webpack_exports__);
 $.ddrChooseFiles = function () {
   var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-  var chooseParams = _.pick(params, ['multiple', 'init', 'preload', 'callback', 'done', 'fail']);
+  var chooseParams = _.pick(params, ['multiple', 'accept', 'init', 'preload', 'callback', 'done', 'fail']);
 
   var files = ref({});
   new _ddrFiles__WEBPACK_IMPORTED_MODULE_0__["default"](true, files).choose(chooseParams);
@@ -13254,7 +13256,7 @@ $.ddrFiles = function () {
       chooseSelector = _$pick2.chooseSelector,
       dropSelector = _$pick2.dropSelector;
 
-  var chooseParams = _.pick(params, ['multiple', 'init', 'preload', 'callback', 'done', 'fail']);
+  var chooseParams = _.pick(params, ['multiple', 'accept', 'init', 'preload', 'callback', 'done', 'fail']);
 
   var dropParams = _.pick(params, ['dragover', 'dragleave', 'drop', 'init', 'preload', 'callback', 'done', 'fail']);
 
@@ -13764,7 +13766,7 @@ var DdrInput = /*#__PURE__*/function () {
       var _item$tagName, _item$type, _item$type$toLowerCas;
 
       var tag = item === null || item === void 0 ? void 0 : (_item$tagName = item.tagName) === null || _item$tagName === void 0 ? void 0 : _item$tagName.toLowerCase(),
-          type = $(item).attr('tagname') !== 'undefined' ? $(item).attr('tagname') : typeof $(item).attr('contenteditable') !== 'undefined' ? 'contenteditable' : item !== null && item !== void 0 && item.type ? item === null || item === void 0 ? void 0 : (_item$type = item.type) === null || _item$type === void 0 ? void 0 : (_item$type$toLowerCas = _item$type.toLowerCase()) === null || _item$type$toLowerCas === void 0 ? void 0 : _item$type$toLowerCas.replace('select-one', 'select') : null,
+          type = typeof $(item).attr('tagname') !== 'undefined' ? $(item).attr('tagname') : typeof $(item).attr('contenteditable') !== 'undefined' ? 'contenteditable' : item !== null && item !== void 0 && item.type ? item === null || item === void 0 ? void 0 : (_item$type = item.type) === null || _item$type === void 0 ? void 0 : (_item$type$toLowerCas = _item$type.toLowerCase()) === null || _item$type$toLowerCas === void 0 ? void 0 : _item$type$toLowerCas.replace('select-one', 'select') : null,
           group = typeof $(item).attr('inpgroup') !== 'undefined' ? $(item).attr('inpgroup') + '-' : '',
           wrapperClass = findWrapByInputType.indexOf(type) !== -1 ? group + type : group + tag,
           wrapperSelector = $(item).closest('.' + wrapperClass).length ? $(item).closest('.' + wrapperClass) : false;
@@ -13950,14 +13952,6 @@ var DdrInput = /*#__PURE__*/function () {
             group = _ref3.group,
             wrapperClass = _ref3.wrapperClass,
             wrapperSelector = _ref3.wrapperSelector;
-        console.log({
-          item: item,
-          tag: tag,
-          type: type,
-          group: group,
-          wrapperClass: wrapperClass,
-          wrapperSelector: wrapperSelector
-        });
 
         if (wrapperSelector) {
           if ($(wrapperSelector).hasClass(wrapperClass + '_disabled') === false) $(wrapperSelector).addClass(wrapperClass + '_disabled');
@@ -21190,7 +21184,9 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
     var calcPrices;
     var calcDates;
     var allPinned;
-    var pinnedInSelected = {}; // Если это оин пункт "копировать"
+    var pinnedInSelected = {}; // можно ли добавлять элементы у этапа
+
+    var canAddItem = $(target.pointer).closest('[ddrtabletd]').attr('canadditem') == 1 ? true : false; // Если это оин пункт "копировать"
 
     if (selectedTextCell || $(target.pointer).closest('[ddrtabletd]').hasClass('selected') || !!$(target.pointer).closest('[ddrtabletd]').find('[edittedplace]').hasClass('select-text')) {
       setStyle({
@@ -21923,8 +21919,8 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
         });
       }
     }, {
-      name: hasCheckbox && canRemoveCheckbox ? 'Удалить чекбокс' : !hasCheckbox && canCreateCheckbox ? 'Добавить чекбокс' : '',
-      visible: isDeptCheckbox && !isArchive && (!hasCheckbox && canCreateCheckbox || hasCheckbox && canRemoveCheckbox) && !selectedTextCell,
+      name: hasCheckbox && (canRemoveCheckbox || canAddItem) ? 'Удалить чекбокс' : !hasCheckbox && (canCreateCheckbox || canAddItem) ? 'Добавить чекбокс' : '',
+      visible: isDeptCheckbox && !isArchive && (!hasCheckbox && (canCreateCheckbox || canAddItem) || hasCheckbox && (canRemoveCheckbox || canAddItem)) && !selectedTextCell,
       sort: 1,
       onClick: function onClick() {
         return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee2() {
@@ -21997,12 +21993,12 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
         }))();
       }
     }, {
-      name: hasSelect && canRemoveSelect ? 'Удалить вып. список' : !hasSelect && canCreateSelect ? 'Добавить вып. список' : '',
-      visible: isDeptSelect && !isArchive && (!hasSelect && canCreateSelect || hasSelect && canRemoveSelect) && !selectedTextCell,
+      name: hasSelect && (canRemoveSelect || canAddItem) ? 'Удалить вып. список' : !hasSelect && (canCreateSelect || canAddItem) ? 'Добавить вып. список' : '',
+      visible: isDeptSelect && !isArchive && (!hasSelect && (canCreateSelect || canAddItem) || hasSelect && (canRemoveSelect || canAddItem)) && !selectedTextCell,
       sort: 1,
       onClick: function onClick() {
         return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee3() {
-          var cell, edited, attrData, _pregSplit5, _pregSplit6, _pregSplit6$, contractId, _pregSplit6$2, departmentId, _pregSplit6$3, stepId, waitCell, _yield$axiosQuery3, list, error, status, headers, randId, listHtml, editedSelect;
+          var cell, edited, attrData, _pregSplit5, _pregSplit6, _pregSplit6$, contractId, _pregSplit6$2, departmentId, _pregSplit6$3, stepId, waitCell, _yield$axiosQuery3, data, error, status, headers, list, randId, listHtml, editedSelect;
 
           return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee3$(_context3) {
             while (1) {
@@ -22026,7 +22022,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
 
                 case 7:
                   _yield$axiosQuery3 = _context3.sent;
-                  list = _yield$axiosQuery3.data;
+                  data = _yield$axiosQuery3.data;
                   error = _yield$axiosQuery3.error;
                   status = _yield$axiosQuery3.status;
                   headers = _yield$axiosQuery3.headers;
@@ -22042,7 +22038,8 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                   return _context3.abrupt("return");
 
                 case 17:
-                  // canCreateCheckbox canRemoveCheckbox
+                  list = data[stepId] || data; // canCreateCheckbox canRemoveCheckbox
+
                   if (list) {
                     if (!hasSelect) {
                       if (edited && canChooseEmployee) {
@@ -22075,7 +22072,7 @@ function contextMenu(haSContextMenu, selectedContracts, removeContractsRows, sen
                     waitCell.destroy();
                   }
 
-                case 18:
+                case 19:
                 case "end":
                   return _context3.stop();
               }
@@ -24338,6 +24335,7 @@ function selectionsList(selection, editSelection, _clearCounts, getList, canEdit
 
                   $.selectionBuildList = function (btn, id) {
                     var canEdit = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+                    var all = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
                     $('[selectionsbtn]').ddrInputs('disable');
                     close();
                     selection.value = id;
@@ -24349,6 +24347,7 @@ function selectionsList(selection, editSelection, _clearCounts, getList, canEdit
 
                     getList({
                       //canEditSelection: canEdit,
+                      all: all,
                       withCounts: true,
                       callback: function callback() {
                         $('#currentSelectionTitle').text(selectionTitle);
