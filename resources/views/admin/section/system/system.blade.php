@@ -1,4 +1,4 @@
-<section>
+﻿<section>
 	<x-settings>
 		<x-card
 			loading="{{__('ui.loading')}}"
@@ -15,6 +15,7 @@
 						<li class="ddrtabsnav__item" ddrtabsitem="systemTab6">ИИ-ассистент</li>
 						<li class="ddrtabsnav__item" ddrtabsitem="systemTab7">Чертежи</li>
 						<li class="ddrtabsnav__item ddrtabsnav__item_active" ddrtabsitem="systemTab8">AutoCAD</li>
+						<li class="ddrtabsnav__item" ddrtabsitem="systemTab9">Мобильное приложение</li>
 					</ul>
 				</div>
 				
@@ -486,6 +487,15 @@
 					</div>
 					
 					
+				<div class="ddrtabscontent__item" ddrtabscontentitem="systemTab9">
+					<p class="color-gray mb1rem">Текст политики конфиденциальности:</p>
+					<x-textarea
+						class="w100"
+						rows="20"
+						group="normal"
+						setting="app_privacy_policy"
+						/>
+				</div>
 				</div>
 			</div>
 		</x-card>
