@@ -43,6 +43,7 @@ return [
     ],
 
     'apns' => [
+        'enabled'          => env('APNS_VOIP_ENABLED', false),
         'team_id'          => env('APNS_TEAM_ID'),
         'key_id'           => env('APNS_KEY_ID'),
         'private_key_path' => env('APNS_PRIVATE_KEY_PATH'),

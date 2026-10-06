@@ -16,6 +16,10 @@ class ApnsVoipService
 
     public function sendIncomingCall(string $deviceToken, array $data): bool
     {
+        if (!config('services.apns.enabled')) {
+            return false;
+        }
+
         $jwt = $this->jwt();
         $bundleId = (string) config('services.apns.bundle_id');
 
@@ -37,7 +41,8 @@ class ApnsVoipService
                     'apns-expiration' => '0',
                 ])
                 ->withOptions(['version' => 2.0])
-                ->timeout(5)
+                ->connectTimeout(1.5)
+                ->timeout(3)
                 ->post($host . '/3/device/' . $deviceToken, [
                     'aps' => ['content-available' => 1],
                 ] + $data);

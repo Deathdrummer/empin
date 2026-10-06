@@ -73,7 +73,7 @@ class PushNotificationService
                     'title' => $callerName,
                     'body' => 'Входящий голосовой звонок',
                     'sound' => 'default',
-                    '_contentAvailable' => true,
+                    'contentAvailable' => true,
                 ];
             }
 
@@ -109,9 +109,7 @@ class PushNotificationService
             ],
             'priority' => 'high',
             'channelId' => 'calls',
-            // iOS использует обычный background push для закрытия CallKit.
-            '_contentAvailable' => true,
-        ]);
+        ], true);
     }
 
     /**
@@ -129,7 +127,11 @@ class PushNotificationService
         ]);
     }
 
-    private function sendToExpoTokens(Staff $staff, array $payload): bool
+    private function sendToExpoTokens(
+        Staff $staff,
+        array $payload,
+        bool $contentAvailableForIos = false
+    ): bool
     {
         $tokens = $this->tokensFor($staff)->where('token_type', 'expo');
         $attempted = false;
@@ -137,7 +139,15 @@ class PushNotificationService
 
         foreach ($tokens as $token) {
             $attempted = true;
-            $delivered = $this->send($token->token, $payload) || $delivered;
+            $tokenPayload = $payload;
+
+            // Старые клиенты без platform и Android получают прежний payload.
+            // Только iOS нужен background push для закрытия CallKit.
+            if ($contentAvailableForIos && $token->platform === 'ios') {
+                $tokenPayload['contentAvailable'] = true;
+            }
+
+            $delivered = $this->send($token->token, $tokenPayload) || $delivered;
         }
 
         return $attempted && $delivered;
@@ -184,7 +194,7 @@ class PushNotificationService
             }
 
             return true;
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error('[Push] Failed to send', ['error' => $e->getMessage()]);
             return false;
         }
