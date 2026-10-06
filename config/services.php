@@ -42,4 +42,12 @@ return [
         'app_certificate' => env('AGORA_APP_CERTIFICATE'),
     ],
 
+    'apns' => [
+        'team_id'          => env('APNS_TEAM_ID'),
+        'key_id'           => env('APNS_KEY_ID'),
+        'private_key_path' => env('APNS_PRIVATE_KEY_PATH'),
+        'bundle_id'        => env('APNS_BUNDLE_ID', 'ru.deathdrumer.empinmobile'),
+        'environment'      => env('APNS_ENVIRONMENT', 'production'),
+    ],
+
 ];

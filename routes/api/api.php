@@ -67,6 +67,9 @@ Route::controller(MessengerApiController::class)->prefix('messenger')->middlewar
 // Messenger Calls API (требует авторизацию)
 Route::prefix('messenger/calls')->middleware('auth:sanctum')->group(function() {
 	Route::post('/push-token', [MessengerCallController::class, 'registerPushToken']);
+	Route::delete('/push-token', [MessengerCallController::class, 'unregisterPushToken']);
+	Route::post('/voip-token', [MessengerCallController::class, 'registerVoipToken']);
+	Route::delete('/voip-token', [MessengerCallController::class, 'unregisterVoipToken']);
 	Route::post('/initiate', [MessengerCallController::class, 'initiate']);
 	Route::post('/{id}/accept', [MessengerCallController::class, 'accept']);
 	Route::post('/{id}/reject', [MessengerCallController::class, 'reject']);

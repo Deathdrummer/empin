@@ -3,39 +3,88 @@
 namespace App\Services;
 
 use App\Models\Staff;
+use App\Models\StaffPushToken;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class PushNotificationService
 {
     private const EXPO_PUSH_URL = 'https://exp.host/--/api/v2/push/send';
+
+    public function __construct(private ApnsVoipService $apnsVoip)
+    {
+    }
 
     /**
      * Отправить push-уведомление о входящем звонке
      */
     public function sendIncomingCallNotification(Staff $callee, Staff $caller, int $callId): bool
     {
-        $token = $callee->expo_push_token ?? null;
+        $callerName = trim("{$caller->sname} {$caller->fname}");
+        $callUuid = Str::uuid()->toString();
+        $tokens = $this->tokensFor($callee);
+        $attempted = false;
+        $delivered = false;
+        $deliveredVoipInstallations = [];
 
-        if (!$token) {
-            Log::warning('[Push] No expo_push_token for callee', ['callee_id' => $callee->id]);
-            return false;
+        foreach ($tokens->where('token_type', 'voip') as $token) {
+            $attempted = true;
+            $voipDelivered = $this->apnsVoip->sendIncomingCall($token->token, [
+                'type' => 'incoming_call',
+                'call_id' => (string) $callId,
+                'call_uuid' => $callUuid,
+                'caller_id' => (string) $caller->id,
+                'caller_name' => $callerName,
+            ]);
+            $delivered = $voipDelivered || $delivered;
+
+            if ($voipDelivered && $token->installation_id) {
+                $deliveredVoipInstallations[] = $token->installation_id;
+            }
         }
 
-        $callerName = trim("{$caller->sname} {$caller->fname}");
+        foreach ($tokens->where('token_type', 'expo') as $token) {
+            $hasVoipForInstallation = $token->platform === 'ios'
+                && $token->installation_id
+                && in_array($token->installation_id, $deliveredVoipInstallations, true);
 
-        // Data-only: без title/body/sound — иначе Android обработает FCM нативно
-        // и JS background task не запустится (displayNotification не вызовется)
-        return $this->send($token, [
-            'data'      => [
-                'type'         => 'incoming_call',
-                'call_id'      => $callId,
-                'caller_id'    => $caller->id,
-                'caller_name'  => $callerName,
-            ],
-            'priority'  => 'high',
-            'channelId' => 'calls',
-        ]);
+            if ($hasVoipForInstallation) {
+                continue;
+            }
+
+            $attempted = true;
+            $data = [
+                'type' => 'incoming_call',
+                'call_id' => $callId,
+                'caller_id' => $caller->id,
+                'caller_name' => $callerName,
+            ];
+
+            $payload = [
+                'data' => $data,
+                'priority' => 'high',
+                'channelId' => 'calls',
+            ];
+
+            // Если на iPhone ещё нет VoIP-токена, хотя бы показываем обычный push.
+            if ($token->platform === 'ios') {
+                $payload += [
+                    'title' => $callerName,
+                    'body' => 'Входящий голосовой звонок',
+                    'sound' => 'default',
+                    '_contentAvailable' => true,
+                ];
+            }
+
+            $delivered = $this->send($token->token, $payload) || $delivered;
+        }
+
+        if (!$attempted) {
+            Log::warning('[Push] No registered token for callee', ['callee_id' => $callee->id]);
+        }
+
+        return $attempted && $delivered;
     }
 
     /**
@@ -43,21 +92,25 @@ class PushNotificationService
      */
     public function sendCallCancelledNotification(Staff $callee, int $callId): bool
     {
-        $token = $callee->expo_push_token ?? null;
+        return $this->sendCallStateNotification($callee, $callId, 'call_cancelled');
+    }
 
-        if (!$token) {
-            return false;
-        }
+    public function sendCallEndedNotification(Staff $recipient, int $callId): bool
+    {
+        return $this->sendCallStateNotification($recipient, $callId, 'call_ended');
+    }
 
-        // Data-only: без title/body — иначе Expo перехватит как notification message
-        // и Firebase onMessage не сработает в foreground
-        return $this->send($token, [
-            'data'      => [
-                'type'    => 'call_cancelled',
+    private function sendCallStateNotification(Staff $recipient, int $callId, string $type): bool
+    {
+        return $this->sendToExpoTokens($recipient, [
+            'data' => [
+                'type' => $type,
                 'call_id' => $callId,
             ],
-            'priority'  => 'high',
+            'priority' => 'high',
             'channelId' => 'calls',
+            // iOS использует обычный background push для закрытия CallKit.
+            '_contentAvailable' => true,
         ]);
     }
 
@@ -66,22 +119,43 @@ class PushNotificationService
      */
     public function sendCallAcceptedNotification(Staff $caller, int $callId): bool
     {
-        $token = $caller->expo_push_token ?? null;
-
-        if (!$token) {
-            return false;
-        }
-
-        return $this->send($token, [
-            'title'     => null,
-            'body'      => null,
-            'data'      => [
-                'type'    => 'call_accepted',
+        return $this->sendToExpoTokens($caller, [
+            'data' => [
+                'type' => 'call_accepted',
                 'call_id' => $callId,
             ],
-            'priority'  => 'high',
+            'priority' => 'high',
             'channelId' => 'calls',
         ]);
+    }
+
+    private function sendToExpoTokens(Staff $staff, array $payload): bool
+    {
+        $tokens = $this->tokensFor($staff)->where('token_type', 'expo');
+        $attempted = false;
+        $delivered = false;
+
+        foreach ($tokens as $token) {
+            $attempted = true;
+            $delivered = $this->send($token->token, $payload) || $delivered;
+        }
+
+        return $attempted && $delivered;
+    }
+
+    private function tokensFor(Staff $staff)
+    {
+        $tokens = $staff->pushTokens()->get();
+
+        if ($staff->expo_push_token && !$tokens->contains('token', $staff->expo_push_token)) {
+            $tokens->push(new StaffPushToken([
+                'token' => $staff->expo_push_token,
+                'platform' => 'unknown',
+                'token_type' => 'expo',
+            ]));
+        }
+
+        return $tokens;
     }
 
     /**
@@ -105,13 +179,13 @@ class PushNotificationService
             // Expo возвращает массив результатов
             $result = $body['data'][0] ?? null;
             if ($result && $result['status'] === 'error') {
-                Log::error('[Push] Expo delivery error', ['result' => $result, 'token' => $token]);
+                Log::error('[Push] Expo delivery error', ['result' => $result]);
                 return false;
             }
 
             return true;
         } catch (\Exception $e) {
-            Log::error('[Push] Failed to send', ['error' => $e->getMessage(), 'token' => $token]);
+            Log::error('[Push] Failed to send', ['error' => $e->getMessage()]);
             return false;
         }
     }

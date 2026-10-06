@@ -9,6 +9,7 @@ use App\Events\CallRejected;
 use App\Http\Controllers\Controller;
 use App\Models\MessengerCall;
 use App\Models\Staff;
+use App\Models\StaffPushToken;
 use App\Services\AgoraService;
 use App\Services\PushNotificationService;
 use Illuminate\Http\JsonResponse;
@@ -32,7 +33,9 @@ class MessengerCallController extends Controller
     public function registerPushToken(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'token' => 'required|string|max:200',
+            'token' => 'required|string|max:255',
+            'platform' => 'nullable|in:android,ios',
+            'installation_id' => 'nullable|string|max:100',
         ]);
 
         $staff = Staff::find($request->user()->staff_id);
@@ -41,7 +44,76 @@ class MessengerCallController extends Controller
             return response()->json(['message' => 'Staff not found'], 404);
         }
 
+        $this->storeDeviceToken(
+            $staff,
+            $validated['token'],
+            $validated['platform'] ?? 'unknown',
+            'expo',
+            $validated['installation_id'] ?? null
+        );
+
+        // Совместимость со старой версией сервиса уведомлений.
         $staff->update(['expo_push_token' => $validated['token']]);
+
+        return response()->json(['success' => true]);
+    }
+
+    public function unregisterPushToken(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'token' => 'required|string|max:255',
+        ]);
+
+        $staff = Staff::find($request->user()->staff_id);
+        if (!$staff) {
+            return response()->json(['message' => 'Staff not found'], 404);
+        }
+
+        StaffPushToken::where('staff_id', $staff->id)
+            ->where('token_type', 'expo')
+            ->where('token', $validated['token'])
+            ->delete();
+
+        if ($staff->expo_push_token === $validated['token']) {
+            $staff->update(['expo_push_token' => null]);
+        }
+
+        return response()->json(['success' => true]);
+    }
+
+    public function registerVoipToken(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'token' => ['required', 'string', 'max:255', 'regex:/^[a-fA-F0-9]+$/'],
+            'installation_id' => 'nullable|string|max:100',
+        ]);
+
+        $staff = Staff::find($request->user()->staff_id);
+        if (!$staff) {
+            return response()->json(['message' => 'Staff not found'], 404);
+        }
+
+        $this->storeDeviceToken(
+            $staff,
+            strtolower($validated['token']),
+            'ios',
+            'voip',
+            $validated['installation_id'] ?? null
+        );
+
+        return response()->json(['success' => true]);
+    }
+
+    public function unregisterVoipToken(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'token' => ['required', 'string', 'max:255', 'regex:/^[a-fA-F0-9]+$/'],
+        ]);
+
+        StaffPushToken::where('staff_id', $request->user()->staff_id)
+            ->where('token_type', 'voip')
+            ->where('token', strtolower($validated['token']))
+            ->delete();
 
         return response()->json(['success' => true]);
     }
@@ -134,6 +206,8 @@ class MessengerCallController extends Controller
 
         // WebSocket: уведомляем caller что звонок принят
         broadcast(new CallAccepted($call->id, $call->caller_id));
+        $call->loadMissing('caller');
+        $this->pushService->sendCallAcceptedNotification($call->caller, $call->id);
 
         return response()->json([
             'call'         => $call,
@@ -166,6 +240,8 @@ class MessengerCallController extends Controller
 
         // WebSocket: уведомляем caller что звонок отклонён
         broadcast(new CallRejected($call->id, $call->caller_id));
+        $call->loadMissing('caller');
+        $this->pushService->sendCallCancelledNotification($call->caller, $call->id);
 
         return response()->json(['success' => true]);
     }
@@ -196,6 +272,8 @@ class MessengerCallController extends Controller
 
         // WebSocket: уведомляем callee что звонок отменён
         broadcast(new CallCancelled($call->id, $call->callee_id));
+        $call->loadMissing('callee');
+        $this->pushService->sendCallCancelledNotification($call->callee, $call->id);
 
         return response()->json(['success' => true]);
     }
@@ -248,6 +326,7 @@ class MessengerCallController extends Controller
         $call->load(['caller', 'callee']);
         $otherParty = ($userId === $call->caller_id) ? $call->callee : $call->caller;
         broadcast(new CallEnded($call->id, $otherParty->id));
+        $this->pushService->sendCallEndedNotification($otherParty, $call->id);
 
         return response()->json(['call' => $call]);
     }
@@ -355,5 +434,35 @@ class MessengerCallController extends Controller
         }
 
         return response()->json(['call' => $call]);
+    }
+
+    private function storeDeviceToken(
+        Staff $staff,
+        string $token,
+        string $platform,
+        string $tokenType,
+        ?string $installationId
+    ): void {
+        $record = $installationId
+            ? StaffPushToken::firstOrNew([
+                'staff_id' => $staff->id,
+                'installation_id' => $installationId,
+                'token_type' => $tokenType,
+            ])
+            : StaffPushToken::firstOrNew(['token' => $token]);
+
+        $tokenConflict = StaffPushToken::where('token', $token)
+            ->when($record->exists, fn ($query) => $query->where('id', '!=', $record->id))
+            ->first();
+        $tokenConflict?->delete();
+
+        $record->fill([
+            'staff_id' => $staff->id,
+            'installation_id' => $installationId,
+            'token' => $token,
+            'platform' => $platform,
+            'token_type' => $tokenType,
+        ]);
+        $record->save();
     }
 }

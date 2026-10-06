@@ -3,6 +3,8 @@
 /public/storage
 /storage/app/public
 /storage/*.key
+*.p8
+*.p12
 /vendor
 .env
 .env.backup

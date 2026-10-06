@@ -5,6 +5,7 @@ use App\Models\Traits\Dateable;
 use App\Models\Traits\Filterable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 
@@ -72,6 +73,11 @@ class Staff extends Model {
 	
 	public function registred() {
 		return $this->hasOne(User::class, 'staff_id', 'id');
+	}
+
+
+	public function pushTokens(): HasMany {
+		return $this->hasMany(StaffPushToken::class);
 	}
 	
 	
