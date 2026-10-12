@@ -75,8 +75,24 @@ class RouteServiceProvider extends ServiceProvider {
 	 * @return void
 	 */
 	protected function configureRateLimiting() {
+	    // Счётчик у каждого пользователя свой. Без by() ключ лимита общий (md5('api')),
+	    // и 30 запросов в минуту делили между собой все пользователи мобильного приложения.
+	    // Лимит входа задан здесь же, а не в маршрутах, чтобы не зависеть от route:cache.
 	    RateLimiter::for('api', function (Request $request) {
-	        return Limit::perMinutes(1, 30); // задавать значения в обратном порядке, нежели в миддлварах
+	        if ($request->is('api/auth/login')) {
+	            // Подбор пароля: 10 попыток в минуту на адрес с одного IP, 60 с одного IP всего
+	            $email = $request->input('email');
+	            $email = is_string($email) ? mb_strtolower(trim($email)) : '';
+
+	            return [
+	                Limit::perMinute(10)->by('login:' . $email . '|' . $request->ip()),
+	                Limit::perMinute(60)->by('login-ip:' . $request->ip()),
+	            ];
+	        }
+
+	        $userId = $request->user('sanctum')?->getAuthIdentifier();
+
+	        return Limit::perMinute(300)->by($userId ? 'user:' . $userId : 'ip:' . $request->ip());
 	    });
 		
 		/* RateLimiter::for('global', function (Request $request) {
