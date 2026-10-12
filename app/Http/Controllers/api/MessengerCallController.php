@@ -142,17 +142,28 @@ class MessengerCallController extends Controller
             return response()->json(['message' => 'Cannot call yourself'], 422);
         }
 
-        // Генерация имени канала Agora
-        $channelName = AgoraService::generateChannelName();
+        // Повторный вызов того же собеседника, пока первый ещё звонит (двойное нажатие, повтор после
+        // ошибки сети): отдаём тот же звонок. Иначе собеседнику придут два входящих подряд.
+        $call = MessengerCall::where('caller_id', $callerId)
+            ->where('callee_id', $calleeId)
+            ->whereIn('status', ['initiated', 'ringing'])
+            ->where('created_at', '>=', now()->subSeconds(30))
+            ->latest('id')
+            ->first();
+        $isNewCall = !$call;
 
-        // Создание записи звонка
-        $call = MessengerCall::create([
-            'caller_id' => $callerId,
-            'callee_id' => $calleeId,
-            'call_type' => 'audio',
-            'status' => 'initiated',
-            'session_id' => $channelName,
-        ]);
+        if ($isNewCall) {
+            // Создание записи звонка с новым каналом Agora
+            $call = MessengerCall::create([
+                'caller_id' => $callerId,
+                'callee_id' => $calleeId,
+                'call_type' => 'audio',
+                'status' => 'initiated',
+                'session_id' => AgoraService::generateChannelName(),
+            ]);
+        }
+
+        $channelName = $call->session_id;
 
         // Загрузка данных callee и caller
         $call->load(['callee', 'caller']);
@@ -160,12 +171,14 @@ class MessengerCallController extends Controller
         // Генерация Agora токена для caller
         $token = $this->agora->generateToken($channelName, $callerId);
 
-        // Отправка push-уведомления callee
-        $this->pushService->sendIncomingCallNotification(
-            $call->callee,
-            $call->caller,
-            $call->id
-        );
+        // Отправка push-уведомления callee (для повторного вызова он уже отправлен)
+        if ($isNewCall) {
+            $this->pushService->sendIncomingCallNotification(
+                $call->callee,
+                $call->caller,
+                $call->id
+            );
+        }
 
         return response()->json([
             'call_id'      => $call->id,

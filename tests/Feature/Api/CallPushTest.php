@@ -228,6 +228,36 @@ class CallPushTest extends TestCase
         Http::assertNothingSent();
     }
 
+    public function test_repeated_initiate_returns_same_ringing_call_without_second_push(): void
+    {
+        $this->storeToken($this->callee, 'ExponentPushToken[android]', 'android', 'expo', 'android');
+        Http::fake(['exp.host/*' => Http::response(['data' => [['status' => 'ok', 'id' => 'ticket']]])]);
+        $this->actingAsStaff($this->caller);
+
+        $first = $this->postJson('/api/messenger/calls/initiate', ['callee_id' => $this->callee->id])->assertOk();
+        $second = $this->postJson('/api/messenger/calls/initiate', ['callee_id' => $this->callee->id])->assertOk();
+
+        $this->assertSame($first->json('call_id'), $second->json('call_id'));
+        $this->assertSame($first->json('channel_name'), $second->json('channel_name'));
+        $this->assertSame(1, MessengerCall::where('caller_id', $this->caller->id)->count());
+        Http::assertSentCount(1);
+    }
+
+    public function test_initiate_creates_new_call_after_previous_one_finished_or_expired(): void
+    {
+        Http::fake();
+        $this->actingAsStaff($this->caller);
+        $cancelled = $this->createCall('cancelled', ['ended_at' => now()]);
+        $stale = $this->createCall('initiated');
+        $stale->forceFill(['created_at' => now()->subSeconds(31)])->save();
+
+        $callId = $this->postJson('/api/messenger/calls/initiate', ['callee_id' => $this->callee->id])
+            ->assertOk()
+            ->json('call_id');
+
+        $this->assertNotContains($callId, [$cancelled->id, $stale->id]);
+    }
+
     private function createStaff(string $name): Staff
     {
         return Staff::find(DB::table('staff')->insertGetId(['fname' => $name, 'sname' => 'Тестов']));
