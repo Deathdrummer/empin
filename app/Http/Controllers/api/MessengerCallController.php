@@ -233,6 +233,11 @@ class MessengerCallController extends Controller
             return response()->json(['message' => 'Forbidden'], 403);
         }
 
+        // Звонок уже завершён (например, звонящий успел отменить) — статус и уведомления не трогаем
+        if ($call->isFinished()) {
+            return response()->json(['success' => true]);
+        }
+
         $call->update([
             'status' => 'rejected',
             'ended_at' => now(),
@@ -265,6 +270,10 @@ class MessengerCallController extends Controller
             return response()->json(['message' => 'Forbidden'], 403);
         }
 
+        if ($call->isFinished()) {
+            return response()->json(['success' => true]);
+        }
+
         $call->update([
             'status' => 'cancelled',
             'ended_at' => now(),
@@ -295,10 +304,16 @@ class MessengerCallController extends Controller
             return response()->json(['message' => 'Forbidden'], 403);
         }
 
+        // Второй участник тоже вызывает end, получив CallEnded: повтор не должен перезаписывать
+        // статус и время завершения и снова слать уведомления
+        if ($call->isFinished()) {
+            return response()->json(['call' => $call]);
+        }
+
         // Определение финального статуса
         $status = 'completed';
 
-        if ($call->status === 'initiated') {
+        if (in_array($call->status, ['initiated', 'ringing'], true)) {
             // Если звонок не был принят
             if ($userId === $call->caller_id) {
                 $status = 'cancelled';
@@ -455,6 +470,12 @@ class MessengerCallController extends Controller
             ->when($record->exists, fn ($query) => $query->where('id', '!=', $record->id))
             ->first();
         $tokenConflict?->delete();
+
+        // Устройство перешло к другому сотруднику: старое поле прежнего владельца
+        // тоже должно отпустить токен, иначе его звонки придут на это устройство
+        Staff::where('expo_push_token', $token)
+            ->where('id', '!=', $staff->id)
+            ->update(['expo_push_token' => null]);
 
         $record->fill([
             'staff_id' => $staff->id,

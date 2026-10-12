@@ -8,16 +8,27 @@ use RuntimeException;
 
 class ApnsVoipService
 {
+    public const DELIVERED = 'delivered';
+    public const FAILED = 'failed';
+    public const INVALID_TOKEN = 'invalid_token';
+
     private const TOKEN_TTL_SECONDS = 3000;
+
+    // Кроме этого ответа токен окончательно недействителен при статусе 410 (Unregistered, ExpiredToken).
+    // DeviceTokenNotForTopic сюда не входит: он означает ошибку настройки сервера, а не токена.
+    private const INVALID_TOKEN_REASONS = ['BadDeviceToken'];
 
     private static ?string $cachedJwt = null;
     private static int $cachedAt = 0;
     private static ?string $cachedFingerprint = null;
 
-    public function sendIncomingCall(string $deviceToken, array $data): bool
+    /**
+     * @return string self::DELIVERED | self::FAILED | self::INVALID_TOKEN
+     */
+    public function sendIncomingCall(string $deviceToken, array $data): string
     {
         if (!config('services.apns.enabled')) {
-            return false;
+            return self::FAILED;
         }
 
         $jwt = $this->jwt();
@@ -25,7 +36,7 @@ class ApnsVoipService
 
         if (!$jwt || !$bundleId) {
             Log::warning('[APNs VoIP] Credentials are not configured');
-            return false;
+            return self::FAILED;
         }
 
         $host = config('services.apns.environment') === 'sandbox'
@@ -48,17 +59,21 @@ class ApnsVoipService
                 ] + $data);
 
             if ($response->status() !== 200) {
+                $reason = $response->json('reason');
                 Log::error('[APNs VoIP] Delivery failed', [
                     'status' => $response->status(),
-                    'reason' => $response->json('reason'),
+                    'reason' => $reason,
                 ]);
-                return false;
+
+                return $response->status() === 410 || in_array($reason, self::INVALID_TOKEN_REASONS, true)
+                    ? self::INVALID_TOKEN
+                    : self::FAILED;
             }
 
-            return true;
+            return self::DELIVERED;
         } catch (\Throwable $error) {
             Log::error('[APNs VoIP] Request failed', ['error' => $error->getMessage()]);
-            return false;
+            return self::FAILED;
         }
     }
 

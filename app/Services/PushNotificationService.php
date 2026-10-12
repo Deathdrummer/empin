@@ -30,13 +30,19 @@ class PushNotificationService
 
         foreach ($tokens->where('token_type', 'voip') as $token) {
             $attempted = true;
-            $voipDelivered = $this->apnsVoip->sendIncomingCall($token->token, [
+            $voipResult = $this->apnsVoip->sendIncomingCall($token->token, [
                 'type' => 'incoming_call',
                 'call_id' => (string) $callId,
                 'call_uuid' => $callUuid,
                 'caller_id' => (string) $caller->id,
                 'caller_name' => $callerName,
             ]);
+
+            if ($voipResult === ApnsVoipService::INVALID_TOKEN) {
+                $this->forgetToken($token->token);
+            }
+
+            $voipDelivered = $voipResult === ApnsVoipService::DELIVERED;
             $delivered = $voipDelivered || $delivered;
 
             if ($voipDelivered && $token->installation_id) {
@@ -142,9 +148,11 @@ class PushNotificationService
             $tokenPayload = $payload;
 
             // Старые клиенты без platform и Android получают прежний payload.
-            // Только iOS нужен background push для закрытия CallKit.
+            // Только iOS нужен background push для закрытия CallKit; Apple требует для него приоритет 5
+            // (Expo: normal), с приоритетом 10 фоновый push считается ошибкой.
             if ($contentAvailableForIos && $token->platform === 'ios') {
                 $tokenPayload['contentAvailable'] = true;
+                $tokenPayload['priority'] = 'normal';
             }
 
             $delivered = $this->send($token->token, $tokenPayload) || $delivered;
@@ -169,6 +177,17 @@ class PushNotificationService
     }
 
     /**
+     * Убрать недействительный токен, в том числе из старого поля staff.expo_push_token
+     */
+    private function forgetToken(string $token): void
+    {
+        StaffPushToken::where('token', $token)->delete();
+        Staff::where('expo_push_token', $token)->update(['expo_push_token' => null]);
+
+        Log::info('[Push] Inactive device token removed');
+    }
+
+    /**
      * Базовый метод отправки через Expo Push API
      */
     private function send(string $token, array $payload): bool
@@ -190,6 +209,12 @@ class PushNotificationService
             $result = $body['data'][0] ?? null;
             if ($result && $result['status'] === 'error') {
                 Log::error('[Push] Expo delivery error', ['result' => $result]);
+
+                // Приложение удалено или push для него отключён — токен больше не сработает
+                if (($result['details']['error'] ?? null) === 'DeviceNotRegistered') {
+                    $this->forgetToken($token);
+                }
+
                 return false;
             }
 

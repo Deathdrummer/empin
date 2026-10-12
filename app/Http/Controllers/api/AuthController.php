@@ -1,6 +1,8 @@
 <?php namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Staff;
+use App\Models\StaffPushToken;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -35,6 +37,13 @@ class AuthController extends Controller {
 
         // Удаляем старые токены
         $user->tokens()->delete();
+
+        // Прежние устройства теперь получат 401 и уже не смогут сами снять свои push-токены,
+        // а звонки продолжали бы приходить на них. Новое устройство зарегистрирует токены после входа.
+        if ($user->staff_id) {
+            StaffPushToken::where('staff_id', $user->staff_id)->delete();
+            Staff::whereKey($user->staff_id)->update(['expo_push_token' => null]);
+        }
 
         // Создаем новый токен
         $token = $user->createToken('mobile-app')->plainTextToken;

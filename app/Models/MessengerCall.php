@@ -30,6 +30,16 @@ class MessengerCall extends Model
     ];
 
     /**
+     * Конечные статусы: повторные reject/cancel/end такой звонок уже не меняют
+     */
+    public const FINISHED_STATUSES = ['completed', 'rejected', 'missed', 'cancelled'];
+
+    public function isFinished(): bool
+    {
+        return in_array($this->status, self::FINISHED_STATUSES, true);
+    }
+
+    /**
      * Звонящий пользователь
      */
     public function caller(): BelongsTo
