@@ -34,12 +34,12 @@ class AgoraService
      *
      * @param string $channelName  Имя канала
      * @param int    $uid          Числовой ID (staff_id)
-     * @param int    $expireSeconds Срок жизни токена
+     * @param int    $expireSeconds Срок жизни токена (24 часа — максимум Agora: при часовом токене разговор длиннее часа обрывался)
      */
     public function generateToken(
         string $channelName,
         int    $uid,
-        int    $expireSeconds = 3600
+        int    $expireSeconds = 86400
     ): string {
         return \RtcTokenBuilder2::buildTokenWithUid(
             $this->appId,
