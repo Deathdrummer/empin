@@ -541,7 +541,11 @@ class MessengerApiController extends Controller {
         }
 
         $peerId = $chat->otherParticipantId((int) $request->user()->staff_id);
-        $payload = ['chat_id' => $chat->id, 'message' => array_merge($resource->resolve($request), ['self' => false])];
+        // «Своё» — с точки зрения получателя: реакцию ставят и на его собственные сообщения
+        $payload = [
+            'chat_id' => $chat->id,
+            'message' => array_merge($resource->resolve($request), ['self' => (int) $message->from_id === $peerId]),
+        ];
         app()->terminating(fn () => $this->broadcastTo($peerId, $event, $payload));
     }
 

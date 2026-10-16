@@ -201,6 +201,21 @@ class MessengerTest extends TestCase
         $this->assertSame($id, $chat->fresh()->lastReadIdFor($this->me->id));
     }
 
+    public function test_reaction_event_marks_message_as_own_for_its_author(): void
+    {
+        $chat = MessengerChat::getOrCreate($this->me->id, $this->peer->id);
+        $peerMessage = $this->message($chat, $this->peer, 'Скинь фото щита');
+        $this->actingAsStaff($this->me);
+
+        // Реакция на сообщение собеседника: у него в чате это его собственное сообщение
+        $this->postJson('/api/messenger/message/reaction', ['message_id' => $peerMessage->id, 'emoji' => '👍'])->assertOk();
+
+        Event::assertDispatched(MessengerEvent::class, fn (MessengerEvent $event) => $event->recipientStaffId === $this->peer->id
+            && $event->eventName === 'message.updated'
+            && $event->payload['message']['id'] === $peerMessage->id
+            && $event->payload['message']['self'] === true);
+    }
+
     public function test_typing_notifies_only_the_peer(): void
     {
         $chat = MessengerChat::getOrCreate($this->me->id, $this->peer->id);
