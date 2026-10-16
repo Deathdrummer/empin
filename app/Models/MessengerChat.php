@@ -95,4 +95,59 @@ class MessengerChat extends Model {
 		]);
 	}
 
+
+
+	/**
+	 * Чаты, в которых участвует сотрудник
+	 */
+	public function scopeForStaff($query, int $staffId) {
+		return $query->where(function ($q) use ($staffId) {
+			$q->where('participant_1_id', $staffId)->orWhere('participant_2_id', $staffId);
+		});
+	}
+
+	public function isParticipant(?int $staffId): bool {
+		return $staffId !== null
+			&& ((int) $this->participant_1_id === $staffId || (int) $this->participant_2_id === $staffId);
+	}
+
+	public function otherParticipantId(int $staffId): int {
+		return (int) $this->participant_1_id === $staffId
+			? (int) $this->participant_2_id
+			: (int) $this->participant_1_id;
+	}
+
+	/**
+	 * Последнее прочитанное сотрудником сообщение (null — ничего не прочитано)
+	 */
+	public function lastReadIdFor(int $staffId): ?int {
+		$value = (int) $this->participant_1_id === $staffId
+			? $this->participant_1_last_read_id
+			: $this->participant_2_last_read_id;
+
+		return $value !== null ? (int) $value : null;
+	}
+
+	/**
+	 * Сдвинуть границу прочитанного вперёд (назад она не двигается).
+	 * Возвращает true, если граница изменилась.
+	 */
+	public function markReadBy(int $staffId, int $messageId): bool {
+		$column = (int) $this->participant_1_id === $staffId
+			? 'participant_1_last_read_id'
+			: 'participant_2_last_read_id';
+
+		$updated = static::whereKey($this->id)
+			->where(function ($q) use ($column, $messageId) {
+				$q->whereNull($column)->orWhere($column, '<', $messageId);
+			})
+			->update([$column => $messageId]);
+
+		if ($updated) {
+			$this->{$column} = $messageId;
+		}
+
+		return $updated > 0;
+	}
+
 }

@@ -56,6 +56,9 @@ Route::controller(TimesheetApiController::class)->prefix('timesheet')->middlewar
 
 // Messenger API (требует авторизацию)
 Route::controller(MessengerApiController::class)->prefix('messenger')->middleware('auth:sanctum')->group(function() {
+	Route::get('/chats', 'getChats');
+	Route::post('/chat/read', 'markRead');
+	Route::post('/chat/typing', 'typing');
 	Route::post('/chat', 'getOrCreateChat');
 	Route::post('/chat/messages', 'getMessages');
 	Route::post('/message', 'addMessage');
