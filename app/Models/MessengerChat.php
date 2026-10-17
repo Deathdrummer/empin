@@ -6,9 +6,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\QueryException;
 
 class MessengerChat extends Model {
     use HasFactory, Filterable, Collectionable;
+
+	public const TYPE_DIRECT = 'direct';
+	public const TYPE_GROUP = 'group';
+	// Чат объекта: комментарии табеля к договору за все дни
+	public const TYPE_OBJECT = 'object';
 
 
 
@@ -58,7 +64,10 @@ class MessengerChat extends Model {
 	 *
      * @var array
      */
-	protected $casts = [];
+	protected $casts = [
+		'contract_id' => 'integer',
+		'created_by' => 'integer',
+	];
 
 
 
@@ -69,6 +78,10 @@ class MessengerChat extends Model {
     	return $this->hasMany(MessengerMessage::class, 'chat_id');
 	}
 
+	public function members(): HasMany {
+		return $this->hasMany(MessengerChatMember::class, 'chat_id');
+	}
+
 	public function participant1(): BelongsTo {
     	return $this->belongsTo(Staff::class, 'participant_1_id');
 	}
@@ -77,8 +90,24 @@ class MessengerChat extends Model {
     	return $this->belongsTo(Staff::class, 'participant_2_id');
 	}
 
+	public function contract(): BelongsTo {
+		return $this->belongsTo(Contract::class, 'contract_id')->select(['id', 'object_number', 'title']);
+	}
+
+	public function isDirect(): bool {
+		return ($this->type ?? self::TYPE_DIRECT) === self::TYPE_DIRECT;
+	}
+
+	public function isGroup(): bool {
+		return $this->type === self::TYPE_GROUP;
+	}
+
+	public function isObject(): bool {
+		return $this->type === self::TYPE_OBJECT;
+	}
+
 	/**
-	 * Получить или создать чат между двумя пользователями
+	 * Получить или создать личный чат между двумя сотрудниками
 	 *
 	 * @param int $userId1
 	 * @param int $userId2
@@ -89,26 +118,62 @@ class MessengerChat extends Model {
 		$participant1Id = min($userId1, $userId2);
 		$participant2Id = max($userId1, $userId2);
 
-		return static::firstOrCreate([
+		$chat = static::firstOrCreate([
 			'participant_1_id' => $participant1Id,
 			'participant_2_id' => $participant2Id,
+		], [
+			'type' => self::TYPE_DIRECT,
 		]);
+
+		$chat->ensureMember($participant1Id);
+		$chat->ensureMember($participant2Id);
+
+		return $chat;
 	}
 
+	/**
+	 * Чат объекта (договора): создаётся при первом обращении
+	 */
+	public static function forObject(int $contractId): MessengerChat {
+		$attributes = ['type' => self::TYPE_OBJECT, 'contract_id' => $contractId];
 
+		try {
+			return static::firstOrCreate(['contract_id' => $contractId], $attributes);
+		} catch (QueryException $error) {
+			// Два запроса одновременно создали чат одного объекта — берём созданный
+			return static::where('contract_id', $contractId)->firstOrFail();
+		}
+	}
 
 	/**
-	 * Чаты, в которых участвует сотрудник
+	 * Чаты, в которых сотрудник участвует (или которые отслеживает — для объектов)
 	 */
 	public function scopeForStaff($query, int $staffId) {
-		return $query->where(function ($q) use ($staffId) {
-			$q->where('participant_1_id', $staffId)->orWhere('participant_2_id', $staffId);
-		});
+		return $query->whereIn('messenger_chats.id', MessengerChatMember::where('staff_id', $staffId)->select('chat_id'));
+	}
+
+	/**
+	 * Может ли сотрудник читать и писать в чат.
+	 * Личный — двое собеседников, группа — её участники, чат объекта — любой сотрудник (как комментарии в табеле).
+	 */
+	public function canAccess(?int $staffId): bool {
+		if ($staffId === null) {
+			return false;
+		}
+
+		if ($this->isObject()) {
+			return true;
+		}
+
+		if ($this->isDirect()) {
+			return (int) $this->participant_1_id === $staffId || (int) $this->participant_2_id === $staffId;
+		}
+
+		return $this->member($staffId) !== null;
 	}
 
 	public function isParticipant(?int $staffId): bool {
-		return $staffId !== null
-			&& ((int) $this->participant_1_id === $staffId || (int) $this->participant_2_id === $staffId);
+		return $this->canAccess($staffId);
 	}
 
 	public function otherParticipantId(int $staffId): int {
@@ -117,15 +182,35 @@ class MessengerChat extends Model {
 			: (int) $this->participant_1_id;
 	}
 
+	public function member(int $staffId): ?MessengerChatMember {
+		return MessengerChatMember::where('chat_id', $this->id)->where('staff_id', $staffId)->first();
+	}
+
+	/**
+	 * Участник (для объекта — отслеживающий). Новый отслеживающий объект не получает
+	 * старые комментарии непрочитанными: граница прочитанного — $lastReadId.
+	 */
+	public function ensureMember(int $staffId, ?int $lastReadId = null, string $role = MessengerChatMember::ROLE_MEMBER): MessengerChatMember {
+		return MessengerChatMember::firstOrCreate(
+			['chat_id' => $this->id, 'staff_id' => $staffId],
+			['last_read_id' => $lastReadId, 'role' => $role]
+		);
+	}
+
+	/**
+	 * Сотрудники чата, которым уходят события реального времени и push
+	 *
+	 * @return int[]
+	 */
+	public function memberIds(): array {
+		return MessengerChatMember::where('chat_id', $this->id)->pluck('staff_id')->map(fn ($id) => (int) $id)->all();
+	}
+
 	/**
 	 * Последнее прочитанное сотрудником сообщение (null — ничего не прочитано)
 	 */
 	public function lastReadIdFor(int $staffId): ?int {
-		$value = (int) $this->participant_1_id === $staffId
-			? $this->participant_1_last_read_id
-			: $this->participant_2_last_read_id;
-
-		return $value !== null ? (int) $value : null;
+		return $this->member($staffId)?->last_read_id;
 	}
 
 	/**
@@ -133,21 +218,14 @@ class MessengerChat extends Model {
 	 * Возвращает true, если граница изменилась.
 	 */
 	public function markReadBy(int $staffId, int $messageId): bool {
-		$column = (int) $this->participant_1_id === $staffId
-			? 'participant_1_last_read_id'
-			: 'participant_2_last_read_id';
+		$this->ensureMember($staffId);
 
-		$updated = static::whereKey($this->id)
-			->where(function ($q) use ($column, $messageId) {
-				$q->whereNull($column)->orWhere($column, '<', $messageId);
+		return MessengerChatMember::where('chat_id', $this->id)
+			->where('staff_id', $staffId)
+			->where(function ($q) use ($messageId) {
+				$q->whereNull('last_read_id')->orWhere('last_read_id', '<', $messageId);
 			})
-			->update([$column => $messageId]);
-
-		if ($updated) {
-			$this->{$column} = $messageId;
-		}
-
-		return $updated > 0;
+			->update(['last_read_id' => $messageId]) > 0;
 	}
 
 }

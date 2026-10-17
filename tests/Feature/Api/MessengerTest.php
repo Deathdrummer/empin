@@ -124,7 +124,7 @@ class MessengerTest extends TestCase
             ->assertOk()
             ->assertJsonPath('last_read_id', $second->id)
             ->assertJsonPath('total_unread', 0);
-        Event::assertDispatched(MessengerEvent::class, fn (MessengerEvent $event) => $event->recipientStaffId === $this->peer->id
+        Event::assertDispatched(MessengerEvent::class, fn (MessengerEvent $event) => $event->recipientStaffIds === [$this->peer->id]
             && $event->eventName === 'chat.read'
             && $event->payload['last_read_id'] === $second->id);
 
@@ -183,7 +183,7 @@ class MessengerTest extends TestCase
             ->assertJsonPath('self', true)
             ->json('id');
 
-        Event::assertDispatched(MessengerEvent::class, fn (MessengerEvent $event) => $event->recipientStaffId === $this->peer->id
+        Event::assertDispatched(MessengerEvent::class, fn (MessengerEvent $event) => $event->recipientStaffIds === [$this->peer->id]
             && $event->eventName === 'message.created'
             && $event->payload['message']['id'] === $id
             && $event->payload['message']['self'] === false
@@ -210,7 +210,7 @@ class MessengerTest extends TestCase
         // Реакция на сообщение собеседника: у него в чате это его собственное сообщение
         $this->postJson('/api/messenger/message/reaction', ['message_id' => $peerMessage->id, 'emoji' => '👍'])->assertOk();
 
-        Event::assertDispatched(MessengerEvent::class, fn (MessengerEvent $event) => $event->recipientStaffId === $this->peer->id
+        Event::assertDispatched(MessengerEvent::class, fn (MessengerEvent $event) => $event->recipientStaffIds === [$this->peer->id]
             && $event->eventName === 'message.updated'
             && $event->payload['message']['id'] === $peerMessage->id
             && $event->payload['message']['self'] === true);
@@ -223,9 +223,9 @@ class MessengerTest extends TestCase
 
         $this->postJson('/api/messenger/chat/typing', ['chat_id' => $chat->id])->assertOk();
 
-        Event::assertDispatched(MessengerEvent::class, fn (MessengerEvent $event) => $event->recipientStaffId === $this->peer->id
+        Event::assertDispatched(MessengerEvent::class, fn (MessengerEvent $event) => $event->recipientStaffIds === [$this->peer->id]
             && $event->eventName === 'chat.typing'
-            && $event->payload === ['chat_id' => $chat->id, 'staff_id' => $this->me->id]);
+            && $event->payload === ['chat_id' => $chat->id, 'staff_id' => $this->me->id, 'name' => 'Сотрудник Я.']);
     }
 
     public function test_too_long_message_event_carries_only_its_id(): void

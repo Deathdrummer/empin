@@ -60,6 +60,7 @@ class TimesheetChat extends Model {
 	protected $casts = [
 		'reactions' => 'array',
 		'media' => 'array',
+		'pinned_at' => 'datetime',
 	];
 	
 	
@@ -70,6 +71,10 @@ class TimesheetChat extends Model {
 	public function profile():BelongsTo {
     	return $this->belongsTo(Staff::class, 'from_id')
 			->select(['id', 'sname', 'fname', 'mname']);
+	}
+
+	public function timesheetContract():BelongsTo {
+    	return $this->belongsTo(TimesheetContract::class, 'timesheet_contract_id');
 	}
 
 	public function replyTo():BelongsTo {

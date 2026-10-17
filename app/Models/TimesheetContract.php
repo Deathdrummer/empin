@@ -68,6 +68,10 @@ class TimesheetContract extends Model {
 	
 	
 	
+	public function team():BelongsTo {
+    	return $this->belongsTo(TimesheetTeam::class, 'team_id');
+	}
+
 	public function contract():BelongsTo {
     	return $this->belongsTo(Contract::class, 'contract_id')
 			->select(['id', 'object_number', 'title', 'titul']);

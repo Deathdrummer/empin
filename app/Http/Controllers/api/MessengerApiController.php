@@ -1,186 +1,213 @@
 <?php namespace App\Http\Controllers\api;
 
-use App\Events\MessengerEvent;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\MessengerMessageResource;
+use App\Http\Resources\ObjectCommentResource;
 use App\Models\MessengerChat;
+use App\Models\MessengerChatMember;
 use App\Models\MessengerMessage;
+use App\Models\MessengerPollVote;
 use App\Models\Staff;
-use App\Services\PushNotificationService;
+use App\Models\TimesheetChat;
+use App\Services\Messenger\ChatDirectory;
+use App\Services\Messenger\MediaStorage;
+use App\Services\Messenger\MessengerNotifier;
+use App\Services\Messenger\ObjectChats;
+use App\Services\Messenger\Presence;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
+/**
+ * Мессенджер мобильного приложения: личные чаты, группы и чаты объектов (комментарии табеля).
+ * Старые версии приложения пользуются только личными чатами и полной историей без limit — это поведение сохранено.
+ */
 class MessengerApiController extends Controller {
 
-    // Pusher принимает событие до 10 КБ; длинное сообщение клиент дозагрузит сам
-    private const MAX_EVENT_BYTES = 9000;
-
-    public function __construct(private PushNotificationService $pushService) {
+    public function __construct(
+        private ChatDirectory $directory,
+        private ObjectChats $objects,
+        private MessengerNotifier $notifier,
+    ) {
     }
 
     /**
-     * Список чатов текущего сотрудника: собеседник, последнее сообщение, непрочитанные.
-     * Чаты без сообщений не показываются. Сортировка — по последнему сообщению.
-     *
-     * @param Request $request
-     * @return JsonResponse
+     * Список чатов: собеседник или группа/объект, последнее сообщение, непрочитанные, закрепление, «без звука»
      */
     public function getChats(Request $request): JsonResponse {
-        $me = (int) $request->user()->staff_id;
+        return response()->json($this->directory->listFor($this->me($request)));
+    }
 
-        $chats = MessengerChat::forStaff($me)
-            ->with(['participant1:id,sname,fname,mname', 'participant2:id,sname,fname,mname'])
-            ->addSelect(['last_message_id' => MessengerMessage::select('id')
-                ->whereColumn('chat_id', 'messenger_chats.id')
-                ->orderByDesc('id')
-                ->limit(1)])
-            ->get()
-            ->filter(fn (MessengerChat $chat) => $chat->last_message_id !== null);
+    /**
+     * Сведения о чате: «в сети», участники группы, закреплённые сообщения
+     */
+    public function chatInfo(Request $request): JsonResponse {
+        $validated = $request->validate(['chat_id' => 'required|integer']);
 
-        $lastMessages = MessengerMessage::whereIn('id', $chats->pluck('last_message_id'))->get()->keyBy('id');
+        $chat = $this->chatFor($request, $validated['chat_id']);
+        if (!$chat) {
+            return $this->chatNotFound();
+        }
 
-        $unreadByChat = $this->unreadQuery($me)
-            ->whereIn('messenger_messages.chat_id', $chats->pluck('id'))
-            ->groupBy('messenger_messages.chat_id')
-            ->selectRaw('messenger_messages.chat_id, COUNT(*) as unread')
-            ->pluck('unread', 'chat_id');
-
-        $items = $chats->map(function (MessengerChat $chat) use ($me, $lastMessages, $unreadByChat) {
-            $peer = (int) $chat->participant_1_id === $me ? $chat->participant2 : $chat->participant1;
-            $last = $lastMessages->get($chat->last_message_id);
-            $peerLastRead = $chat->lastReadIdFor($chat->otherParticipantId($me));
-            $isSelf = $last && (int) $last->from_id === $me;
-
-            return [
-                'chat_id' => $chat->id,
-                'participant' => $peer ? [
-                    'id' => $peer->id,
-                    'sname' => $peer->sname,
-                    'fname' => $peer->fname,
-                    'mname' => $peer->mname,
-                ] : null,
-                'last_message' => $last ? [
-                    'id' => $last->id,
-                    'from_id' => $last->from_id,
-                    'self' => $isSelf,
-                    'text' => MessengerMessageResource::previewText($last->message, $last->media),
-                    'type' => MessengerMessageResource::previewType($last->media),
-                    'read' => $isSelf && $peerLastRead !== null && $peerLastRead >= $last->id,
-                    'created_at' => $last->created_at->toIso8601String(),
-                ] : null,
-                'unread_count' => (int) ($unreadByChat[$chat->id] ?? 0),
-            ];
-        })->sortByDesc(fn (array $item) => $item['last_message']['id'] ?? 0)->values();
-
-        return response()->json([
-            'chats' => $items,
-            'total_unread' => $items->sum('unread_count'),
+        return response()->json($this->directory->infoFor($chat, $this->me($request)) + [
+            'can_write' => !$chat->isObject() || $this->canComment($request),
         ]);
     }
 
     /**
-     * Получить или создать чат между двумя пользователями
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * Получить или создать личный чат между двумя сотрудниками
      */
     public function getOrCreateChat(Request $request) {
-        [
-            'participant_id' => $participantId,
-        ] = $request->validate([
+        $validated = $request->validate([
             'participant_id' => 'required|integer|exists:staff,id',
         ]);
 
-        $currentUserId = (int) $request->user()->staff_id;
-
-        if ((int) $participantId === $currentUserId) {
+        $me = $this->me($request);
+        if ((int) $validated['participant_id'] === $me) {
             return response()->json(['error' => 'Нельзя создать чат с самим собой'], 422);
         }
 
-        $chat = MessengerChat::getOrCreate($currentUserId, $participantId);
+        $chat = MessengerChat::getOrCreate($me, (int) $validated['participant_id']);
 
         return response()->json(['chat_id' => $chat->id]);
     }
 
     /**
-     * Получить сообщения чата.
-     * Без limit — вся история (так работают старые версии приложения).
-     * limit + before_id — страница истории перед сообщением, after_id — новые сообщения после него.
-     *
-     * @param Request $request
-     * @return JsonResponse
+     * Открыть чат объекта (договора) из поиска или табеля
      */
-    public function getMessages(Request $request) {
-        $validated = $request->validate([
-            'chat_id' => 'required|integer',
-            'limit' => 'nullable|integer|min:1|max:100',
-            'before_id' => 'nullable|integer',
-            'after_id' => 'nullable|integer',
-        ]);
+    public function openObjectChat(Request $request): JsonResponse {
+        $validated = $request->validate(['contract_id' => 'required|integer|exists:contracts,id']);
 
-        $chat = $this->chatForParticipant($request, $validated['chat_id']);
-        if (!$chat) {
-            return $this->chatNotFound();
-        }
+        $contractId = (int) $validated['contract_id'];
+        $chat = MessengerChat::forObject($contractId);
+        $chat->ensureMember($this->me($request), $this->objects->lastCommentId($contractId));
 
-        $me = (int) $request->user()->staff_id;
-        $limit = $validated['limit'] ?? null;
-        $hasMore = false;
+        return response()->json(['chat_id' => $chat->id]);
+    }
 
-        $query = MessengerMessage::where('chat_id', $chat->id)
-            ->with(['profile.registred', 'replyTo.profile']);
+    /**
+     * Комментарии объекта просмотрены в табеле — в «Чатах» они больше не непрочитанные
+     */
+    public function markObjectRead(Request $request): JsonResponse {
+        $validated = $request->validate(['contract_id' => 'required|integer|exists:contracts,id']);
 
-        if (!empty($validated['after_id'])) {
-            $messages = $query->where('id', '>', $validated['after_id'])
-                ->orderBy('id')
-                ->limit($limit ?? 100)
-                ->get();
-        } elseif ($limit) {
-            if (!empty($validated['before_id'])) {
-                $query->where('id', '<', $validated['before_id']);
-            }
-            $messages = $query->orderByDesc('id')->limit($limit + 1)->get();
-            $hasMore = $messages->count() > $limit;
-            $messages = $messages->take($limit)->reverse()->values();
-        } else {
-            $messages = $query->orderBy('created_at', 'asc')->get();
+        $me = $this->me($request);
+        $contractId = (int) $validated['contract_id'];
+        $chat = MessengerChat::forObject($contractId);
+        $lastId = $this->objects->lastCommentId($contractId);
+
+        $chat->ensureMember($me, $lastId);
+        if ($lastId) {
+            $chat->markReadBy($me, $lastId);
         }
 
         return response()->json([
-            'messages' => MessengerMessageResource::collection($messages),
-            'has_more' => $hasMore,
-            'peer_last_read_id' => $chat->lastReadIdFor($chat->otherParticipantId($me)),
+            'chat_id'      => $chat->id,
+            'total_unread' => $this->directory->totalUnread($me),
         ]);
     }
 
     /**
-     * Добавить сообщение в чат
-     *
-     * @param Request $request
-     * @return MessengerMessageResource|\Illuminate\Http\JsonResponse
+     * Сообщения чата.
+     * Без limit — вся история (так работают старые версии приложения).
+     * limit + before_id — страница истории перед сообщением, after_id — новые после него,
+     * around_id — окно вокруг сообщения (переход из поиска или к закреплённому).
      */
-    public function addMessage(Request $request) {
+    public function getMessages(Request $request) {
         $validated = $request->validate([
-            'chat_id' => 'required|integer',
-            'message' => 'nullable|string',
-            'reply_to_id' => 'nullable|integer',
-            'media' => 'nullable|array',
-            'media.*' => 'file|mimes:jpeg,jpg,png,gif,bmp,webp,mp4,mov,avi,mkv,pdf,doc,docx,xls,xlsx,ppt,pptx,zip,rar,7z,txt,csv,mp3,wav,ogg,aac,flac,m4a|max:307200', // max 300MB на файл
+            'chat_id'   => 'required|integer',
+            'limit'     => 'nullable|integer|min:1|max:100',
+            'before_id' => 'nullable|integer',
+            'after_id'  => 'nullable|integer',
+            'around_id' => 'nullable|integer',
         ]);
 
-        $chat = $this->chatForParticipant($request, $validated['chat_id']);
+        $chat = $this->chatFor($request, $validated['chat_id']);
         if (!$chat) {
             return $this->chatNotFound();
         }
 
-        $me = (int) $request->user()->staff_id;
-        $message = $validated['message'] ?? '';
+        $me = $this->me($request);
+
+        if ($chat->isObject()) {
+            $query = $this->objects->commentsQuery((int) $chat->contract_id)
+                ->with(['profile', 'replyTo.profile', 'timesheetContract.team.profile']);
+            [$messages, $hasMore, $hasMoreNewer] = $this->page($query, $validated);
+
+            return response()->json([
+                'messages'          => $messages->map(fn (TimesheetChat $comment) => ObjectCommentResource::forChat($comment, $chat->id)->resolve($request))->values(),
+                'has_more'          => $hasMore,
+                'has_more_newer'    => $hasMoreNewer,
+                'peer_last_read_id' => null,
+            ]);
+        }
+
+        $query = MessengerMessage::where('chat_id', $chat->id)->with(['profile.registred', 'replyTo.profile', 'votes']);
+        [$messages, $hasMore, $hasMoreNewer] = $this->page($query, $validated);
+
+        $response = [
+            'messages'          => MessengerMessageResource::collection($messages),
+            'has_more'          => $hasMore,
+            'has_more_newer'    => $hasMoreNewer,
+            'peer_last_read_id' => $chat->isDirect() ? $chat->lastReadIdFor($chat->otherParticipantId($me)) : null,
+        ];
+
+        // Группа: докуда дочитал каждый участник — для галочек и «Прочитали»
+        if ($chat->isGroup()) {
+            $response['members_read'] = MessengerChatMember::where('chat_id', $chat->id)
+                ->where('staff_id', '!=', $me)
+                ->pluck('last_read_id', 'staff_id')
+                ->map(fn ($id) => $id !== null ? (int) $id : null);
+        }
+
+        return response()->json($response);
+    }
+
+    /**
+     * Добавить сообщение: текст, вложения, опрос (в группе), упоминания (в группе).
+     * В чате объекта сообщение становится комментарием табеля.
+     */
+    public function addMessage(Request $request) {
+        $validated = $request->validate([
+            'chat_id'           => 'required|integer',
+            'message'           => 'nullable|string',
+            'reply_to_id'       => 'nullable|integer',
+            'media'             => 'nullable|array|max:20',
+            'media.*'           => MediaStorage::RULES,
+            'type'              => 'nullable|in:text,poll',
+            'poll'              => 'nullable|array',
+            'poll.question'     => 'required_if:type,poll|nullable|string|max:255',
+            'poll.options'      => 'required_if:type,poll|nullable|array|min:2|max:10',
+            'poll.options.*'    => 'string|max:100',
+            'poll.multiple'     => 'nullable|boolean',
+            'mention_ids'       => 'nullable|array',
+            'mention_ids.*'     => 'integer',
+        ]);
+
+        $chat = $this->chatFor($request, $validated['chat_id']);
+        if (!$chat) {
+            return $this->chatNotFound();
+        }
+
+        if ($chat->isObject()) {
+            return $this->addObjectComment($request, $chat, $validated);
+        }
+
+        $me = $this->me($request);
+        $text = $validated['message'] ?? '';
+        $isPoll = ($validated['type'] ?? 'text') === MessengerMessage::TYPE_POLL;
         $replyToId = $validated['reply_to_id'] ?? null;
 
-        // Проверяем, что есть хотя бы сообщение или медиа
-        if (empty(trim($message)) && !$request->hasFile('media')) {
+        if ($isPoll) {
+            if (!$chat->isGroup()) {
+                return response()->json(['error' => 'Опрос можно создать только в группе'], 422);
+            }
+            $options = array_values(array_filter(array_map('trim', $validated['poll']['options'] ?? []), fn ($o) => $o !== ''));
+            if (count($options) < 2 || trim((string) ($validated['poll']['question'] ?? '')) === '') {
+                return response()->json(['error' => 'Нужны вопрос и хотя бы два варианта ответа'], 422);
+            }
+        } elseif (trim($text) === '' && !$request->hasFile('media')) {
             return response()->json(['error' => 'Необходимо указать текст сообщения или прикрепить медиа'], 422);
         }
 
@@ -189,326 +216,420 @@ class MessengerApiController extends Controller {
             return response()->json(['error' => 'Сообщение для ответа не найдено'], 422);
         }
 
-        // Обработка медиа файлов
-        $mediaArray = [];
-        if ($request->hasFile('media')) {
-            $files = $request->file('media');
-
-            foreach ($files as $file) {
-                $mimeType = $file->getMimeType();
-                $size = $file->getSize();
-                $originalFilename = $file->getClientOriginalName();
-
-                // Сохраняем файл через Storage API в storage/app/public/messenger/messages/
-                $storagePath = $file->store('messenger/messages', 'public');
-
-                // Определяем тип медиа по MIME типу
-                $type = 'file';
-                if (str_starts_with($mimeType, 'image/')) {
-                    $type = 'image';
-                } elseif (str_starts_with($mimeType, 'video/')) {
-                    $type = 'video';
-                } elseif (str_starts_with($mimeType, 'audio/')) {
-                    $type = 'audio';
-                } elseif (in_array($mimeType, [
-                    'application/pdf',
-                    'application/msword',
-                    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                    'application/vnd.ms-excel',
-                    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                    'application/vnd.ms-powerpoint',
-                    'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-                    'text/plain',
-                    'text/csv',
-                ])) {
-                    $type = 'document';
-                } elseif (in_array($mimeType, [
-                    'application/zip',
-                    'application/x-rar-compressed',
-                    'application/x-7z-compressed',
-                ])) {
-                    $type = 'archive';
-                }
-
-                // Формируем данные о медиа
-                $mediaArray[] = [
-                    'path' => '/storage/' . $storagePath,
-                    'type' => $type,
-                    'mime_type' => $mimeType,
-                    'size' => $size,
-                    'name' => $originalFilename,
-                ];
-            }
+        // Упомянуть можно только участников группы
+        $mentions = [];
+        if ($chat->isGroup() && !empty($validated['mention_ids'])) {
+            $mentions = array_values(array_intersect(
+                array_map('intval', $validated['mention_ids']),
+                array_filter($chat->memberIds(), fn (int $id) => $id !== $me)
+            ));
         }
 
+        $media = $isPoll ? [] : MediaStorage::store($request, 'messenger/messages');
+
         $messageRecord = MessengerMessage::create([
-            'chat_id' => $chat->id,
-            'from_id' => $me,
-            'message' => $message,
+            'chat_id'     => $chat->id,
+            'from_id'     => $me,
+            'type'        => $isPoll ? MessengerMessage::TYPE_POLL : MessengerMessage::TYPE_TEXT,
+            'message'     => $isPoll ? '' : $text,
             'reply_to_id' => $replyToId,
-            'media' => !empty($mediaArray) ? $mediaArray : null,
+            'media'       => $media ?: null,
+            'poll'        => $isPoll ? [
+                'question' => trim($validated['poll']['question']),
+                'options'  => $options,
+                'multiple' => (bool) ($validated['poll']['multiple'] ?? false),
+            ] : null,
+            'mentions'    => $mentions ?: null,
         ]);
 
-        $messageRecord->load(['profile.registred', 'replyTo.profile']);
+        $messageRecord->load(['profile.registred', 'replyTo.profile', 'votes']);
 
         // Отправитель видел свой чат до этого сообщения включительно
         $chat->markReadBy($me, $messageRecord->id);
 
         $resource = new MessengerMessageResource($messageRecord);
-        $peerId = $chat->otherParticipantId($me);
-        $eventMessage = array_merge($resource->resolve($request), ['self' => false]);
+        $payload = array_merge($resource->resolve($request), ['self' => false]);
+        $preview = $this->directory->previewOf($messageRecord, false);
+        $sender = Staff::find($me);
 
         // После ответа клиенту: отправка не ждёт Pusher и Expo, а их сбой не ломает отправку
-        app()->terminating(function () use ($chat, $peerId, $me, $eventMessage, $messageRecord) {
-            $this->broadcastTo($peerId, 'message.created', ['chat_id' => $chat->id, 'message' => $eventMessage]);
-            $this->sendMessagePush($peerId, $me, $messageRecord);
-        });
+        app()->terminating(fn () => $this->notifier->newMessage($chat, $sender, $payload, $preview, $mentions));
 
         return $resource;
     }
 
     /**
-     * Обновить сообщение
-     *
-     * @param Request $request
-     * @param int $id
-     * @return MessengerMessageResource|\Illuminate\Http\JsonResponse
+     * Изменить текст сообщения (в чате объекта — комментария)
      */
     public function updateMessage(Request $request, $id) {
-        // Проверка прав
         if (!$request->user()->can('mobile-app-can-edit-comment:site')) {
-            return response()->json([
-                'error' => 'У вас нет прав для редактирования сообщений'
-            ], 403);
+            return response()->json(['error' => 'У вас нет прав для редактирования сообщений'], 403);
         }
 
-        [
-            'message' => $message,
-        ] = $request->validate([
+        $validated = $request->validate([
             'message' => 'required|string',
+            'chat_id' => 'nullable|integer',
         ]);
 
-        $messageRecord = MessengerMessage::find($id);
+        $me = $this->me($request);
+        [$chat, $record] = $this->findMessage($request, (int) $id, $validated['chat_id'] ?? null);
 
-        if (!$messageRecord) {
+        if (!$record) {
             return response()->json(['error' => 'Message not found'], 404);
         }
 
-        // Проверяем, что пользователь - автор сообщения
-        if ($messageRecord->from_id !== $request->user()->staff_id) {
+        if ((int) $record->from_id !== $me || ($record->type ?? 'text') === MessengerMessage::TYPE_SYSTEM) {
             return response()->json(['error' => 'У вас нет прав для редактирования этого сообщения'], 403);
         }
 
-        $messageRecord->message = $message;
-        $messageRecord->save();
+        $record->message = $validated['message'];
+        $record->save();
 
-        $messageRecord->load(['profile.registred', 'replyTo.profile']);
+        $payload = $this->messagePayload($request, $chat, $record);
+        $this->afterResponse(fn () => $this->notifier->broadcastToChat($chat, 'message.updated', [
+            'chat_id' => $chat->id,
+            'message' => $this->forRecipients($chat, $payload, $me),
+        ], $me));
 
-        $resource = new MessengerMessageResource($messageRecord);
-        $this->notifyPeerAboutMessage($request, $messageRecord, 'message.updated', $resource);
-
-        return $resource;
+        return response()->json($payload);
     }
 
     /**
-     * Удалить сообщение
-     *
-     * @param Request $request
-     * @param int $id
-     * @return \Illuminate\Http\JsonResponse
+     * Удалить сообщение (в чате объекта — комментарий)
      */
     public function removeMessage(Request $request, $id) {
-        // Проверка прав
         if (!$request->user()->can('mobile-app-can-delete-comment:site')) {
-            return response()->json([
-                'error' => 'У вас нет прав для удаления сообщений'
-            ], 403);
+            return response()->json(['error' => 'У вас нет прав для удаления сообщений'], 403);
         }
 
-        $messageRecord = MessengerMessage::find($id);
+        $me = $this->me($request);
+        [$chat, $record] = $this->findMessage($request, (int) $id, $request->input('chat_id'));
 
-        if (!$messageRecord) {
+        if (!$record) {
             return response()->json(['success' => false], 404);
         }
 
-        // Проверяем, что пользователь - автор сообщения
-        if ($messageRecord->from_id !== $request->user()->staff_id) {
+        if ((int) $record->from_id !== $me || ($record->type ?? 'text') === MessengerMessage::TYPE_SYSTEM) {
             return response()->json(['error' => 'У вас нет прав для удаления этого сообщения'], 403);
         }
 
-        // Удаляем медиа файлы если они есть
-        if ($messageRecord->media) {
-            $mediaArray = [];
-            if (is_array($messageRecord->media)) {
-                // Проверяем, является ли это массивом медиа или одним объектом медиа
-                if (isset($messageRecord->media['path'])) {
-                    // Старый формат - одно медиа
-                    $mediaArray = [$messageRecord->media];
-                } else {
-                    // Новый формат - массив медиа
-                    $mediaArray = $messageRecord->media;
-                }
-            }
+        MediaStorage::delete($record->media);
+        $messageId = $record->id;
+        $record->delete();
 
-            // Удаляем все файлы
-            foreach ($mediaArray as $media) {
-                if (isset($media['path'])) {
-                    $filePath = $media['path'];
-                    // Убираем префикс /storage/ чтобы получить путь в storage/app/public/
-                    $storageFilePath = str_replace('/storage/', '', $filePath);
-
-                    if (Storage::disk('public')->exists($storageFilePath)) {
-                        Storage::disk('public')->delete($storageFilePath);
-                    }
-                }
-            }
-        }
-
-        $chat = $messageRecord->chat;
-        $messageId = $messageRecord->id;
-        $messageRecord->delete();
-
-        if ($chat) {
-            $peerId = $chat->otherParticipantId((int) $request->user()->staff_id);
-            app()->terminating(fn () => $this->broadcastTo($peerId, 'message.deleted', [
-                'chat_id' => $chat->id,
-                'message_id' => $messageId,
-            ]));
-        }
+        $this->afterResponse(fn () => $this->notifier->broadcastToChat($chat, 'message.deleted', [
+            'chat_id'    => $chat->id,
+            'message_id' => $messageId,
+        ], $me));
 
         return response()->json(['success' => true]);
     }
 
     /**
-     * Добавить/удалить реакцию на сообщение (toggle)
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * Добавить/убрать реакцию (повторное нажатие той же реакции убирает её)
      */
     public function toggleReaction(Request $request) {
-        [
-            'message_id' => $messageId,
-            'emoji' => $emoji,
-        ] = $request->validate([
+        $validated = $request->validate([
             'message_id' => 'required|integer',
-            'emoji' => 'required|string|max:16',
+            'emoji'      => 'required|string|max:16',
+            'chat_id'    => 'nullable|integer',
         ]);
 
-        $message = MessengerMessage::find($messageId);
+        $me = $this->me($request);
+        [$chat, $record] = $this->findMessage($request, (int) $validated['message_id'], $validated['chat_id'] ?? null);
 
-        // Реакция — только в своём чате; чужое сообщение выглядит как несуществующее
-        if (!$message || !$message->chat || !$message->chat->isParticipant((int) $request->user()->staff_id)) {
+        // Реакция — только в доступном чате; чужое сообщение выглядит как несуществующее
+        if (!$record) {
             return response()->json(['error' => 'Message not found'], 404);
         }
 
         $userId = $request->user()->id;
-        $reactions = $message->reactions ?? [];
+        $reactions = $record->reactions ?? [];
+        $existing = collect($reactions)->search(fn ($r) => $r['user_id'] == $userId && $r['emoji'] === $validated['emoji']);
 
-        // Проверяем, есть ли уже реакция от этого пользователя с таким же эмодзи
-        $reactionIndex = null;
-        foreach ($reactions as $index => $reaction) {
-            if ($reaction['user_id'] == $userId && $reaction['emoji'] === $emoji) {
-                $reactionIndex = $index;
-                break;
-            }
-        }
-
-        if ($reactionIndex !== null) {
-            // Удаляем существующую реакцию
-            array_splice($reactions, $reactionIndex, 1);
+        if ($existing !== false) {
+            array_splice($reactions, $existing, 1);
         } else {
-            // Добавляем новую реакцию
-            $reactions[] = [
-                'user_id' => $userId,
-                'emoji' => $emoji,
-            ];
+            $reactions[] = ['user_id' => $userId, 'emoji' => $validated['emoji']];
         }
 
-        $message->reactions = $reactions;
-        $message->save();
+        $record->reactions = $reactions;
+        $record->save();
 
-        $message->load(['profile.registred', 'replyTo.profile']);
-        $this->notifyPeerAboutMessage($request, $message, 'message.updated', new MessengerMessageResource($message));
+        $payload = $this->messagePayload($request, $chat, $record);
+        $this->afterResponse(fn () => $this->notifier->broadcastToChat($chat, 'message.updated', [
+            'chat_id' => $chat->id,
+            'message' => $this->forRecipients($chat, $payload, $me),
+        ], $me));
 
         return response()->json([
-            'success' => true,
+            'success'   => true,
             'reactions' => $reactions,
         ]);
     }
 
     /**
      * Отметить сообщения чата прочитанными до message_id включительно.
-     * Граница прочитанного только растёт; собеседник получает событие chat.read (галочки «прочитано»).
-     *
-     * @param Request $request
-     * @return JsonResponse
+     * Граница прочитанного только растёт; участники получают chat.read (галочки «прочитано»).
      */
     public function markRead(Request $request): JsonResponse {
         $validated = $request->validate([
-            'chat_id' => 'required|integer',
+            'chat_id'    => 'required|integer',
             'message_id' => 'required|integer',
         ]);
 
-        $chat = $this->chatForParticipant($request, $validated['chat_id']);
+        $chat = $this->chatFor($request, $validated['chat_id']);
         if (!$chat) {
             return $this->chatNotFound();
         }
 
-        $me = (int) $request->user()->staff_id;
+        $me = $this->me($request);
 
         // Не дальше последнего существующего сообщения этого чата
-        $lastId = MessengerMessage::where('chat_id', $chat->id)
+        $lastId = ($chat->isObject()
+                ? $this->objects->commentsQuery((int) $chat->contract_id)
+                : MessengerMessage::where('chat_id', $chat->id))
             ->where('id', '<=', $validated['message_id'])
             ->max('id');
 
-        if ($lastId && $chat->markReadBy($me, (int) $lastId)) {
-            $peerId = $chat->otherParticipantId($me);
-            app()->terminating(fn () => $this->broadcastTo($peerId, 'chat.read', [
-                'chat_id' => $chat->id,
-                'reader_id' => $me,
+        if ($lastId && $chat->markReadBy($me, (int) $lastId) && !$chat->isObject()) {
+            $this->afterResponse(fn () => $this->notifier->broadcastToChat($chat, 'chat.read', [
+                'chat_id'      => $chat->id,
+                'reader_id'    => $me,
                 'last_read_id' => (int) $lastId,
-            ]));
+            ], $me));
         }
 
         return response()->json([
             'last_read_id' => $chat->lastReadIdFor($me),
-            'total_unread' => $this->unreadQuery($me)->count(),
+            'total_unread' => $this->directory->totalUnread($me),
         ]);
     }
 
     /**
-     * «Печатает…»: клиент вызывает не чаще раза в несколько секунд, собеседник получает chat.typing
-     *
-     * @param Request $request
-     * @return JsonResponse
+     * «Печатает…»: клиент вызывает не чаще раза в несколько секунд
      */
     public function typing(Request $request): JsonResponse {
-        $validated = $request->validate([
-            'chat_id' => 'required|integer',
-        ]);
+        $validated = $request->validate(['chat_id' => 'required|integer']);
 
-        $chat = $this->chatForParticipant($request, $validated['chat_id']);
+        $chat = $this->chatFor($request, $validated['chat_id']);
         if (!$chat) {
             return $this->chatNotFound();
         }
 
-        $me = (int) $request->user()->staff_id;
-        $peerId = $chat->otherParticipantId($me);
-        app()->terminating(fn () => $this->broadcastTo($peerId, 'chat.typing', [
-            'chat_id' => $chat->id,
+        $me = $this->me($request);
+        $name = ChatDirectory::shortName(Staff::find($me));
+
+        $this->afterResponse(fn () => $this->notifier->broadcastToChat($chat, 'chat.typing', [
+            'chat_id'  => $chat->id,
             'staff_id' => $me,
-        ]));
+            'name'     => $name,
+        ], $me));
 
         return response()->json(['success' => true]);
     }
 
     /**
-     * Чат, если текущий сотрудник его участник; иначе null
+     * Закрепить чат вверху списка — на всех устройствах сотрудника
      */
-    private function chatForParticipant(Request $request, $chatId): ?MessengerChat {
+    public function pinChat(Request $request): JsonResponse {
+        return $this->updateMemberState($request, 'pinned');
+    }
+
+    /**
+     * «Без звука»: без push и без учёта в значке непрочитанных
+     */
+    public function muteChat(Request $request): JsonResponse {
+        return $this->updateMemberState($request, 'muted');
+    }
+
+    /**
+     * Закрепить сообщение в чате — видно всем участникам
+     */
+    public function pinMessage(Request $request): JsonResponse {
+        $validated = $request->validate([
+            'chat_id'    => 'required|integer',
+            'message_id' => 'required|integer',
+            'pinned'     => 'required|boolean',
+        ]);
+
+        [$chat, $record] = $this->findMessage($request, (int) $validated['message_id'], (int) $validated['chat_id']);
+        if (!$record || ($record->type ?? 'text') === MessengerMessage::TYPE_SYSTEM) {
+            return response()->json(['error' => 'Message not found'], 404);
+        }
+
+        $record->pinned_at = $validated['pinned'] ? now() : null;
+        $record->pinned_by = $validated['pinned'] ? $this->me($request) : null;
+        $record->timestamps = false;
+        $record->save();
+
+        $pinned = $this->directory->pinnedMessages($chat);
+        $this->afterResponse(fn () => $this->notifier->broadcastToChat($chat, 'chat.pinned', [
+            'chat_id'         => $chat->id,
+            'pinned_messages' => $pinned,
+        ]));
+
+        return response()->json(['pinned_messages' => $pinned]);
+    }
+
+    /**
+     * Голос в опросе: options — выбранные варианты (пустой массив — отозвать голос)
+     */
+    public function votePoll(Request $request): JsonResponse {
+        $validated = $request->validate([
+            'message_id' => 'required|integer',
+            'options'    => 'present|array|max:10',
+            'options.*'  => 'integer|min:0|max:9',
+        ]);
+
+        $message = MessengerMessage::find($validated['message_id']);
+        $me = $this->me($request);
+
+        if (!$message || $message->type !== MessengerMessage::TYPE_POLL || !$message->chat?->canAccess($me)) {
+            return response()->json(['error' => 'Опрос не найден'], 404);
+        }
+
+        $count = count($message->poll['options'] ?? []);
+        $options = array_values(array_unique(array_filter($validated['options'], fn ($i) => $i < $count)));
+        if (!($message->poll['multiple'] ?? false)) {
+            $options = array_slice($options, 0, 1);
+        }
+
+        DB::transaction(function () use ($message, $me, $options) {
+            MessengerPollVote::where('message_id', $message->id)->where('staff_id', $me)->delete();
+            foreach ($options as $index) {
+                MessengerPollVote::create(['message_id' => $message->id, 'staff_id' => $me, 'option_index' => $index]);
+            }
+        });
+
+        $message->load(['profile.registred', 'replyTo.profile', 'votes']);
+        $payload = array_merge((new MessengerMessageResource($message))->resolve($request), ['self' => false]);
+        $chat = $message->chat;
+
+        // Своим другим устройствам тоже — голоса видны везде
+        $this->afterResponse(fn () => $this->notifier->broadcastToChat($chat, 'message.updated', [
+            'chat_id' => $chat->id,
+            'message' => $payload,
+        ]));
+
+        return response()->json(['message' => $payload]);
+    }
+
+    /**
+     * Поиск: сообщения во всех чатах сотрудника (или в одном chat_id), группы и объекты по названию
+     */
+    public function search(Request $request): JsonResponse {
+        $validated = $request->validate([
+            'q'       => 'required|string|min:2|max:100',
+            'chat_id' => 'nullable|integer',
+        ]);
+
+        $me = $this->me($request);
+        $like = '%' . addcslashes(trim($validated['q']), '%_\\') . '%';
+        $chat = null;
+
+        if (!empty($validated['chat_id'])) {
+            $chat = $this->chatFor($request, $validated['chat_id']);
+            if (!$chat) {
+                return $this->chatNotFound();
+            }
+        }
+
+        $messages = collect();
+
+        if (!$chat || !$chat->isObject()) {
+            $messages = MessengerMessage::query()
+                ->select('messenger_messages.*')
+                ->join('messenger_chat_members as m', function ($join) use ($me) {
+                    $join->on('m.chat_id', '=', 'messenger_messages.chat_id')->where('m.staff_id', $me);
+                })
+                ->when($chat, fn ($q) => $q->where('messenger_messages.chat_id', $chat->id))
+                ->where('messenger_messages.type', MessengerMessage::TYPE_TEXT)
+                ->where('messenger_messages.message', 'like', $like)
+                ->orderByDesc('messenger_messages.id')
+                ->limit(30)
+                ->with(['profile', 'chat.contract'])
+                ->get()
+                ->map(fn (MessengerMessage $message) => $this->searchHit($message->chat, $message, $me));
+        }
+
+        if (!$chat || $chat->isObject()) {
+            $comments = TimesheetChat::query()
+                ->select('timesheet_chat.*', 'c.id as messenger_chat_id')
+                ->join('timesheet_contracts as tc', 'tc.id', '=', 'timesheet_chat.timesheet_contract_id')
+                ->join('messenger_chats as c', function ($join) {
+                    $join->on('c.contract_id', '=', 'tc.contract_id')->where('c.type', MessengerChat::TYPE_OBJECT);
+                })
+                ->when($chat, fn ($q) => $q->where('c.id', $chat->id), fn ($q) => $q->whereIn('c.id', MessengerChatMember::where('staff_id', $me)->select('chat_id')))
+                ->where('timesheet_chat.message', 'like', $like)
+                ->orderByDesc('timesheet_chat.id')
+                ->limit(30)
+                ->with('profile')
+                ->get();
+
+            $objectChats = MessengerChat::whereIn('id', $comments->pluck('messenger_chat_id'))->with('contract')->get()->keyBy('id');
+            $messages = $messages->concat($comments->map(
+                fn (TimesheetChat $comment) => $this->searchHit($objectChats[$comment->messenger_chat_id], $comment, $me)
+            ));
+        }
+
+        $chats = [];
+        if (!$chat) {
+            $groups = MessengerChat::forStaff($me)
+                ->where('type', MessengerChat::TYPE_GROUP)
+                ->where('title', 'like', $like)
+                ->limit(10)
+                ->get()
+                ->map(fn (MessengerChat $group) => ['type' => 'group', 'chat_id' => $group->id, 'title' => $group->title]);
+
+            $objects = DB::table('contracts')
+                ->where(fn ($q) => $q->where('object_number', 'like', $like)->orWhere('title', 'like', $like))
+                ->whereExists(fn ($q) => $q->select(DB::raw(1))->from('timesheet_contracts')->whereColumn('timesheet_contracts.contract_id', 'contracts.id'))
+                ->orderByDesc('id')
+                ->limit(10)
+                ->get(['id', 'object_number', 'title'])
+                ->map(fn ($object) => [
+                    'type'          => 'object',
+                    'contract_id'   => (int) $object->id,
+                    'object_number' => $object->object_number,
+                    'title'         => trim($object->object_number . ' ' . $object->title),
+                ]);
+
+            $chats = $groups->concat($objects)->values()->all();
+        }
+
+        return response()->json([
+            'chats'    => $chats,
+            'messages' => $messages->sortByDesc('created_at')->take(40)->values()->all(),
+        ]);
+    }
+
+    /**
+     * Приложение открыто: отметка «в сети» (раз в минуту)
+     */
+    public function presence(Request $request): JsonResponse {
+        Presence::touch($this->me($request));
+
+        return response()->json(['success' => true]);
+    }
+
+    // --- Вспомогательное ---
+
+    private function me(Request $request): int {
+        return (int) $request->user()->staff_id;
+    }
+
+    private function canComment(Request $request): bool {
+        return $request->user()->can('mobile-app-can-create-comment:site');
+    }
+
+    /**
+     * Чат, если текущий сотрудник может его открыть; иначе null
+     */
+    private function chatFor(Request $request, $chatId): ?MessengerChat {
         $chat = MessengerChat::find($chatId);
 
-        return $chat && $chat->isParticipant((int) $request->user()->staff_id) ? $chat : null;
+        return $chat && $chat->canAccess($this->me($request)) ? $chat : null;
     }
 
     /**
@@ -519,70 +640,187 @@ class MessengerApiController extends Controller {
     }
 
     /**
-     * Непрочитанные сообщения сотрудника: от собеседника и новее его границы прочитанного
+     * Сообщение доступного чата. Без chat_id — сообщение мессенджера (так работают старые версии);
+     * с chat_id чата объекта — комментарий табеля этого объекта.
+     *
+     * @return array{0: ?MessengerChat, 1: MessengerMessage|TimesheetChat|null}
      */
-    private function unreadQuery(int $staffId) {
-        return MessengerMessage::query()
-            ->join('messenger_chats as c', 'c.id', '=', 'messenger_messages.chat_id')
-            ->where(function ($q) use ($staffId) {
-                $q->where('c.participant_1_id', $staffId)->orWhere('c.participant_2_id', $staffId);
-            })
-            ->where('messenger_messages.from_id', '!=', $staffId)
-            ->whereRaw(
-                'messenger_messages.id > COALESCE(CASE WHEN c.participant_1_id = ? THEN c.participant_1_last_read_id ELSE c.participant_2_last_read_id END, 0)',
-                [$staffId]
-            );
-    }
+    private function findMessage(Request $request, int $messageId, $chatId): array {
+        if ($chatId) {
+            $chat = $this->chatFor($request, $chatId);
+            if (!$chat) {
+                return [null, null];
+            }
 
-    private function notifyPeerAboutMessage(Request $request, MessengerMessage $message, string $event, MessengerMessageResource $resource): void {
-        $chat = $message->chat;
-        if (!$chat) {
-            return;
+            $record = $chat->isObject()
+                ? $this->objects->commentsQuery((int) $chat->contract_id)->whereKey($messageId)->first()
+                : MessengerMessage::where('chat_id', $chat->id)->whereKey($messageId)->first();
+
+            return [$chat, $record];
         }
 
-        $peerId = $chat->otherParticipantId((int) $request->user()->staff_id);
-        // «Своё» — с точки зрения получателя: реакцию ставят и на его собственные сообщения
-        $payload = [
-            'chat_id' => $chat->id,
-            'message' => array_merge($resource->resolve($request), ['self' => (int) $message->from_id === $peerId]),
-        ];
-        app()->terminating(fn () => $this->broadcastTo($peerId, $event, $payload));
+        $record = MessengerMessage::find($messageId);
+        $chat = $record?->chat;
+
+        return $chat && $chat->canAccess($this->me($request)) ? [$chat, $record] : [null, null];
     }
 
-    private function broadcastTo(int $staffId, string $event, array $payload): void {
-        // Слишком длинное сообщение не влезет в событие Pusher — клиент дозагрузит его по message_id
-        if (isset($payload['message']) && strlen(json_encode($payload, JSON_UNESCAPED_UNICODE)) > self::MAX_EVENT_BYTES) {
-            $payload = [
-                'chat_id' => $payload['chat_id'],
-                'message_id' => $payload['message']['id'],
-                'truncated' => true,
+    private function messagePayload(Request $request, MessengerChat $chat, $record): array {
+        if ($chat->isObject()) {
+            $record->load(['profile', 'replyTo.profile', 'timesheetContract.team.profile']);
+
+            return ObjectCommentResource::forChat($record, $chat->id)->resolve($request);
+        }
+
+        $record->load(['profile.registred', 'replyTo.profile', 'votes']);
+
+        return (new MessengerMessageResource($record))->resolve($request);
+    }
+
+    /**
+     * Сообщение в событии: «своё» — с точки зрения получателя. В личном чате получатель один —
+     * собеседник; в группе и объекте получателей много, и «своё» клиент определяет по from_id.
+     */
+    private function forRecipients(MessengerChat $chat, array $payload, int $me): array {
+        $self = $chat->isDirect() && (int) $payload['from_id'] === $chat->otherParticipantId($me);
+
+        return array_merge($payload, ['self' => $self]);
+    }
+
+    private function afterResponse(callable $callback): void {
+        app()->terminating($callback);
+    }
+
+    private function updateMemberState(Request $request, string $field): JsonResponse {
+        $validated = $request->validate([
+            'chat_id' => 'required|integer',
+            $field    => 'required|boolean',
+        ]);
+
+        $chat = $this->chatFor($request, $validated['chat_id']);
+        if (!$chat) {
+            return $this->chatNotFound();
+        }
+
+        $me = $this->me($request);
+        $member = $chat->ensureMember($me, $chat->isObject() ? $this->objects->lastCommentId((int) $chat->contract_id) : null);
+        $member->{$field === 'pinned' ? 'pinned_at' : 'muted'} = $field === 'pinned'
+            ? ($validated['pinned'] ? now() : null)
+            : (bool) $validated['muted'];
+        $member->save();
+
+        // Другие устройства сотрудника обновят список
+        $this->afterResponse(fn () => $this->notifier->broadcast([$me], 'chat.updated', ['chat_id' => $chat->id]));
+
+        return response()->json([
+            'chat_id'      => $chat->id,
+            'pinned'       => $member->pinned_at !== null,
+            'muted'        => (bool) $member->muted,
+            'total_unread' => $this->directory->totalUnread($me),
+        ]);
+    }
+
+    /**
+     * Комментарий табеля из чата объекта: попадает в объект на ближайший к сегодня день
+     */
+    private function addObjectComment(Request $request, MessengerChat $chat, array $validated) {
+        if (!$this->canComment($request)) {
+            return response()->json(['error' => 'У вас нет прав для комментариев к объектам'], 403);
+        }
+
+        $text = $validated['message'] ?? '';
+        if (trim($text) === '' && !$request->hasFile('media')) {
+            return response()->json(['error' => 'Необходимо указать текст сообщения или прикрепить медиа'], 422);
+        }
+
+        $contractId = (int) $chat->contract_id;
+        $target = $this->objects->targetTimesheetContract($contractId);
+        if (!$target) {
+            return response()->json(['error' => 'Объекта нет в табеле'], 422);
+        }
+
+        $replyToId = $validated['reply_to_id'] ?? null;
+        if ($replyToId && !$this->objects->commentsQuery($contractId)->whereKey($replyToId)->exists()) {
+            return response()->json(['error' => 'Сообщение для ответа не найдено'], 422);
+        }
+
+        $me = $this->me($request);
+        $media = MediaStorage::store($request, 'timesheet/comments');
+
+        $comment = $target->chat()->create([
+            'from_id'     => $me,
+            'message'     => $text,
+            'reply_to_id' => $replyToId,
+            'media'       => $media ?: null,
+        ]);
+
+        $chat->ensureMember($me);
+        $chat->markReadBy($me, $comment->id);
+
+        $payload = $this->messagePayload($request, $chat, $comment);
+        $preview = $this->directory->previewOf($comment, true);
+        $sender = Staff::find($me);
+        $event = array_merge($payload, ['self' => false]);
+
+        $this->afterResponse(fn () => $this->notifier->newMessage($chat, $sender, $event, $preview));
+
+        return response()->json($payload, 201);
+    }
+
+    /**
+     * Найденное сообщение для списка результатов поиска
+     */
+    private function searchHit(MessengerChat $chat, $message, int $me): array {
+        $peer = $chat->isDirect() ? Staff::find($chat->otherParticipantId($me), ['id', 'sname', 'fname']) : null;
+
+        return [
+            'chat_id'    => $chat->id,
+            'chat_type'  => $chat->type ?? MessengerChat::TYPE_DIRECT,
+            'chat_title' => $this->directory->titleOf($chat, $peer),
+            'peer_id'    => $peer?->id,
+            'message_id' => $message->id,
+            'from_name'  => (int) $message->from_id === $me ? 'Вы' : ChatDirectory::shortName($message->profile),
+            'text'       => mb_strimwidth(trim(preg_replace('/\s+/u', ' ', (string) $message->message)), 0, 160, '…'),
+            'created_at' => $message->created_at->toIso8601String(),
+        ];
+    }
+
+    /**
+     * Страница сообщений по параметрам limit / before_id / after_id / around_id
+     *
+     * @return array{0: Collection, 1: bool, 2: bool} сообщения по возрастанию, есть ли старше, есть ли новее
+     */
+    private function page($query, array $params): array {
+        $limit = $params['limit'] ?? null;
+
+        if (!empty($params['around_id'])) {
+            $half = max(1, intdiv($limit ?? 40, 2));
+            $older = (clone $query)->where('id', '<=', $params['around_id'])->orderByDesc('id')->limit($half + 1)->get();
+            $newer = (clone $query)->where('id', '>', $params['around_id'])->orderBy('id')->limit($half + 1)->get();
+
+            return [
+                $older->take($half)->reverse()->values()->concat($newer->take($half))->values(),
+                $older->count() > $half,
+                $newer->count() > $half,
             ];
         }
 
-        try {
-            event(new MessengerEvent($staffId, $event, $payload));
-        } catch (\Throwable $error) {
-            // Сообщение уже сохранено: собеседник получит его при следующей загрузке чата
-            Log::warning('[Messenger] Broadcast failed', ['event' => $event, 'error' => $error->getMessage()]);
-        }
-    }
+        if (!empty($params['after_id'])) {
+            $count = $limit ?? 100;
+            $rows = (clone $query)->where('id', '>', $params['after_id'])->orderBy('id')->limit($count + 1)->get();
 
-    private function sendMessagePush(int $recipientId, int $senderId, MessengerMessage $message): void {
-        try {
-            $recipient = Staff::find($recipientId);
-            $sender = Staff::find($senderId);
-            if (!$recipient || !$sender) {
-                return;
+            return [$rows->take($count)->values(), false, $rows->count() > $count];
+        }
+
+        if ($limit) {
+            if (!empty($params['before_id'])) {
+                $query->where('id', '<', $params['before_id']);
             }
+            $rows = $query->orderByDesc('id')->limit($limit + 1)->get();
 
-            $this->pushService->sendNewMessageNotification(
-                $recipient,
-                $sender,
-                $message,
-                $this->unreadQuery($recipientId)->count()
-            );
-        } catch (\Throwable $error) {
-            Log::warning('[Messenger] Message push failed', ['error' => $error->getMessage()]);
+            return [$rows->take($limit)->reverse()->values(), $rows->count() > $limit, false];
         }
+
+        return [$query->orderBy('created_at')->orderBy('id')->get(), false, false];
     }
 }

@@ -3,6 +3,7 @@
 use App\Helpers\DdrDateTime;
 use App\Http\Controllers\Controller;
 use App\Http\Filters\ContractFilter;
+use App\Http\Resources\ObjectCommentResource;
 use App\Http\Resources\TimesheetChatResource;
 use App\Http\Resources\TimesheetTeamResource;
 use App\Models\Contract as ContractModel;
@@ -11,11 +12,63 @@ use App\Models\Staff;
 use App\Models\TimesheetChat;
 use App\Models\TimesheetContract;
 use App\Models\TimesheetTeam;
+use App\Services\Messenger\ChatDirectory;
+use App\Services\Messenger\MessengerNotifier;
+use App\Services\Messenger\ObjectChats;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class TimesheetApiController extends Controller {
+
+    /**
+     * Комментарий изменился в табеле — чат объекта в «Чатах» узнаёт об этом сразу:
+     * created — событие и push отслеживающим объект, updated — событие, deleted — событие об удалении.
+     */
+    private function notifyObjectChat(Request $request, TimesheetChat $comment, string $action): void {
+        try {
+            $chat = app(ObjectChats::class)->chatForComment($comment);
+            if (!$chat) {
+                return;
+            }
+
+            $me = (int) $request->user()->staff_id;
+            $notifier = app(MessengerNotifier::class);
+
+            if ($action === 'deleted') {
+                $commentId = $comment->id;
+                app()->terminating(fn () => $notifier->broadcastToChat($chat, 'message.deleted', [
+                    'chat_id'    => $chat->id,
+                    'message_id' => $commentId,
+                ], $me));
+
+                return;
+            }
+
+            if ($action === 'created') {
+                // Автор комментария отслеживает объект и свой комментарий прочитал
+                $chat->ensureMember($me);
+                $chat->markReadBy($me, $comment->id);
+            }
+
+            $comment->loadMissing(['profile', 'replyTo.profile', 'timesheetContract.team.profile']);
+            $payload = array_merge(ObjectCommentResource::forChat($comment, $chat->id)->resolve($request), ['self' => false]);
+
+            if ($action === 'created') {
+                $preview = app(ChatDirectory::class)->previewOf($comment, true);
+                $sender = Staff::find($me);
+                app()->terminating(fn () => $notifier->newMessage($chat, $sender, $payload, $preview));
+            } else {
+                app()->terminating(fn () => $notifier->broadcastToChat($chat, 'message.updated', [
+                    'chat_id' => $chat->id,
+                    'message' => $payload,
+                ], $me));
+            }
+        } catch (\Throwable $error) {
+            // Комментарий уже сохранён: чат объекта увидит его при следующей загрузке
+            \Log::warning('[Timesheet] Object chat notify failed', ['error' => $error->getMessage()]);
+        }
+    }
 
     /**
      * Получить данные слайдов по дням
@@ -342,6 +395,7 @@ class TimesheetApiController extends Controller {
         ]);
 
         $comment->load('profile.registred');
+        $this->notifyObjectChat($request, $comment, 'created');
 
         return new TimesheetChatResource($comment);
     }
@@ -375,6 +429,7 @@ class TimesheetApiController extends Controller {
         $timesheetMess->save();
 
         $timesheetMess->load('profile.registred');
+        $this->notifyObjectChat($request, $timesheetMess, 'updated');
 
         return new TimesheetChatResource($timesheetMess);
     }
@@ -385,11 +440,16 @@ class TimesheetApiController extends Controller {
      * @param int $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function removeComment($id) {
+    public function removeComment(Request $request, $id) {
         $timesheetMess = TimesheetChat::find($id);
 
         if (!$timesheetMess) {
             return response()->json(['success' => false], 404);
+        }
+
+        // Удалить можно только свой комментарий (приложение и не предлагает удалять чужие)
+        if ((int) $timesheetMess->from_id !== (int) $request->user()->staff_id) {
+            return response()->json(['error' => 'У вас нет прав для удаления этого комментария'], 403);
         }
 
         // Удаляем медиа файлы если они есть
@@ -421,6 +481,7 @@ class TimesheetApiController extends Controller {
             }
         }
 
+        $this->notifyObjectChat($request, $timesheetMess, 'deleted');
         $timesheetMess->delete();
 
         return response()->json(['success' => true]);
@@ -635,6 +696,7 @@ class TimesheetApiController extends Controller {
 
         $comment->reactions = $reactions;
         $comment->save();
+        $this->notifyObjectChat($request, $comment, 'updated');
 
         return response()->json([
             'success' => true,

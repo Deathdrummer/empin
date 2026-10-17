@@ -2,8 +2,6 @@
 
 namespace App\Services;
 
-use App\Http\Resources\MessengerMessageResource;
-use App\Models\MessengerMessage;
 use App\Models\Staff;
 use App\Models\StaffPushToken;
 use Illuminate\Support\Facades\Http;
@@ -121,25 +119,18 @@ class PushNotificationService
     }
 
     /**
-     * Новое сообщение в мессенджере. Показывается системой, когда приложение свёрнуто или закрыто;
-     * badge — общее число непрочитанных у получателя (значок на иконке iOS).
+     * Новое сообщение в мессенджере (личный чат, группа или чат объекта). Показывается системой,
+     * когда приложение свёрнуто или закрыто; badge — общее число непрочитанных у получателя.
      */
-    public function sendNewMessageNotification(Staff $recipient, Staff $sender, MessengerMessage $message, int $badge): bool
+    public function sendChatMessageNotification(Staff $recipient, string $title, string $body, array $data, int $badge): bool
     {
-        $title = trim("{$sender->sname} {$sender->fname}");
-
         return $this->sendToExpoTokens($recipient, [
             'title' => $title !== '' ? $title : 'Новое сообщение',
-            'body' => MessengerMessageResource::previewText($message->message, $message->media),
+            'body' => $body,
             'sound' => 'default',
             'badge' => $badge,
             'priority' => 'high',
-            'data' => [
-                'type' => 'message',
-                'chat_id' => $message->chat_id,
-                'message_id' => $message->id,
-                'sender_id' => $sender->id,
-            ],
+            'data' => ['type' => 'message'] + $data,
         ]);
     }
 

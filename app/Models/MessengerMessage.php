@@ -61,7 +61,15 @@ class MessengerMessage extends Model {
 	protected $casts = [
 		'reactions' => 'array',
 		'media' => 'array',
+		'poll' => 'array',
+		'mentions' => 'array',
+		'pinned_at' => 'datetime',
 	];
+
+	public const TYPE_TEXT = 'text';
+	public const TYPE_POLL = 'poll';
+	// «Иванов создал группу», «Петров добавил Сидорова»
+	public const TYPE_SYSTEM = 'system';
 
 
 
@@ -79,6 +87,10 @@ class MessengerMessage extends Model {
 
 	public function replyTo(): BelongsTo {
     	return $this->belongsTo(MessengerMessage::class, 'reply_to_id');
+	}
+
+	public function votes(): HasMany {
+		return $this->hasMany(MessengerPollVote::class, 'message_id');
 	}
 
 	public function replies(): HasMany {

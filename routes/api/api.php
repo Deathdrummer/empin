@@ -3,6 +3,7 @@
 use App\Http\Controllers\api\AuthController;
 use App\Http\Controllers\api\MessengerApiController;
 use App\Http\Controllers\api\MessengerCallController;
+use App\Http\Controllers\api\MessengerGroupController;
 use App\Http\Controllers\api\TimesheetApiController;
 use App\Http\Controllers\SettingsController;
 use Illuminate\Support\Facades\Route;
@@ -34,7 +35,7 @@ Route::controller(AuthController::class)->prefix('auth')->group(function() {
 });
 
 // Timesheet API (требует авторизацию)
-Route::controller(TimesheetApiController::class)->prefix('timesheet')->middleware('auth:sanctum')->group(function() {
+Route::controller(TimesheetApiController::class)->prefix('timesheet')->middleware(['auth:sanctum', 'presence'])->group(function() {
 	Route::post('/slides', 'getSlidesData');
 	Route::post('/slide', 'getSlideData');
 	Route::get('/staff', 'getStaff');
@@ -55,20 +56,38 @@ Route::controller(TimesheetApiController::class)->prefix('timesheet')->middlewar
 });
 
 // Messenger API (требует авторизацию)
-Route::controller(MessengerApiController::class)->prefix('messenger')->middleware('auth:sanctum')->group(function() {
+Route::controller(MessengerApiController::class)->prefix('messenger')->middleware(['auth:sanctum', 'presence'])->group(function() {
 	Route::get('/chats', 'getChats');
+	Route::get('/chat/info', 'chatInfo');
 	Route::post('/chat/read', 'markRead');
 	Route::post('/chat/typing', 'typing');
+	Route::post('/chat/pin', 'pinChat');
+	Route::post('/chat/mute', 'muteChat');
 	Route::post('/chat', 'getOrCreateChat');
 	Route::post('/chat/messages', 'getMessages');
+	Route::post('/object/open', 'openObjectChat');
+	Route::post('/object/read', 'markObjectRead');
 	Route::post('/message', 'addMessage');
 	Route::put('/message/{id}', 'updateMessage');
 	Route::delete('/message/{id}', 'removeMessage');
 	Route::post('/message/reaction', 'toggleReaction');
+	Route::post('/message/pin', 'pinMessage');
+	Route::post('/poll/vote', 'votePoll');
+	Route::get('/search', 'search');
+	Route::post('/presence', 'presence');
+});
+
+// Групповые чаты (бригады)
+Route::controller(MessengerGroupController::class)->prefix('messenger/group')->middleware(['auth:sanctum', 'presence'])->group(function() {
+	Route::post('/', 'create');
+	Route::post('/rename', 'rename');
+	Route::post('/members/add', 'addMembers');
+	Route::post('/members/remove', 'removeMember');
+	Route::post('/leave', 'leave');
 });
 
 // Messenger Calls API (требует авторизацию)
-Route::prefix('messenger/calls')->middleware('auth:sanctum')->group(function() {
+Route::prefix('messenger/calls')->middleware(['auth:sanctum', 'presence'])->group(function() {
 	Route::post('/push-token', [MessengerCallController::class, 'registerPushToken']);
 	Route::delete('/push-token', [MessengerCallController::class, 'unregisterPushToken']);
 	Route::post('/voip-token', [MessengerCallController::class, 'registerVoipToken']);
