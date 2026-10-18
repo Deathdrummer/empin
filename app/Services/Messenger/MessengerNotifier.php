@@ -20,6 +20,7 @@ class MessengerNotifier
     public function __construct(
         private PushNotificationService $push,
         private ChatDirectory $directory,
+        private ObjectChats $objects,
     ) {
     }
 
@@ -65,11 +66,14 @@ class MessengerNotifier
     /**
      * Новое сообщение: событие всем участникам, кроме автора; push — тем, у кого чат не «без звука».
      * Упомянутым через @ push приходит всегда.
+     * В чате объекта состав сначала сверяется с табелем: сообщение получат и мастера, ещё не открывавшие «Чаты».
      *
      * @param int[] $mentionIds
      */
     public function newMessage(MessengerChat $chat, Staff $sender, array $message, string $preview, array $mentionIds = []): void
     {
+        $this->objects->syncMembers($chat);
+
         $members = MessengerChatMember::where('chat_id', $chat->id)
             ->where('staff_id', '!=', $sender->id)
             ->get();

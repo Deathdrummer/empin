@@ -146,7 +146,7 @@ class MessengerChat extends Model {
 	}
 
 	/**
-	 * Чаты, в которых сотрудник участвует (или которые отслеживает — для объектов)
+	 * Чаты, в которых сотрудник участвует
 	 */
 	public function scopeForStaff($query, int $staffId) {
 		return $query->whereIn('messenger_chats.id', MessengerChatMember::where('staff_id', $staffId)->select('chat_id'));
@@ -215,10 +215,13 @@ class MessengerChat extends Model {
 
 	/**
 	 * Сдвинуть границу прочитанного вперёд (назад она не двигается).
-	 * Возвращает true, если граница изменилась.
+	 * Возвращает true, если граница изменилась. Чтение чата объекта не делает участником —
+	 * их определяет табель и ручное добавление.
 	 */
 	public function markReadBy(int $staffId, int $messageId): bool {
-		$this->ensureMember($staffId);
+		if (!$this->isObject()) {
+			$this->ensureMember($staffId);
+		}
 
 		return MessengerChatMember::where('chat_id', $this->id)
 			->where('staff_id', $staffId)

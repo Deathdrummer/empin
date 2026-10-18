@@ -8,6 +8,7 @@ use App\Http\Resources\TimesheetChatResource;
 use App\Http\Resources\TimesheetTeamResource;
 use App\Models\Contract as ContractModel;
 use App\Models\Department;
+use App\Models\MessengerChat;
 use App\Models\Staff;
 use App\Models\TimesheetChat;
 use App\Models\TimesheetContract;
@@ -46,12 +47,11 @@ class TimesheetApiController extends Controller {
             }
 
             if ($action === 'created') {
-                // Автор комментария отслеживает объект и свой комментарий прочитал
-                $chat->ensureMember($me);
+                // Автор свой комментарий прочитал (если он участник чата объекта)
                 $chat->markReadBy($me, $comment->id);
             }
 
-            $comment->loadMissing(['profile', 'replyTo.profile', 'timesheetContract.team.profile']);
+            $comment->loadMissing(['profile', 'replyTo.profile', 'timesheetContract.team']);
             $payload = array_merge(ObjectCommentResource::forChat($comment, $chat->id)->resolve($request), ['self' => false]);
 
             if ($action === 'created') {
@@ -283,6 +283,15 @@ class TimesheetApiController extends Controller {
         }
 
         $contract = $team->contracts()->create(['contract_id' => $contractId]);
+
+        // Мастер бригады сразу появляется в чате объекта (назначения с сайта подхватятся при загрузке чатов)
+        app()->terminating(function () use ($contractId) {
+            try {
+                app(ObjectChats::class)->syncMembers(MessengerChat::forObject((int) $contractId));
+            } catch (\Throwable $error) {
+                \Log::warning('[Timesheet] Object chat members sync failed', ['error' => $error->getMessage()]);
+            }
+        });
 
         return response()->json(['id' => $contract->id]);
     }

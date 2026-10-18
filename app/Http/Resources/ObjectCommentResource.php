@@ -4,7 +4,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
  * Комментарий табеля в чате объекта — в том же виде, что сообщение мессенджера.
- * context — день табеля и бригада, к которым относится комментарий.
+ * context — день табеля, к которому относится комментарий.
  */
 class ObjectCommentResource extends JsonResource {
 
@@ -22,7 +22,6 @@ class ObjectCommentResource extends JsonResource {
     public function toArray($request) {
         $me = $request->user()?->staff_id;
         $team = $this->relationLoaded('timesheetContract') ? $this->timesheetContract?->team : null;
-        $master = $team && $team->relationLoaded('profile') ? $team->profile : null;
         $day = $team?->getRawOriginal('day');
 
         return [
@@ -53,8 +52,7 @@ class ObjectCommentResource extends JsonResource {
             'pinned'      => $this->pinned_at !== null,
             'self'        => $me !== null && (int) $this->from_id === (int) $me,
             'context'     => [
-                'day'  => $day ? substr((string) $day, 0, 10) : null,
-                'team' => $master ? trim($master->sname . ' ' . mb_substr((string) $master->fname, 0, 1) . '.') : null,
+                'day' => $day ? substr((string) $day, 0, 10) : null,
             ],
             'created_at'  => $this->created_at->toIso8601String(),
             'updated_at'  => $this->updated_at ? $this->updated_at->toIso8601String() : null,

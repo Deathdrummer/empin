@@ -7,6 +7,7 @@ use App\Models\MessengerChat;
 use App\Models\MessengerChatMember;
 use App\Models\MessengerMessage;
 use App\Models\MessengerPollVote;
+use App\Models\MessengerSetting;
 use App\Models\Staff;
 use App\Models\TimesheetChat;
 use App\Services\Messenger\ChatDirectory;
@@ -50,8 +51,44 @@ class MessengerApiController extends Controller {
             return $this->chatNotFound();
         }
 
-        return response()->json($this->directory->infoFor($chat, $this->me($request)) + [
-            'can_write' => !$chat->isObject() || $this->canComment($request),
+        $me = $this->me($request);
+        $this->objects->syncMembers($chat);
+        $member = $chat->member($me);
+        $canAssign = $this->canAssignObjects($request);
+
+        // Состав группы: добавляет любой участник, исключает администратор.
+        // Состав объекта: добавляет участник или тот, кто ставит объекты бригадам, убирает — только он.
+        return response()->json($this->directory->infoFor($chat, $me) + [
+            'can_write'          => !$chat->isObject() || $this->canComment($request),
+            'is_member'          => $member !== null,
+            'can_add_members'    => $chat->isGroup() || ($chat->isObject() && ($member !== null || $canAssign)),
+            'can_remove_members' => ($chat->isGroup() && $member?->role === MessengerChatMember::ROLE_ADMIN)
+                || ($chat->isObject() && $canAssign),
+        ]);
+    }
+
+    /**
+     * Настройки мессенджера сотрудника (одинаковые на всех его устройствах)
+     */
+    public function settings(Request $request): JsonResponse {
+        return response()->json(['mute_objects' => MessengerSetting::muteObjects($this->me($request))]);
+    }
+
+    /**
+     * «Чаты объектов без звука»: сразу для всех объектов, и новые объекты приходят без звука
+     */
+    public function updateSettings(Request $request): JsonResponse {
+        $validated = $request->validate(['mute_objects' => 'required|boolean']);
+
+        $me = $this->me($request);
+        $this->objects->setMuteObjects($me, (bool) $validated['mute_objects']);
+
+        // Другие устройства сотрудника обновят список
+        $this->afterResponse(fn () => $this->notifier->broadcast([$me], 'chat.updated', ['settings' => true]));
+
+        return response()->json([
+            'mute_objects' => (bool) $validated['mute_objects'],
+            'total_unread' => $this->directory->totalUnread($me),
         ]);
     }
 
@@ -74,20 +111,18 @@ class MessengerApiController extends Controller {
     }
 
     /**
-     * Открыть чат объекта (договора) из поиска или табеля
+     * Открыть чат объекта (договора) из поиска или табеля. Открытие не делает участником.
      */
     public function openObjectChat(Request $request): JsonResponse {
         $validated = $request->validate(['contract_id' => 'required|integer|exists:contracts,id']);
 
-        $contractId = (int) $validated['contract_id'];
-        $chat = MessengerChat::forObject($contractId);
-        $chat->ensureMember($this->me($request), $this->objects->lastCommentId($contractId));
+        $chat = MessengerChat::forObject((int) $validated['contract_id']);
 
         return response()->json(['chat_id' => $chat->id]);
     }
 
     /**
-     * Комментарии объекта просмотрены в табеле — в «Чатах» они больше не непрочитанные
+     * Комментарии объекта просмотрены в табеле — в «Чатах» участника они больше не непрочитанные
      */
     public function markObjectRead(Request $request): JsonResponse {
         $validated = $request->validate(['contract_id' => 'required|integer|exists:contracts,id']);
@@ -97,7 +132,6 @@ class MessengerApiController extends Controller {
         $chat = MessengerChat::forObject($contractId);
         $lastId = $this->objects->lastCommentId($contractId);
 
-        $chat->ensureMember($me, $lastId);
         if ($lastId) {
             $chat->markReadBy($me, $lastId);
         }
@@ -132,7 +166,7 @@ class MessengerApiController extends Controller {
 
         if ($chat->isObject()) {
             $query = $this->objects->commentsQuery((int) $chat->contract_id)
-                ->with(['profile', 'replyTo.profile', 'timesheetContract.team.profile']);
+                ->with(['profile', 'replyTo.profile', 'timesheetContract.team']);
             [$messages, $hasMore, $hasMoreNewer] = $this->page($query, $validated);
 
             return response()->json([
@@ -623,6 +657,11 @@ class MessengerApiController extends Controller {
         return $request->user()->can('mobile-app-can-create-comment:site');
     }
 
+    /** Ставит объекты бригадам в табеле — управляет составом чатов объектов */
+    private function canAssignObjects(Request $request): bool {
+        return $request->user()->can('mobile-app-can-create-contract:site');
+    }
+
     /**
      * Чат, если текущий сотрудник может его открыть; иначе null
      */
@@ -667,7 +706,7 @@ class MessengerApiController extends Controller {
 
     private function messagePayload(Request $request, MessengerChat $chat, $record): array {
         if ($chat->isObject()) {
-            $record->load(['profile', 'replyTo.profile', 'timesheetContract.team.profile']);
+            $record->load(['profile', 'replyTo.profile', 'timesheetContract.team']);
 
             return ObjectCommentResource::forChat($record, $chat->id)->resolve($request);
         }
@@ -703,7 +742,8 @@ class MessengerApiController extends Controller {
         }
 
         $me = $this->me($request);
-        $member = $chat->ensureMember($me, $chat->isObject() ? $this->objects->lastCommentId((int) $chat->contract_id) : null);
+        // Закрепить или выключить звук у чата объекта — значит следить за ним: сотрудник становится участником
+        $member = $chat->isObject() ? $this->objects->addMember($chat, $me, false) : $chat->ensureMember($me);
         $member->{$field === 'pinned' ? 'pinned_at' : 'muted'} = $field === 'pinned'
             ? ($validated['pinned'] ? now() : null)
             : (bool) $validated['muted'];
@@ -754,7 +794,8 @@ class MessengerApiController extends Controller {
             'media'       => $media ?: null,
         ]);
 
-        $chat->ensureMember($me);
+        // Написавший в чат объекта становится его участником — увидит ответы в «Чатах»
+        $this->objects->addMember($chat, $me, false);
         $chat->markReadBy($me, $comment->id);
 
         $payload = $this->messagePayload($request, $chat, $comment);

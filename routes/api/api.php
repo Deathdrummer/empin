@@ -4,6 +4,7 @@ use App\Http\Controllers\api\AuthController;
 use App\Http\Controllers\api\MessengerApiController;
 use App\Http\Controllers\api\MessengerCallController;
 use App\Http\Controllers\api\MessengerGroupController;
+use App\Http\Controllers\api\MessengerObjectController;
 use App\Http\Controllers\api\TimesheetApiController;
 use App\Http\Controllers\SettingsController;
 use Illuminate\Support\Facades\Route;
@@ -75,12 +76,21 @@ Route::controller(MessengerApiController::class)->prefix('messenger')->middlewar
 	Route::post('/poll/vote', 'votePoll');
 	Route::get('/search', 'search');
 	Route::post('/presence', 'presence');
+	Route::get('/settings', 'settings');
+	Route::post('/settings', 'updateSettings');
 });
 
 // Групповые чаты (бригады)
 Route::controller(MessengerGroupController::class)->prefix('messenger/group')->middleware(['auth:sanctum', 'presence'])->group(function() {
 	Route::post('/', 'create');
 	Route::post('/rename', 'rename');
+	Route::post('/members/add', 'addMembers');
+	Route::post('/members/remove', 'removeMember');
+	Route::post('/leave', 'leave');
+});
+
+// Состав чатов объектов
+Route::controller(MessengerObjectController::class)->prefix('messenger/object')->middleware(['auth:sanctum', 'presence'])->group(function() {
 	Route::post('/members/add', 'addMembers');
 	Route::post('/members/remove', 'removeMember');
 	Route::post('/leave', 'leave');

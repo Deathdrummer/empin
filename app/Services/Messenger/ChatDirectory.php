@@ -63,7 +63,6 @@ class ChatDirectory
         $objectChats = $chats->filter(fn (MessengerChat $chat) => $chat->isObject());
         $messageChats = $chats->reject(fn (MessengerChat $chat) => $chat->isObject());
         $directChats = $messageChats->filter(fn (MessengerChat $chat) => $chat->isDirect());
-        $groupChats = $messageChats->filter(fn (MessengerChat $chat) => $chat->isGroup());
 
         $lastIds = MessengerMessage::whereIn('chat_id', $messageChats->pluck('id'))
             ->groupBy('chat_id')
@@ -87,7 +86,7 @@ class ChatDirectory
             ->select('chat_id', DB::raw('MAX(last_read_id) as last_read'))
             ->pluck('last_read', 'chat_id');
 
-        $membersCount = MessengerChatMember::whereIn('chat_id', $groupChats->pluck('id'))
+        $membersCount = MessengerChatMember::whereIn('chat_id', $chats->reject(fn (MessengerChat $chat) => $chat->isDirect())->pluck('id'))
             ->groupBy('chat_id')
             ->select('chat_id', DB::raw('COUNT(*) as total'))
             ->pluck('total', 'chat_id');
@@ -122,7 +121,7 @@ class ChatDirectory
                     'fname' => $peer->fname,
                     'mname' => $peer->mname,
                 ] + Presence::of($peer) : null,
-                'members_count' => $chat->isGroup() ? (int) ($membersCount[$chat->id] ?? 0) : null,
+                'members_count' => $chat->isDirect() ? null : (int) ($membersCount[$chat->id] ?? 0),
                 'object'        => $chat->isObject() ? $this->objectInfo($chat) : null,
                 'last_message'  => $last ? [
                     'id'         => $last->id,
@@ -199,11 +198,7 @@ class ChatDirectory
         }
 
         if ($chat->isObject()) {
-            $info['title'] = $this->titleOf($chat, null);
             $info['object'] = $this->objectInfo($chat);
-            $info['members_count'] = MessengerChatMember::where('chat_id', $chat->id)->count();
-
-            return $info;
         }
 
         $members = MessengerChatMember::where('chat_id', $chat->id)
@@ -212,7 +207,7 @@ class ChatDirectory
             ->orderBy('s.sname')
             ->get(['s.id', 's.sname', 's.fname', 's.mname', 's.last_seen_at', 'messenger_chat_members.role', 'messenger_chat_members.last_read_id']);
 
-        $info['title'] = $chat->title;
+        $info['title'] = $chat->isObject() ? $this->titleOf($chat, null) : $chat->title;
         $info['members'] = $members->map(fn ($row) => [
             'id'    => (int) $row->id,
             'sname' => $row->sname,

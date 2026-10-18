@@ -276,7 +276,7 @@ class MessengerGroupsObjectsTest extends TestCase
         $sent = $this->postJson('/api/messenger/message', ['chat_id' => $chatId, 'message' => 'Фото щита скинул'])
             ->assertCreated()
             ->assertJsonPath('context.day', today()->toDateString())
-            ->assertJsonPath('context.team', 'Иванов С.');
+            ->assertJsonMissingPath('context.team');
         $this->assertSame($today, TimesheetChat::find($sent->json('id'))->timesheet_contract_id);
 
         // Лента объекта — все дни; окно вокруг сообщения
@@ -291,6 +291,109 @@ class MessengerGroupsObjectsTest extends TestCase
         // Без права на комментарии писать в чат объекта нельзя
         $this->actingAsStaff($this->outsider);
         $this->postJson('/api/messenger/message', ['chat_id' => $chatId, 'message' => 'Привет'])->assertForbidden();
+    }
+
+    public function test_object_chat_members_are_masters_assigned_in_timesheet(): void
+    {
+        $contractId = $this->contract('114', 'КТП-3 Лесная');
+        // Давнее назначение тоже считается — без окна в 30 дней
+        $this->assignToTeam($contractId, $this->peer, today()->subDays(200)->toDateString());
+        $current = $this->assignToTeam($contractId, $this->me, today()->toDateString());
+        $this->comment($current, $this->third, 'Комментарий не назначенного');
+
+        $this->actingAsStaff($this->me);
+        $chatId = collect($this->getJson('/api/messenger/chats')->assertOk()->json('chats'))->firstWhere('type', 'object')['chat_id'];
+
+        $info = $this->getJson('/api/messenger/chat/info?chat_id=' . $chatId)->assertOk()
+            ->assertJsonPath('is_member', true)
+            ->assertJsonPath('can_add_members', true)
+            ->assertJsonPath('can_remove_members', false)
+            ->assertJsonPath('members_count', 2);
+        $this->assertEqualsCanonicalizing([$this->me->id, $this->peer->id], array_column($info->json('members'), 'id'));
+
+        // Автор комментариев без назначения и тот, кто открыл объект в табеле, участниками не становятся
+        $this->actingAsStaff($this->third);
+        $this->postJson('/api/messenger/object/read', ['contract_id' => $contractId])->assertOk();
+        $this->postJson('/api/messenger/object/open', ['contract_id' => $contractId])->assertOk()->assertJsonPath('chat_id', $chatId);
+        $this->assertNull(collect($this->getJson('/api/messenger/chats')->json('chats'))->firstWhere('chat_id', $chatId));
+        $this->getJson('/api/messenger/chat/info?chat_id=' . $chatId)->assertOk()->assertJsonPath('is_member', false);
+    }
+
+    public function test_object_chat_members_can_be_added_removed_and_return_on_new_assignment(): void
+    {
+        $manager = ['mobile-app-can-create-contract:site'];
+        $contractId = $this->contract('116', 'ТП-21 Озёрная');
+        $this->assignToTeam($contractId, $this->me, today()->toDateString());
+        $peerAssignment = $this->assignToTeam($contractId, $this->peer, today()->toDateString());
+        $this->comment($peerAssignment, $this->peer, 'Начали');
+        $chat = MessengerChat::forObject($contractId);
+
+        // Участник без права ставить объекты добавлять может, убирать — нет
+        $this->actingAsStaff($this->peer, []);
+        $this->postJson('/api/messenger/object/members/add', ['chat_id' => $chat->id, 'member_ids' => [$this->third->id]])
+            ->assertOk()->assertJsonPath('added', [$this->third->id]);
+        $this->postJson('/api/messenger/object/members/remove', ['chat_id' => $chat->id, 'staff_id' => $this->me->id])->assertForbidden();
+        $this->actingAsStaff($this->third, []);
+        $this->assertNotNull(collect($this->getJson('/api/messenger/chats')->json('chats'))->firstWhere('chat_id', $chat->id));
+
+        // Тот, кто ставит объекты, убирает участника — табель не возвращает его в чат
+        $this->actingAsStaff($this->me, $manager);
+        $this->getJson('/api/messenger/chat/info?chat_id=' . $chat->id)->assertJsonPath('can_remove_members', true);
+        $this->postJson('/api/messenger/object/members/remove', ['chat_id' => $chat->id, 'staff_id' => $this->peer->id])
+            ->assertOk()->assertJsonPath('removed', true);
+        Event::assertDispatched(MessengerEvent::class, fn (MessengerEvent $event) => $event->eventName === 'chat.updated'
+            && $event->recipientStaffIds === [$this->peer->id] && ($event->payload['removed'] ?? false));
+
+        $this->actingAsStaff($this->peer, []);
+        $this->assertNull(collect($this->getJson('/api/messenger/chats')->json('chats'))->firstWhere('chat_id', $chat->id));
+        $this->actingAsStaff($this->me, $manager);
+        $this->getJson('/api/messenger/chat/info?chat_id=' . $chat->id)->assertOk();
+        $this->assertNotContains($this->peer->id, $chat->memberIds());
+
+        // Объект снова поставили бригаде Петрова — он возвращается в чат
+        $this->travel(2)->minutes();
+        $this->assignToTeam($contractId, $this->peer, today()->addDay()->toDateString());
+        $this->actingAsStaff($this->peer, []);
+        $this->assertNotNull(collect($this->getJson('/api/messenger/chats')->json('chats'))->firstWhere('chat_id', $chat->id));
+
+        // Выйти может любой участник
+        $this->actingAsStaff($this->third, []);
+        $this->postJson('/api/messenger/object/leave', ['chat_id' => $chat->id])->assertOk()->assertJsonPath('removed', true);
+        $this->assertNull(collect($this->getJson('/api/messenger/chats')->json('chats'))->firstWhere('chat_id', $chat->id));
+    }
+
+    public function test_mute_objects_setting_silences_all_object_chats_and_new_ones(): void
+    {
+        $first = $this->contract('117', 'РП-5 Речная');
+        $mine = $this->assignToTeam($first, $this->me, today()->toDateString());
+        $this->comment($mine, $this->peer, 'Первый объект');
+        $direct = MessengerChat::getOrCreate($this->me->id, $this->peer->id);
+        $this->message($direct, $this->peer, 'Личное');
+        $this->token($this->me, 'ExponentPushToken[me]');
+
+        $this->actingAsStaff($this->me);
+        $this->getJson('/api/messenger/settings')->assertOk()->assertJsonPath('mute_objects', false);
+        $this->getJson('/api/messenger/chats')->assertOk();
+        $this->postJson('/api/messenger/settings', ['mute_objects' => true])->assertOk()->assertJsonPath('mute_objects', true);
+        $this->getJson('/api/messenger/settings')->assertJsonPath('mute_objects', true);
+
+        // Новый объект приходит уже без звука, личный чат звук не теряет
+        $second = $this->contract('118', 'ТП-30 Новая');
+        $secondAssignment = $this->assignToTeam($second, $this->me, today()->toDateString());
+        $this->comment($secondAssignment, $this->peer, 'Второй объект');
+        $chats = collect($this->getJson('/api/messenger/chats')->json('chats'));
+        $this->assertTrue($chats->where('type', 'object')->every(fn (array $chat) => $chat['muted']));
+        $this->assertFalse($chats->firstWhere('type', 'direct')['muted']);
+
+        // Комментарий в объекте без звука — без push
+        $this->actingAsStaff($this->peer, ['mobile-app-can-create-comment:site']);
+        $this->postJson('/api/timesheet/comment', ['timesheet_contract_id' => $secondAssignment, 'message' => 'Тихо'])->assertCreated();
+        Http::assertNotSent(fn (HttpRequest $request) => str_contains($request->url(), 'exp.host') && ($request[0]['to'] ?? null) === 'ExponentPushToken[me]');
+
+        // Выключение настройки возвращает звук всем объектам
+        $this->actingAsStaff($this->me);
+        $this->postJson('/api/messenger/settings', ['mute_objects' => false])->assertOk();
+        $this->assertTrue(collect($this->getJson('/api/messenger/chats')->json('chats'))->where('type', 'object')->every(fn (array $chat) => !$chat['muted']));
     }
 
     public function test_timesheet_comment_can_be_deleted_only_by_author(): void
@@ -333,19 +436,23 @@ class MessengerGroupsObjectsTest extends TestCase
         $this->permissions = $names;
     }
 
-    private function actingAsStaff(Staff $staff): void
+    /**
+     * @param string[]|null $permissions права именно этого сотрудника (иначе — общие из givePermissions)
+     */
+    private function actingAsStaff(Staff $staff, ?array $permissions = null): void
     {
         $user = User::firstOrCreate(['staff_id' => $staff->id], [
             'email' => "groups{$staff->id}@example.com",
             'password' => 'correct-horse-42',
         ]);
 
-        if ($this->permissions && $staff->id !== $this->outsider->id) {
-            foreach ($this->permissions as $name) {
+        $names = $permissions ?? ($staff->id !== $this->outsider->id ? $this->permissions : null);
+        if ($names !== null) {
+            foreach ($names as $name) {
                 Permission::findOrCreate($name, 'site');
             }
             app(PermissionRegistrar::class)->forgetCachedPermissions();
-            $user->givePermissionTo($this->permissions);
+            $user->syncPermissions($names);
         }
 
         Sanctum::actingAs($user);

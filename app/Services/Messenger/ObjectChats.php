@@ -4,23 +4,26 @@ namespace App\Services\Messenger;
 
 use App\Models\MessengerChat;
 use App\Models\MessengerChatMember;
+use App\Models\MessengerChatRemoval;
+use App\Models\MessengerSetting;
 use App\Models\TimesheetChat;
 use App\Models\TimesheetContract;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 /**
  * Чаты объектов: комментарии табеля к договору за все дни и все бригады одной лентой.
  *
- * Объект попадает в «Чаты» сотрудника сам, если его бригада работала на объекте в последние
- * TEAM_DAYS дней или он писал комментарии к объекту в последние COMMENT_DAYS дней.
+ * Участники — мастера бригад, которым объект поставлен в табеле (за любой день), и добавленные вручную.
+ * Табель сверяется при загрузке списка чатов, перед рассылкой нового сообщения и в сведениях о чате,
+ * поэтому подхватываются назначения, сделанные и в приложении, и на сайте.
+ * Убранный из чата (или вышедший сам) возвращается, только если объект поставят его бригаде снова.
  * Открыть и написать в чат любого объекта может любой сотрудник — как в табеле.
  */
 class ObjectChats
 {
-    private const TEAM_DAYS = 30;
-    private const COMMENT_DAYS = 60;
-
     /** Комментарии объекта (договора) за все дни */
     public function commentsQuery(int $contractId): Builder
     {
@@ -38,61 +41,169 @@ class ObjectChats
     }
 
     /**
-     * Создать чаты и участие для объектов, которые сотрудник отслеживает, но ещё не открывал.
+     * Добавить сотрудника в чаты объектов, которые табель поставил его бригадам.
      * Новый участник не получает старые комментарии непрочитанными.
      */
     public function syncFollowedObjects(int $staffId): void
     {
-        $teamContracts = TimesheetContract::query()
-            ->join('timesheet_teams as t', 't.id', '=', 'timesheet_contracts.team_id')
+        $assigned = $this->assignments()
             ->where('t.staff_id', $staffId)
-            ->where('t.day', '>=', now()->subDays(self::TEAM_DAYS)->toDateString())
-            ->distinct()
-            ->pluck('timesheet_contracts.contract_id');
-
-        $commentContracts = TimesheetChat::query()
-            ->join('timesheet_contracts as tc', 'tc.id', '=', 'timesheet_chat.timesheet_contract_id')
-            ->where('timesheet_chat.from_id', $staffId)
-            ->where('timesheet_chat.created_at', '>=', now()->subDays(self::COMMENT_DAYS))
-            ->distinct()
-            ->pluck('tc.contract_id');
-
-        $contractIds = $teamContracts->merge($commentContracts)->map(fn ($id) => (int) $id)->unique()->values();
-        if ($contractIds->isEmpty()) {
+            ->groupBy('timesheet_contracts.contract_id')
+            ->select('timesheet_contracts.contract_id', DB::raw('MAX(timesheet_contracts.created_at) as assigned_at'))
+            ->pluck('assigned_at', 'contract_id');
+        if ($assigned->isEmpty()) {
             return;
         }
 
-        $chats = MessengerChat::where('type', MessengerChat::TYPE_OBJECT)
-            ->whereIn('contract_id', $contractIds)
-            ->get()
-            ->keyBy('contract_id');
+        $chats = $this->chatsForObjects($assigned->keys()->map(fn ($id) => (int) $id)->all());
+        $joined = MessengerChatMember::where('staff_id', $staffId)->whereIn('chat_id', $chats->pluck('id'))->pluck('chat_id')->flip();
+        $removedAt = MessengerChatRemoval::where('staff_id', $staffId)->whereIn('chat_id', $chats->pluck('id'))->pluck('created_at', 'chat_id');
 
-        foreach ($contractIds->diff($chats->keys()) as $contractId) {
-            $chats[$contractId] = MessengerChat::forObject($contractId);
-        }
-
-        $following = MessengerChatMember::where('staff_id', $staffId)
-            ->whereIn('chat_id', $chats->pluck('id'))
-            ->pluck('chat_id')
-            ->map(fn ($id) => (int) $id);
-
-        $newChats = $chats->reject(fn (MessengerChat $chat) => $following->contains($chat->id));
+        $newChats = $chats->filter(fn (MessengerChat $chat) => !isset($joined[$chat->id])
+            && $this->assignedSinceRemoval($assigned[$chat->contract_id] ?? null, $removedAt[$chat->id] ?? null));
         if ($newChats->isEmpty()) {
             return;
         }
 
         $lastIds = $this->lastCommentIds($newChats->pluck('contract_id')->all());
-        $now = now();
+        $muted = MessengerSetting::muteObjects($staffId);
 
-        MessengerChatMember::insertOrIgnore($newChats->map(fn (MessengerChat $chat) => [
+        $this->insertMembers($newChats->map(fn (MessengerChat $chat) => [
             'chat_id'      => $chat->id,
             'staff_id'     => $staffId,
-            'role'         => MessengerChatMember::ROLE_MEMBER,
             'last_read_id' => $lastIds[$chat->contract_id] ?? null,
-            'muted'        => false,
-            'created_at'   => $now,
-            'updated_at'   => $now,
+            'muted'        => $muted,
         ])->values()->all());
+    }
+
+    /**
+     * Добавить в чат объекта всех мастеров бригад, которым объект поставлен в табеле
+     */
+    public function syncMembers(MessengerChat $chat): void
+    {
+        if (!$chat->isObject()) {
+            return;
+        }
+
+        $assigned = $this->assignments()
+            ->where('timesheet_contracts.contract_id', $chat->contract_id)
+            ->groupBy('t.staff_id')
+            ->select('t.staff_id', DB::raw('MAX(timesheet_contracts.created_at) as assigned_at'))
+            ->pluck('assigned_at', 'staff_id');
+
+        $joined = MessengerChatMember::where('chat_id', $chat->id)->pluck('staff_id')->flip();
+        $removedAt = MessengerChatRemoval::where('chat_id', $chat->id)->pluck('created_at', 'staff_id');
+
+        $newIds = $assigned->keys()
+            ->map(fn ($id) => (int) $id)
+            ->filter(fn (int $staffId) => !isset($joined[$staffId])
+                && $this->assignedSinceRemoval($assigned[$staffId], $removedAt[$staffId] ?? null))
+            ->values();
+        if ($newIds->isEmpty()) {
+            return;
+        }
+
+        $lastId = $this->lastCommentId((int) $chat->contract_id);
+        $muted = MessengerSetting::whereIn('staff_id', $newIds)->pluck('mute_objects', 'staff_id');
+
+        $this->insertMembers($newIds->map(fn (int $staffId) => [
+            'chat_id'      => $chat->id,
+            'staff_id'     => $staffId,
+            'last_read_id' => $lastId,
+            'muted'        => (bool) ($muted[$staffId] ?? false),
+        ])->all());
+    }
+
+    /**
+     * Добавить сотрудника вручную. Добавленный другим человеком получает звук по своей настройке
+     * «чаты объектов без звука», вступивший сам (написал в чат) — со звуком.
+     */
+    public function addMember(MessengerChat $chat, int $staffId, bool $byOther = true): MessengerChatMember
+    {
+        MessengerChatRemoval::where('chat_id', $chat->id)->where('staff_id', $staffId)->delete();
+
+        return MessengerChatMember::firstOrCreate(['chat_id' => $chat->id, 'staff_id' => $staffId], [
+            'role'         => MessengerChatMember::ROLE_MEMBER,
+            'last_read_id' => $this->lastCommentId((int) $chat->contract_id),
+            'muted'        => $byOther && MessengerSetting::muteObjects($staffId),
+        ]);
+    }
+
+    /**
+     * Убрать сотрудника из чата объекта (или он вышел сам). Табель не вернёт его,
+     * пока объект не поставят его бригаде снова.
+     */
+    public function removeMember(MessengerChat $chat, int $staffId, int $removedBy): bool
+    {
+        $removed = MessengerChatMember::where('chat_id', $chat->id)->where('staff_id', $staffId)->delete() > 0;
+
+        // Отметка пересоздаётся: важно время последнего удаления
+        MessengerChatRemoval::where('chat_id', $chat->id)->where('staff_id', $staffId)->delete();
+        MessengerChatRemoval::create(['chat_id' => $chat->id, 'staff_id' => $staffId, 'removed_by' => $removedBy]);
+
+        return $removed;
+    }
+
+    /**
+     * «Чаты объектов без звука»: сразу для всех объектов сотрудника, а новые объекты приходят без звука.
+     * Выключение возвращает звук всем объектам.
+     */
+    public function setMuteObjects(int $staffId, bool $mute): void
+    {
+        MessengerSetting::updateOrCreate(['staff_id' => $staffId], ['mute_objects' => $mute]);
+
+        MessengerChatMember::where('staff_id', $staffId)
+            ->whereIn('chat_id', MessengerChat::where('type', MessengerChat::TYPE_OBJECT)->select('id'))
+            ->update(['muted' => $mute]);
+    }
+
+    /** Назначения объектов бригадам: строки табеля с мастером бригады (t.staff_id) */
+    private function assignments(): Builder
+    {
+        return TimesheetContract::query()->join('timesheet_teams as t', 't.id', '=', 'timesheet_contracts.team_id');
+    }
+
+    /**
+     * Чаты объектов по договорам; недостающие создаются одним запросом
+     *
+     * @param int[] $contractIds
+     * @return Collection<int, MessengerChat>
+     */
+    private function chatsForObjects(array $contractIds): Collection
+    {
+        $load = fn () => MessengerChat::where('type', MessengerChat::TYPE_OBJECT)->whereIn('contract_id', $contractIds)->get();
+        $chats = $load();
+
+        $missing = array_values(array_diff($contractIds, $chats->pluck('contract_id')->all()));
+        if ($missing) {
+            $now = now();
+            // Параллельный запрос мог создать тот же чат — уникальный contract_id не даст дубля
+            MessengerChat::insertOrIgnore(array_map(fn (int $contractId) => [
+                'type'        => MessengerChat::TYPE_OBJECT,
+                'contract_id' => $contractId,
+                'created_at'  => $now,
+                'updated_at'  => $now,
+            ], $missing));
+            $chats = $load();
+        }
+
+        return $chats;
+    }
+
+    /** Не убран из чата, или объект поставили его бригаде уже после этого */
+    private function assignedSinceRemoval(?string $assignedAt, ?Carbon $removedAt): bool
+    {
+        return $removedAt === null || ($assignedAt !== null && Carbon::parse($assignedAt)->gt($removedAt));
+    }
+
+    private function insertMembers(array $rows): void
+    {
+        $now = now();
+        MessengerChatMember::insertOrIgnore(array_map(fn (array $row) => $row + [
+            'role'       => MessengerChatMember::ROLE_MEMBER,
+            'created_at' => $now,
+            'updated_at' => $now,
+        ], $rows));
     }
 
     /**
