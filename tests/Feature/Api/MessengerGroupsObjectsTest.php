@@ -468,7 +468,6 @@ class MessengerGroupsObjectsTest extends TestCase
         return DB::table('contracts')->insertGetId([
             'object_number' => $number,
             'title' => $title,
-            'last_id' => 0,
             'created_at' => now(),
             'updated_at' => now(),
         ]);

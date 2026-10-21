@@ -42,11 +42,12 @@ return new class extends Migration
             $table->foreign('staff_id')->references('id')->on('staff')->onDelete('cascade');
         });
 
-        // Участники существующих личных чатов
+        // UNION убирает повтор участника в существующих чатах с самим собой.
+        // Сами чаты и их история сохраняются.
         DB::statement("
             INSERT INTO messenger_chat_members (chat_id, staff_id, role, created_at, updated_at)
             SELECT id, participant_1_id, 'member', NOW(), NOW() FROM messenger_chats WHERE participant_1_id IS NOT NULL
-            UNION ALL
+            UNION
             SELECT id, participant_2_id, 'member', NOW(), NOW() FROM messenger_chats WHERE participant_2_id IS NOT NULL
         ");
 
