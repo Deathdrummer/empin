@@ -6,7 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * Настройки мессенджера сотрудника — одинаковые на всех его устройствах.
- * mute_objects — чаты объектов без звука, и новые тоже приходят без звука.
+ * mute_objects — чаты объектов без звука, и новые тоже приходят без звука;
+ * open_chats_on_start — при открытии приложения показывать «Чаты» (по умолчанию — табель).
  */
 class MessengerSetting extends Model
 {
@@ -18,6 +19,7 @@ class MessengerSetting extends Model
 
     protected $casts = [
         'mute_objects' => 'boolean',
+        'open_chats_on_start' => 'boolean',
     ];
 
     public static function muteObjects(int $staffId): bool

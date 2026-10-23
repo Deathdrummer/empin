@@ -77,7 +77,7 @@ class ChatDirectory
         $mentioned = $this->unreadMentions($staffId);
 
         $peerIds = $directChats->mapWithKeys(fn (MessengerChat $chat) => [$chat->id => $chat->otherParticipantId($staffId)]);
-        $peers = Staff::whereIn('id', $peerIds->values())->get(['id', 'sname', 'fname', 'mname', 'last_seen_at'])->keyBy('id');
+        $peers = Staff::whereIn('id', $peerIds->values())->get(['id', 'sname', 'fname', 'mname', 'avatar', 'last_seen_at'])->keyBy('id');
 
         // Галочки «прочитано» у моего последнего сообщения: собеседник или кто-то из группы дочитал до него
         $othersRead = MessengerChatMember::whereIn('chat_id', $messageChats->pluck('id'))
@@ -120,6 +120,7 @@ class ChatDirectory
                     'sname' => $peer->sname,
                     'fname' => $peer->fname,
                     'mname' => $peer->mname,
+                    'avatar' => $peer->avatar,
                 ] + Presence::of($peer) : null,
                 'members_count' => $chat->isDirect() ? null : (int) ($membersCount[$chat->id] ?? 0),
                 'object'        => $chat->isObject() ? $this->objectInfo($chat) : null,
@@ -185,13 +186,14 @@ class ChatDirectory
         ];
 
         if ($chat->isDirect()) {
-            $peer = Staff::find($chat->otherParticipantId($staffId), ['id', 'sname', 'fname', 'mname', 'last_seen_at']);
+            $peer = Staff::find($chat->otherParticipantId($staffId), ['id', 'sname', 'fname', 'mname', 'avatar', 'last_seen_at']);
             $info['title'] = $this->titleOf($chat, $peer);
             $info['participant'] = $peer ? [
                 'id'    => $peer->id,
                 'sname' => $peer->sname,
                 'fname' => $peer->fname,
                 'mname' => $peer->mname,
+                'avatar' => $peer->avatar,
             ] + Presence::of($peer) : null;
 
             return $info;
@@ -205,7 +207,7 @@ class ChatDirectory
             ->join('staff as s', 's.id', '=', 'messenger_chat_members.staff_id')
             ->orderByRaw("messenger_chat_members.role = 'admin' DESC")
             ->orderBy('s.sname')
-            ->get(['s.id', 's.sname', 's.fname', 's.mname', 's.last_seen_at', 'messenger_chat_members.role', 'messenger_chat_members.last_read_id']);
+            ->get(['s.id', 's.sname', 's.fname', 's.mname', 's.avatar', 's.last_seen_at', 'messenger_chat_members.role', 'messenger_chat_members.last_read_id']);
 
         $info['title'] = $chat->isObject() ? $this->titleOf($chat, null) : $chat->title;
         $info['members'] = $members->map(fn ($row) => [
@@ -213,6 +215,7 @@ class ChatDirectory
             'sname' => $row->sname,
             'fname' => $row->fname,
             'mname' => $row->mname,
+            'avatar' => $row->avatar,
             'role'  => $row->role,
         ] + Presence::of(new Staff(['last_seen_at' => $row->last_seen_at])))->values()->all();
         $info['members_count'] = count($info['members']);

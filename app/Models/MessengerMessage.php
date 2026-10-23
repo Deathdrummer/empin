@@ -83,7 +83,7 @@ class MessengerMessage extends Model {
 
 	public function profile(): BelongsTo {
     	return $this->belongsTo(Staff::class, 'from_id')
-			->select(['id', 'sname', 'fname', 'mname']);
+			->select(['id', 'sname', 'fname', 'mname', 'avatar']);
 	}
 
 	public function replyTo(): BelongsTo {

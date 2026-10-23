@@ -521,7 +521,8 @@ class TimesheetApiController extends Controller {
                 MIN(id) as id,
                 TRIM(sname) as sname,
                 TRIM(fname) as fname,
-                TRIM(mname) as mname
+                TRIM(mname) as mname,
+                MAX(avatar) as avatar
             ')
             ->groupByRaw('TRIM(sname), TRIM(fname), TRIM(mname)')
             ->orderByRaw('TRIM(sname), TRIM(fname)')

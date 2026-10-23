@@ -79,6 +79,8 @@ Route::controller(MessengerApiController::class)->prefix('messenger')->middlewar
 	Route::post('/presence', 'presence');
 	Route::get('/settings', 'settings');
 	Route::post('/settings', 'updateSettings');
+	Route::post('/avatar', 'uploadAvatar');
+	Route::delete('/avatar', 'deleteAvatar');
 });
 
 // Групповые чаты (бригады)

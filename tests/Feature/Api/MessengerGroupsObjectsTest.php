@@ -12,6 +12,7 @@ use App\Models\TimesheetChat;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Http\Client\Request as HttpRequest;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
@@ -488,6 +489,49 @@ class MessengerGroupsObjectsTest extends TestCase
         $this->actingAsStaff($this->outsider);
         $this->postJson('/api/messenger/forward', ['chat_id' => $direct->id, 'message_ids' => [$photo->id], 'target_staff_ids' => [$this->me->id]])->assertNotFound();
     }
+
+    public function test_avatar_is_shown_everywhere_and_start_screen_setting_is_saved(): void
+    {
+        Storage::fake('public');
+        $direct = MessengerChat::getOrCreate($this->me->id, $this->peer->id);
+        $this->message($direct, $this->me, 'Привет');
+        $upload = fn () => $this->post('/api/messenger/avatar', [
+            'avatar' => UploadedFile::fake()->createWithContent('me.jpg', base64_decode(self::TINY_JPEG)),
+        ], ['Accept' => 'application/json']);
+
+        $this->actingAsStaff($this->me);
+        $first = $upload()->assertOk()->json('avatar');
+        $this->assertStringStartsWith('/storage/avatars/', $first);
+        Storage::disk('public')->assertExists(str_replace('/storage/', '', $first));
+        $this->getJson('/api/messenger/settings')->assertJsonPath('avatar', $first)->assertJsonPath('open_chats_on_start', false);
+
+        // Собеседник видит аватарку в списке чатов, у сообщения и в списке сотрудников
+        $this->actingAsStaff($this->peer);
+        $chat = collect($this->getJson('/api/messenger/chats')->json('chats'))->firstWhere('chat_id', $direct->id);
+        $this->assertSame($first, $chat['participant']['avatar']);
+        $this->postJson('/api/messenger/chat/messages', ['chat_id' => $direct->id])->assertOk()->assertJsonPath('messages.0.from.avatar', $first);
+        $this->assertSame($first, collect($this->getJson('/api/timesheet/all-staff')->json())->firstWhere('id', $this->me->id)['avatar']);
+
+        // Новая заменяет прежнюю (старый файл удалён), удаление очищает
+        $this->actingAsStaff($this->me);
+        $second = $upload()->assertOk()->json('avatar');
+        Storage::disk('public')->assertMissing(str_replace('/storage/', '', $first));
+        $this->deleteJson('/api/messenger/avatar')->assertOk()->assertJsonPath('avatar', null);
+        Storage::disk('public')->assertMissing(str_replace('/storage/', '', $second));
+
+        // Не картинка — отказ
+        $this->post('/api/messenger/avatar', ['avatar' => UploadedFile::fake()->createWithContent('note.txt', 'hello')], ['Accept' => 'application/json'])
+            ->assertStatus(422);
+
+        // «Показывать чаты при открытии» сохраняется и не трогает «без звука» для объектов
+        $this->postJson('/api/messenger/settings', ['open_chats_on_start' => true])->assertOk()
+            ->assertJsonPath('open_chats_on_start', true)
+            ->assertJsonPath('mute_objects', false);
+        $this->getJson('/api/messenger/settings')->assertJsonPath('open_chats_on_start', true);
+    }
+
+    // Картинка 1×1 JPEG — без GD в тестовом окружении
+    private const TINY_JPEG = '/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP//////////////////////////////////////////////////////////////////////////////////////wgALCAABAAEBAREA/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPxA=';
 
     public function test_timesheet_comment_can_be_deleted_only_by_author(): void
     {

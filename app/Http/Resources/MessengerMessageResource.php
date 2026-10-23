@@ -31,6 +31,7 @@ class MessengerMessageResource extends JsonResource {
                                 'sname' => $this->profile->sname,
                                 'fname' => $this->profile->fname,
                                 'mname' => $this->profile->mname,
+                                'avatar' => $this->profile->avatar,
                             ] : null,
             'message'     => $this->message,
             'reply_to_id' => $this->reply_to_id,

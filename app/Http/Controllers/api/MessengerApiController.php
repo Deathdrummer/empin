@@ -72,25 +72,67 @@ class MessengerApiController extends Controller {
      * Настройки мессенджера сотрудника (одинаковые на всех его устройствах)
      */
     public function settings(Request $request): JsonResponse {
-        return response()->json(['mute_objects' => MessengerSetting::muteObjects($this->me($request))]);
+        return response()->json($this->settingsPayload($this->me($request)));
     }
 
     /**
-     * «Чаты объектов без звука»: сразу для всех объектов, и новые объекты приходят без звука
+     * «Чаты объектов без звука» (сразу для всех объектов, и новые приходят без звука)
+     * и «При открытии приложения показывать чаты». Меняется только переданное.
      */
     public function updateSettings(Request $request): JsonResponse {
-        $validated = $request->validate(['mute_objects' => 'required|boolean']);
+        $validated = $request->validate([
+            'mute_objects'        => 'sometimes|boolean',
+            'open_chats_on_start' => 'sometimes|boolean',
+        ]);
 
         $me = $this->me($request);
-        $this->objects->setMuteObjects($me, (bool) $validated['mute_objects']);
+        if (array_key_exists('mute_objects', $validated)) {
+            $this->objects->setMuteObjects($me, (bool) $validated['mute_objects']);
+        }
+        if (array_key_exists('open_chats_on_start', $validated)) {
+            MessengerSetting::updateOrCreate(['staff_id' => $me], ['open_chats_on_start' => (bool) $validated['open_chats_on_start']]);
+        }
 
         // Другие устройства сотрудника обновят список
         $this->afterResponse(fn () => $this->notifier->broadcast([$me], 'chat.updated', ['settings' => true]));
 
-        return response()->json([
-            'mute_objects' => (bool) $validated['mute_objects'],
+        return response()->json($this->settingsPayload($me) + [
             'total_unread' => $this->directory->totalUnread($me),
         ]);
+    }
+
+    /**
+     * Аватарка из приложения: квадратное фото (приложение уже уменьшило его до 512×512).
+     * Прежний файл удаляется.
+     */
+    public function uploadAvatar(Request $request): JsonResponse {
+        $request->validate(['avatar' => 'required|file|mimes:jpeg,jpg,png,webp|max:5120']);
+
+        $staff = Staff::findOrFail($this->me($request));
+        $previous = $staff->avatar;
+        $path = '/storage/' . $request->file('avatar')->store('avatars', 'public');
+        $staff->forceFill(['avatar' => $path])->save();
+        MediaStorage::delete($previous ? [['path' => $previous]] : null);
+
+        return response()->json(['avatar' => $path]);
+    }
+
+    public function deleteAvatar(Request $request): JsonResponse {
+        $staff = Staff::findOrFail($this->me($request));
+        MediaStorage::delete($staff->avatar ? [['path' => $staff->avatar]] : null);
+        $staff->forceFill(['avatar' => null])->save();
+
+        return response()->json(['avatar' => null]);
+    }
+
+    private function settingsPayload(int $staffId): array {
+        $settings = MessengerSetting::find($staffId);
+
+        return [
+            'mute_objects'        => (bool) $settings?->mute_objects,
+            'open_chats_on_start' => (bool) $settings?->open_chats_on_start,
+            'avatar'              => Staff::whereKey($staffId)->value('avatar'),
+        ];
     }
 
     /**
