@@ -530,6 +530,41 @@ class MessengerGroupsObjectsTest extends TestCase
         $this->getJson('/api/messenger/settings')->assertJsonPath('open_chats_on_start', true);
     }
 
+    public function test_android_voice_m4a_is_audio_not_video(): void
+    {
+        Storage::fake('public');
+        $direct = MessengerChat::getOrCreate($this->me->id, $this->peer->id);
+        // Заголовок MP4 с маркой mp42, как у диктофона Android: по содержимому это «video/mp4»
+        $mp4 = hex2bin('0000001c66747970' . bin2hex('mp42') . '00000000' . bin2hex('isommp42') . '0000000866726565');
+
+        $this->actingAsStaff($this->me);
+        $sent = $this->post('/api/messenger/message', [
+            'chat_id' => $direct->id,
+            'media' => [UploadedFile::fake()->createWithContent('%D0%93%D0%BE%D0%BB%D0%BE%D1%81.m4a', $mp4)],
+        ], ['Accept' => 'application/json'])->assertCreated();
+        $media = $sent->json('media.0');
+        $this->assertSame('audio', $media['type']);
+        $this->assertSame('Голос.m4a', $media['name']);
+        $this->assertStringEndsWith('.m4a', $media['path']);
+
+        // Сохранённое раньше как «видео» голосовое показывается звуком (и в превью списка чатов)
+        MessengerMessage::create(['chat_id' => $direct->id, 'from_id' => $this->peer->id, 'message' => '', 'media' => [[
+            'path' => '/storage/messenger/messages/old.mp4', 'type' => 'video', 'mime_type' => 'video/mp4', 'size' => 10,
+            'name' => '%D0%93%D0%BE%D0%BB%D0%BE%D1%81%D0%BE%D0%B2%D0%BE%D0%B5.m4a',
+        ]]]);
+        $this->postJson('/api/messenger/chat/messages', ['chat_id' => $direct->id])->assertOk()->assertJsonPath('messages.1.media.0.type', 'audio');
+        $this->assertSame('audio', collect($this->getJson('/api/messenger/chats')->json('chats'))->firstWhere('chat_id', $direct->id)['last_message']['type']);
+
+        // Комментарий табеля с голосовым — то же правило
+        $this->actingAsStaff($this->me, ['mobile-app-can-create-comment:site']);
+        $timesheetContract = $this->assignToTeam($this->contract('121', 'ТП-50'), $this->me, today()->toDateString());
+        $this->post('/api/timesheet/comment', [
+            'timesheet_contract_id' => $timesheetContract,
+            'message' => '',
+            'media' => [UploadedFile::fake()->createWithContent('voice.m4a', $mp4)],
+        ], ['Accept' => 'application/json'])->assertCreated()->assertJsonPath('data.media.0.type', 'audio');
+    }
+
     // Картинка 1×1 JPEG — без GD в тестовом окружении
     private const TINY_JPEG = '/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP//////////////////////////////////////////////////////////////////////////////////////wgALCAABAAEBAREA/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPxA=';
 

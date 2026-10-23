@@ -1,5 +1,6 @@
 <?php namespace App\Http\Resources;
 
+use App\Services\Messenger\MediaStorage;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class TimesheetChatResource extends JsonResource {
@@ -75,7 +76,8 @@ class TimesheetChatResource extends JsonResource {
                     }
                 }
 
-                return $m;
+                // Голосовые с Android, сохранённые как «видео», показываем как звук
+                return MediaStorage::fixLegacyType($m);
             }, $this->media);
         }
 

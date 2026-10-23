@@ -15,6 +15,7 @@ use App\Models\TimesheetContract;
 use App\Models\TimesheetTeam;
 use App\Services\Messenger\ChatDirectory;
 use App\Services\Messenger\MessengerNotifier;
+use App\Services\Messenger\MediaStorage;
 use App\Services\Messenger\ObjectChats;
 use App\Services\Messenger\Reactions;
 use Carbon\Carbon;
@@ -345,57 +346,8 @@ class TimesheetApiController extends Controller {
             return response()->json(['error' => 'Contract not found'], 404);
         }
 
-        // Обработка медиа файлов
-        $mediaArray = [];
-        if ($request->hasFile('media')) {
-            $files = $request->file('media');
-
-            foreach ($files as $file) {
-                $mimeType = $file->getMimeType();
-                $size = $file->getSize();
-                $originalFilename = $file->getClientOriginalName();
-
-                // Сохраняем файл через Storage API в storage/app/public/timesheet/comments/
-                $storagePath = $file->store('timesheet/comments', 'public');
-
-                // Определяем тип медиа по MIME типу
-                $type = 'file'; // По умолчанию
-                if (str_starts_with($mimeType, 'image/')) {
-                    $type = 'image';
-                } elseif (str_starts_with($mimeType, 'video/')) {
-                    $type = 'video';
-                } elseif (str_starts_with($mimeType, 'audio/')) {
-                    $type = 'audio';
-                } elseif (in_array($mimeType, [
-                    'application/pdf',
-                    'application/msword',
-                    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                    'application/vnd.ms-excel',
-                    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                    'application/vnd.ms-powerpoint',
-                    'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-                    'text/plain',
-                    'text/csv',
-                ])) {
-                    $type = 'document';
-                } elseif (in_array($mimeType, [
-                    'application/zip',
-                    'application/x-rar-compressed',
-                    'application/x-7z-compressed',
-                ])) {
-                    $type = 'archive';
-                }
-
-                // Формируем данные о медиа
-                $mediaArray[] = [
-                    'path' => '/storage/' . $storagePath, // Путь для доступа через веб
-                    'type' => $type,
-                    'mime_type' => $mimeType,
-                    'size' => $size,
-                    'name' => $originalFilename,
-                ];
-            }
-        }
+        // Медиа файлы: тип по содержимому и расширению (голосовое m4a — аудио, а не видео)
+        $mediaArray = MediaStorage::store($request, 'timesheet/comments');
 
         $comment = $contract->chat()->create([
             'from_id' => $request->user()->staff_id,

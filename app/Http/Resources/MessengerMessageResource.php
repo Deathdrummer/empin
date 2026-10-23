@@ -1,5 +1,6 @@
 <?php namespace App\Http\Resources;
 
+use App\Services\Messenger\MediaStorage;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class MessengerMessageResource extends JsonResource {
@@ -119,7 +120,7 @@ class MessengerMessageResource extends JsonResource {
                 }
             }
 
-            return $m;
+            return MediaStorage::fixLegacyType($m);
         }, $media);
     }
 
@@ -134,7 +135,7 @@ class MessengerMessageResource extends JsonResource {
         // Старый формат — одно вложение объектом
         $first = isset($media['path']) ? $media : ($media[0] ?? null);
 
-        return is_array($first) ? ($first['type'] ?? 'file') : 'text';
+        return is_array($first) ? (MediaStorage::fixLegacyType($first)['type'] ?? 'file') : 'text';
     }
 
     /**
