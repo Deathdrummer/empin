@@ -15,6 +15,7 @@ use App\Services\Messenger\MediaStorage;
 use App\Services\Messenger\MessengerNotifier;
 use App\Services\Messenger\ObjectChats;
 use App\Services\Messenger\Presence;
+use App\Services\Messenger\Reactions;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -377,15 +378,8 @@ class MessengerApiController extends Controller {
             return response()->json(['error' => 'Message not found'], 404);
         }
 
-        $userId = $request->user()->id;
-        $reactions = $record->reactions ?? [];
-        $existing = collect($reactions)->search(fn ($r) => $r['user_id'] == $userId && $r['emoji'] === $validated['emoji']);
-
-        if ($existing !== false) {
-            array_splice($reactions, $existing, 1);
-        } else {
-            $reactions[] = ['user_id' => $userId, 'emoji' => $validated['emoji']];
-        }
+        // Одна реакция от человека: та же снимается, другая заменяет прежнюю
+        $reactions = Reactions::toggle($record->reactions ?? [], (int) $request->user()->id, $validated['emoji']);
 
         $record->reactions = $reactions;
         $record->save();

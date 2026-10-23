@@ -16,6 +16,7 @@ use App\Models\TimesheetTeam;
 use App\Services\Messenger\ChatDirectory;
 use App\Services\Messenger\MessengerNotifier;
 use App\Services\Messenger\ObjectChats;
+use App\Services\Messenger\Reactions;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -680,28 +681,8 @@ class TimesheetApiController extends Controller {
             return response()->json(['error' => 'Comment not found'], 404);
         }
 
-        $userId = $request->user()->id;
-        $reactions = $comment->reactions ?? [];
-
-        // Проверяем, есть ли уже реакция от этого пользователя с таким же эмодзи
-        $reactionIndex = null;
-        foreach ($reactions as $index => $reaction) {
-            if ($reaction['user_id'] == $userId && $reaction['emoji'] === $emoji) {
-                $reactionIndex = $index;
-                break;
-            }
-        }
-
-        if ($reactionIndex !== null) {
-            // Удаляем существующую реакцию
-            array_splice($reactions, $reactionIndex, 1);
-        } else {
-            // Добавляем новую реакцию
-            $reactions[] = [
-                'user_id' => $userId,
-                'emoji' => $emoji,
-            ];
-        }
+        // Одна реакция от человека: та же снимается, другая заменяет прежнюю
+        $reactions = Reactions::toggle($comment->reactions ?? [], (int) $request->user()->id, $emoji);
 
         $comment->reactions = $reactions;
         $comment->save();

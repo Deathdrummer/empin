@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Schema;
 use Laravel\Sanctum\Sanctum;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\PermissionRegistrar;
@@ -396,6 +397,32 @@ class MessengerGroupsObjectsTest extends TestCase
         $this->assertTrue(collect($this->getJson('/api/messenger/chats')->json('chats'))->where('type', 'object')->every(fn (array $chat) => !$chat['muted']));
     }
 
+    public function test_one_reaction_per_person_new_one_replaces_previous(): void
+    {
+        $direct = MessengerChat::getOrCreate($this->me->id, $this->peer->id);
+        $message = $this->message($direct, $this->peer, 'Щит смонтирован');
+        $contractId = $this->contract('119', 'КТП-7 Полевая');
+        $comment = $this->comment($this->assignToTeam($contractId, $this->peer, today()->toDateString()), $this->peer, 'Начали');
+
+        $this->actingAsStaff($this->me);
+        $userId = User::where('staff_id', $this->me->id)->value('id');
+        $mine = fn (array $reactions) => array_values(array_filter($reactions, fn ($reaction) => (int) $reaction['user_id'] === (int) $userId));
+
+        // Сообщение: вторая реакция заменяет первую, повтор снимает
+        $this->postJson('/api/messenger/message/reaction', ['message_id' => $message->id, 'emoji' => '👍'])->assertOk();
+        $reactions = $this->postJson('/api/messenger/message/reaction', ['message_id' => $message->id, 'emoji' => '🔥'])->assertOk()->json('reactions');
+        $this->assertSame([['user_id' => $userId, 'emoji' => '🔥']], $mine($reactions));
+        $reactions = $this->postJson('/api/messenger/message/reaction', ['message_id' => $message->id, 'emoji' => '🔥'])->assertOk()->json('reactions');
+        $this->assertSame([], $mine($reactions));
+
+        // Комментарий табеля: то же правило; реакции других людей не трогаются
+        $comment->update(['reactions' => [['user_id' => 999999, 'emoji' => '❤️']]]);
+        $this->postJson('/api/timesheet/comment/reaction', ['comment_id' => $comment->id, 'emoji' => '👍'])->assertOk();
+        $reactions = $this->postJson('/api/timesheet/comment/reaction', ['comment_id' => $comment->id, 'emoji' => '✅'])->assertOk()->json('reactions');
+        $this->assertCount(2, $reactions);
+        $this->assertSame([['user_id' => $userId, 'emoji' => '✅']], $mine($reactions));
+    }
+
     public function test_timesheet_comment_can_be_deleted_only_by_author(): void
     {
         $contractId = $this->contract('113', 'ТП-9 Южная');
@@ -465,12 +492,13 @@ class MessengerGroupsObjectsTest extends TestCase
 
     private function contract(string $number, string $title): int
     {
+        // В схеме из миграций репозитория last_id обязателен, в схеме production — нет
         return DB::table('contracts')->insertGetId([
             'object_number' => $number,
             'title' => $title,
             'created_at' => now(),
             'updated_at' => now(),
-        ]);
+        ] + (Schema::hasColumn('contracts', 'last_id') ? ['last_id' => 0] : []));
     }
 
     private function assignToTeam(int $contractId, Staff $master, string $day): int
