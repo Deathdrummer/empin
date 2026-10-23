@@ -685,7 +685,10 @@ class TimesheetApiController extends Controller {
         $reactions = Reactions::toggle($comment->reactions ?? [], (int) $request->user()->id, $emoji);
 
         $comment->reactions = $reactions;
+        // Реакция — не правка текста: время изменения не трогаем, иначе у комментария появится «изменено»
+        $comment->timestamps = false;
         $comment->save();
+        $comment->timestamps = true;
         $this->notifyObjectChat($request, $comment, 'updated');
 
         return response()->json([

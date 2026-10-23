@@ -382,7 +382,10 @@ class MessengerApiController extends Controller {
         $reactions = Reactions::toggle($record->reactions ?? [], (int) $request->user()->id, $validated['emoji']);
 
         $record->reactions = $reactions;
+        // Реакция — не правка текста: время изменения не трогаем, иначе у сообщения появится «изменено»
+        $record->timestamps = false;
         $record->save();
+        $record->timestamps = true;
 
         $payload = $this->messagePayload($request, $chat, $record);
         $this->afterResponse(fn () => $this->notifier->broadcastToChat($chat, 'message.updated', [
@@ -490,6 +493,7 @@ class MessengerApiController extends Controller {
         $record->pinned_by = $validated['pinned'] ? $this->me($request) : null;
         $record->timestamps = false;
         $record->save();
+        $record->timestamps = true;
 
         $pinned = $this->directory->pinnedMessages($chat);
         $this->afterResponse(fn () => $this->notifier->broadcastToChat($chat, 'chat.pinned', [

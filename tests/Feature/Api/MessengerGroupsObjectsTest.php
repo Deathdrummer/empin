@@ -421,6 +421,15 @@ class MessengerGroupsObjectsTest extends TestCase
         $reactions = $this->postJson('/api/timesheet/comment/reaction', ['comment_id' => $comment->id, 'emoji' => '✅'])->assertOk()->json('reactions');
         $this->assertCount(2, $reactions);
         $this->assertSame([['user_id' => $userId, 'emoji' => '✅']], $mine($reactions));
+
+        // Реакция — не правка текста: время изменения прежнее, пометки «изменено» не будет
+        $messageEditedAt = $message->fresh()->updated_at;
+        $commentEditedAt = $comment->fresh()->updated_at;
+        $this->travel(5)->minutes();
+        $this->postJson('/api/messenger/message/reaction', ['message_id' => $message->id, 'emoji' => '👏'])->assertOk();
+        $this->postJson('/api/timesheet/comment/reaction', ['comment_id' => $comment->id, 'emoji' => '👏'])->assertOk();
+        $this->assertTrue($message->fresh()->updated_at->equalTo($messageEditedAt));
+        $this->assertTrue($comment->fresh()->updated_at->equalTo($commentEditedAt));
     }
 
     public function test_timesheet_comment_can_be_deleted_only_by_author(): void
