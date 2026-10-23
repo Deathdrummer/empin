@@ -4,6 +4,7 @@ namespace App\Services\Messenger;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 /**
  * Вложения сообщений и комментариев: сохранение в storage/app/public и удаление
@@ -53,6 +54,37 @@ class MediaStorage
         }
 
         return $media;
+    }
+
+    /**
+     * Копия вложений для пересланного сообщения: у копии свои файлы — если автор удалит оригинал,
+     * у получателя вложение не пропадёт. Отсутствующие файлы пропускаются.
+     *
+     * @return array<int, array{path: string, type: string, mime_type: string, size: int, name: string}>
+     */
+    public static function copy($media, string $directory): array
+    {
+        if (!$media || !is_array($media)) {
+            return [];
+        }
+
+        $disk = Storage::disk('public');
+        $copies = [];
+        // Старый формат — одно вложение объектом
+        foreach (isset($media['path']) ? [$media] : $media as $item) {
+            $source = str_replace('/storage/', '', (string) ($item['path'] ?? ''));
+            if ($source === '' || !$disk->exists($source)) {
+                continue;
+            }
+
+            $extension = pathinfo($source, PATHINFO_EXTENSION);
+            $target = trim($directory, '/') . '/' . Str::random(40) . ($extension !== '' ? ".{$extension}" : '');
+            $disk->copy($source, $target);
+
+            $copies[] = array_merge($item, ['path' => '/storage/' . $target]);
+        }
+
+        return $copies;
     }
 
     public static function delete($media): void

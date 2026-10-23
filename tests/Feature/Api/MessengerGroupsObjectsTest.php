@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\Sanctum;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\PermissionRegistrar;
@@ -430,6 +431,62 @@ class MessengerGroupsObjectsTest extends TestCase
         $this->postJson('/api/timesheet/comment/reaction', ['comment_id' => $comment->id, 'emoji' => '👏'])->assertOk();
         $this->assertTrue($message->fresh()->updated_at->equalTo($messageEditedAt));
         $this->assertTrue($comment->fresh()->updated_at->equalTo($commentEditedAt));
+    }
+
+    public function test_forward_keeps_author_copies_files_and_sends_one_push_per_chat(): void
+    {
+        Storage::fake('public');
+        Storage::disk('public')->put('messenger/messages/shield.jpg', 'jpeg-bytes');
+
+        $direct = MessengerChat::getOrCreate($this->me->id, $this->peer->id);
+        $photo = MessengerMessage::create([
+            'chat_id' => $direct->id, 'from_id' => $this->peer->id, 'message' => 'Щит смонтирован',
+            'media' => [['path' => '/storage/messenger/messages/shield.jpg', 'type' => 'image', 'mime_type' => 'image/jpeg', 'size' => 10, 'name' => 'shield.jpg']],
+        ]);
+        $second = $this->message($direct, $this->peer, 'Отходящие линии завтра');
+        $group = $this->group([$this->third], 'Бригада');
+        $this->token($this->third, 'ExponentPushToken[third]');
+
+        $contractId = $this->contract('120', 'ТП-40 Лесная');
+        $comment = $this->comment($this->assignToTeam($contractId, $this->me, today()->toDateString()), $this->third, 'Отключение согласовано');
+        $objectChat = MessengerChat::forObject($contractId);
+
+        // Два сообщения из личного чата — в группу и новым личным чатом Самсонову
+        $this->actingAsStaff($this->me);
+        $result = $this->postJson('/api/messenger/forward', [
+            'chat_id' => $direct->id,
+            'message_ids' => [$second->id, $photo->id],
+            'target_chat_ids' => [$group->id, $objectChat->id],
+            'target_staff_ids' => [$this->third->id],
+        ])->assertOk()->assertJsonPath('forwarded', 4);
+        $this->assertNotContains($objectChat->id, $result->json('chat_ids'));
+
+        $copies = MessengerMessage::where('chat_id', $group->id)->where('type', 'text')->orderBy('id')->get();
+        $this->assertSame(['Щит смонтирован', 'Отходящие линии завтра'], $copies->pluck('message')->all());
+        $this->assertSame('Петров А.', $copies[0]->forwarded_from['name']);
+        $this->assertSame($this->me->id, (int) $copies[0]->from_id);
+        // У копии свой файл: удаление оригинала не ломает пересланное
+        $copyPath = str_replace('/storage/', '', $copies[0]->media[0]['path']);
+        $this->assertNotSame('messenger/messages/shield.jpg', $copyPath);
+        Storage::disk('public')->assertExists($copyPath);
+        // Самсонову — новый личный чат с теми же двумя сообщениями
+        $this->assertSame(2, MessengerMessage::where('chat_id', MessengerChat::getOrCreate($this->me->id, $this->third->id)->id)->count());
+
+        // Самсонову — одно уведомление на группу и одно на личный чат, а не по сообщению
+        Http::assertSentCount(2);
+        $this->assertPushSent('ExponentPushToken[third]', 'Бригада', 'Иванов С.: Пересланные сообщения: 2');
+
+        // Комментарий объекта пересылается с автором; пересланное пересланного сохраняет первого автора
+        $this->postJson('/api/messenger/forward', ['chat_id' => $objectChat->id, 'message_ids' => [$comment->id], 'target_chat_ids' => [$group->id]])
+            ->assertOk()->assertJsonPath('forwarded', 1);
+        $this->assertSame('Самсонов А.', MessengerMessage::where('chat_id', $group->id)->latest('id')->first()->forwarded_from['name']);
+        $this->postJson('/api/messenger/forward', ['chat_id' => $group->id, 'message_ids' => [$copies[0]->id], 'target_staff_ids' => [$this->peer->id]])->assertOk();
+        $this->assertSame('Петров А.', MessengerMessage::where('chat_id', $direct->id)->latest('id')->first()->forwarded_from['name']);
+
+        // Только в чат объекта — некуда; из чужого чата — как несуществующий
+        $this->postJson('/api/messenger/forward', ['chat_id' => $direct->id, 'message_ids' => [$photo->id], 'target_chat_ids' => [$objectChat->id]])->assertStatus(422);
+        $this->actingAsStaff($this->outsider);
+        $this->postJson('/api/messenger/forward', ['chat_id' => $direct->id, 'message_ids' => [$photo->id], 'target_staff_ids' => [$this->me->id]])->assertNotFound();
     }
 
     public function test_timesheet_comment_can_be_deleted_only_by_author(): void

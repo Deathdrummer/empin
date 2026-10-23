@@ -51,6 +51,7 @@ class MessengerMessageResource extends JsonResource {
             'type'        => $this->type ?? 'text',
             'poll'        => $this->when($this->type === 'poll' && is_array($this->poll), fn () => self::pollPayload($this->resource)),
             'mentions'    => array_map('intval', $this->mentions ?? []),
+            'forwarded_from' => $this->forwarded_from,
             'pinned'      => $this->pinned_at !== null,
             'self'        => $isSelf,
             'created_at'  => $this->created_at->toIso8601String(),

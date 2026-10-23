@@ -63,6 +63,7 @@ class MessengerMessage extends Model {
 		'media' => 'array',
 		'poll' => 'array',
 		'mentions' => 'array',
+		'forwarded_from' => 'array',
 		'pinned_at' => 'datetime',
 	];
 

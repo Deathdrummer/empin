@@ -550,6 +550,94 @@ class MessengerApiController extends Controller {
     /**
      * Поиск: сообщения во всех чатах сотрудника (или в одном chat_id), группы и объекты по названию
      */
+    /**
+     * Переслать сообщения (или комментарии чата объекта) в личные чаты и группы.
+     * У копии — «Переслано от» автора оригинала (у пересланного пересланного — первый автор) и свои файлы.
+     * В чат объекта не пересылается: там сообщения становятся комментариями табеля.
+     * Получатель получает одно уведомление на пересылку, а не по сообщению.
+     */
+    public function forward(Request $request): JsonResponse {
+        $validated = $request->validate([
+            'chat_id'            => 'required|integer',
+            'message_ids'        => 'required|array|min:1|max:100',
+            'message_ids.*'      => 'integer',
+            'target_chat_ids'    => 'nullable|array|max:20',
+            'target_chat_ids.*'  => 'integer',
+            'target_staff_ids'   => 'nullable|array|max:20',
+            'target_staff_ids.*' => 'integer|exists:staff,id',
+        ]);
+
+        $source = $this->chatFor($request, $validated['chat_id']);
+        if (!$source) {
+            return $this->chatNotFound();
+        }
+
+        $me = $this->me($request);
+        $records = ($source->isObject()
+                ? $this->objects->commentsQuery((int) $source->contract_id)
+                : MessengerMessage::where('chat_id', $source->id)->where('type', '!=', MessengerMessage::TYPE_SYSTEM))
+            ->whereIn('id', $validated['message_ids'])
+            ->orderBy('id')
+            ->with('profile')
+            ->get();
+        if ($records->isEmpty()) {
+            return response()->json(['error' => 'Сообщения не найдены'], 404);
+        }
+
+        $targets = collect($validated['target_chat_ids'] ?? [])
+            ->map(fn ($id) => $this->chatFor($request, $id))
+            ->filter(fn (?MessengerChat $chat) => $chat && !$chat->isObject());
+        foreach (array_unique(array_map('intval', $validated['target_staff_ids'] ?? [])) as $staffId) {
+            if ($staffId !== $me) {
+                $targets->push(MessengerChat::getOrCreate($me, $staffId));
+            }
+        }
+        $targets = $targets->unique('id')->values();
+        if ($targets->isEmpty()) {
+            return response()->json(['error' => 'Выберите, куда переслать'], 422);
+        }
+
+        $sender = Staff::find($me);
+        $forwarded = 0;
+        foreach ($targets as $chat) {
+            $created = $records->map(fn ($record) => MessengerMessage::create([
+                'chat_id'        => $chat->id,
+                'from_id'        => $me,
+                'type'           => MessengerMessage::TYPE_TEXT,
+                'message'        => $this->forwardText($record, $source),
+                'media'          => MediaStorage::copy($record->media, 'messenger/messages') ?: null,
+                'forwarded_from' => $record->forwarded_from ?? [
+                    'staff_id' => (int) $record->from_id,
+                    'name'     => ChatDirectory::shortName($record->profile),
+                ],
+            ]));
+            $forwarded += $created->count();
+            $chat->markReadBy($me, (int) $created->last()->id);
+
+            $payloads = $created->map(function (MessengerMessage $message) use ($request) {
+                $message->load(['profile.registred', 'votes']);
+
+                return array_merge((new MessengerMessageResource($message))->resolve($request), ['self' => false]);
+            });
+            $preview = $created->count() > 1
+                ? 'Пересланные сообщения: ' . $created->count()
+                : $this->directory->previewOf($created->last(), false);
+
+            // Все сообщения — событием, уведомление — одно, на последнее
+            $this->afterResponse(function () use ($chat, $payloads, $sender, $preview, $me) {
+                foreach ($payloads->slice(0, -1) as $payload) {
+                    $this->notifier->broadcastToChat($chat, 'message.created', ['chat_id' => $chat->id, 'message' => $payload], $me);
+                }
+                $this->notifier->newMessage($chat, $sender, $payloads->last(), $preview);
+            });
+        }
+
+        return response()->json([
+            'forwarded' => $forwarded,
+            'chat_ids'  => $targets->pluck('id')->values()->all(),
+        ]);
+    }
+
     public function search(Request $request): JsonResponse {
         $validated = $request->validate([
             'q'       => 'required|string|min:2|max:100',
@@ -804,6 +892,19 @@ class MessengerApiController extends Controller {
         $this->afterResponse(fn () => $this->notifier->newMessage($chat, $sender, $event, $preview));
 
         return response()->json($payload, 201);
+    }
+
+    /**
+     * Текст пересылаемого: опрос пересылается текстом — вопрос и варианты
+     */
+    private function forwardText($record, MessengerChat $source): string {
+        if (!$source->isObject() && $record->type === MessengerMessage::TYPE_POLL && is_array($record->poll)) {
+            $options = array_map(fn ($option) => "— {$option}", $record->poll['options'] ?? []);
+
+            return trim('Опрос: ' . ($record->poll['question'] ?? '') . "\n" . implode("\n", $options));
+        }
+
+        return (string) $record->message;
     }
 
     /**

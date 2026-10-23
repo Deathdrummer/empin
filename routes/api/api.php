@@ -73,6 +73,7 @@ Route::controller(MessengerApiController::class)->prefix('messenger')->middlewar
 	Route::delete('/message/{id}', 'removeMessage');
 	Route::post('/message/reaction', 'toggleReaction');
 	Route::post('/message/pin', 'pinMessage');
+	Route::post('/forward', 'forward');
 	Route::post('/poll/vote', 'votePoll');
 	Route::get('/search', 'search');
 	Route::post('/presence', 'presence');
