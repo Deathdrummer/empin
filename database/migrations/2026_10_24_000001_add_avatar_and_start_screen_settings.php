@@ -29,10 +29,7 @@ return new class extends Migration
             $table->dropColumn('open_chats_on_start');
         });
 
-        if (Schema::hasColumn('staff', 'avatar')) {
-            Schema::table('staff', function (Blueprint $table) {
-                $table->dropColumn('avatar');
-            });
-        }
+        // staff.avatar не удаляем: колонка могла быть в базе до этой миграции (up её тогда не создавал),
+        // а откат стёр бы аватарки. Пустая nullable-колонка старому коду не мешает.
     }
 };
