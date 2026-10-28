@@ -19,6 +19,7 @@ use App\Services\Messenger\Reactions;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -597,6 +598,7 @@ class MessengerApiController extends Controller {
      * У копии — «Переслано от» автора оригинала (у пересланного пересланного — первый автор) и свои файлы.
      * В чат объекта не пересылается: там сообщения становятся комментариями табеля.
      * Получатель получает одно уведомление на пересылку, а не по сообщению.
+     * client_key — ключ попытки: повтор того же запроса (ответ не дошёл до телефона) не пересылает второй раз.
      */
     public function forward(Request $request): JsonResponse {
         $validated = $request->validate([
@@ -607,6 +609,7 @@ class MessengerApiController extends Controller {
             'target_chat_ids.*'  => 'integer',
             'target_staff_ids'   => 'nullable|array|max:20',
             'target_staff_ids.*' => 'integer|exists:staff,id',
+            'client_key'         => 'nullable|string|max:64',
         ]);
 
         $source = $this->chatFor($request, $validated['chat_id']);
@@ -615,6 +618,11 @@ class MessengerApiController extends Controller {
         }
 
         $me = $this->me($request);
+        $replayKey = isset($validated['client_key']) ? "messenger:forward:{$me}:{$validated['client_key']}" : null;
+        if ($replayKey && is_array($done = Cache::get($replayKey))) {
+            return response()->json($done);
+        }
+
         $records = ($source->isObject()
                 ? $this->objects->commentsQuery((int) $source->contract_id)
                 : MessengerMessage::where('chat_id', $source->id)->where('type', '!=', MessengerMessage::TYPE_SYSTEM))
@@ -639,22 +647,86 @@ class MessengerApiController extends Controller {
             return response()->json(['error' => 'Выберите, куда переслать'], 422);
         }
 
+        // Тот же запрос ещё выполняется (телефон не дождался ответа и повторил) — второй раз не пересылаем
+        $lock = $replayKey ? $this->forwardLock($replayKey) : null;
+        if ($lock === false) {
+            return response()->json(['error' => 'Пересылка ещё идёт — проверьте чат через несколько секунд'], 409);
+        }
+
+        try {
+            if ($replayKey && is_array($done = Cache::get($replayKey))) {
+                return response()->json($done);
+            }
+
+            $result = $this->forwardToTargets($request, $source, $records, $targets, $me);
+            if ($replayKey) {
+                Cache::put($replayKey, $result, now()->addDay());
+            }
+
+            return response()->json($result);
+        } finally {
+            $lock?->release();
+        }
+    }
+
+    /**
+     * Блокировка повтора пересылки: false — занята тем же запросом, null — драйвер кэша блокировок
+     * не поддерживает (например, database без таблицы cache_locks): тогда без неё, как раньше.
+     */
+    private function forwardLock(string $replayKey): \Illuminate\Contracts\Cache\Lock|false|null {
+        try {
+            $lock = Cache::lock("{$replayKey}:lock", 120);
+
+            return $lock->get() ? $lock : false;
+        } catch (\Throwable $error) {
+            report($error);
+
+            return null;
+        }
+    }
+
+    /**
+     * Копии во всех получателях — одной транзакцией: при ошибке не остаётся пересланного «наполовину»
+     * (повтор задвоил бы уже созданное). Скопированные файлы откатившихся копий удаляются,
+     * события и уведомления уходят только после записи.
+     */
+    private function forwardToTargets(Request $request, MessengerChat $source, Collection $records, Collection $targets, int $me): array {
+        $copiedMedia = [];
+        try {
+            $deliveries = DB::transaction(function () use ($source, $records, $targets, $me, &$copiedMedia) {
+                $deliveries = [];
+                foreach ($targets as $chat) {
+                    $created = $records->map(function ($record) use ($chat, $source, $me, &$copiedMedia) {
+                        $media = MediaStorage::copy($record->media, 'messenger/messages');
+                        array_push($copiedMedia, ...$media);
+
+                        return MessengerMessage::create([
+                            'chat_id'        => $chat->id,
+                            'from_id'        => $me,
+                            'type'           => MessengerMessage::TYPE_TEXT,
+                            'message'        => $this->forwardText($record, $source),
+                            'media'          => $media ?: null,
+                            'forwarded_from' => $record->forwarded_from ?? [
+                                'staff_id' => (int) $record->from_id,
+                                'name'     => ChatDirectory::shortName($record->profile),
+                            ],
+                        ]);
+                    });
+                    $chat->markReadBy($me, (int) $created->last()->id);
+                    $deliveries[] = [$chat, $created];
+                }
+
+                return $deliveries;
+            });
+        } catch (\Throwable $error) {
+            MediaStorage::delete($copiedMedia);
+            throw $error;
+        }
+
         $sender = Staff::find($me);
         $forwarded = 0;
-        foreach ($targets as $chat) {
-            $created = $records->map(fn ($record) => MessengerMessage::create([
-                'chat_id'        => $chat->id,
-                'from_id'        => $me,
-                'type'           => MessengerMessage::TYPE_TEXT,
-                'message'        => $this->forwardText($record, $source),
-                'media'          => MediaStorage::copy($record->media, 'messenger/messages') ?: null,
-                'forwarded_from' => $record->forwarded_from ?? [
-                    'staff_id' => (int) $record->from_id,
-                    'name'     => ChatDirectory::shortName($record->profile),
-                ],
-            ]));
+        foreach ($deliveries as [$chat, $created]) {
             $forwarded += $created->count();
-            $chat->markReadBy($me, (int) $created->last()->id);
 
             $payloads = $created->map(function (MessengerMessage $message) use ($request) {
                 $message->load(['profile.registred', 'votes']);
@@ -674,10 +746,10 @@ class MessengerApiController extends Controller {
             });
         }
 
-        return response()->json([
+        return [
             'forwarded' => $forwarded,
             'chat_ids'  => $targets->pluck('id')->values()->all(),
-        ]);
+        ];
     }
 
     public function search(Request $request): JsonResponse {

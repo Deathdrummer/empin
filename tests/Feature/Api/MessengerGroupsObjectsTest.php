@@ -490,6 +490,86 @@ class MessengerGroupsObjectsTest extends TestCase
         $this->postJson('/api/messenger/forward', ['chat_id' => $direct->id, 'message_ids' => [$photo->id], 'target_staff_ids' => [$this->me->id]])->assertNotFound();
     }
 
+    public function test_forward_failure_in_one_chat_leaves_no_copies_files_or_pushes(): void
+    {
+        Storage::fake('public');
+        Storage::disk('public')->put('messenger/messages/shield.jpg', 'jpeg-bytes');
+
+        $direct = MessengerChat::getOrCreate($this->me->id, $this->peer->id);
+        $photo = MessengerMessage::create([
+            'chat_id' => $direct->id, 'from_id' => $this->peer->id, 'message' => 'Щит',
+            'media' => [['path' => '/storage/messenger/messages/shield.jpg', 'type' => 'image', 'mime_type' => 'image/jpeg', 'size' => 10, 'name' => 'shield.jpg']],
+        ]);
+        $first = $this->group([$this->third], 'Бригада');
+        $second = $this->group([$this->third], 'Снабжение');
+        $this->token($this->third, 'ExponentPushToken[third]');
+
+        // Запись во второй чат падает (например, обрыв соединения с базой) — после первого уже скопированного
+        MessengerMessage::creating(function (MessengerMessage $message) use ($second) {
+            if ((int) $message->chat_id === $second->id) {
+                throw new \RuntimeException('database went away');
+            }
+        });
+
+        $pushesBefore = count(Http::recorded());
+        $this->actingAsStaff($this->me);
+        $this->postJson('/api/messenger/forward', [
+            'chat_id' => $direct->id, 'message_ids' => [$photo->id], 'target_chat_ids' => [$first->id, $second->id],
+        ])->assertStatus(500);
+
+        // В первом чате не осталось «половины»: повтор не задвоит; лишних файлов и уведомлений нет
+        $this->assertSame(0, MessengerMessage::where('chat_id', $first->id)->where('type', 'text')->count());
+        $this->assertSame(['messenger/messages/shield.jpg'], Storage::disk('public')->allFiles('messenger/messages'));
+        $this->assertCount($pushesBefore, Http::recorded());
+    }
+
+    public function test_forward_repeated_with_same_client_key_is_not_duplicated(): void
+    {
+        $direct = MessengerChat::getOrCreate($this->me->id, $this->peer->id);
+        $note = $this->message($direct, $this->peer, 'Ключи у охраны');
+        $group = $this->group([$this->third], 'Бригада');
+        $request = ['chat_id' => $direct->id, 'message_ids' => [$note->id], 'target_chat_ids' => [$group->id], 'client_key' => 'fwd-1'];
+
+        // Ответ не дошёл до телефона — тот же запрос ещё раз
+        $this->actingAsStaff($this->me);
+        $firstResult = $this->postJson('/api/messenger/forward', $request)->assertOk()->json();
+        $this->postJson('/api/messenger/forward', $request)->assertOk()->assertExactJson($firstResult);
+        $this->assertSame(1, MessengerMessage::where('chat_id', $group->id)->where('type', 'text')->count());
+
+        // Тот же запрос, пока первый ещё выполняется, — отказ, а не вторая копия
+        $lock = Cache::lock("messenger:forward:{$this->me->id}:fwd-2:lock", 120);
+        $lock->get();
+        $this->postJson('/api/messenger/forward', ['client_key' => 'fwd-2'] + $request)->assertStatus(409);
+        $lock->release();
+        $this->assertSame(1, MessengerMessage::where('chat_id', $group->id)->where('type', 'text')->count());
+
+        // Новая пересылка (другой ключ) — новая копия; без ключа — как раньше
+        $this->postJson('/api/messenger/forward', ['client_key' => 'fwd-3'] + $request)->assertOk();
+        $this->postJson('/api/messenger/forward', array_diff_key($request, ['client_key' => true]))->assertOk();
+        $this->assertSame(3, MessengerMessage::where('chat_id', $group->id)->where('type', 'text')->count());
+
+        // Драйвер кэша без блокировок (например, database без cache_locks) — пересылка работает, повтор не задваивает
+        $store = new class implements \Illuminate\Contracts\Cache\Store {
+            private \Illuminate\Cache\ArrayStore $inner;
+            public function __construct() { $this->inner = new \Illuminate\Cache\ArrayStore(); }
+            public function get($key) { return $this->inner->get($key); }
+            public function many(array $keys) { return $this->inner->many($keys); }
+            public function put($key, $value, $seconds) { return $this->inner->put($key, $value, $seconds); }
+            public function putMany(array $values, $seconds) { return $this->inner->putMany($values, $seconds); }
+            public function increment($key, $value = 1) { return $this->inner->increment($key, $value); }
+            public function decrement($key, $value = 1) { return $this->inner->decrement($key, $value); }
+            public function forever($key, $value) { return $this->inner->forever($key, $value); }
+            public function forget($key) { return $this->inner->forget($key); }
+            public function flush() { return $this->inner->flush(); }
+            public function getPrefix() { return ''; }
+        };
+        Cache::extend('no-locks', fn () => Cache::repository($store));
+        config(['cache.stores.no-locks' => ['driver' => 'no-locks'], 'cache.default' => 'no-locks']);
+        $this->postJson('/api/messenger/forward', ['client_key' => 'fwd-4'] + $request)->assertOk();
+        $this->postJson('/api/messenger/forward', ['client_key' => 'fwd-4'] + $request)->assertOk();
+        $this->assertSame(4, MessengerMessage::where('chat_id', $group->id)->where('type', 'text')->count());
+    }
+
     public function test_avatar_is_shown_everywhere_and_start_screen_setting_is_saved(): void
     {
         Storage::fake('public');
