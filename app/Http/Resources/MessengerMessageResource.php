@@ -141,8 +141,27 @@ class MessengerMessageResource extends JsonResource {
     /**
      * Короткий текст сообщения для списка чатов и push: сам текст или название вложения
      */
+    /**
+     * Текст без маркеров форматирования (как в Telegram: **жирный**, __курсив__, ~~зачёркнутый~~, `код`, ||скрытый||)
+     * — для превью в списке чатов и уведомлений. Скрытый текст не показывается: на экране блокировки его видно всем.
+     */
+    public static function plainText(?string $text): string {
+        $text = preg_replace('/`([^`\n]+)`/u', '$1', (string) $text);
+        $text = preg_replace('/\|\|(?=\S)(.+?)(?<=\S)\|\|/u', '•••', $text);
+        // Вложенное форматирование (**жирный __курсив__**) снимается за несколько проходов
+        for ($pass = 0; $pass < 3; $pass++) {
+            $next = preg_replace('/(\*\*|__|~~)(?=\S)(.+?)(?<=\S)\1/u', '$2', $text);
+            if ($next === $text) {
+                break;
+            }
+            $text = $next;
+        }
+
+        return $text;
+    }
+
     public static function previewText(?string $text, $media): string {
-        $text = trim(preg_replace('/\s+/u', ' ', (string) $text));
+        $text = trim(preg_replace('/\s+/u', ' ', self::plainText($text)));
         if ($text !== '') {
             return mb_strimwidth($text, 0, 120, '…');
         }

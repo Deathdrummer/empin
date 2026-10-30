@@ -5,6 +5,7 @@ namespace App\Services\Messenger;
 use App\Http\Resources\MessengerMessageResource;
 use App\Models\MessengerChat;
 use App\Models\MessengerChatMember;
+use App\Models\MessengerHiddenMessage;
 use App\Models\MessengerMessage;
 use App\Models\Staff;
 use App\Models\TimesheetChat;
@@ -33,6 +34,7 @@ class ChatDirectory
             ->where('messenger_messages.from_id', '!=', $staffId)
             ->where('messenger_messages.type', '!=', MessengerMessage::TYPE_SYSTEM)
             ->whereRaw('messenger_messages.id > COALESCE(m.last_read_id, 0)')
+            ->tap(fn ($q) => MessengerHiddenMessage::excludeFor($q, $staffId, 'messenger_messages.chat_id', 'messenger_messages.id'))
             ->groupBy('messenger_messages.chat_id')
             ->select('messenger_messages.chat_id', DB::raw('COUNT(*) as unread'))
             ->pluck('unread', 'chat_id')
@@ -64,13 +66,15 @@ class ChatDirectory
         $messageChats = $chats->reject(fn (MessengerChat $chat) => $chat->isObject());
         $directChats = $messageChats->filter(fn (MessengerChat $chat) => $chat->isDirect());
 
+        // Последнее сообщение — без удалённых мной «у себя»
         $lastIds = MessengerMessage::whereIn('chat_id', $messageChats->pluck('id'))
+            ->tap(fn ($q) => MessengerHiddenMessage::excludeFor($q, $staffId, 'messenger_messages.chat_id', 'messenger_messages.id'))
             ->groupBy('chat_id')
             ->select('chat_id', DB::raw('MAX(id) as last_id'))
             ->pluck('last_id', 'chat_id');
         $lastMessages = MessengerMessage::whereIn('id', $lastIds->values())->with('profile')->get()->keyBy('id');
 
-        $lastCommentIds = $this->objects->lastCommentIds($objectChats->pluck('contract_id')->all());
+        $lastCommentIds = $this->objects->lastCommentIds($objectChats->pluck('contract_id')->all(), $staffId);
         $lastComments = TimesheetChat::whereIn('id', array_values($lastCommentIds))->with('profile')->get()->keyBy('id');
 
         $unread = $this->messageUnreadByChat($staffId) + $this->objects->unreadByChat($staffId);
@@ -182,7 +186,7 @@ class ChatDirectory
             'pinned'     => $member?->pinned_at !== null,
             'muted'      => (bool) $member?->muted,
             'role'       => $member?->role,
-            'pinned_messages' => $this->pinnedMessages($chat),
+            'pinned_messages' => $this->pinnedMessages($chat, $staffId),
         ];
 
         if ($chat->isDirect()) {
@@ -225,13 +229,16 @@ class ChatDirectory
     }
 
     /**
-     * Закреплённые сообщения чата, последнее закреплённое первым
+     * Закреплённые сообщения чата, последнее закреплённое первым; $hiddenFor — без удалённых этим сотрудником «у себя»
      */
-    public function pinnedMessages(MessengerChat $chat): array
+    public function pinnedMessages(MessengerChat $chat, ?int $hiddenFor = null): array
     {
         $query = $chat->isObject()
             ? $this->objects->commentsQuery((int) $chat->contract_id)
             : MessengerMessage::where('chat_id', $chat->id);
+        if ($hiddenFor !== null) {
+            $query->whereNotIn('id', MessengerHiddenMessage::idsQuery($hiddenFor, $chat->id));
+        }
 
         return $query->whereNotNull('pinned_at')
             ->orderByDesc('pinned_at')
@@ -317,6 +324,7 @@ class ChatDirectory
             })
             ->whereJsonContains('messenger_messages.mentions', $staffId)
             ->whereRaw('messenger_messages.id > COALESCE(m.last_read_id, 0)')
+            ->tap(fn ($q) => MessengerHiddenMessage::excludeFor($q, $staffId, 'messenger_messages.chat_id', 'messenger_messages.id'))
             ->distinct()
             ->pluck('messenger_messages.chat_id')
             ->map(fn ($id) => (int) $id)

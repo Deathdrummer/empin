@@ -42,7 +42,22 @@ class MediaStorage
         'application/x-7z-compressed',
     ];
 
+    // Сведения о вложении от приложения (необязательны; старые версии их не шлют)
+    public const META_RULES = [
+        'media_meta'    => 'nullable|array|max:20',
+        'media_meta.*'  => 'nullable|string|max:4000',
+        'media_thumb'   => 'nullable|array|max:20',
+        'media_thumb.*' => 'file|mimes:jpeg,jpg,png,webp|max:1024',
+    ];
+
+    private const WAVEFORM_BARS = 100;
+    private const WAVEFORM_MAX = 31;
+
     /**
+     * Вложения из запроса. К каждому файлу приложение может приложить (тем же порядковым номером):
+     * media_meta[i] — JSON {waveform: [0..31], duration: сек, width, height} — «волна» голосового, длительность,
+     * размеры видео; media_thumb[i] — кадр-превью видео (снят на телефоне, как в Telegram).
+     *
      * @return array<int, array{path: string, type: string, mime_type: string, size: int, name: string}>
      */
     public static function store(Request $request, string $directory): array
@@ -51,32 +66,74 @@ class MediaStorage
             return [];
         }
 
+        $metaList = (array) $request->input('media_meta', []);
+        $thumbs = (array) $request->file('media_thumb', []);
+
         $media = [];
-        foreach ((array) $request->file('media') as $file) {
-            $mimeType = (string) $file->getMimeType();
-            $extension = strtolower((string) $file->getClientOriginalExtension());
-
-            // Голосовое m4a/aac — MP4-контейнер только со звуком: по содержимому определяется как видео
-            // (так пишет диктофон Android). Тип берём по расширению, файл сохраняем с ним же.
-            $audioMime = self::AUDIO_EXTENSIONS[$extension] ?? null;
-            if ($audioMime && !str_starts_with($mimeType, 'audio/')) {
-                $mimeType = $audioMime;
-                $stored = $file->storeAs($directory, Str::random(40) . '.' . $extension, 'public');
-            } else {
-                $stored = $file->store($directory, 'public');
+        foreach (array_values((array) $request->file('media')) as $index => $file) {
+            $item = self::storeFile($file, $directory);
+            $item += self::sanitizeMeta($metaList[$index] ?? null);
+            if ($item['type'] === 'video' && isset($thumbs[$index])) {
+                $item['thumbnail'] = '/storage/' . $thumbs[$index]->store($directory . '/thumbs', 'public');
             }
-
-            $media[] = [
-                'path'      => '/storage/' . $stored,
-                'type'      => self::typeOf($mimeType),
-                'mime_type' => $mimeType,
-                'size'      => $file->getSize(),
-                // Android присылает имя в URL-кодировке («%D0%93…»)
-                'name'      => rawurldecode($file->getClientOriginalName()),
-            ];
+            $media[] = $item;
         }
 
         return $media;
+    }
+
+    /**
+     * Только числа в допустимых пределах: «волна» — до 100 столбиков 0…31, длительность — до 10 часов
+     */
+    private static function sanitizeMeta($raw): array
+    {
+        $meta = is_string($raw) ? json_decode($raw, true) : null;
+        if (!is_array($meta)) {
+            return [];
+        }
+
+        $result = [];
+        if (is_array($meta['waveform'] ?? null)) {
+            $bars = array_slice(array_values(array_filter($meta['waveform'], 'is_numeric')), 0, self::WAVEFORM_BARS);
+            if ($bars) {
+                $result['waveform'] = array_map(fn ($bar) => max(0, min(self::WAVEFORM_MAX, (int) round($bar))), $bars);
+            }
+        }
+        if (is_numeric($meta['duration'] ?? null) && $meta['duration'] > 0 && $meta['duration'] <= 36000) {
+            $result['duration'] = round((float) $meta['duration'], 1);
+        }
+        foreach (['width', 'height'] as $key) {
+            if (is_numeric($meta[$key] ?? null) && $meta[$key] >= 1 && $meta[$key] <= 20000) {
+                $result[$key] = (int) $meta[$key];
+            }
+        }
+
+        return $result;
+    }
+
+    private static function storeFile($file, string $directory): array
+    {
+        $mimeType = (string) $file->getMimeType();
+        $extension = strtolower((string) $file->getClientOriginalExtension());
+
+        // Голосовое m4a/aac — MP4-контейнер только со звуком: по содержимому определяется как видео
+        // (так пишет диктофон Android). Тип берём по расширению, файл сохраняем с ним же.
+        $audioMime = self::AUDIO_EXTENSIONS[$extension] ?? null;
+        if ($audioMime && !str_starts_with($mimeType, 'audio/')) {
+            $mimeType = $audioMime;
+            $stored = $file->storeAs($directory, Str::random(40) . '.' . $extension, 'public');
+        } else {
+            $stored = $file->store($directory, 'public');
+        }
+
+        return [
+            'path'      => '/storage/' . $stored,
+            'type'      => self::typeOf($mimeType),
+            'mime_type' => $mimeType,
+            'size'      => $file->getSize(),
+            // Android присылает имя в URL-кодировке («%D0%93…»)
+            'name'      => rawurldecode($file->getClientOriginalName()),
+        ];
     }
 
     /**
@@ -116,14 +173,26 @@ class MediaStorage
                 continue;
             }
 
-            $extension = pathinfo($source, PATHINFO_EXTENSION);
-            $target = trim($directory, '/') . '/' . Str::random(40) . ($extension !== '' ? ".{$extension}" : '');
-            $disk->copy($source, $target);
-
-            $copies[] = array_merge($item, ['path' => '/storage/' . $target]);
+            $copy = array_merge($item, ['path' => '/storage/' . self::copyFile($source, trim($directory, '/'))]);
+            // Кадр-превью видео — тоже своя копия; пропал — копия без превью
+            unset($copy['thumbnail']);
+            $thumbSource = str_replace('/storage/', '', (string) ($item['thumbnail'] ?? ''));
+            if ($thumbSource !== '' && $disk->exists($thumbSource)) {
+                $copy['thumbnail'] = '/storage/' . self::copyFile($thumbSource, trim($directory, '/') . '/thumbs');
+            }
+            $copies[] = $copy;
         }
 
         return $copies;
+    }
+
+    private static function copyFile(string $source, string $directory): string
+    {
+        $extension = pathinfo($source, PATHINFO_EXTENSION);
+        $target = $directory . '/' . Str::random(40) . ($extension !== '' ? ".{$extension}" : '');
+        Storage::disk('public')->copy($source, $target);
+
+        return $target;
     }
 
     public static function delete($media): void
@@ -132,12 +201,14 @@ class MediaStorage
             return;
         }
 
-        // Старый формат — одно вложение объектом
+        // Старый формат — одно вложение объектом; кадр-превью видео удаляется вместе с ним
         foreach (isset($media['path']) ? [$media] : $media as $item) {
-            if (!empty($item['path'])) {
-                $path = str_replace('/storage/', '', $item['path']);
-                if (Storage::disk('public')->exists($path)) {
-                    Storage::disk('public')->delete($path);
+            foreach (['path', 'thumbnail'] as $key) {
+                if (!empty($item[$key])) {
+                    $path = str_replace('/storage/', '', $item[$key]);
+                    if (Storage::disk('public')->exists($path)) {
+                        Storage::disk('public')->delete($path);
+                    }
                 }
             }
         }

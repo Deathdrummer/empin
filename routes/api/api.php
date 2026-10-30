@@ -71,11 +71,13 @@ Route::controller(MessengerApiController::class)->prefix('messenger')->middlewar
 	Route::post('/message', 'addMessage');
 	Route::put('/message/{id}', 'updateMessage');
 	Route::delete('/message/{id}', 'removeMessage');
+	Route::post('/message/hide', 'hideMessages');
 	Route::post('/message/reaction', 'toggleReaction');
 	Route::post('/message/pin', 'pinMessage');
 	Route::post('/forward', 'forward');
 	Route::post('/poll/vote', 'votePoll');
 	Route::get('/search', 'search');
+	Route::get('/chat/media', 'chatMedia');
 	Route::post('/presence', 'presence');
 	Route::get('/settings', 'settings');
 	Route::post('/settings', 'updateSettings');

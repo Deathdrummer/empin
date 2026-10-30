@@ -5,12 +5,14 @@ use App\Http\Resources\MessengerMessageResource;
 use App\Http\Resources\ObjectCommentResource;
 use App\Models\MessengerChat;
 use App\Models\MessengerChatMember;
+use App\Models\MessengerHiddenMessage;
 use App\Models\MessengerMessage;
 use App\Models\MessengerPollVote;
 use App\Models\MessengerSetting;
 use App\Models\Staff;
 use App\Models\TimesheetChat;
 use App\Services\Messenger\ChatDirectory;
+use App\Services\Messenger\ChatMedia;
 use App\Services\Messenger\MediaStorage;
 use App\Services\Messenger\MessengerNotifier;
 use App\Services\Messenger\ObjectChats;
@@ -208,8 +210,12 @@ class MessengerApiController extends Controller {
 
         $me = $this->me($request);
 
+        // Открытие чата (не догрузка истории): где начинаются непрочитанные и где упомянули меня
+        $opening = empty($validated['before_id']) && empty($validated['after_id']);
+
         if ($chat->isObject()) {
             $query = $this->objects->commentsQuery((int) $chat->contract_id)
+                ->whereNotIn('id', MessengerHiddenMessage::idsQuery($me, $chat->id))
                 ->with(['profile', 'replyTo.profile', 'timesheetContract.team']);
             [$messages, $hasMore, $hasMoreNewer] = $this->page($query, $validated);
 
@@ -218,10 +224,12 @@ class MessengerApiController extends Controller {
                 'has_more'          => $hasMore,
                 'has_more_newer'    => $hasMoreNewer,
                 'peer_last_read_id' => null,
-            ]);
+            ] + $this->membersRead($chat, $me) + ($opening ? ['unread' => $this->unreadState($chat, $me)] : []));
         }
 
-        $query = MessengerMessage::where('chat_id', $chat->id)->with(['profile.registred', 'replyTo.profile', 'votes']);
+        $query = MessengerMessage::where('chat_id', $chat->id)
+            ->whereNotIn('id', MessengerHiddenMessage::idsQuery($me, $chat->id))
+            ->with(['profile.registred', 'replyTo.profile', 'votes']);
         [$messages, $hasMore, $hasMoreNewer] = $this->page($query, $validated);
 
         $response = [
@@ -229,17 +237,91 @@ class MessengerApiController extends Controller {
             'has_more'          => $hasMore,
             'has_more_newer'    => $hasMoreNewer,
             'peer_last_read_id' => $chat->isDirect() ? $chat->lastReadIdFor($chat->otherParticipantId($me)) : null,
-        ];
+        ] + ($opening ? ['unread' => $this->unreadState($chat, $me)] : []);
 
-        // Группа: докуда дочитал каждый участник — для галочек и «Прочитали»
         if ($chat->isGroup()) {
-            $response['members_read'] = MessengerChatMember::where('chat_id', $chat->id)
-                ->where('staff_id', '!=', $me)
-                ->pluck('last_read_id', 'staff_id')
-                ->map(fn ($id) => $id !== null ? (int) $id : null);
+            $response += $this->membersRead($chat, $me);
         }
 
         return response()->json($response);
+    }
+
+    /**
+     * Группа и объект — для галочек и «Прочитали»:
+     * members_read — докуда дочитал каждый участник (staff_id => id сообщения);
+     * members_since — когда участник появился в чате. Вступившему граница прочитанного ставится на последнее
+     * сообщение, чтобы история не стала непрочитанной, — поэтому прочитавшими сообщение считаются только те,
+     * кто был в чате, когда его отправили (мастер, которого табель добавил позже, не «прочитал» старые).
+     */
+    private function membersRead(MessengerChat $chat, int $me): array {
+        $members = MessengerChatMember::where('chat_id', $chat->id)
+            ->where('staff_id', '!=', $me)
+            ->get(['staff_id', 'last_read_id', 'created_at']);
+
+        return [
+            'members_read'  => $members->mapWithKeys(fn ($member) => [
+                $member->staff_id => $member->last_read_id !== null ? (int) $member->last_read_id : null,
+            ]),
+            'members_since' => $members->mapWithKeys(fn ($member) => [
+                $member->staff_id => $member->created_at?->toIso8601String(),
+            ]),
+        ];
+    }
+
+    /**
+     * «Медиа, файлы, голосовые, ссылки» чата — раздел сведений о чате. Страницы от новых к старым (before_id).
+     */
+    public function chatMedia(Request $request, ChatMedia $media): JsonResponse {
+        $validated = $request->validate([
+            'chat_id'   => 'required|integer',
+            'kind'      => 'required|in:' . implode(',', ChatMedia::KINDS),
+            'before_id' => 'nullable|integer',
+            'limit'     => 'nullable|integer|min:1|max:100',
+        ]);
+
+        $chat = $this->chatFor($request, $validated['chat_id']);
+        if (!$chat) {
+            return $this->chatNotFound();
+        }
+
+        return response()->json($media->list(
+            $chat,
+            $validated['kind'],
+            $validated['before_id'] ?? null,
+            (int) ($validated['limit'] ?? 60),
+            $this->me($request),
+        ));
+    }
+
+    /**
+     * Непрочитанное при открытии чата, как в Telegram: с какого сообщения начинаются непрочитанные (там — разделитель
+     * «Непрочитанные сообщения», туда открывается чат), сколько их и где меня упомянули (кнопка «@»).
+     * Считается так же, как счётчик в списке чатов: чужие сообщения после границы прочитанного, без системных.
+     * null — сотрудник не участник чата (открыл объект из поиска): непрочитанных у него нет.
+     */
+    private function unreadState(MessengerChat $chat, int $me): ?array {
+        $member = $chat->member($me);
+        if (!$member) {
+            return null;
+        }
+        $lastRead = (int) ($member->last_read_id ?? 0);
+
+        $unread = $chat->isObject()
+            ? $this->objects->commentsQuery((int) $chat->contract_id)->where('id', '>', $lastRead)->where('from_id', '!=', $me)
+            : MessengerMessage::where('chat_id', $chat->id)->where('id', '>', $lastRead)->where('from_id', '!=', $me)
+                ->where('type', '!=', MessengerMessage::TYPE_SYSTEM);
+        $unread->whereNotIn('id', MessengerHiddenMessage::idsQuery($me, $chat->id));
+        $count = (clone $unread)->count();
+
+        return [
+            'last_read_id' => $lastRead,
+            'first_id'     => $count ? (int) (clone $unread)->min('id') : null,
+            'count'        => $count,
+            // Упоминания — только в группах; не больше сотни (дальше кнопка «@» ведёт по ним по порядку)
+            'mention_ids'  => $chat->isGroup() && $count
+                ? (clone $unread)->whereJsonContains('mentions', $me)->orderBy('id')->limit(100)->pluck('id')->map(fn ($id) => (int) $id)->all()
+                : [],
+        ];
     }
 
     /**
@@ -247,7 +329,7 @@ class MessengerApiController extends Controller {
      * В чате объекта сообщение становится комментарием табеля.
      */
     public function addMessage(Request $request) {
-        $validated = $request->validate([
+        $validated = $request->validate(MediaStorage::META_RULES + [
             'chat_id'           => 'required|integer',
             'message'           => 'nullable|string',
             'reply_to_id'       => 'nullable|integer',
@@ -404,6 +486,56 @@ class MessengerApiController extends Controller {
     }
 
     /**
+     * «Удалить у меня», как в Telegram: сообщения пропадают только у этого сотрудника (лента, список чатов, поиск,
+     * медиа, счётчики), у остальных остаются. Можно и чужие, и свои, и системные. Другие устройства сотрудника
+     * получают messages.hidden.
+     */
+    public function hideMessages(Request $request): JsonResponse {
+        $validated = $request->validate([
+            'chat_id'       => 'required|integer',
+            'message_ids'   => 'required|array|min:1|max:100',
+            'message_ids.*' => 'integer',
+        ]);
+
+        $chat = $this->chatFor($request, $validated['chat_id']);
+        if (!$chat) {
+            return $this->chatNotFound();
+        }
+
+        $me = $this->me($request);
+        // Только сообщения этого чата: чужие id молча пропускаются
+        $ids = ($chat->isObject()
+                ? $this->objects->commentsQuery((int) $chat->contract_id)
+                : MessengerMessage::where('chat_id', $chat->id))
+            ->whereIn('id', array_unique($validated['message_ids']))
+            ->pluck('id')
+            ->map(fn ($id) => (int) $id)
+            ->values()
+            ->all();
+
+        if ($ids) {
+            $now = now();
+            MessengerHiddenMessage::insertOrIgnore(array_map(fn (int $id) => [
+                'staff_id'   => $me,
+                'chat_id'    => $chat->id,
+                'message_id' => $id,
+                'created_at' => $now,
+            ], $ids));
+
+            $this->afterResponse(fn () => $this->notifier->broadcast([$me], 'messages.hidden', [
+                'chat_id'     => $chat->id,
+                'message_ids' => $ids,
+            ]));
+        }
+
+        return response()->json([
+            'chat_id'      => $chat->id,
+            'message_ids'  => $ids,
+            'total_unread' => $this->directory->totalUnread($me),
+        ]);
+    }
+
+    /**
      * Добавить/убрать реакцию (повторное нажатие той же реакции убирает её)
      */
     public function toggleReaction(Request $request) {
@@ -466,7 +598,8 @@ class MessengerApiController extends Controller {
             ->where('id', '<=', $validated['message_id'])
             ->max('id');
 
-        if ($lastId && $chat->markReadBy($me, (int) $lastId) && !$chat->isObject()) {
+        // Чат объекта — тоже: «Прочитали» у своего комментария
+        if ($lastId && $chat->markReadBy($me, (int) $lastId)) {
             $this->afterResponse(fn () => $this->notifier->broadcastToChat($chat, 'chat.read', [
                 'chat_id'      => $chat->id,
                 'reader_id'    => $me,
@@ -544,7 +677,7 @@ class MessengerApiController extends Controller {
             'pinned_messages' => $pinned,
         ]));
 
-        return response()->json(['pinned_messages' => $pinned]);
+        return response()->json(['pinned_messages' => $this->directory->pinnedMessages($chat, $this->me($request))]);
     }
 
     /**
@@ -780,6 +913,7 @@ class MessengerApiController extends Controller {
                 ->when($chat, fn ($q) => $q->where('messenger_messages.chat_id', $chat->id))
                 ->where('messenger_messages.type', MessengerMessage::TYPE_TEXT)
                 ->where('messenger_messages.message', 'like', $like)
+                ->tap(fn ($q) => MessengerHiddenMessage::excludeFor($q, $me, 'messenger_messages.chat_id', 'messenger_messages.id'))
                 ->orderByDesc('messenger_messages.id')
                 ->limit(30)
                 ->with(['profile', 'chat.contract'])
@@ -796,6 +930,7 @@ class MessengerApiController extends Controller {
                 })
                 ->when($chat, fn ($q) => $q->where('c.id', $chat->id), fn ($q) => $q->whereIn('c.id', MessengerChatMember::where('staff_id', $me)->select('chat_id')))
                 ->where('timesheet_chat.message', 'like', $like)
+                ->tap(fn ($q) => MessengerHiddenMessage::excludeFor($q, $me, 'c.id', 'timesheet_chat.id'))
                 ->orderByDesc('timesheet_chat.id')
                 ->limit(30)
                 ->with('profile')
@@ -1034,7 +1169,8 @@ class MessengerApiController extends Controller {
             'peer_id'    => $peer?->id,
             'message_id' => $message->id,
             'from_name'  => (int) $message->from_id === $me ? 'Вы' : ChatDirectory::shortName($message->profile),
-            'text'       => mb_strimwidth(trim(preg_replace('/\s+/u', ' ', (string) $message->message)), 0, 160, '…'),
+            // Без маркеров форматирования, скрытый текст замаскирован — как в списке чатов
+            'text'       => mb_strimwidth(trim(preg_replace('/\s+/u', ' ', MessengerMessageResource::plainText($message->message))), 0, 160, '…'),
             'created_at' => $message->created_at->toIso8601String(),
         ];
     }

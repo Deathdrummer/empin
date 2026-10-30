@@ -5,6 +5,7 @@ namespace App\Services\Messenger;
 use App\Models\MessengerChat;
 use App\Models\MessengerChatMember;
 use App\Models\MessengerChatRemoval;
+use App\Models\MessengerHiddenMessage;
 use App\Models\MessengerSetting;
 use App\Models\TimesheetChat;
 use App\Models\TimesheetContract;
@@ -207,12 +208,12 @@ class ObjectChats
     }
 
     /**
-     * Последний комментарий каждого объекта
+     * Последний комментарий каждого объекта; $hiddenFor — без удалённых этим сотрудником «у себя» (список чатов)
      *
      * @param int[] $contractIds
      * @return array<int, int> contract_id => comment id
      */
-    public function lastCommentIds(array $contractIds): array
+    public function lastCommentIds(array $contractIds, ?int $hiddenFor = null): array
     {
         if (!$contractIds) {
             return [];
@@ -221,6 +222,11 @@ class ObjectChats
         return TimesheetChat::query()
             ->join('timesheet_contracts as tc', 'tc.id', '=', 'timesheet_chat.timesheet_contract_id')
             ->whereIn('tc.contract_id', $contractIds)
+            ->when($hiddenFor !== null, fn ($q) => $q
+                ->join('messenger_chats as c', function ($join) {
+                    $join->on('c.contract_id', '=', 'tc.contract_id')->where('c.type', MessengerChat::TYPE_OBJECT);
+                })
+                ->tap(fn ($q) => MessengerHiddenMessage::excludeFor($q, $hiddenFor, 'c.id', 'timesheet_chat.id')))
             ->groupBy('tc.contract_id')
             ->select('tc.contract_id', DB::raw('MAX(timesheet_chat.id) as last_id'))
             ->pluck('last_id', 'contract_id')
@@ -246,6 +252,7 @@ class ObjectChats
             ->when($onlyAudible, fn ($q) => $q->where('m.muted', false))
             ->where('timesheet_chat.from_id', '!=', $staffId)
             ->whereRaw('timesheet_chat.id > COALESCE(m.last_read_id, 0)')
+            ->tap(fn ($q) => MessengerHiddenMessage::excludeFor($q, $staffId, 'c.id', 'timesheet_chat.id'))
             ->groupBy('c.id')
             ->select('c.id', DB::raw('COUNT(*) as unread'))
             ->pluck('unread', 'id')

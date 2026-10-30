@@ -323,7 +323,8 @@ class TimesheetApiController extends Controller {
      * @return TimesheetChatResource
      */
     public function addComment(Request $request) {
-        $validated = $request->validate([
+        // + «волна» голосового, длительность и кадр-превью видео (необязательны)
+        $validated = $request->validate(MediaStorage::META_RULES + [
             'timesheet_contract_id' => 'required|integer',
             'message' => 'nullable|string',
             'reply_to_id' => 'nullable|integer',
