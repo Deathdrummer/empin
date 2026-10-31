@@ -251,7 +251,7 @@ class ObjectChats
             ->join('messenger_chat_members as m', function ($join) use ($staffId) {
                 $join->on('m.chat_id', '=', 'c.id')->where('m.staff_id', $staffId);
             })
-            ->when($onlyAudible, fn ($q) => $q->where('m.muted', false))
+            ->when($onlyAudible, fn ($q) => $q->where('m.muted', false)->whereNull('m.archived_at'))
             ->where('timesheet_chat.from_id', '!=', $staffId)
             ->whereRaw('timesheet_chat.id > COALESCE(m.last_read_id, 0)')
             ->tap(fn ($q) => MessengerHiddenMessage::excludeFor($q, $staffId, 'c.id', 'timesheet_chat.id'))

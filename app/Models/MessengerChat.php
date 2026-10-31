@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\DB;
 
 class MessengerChat extends Model {
     use HasFactory, Filterable, Collectionable;
@@ -15,6 +16,8 @@ class MessengerChat extends Model {
 	public const TYPE_GROUP = 'group';
 	// Чат объекта: комментарии табеля к договору за все дни
 	public const TYPE_OBJECT = 'object';
+	// «Избранное»: сообщения себе (заметки, пересланное на потом), единственный участник — владелец
+	public const TYPE_SAVED = 'saved';
 
 
 
@@ -104,6 +107,26 @@ class MessengerChat extends Model {
 
 	public function isObject(): bool {
 		return $this->type === self::TYPE_OBJECT;
+	}
+
+	public function isSaved(): bool {
+		return $this->type === self::TYPE_SAVED;
+	}
+
+	/**
+	 * «Избранное» сотрудника: создаётся при первом обращении. Блокировка строки сотрудника — чтобы два
+	 * одновременных запроса (две вкладки, повтор) не создали два «Избранных»
+	 */
+	public static function savedFor(int $staffId): MessengerChat {
+		$find = fn () => static::where('type', self::TYPE_SAVED)->where('created_by', $staffId)->first();
+
+		return $find() ?? DB::transaction(function () use ($staffId, $find) {
+			Staff::whereKey($staffId)->lockForUpdate()->first();
+			$chat = $find() ?? static::create(['type' => self::TYPE_SAVED, 'created_by' => $staffId]);
+			$chat->ensureMember($staffId);
+
+			return $chat;
+		});
 	}
 
 	/**

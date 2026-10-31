@@ -36,6 +36,8 @@ class MessengerCallController extends Controller
             'token' => 'required|string|max:255',
             'platform' => 'nullable|in:android,ios',
             'installation_id' => 'nullable|string|max:100',
+            // Приложение само показывает уведомление о сообщении — push ему только данными (см. миграцию data_only)
+            'data_only' => 'nullable|boolean',
         ]);
 
         $staff = Staff::find($request->user()->staff_id);
@@ -49,7 +51,8 @@ class MessengerCallController extends Controller
             $validated['token'],
             $validated['platform'] ?? 'unknown',
             'expo',
-            $validated['installation_id'] ?? null
+            $validated['installation_id'] ?? null,
+            (bool) ($validated['data_only'] ?? false)
         );
 
         // Совместимость со старой версией сервиса уведомлений.
@@ -469,7 +472,8 @@ class MessengerCallController extends Controller
         string $token,
         string $platform,
         string $tokenType,
-        ?string $installationId
+        ?string $installationId,
+        bool $dataOnly = false
     ): void {
         $record = $installationId
             ? StaffPushToken::firstOrNew([
@@ -496,6 +500,7 @@ class MessengerCallController extends Controller
             'token' => $token,
             'platform' => $platform,
             'token_type' => $tokenType,
+            'data_only' => $dataOnly,
         ]);
         $record->save();
     }

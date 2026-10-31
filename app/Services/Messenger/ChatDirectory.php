@@ -23,6 +23,7 @@ class ChatDirectory
     /**
      * Непрочитанные сообщения личных чатов и групп: chat_id => count.
      * Системные сообщения («добавил в группу») непрочитанными не считаются.
+     * $onlyAudible — для значка: без чатов «без звука» и архива (их не видно в основном списке)
      */
     public function messageUnreadByChat(int $staffId, bool $onlyAudible = false): array
     {
@@ -30,7 +31,7 @@ class ChatDirectory
             ->join('messenger_chat_members as m', function ($join) use ($staffId) {
                 $join->on('m.chat_id', '=', 'messenger_messages.chat_id')->where('m.staff_id', $staffId);
             })
-            ->when($onlyAudible, fn ($q) => $q->where('m.muted', false))
+            ->when($onlyAudible, fn ($q) => $q->where('m.muted', false)->whereNull('m.archived_at'))
             ->where('messenger_messages.from_id', '!=', $staffId)
             ->where('messenger_messages.type', '!=', MessengerMessage::TYPE_SYSTEM)
             ->whereRaw('messenger_messages.id > COALESCE(m.last_read_id, 0)')
@@ -128,7 +129,7 @@ class ChatDirectory
                     'mname' => $peer->mname,
                     'avatar' => $peer->avatar,
                 ] + Presence::of($peer) : null,
-                'members_count' => $chat->isDirect() ? null : (int) ($membersCount[$chat->id] ?? 0),
+                'members_count' => $chat->isDirect() || $chat->isSaved() ? null : (int) ($membersCount[$chat->id] ?? 0),
                 'object'        => $chat->isObject() ? $this->objectInfo($chat) : null,
                 'last_message'  => $last ? [
                     'id'         => $last->id,
@@ -147,6 +148,7 @@ class ChatDirectory
                 'mentioned'     => in_array($chat->id, $mentioned, true),
                 'pinned'        => $member->pinned_at !== null,
                 'muted'         => (bool) $member->muted,
+                'archived'      => $member->archived_at !== null,
                 'activity_at'   => $activity?->toIso8601String(),
                 '_pinned_ts'    => $member->pinned_at?->getTimestamp() ?? 0,
                 '_activity_ts'  => $activity?->getTimestamp() ?? 0,
@@ -166,7 +168,7 @@ class ChatDirectory
 
         $totalUnread = 0;
         foreach ($items as &$item) {
-            if (!$item['muted']) {
+            if (!$item['muted'] && !$item['archived']) {
                 $totalUnread += $item['unread_count'];
             }
             unset($item['_pinned_ts'], $item['_activity_ts']);
@@ -204,6 +206,13 @@ class ChatDirectory
                 'mname' => $peer->mname,
                 'avatar' => $peer->avatar,
             ] + Presence::of($peer) : null;
+
+            return $info;
+        }
+
+        // «Избранное» — без участников и собеседника
+        if ($chat->isSaved()) {
+            $info['title'] = $this->titleOf($chat, null);
 
             return $info;
         }
@@ -270,6 +279,10 @@ class ChatDirectory
 
         if ($chat->isGroup()) {
             return (string) $chat->title;
+        }
+
+        if ($chat->isSaved()) {
+            return 'Избранное';
         }
 
         return $peer ? trim("{$peer->sname} {$peer->fname}") : 'Собеседник';

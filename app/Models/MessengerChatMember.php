@@ -20,6 +20,7 @@ class MessengerChatMember extends Model
         'last_read_id' => 'integer',
         'joined_read_id' => 'integer',
         'pinned_at' => 'datetime',
+        'archived_at' => 'datetime',
         'muted' => 'boolean',
     ];
 

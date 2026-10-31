@@ -74,6 +74,14 @@ class MessengerNotifier
     {
         $this->objects->syncMembers($chat);
 
+        // Архив, как в Telegram: чат со звуком возвращается в основной список при новом сообщении,
+        // «без звука» — остаётся в архиве
+        MessengerChatMember::where('chat_id', $chat->id)
+            ->where('staff_id', '!=', $sender->id)
+            ->whereNotNull('archived_at')
+            ->where('muted', false)
+            ->update(['archived_at' => null]);
+
         $members = MessengerChatMember::where('chat_id', $chat->id)
             ->where('staff_id', '!=', $sender->id)
             ->get();

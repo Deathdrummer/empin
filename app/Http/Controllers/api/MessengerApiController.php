@@ -13,6 +13,7 @@ use App\Models\Staff;
 use App\Models\TimesheetChat;
 use App\Services\Messenger\ChatDirectory;
 use App\Services\Messenger\ChatMedia;
+use App\Services\Messenger\LinkPreview;
 use App\Services\Messenger\MediaStorage;
 use App\Services\Messenger\MessengerNotifier;
 use App\Services\Messenger\ObjectChats;
@@ -342,6 +343,7 @@ class MessengerApiController extends Controller {
             'poll.multiple'     => 'nullable|boolean',
             'mention_ids'       => 'nullable|array',
             'mention_ids.*'     => 'integer',
+            'client_key'        => 'nullable|string|max:64',
         ]);
 
         $chat = $this->chatFor($request, $validated['chat_id']);
@@ -349,10 +351,58 @@ class MessengerApiController extends Controller {
             return $this->chatNotFound();
         }
 
-        if ($chat->isObject()) {
-            return $this->addObjectComment($request, $chat, $validated);
+        // client_key — ключ попытки (ответ из уведомления): повтор того же запроса, когда телефон не дождался
+        // ответа или iOS усыпил приложение, возвращает уже отправленное, а не создаёт второе сообщение
+        $replayKey = isset($validated['client_key'])
+            ? "messenger:send:{$this->me($request)}:{$chat->id}:{$validated['client_key']}"
+            : null;
+        if ($replayKey && ($sent = $this->sentBefore($request, $chat, $replayKey))) {
+            return $sent;
+        }
+        $lock = $replayKey ? $this->forwardLock($replayKey) : null;
+        if ($lock === false) {
+            return response()->json(['error' => 'Сообщение ещё отправляется'], 409);
         }
 
+        try {
+            if ($replayKey && ($sent = $this->sentBefore($request, $chat, $replayKey))) {
+                return $sent;
+            }
+            $response = $chat->isObject()
+                ? $this->addObjectComment($request, $chat, $validated)
+                : $this->storeMessage($request, $chat, $validated);
+            if ($replayKey) {
+                $response = $response instanceof JsonResponse ? $response : $response->toResponse($request);
+                $id = $response->getData(true)['data']['id'] ?? $response->getData(true)['id'] ?? null;
+                if ($response->isSuccessful() && $id) {
+                    Cache::put($replayKey, (int) $id, now()->addDay());
+                }
+            }
+
+            return $response;
+        } finally {
+            $lock?->release();
+        }
+    }
+
+    /** Уже отправленное по этому ключу попытки — то же, что вернула первая отправка */
+    private function sentBefore(Request $request, MessengerChat $chat, string $replayKey): ?JsonResponse {
+        $id = Cache::get($replayKey);
+        if (!$id) {
+            return null;
+        }
+        if ($chat->isObject()) {
+            $comment = $this->objects->commentsQuery((int) $chat->contract_id)->with(['profile', 'replyTo.profile', 'timesheetContract.team'])->find($id);
+
+            return $comment ? response()->json(ObjectCommentResource::forChat($comment, $chat->id)->resolve($request)) : null;
+        }
+        $message = MessengerMessage::where('chat_id', $chat->id)->with(['profile.registred', 'replyTo.profile', 'votes'])->find($id);
+
+        return $message ? (new MessengerMessageResource($message))->toResponse($request) : null;
+    }
+
+    /** Сообщение личного чата или группы (в чате объекта — addObjectComment) */
+    private function storeMessage(Request $request, MessengerChat $chat, array $validated) {
         $me = $this->me($request);
         $text = $validated['message'] ?? '';
         $isPoll = ($validated['type'] ?? 'text') === MessengerMessage::TYPE_POLL;
@@ -647,6 +697,37 @@ class MessengerApiController extends Controller {
      */
     public function muteChat(Request $request): JsonResponse {
         return $this->updateMemberState($request, 'muted');
+    }
+
+    /**
+     * Архив, как в Telegram: чат убран из основного списка и не учитывается в значке. Закрепление снимается.
+     * Чат со звуком вернётся из архива при новом сообщении, «без звука» — останется в архиве
+     */
+    public function archiveChat(Request $request): JsonResponse {
+        return $this->updateMemberState($request, 'archived');
+    }
+
+    /**
+     * Превью ссылки из сообщения, как в Telegram: сайт, заголовок, описание, картинка (см. LinkPreview —
+     * там же защита от обращений во внутреннюю сеть). Без схемы — https://
+     */
+    public function linkPreview(Request $request, LinkPreview $previews): JsonResponse {
+        $validated = $request->validate(['url' => 'required|string|max:2048']);
+        $url = trim($validated['url']);
+        if (!preg_match('~^https?://~i', $url)) {
+            $url = 'https://' . $url;
+        }
+
+        return response()->json(['preview' => $previews->for($url)]);
+    }
+
+    /**
+     * «Избранное» — чат с самим собой (заметки, пересланное на потом). Создаётся при первом открытии
+     */
+    public function savedChat(Request $request): JsonResponse {
+        $chat = MessengerChat::savedFor($this->me($request));
+
+        return response()->json(['chat_id' => $chat->id, 'type' => $chat->type, 'title' => $this->directory->titleOf($chat, null)]);
     }
 
     /**
@@ -1078,9 +1159,18 @@ class MessengerApiController extends Controller {
         $me = $this->me($request);
         // Закрепить или выключить звук у чата объекта — значит следить за ним: сотрудник становится участником
         $member = $chat->isObject() ? $this->objects->addMember($chat, $me, false) : $chat->ensureMember($me);
-        $member->{$field === 'pinned' ? 'pinned_at' : 'muted'} = $field === 'pinned'
-            ? ($validated['pinned'] ? now() : null)
-            : (bool) $validated['muted'];
+        $value = (bool) $validated[$field];
+        if ($field === 'pinned') {
+            $member->pinned_at = $value ? now() : null;
+        } elseif ($field === 'muted') {
+            $member->muted = $value;
+        } else {
+            $member->archived_at = $value ? now() : null;
+            // В архиве закрепление не нужно — как в Telegram
+            if ($value) {
+                $member->pinned_at = null;
+            }
+        }
         $member->save();
 
         // Другие устройства сотрудника обновят список
@@ -1090,6 +1180,7 @@ class MessengerApiController extends Controller {
             'chat_id'      => $chat->id,
             'pinned'       => $member->pinned_at !== null,
             'muted'        => (bool) $member->muted,
+            'archived'     => $member->archived_at !== null,
             'total_unread' => $this->directory->totalUnread($me),
         ]);
     }

@@ -124,14 +124,29 @@ class PushNotificationService
      */
     public function sendChatMessageNotification(Staff $recipient, string $title, string $body, array $data, int $badge): bool
     {
+        $title = $title !== '' ? $title : 'Новое сообщение';
+
         return $this->sendToExpoTokens($recipient, [
-            'title' => $title !== '' ? $title : 'Новое сообщение',
+            'title' => $title,
             'body' => $body,
             'sound' => 'default',
             'badge' => $badge,
             'priority' => 'high',
             'data' => ['type' => 'message'] + $data,
-        ]);
+        ] + (!empty($data['message_id']) ? [
+            // Кнопки «Ответить» и «Прочитано» (категорию регистрирует приложение; старое — покажет без кнопок)
+            'categoryId' => 'message',
+        ] : []), false, function (array $payload, StaffPushToken $token) use ($title, $body) {
+            // Android-приложение само показывает уведомление (с кнопками). С заголовком и текстом push Firebase
+            // показал бы ещё и своё — второе, без кнопок. Поэтому только данные: текст — внутри них
+            if ($token->platform !== 'android' || !$token->data_only) {
+                return $payload;
+            }
+            unset($payload['title'], $payload['body'], $payload['sound'], $payload['categoryId']);
+            $payload['data'] += ['push_title' => $title, 'push_body' => $body];
+
+            return $payload;
+        });
     }
 
     /**
@@ -149,10 +164,14 @@ class PushNotificationService
         ]);
     }
 
+    /**
+     * @param ?callable(array, StaffPushToken): array $forToken — свой вариант payload для отдельного устройства
+     */
     private function sendToExpoTokens(
         Staff $staff,
         array $payload,
-        bool $contentAvailableForIos = false
+        bool $contentAvailableForIos = false,
+        ?callable $forToken = null
     ): bool
     {
         $tokens = $this->tokensFor($staff)->where('token_type', 'expo');
@@ -161,7 +180,7 @@ class PushNotificationService
 
         foreach ($tokens as $token) {
             $attempted = true;
-            $tokenPayload = $payload;
+            $tokenPayload = $forToken ? $forToken($payload, $token) : $payload;
 
             // Старые клиенты без platform и Android получают прежний payload.
             // Только iOS нужен background push для закрытия CallKit; Apple требует для него приоритет 5

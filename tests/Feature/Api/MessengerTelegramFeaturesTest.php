@@ -345,6 +345,264 @@ class MessengerTelegramFeaturesTest extends TestCase
         $this->assertTrue($this->chatItem($direct->id)['last_message']['read']);
     }
 
+    // --- B1. Ответ и «Прочитано» из уведомления ---
+
+    public function test_message_push_has_reply_buttons_and_reply_is_not_sent_twice(): void
+    {
+        $this->pushToken($this->peer, 'ExponentPushToken[peer]');
+        $direct = MessengerChat::getOrCreate($this->me->id, $this->peer->id);
+
+        $this->signIn($this->me);
+        $first = $this->postJson('/api/messenger/message', ['chat_id' => $direct->id, 'message' => 'Еду', 'client_key' => 'message-77:reply'])
+            ->assertSuccessful();
+        $id = $first->json('data.id') ?? $first->json('id');
+        // Push о сообщении — с кнопками «Ответить» / «Прочитано»
+        $this->assertSame('message', $this->pushesTo('ExponentPushToken[peer]')[0]['categoryId'] ?? null);
+
+        // Телефон не дождался ответа (или iOS усыпил приложение) и повторил — второго сообщения нет
+        $again = $this->postJson('/api/messenger/message', ['chat_id' => $direct->id, 'message' => 'Еду', 'client_key' => 'message-77:reply'])
+            ->assertSuccessful();
+        $this->assertSame($id, $again->json('data.id') ?? $again->json('id'));
+        $this->assertSame(1, $direct->messages()->where('message', 'Еду')->count());
+
+        // Другой ключ и обычная отправка без ключа — новые сообщения
+        $this->postJson('/api/messenger/message', ['chat_id' => $direct->id, 'message' => 'Еду', 'client_key' => 'message-78:reply'])->assertSuccessful();
+        $this->postJson('/api/messenger/message', ['chat_id' => $direct->id, 'message' => 'Еду'])->assertSuccessful();
+        $this->assertSame(3, $direct->messages()->where('message', 'Еду')->count());
+
+        // Ключ попытки — свой у каждого сотрудника: тот же ключ у собеседника не вернёт моё сообщение
+        $this->signIn($this->peer);
+        $peers = $this->postJson('/api/messenger/message', ['chat_id' => $direct->id, 'message' => 'Жду', 'client_key' => 'message-77:reply'])->assertSuccessful();
+        $this->assertNotSame($id, $peers->json('data.id') ?? $peers->json('id'));
+
+        // Push «вас добавили в группу» — без кнопок (нечего отмечать прочитанным)
+        Http::fake(['exp.host/*' => Http::response(['data' => [['status' => 'ok', 'id' => 'ticket']]])]);
+        $this->pushToken($this->third, 'ExponentPushToken[third]');
+        app(\App\Services\Messenger\MessengerNotifier::class)->addedToGroup($this->makeGroup($this->me, []), $this->me, [$this->third->id]);
+        $this->assertArrayNotHasKey('categoryId', $this->pushesTo('ExponentPushToken[third]')[0]);
+    }
+
+    public function test_new_android_app_gets_message_push_as_data_only_without_firebase_duplicate(): void
+    {
+        $direct = MessengerChat::getOrCreate($this->me->id, $this->peer->id);
+
+        // Новое Android-приложение регистрирует токен с data_only, старое — без, iPhone — как всегда
+        $this->signIn($this->peer);
+        $this->postJson('/api/messenger/calls/push-token', ['token' => 'ExponentPushToken[new-android]', 'platform' => 'android', 'installation_id' => 'a1', 'data_only' => true])->assertOk();
+        $this->postJson('/api/messenger/calls/push-token', ['token' => 'ExponentPushToken[old-android]', 'platform' => 'android', 'installation_id' => 'a2'])->assertOk();
+        $this->postJson('/api/messenger/calls/push-token', ['token' => 'ExponentPushToken[iphone]', 'platform' => 'ios', 'installation_id' => 'i1', 'data_only' => true])->assertOk();
+
+        $this->signIn($this->me);
+        $this->postJson('/api/messenger/message', ['chat_id' => $direct->id, 'message' => 'Щит смонтирован'])->assertSuccessful();
+
+        // Только данные: Firebase не покажет своё уведомление, приложение покажет одно — с кнопками
+        $new = $this->pushesTo('ExponentPushToken[new-android]')[0];
+        $this->assertArrayNotHasKey('title', $new);
+        $this->assertArrayNotHasKey('body', $new);
+        $this->assertArrayNotHasKey('sound', $new);
+        $this->assertSame('high', $new['priority']);
+        $this->assertSame(['Иванов Сергей', 'Щит смонтирован'], [$new['data']['push_title'], $new['data']['push_body']]);
+        $this->assertSame('message', $new['data']['type']);
+
+        // Старая версия и iPhone — как раньше: заголовок, текст, звук (iPhone — с кнопками по категории)
+        $old = $this->pushesTo('ExponentPushToken[old-android]')[0];
+        $iphone = $this->pushesTo('ExponentPushToken[iphone]')[0];
+        $this->assertSame(['Иванов Сергей', 'Щит смонтирован'], [$old['title'], $old['body']]);
+        $this->assertSame(['Иванов Сергей', 'Щит смонтирован', 'message'], [$iphone['title'], $iphone['body'], $iphone['categoryId']]);
+        $this->assertArrayNotHasKey('push_title', $iphone['data']);
+    }
+
+    public function test_reply_to_object_chat_from_notification_is_not_duplicated(): void
+    {
+        $contractId = $this->makeContract('112', 'ТП-14 Северная');
+        $this->assignContract($contractId, $this->me, today()->toDateString());
+        $chat = MessengerChat::forObject($contractId);
+        $chat->ensureMember($this->me->id);
+
+        $this->signIn($this->me, ['mobile-app-can-create-comment:site']);
+        $send = fn () => $this->postJson('/api/messenger/message', ['chat_id' => $chat->id, 'message' => 'Принял', 'client_key' => 'message-9:reply'])->assertSuccessful();
+        $first = $send()->json('id');
+        $this->assertSame($first, $send()->json('id'));
+        $this->assertSame(1, \App\Models\TimesheetChat::where('message', 'Принял')->count());
+    }
+
+    // --- B3. Превью ссылок ---
+
+    public function test_link_preview_reads_open_graph_in_any_charset_and_keeps_image_on_our_server(): void
+    {
+        Storage::fake('public');
+        $this->fakeDns(['empin-news.ru' => ['93.184.216.34'], 'cdn.empin-news.ru' => ['93.184.216.35']]);
+        $html = '<html><head><meta charset="windows-1251"><title>Запасной заголовок</title>'
+            . '<meta property="og:site_name" content="Новости энергетики">'
+            . '<meta property="og:title" content="Подстанция &laquo;Северная&raquo; введена">'
+            . '<meta name="description" content="Пуск   ТП-14 после ремонта">'
+            . '<meta property="og:image" content="//cdn.empin-news.ru/cover.png"></head><body></body></html>';
+        Http::fake([
+            'empin-news.ru/article/12' => Http::response(mb_convert_encoding($html, 'Windows-1251', 'UTF-8'), 200, ['Content-Type' => 'text/html']),
+            'cdn.empin-news.ru/cover.png' => Http::response($this->png(600, 315), 200, ['Content-Type' => 'image/png']),
+            '*' => Http::response('', 404),
+        ]);
+
+        $this->signIn($this->me);
+        $preview = $this->getJson('/api/messenger/link-preview?url=' . urlencode('empin-news.ru/article/12'))->assertOk()->json('preview');
+        $this->assertSame('https://empin-news.ru/article/12', $preview['url']);
+        $this->assertSame('Новости энергетики', $preview['site']);
+        $this->assertSame('Подстанция «Северная» введена', $preview['title']);
+        $this->assertSame('Пуск ТП-14 после ремонта', $preview['description']);
+        $this->assertStringStartsWith('/storage/messenger/previews/', $preview['image']);
+        $this->assertSame([600, 315], [$preview['image_width'], $preview['image_height']]);
+        Storage::disk('public')->assertExists(str_replace('/storage/', '', $preview['image']));
+
+        // Второй раз — из кэша, сайт не запрашивается
+        $sent = count(Http::recorded());
+        $this->getJson('/api/messenger/link-preview?url=' . urlencode('empin-news.ru/article/12'))->assertOk()->assertJsonPath('preview.title', 'Подстанция «Северная» введена');
+        $this->assertSame($sent, count(Http::recorded()));
+    }
+
+    public function test_link_preview_never_reaches_internal_network(): void
+    {
+        $this->fakeDns([
+            'intranet.empin-pro.ru' => ['10.0.0.5'],
+            'half.empin-pro.ru' => ['93.184.216.34', '127.0.0.1'],
+            'jump.empin-pro.ru' => ['93.184.216.34'],
+            'site.empin-pro.ru' => ['93.184.216.36'],
+        ]);
+        Http::fake([
+            'jump.empin-pro.ru/*' => Http::response('', 302, ['Location' => 'http://10.0.0.5/secret']),
+            'site.empin-pro.ru/file.pdf' => Http::response('%PDF', 200, ['Content-Type' => 'application/pdf']),
+            'site.empin-pro.ru/empty' => Http::response('<html><body>нет заголовка</body></html>', 200, ['Content-Type' => 'text/html']),
+            '*' => Http::response('<title>внутреннее</title>', 200, ['Content-Type' => 'text/html']),
+        ]);
+
+        $this->signIn($this->me);
+        foreach ([
+            'http://127.0.0.1/admin', 'http://[::1]/', 'http://169.254.169.254/latest/meta-data', 'http://localhost/',
+            'http://intranet.empin-pro.ru/', 'http://half.empin-pro.ru/', 'http://100.64.1.1/', 'http://[::ffff:10.0.0.1]/',
+            'https://site.empin-pro.ru:8443/', 'ftp://site.empin-pro.ru/', 'http://user:secret@site.empin-pro.ru/',
+            'http://jump.empin-pro.ru/go', 'https://site.empin-pro.ru/file.pdf', 'https://site.empin-pro.ru/empty',
+        ] as $url) {
+            $this->assertNull($this->getJson('/api/messenger/link-preview?url=' . urlencode($url))->assertOk()->json('preview'), $url);
+        }
+
+        // Во внутреннюю сеть не ушло ни одного запроса — даже по переадресации
+        $this->assertSame([], collect(Http::recorded())->map(fn ($pair) => $pair[0]->url())
+            ->filter(fn (string $url) => !str_contains($url, 'jump.empin-pro.ru') && !str_contains($url, 'site.empin-pro.ru'))
+            ->values()->all());
+
+        // Без входа — нельзя
+        $this->app['auth']->forgetGuards();
+        $this->getJson('/api/messenger/link-preview?url=' . urlencode('https://site.empin-pro.ru/empty'))->assertUnauthorized();
+    }
+
+    /** @param array<string, string[]> $map хост => адреса; IP в адресе ссылки — как есть */
+    private function fakeDns(array $map): void
+    {
+        $this->app->instance(\App\Services\Messenger\HostResolver::class, new class($map) extends \App\Services\Messenger\HostResolver {
+            public function __construct(private array $map)
+            {
+            }
+
+            public function resolve(string $host): array
+            {
+                return filter_var($host, FILTER_VALIDATE_IP) ? [$host] : ($this->map[$host] ?? []);
+            }
+        });
+    }
+
+    /** PNG заданного размера без расширения GD */
+    private function png(int $width, int $height): string
+    {
+        $chunk = fn (string $type, string $data) => pack('N', strlen($data)) . $type . $data . pack('N', crc32($type . $data));
+        $rows = str_repeat("\0" . str_repeat("\0\0\0", $width), $height);
+
+        return "\x89PNG\r\n\x1a\n" . $chunk('IHDR', pack('NNCCCCC', $width, $height, 8, 2, 0, 0, 0))
+            . $chunk('IDAT', gzcompress($rows)) . $chunk('IEND', '');
+    }
+
+    // --- B5. «Избранное» и архив ---
+
+    public function test_saved_messages_is_a_private_chat_with_myself(): void
+    {
+        $this->pushToken($this->me, 'ExponentPushToken[me]');
+        $direct = MessengerChat::getOrCreate($this->me->id, $this->peer->id);
+        $note = $this->say($direct, $this->peer, 'Схема щита во вложении');
+
+        $this->signIn($this->me);
+        $saved = $this->postJson('/api/messenger/chat/saved')->assertOk()->assertJsonPath('title', 'Избранное')->json('chat_id');
+        // Повторное открытие — тот же чат; пустое «Избранное» в списке не показывается
+        $this->assertSame($saved, $this->postJson('/api/messenger/chat/saved')->json('chat_id'));
+        $this->assertNull($this->chatItem($saved));
+
+        // Заметка себе и пересланное на потом
+        $this->postJson('/api/messenger/message', ['chat_id' => $saved, 'message' => 'Купить автомат 25А'])->assertSuccessful();
+        $this->postJson('/api/messenger/forward', ['chat_id' => $direct->id, 'message_ids' => [$note->id], 'target_chat_ids' => [$saved]])->assertOk();
+
+        $item = $this->chatItem($saved);
+        $this->assertSame('saved', $item['type']);
+        $this->assertSame('Избранное', $item['title']);
+        $this->assertNull($item['members_count']);
+        $this->assertSame(0, $item['unread_count']);
+        $this->assertSame('Схема щита во вложении', $item['last_message']['text']);
+        $this->assertSame(['Купить автомат 25А', 'Схема щита во вложении'], array_column(
+            $this->postJson('/api/messenger/chat/messages', ['chat_id' => $saved, 'limit' => 30])->json('messages'), 'message'));
+        $this->getJson("/api/messenger/chat/info?chat_id={$saved}")->assertOk()->assertJsonPath('title', 'Избранное');
+        $hit = collect($this->getJson('/api/messenger/search?q=' . urlencode('автомат'))->json('messages'))->firstWhere('chat_id', $saved);
+        $this->assertSame('Избранное', $hit['chat_title']);
+
+        // Ни push, ни событий другим: это только моё
+        $this->assertSame([], $this->pushesTo('ExponentPushToken[me]'));
+        Event::assertNotDispatched(MessengerEvent::class, fn (MessengerEvent $event) => $event->eventName === 'message.created'
+            && ($event->payload['chat_id'] ?? null) === $saved);
+
+        // Чужое «Избранное» — как несуществующий чат; у коллеги — своё
+        $this->signIn($this->peer);
+        $this->postJson('/api/messenger/chat/messages', ['chat_id' => $saved, 'limit' => 30])->assertNotFound();
+        $this->assertNotSame($saved, $this->postJson('/api/messenger/chat/saved')->json('chat_id'));
+    }
+
+    public function test_archived_chat_leaves_the_list_and_returns_on_new_message_unless_muted(): void
+    {
+        $direct = MessengerChat::getOrCreate($this->me->id, $this->peer->id);
+        $group = $this->makeGroup($this->peer, [$this->me]);
+        $this->say($direct, $this->peer, 'Привет');
+        $this->say($group, $this->peer, 'Сбор в 7:30');
+
+        $this->signIn($this->me);
+        $this->postJson('/api/messenger/chat/pin', ['chat_id' => $direct->id, 'pinned' => true])->assertOk();
+        $archived = $this->postJson('/api/messenger/chat/archive', ['chat_id' => $direct->id, 'archived' => true])->assertOk();
+        // В архиве не закреплён и не считается в значке
+        $this->assertTrue($archived->json('archived'));
+        $this->assertFalse($archived->json('pinned'));
+        $this->assertSame(1, $archived->json('total_unread'));
+        $list = $this->getJson('/api/messenger/chats')->json();
+        $this->assertSame(1, $list['total_unread']);
+        $this->assertTrue(collect($list['chats'])->firstWhere('chat_id', $direct->id)['archived']);
+        $this->assertFalse(collect($list['chats'])->firstWhere('chat_id', $group->id)['archived']);
+
+        // Новое сообщение — чат со звуком возвращается из архива
+        $this->signIn($this->peer);
+        $this->postJson('/api/messenger/message', ['chat_id' => $direct->id, 'message' => 'Ты где?'])->assertSuccessful();
+        $this->signIn($this->me);
+        $this->assertFalse($this->chatItem($direct->id)['archived']);
+        $this->assertSame(3, $this->getJson('/api/messenger/chats')->json('total_unread'));
+
+        // «Без звука» — остаётся в архиве
+        $this->postJson('/api/messenger/chat/mute', ['chat_id' => $group->id, 'muted' => true])->assertOk();
+        $this->postJson('/api/messenger/chat/archive', ['chat_id' => $group->id, 'archived' => true])->assertOk();
+        $this->signIn($this->peer);
+        $this->postJson('/api/messenger/message', ['chat_id' => $group->id, 'message' => 'Отбой'])->assertSuccessful();
+        $this->signIn($this->me);
+        $this->assertTrue($this->chatItem($group->id)['archived']);
+
+        // Вернуть из архива вручную
+        $this->postJson('/api/messenger/chat/archive', ['chat_id' => $group->id, 'archived' => false])->assertOk()->assertJsonPath('archived', false);
+        $this->assertFalse($this->chatItem($group->id)['archived']);
+
+        // Чужой чат не архивируется
+        $this->signIn($this->third);
+        $this->postJson('/api/messenger/chat/archive', ['chat_id' => $direct->id, 'archived' => true])->assertNotFound();
+    }
+
     // --- B2. Форматирование ---
 
     public function test_chat_list_and_push_show_text_without_formatting_and_hide_spoilers(): void

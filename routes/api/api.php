@@ -64,6 +64,10 @@ Route::controller(MessengerApiController::class)->prefix('messenger')->middlewar
 	Route::post('/chat/typing', 'typing');
 	Route::post('/chat/pin', 'pinChat');
 	Route::post('/chat/mute', 'muteChat');
+	Route::post('/chat/archive', 'archiveChat');
+	Route::post('/chat/saved', 'savedChat');
+	// Сервер ходит по чужим адресам — не чаще раза в секунду на сотрудника
+	Route::get('/link-preview', 'linkPreview')->middleware('throttle:60,1');
 	Route::post('/chat', 'getOrCreateChat');
 	Route::post('/chat/messages', 'getMessages');
 	Route::post('/object/open', 'openObjectChat');
