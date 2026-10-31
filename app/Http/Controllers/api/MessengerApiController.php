@@ -249,22 +249,21 @@ class MessengerApiController extends Controller {
     /**
      * Группа и объект — для галочек и «Прочитали»:
      * members_read — докуда дочитал каждый участник (staff_id => id сообщения);
-     * members_since — когда участник появился в чате. Вступившему граница прочитанного ставится на последнее
-     * сообщение, чтобы история не стала непрочитанной, — поэтому прочитавшими сообщение считаются только те,
-     * кто был в чате, когда его отправили (мастер, которого табель добавил позже, не «прочитал» старые).
+     * members_joined — граница прочитанного при вступлении. Вступившему она ставится на последнее сообщение,
+     * чтобы история не стала непрочитанной, — поэтому сообщение прочитали только те, для кого оно новее этой
+     * границы (мастер, которого табель добавил позже, не «прочитал» старые). null — в чате с самого начала.
      */
     private function membersRead(MessengerChat $chat, int $me): array {
         $members = MessengerChatMember::where('chat_id', $chat->id)
             ->where('staff_id', '!=', $me)
-            ->get(['staff_id', 'last_read_id', 'created_at']);
+            ->get(['staff_id', 'last_read_id', 'joined_read_id']);
+        $ids = fn (string $field) => $members->mapWithKeys(fn ($member) => [
+            $member->staff_id => $member->{$field} !== null ? (int) $member->{$field} : null,
+        ]);
 
         return [
-            'members_read'  => $members->mapWithKeys(fn ($member) => [
-                $member->staff_id => $member->last_read_id !== null ? (int) $member->last_read_id : null,
-            ]),
-            'members_since' => $members->mapWithKeys(fn ($member) => [
-                $member->staff_id => $member->created_at?->toIso8601String(),
-            ]),
+            'members_read'   => $ids('last_read_id'),
+            'members_joined' => $ids('joined_read_id'),
         ];
     }
 

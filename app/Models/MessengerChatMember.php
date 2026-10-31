@@ -18,9 +18,21 @@ class MessengerChatMember extends Model
 
     protected $casts = [
         'last_read_id' => 'integer',
+        'joined_read_id' => 'integer',
         'pinned_at' => 'datetime',
         'muted' => 'boolean',
     ];
+
+    protected static function booted(): void
+    {
+        // Граница прочитанного при вступлении: сообщения до неё участник не читал (см. миграцию joined_read_id).
+        // Массовая вставка (insertOrIgnore) событий не вызывает — там поле заполняется явно
+        static::creating(function (MessengerChatMember $member) {
+            if (!array_key_exists('joined_read_id', $member->getAttributes())) {
+                $member->joined_read_id = $member->last_read_id;
+            }
+        });
+    }
 
     public function chat(): BelongsTo
     {

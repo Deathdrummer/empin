@@ -83,12 +83,14 @@ class ChatDirectory
         $peerIds = $directChats->mapWithKeys(fn (MessengerChat $chat) => [$chat->id => $chat->otherParticipantId($staffId)]);
         $peers = Staff::whereIn('id', $peerIds->values())->get(['id', 'sname', 'fname', 'mname', 'avatar', 'last_seen_at'])->keyBy('id');
 
-        // Галочки «прочитано» у моего последнего сообщения: собеседник или кто-то из группы дочитал до него
-        $othersRead = MessengerChatMember::whereIn('chat_id', $messageChats->pluck('id'))
+        // Галочки «прочитано» у моего последнего сообщения: его дочитал кто-то, для кого оно новее точки
+        // вступления (вступившему граница прочитанного ставится на последнее сообщение — это не прочтение).
+        // Так же считает лента чата (members_joined)
+        $othersRead = MessengerChatMember::whereIn('chat_id', $chats->pluck('id'))
             ->where('staff_id', '!=', $staffId)
-            ->groupBy('chat_id')
-            ->select('chat_id', DB::raw('MAX(last_read_id) as last_read'))
-            ->pluck('last_read', 'chat_id');
+            ->whereNotNull('last_read_id')
+            ->get(['chat_id', 'last_read_id', 'joined_read_id'])
+            ->groupBy('chat_id');
 
         $membersCount = MessengerChatMember::whereIn('chat_id', $chats->reject(fn (MessengerChat $chat) => $chat->isDirect())->pluck('id'))
             ->groupBy('chat_id')
@@ -135,7 +137,10 @@ class ChatDirectory
                     'self'       => $isSelf,
                     'text'       => $this->previewOf($last, $chat->isObject()),
                     'type'       => $chat->isObject() ? MessengerMessageResource::previewType($last->media) : $this->typeOf($last),
-                    'read'       => $isSelf && !$chat->isObject() && (int) ($othersRead[$chat->id] ?? 0) >= $last->id,
+                    'read'       => $isSelf && collect($othersRead[$chat->id] ?? [])->contains(
+                        fn ($member) => (int) $member->last_read_id >= $last->id
+                            && ($member->joined_read_id === null || $last->id > (int) $member->joined_read_id)
+                    ),
                     'created_at' => $last->created_at->toIso8601String(),
                 ] : null,
                 'unread_count'  => $unread[$chat->id] ?? 0,

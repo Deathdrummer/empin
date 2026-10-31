@@ -258,7 +258,6 @@ class MessengerTelegramFeaturesTest extends TestCase
         $chat->ensureMember($this->peer->id);
         $mine = $this->addComment($placement, $this->me, 'Щит смонтирован');
         $last = $this->addComment($placement, $this->peer, 'Принято, фото позже');
-        $this->travel(1)->minutes();
         // Мастер, добавленный табелем позже: граница прочитанного — последний комментарий, но он их не читал
         $chat->ensureMember($this->third->id, $last->id);
 
@@ -275,8 +274,9 @@ class MessengerTelegramFeaturesTest extends TestCase
         $this->assertSame($mine->id, $page['members_read'][$this->peer->id]);
         $this->assertSame($last->id, $page['members_read'][$this->third->id]);
         $this->assertArrayNotHasKey($this->me->id, $page['members_read']);
-        // Позже вступивший — позже отправки моего комментария: приложение не считает его прочитавшим
-        $this->assertGreaterThan($mine->created_at, \Illuminate\Support\Carbon::parse($page['members_since'][$this->third->id]));
+        // Точка вступления: позже добавленный «получил» комментарии до неё, не читая; бывший с начала — null
+        $this->assertSame($last->id, $page['members_joined'][$this->third->id]);
+        $this->assertNull($page['members_joined'][$this->peer->id]);
 
         // «Удалить у меня» в объекте: только у меня, и в списке чатов последним становится предыдущий
         $this->postJson('/api/messenger/message/hide', ['chat_id' => $chat->id, 'message_ids' => [$last->id]])
@@ -288,6 +288,61 @@ class MessengerTelegramFeaturesTest extends TestCase
         $this->signIn($this->peer);
         $this->assertCount(2, $this->postJson('/api/messenger/chat/messages', ['chat_id' => $chat->id, 'limit' => 30])->json('messages'));
         $this->assertSame($last->id, $this->chatItem($chat->id)['last_message']['id']);
+    }
+
+    public function test_master_added_by_timesheet_with_new_comment_has_not_read_it(): void
+    {
+        $contractId = $this->makeContract('112', 'ТП-14 Северная');
+        $this->assignContract($contractId, $this->me, today()->toDateString());
+        // Объект поставлен и бригаде Самсонова — в чат он попадёт при первом же комментарии
+        $this->assignContract($contractId, $this->third, today()->toDateString());
+        $chat = MessengerChat::forObject($contractId);
+        $chat->ensureMember($this->me->id);
+
+        $this->signIn($this->me, ['mobile-app-can-create-comment:site']);
+        $sent = $this->postJson('/api/messenger/message', ['chat_id' => $chat->id, 'message' => 'Щит смонтирован'])->assertCreated();
+        $commentId = $sent->json('data.id') ?? $sent->json('id');
+
+        // Граница прочитанного у добавленного — этот комментарий, но прочтением это не считается
+        $joined = $this->postJson('/api/messenger/chat/messages', ['chat_id' => $chat->id, 'limit' => 30])->json();
+        $this->assertSame($commentId, $joined['members_read'][$this->third->id]);
+        $this->assertSame($commentId, $joined['members_joined'][$this->third->id]);
+        $this->assertFalse($this->chatItem($chat->id)['last_message']['read']);
+    }
+
+    public function test_chat_list_read_ticks_ignore_members_added_after_the_message(): void
+    {
+        $group = $this->makeGroup($this->me, [$this->peer]);
+        $mine = $this->say($group, $this->me, 'Завтра в 7:30');
+        // Добавлен позже (в ту же секунду — неважно): граница прочитанного — моё сообщение, но он его не читал
+        $group->ensureMember($this->third->id, $mine->id);
+
+        $this->signIn($this->me);
+        $this->assertFalse($this->chatItem($group->id)['last_message']['read']);
+
+        // Прочитал тот, кто был в группе, — две галочки
+        $group->markReadBy($this->peer->id, $mine->id);
+        $this->assertTrue($this->chatItem($group->id)['last_message']['read']);
+
+        // Чат объекта — тоже с галочками (раньше всегда одна)
+        $contractId = $this->makeContract('112', 'ТП-14 Северная');
+        $placement = $this->assignContract($contractId, $this->me, today()->toDateString());
+        $object = MessengerChat::forObject($contractId);
+        $object->ensureMember($this->me->id);
+        $object->ensureMember($this->peer->id);
+        $comment = $this->addComment($placement, $this->me, 'Щит смонтирован');
+        $this->assertFalse($this->chatItem($object->id)['last_message']['read']);
+        // Мастер, которого табель добавил при этом комментарии (граница — сам комментарий), — не прочтение
+        $object->ensureMember($this->third->id, $comment->id);
+        $this->assertFalse($this->chatItem($object->id)['last_message']['read']);
+        $object->markReadBy($this->peer->id, $comment->id);
+        $this->assertTrue($this->chatItem($object->id)['last_message']['read']);
+
+        // Личный чат: первое сообщение в ту же секунду, что создан чат, — прочтение видно
+        $direct = MessengerChat::getOrCreate($this->me->id, $this->peer->id);
+        $hello = $this->say($direct, $this->me, 'Привет');
+        $direct->markReadBy($this->peer->id, $hello->id);
+        $this->assertTrue($this->chatItem($direct->id)['last_message']['read']);
     }
 
     // --- B2. Форматирование ---

@@ -201,6 +201,8 @@ class ObjectChats
     {
         $now = now();
         MessengerChatMember::insertOrIgnore(array_map(fn (array $row) => $row + [
+            // Комментарии до вступления мастер не читал — «Прочитали» и галочки их не засчитывают
+            'joined_read_id' => $row['last_read_id'] ?? null,
             'role'       => MessengerChatMember::ROLE_MEMBER,
             'created_at' => $now,
             'updated_at' => $now,
