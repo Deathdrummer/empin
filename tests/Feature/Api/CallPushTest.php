@@ -228,6 +228,20 @@ class CallPushTest extends TestCase
         $this->assertNull($call->fresh()->started_at);
     }
 
+    public function test_accept_supplies_caller_when_native_answer_has_no_local_push_data(): void
+    {
+        Event::fake([CallAccepted::class]);
+        Http::fake();
+        $this->actingAsStaff($this->callee);
+        $call = $this->createCall('initiated');
+        $this->postJson("/api/messenger/calls/{$call->id}/accept")
+            ->assertOk()->assertJsonPath('call.id', $call->id)
+            ->assertJsonPath('call.caller.id', $this->caller->id)
+            ->assertJsonPath('uid', $this->callee->id)
+            ->assertJsonStructure(['token', 'channel_name', 'agora_app_id'])
+            ->assertJsonMissingPath('call.answered_access_token_id');
+    }
+
     public function test_expired_unanswered_call_cannot_be_accepted(): void
     {
         $this->actingAsStaff($this->callee);

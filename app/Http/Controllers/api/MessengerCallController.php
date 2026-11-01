@@ -260,6 +260,9 @@ class MessengerCallController extends Controller
             });
         }
 
+        // При ответе с системного окна локальные данные push могут отсутствовать.
+        // Возвращаем собеседника из проверенной серверной записи вместе с RTC-параметрами.
+        $call->loadMissing('caller');
         return response()->json([
             'call'         => $call,
             'channel_name' => $call->session_id,
