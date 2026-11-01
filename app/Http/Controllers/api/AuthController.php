@@ -25,6 +25,7 @@ class AuthController extends Controller {
         $credentials = $request->validate([
             'email' => 'required|email',
             'password' => 'required|string',
+            'installation_id' => 'nullable|string|max:100|regex:/^[a-zA-Z0-9_-]+$/',
         ]);
 
         $user = User::where('email', $credentials['email'])->first();
@@ -35,18 +36,18 @@ class AuthController extends Controller {
             ], 401);
         }
 
-        // Удаляем старые токены
-        $user->tokens()->delete();
-
-        // Прежние устройства теперь получат 401 и уже не смогут сами снять свои push-токены,
-        // а звонки продолжали бы приходить на них. Новое устройство зарегистрирует токены после входа.
-        if ($user->staff_id) {
-            StaffPushToken::where('staff_id', $user->staff_id)->delete();
-            Staff::whereKey($user->staff_id)->update(['expo_push_token' => null]);
-        }
-
-        // Создаем новый токен
-        $token = $user->createToken('mobile-app')->plainTextToken;
+        // Повторный вход заменяет только сессию этого устройства. Глобальное удаление ломало
+        // звонки и PushKit другого телефона того же сотрудника. Старые клиенты без installation_id
+        // остаются совместимыми; их сессии снимаются обычным logout.
+        $installationId = $credentials['installation_id'] ?? null;
+        $tokenName = $installationId ? 'mobile-app:' . $installationId : 'mobile-app';
+        $token = \DB::transaction(function () use ($user, $installationId, $tokenName) {
+            User::whereKey($user->id)->lockForUpdate()->firstOrFail();
+            if ($installationId) {
+                $user->tokens()->where('name', $tokenName)->delete();
+            }
+            return $user->createToken($tokenName)->plainTextToken;
+        });
 
         // Получаем все права пользователя через Spatie
         $permissions = $user->getAllPermissions()->pluck('name')->toArray();
@@ -70,7 +71,18 @@ class AuthController extends Controller {
      * @return \Illuminate\Http\JsonResponse
      */
     public function logout(Request $request) {
-        $request->user()->currentAccessToken()->delete();
+        $user = $request->user();
+        $accessToken = $user->currentAccessToken();
+        $name = $accessToken->name;
+        if ($user->staff_id && str_starts_with($name, 'mobile-app:')) {
+            $tokens = StaffPushToken::where('staff_id', $user->staff_id)
+                ->where('installation_id', substr($name, strlen('mobile-app:')));
+            $removed = (clone $tokens)->pluck('token');
+            $tokens->delete();
+            Staff::whereKey($user->staff_id)->whereIn('expo_push_token', $removed)
+                ->update(['expo_push_token' => null]);
+        }
+        $accessToken->delete();
 
         return response()->json([
             'message' => 'Successfully logged out',

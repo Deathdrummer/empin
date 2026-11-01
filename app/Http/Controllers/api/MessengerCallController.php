@@ -14,6 +14,8 @@ use App\Services\AgoraService;
 use App\Services\PushNotificationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
 class MessengerCallController extends Controller
@@ -198,32 +200,51 @@ class MessengerCallController extends Controller
      */
     public function accept(Request $request, int $id): JsonResponse
     {
-        $call = MessengerCall::find($id);
+        $request->validate(['installation_id' => 'nullable|string|max:100|regex:/^[a-zA-Z0-9_-]+$/']);
+        $accessToken = $request->user()->currentAccessToken();
+        $tokenId = $accessToken && method_exists($accessToken, 'getKey') ? $accessToken->getKey() : null;
+        $tokenName = $accessToken->name ?? '';
+        $installationId = str_starts_with($tokenName, 'mobile-app:')
+            ? substr($tokenName, strlen('mobile-app:')) : $request->input('installation_id');
+        [$call, $token, $newlyAccepted] = DB::transaction(function () use ($request, $id, $tokenId) {
+            $call = MessengerCall::whereKey($id)->lockForUpdate()->first();
+            abort_unless($call, 404, 'Call not found');
+            abort_unless($call->callee_id === $request->user()->staff_id, 403, 'Forbidden');
+            abort_unless(in_array($call->status, ['initiated', 'ringing', 'active']), 422, 'Call cannot be accepted');
+            if ($call->status === 'active' && $call->answered_access_token_id && (int)$call->answered_access_token_id !== (int)$tokenId) {
+                abort(409, 'Call already answered on another device');
+            }
+            // Сначала готовим RTC-доступ. Ошибка генерации не должна оставлять ложный active.
+            $token = $this->agora->generateToken($call->session_id, $call->callee_id);
+            abort_if($token === '', 503, 'Call service unavailable');
+            $newlyAccepted = $call->status !== 'active';
+            if ($newlyAccepted) {
+                $call->forceFill(['status' => 'active', 'started_at' => now(), 'answered_access_token_id' => $tokenId])->save();
+            }
+            return [$call, $token, $newlyAccepted];
+        });
 
-        if (!$call) {
-            return response()->json(['message' => 'Call not found'], 404);
+        if ($newlyAccepted) {
+            // Доставка уведомлений не задерживает RTC-ответ и не превращает принятое действие в 500.
+            // Очередь/worker не требуется: Laravel выполнит callback после отправки HTTP-ответа.
+            $sent = false;
+            app()->terminating(function () use ($call, $installationId, &$sent) {
+                if ($sent) return;
+                $sent = true;
+                try { broadcast(new CallAccepted($call->id, $call->caller_id)); }
+                catch (\Throwable $e) { Log::warning('[Call] Accepted broadcast failed', ['call_id' => $call->id, 'class' => get_class($e)]); }
+                try {
+                    $call->loadMissing('caller');
+                    $this->pushService->sendCallAcceptedNotification($call->caller, $call->id);
+                } catch (\Throwable $e) { Log::warning('[Call] Accepted push failed', ['call_id' => $call->id, 'class' => get_class($e)]); }
+                if ($installationId) {
+                    try {
+                        $call->loadMissing('callee');
+                        $this->pushService->sendCallAnsweredElsewhereNotification($call->callee, $call->id, $installationId);
+                    } catch (\Throwable $e) { Log::warning('[Call] Other device notification failed', ['call_id' => $call->id, 'class' => get_class($e)]); }
+                }
+            });
         }
-
-        if (!in_array($call->status, ['initiated', 'ringing'])) {
-            return response()->json(['message' => 'Call cannot be accepted'], 422);
-        }
-
-        if ($call->callee_id !== $request->user()->staff_id) {
-            return response()->json(['message' => 'Forbidden'], 403);
-        }
-
-        $call->update([
-            'status' => 'active',
-            'started_at' => now(),
-        ]);
-
-        // Генерация Agora токена для callee
-        $token = $this->agora->generateToken($call->session_id, $call->callee_id);
-
-        // WebSocket: уведомляем caller что звонок принят
-        broadcast(new CallAccepted($call->id, $call->caller_id));
-        $call->loadMissing('caller');
-        $this->pushService->sendCallAcceptedNotification($call->caller, $call->id);
 
         return response()->json([
             'call'         => $call,
@@ -250,7 +271,7 @@ class MessengerCallController extends Controller
         }
 
         // Звонок уже завершён (например, звонящий успел отменить) — статус и уведомления не трогаем
-        if ($call->isFinished()) {
+        if ($call->isFinished() || $call->status === 'active') {
             return response()->json(['success' => true]);
         }
 
@@ -320,6 +341,15 @@ class MessengerCallController extends Controller
             return response()->json(['message' => 'Forbidden'], 403);
         }
 
+        // Другой телефон того же вызываемого может ещё показывать входящий и прислать timeout.
+        // Он не должен оборвать разговор, который уже приняли на первом телефоне.
+        $accessToken = $request->user()->currentAccessToken();
+        $tokenId = $accessToken && method_exists($accessToken, 'getKey') ? $accessToken->getKey() : null;
+        if ($call->status === 'active' && $userId === $call->callee_id && $call->answered_access_token_id
+            && (int)$call->answered_access_token_id !== (int)$tokenId) {
+            return response()->json(['call' => $call]);
+        }
+
         // Второй участник тоже вызывает end, получив CallEnded: повтор не должен перезаписывать
         // статус и время завершения и снова слать уведомления
         if ($call->isFinished()) {
@@ -376,6 +406,7 @@ class MessengerCallController extends Controller
 
         $call = MessengerCall::where('callee_id', $userId)
             ->whereIn('status', ['initiated', 'ringing'])
+            ->where('created_at', '>=', now()->subSeconds(90))
             ->with('caller')
             ->latest()
             ->first();

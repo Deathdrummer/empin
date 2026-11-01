@@ -164,6 +164,20 @@ class PushNotificationService
         ]);
     }
 
+    /** Приняли на другом телефоне того же сотрудника — убрать остальные входящие. */
+    public function sendCallAnsweredElsewhereNotification(Staff $callee, int $callId, string $answeredInstallation): bool
+    {
+        $delivered = false;
+        foreach ($this->tokensFor($callee)->where('token_type', 'expo') as $token) {
+            if ($token->installation_id === $answeredInstallation) continue;
+            $payload = ['data' => ['type' => 'call_answered_elsewhere', 'call_id' => $callId],
+                'priority' => $token->platform === 'ios' ? 'normal' : 'high', 'channelId' => 'calls'];
+            if ($token->platform === 'ios') $payload['contentAvailable'] = true;
+            $delivered = $this->send($token->token, $payload) || $delivered;
+        }
+        return $delivered;
+    }
+
     /**
      * @param ?callable(array, StaffPushToken): array $forToken — свой вариант payload для отдельного устройства
      */

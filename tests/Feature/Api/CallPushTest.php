@@ -3,6 +3,7 @@
 namespace Tests\Feature\Api;
 
 use App\Events\CallEnded;
+use App\Events\CallAccepted;
 use App\Events\CallRejected;
 use App\Models\MessengerCall;
 use App\Models\Staff;
@@ -37,8 +38,8 @@ class CallPushTest extends TestCase
         parent::setUp();
 
         config([
-            'services.agora.app_id' => 'test-app-id',
-            'services.agora.app_certificate' => 'test-app-certificate',
+            'services.agora.app_id' => str_repeat('a', 32),
+            'services.agora.app_certificate' => str_repeat('b', 32),
         ]);
 
         $this->caller = $this->createStaff('Звонящий');
@@ -54,7 +55,7 @@ class CallPushTest extends TestCase
         parent::tearDown();
     }
 
-    public function test_login_removes_push_tokens_of_replaced_sessions(): void
+    public function test_login_keeps_other_device_sessions_and_push_tokens(): void
     {
         $user = User::create([
             'email' => 'push.login@example.com',
@@ -65,12 +66,48 @@ class CallPushTest extends TestCase
         $this->storeToken($this->callee, 'ExponentPushToken[old-device]', 'ios', 'expo', 'old-installation');
         $this->storeToken($this->callee, self::VOIP_TOKEN, 'ios', 'voip', 'old-installation');
         $this->storeToken($this->caller, 'ExponentPushToken[someone-else]', 'android', 'expo', 'other-installation');
+        $oldToken = $user->createToken('mobile-app:old-installation');
 
-        $this->postJson('/api/auth/login', ['email' => $user->email, 'password' => self::PASSWORD])->assertOk();
+        $newToken = $this->postJson('/api/auth/login', ['email' => $user->email, 'password' => self::PASSWORD,
+            'installation_id' => 'new-android'])->assertOk()->json('token');
 
-        $this->assertSame(0, StaffPushToken::where('staff_id', $this->callee->id)->count());
-        $this->assertNull($this->callee->fresh()->expo_push_token);
+        $this->assertSame(2, StaffPushToken::where('staff_id', $this->callee->id)->count());
+        $this->assertSame('ExponentPushToken[old-device]', $this->callee->fresh()->expo_push_token);
+        $this->assertDatabaseHas('personal_access_tokens', ['id' => $oldToken->accessToken->id]);
         $this->assertSame(1, StaffPushToken::where('staff_id', $this->caller->id)->count());
+        $this->app['auth']->forgetGuards();
+        $this->withToken($oldToken->plainTextToken)->getJson('/api/auth/me')->assertOk()->assertJsonPath('staff_id', $this->callee->id);
+        $this->app['auth']->forgetGuards();
+        $this->withToken($newToken)->getJson('/api/auth/me')->assertOk()->assertJsonPath('staff_id', $this->callee->id);
+    }
+
+    public function test_login_rotates_only_same_installation_and_legacy_login_preserves_devices(): void
+    {
+        $user = User::create(['email' => 'multi.device@example.com', 'password' => self::PASSWORD, 'staff_id' => $this->callee->id]);
+        $phone = $user->createToken('mobile-app:phone');
+        $tablet = $user->createToken('mobile-app:tablet');
+        $web = $user->createToken('web-integration');
+        $this->postJson('/api/auth/login', ['email' => $user->email, 'password' => self::PASSWORD,
+            'installation_id' => 'phone'])->assertOk();
+        $this->assertDatabaseMissing('personal_access_tokens', ['id' => $phone->accessToken->id]);
+        $this->assertDatabaseHas('personal_access_tokens', ['id' => $tablet->accessToken->id]);
+        $this->assertDatabaseHas('personal_access_tokens', ['id' => $web->accessToken->id]);
+        $this->postJson('/api/auth/login', ['email' => $user->email, 'password' => self::PASSWORD])->assertOk();
+        $this->assertSame(4, $user->tokens()->count());
+    }
+
+    public function test_logout_removes_only_current_installation_tokens(): void
+    {
+        $user = User::create(['email' => 'logout.device@example.com', 'password' => self::PASSWORD, 'staff_id' => $this->callee->id]);
+        $this->storeToken($this->callee, self::VOIP_TOKEN, 'ios', 'voip', 'iphone');
+        $this->storeToken($this->callee, 'ExponentPushToken[android]', 'android', 'expo', 'android');
+        $token = $user->createToken('mobile-app:android');
+        $other = $user->createToken('mobile-app:iphone');
+        $this->withToken($token->plainTextToken)->postJson('/api/auth/logout')->assertOk();
+        $this->assertDatabaseMissing('personal_access_tokens', ['id' => $token->accessToken->id]);
+        $this->assertDatabaseHas('personal_access_tokens', ['id' => $other->accessToken->id]);
+        $this->assertSame(1, StaffPushToken::where('staff_id', $this->callee->id)->count());
+        $this->assertDatabaseHas('staff_push_tokens', ['staff_id' => $this->callee->id, 'installation_id' => 'iphone']);
     }
 
     public function test_failed_login_keeps_push_tokens(): void
@@ -85,6 +122,76 @@ class CallPushTest extends TestCase
         $this->postJson('/api/auth/login', ['email' => 'push.login@example.com', 'password' => 'wrong'])->assertStatus(401);
 
         $this->assertSame(1, StaffPushToken::where('staff_id', $this->callee->id)->count());
+    }
+
+    public function test_accept_is_idempotent_and_keeps_original_start_time(): void
+    {
+        Event::fake([CallAccepted::class]);
+        Http::fake();
+        $this->actingAsStaff($this->callee);
+        $call = $this->createCall('initiated');
+        $first = $this->postJson("/api/messenger/calls/{$call->id}/accept")->assertOk();
+        $this->travel(5)->seconds();
+        $second = $this->postJson("/api/messenger/calls/{$call->id}/accept")->assertOk();
+        $this->assertSame($first->json('call.started_at'), $second->json('call.started_at'));
+        $this->assertSame($first->json('channel_name'), $second->json('channel_name'));
+        $this->assertStringStartsWith('007', $second->json('token'));
+        Event::assertDispatchedTimes(CallAccepted::class, 1);
+    }
+
+    public function test_accept_generation_failure_does_not_mark_call_active(): void
+    {
+        config(['services.agora.app_id' => 'invalid']);
+        $this->actingAsStaff($this->callee);
+        $call = $this->createCall('initiated');
+        $this->postJson("/api/messenger/calls/{$call->id}/accept")->assertStatus(503);
+        $this->assertSame('initiated', $call->fresh()->status);
+        $this->assertNull($call->fresh()->started_at);
+    }
+
+    public function test_accept_broadcast_failure_does_not_break_rtc_response(): void
+    {
+        Http::fake();
+        $this->actingAsStaff($this->callee);
+        $call = $this->createCall('initiated');
+        Event::listen(CallAccepted::class, function () { throw new \RuntimeException('broadcast offline'); });
+        $this->postJson("/api/messenger/calls/{$call->id}/accept")->assertOk()->assertJsonStructure(['token', 'uid', 'channel_name']);
+        $this->assertSame('active', $call->fresh()->status);
+    }
+
+    public function test_other_device_cannot_accept_or_timeout_an_active_call(): void
+    {
+        Event::fake([CallAccepted::class, CallEnded::class, CallRejected::class]);
+        Http::fake();
+        $user = User::create(['email' => 'answer.device@example.com', 'password' => self::PASSWORD, 'staff_id' => $this->callee->id]);
+        $phone = $user->createToken('mobile-app:iphone');
+        $tablet = $user->createToken('mobile-app:tablet');
+        $call = $this->createCall('initiated');
+        $this->withToken($phone->plainTextToken)->postJson("/api/messenger/calls/{$call->id}/accept")->assertOk();
+        $this->app['auth']->forgetGuards();
+        $this->withToken($tablet->plainTextToken)->postJson("/api/messenger/calls/{$call->id}/accept")->assertStatus(409);
+        $this->app['auth']->forgetGuards();
+        $this->withToken($tablet->plainTextToken)->postJson("/api/messenger/calls/{$call->id}/end")->assertOk();
+        $this->app['auth']->forgetGuards();
+        $this->withToken($tablet->plainTextToken)->postJson("/api/messenger/calls/{$call->id}/reject")->assertOk();
+        $this->assertSame('active', $call->fresh()->status);
+        Event::assertNotDispatched(CallEnded::class);
+        Event::assertNotDispatched(CallRejected::class);
+        $this->app['auth']->forgetGuards();
+        $this->withToken($phone->plainTextToken)->postJson("/api/messenger/calls/{$call->id}/end")->assertOk();
+        $this->assertSame('completed', $call->fresh()->status);
+    }
+
+    public function test_answer_elsewhere_push_skips_answering_phone_and_silently_closes_other_ios(): void
+    {
+        Http::fake(['exp.host/*' => Http::response(['data' => [['status' => 'ok']]])]);
+        $this->storeToken($this->callee, 'ExponentPushToken[answering]', 'ios', 'expo', 'iphone');
+        $this->storeToken($this->callee, 'ExponentPushToken[other]', 'ios', 'expo', 'ipad');
+        app(PushNotificationService::class)->sendCallAnsweredElsewhereNotification($this->callee, 123, 'iphone');
+        Http::assertSentCount(1);
+        Http::assertSent(fn (HttpRequest $request) => $request[0]['to'] === 'ExponentPushToken[other]'
+            && $request[0]['data']['type'] === 'call_answered_elsewhere'
+            && $request[0]['contentAvailable'] === true && $request[0]['priority'] === 'normal');
     }
 
     public function test_registering_device_releases_legacy_token_of_previous_owner(): void

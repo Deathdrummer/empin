@@ -23,11 +23,14 @@ class MessengerCall extends Model
     ];
 
     protected $casts = [
+        'answered_access_token_id' => 'integer',
         'started_at' => 'datetime',
         'ended_at' => 'datetime',
         'duration' => 'integer',
         'quality_rating' => 'integer',
     ];
+
+    protected $hidden = ['answered_access_token_id'];
 
     /**
      * Конечные статусы: повторные reject/cancel/end такой звонок уже не меняют
