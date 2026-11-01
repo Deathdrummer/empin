@@ -23,6 +23,7 @@ class PushNotificationService
     {
         $callerName = trim("{$caller->sname} {$caller->fname}");
         $callUuid = Str::uuid()->toString();
+        $expiresAt = now()->addSeconds(90)->timestamp;
         $tokens = $this->tokensFor($callee);
         $attempted = false;
         $delivered = false;
@@ -36,6 +37,7 @@ class PushNotificationService
                 'call_uuid' => $callUuid,
                 'caller_id' => (string) $caller->id,
                 'caller_name' => $callerName,
+                'expires_at' => $expiresAt,
             ]);
 
             if ($voipResult === ApnsVoipService::INVALID_TOKEN) {
@@ -65,12 +67,17 @@ class PushNotificationService
                 'call_id' => $callId,
                 'caller_id' => $caller->id,
                 'caller_name' => $callerName,
+                'expires_at' => $expiresAt,
             ];
 
             $payload = [
                 'data' => $data,
                 'priority' => 'high',
                 'channelId' => 'calls',
+                // Входящий вызов нельзя доставлять через минуты/часы после его окончания.
+                'ttl' => 90,
+                'expiration' => $expiresAt,
+                'collapseId' => 'empin-call-' . $callId,
             ];
 
             // Если на iPhone ещё нет VoIP-токена, хотя бы показываем обычный push.
@@ -115,6 +122,8 @@ class PushNotificationService
             ],
             'priority' => 'high',
             'channelId' => 'calls',
+            'collapseId' => 'empin-call-' . $callId,
+            'ttl' => 90,
         ], true);
     }
 
@@ -161,6 +170,8 @@ class PushNotificationService
             ],
             'priority' => 'high',
             'channelId' => 'calls',
+            'collapseId' => 'empin-call-' . $callId,
+            'ttl' => 90,
         ]);
     }
 
@@ -171,7 +182,8 @@ class PushNotificationService
         foreach ($this->tokensFor($callee)->where('token_type', 'expo') as $token) {
             if ($token->installation_id === $answeredInstallation) continue;
             $payload = ['data' => ['type' => 'call_answered_elsewhere', 'call_id' => $callId],
-                'priority' => $token->platform === 'ios' ? 'normal' : 'high', 'channelId' => 'calls'];
+                'priority' => $token->platform === 'ios' ? 'normal' : 'high', 'channelId' => 'calls',
+                'collapseId' => 'empin-call-' . $callId, 'ttl' => 90];
             if ($token->platform === 'ios') $payload['contentAvailable'] = true;
             $delivered = $this->send($token->token, $payload) || $delivered;
         }

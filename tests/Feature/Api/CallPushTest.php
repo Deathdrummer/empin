@@ -139,6 +139,28 @@ class CallPushTest extends TestCase
         Event::assertDispatchedTimes(CallAccepted::class, 1);
     }
 
+    public function test_answering_finished_call_returns_explicit_message_without_reopening_it(): void
+    {
+        Event::fake([CallAccepted::class]);
+        Http::fake();
+        $this->actingAsStaff($this->callee);
+        // Завершённый звонок не должен даже обращаться за RTC-токеном.
+        config(['services.agora.app_id' => 'invalid']);
+        foreach (['cancelled', 'completed', 'missed', 'rejected'] as $status) {
+            $call = $this->createCall($status, ['ended_at' => now()->subMinutes(4)]);
+            $before = $call->refresh()->getAttributes();
+            $this->postJson("/api/messenger/calls/{$call->id}/accept")
+                ->assertStatus(422)
+                ->assertJsonPath('code', 'call_finished')
+                ->assertJsonPath('call_status', $status)
+                ->assertJsonPath('message', 'Звонок уже завершён. Попросите собеседника позвонить снова.')
+                ->assertJsonMissingPath('token');
+            $this->assertSame($before, $call->fresh()->getAttributes());
+        }
+        Event::assertNotDispatched(CallAccepted::class);
+        Http::assertNothingSent();
+    }
+
     public function test_accept_generation_failure_does_not_mark_call_active(): void
     {
         config(['services.agora.app_id' => 'invalid']);
@@ -147,6 +169,31 @@ class CallPushTest extends TestCase
         $this->postJson("/api/messenger/calls/{$call->id}/accept")->assertStatus(503);
         $this->assertSame('initiated', $call->fresh()->status);
         $this->assertNull($call->fresh()->started_at);
+    }
+
+    public function test_expired_unanswered_call_cannot_be_accepted(): void
+    {
+        $this->actingAsStaff($this->callee);
+        $call = $this->createCall('ringing');
+        $call->forceFill(['created_at' => now()->subSeconds(91)])->save();
+        $this->postJson("/api/messenger/calls/{$call->id}/accept")
+            ->assertStatus(422)->assertJsonPath('code', 'call_finished');
+        $this->assertNull($call->fresh()->started_at);
+    }
+
+    public function test_incoming_expo_push_has_short_delivery_expiry(): void
+    {
+        $this->storeToken($this->callee, 'ExponentPushToken[android]', 'android', 'expo', 'android');
+        Http::fake(['exp.host/*' => Http::response(['data' => [['status' => 'ok']]])]);
+        $this->freezeTime();
+        app(PushNotificationService::class)->sendIncomingCallNotification($this->callee, $this->caller, 277);
+        Http::assertSent(fn (HttpRequest $request) => $request[0]['ttl'] === 90
+            && $request[0]['collapseId'] === 'empin-call-277'
+            && $request[0]['expiration'] === now()->addSeconds(90)->timestamp
+            && $request[0]['data']['expires_at'] === now()->addSeconds(90)->timestamp);
+        app(PushNotificationService::class)->sendCallEndedNotification($this->callee, 277);
+        Http::assertSent(fn (HttpRequest $request) => $request[0]['data']['type'] === 'call_ended'
+            && $request[0]['collapseId'] === 'empin-call-277' && $request[0]['ttl'] === 90);
     }
 
     public function test_accept_broadcast_failure_does_not_break_rtc_response(): void

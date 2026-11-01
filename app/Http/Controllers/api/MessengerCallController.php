@@ -210,7 +210,12 @@ class MessengerCallController extends Controller
             $call = MessengerCall::whereKey($id)->lockForUpdate()->first();
             abort_unless($call, 404, 'Call not found');
             abort_unless($call->callee_id === $request->user()->staff_id, 403, 'Forbidden');
-            abort_unless(in_array($call->status, ['initiated', 'ringing', 'active']), 422, 'Call cannot be accepted');
+            // Запоздалый ответ на отменённый вызов — состояние звонка, а не ошибка полей формы.
+            // Возвращаем JSON напрямую ниже: общий Handler переводит abort(422) в «Ошибка валидации».
+            if (!in_array($call->status, ['initiated', 'ringing', 'active'])
+                || ($call->status !== 'active' && $call->created_at->lt(now()->subSeconds(90)))) {
+                return [$call, null, false];
+            }
             if ($call->status === 'active' && $call->answered_access_token_id && (int)$call->answered_access_token_id !== (int)$tokenId) {
                 abort(409, 'Call already answered on another device');
             }
@@ -223,6 +228,15 @@ class MessengerCallController extends Controller
             }
             return [$call, $token, $newlyAccepted];
         });
+
+        if ($token === null) {
+            return response()->json([
+                'message' => 'Звонок уже завершён. Попросите собеседника позвонить снова.',
+                'code' => 'call_finished',
+                'call_id' => $call->id,
+                'call_status' => $call->status,
+            ], 422);
+        }
 
         if ($newlyAccepted) {
             // Доставка уведомлений не задерживает RTC-ответ и не превращает принятое действие в 500.
