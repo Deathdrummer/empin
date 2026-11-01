@@ -15,6 +15,7 @@ use Illuminate\Http\Client\Request as HttpRequest;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
@@ -53,6 +54,62 @@ class CallPushTest extends TestCase
         }
 
         parent::tearDown();
+    }
+
+    public function test_call_trace_identifies_ending_device_without_logging_secrets(): void
+    {
+        Http::fake();
+        Event::fake([CallEnded::class]);
+        $user = User::create(['email' => 'trace@example.com', 'password' => self::PASSWORD, 'staff_id' => $this->caller->id]);
+        $device = $user->createToken('mobile-app:trace-phone');
+        $call = $this->createCall('active', ['started_at' => now()->subSeconds(10)]);
+        $entries = [];
+        $logger = \Mockery::mock(\Psr\Log\LoggerInterface::class);
+        $logger->shouldReceive('info')->twice()->andReturnUsing(function ($message, $context) use (&$entries) { $entries[] = $context; });
+        Log::partialMock()->shouldReceive('build')->once()->with(\Mockery::on(fn ($config) => $config['driver'] === 'daily'
+            && $config['days'] === 7 && $config['permission'] === 0600))->andReturn($logger);
+        $this->withToken($device->plainTextToken)->withHeaders(['X-Empin-Build' => '25', 'X-Empin-Platform' => 'android', 'X-Empin-Call-Cause' => '6', 'X-Empin-Call-Session' => '1793570000000'])
+            ->postJson("/api/messenger/calls/{$call->id}/end", ['password' => 'never-log-this'])->assertOk();
+        $this->assertSame($this->caller->id, $entries[1]['actor_staff_id']);
+        $this->assertSame($device->accessToken->id, $entries[1]['access_token_id']);
+        $this->assertSame($call->id, $entries[1]['call_id']);
+        $this->assertSame(25, $entries[1]['build']);
+        $this->assertSame(6, $entries[1]['cause']);
+        $this->assertSame(1793570000000, $entries[1]['client_session']);
+        $this->assertSame($entries[0]['request_id'], $entries[1]['request_id']);
+        $this->assertSame(200, $entries[1]['http_status']);
+        $this->assertSame('active', $entries[1]['before']['status']);
+        $this->assertSame('completed', $entries[1]['after']['status']);
+        $this->assertStringNotContainsString($device->plainTextToken, json_encode($entries));
+        $this->assertStringNotContainsString('never-log-this', json_encode($entries));
+    }
+
+    public function test_call_trace_filters_headers_and_records_failed_answer(): void
+    {
+        $this->actingAsStaff($this->callee);
+        $call = $this->createCall('cancelled', ['ended_at' => now()]);
+        $entries = [];
+        $logger = \Mockery::mock(\Psr\Log\LoggerInterface::class);
+        $logger->shouldReceive('info')->twice()->andReturnUsing(function ($message, $context) use (&$entries) { $entries[] = $context; });
+        Log::partialMock()->shouldReceive('build')->once()->andReturn($logger);
+        $this->withHeaders(['X-Empin-Build' => 'secret-build', 'X-Empin-Platform' => 'secret-platform', 'X-Empin-Call-Cause' => 'secret-reason'])
+            ->postJson("/api/messenger/calls/{$call->id}/accept")->assertStatus(422);
+        $this->assertSame(422, $entries[1]['http_status']);
+        $this->assertNull($entries[1]['build']);
+        $this->assertNull($entries[1]['platform']);
+        $this->assertNull($entries[1]['cause']);
+        $this->assertStringNotContainsString('secret-', json_encode($entries));
+    }
+
+    public function test_call_still_completes_when_diagnostic_log_is_unavailable(): void
+    {
+        Http::fake();
+        Event::fake([CallEnded::class]);
+        $this->actingAsStaff($this->caller);
+        $call = $this->createCall('active', ['started_at' => now()->subSeconds(10)]);
+        Log::partialMock()->shouldReceive('build')->once()->andThrow(new \RuntimeException('log unavailable'));
+        $this->postJson("/api/messenger/calls/{$call->id}/end")->assertOk();
+        $this->assertSame('completed', $call->fresh()->status);
     }
 
     public function test_login_keeps_other_device_sessions_and_push_tokens(): void
