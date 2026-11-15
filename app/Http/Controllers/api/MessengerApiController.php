@@ -31,6 +31,9 @@ use Illuminate\Support\Facades\DB;
  */
 class MessengerApiController extends Controller {
 
+    /** Совпадений поиска за один запрос (в чате дальше — следующей страницей) */
+    private const SEARCH_PAGE = 30;
+
     public function __construct(
         private ChatDirectory $directory,
         private ObjectChats $objects,
@@ -967,8 +970,10 @@ class MessengerApiController extends Controller {
 
     public function search(Request $request): JsonResponse {
         $validated = $request->validate([
-            'q'       => 'required|string|min:2|max:100',
-            'chat_id' => 'nullable|integer',
+            'q'         => 'required|string|min:2|max:100',
+            'chat_id'   => 'nullable|integer',
+            // Поиск в одном чате листается страницами, как в Telegram: самое старое из уже показанных совпадений
+            'before_id' => 'nullable|integer|min:1',
         ]);
 
         $me = $this->me($request);
@@ -982,39 +987,59 @@ class MessengerApiController extends Controller {
             }
         }
 
+        $beforeId = $chat ? ($validated['before_id'] ?? null) : null;
+        // Сколько всего совпадений в чате — только с первой страницей; есть ли страница старше
+        $total = null;
+        $hasMore = false;
+        // Одна страница из источника, свежие сначала. В чате — «до before_id», счётчик и признак продолжения
+        $pageOf = function ($query, string $idColumn) use ($chat, $beforeId, &$total, &$hasMore) {
+            if ($chat && !$beforeId) {
+                $total = (clone $query)->count();
+            }
+            $rows = $query
+                ->when($beforeId, fn ($q) => $q->where($idColumn, '<', $beforeId))
+                ->orderByDesc($idColumn)
+                ->limit(self::SEARCH_PAGE + 1)
+                ->get();
+            if ($chat) {
+                $hasMore = $rows->count() > self::SEARCH_PAGE;
+            }
+
+            return $rows->take(self::SEARCH_PAGE);
+        };
+
         $messages = collect();
 
         if (!$chat || !$chat->isObject()) {
-            $messages = MessengerMessage::query()
-                ->select('messenger_messages.*')
-                ->join('messenger_chat_members as m', function ($join) use ($me) {
-                    $join->on('m.chat_id', '=', 'messenger_messages.chat_id')->where('m.staff_id', $me);
-                })
-                ->when($chat, fn ($q) => $q->where('messenger_messages.chat_id', $chat->id))
-                ->where('messenger_messages.type', MessengerMessage::TYPE_TEXT)
-                ->where('messenger_messages.message', 'like', $like)
-                ->tap(fn ($q) => MessengerHiddenMessage::excludeFor($q, $me, 'messenger_messages.chat_id', 'messenger_messages.id'))
-                ->orderByDesc('messenger_messages.id')
-                ->limit(30)
-                ->with(['profile', 'chat.contract'])
-                ->get()
-                ->map(fn (MessengerMessage $message) => $this->searchHit($message->chat, $message, $me));
+            $messages = $pageOf(
+                MessengerMessage::query()
+                    ->select('messenger_messages.*')
+                    ->join('messenger_chat_members as m', function ($join) use ($me) {
+                        $join->on('m.chat_id', '=', 'messenger_messages.chat_id')->where('m.staff_id', $me);
+                    })
+                    ->when($chat, fn ($q) => $q->where('messenger_messages.chat_id', $chat->id))
+                    ->where('messenger_messages.type', MessengerMessage::TYPE_TEXT)
+                    ->where('messenger_messages.message', 'like', $like)
+                    ->tap(fn ($q) => MessengerHiddenMessage::excludeFor($q, $me, 'messenger_messages.chat_id', 'messenger_messages.id'))
+                    ->with(['profile', 'chat.contract']),
+                'messenger_messages.id'
+            )->map(fn (MessengerMessage $message) => $this->searchHit($message->chat, $message, $me));
         }
 
         if (!$chat || $chat->isObject()) {
-            $comments = TimesheetChat::query()
-                ->select('timesheet_chat.*', 'c.id as messenger_chat_id')
-                ->join('timesheet_contracts as tc', 'tc.id', '=', 'timesheet_chat.timesheet_contract_id')
-                ->join('messenger_chats as c', function ($join) {
-                    $join->on('c.contract_id', '=', 'tc.contract_id')->where('c.type', MessengerChat::TYPE_OBJECT);
-                })
-                ->when($chat, fn ($q) => $q->where('c.id', $chat->id), fn ($q) => $q->whereIn('c.id', MessengerChatMember::where('staff_id', $me)->select('chat_id')))
-                ->where('timesheet_chat.message', 'like', $like)
-                ->tap(fn ($q) => MessengerHiddenMessage::excludeFor($q, $me, 'c.id', 'timesheet_chat.id'))
-                ->orderByDesc('timesheet_chat.id')
-                ->limit(30)
-                ->with('profile')
-                ->get();
+            $comments = $pageOf(
+                TimesheetChat::query()
+                    ->select('timesheet_chat.*', 'c.id as messenger_chat_id')
+                    ->join('timesheet_contracts as tc', 'tc.id', '=', 'timesheet_chat.timesheet_contract_id')
+                    ->join('messenger_chats as c', function ($join) {
+                        $join->on('c.contract_id', '=', 'tc.contract_id')->where('c.type', MessengerChat::TYPE_OBJECT);
+                    })
+                    ->when($chat, fn ($q) => $q->where('c.id', $chat->id), fn ($q) => $q->whereIn('c.id', MessengerChatMember::where('staff_id', $me)->select('chat_id')))
+                    ->where('timesheet_chat.message', 'like', $like)
+                    ->tap(fn ($q) => MessengerHiddenMessage::excludeFor($q, $me, 'c.id', 'timesheet_chat.id'))
+                    ->with('profile'),
+                'timesheet_chat.id'
+            );
 
             $objectChats = MessengerChat::whereIn('id', $comments->pluck('messenger_chat_id'))->with('contract')->get()->keyBy('id');
             $messages = $messages->concat($comments->map(
@@ -1022,33 +1047,39 @@ class MessengerApiController extends Controller {
             ));
         }
 
-        $chats = [];
-        if (!$chat) {
-            $groups = MessengerChat::forStaff($me)
-                ->where('type', MessengerChat::TYPE_GROUP)
-                ->where('title', 'like', $like)
-                ->limit(10)
-                ->get()
-                ->map(fn (MessengerChat $group) => ['type' => 'group', 'chat_id' => $group->id, 'title' => $group->title]);
-
-            $objects = DB::table('contracts')
-                ->where(fn ($q) => $q->where('object_number', 'like', $like)->orWhere('title', 'like', $like))
-                ->whereExists(fn ($q) => $q->select(DB::raw(1))->from('timesheet_contracts')->whereColumn('timesheet_contracts.contract_id', 'contracts.id'))
-                ->orderByDesc('id')
-                ->limit(10)
-                ->get(['id', 'object_number', 'title'])
-                ->map(fn ($object) => [
-                    'type'          => 'object',
-                    'contract_id'   => (int) $object->id,
-                    'object_number' => $object->object_number,
-                    'title'         => trim($object->object_number . ' ' . $object->title),
-                ]);
-
-            $chats = $groups->concat($objects)->values()->all();
+        if ($chat) {
+            // Один источник, свежие сначала (по id — так же листаются страницы)
+            return response()->json([
+                'chats'    => [],
+                'messages' => $messages->values()->all(),
+                'has_more' => $hasMore,
+                'total'    => $total,
+            ]);
         }
 
+        // Поиск по всем чатам: ещё группы и объекты по названию
+        $groups = MessengerChat::forStaff($me)
+            ->where('type', MessengerChat::TYPE_GROUP)
+            ->where('title', 'like', $like)
+            ->limit(10)
+            ->get()
+            ->map(fn (MessengerChat $group) => ['type' => 'group', 'chat_id' => $group->id, 'title' => $group->title]);
+
+        $objects = DB::table('contracts')
+            ->where(fn ($q) => $q->where('object_number', 'like', $like)->orWhere('title', 'like', $like))
+            ->whereExists(fn ($q) => $q->select(DB::raw(1))->from('timesheet_contracts')->whereColumn('timesheet_contracts.contract_id', 'contracts.id'))
+            ->orderByDesc('id')
+            ->limit(10)
+            ->get(['id', 'object_number', 'title'])
+            ->map(fn ($object) => [
+                'type'          => 'object',
+                'contract_id'   => (int) $object->id,
+                'object_number' => $object->object_number,
+                'title'         => trim($object->object_number . ' ' . $object->title),
+            ]);
+
         return response()->json([
-            'chats'    => $chats,
+            'chats'    => $groups->concat($objects)->values()->all(),
             'messages' => $messages->sortByDesc('created_at')->take(40)->values()->all(),
         ]);
     }
