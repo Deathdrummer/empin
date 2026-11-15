@@ -14,7 +14,7 @@ class TraceMessengerCall
 {
     public function handle(Request $request, Closure $next)
     {
-        if (!$request->isMethod('POST') || !preg_match('~^api/messenger/calls/(initiate|([0-9]{1,15})/(accept|reject|cancel|end))$~', $request->path(), $match)) {
+        if (!$request->isMethod('POST') || !preg_match('~^api/messenger/calls/(initiate|([0-9]{1,15})/(accept|reject|cancel|end|hold))$~', $request->path(), $match)) {
             return $next($request);
         }
         $callId = isset($match[2]) && $match[2] !== '' ? (int) $match[2] : null;

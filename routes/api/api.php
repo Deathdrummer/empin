@@ -116,6 +116,7 @@ Route::prefix('messenger/calls')->middleware(['auth:sanctum', 'presence', \App\H
 	Route::post('/{id}/reject', [MessengerCallController::class, 'reject']);
 	Route::post('/{id}/cancel', [MessengerCallController::class, 'cancel']);
 	Route::post('/{id}/end', [MessengerCallController::class, 'end']);
+	Route::post('/{id}/hold', [MessengerCallController::class, 'hold']);
 	Route::get('/pending', [MessengerCallController::class, 'pending']);
 	Route::get('/history', [MessengerCallController::class, 'history']);
 	Route::get('/{id}', [MessengerCallController::class, 'show']);

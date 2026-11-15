@@ -5,6 +5,7 @@ namespace App\Http\Controllers\api;
 use App\Events\CallAccepted;
 use App\Events\CallCancelled;
 use App\Events\CallEnded;
+use App\Events\CallHeld;
 use App\Events\CallRejected;
 use App\Http\Controllers\Controller;
 use App\Models\MessengerCall;
@@ -512,7 +513,62 @@ class MessengerCallController extends Controller
             return response()->json(['message' => 'Forbidden'], 403);
         }
 
-        return response()->json(['call' => $call]);
+        return response()->json(['call' => $call, 'hold' => $call->holdFor($userId)]);
+    }
+
+    /**
+     * Удержать звонок или вернуться к нему. Собеседник получает call.held и видит «на удержании»;
+     * пока звонок удержан, выход удержавшего из голосового канала не завершает разговор у собеседника.
+     * Возврат отдаёт параметры входа в канал: удержавший мог выйти из него (ответил на второй звонок).
+     */
+    public function hold(Request $request, int $id): JsonResponse
+    {
+        $validated = $request->validate(['on_hold' => 'required|boolean']);
+        $userId = $request->user()->staff_id;
+        $onHold = (bool) $validated['on_hold'];
+
+        [$call, $changed] = DB::transaction(function () use ($id, $userId, $onHold) {
+            $call = MessengerCall::whereKey($id)->lockForUpdate()->first();
+            abort_unless($call, 404, 'Call not found');
+            $column = $call->holdColumnFor($userId);
+            abort_unless($column, 403, 'Forbidden');
+            // Повтор того же запроса (сеть, двойное событие) ничего не меняет и не шлёт уведомлений
+            $changed = $call->status === 'active' && (bool) $call->{$column} !== $onHold;
+            if ($changed) {
+                $call->forceFill([$column => $onHold])->save();
+            }
+            return [$call, $changed];
+        });
+
+        // Удерживать можно только идущий разговор: завершённый или ещё звонящий — состояние, а не ошибка формы
+        if ($call->status !== 'active') {
+            return response()->json([
+                'message' => 'Звонок уже не идёт.',
+                'code' => 'call_not_active',
+                'call_id' => $call->id,
+                'call_status' => $call->status,
+            ], 422);
+        }
+
+        if ($changed) {
+            $otherPartyId = $userId === (int) $call->caller_id ? (int) $call->callee_id : (int) $call->caller_id;
+            try { broadcast(new CallHeld($call->id, $otherPartyId, $onHold)); }
+            catch (\Throwable $e) { Log::warning('[Call] Hold broadcast failed', ['call_id' => $call->id, 'class' => get_class($e)]); }
+        }
+
+        $response = ['call_id' => $call->id, 'hold' => $call->holdFor($userId)];
+        if (!$onHold) {
+            $token = $this->agora->generateToken($call->session_id, $userId);
+            abort_if($token === '', 503, 'Call service unavailable');
+            $response += [
+                'channel_name' => $call->session_id,
+                'token'        => $token,
+                'uid'          => $userId,
+                'agora_app_id' => $this->agora->getAppId(),
+            ];
+        }
+
+        return response()->json($response);
     }
 
     private function storeDeviceToken(

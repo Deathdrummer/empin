@@ -20,10 +20,14 @@ class MessengerCall extends Model
         'duration',
         'quality_rating',
         'session_id',
+        'caller_on_hold',
+        'callee_on_hold',
     ];
 
     protected $casts = [
         'answered_access_token_id' => 'integer',
+        'caller_on_hold' => 'boolean',
+        'callee_on_hold' => 'boolean',
         'started_at' => 'datetime',
         'ended_at' => 'datetime',
         'duration' => 'integer',
@@ -40,6 +44,27 @@ class MessengerCall extends Model
     public function isFinished(): bool
     {
         return in_array($this->status, self::FINISHED_STATUSES, true);
+    }
+
+    /** Колонка удержания стороны звонка; null — сотрудник в звонке не участвует */
+    public function holdColumnFor(int $staffId): ?string
+    {
+        return match ($staffId) {
+            (int) $this->caller_id => 'caller_on_hold',
+            (int) $this->callee_id => 'callee_on_hold',
+            default => null,
+        };
+    }
+
+    /** Удержание глазами участника: держит ли звонок он сам и держит ли собеседник */
+    public function holdFor(int $staffId): array
+    {
+        $mine = $staffId === (int) $this->caller_id;
+
+        return [
+            'me'   => (bool) ($mine ? $this->caller_on_hold : $this->callee_on_hold),
+            'peer' => (bool) ($mine ? $this->callee_on_hold : $this->caller_on_hold),
+        ];
     }
 
     /**
