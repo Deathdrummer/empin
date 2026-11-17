@@ -20,6 +20,8 @@ Route::prefix('production')->middleware(['auth:sanctum', 'presence'])->group(fun
 
     // Задания и календарь (раздел 6)
     Route::get('/tasks', [ProductionTasksController::class, 'index']);
+    Route::get('/tasks/dates', [ProductionTasksController::class, 'dates']);
+    Route::get('/tasks/filters', [ProductionTasksController::class, 'filters']);
     Route::post('/tasks', [ProductionTasksController::class, 'store']);
     Route::get('/tasks/{id}', [ProductionTasksController::class, 'show'])->whereNumber('id');
     Route::patch('/tasks/{id}', [ProductionTasksController::class, 'update'])->whereNumber('id');

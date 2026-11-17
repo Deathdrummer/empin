@@ -7,6 +7,7 @@ use App\Production\Support\OrgClock;
 use App\Production\Support\ProductionException;
 use App\Production\Tasks\TaskAccess;
 use App\Production\Tasks\TaskFacts;
+use App\Production\Tasks\TaskFilterOptions;
 use App\Production\Tasks\TaskPresenter;
 use App\Production\Tasks\TaskService;
 use App\Production\Tasks\Viewer;
@@ -20,6 +21,9 @@ use Illuminate\Http\Request;
  */
 class ProductionTasksController extends Controller
 {
+    /** Окно календаря выбора даты: открытый месяц и по три месяца в обе стороны */
+    private const DATES_MAX_DAYS = 220;
+
     public function __construct(
         private readonly OrgClock $clock,
         private readonly TaskService $tasks,
@@ -35,12 +39,7 @@ class ProductionTasksController extends Controller
             'date' => 'required_without:from|date_format:Y-m-d',
             'from' => 'required_without:date|date_format:Y-m-d',
             'to' => 'required_with:from|date_format:Y-m-d|after_or_equal:from',
-            'object_id' => 'nullable|integer',
-            'brigade_id' => 'nullable|integer',
-            'executor_staff_id' => 'nullable|integer',
-            'creator_id' => 'nullable|integer',
-            'vehicle_id' => 'nullable|integer',
-            'driver_staff_id' => 'nullable|integer',
+            ...$this->filterRules(),
         ]);
         $from = CarbonImmutable::parse($data['date'] ?? $data['from']);
         $to = CarbonImmutable::parse($data['date'] ?? $data['to']);
@@ -59,6 +58,38 @@ class ProductionTasksController extends Controller
             'rights_version' => $viewer->rights->version(),
             'items' => $this->presenter->list($tasks, $viewer, $today),
         ]);
+    }
+
+    /** Даты с заданиями за период — для выбора даты в календаре при включённом фильтре */
+    public function dates(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'from' => 'required|date_format:Y-m-d',
+            'to' => 'required|date_format:Y-m-d|after_or_equal:from',
+            ...$this->filterRules(),
+        ]);
+        $from = CarbonImmutable::parse($data['from']);
+        $to = CarbonImmutable::parse($data['to']);
+        if ($from->diffInDays($to) > self::DATES_MAX_DAYS) {
+            throw ProductionException::invalid('Слишком большой период: не больше '.self::DATES_MAX_DAYS.' дней');
+        }
+
+        $dates = $this->tasks->calendar($this->viewer($request), $from, $to, $data)
+            ->reorder()
+            ->select('t.day')
+            ->distinct()
+            ->orderBy('t.day')
+            ->pluck('day')
+            ->map(fn ($day) => substr((string) $day, 0, 10))
+            ->values();
+
+        return response()->json(['dates' => $dates]);
+    }
+
+    /** Варианты фильтров календаря — только из видимых сотруднику заданий */
+    public function filters(Request $request, TaskFilterOptions $options): JsonResponse
+    {
+        return response()->json($options->for($this->viewer($request)));
     }
 
     /** Карточка задания: содержание, история изменений и исполнителей; приглашённые — обладателю права 7 */
@@ -127,6 +158,19 @@ class ProductionTasksController extends Controller
         $this->tasks->revokeInvite($viewer, $id, $staffId);
 
         return response()->json(['invites' => $this->tasks->invites($this->tasks->visible($viewer, $id))]);
+    }
+
+    /** Фильтры календаря (п. 6.4): объект, бригада или сотрудник-исполнитель, создатель, техника, водитель */
+    private function filterRules(): array
+    {
+        return [
+            'object_id' => 'nullable|integer',
+            'brigade_id' => 'nullable|integer',
+            'executor_staff_id' => 'nullable|integer',
+            'creator_id' => 'nullable|integer',
+            'vehicle_id' => 'nullable|integer',
+            'driver_staff_id' => 'nullable|integer',
+        ];
     }
 
     private function rules(bool $creating): array
