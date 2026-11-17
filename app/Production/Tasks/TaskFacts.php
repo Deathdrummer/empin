@@ -3,6 +3,7 @@
 namespace App\Production\Tasks;
 
 use App\Models\TimesheetContract;
+use App\Production\Objects\ObjectDirectory;
 use Carbon\CarbonImmutable;
 
 /**
@@ -24,7 +25,8 @@ final class TaskFacts
     ) {
     }
 
-    public static function fromModel(TimesheetContract $task): self
+    /** @param bool|null $objectActive если уже известно (календарь загружает объекты одним запросом) */
+    public static function fromModel(TimesheetContract $task, ?bool $objectActive = null): self
     {
         $task->loadMissing(['team', 'activeInvites']);
         $team = $task->team;
@@ -38,7 +40,7 @@ final class TaskFacts
             personalStaffId: $brigadeId ? null : (int) $team->staff_id,
             driverStaffId: $task->driver_staff_id ? (int) $task->driver_staff_id : null,
             invitedStaffIds: $task->activeInvites->pluck('staff_id')->map(fn ($id) => (int) $id)->all(),
-            objectActive: (int) \DB::table('contracts')->where('id', $task->contract_id)->value('archive') === 0,
+            objectActive: $objectActive ?? ObjectDirectory::isActive(\DB::table('contracts')->where('id', $task->contract_id)->value('archive')),
         );
     }
 }

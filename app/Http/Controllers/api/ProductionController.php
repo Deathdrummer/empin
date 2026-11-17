@@ -6,9 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\Erp\BrigadeMember;
 use App\Models\Erp\Driver;
 use App\Models\Staff;
+use App\Models\StaffNotification;
 use App\Production\Rights\Grant;
 use App\Production\Rights\StaffRights;
 use App\Production\Support\OrgClock;
+use App\Production\Support\ProductionException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -71,6 +73,42 @@ class ProductionController extends Controller
             'rights_version' => $rights->version(),
             'time' => $this->timePayload(),
         ]);
+    }
+
+    /** Уведомления, которые висят до ручного закрытия (п. 9.3) */
+    public function notifications(Request $request): JsonResponse
+    {
+        $items = StaffNotification::query()
+            ->open()
+            ->where('staff_id', (int) $request->user()->staff_id)
+            ->orderByDesc('id')
+            ->limit(200)
+            ->get()
+            ->map(fn (StaffNotification $n) => [
+                'id' => $n->id,
+                'kind' => $n->kind,
+                'title' => $n->title,
+                'body' => $n->body,
+                'task_id' => $n->task_id,
+                'payload' => $n->payload,
+                'created_at' => $n->created_at?->toIso8601String(),
+            ]);
+
+        return response()->json(['items' => $items]);
+    }
+
+    public function closeNotification(Request $request, int $id): JsonResponse
+    {
+        $closed = StaffNotification::query()
+            ->where('id', $id)
+            ->where('staff_id', (int) $request->user()->staff_id)
+            ->whereNull('closed_at')
+            ->update(['closed_at' => now()]);
+        if (!$closed && !StaffNotification::where('id', $id)->where('staff_id', (int) $request->user()->staff_id)->exists()) {
+            throw ProductionException::notFound('Уведомление не найдено');
+        }
+
+        return response()->json(['closed' => true]);
     }
 
     private function timePayload(): array

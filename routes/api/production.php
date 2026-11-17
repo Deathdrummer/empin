@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\api\ProductionController;
+use App\Http\Controllers\api\ProductionDirectoryController;
+use App\Http\Controllers\api\ProductionTasksController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -9,4 +11,24 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('production')->middleware(['auth:sanctum', 'presence'])->group(function () {
     Route::get('/time', [ProductionController::class, 'time']);
     Route::get('/me', [ProductionController::class, 'me']);
+
+    // Данные ERP для формы задания (раздел 5)
+    Route::get('/objects', [ProductionDirectoryController::class, 'objects']);
+    Route::get('/objects/{objectId}/plan', [ProductionDirectoryController::class, 'plan'])->whereNumber('objectId');
+    Route::get('/executors', [ProductionDirectoryController::class, 'executors']);
+    Route::get('/vehicles', [ProductionDirectoryController::class, 'vehicles']);
+
+    // Задания и календарь (раздел 6)
+    Route::get('/tasks', [ProductionTasksController::class, 'index']);
+    Route::post('/tasks', [ProductionTasksController::class, 'store']);
+    Route::get('/tasks/{id}', [ProductionTasksController::class, 'show'])->whereNumber('id');
+    Route::patch('/tasks/{id}', [ProductionTasksController::class, 'update'])->whereNumber('id');
+    Route::delete('/tasks/{id}', [ProductionTasksController::class, 'destroy'])->whereNumber('id');
+    Route::post('/tasks/{id}/copy', [ProductionTasksController::class, 'copy'])->whereNumber('id');
+    Route::post('/tasks/{id}/invites', [ProductionTasksController::class, 'invite'])->whereNumber('id');
+    Route::delete('/tasks/{id}/invites/{staffId}', [ProductionTasksController::class, 'revokeInvite'])->whereNumber(['id', 'staffId']);
+
+    // Уведомления до ручного закрытия (п. 9.3)
+    Route::get('/notifications', [ProductionController::class, 'notifications']);
+    Route::post('/notifications/{id}/close', [ProductionController::class, 'closeNotification'])->whereNumber('id');
 });
