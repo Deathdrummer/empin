@@ -4,6 +4,7 @@ namespace App\Production\Tasks;
 
 use App\Models\Erp\Brigade;
 use App\Models\Staff;
+use App\Models\TimesheetContract;
 use App\Production\Objects\ObjectDirectory;
 use Illuminate\Support\Collection;
 
@@ -38,14 +39,18 @@ final class TaskFilterOptions
         $brigades = Brigade::query()->whereIn('id', $ids('t.brigade_id'))->orderBy('name')->get(['id', 'name'])
             ->map(fn (Brigade $b) => ['id' => $b->id, 'name' => $b->name]);
 
-        // Техника и водитель — по снимку в задании: машину могли переименовать или убрать из ERP (П-ОБ-23б)
-        $vehicles = (new TaskVisibility())->query($viewer)
+        // Техника — по снимку в задании: машину могли переименовать или убрать из ERP (П-ОБ-23б). Название берётся
+        // из последнего задания с этой машиной; база отдаёт по одной строке на машину, а не все задания с техникой
+        $latest = (new TaskVisibility())->query($viewer)
             ->whereNotNull('timesheet_contracts.vehicle_id')
-            ->select(['timesheet_contracts.vehicle_id', 'timesheet_contracts.vehicle_name', 'timesheet_contracts.vehicle_plate'])
-            ->orderByDesc('timesheet_contracts.id')
+            ->select('timesheet_contracts.vehicle_id')
+            ->selectRaw('MAX(timesheet_contracts.id) as last_id')
+            ->groupBy('timesheet_contracts.vehicle_id')
             ->toBase()
-            ->get()
-            ->unique('vehicle_id')
+            ->pluck('last_id');
+        $vehicles = TimesheetContract::query()
+            ->whereIn('id', $latest)
+            ->get(['vehicle_id', 'vehicle_name', 'vehicle_plate'])
             ->map(fn ($row) => ['id' => (int) $row->vehicle_id, 'name' => $row->vehicle_name, 'plate' => $row->vehicle_plate])
             ->sortBy('name')
             ->values();
