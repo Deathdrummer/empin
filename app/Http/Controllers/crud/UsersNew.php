@@ -8,6 +8,7 @@ use App\Models\ListUser;
 use App\Models\Staff;
 use App\Models\Step;
 use App\Models\User;
+use App\Production\Rights\RightsHistory;
 use App\Services\Business\Department as BusinessDepartment;
 use App\Traits\HasCrudController;
 use Illuminate\Http\Request;
@@ -456,10 +457,11 @@ class UsersNew extends Controller {
 		]);
 		
 		if (!$user = User::fromStaff($userId)->first()) return response()->json(false);
-		
-		
+
+		$before = ['roles' => $user->roles->pluck('id')->all(), 'permissions' => $user->permissions->pluck('id')->all()];
 		$data = $user->syncRoles($roleId);
 		$user->permissions()->detach();
+		app(RightsHistory::class)->record('role_set', $user->id, null, $before, ['roles' => [(int) $roleId], 'permissions' => []], (int) $roleId);
 		
 		//$user->assignRole($roleId);
 		
@@ -548,18 +550,21 @@ class UsersNew extends Controller {
 		]);
 		
 		if (!$user = User::fromStaff($valid['user'])->first()) return response()->json(false);
-		
+
+		$history = app(RightsHistory::class);
 		if ($hasRole = !!count($user->roles)) {
 			$rolesPpermissions = $user->getPermissionsViaRoles();
+			$history->record('role_converted', $user->id, null, ['roles' => $user->roles->pluck('id')->all()], ['permissions' => $rolesPpermissions->pluck('id')->all()]);
 			$user->syncRoles();
 			$user->givePermissionTo($rolesPpermissions);
 		}
-		
+
 		if ($valid['stat']) {
 			$user->givePermissionTo($valid['permission']);
 		} else {
 			$user->revokePermissionTo($valid['permission']);
 		}
+		$history->record($valid['stat'] ? 'granted' : 'revoked', $user->id, (int) $valid['permission']);
 		$hasPermissions = !!count($user->getAllPermissions());
 		return response()->json(['was_role' => $hasRole, 'has_permissions' => $hasPermissions]);
 	}

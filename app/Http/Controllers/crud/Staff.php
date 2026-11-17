@@ -4,6 +4,7 @@ use App\Http\Controllers\Controller;
 use App\Mail\UserCreated;
 use App\Models\Department;
 use App\Models\User;
+use App\Production\Rights\RightsHistory;
 use App\Traits\HasCrudController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
@@ -398,18 +399,21 @@ class Staff extends Controller {
 		]);
 		
 		if (!$user = User::find($valid['user'])) return response()->json(false);
-		
+
+		$history = app(RightsHistory::class);
 		if ($hasRole = !!count($user->roles)) {
 			$rolesPpermissions = $user->getPermissionsViaRoles();
+			$history->record('role_converted', $user->id, null, ['roles' => $user->roles->pluck('id')->all()], ['permissions' => $rolesPpermissions->pluck('id')->all()]);
 			$user->syncRoles();
 			$user->givePermissionTo($rolesPpermissions);
 		}
-		
+
 		if ($valid['stat']) {
 			$user->givePermissionTo($valid['permission']);
 		} else {
 			$user->revokePermissionTo($valid['permission']);
 		}
+		$history->record($valid['stat'] ? 'granted' : 'revoked', $user->id, (int) $valid['permission']);
 		$hasPermissions = !!count($user->getAllPermissions());
 		return response()->json(['was_role' => $hasRole, 'has_permissions' => $hasPermissions]);
 	}

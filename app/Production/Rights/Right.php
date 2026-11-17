@@ -53,6 +53,43 @@ enum Right: int
         };
     }
 
+    /** Имя права в механизме прав ERP (Spatie, guard `site`) — в стиле прав «МОБ. приложение» */
+    public function permissionName(): string
+    {
+        return 'mobile-app-' . match ($this) {
+            self::TaskCreate => 'task-create',
+            self::TaskEditOwn => 'task-edit-own',
+            self::TaskDeleteOwn => 'task-delete-own',
+            self::TaskEditOthers => 'task-edit-others',
+            self::TaskDeleteOthers => 'task-delete-others',
+            self::TaskViewAll => 'task-view-all',
+            self::TaskInvite => 'task-invite',
+            self::ReportSubmit => 'report-submit',
+            self::ReportApproveOthers => 'report-approve-others',
+            self::ReportEditApproved => 'report-edit-approved',
+            self::OverageDeclare => 'overage-declare',
+            self::OverageApprove => 'overage-approve',
+            self::OffPlanDeclare => 'offplan-declare',
+            self::OffPlanApprove => 'offplan-approve',
+            self::ReadinessEdit => 'readiness-edit',
+            self::CrewDeclare => 'crew-declare',
+            self::AttendanceConfirmOthers => 'attendance-confirm-others',
+            self::AttendanceCorrect => 'attendance-correct',
+            self::TimesheetView => 'timesheet-view',
+        } . ':site';
+    }
+
+    public static function fromPermissionName(string $name): ?self
+    {
+        foreach (self::cases() as $right) {
+            if ($right->permissionName() === $name) {
+                return $right;
+            }
+        }
+
+        return null;
+    }
+
     /** Есть ли у права глубина «N дней или без ограничений» (права 2, 3, 4, 5, 17, 18) */
     public function hasDepth(): bool
     {

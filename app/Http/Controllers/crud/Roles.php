@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Controller;
 
+use App\Production\Rights\RightsHistory;
 use App\Traits\HasCrudController;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -264,6 +265,7 @@ class Roles extends Controller {
 		} else {
 			if ($role->hasPermissionTo($valid['permission'])) $role->revokePermissionTo($valid['permission']);
 		}
+		app(RightsHistory::class)->record($valid['stat'] ? 'role_permission_granted' : 'role_permission_revoked', null, (int) $valid['permission'], null, null, (int) $role->id);
 		
 		return response()->json($valid);
 	}

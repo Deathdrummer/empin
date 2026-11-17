@@ -2,12 +2,13 @@
 
 namespace App\Production\Rights;
 
-use App\Models\Erp\AppRight;
+use App\Models\Erp\PermissionSetting;
+use App\Models\User;
 use Illuminate\Support\Collection;
 
 /**
- * Права сотрудника, полученные из ERP. Отозванные (мягко удалённые) не действуют сразу (П-ПР-24).
- * Сама проверка права выполняется сервером при каждом действии (п. 4.2.2, п. 9.1 правило 4).
+ * Права сотрудника из ERP: права приложения в механизме прав ERP (личные и через роль) плюс их настройки.
+ * Отозванное право не действует сразу (П-ПР-24). Окончательная проверка — на сервере при каждом действии (п. 9.1, правило 4).
  */
 final class StaffRights
 {
@@ -18,13 +19,32 @@ final class StaffRights
 
     public static function load(int $staffId): self
     {
-        $grants = AppRight::query()
-            ->where('staff_id', $staffId)
-            ->orderBy('right_no')
+        $user = User::where('staff_id', $staffId)->first();
+        if (!$user) {
+            return new self($staffId, collect());
+        }
+
+        $permissions = $user->getAllPermissions()
+            ->filter(fn ($permission) => $permission->guard_name === 'site')
+            ->mapWithKeys(fn ($permission) => [$permission->id => Right::fromPermissionName($permission->name)])
+            ->filter();
+
+        $settings = PermissionSetting::query()
+            ->where('user_id', $user->id)
+            ->whereIn('permission_id', $permissions->keys())
             ->orderBy('id')
             ->get()
-            ->filter(fn (AppRight $row) => $row->right_no instanceof Right)
-            ->map(fn (AppRight $row) => Grant::fromModel($row))
+            ->groupBy('permission_id');
+
+        $grants = $permissions
+            ->sortBy(fn (Right $right) => $right->value)
+            ->flatMap(function (Right $right, int $permissionId) use ($settings) {
+                $rows = $settings->get($permissionId);
+
+                return $rows && $rows->isNotEmpty()
+                    ? $rows->map(fn (PermissionSetting $row) => Grant::fromSetting($right, $row))->all()
+                    : [Grant::withoutSettings($right)];
+            })
             ->values();
 
         return new self($staffId, $grants);

@@ -5,7 +5,8 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 /**
- * Справочники ERP для производственного приложения («Доработки ERP», пп. 1–6; ТЗ, п. 10.1).
+ * Справочники ERP для производственного приложения («Доработки ERP», пп. 1–5; ТЗ, п. 10.1).
+ * Права приложения (п. 6) — в механизме прав ERP: миграция 2026_11_17_100100.
  *
  * Ведутся в ERP, приложение их только читает. История не теряется: бригады не удаляются, а расформировываются,
  * машины, водители и виды работ удаляются мягко, на сотрудников ссылки с запретом удаления (ERP их не удаляет,
@@ -100,29 +101,10 @@ return new class extends Migration {
             $table->decimal('quantity', 14, 3);
             $table->unique(['revision_id', 'work_type_id']);
         });
-
-        // Права приложения (ТЗ, п. 4.2.2). Одно право может быть выдано несколько раз с разными настройками:
-        // например, у права 19 у каждой области свои даты «с/по» (интервью, 8.18). Отзыв — мягкое удаление.
-        Schema::create('app_rights', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('staff_id')->constrained('staff')->restrictOnDelete();
-            $table->unsignedTinyInteger('right_no')->comment('Номер права 1–19 по ТЗ, п. 4.2.2');
-            $table->unsignedSmallInteger('depth_days')->nullable()->comment('Глубина N дней, считая сегодня; NULL — без ограничений');
-            $table->boolean('scope_all')->default(false)->comment('Область без ограничений: все задания / все бригады / вся компания');
-            $table->json('staff_ids')->nullable()->comment('Выбранные сотрудники: создатели, начальники участков или люди');
-            $table->json('brigade_ids')->nullable()->comment('Выбранные бригады');
-            $table->boolean('all_brigades')->default(false)->comment('Право 19: все бригады');
-            $table->date('date_from')->nullable()->comment('Право 19: просмотр с даты');
-            $table->date('date_to')->nullable()->comment('Право 19: просмотр по дату');
-            $table->timestamps();
-            $table->softDeletes();
-            $table->index(['staff_id', 'right_no']);
-        });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('app_rights');
         Schema::dropIfExists('contract_plan_items');
         Schema::dropIfExists('contract_plan_revisions');
         Schema::dropIfExists('work_types');

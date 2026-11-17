@@ -2,7 +2,7 @@
 
 namespace App\Production\Rights;
 
-use App\Models\Erp\AppRight;
+use App\Models\Erp\PermissionSetting;
 use App\Production\Support\DateWindows;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
@@ -29,11 +29,12 @@ final class Grant
     ) {
     }
 
-    public static function fromModel(AppRight $row): self
+    /** Выдача права с настройками из ERP */
+    public static function fromSetting(Right $right, PermissionSetting $row): self
     {
         return new self(
-            right: $row->right_no,
-            depthDays: $row->right_no->hasDepth() ? $row->depth_days : null,
+            right: $right,
+            depthDays: $right->hasDepth() ? $row->depth_days : null,
             scopeAll: (bool) $row->scope_all,
             staffIds: array_values(array_map('intval', $row->staff_ids ?? [])),
             brigadeIds: array_values(array_map('intval', $row->brigade_ids ?? [])),
@@ -41,6 +42,17 @@ final class Grant
             dateFrom: $row->date_from ? CarbonImmutable::parse($row->date_from->toDateString()) : null,
             dateTo: $row->date_to ? CarbonImmutable::parse($row->date_to->toDateString()) : null,
         );
+    }
+
+    /**
+     * Право выдано, а настройки не заданы. По словам заказчика настройка обязательна при выдаче (интервью, ответы
+     * 7.2 и 8.2: «с обязательной настройкой… не менее 1. Или без ограничений»), значит ERP должна требовать её.
+     * Если её всё же нет — страховка: минимальный объём (глубина N = 1, область пустая). Права без настроек
+     * (1, 7, 8, 10–16) действуют полностью.
+     */
+    public static function withoutSettings(Right $right): self
+    {
+        return new self(right: $right, depthDays: $right->hasDepth() ? 1 : null);
     }
 
     /** Глубина права пускает к дате (П-ПР-08). У прав без глубины ограничения по дате нет */
