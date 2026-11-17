@@ -1,7 +1,10 @@
 <?php namespace App\Providers;
 
+use App\Models\User;
+use App\Services\AccountAccess;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
+use Laravel\Sanctum\Sanctum;
 
 class AuthServiceProvider extends ServiceProvider {
     /**
@@ -26,6 +29,11 @@ class AuthServiceProvider extends ServiceProvider {
 				return true;
 			}
 		});
-		
+
+		// Токен приложения не действует, если ERP отключила сотрудника или стёрла пароль учётки (П-ПР-24)
+		Sanctum::authenticateAccessTokensUsing(
+			fn ($accessToken, bool $isValid) => $isValid && app(AccountAccess::class)->isActive($accessToken->tokenable instanceof User ? $accessToken->tokenable : null)
+		);
+
     }
 }

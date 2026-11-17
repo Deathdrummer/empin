@@ -224,6 +224,12 @@ class PushNotificationService
 
     private function tokensFor(Staff $staff)
     {
+        // Сотрудник отключён в ERP — уведомления на его телефоны не уходят (П-ПР-24); токены не удаляются,
+        // при повторном включении доставка возобновится
+        if (!app(\App\Services\AccountAccess::class)->isStaffActive($staff)) {
+            return collect();
+        }
+
         $tokens = $staff->pushTokens()->get();
 
         if ($staff->expo_push_token && !$tokens->contains('token', $staff->expo_push_token)) {

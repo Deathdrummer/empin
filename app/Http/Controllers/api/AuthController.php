@@ -4,6 +4,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Staff;
 use App\Models\StaffPushToken;
 use App\Models\User;
+use App\Services\AccountAccess;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -34,6 +35,13 @@ class AuthController extends Controller {
             return response()->json([
                 'message' => 'Неверный логин или пароль',
             ], 401);
+        }
+
+        // Сотрудник отключён в ERP («Работает» выключено) — вход не выдаётся (П-ПР-24)
+        if (!app(AccountAccess::class)->isActive($user)) {
+            return response()->json([
+                'message' => 'Учётная запись отключена. Обратитесь к администратору.',
+            ], 403);
         }
 
         // Повторный вход заменяет только сессию этого устройства. Глобальное удаление ломало
