@@ -83,7 +83,6 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'isajax' => \App\Http\Middleware\IsAjaxRequest::class,
-        'erp.access' => \App\Http\Middleware\ErpAccess::class,
 		'lang' => \App\Http\Middleware\Lang::class,  
 		'role' => \App\Http\Middleware\RoleMiddleware::class,
     ];
