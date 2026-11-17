@@ -284,7 +284,7 @@ Route::post('/lang', function (Request $request) {
 //---------------------------------------------------------------------------------
 
 
-Route::prefix('site')->middleware(['lang', 'isajax:site'])->group(function() {
+Route::prefix('site')->middleware(['lang', 'isajax:site', 'auth:site'])->group(function() {
 	// Договоры
 	
 	Route::get('/contracts', [Contracts::class, 'list']);

@@ -112,144 +112,53 @@ Route::middleware(['isajax:admin', 'lang'])->post('/simplelist', function(Reques
 
 
 
-// Адинистраторы
-Route::post('/admins/permissions', [Admins::class, 'permissions']);
-Route::put('/admins/permissions', [Admins::class, 'set_permissions']);
-Route::middleware('lang')->post('/admins/send_email', [Admins::class, 'send_email']);
-Route::post('/admins/store_show', [Admins::class, 'store_show']);
-Route::resource('admins', Admins::class);
+Route::middleware('erp.access')->group(function() {
+	// Адинистраторы
+	Route::post('/admins/permissions', [Admins::class, 'permissions']);
+	Route::put('/admins/permissions', [Admins::class, 'set_permissions']);
+	Route::middleware('lang')->post('/admins/send_email', [Admins::class, 'send_email']);
+	Route::post('/admins/store_show', [Admins::class, 'store_show']);
+	Route::resource('admins', Admins::class);
 
 
 
-// Персонал
-Route::post('/staff/permissions', [Staff::class, 'permissions']);
-Route::put('/staff/permissions', [Staff::class, 'set_permissions']);
-Route::middleware('lang')->post('/staff/send_email', [Staff::class, 'send_email']);
-Route::post('/staff/store_show', [Staff::class, 'store_show']);
-Route::resource('staff', Staff::class);
-
-
-// Сотрудники нов.
-Route::post('/users_new/permissions', [UsersNew::class, 'permissions']);
-Route::put('/users_new/permissions', [UsersNew::class, 'set_permissions']);
-
-Route::get('users_new/reg_staff_to_user', [UsersNew::class, 'get_staff_to_user_form']);
-Route::post('users_new/reg_staff_to_user', [UsersNew::class, 'reg_staff_to_user']);
-Route::delete('users_new/reg_staff_to_user', [UsersNew::class, 'unreg_user_from_staff']);
-
-Route::get('users_new/change_user_email', [UsersNew::class, 'get_user_email']);
-Route::post('users_new/change_user_email', [UsersNew::class, 'change_user_email']);
-Route::post('/users_new/send_email', [UsersNew::class, 'send_email']);
-Route::post('/users_new/login_as_user', [UsersNew::class, 'login_as_user']);
-
-Route::post('/users_new/set_role', [UsersNew::class, 'set_role']);
-Route::post('/users_new/set_department', [UsersNew::class, 'set_department']);
-
-Route::post('/users_new/list_user', [UsersNew::class, 'add_to_list_user']);
-Route::delete('/users_new/list_user', [UsersNew::class, 'remove_from_list_user']);
-
-Route::put('/users_new/set_show_in_selection', [UsersNew::class, 'set_show_in_selection']);
-Route::put('/users_new/set_working', [UsersNew::class, 'set_working']);
-
-Route::get('/users_new/filters', [UsersNew::class, 'filters']);
-
-
-Route::post('/users_new/store_show', [UsersNew::class, 'store_show']);
-Route::resource('users_new', UsersNew::class);
-
-
-
-
-
-
-// Роли
-Route::post('/roles/permissions', [Roles::class, 'permissions']);
-Route::put('/roles/permissions', [Roles::class, 'permissions_save']);
-Route::post('/roles/store_show', [Roles::class, 'store_show']);
-Route::resource('roles', Roles::class);
-
-
-
-
-
-// Разрешения
-Route::post('/permissions/sections', [Permissions::class, 'sections']);
-Route::put('/permissions/sections', [Permissions::class, 'section_save']);
-Route::delete('/permissions/sections', [Permissions::class, 'section_remove']);
-Route::post('/permissions/store_show', [Permissions::class, 'store_show']);
-Route::resource('permissions', Permissions::class);
-
-
-
-
-
-
-// Отделы
-Route::post('/departments/store_show', [Departments::class, 'store_show']);
-Route::resource('departments', Departments::class);
-
-
-
-
-
-// Этапы
-Route::post('/steps/init', [Steps::class, 'init']);
-Route::post('/steps/store_show', [Steps::class, 'store_show']);
-Route::resource('steps', Steps::class);
-
-
-
-
-
-// Шаблоны этапов
-Route::get('/steps_patterns/steps', [StepsPatterns::class, 'steps']);
-Route::post('/steps_patterns/steps', [StepsPatterns::class, 'steps_save']);
-Route::delete('/steps_patterns/steps', [StepsPatterns::class, 'steps_remove']);
-Route::post('/steps_patterns/store_show', [StepsPatterns::class, 'store_show']);
-Route::resource('steps_patterns', StepsPatterns::class);
-
-
-
-
-
-Route::get('/contracts_files_list', [UploadFilesController::class, 'list']);
-Route::get('/get_values_to_filter', [UploadFilesController::class, 'get_values_to_filter']);
-Route::post('/upload_file', [UploadFilesController::class, 'upload']);
-Route::delete('/upload_file', [UploadFilesController::class, 'remove']);
-
-
-
-# Файлы договоров
-Route::post('/contracts_files', [ContractsFilesController::class, 'upload']);
-Route::get('/contracts_files', [ContractsFilesController::class, 'download']);
-Route::delete('/contracts_files', [ContractsFilesController::class, 'remove']);
-
-
-
-# Файлы ассистента
-Route::post('/assistent_files', [AssistentFilesController::class, 'upload']);
-Route::get('/assistent_files', [AssistentFilesController::class, 'download']);
-Route::delete('/assistent_files', [AssistentFilesController::class, 'remove']);
-
-Route::put('/prompt_files', [PromptFilesController::class, 'save']);
-
-
-
-
-
-
-
-
-
-Route::get('/get_export_cheatsheet', function (Request $request) {
-	$data = ContractColums::asArray();
-	$virtVars = VirtualVars::asArray();
-	
-	return response()->json(['cols' => $data, 'virtVars' => $virtVars]);
+	// Персонал
+	Route::post('/staff/permissions', [Staff::class, 'permissions']);
+	Route::put('/staff/permissions', [Staff::class, 'set_permissions']);
+	Route::middleware('lang')->post('/staff/send_email', [Staff::class, 'send_email']);
+	Route::post('/staff/store_show', [Staff::class, 'store_show']);
+	Route::resource('staff', Staff::class);
 });
 
-Route::get('/get_export_hints', function (Request $request) {
-	return response()->view('admin/section/contracts/render/templates-to-export/hints');
+
+Route::middleware('erp.access:staff')->group(function() {
+	// Сотрудники нов.
+	Route::post('/users_new/permissions', [UsersNew::class, 'permissions']);
+	Route::put('/users_new/permissions', [UsersNew::class, 'set_permissions']);
+
+	Route::get('users_new/reg_staff_to_user', [UsersNew::class, 'get_staff_to_user_form']);
+	Route::post('users_new/reg_staff_to_user', [UsersNew::class, 'reg_staff_to_user']);
+	Route::delete('users_new/reg_staff_to_user', [UsersNew::class, 'unreg_user_from_staff']);
+
+	Route::get('users_new/change_user_email', [UsersNew::class, 'get_user_email']);
+	Route::post('users_new/change_user_email', [UsersNew::class, 'change_user_email']);
+	Route::post('/users_new/send_email', [UsersNew::class, 'send_email']);
+	Route::middleware('erp.access')->post('/users_new/login_as_user', [UsersNew::class, 'login_as_user']);
+
+	Route::post('/users_new/set_role', [UsersNew::class, 'set_role']);
+	Route::post('/users_new/set_department', [UsersNew::class, 'set_department']);
+
+	Route::post('/users_new/list_user', [UsersNew::class, 'add_to_list_user']);
+	Route::delete('/users_new/list_user', [UsersNew::class, 'remove_from_list_user']);
+
+	Route::put('/users_new/set_show_in_selection', [UsersNew::class, 'set_show_in_selection']);
+	Route::put('/users_new/set_working', [UsersNew::class, 'set_working']);
+
+	Route::get('/users_new/filters', [UsersNew::class, 'filters']);
+
+
+	Route::post('/users_new/store_show', [UsersNew::class, 'store_show']);
+	Route::resource('users_new', UsersNew::class);
 });
 
 
@@ -257,54 +166,104 @@ Route::get('/get_export_hints', function (Request $request) {
 
 
 
-
-// Договоры
-Route::get('/contracts/to_archive/{id}', [Contracts::class, 'to_archive']);
-Route::get('/contracts/set_customer_rules', [Contracts::class, 'set_customer_rules']);
-Route::get('/contracts/get_deps_hidden_statuses', [Contracts::class, 'get_deps_hidden_statuses']);
-Route::put('/contracts/set_dept_hidden_status', [Contracts::class, 'set_dept_hidden_status']);
-Route::post('/contracts/store_show', [Contracts::class, 'store_show']);
-Route::get('/contracts/check_exists_contracts', [Contracts::class, 'check_exists_contracts']);
-Route::resource('contracts', Contracts::class);
+Route::middleware('erp.access')->group(function() {
+	// Роли
+	Route::post('/roles/permissions', [Roles::class, 'permissions']);
+	Route::put('/roles/permissions', [Roles::class, 'permissions_save']);
+	Route::post('/roles/store_show', [Roles::class, 'store_show']);
+	Route::resource('roles', Roles::class);
 
 
 
 
 
+	// Разрешения
+	Route::post('/permissions/sections', [Permissions::class, 'sections']);
+	Route::put('/permissions/sections', [Permissions::class, 'section_save']);
+	Route::delete('/permissions/sections', [Permissions::class, 'section_remove']);
+	Route::post('/permissions/store_show', [Permissions::class, 'store_show']);
+	Route::resource('permissions', Permissions::class);
 
 
-Route::get('/get_employee_list', function (Request $request, BusinessUser $usersService) {
-	$deptId = $request->input('dept_id', 0);
-	$stepId = $request->input('step_id', 0);
-	$listId = $request->input('list', null);
-	$isArhive = $listId == -1;
+
+
+
+
+	// Отделы
+	Route::post('/departments/store_show', [Departments::class, 'store_show']);
+	Route::resource('departments', Departments::class);
+
+
+
+
+
+	// Этапы
+	Route::post('/steps/init', [Steps::class, 'init']);
+	Route::post('/steps/store_show', [Steps::class, 'store_show']);
+	Route::resource('steps', Steps::class);
+
+
+
+
+
+	// Шаблоны этапов
+	Route::get('/steps_patterns/steps', [StepsPatterns::class, 'steps']);
+	Route::post('/steps_patterns/steps', [StepsPatterns::class, 'steps_save']);
+	Route::delete('/steps_patterns/steps', [StepsPatterns::class, 'steps_remove']);
+	Route::post('/steps_patterns/store_show', [StepsPatterns::class, 'store_show']);
+	Route::resource('steps_patterns', StepsPatterns::class);
+});
+
+
+
+
+
+Route::middleware('erp.access')->group(function() {
+	Route::get('/contracts_files_list', [UploadFilesController::class, 'list']);
+	Route::get('/get_values_to_filter', [UploadFilesController::class, 'get_values_to_filter']);
+});
+Route::middleware('erp.access:*')->group(function() {
+	Route::post('/upload_file', [UploadFilesController::class, 'upload']);
+	Route::delete('/upload_file', [UploadFilesController::class, 'remove']);
+});
+
+
+
+Route::middleware('erp.access:contracts')->group(function() {
+	# Файлы договоров
+	Route::post('/contracts_files', [ContractsFilesController::class, 'upload']);
+	Route::get('/contracts_files', [ContractsFilesController::class, 'download']);
+	Route::delete('/contracts_files', [ContractsFilesController::class, 'remove']);
+});
+
+
+
+Route::middleware('erp.access')->group(function() {
+	# Файлы ассистента
+	Route::post('/assistent_files', [AssistentFilesController::class, 'upload']);
+	Route::get('/assistent_files', [AssistentFilesController::class, 'download']);
+	Route::delete('/assistent_files', [AssistentFilesController::class, 'remove']);
+
+	Route::put('/prompt_files', [PromptFilesController::class, 'save']);
+
+
+
+
+
+
+
+
+
+	Route::get('/get_export_cheatsheet', function (Request $request) {
+		$data = ContractColums::asArray();
+		$virtVars = VirtualVars::asArray();
 	
-	
-	
-	$staffIds = ContractData::select(['data', 'contract_id'])
-		->whereHas('meta', function($query) use($isArhive) {
-			if (!$isArhive) $query->where('archive', 0)->orWhereNull('archive');
-			else $query->where('archive', 1);
-		})
-		->where('department_id', $deptId)
-		->where('step_id', $stepId)
-		->where('type', 3)
-		->get()
-		->pluck('data')
-		->unique()
-		->filter()
-		->values()
-		->map(fn ($item) => (int)$item)
-		->toArray();
-	
-	$depsUsers = $usersService->get(fields: ['department_id', 'full_name', 'working'], departments: $deptId, staffIds: $staffIds)->values();
-	
-	//$depsUsers = $departmentService->getUsersToAssign([$deptId], ['id', 'full_name'], registred: null);
-	//$test = $usersService->get(fields: ['department_id', 'full_name', 'working'], registred: true, departments: [$deptId]);
-	
-	return $depsUsers;
-	
-    //return User::select('id', 'pseudoname')->where('department_id', $deptId)->get();
+		return response()->json(['cols' => $data, 'virtVars' => $virtVars]);
+	});
+
+	Route::get('/get_export_hints', function (Request $request) {
+		return response()->view('admin/section/contracts/render/templates-to-export/hints');
+	});
 });
 
 
@@ -313,19 +272,78 @@ Route::get('/get_employee_list', function (Request $request, BusinessUser $users
 
 
 
+Route::middleware('erp.access:contracts')->group(function() {
+	// Договоры
+	Route::get('/contracts/to_archive/{id}', [Contracts::class, 'to_archive']);
+	Route::get('/contracts/set_customer_rules', [Contracts::class, 'set_customer_rules']);
+	Route::get('/contracts/get_deps_hidden_statuses', [Contracts::class, 'get_deps_hidden_statuses']);
+	Route::put('/contracts/set_dept_hidden_status', [Contracts::class, 'set_dept_hidden_status']);
+	Route::post('/contracts/store_show', [Contracts::class, 'store_show']);
+	Route::get('/contracts/check_exists_contracts', [Contracts::class, 'check_exists_contracts']);
+	Route::resource('contracts', Contracts::class);
 
 
 
-// Парсер сайтовы
-Route::get('/siteparser/list', [SiteParserController::class, 'list']);
-Route::get('/siteparser/get_subjects', [SiteParserController::class, 'get_subjects']);
-Route::get('/siteparser/import_form', [SiteParserController::class, 'import_form']);
-Route::post('/siteparser/import_form', [SiteParserController::class, 'import_data']);
-Route::post('/siteparser/set_stat', [SiteParserController::class, 'set_stat']);
+
+
+
+
+	Route::get('/get_employee_list', function (Request $request, BusinessUser $usersService) {
+		$deptId = $request->input('dept_id', 0);
+		$stepId = $request->input('step_id', 0);
+		$listId = $request->input('list', null);
+		$isArhive = $listId == -1;
+	
+	
+	
+		$staffIds = ContractData::select(['data', 'contract_id'])
+			->whereHas('meta', function($query) use($isArhive) {
+				if (!$isArhive) $query->where('archive', 0)->orWhereNull('archive');
+				else $query->where('archive', 1);
+			})
+			->where('department_id', $deptId)
+			->where('step_id', $stepId)
+			->where('type', 3)
+			->get()
+			->pluck('data')
+			->unique()
+			->filter()
+			->values()
+			->map(fn ($item) => (int)$item)
+			->toArray();
+	
+		$depsUsers = $usersService->get(fields: ['department_id', 'full_name', 'working'], departments: $deptId, staffIds: $staffIds)->values();
+	
+		//$depsUsers = $departmentService->getUsersToAssign([$deptId], ['id', 'full_name'], registred: null);
+		//$test = $usersService->get(fields: ['department_id', 'full_name', 'working'], registred: true, departments: [$deptId]);
+	
+		return $depsUsers;
+	
+	    //return User::select('id', 'pseudoname')->where('department_id', $deptId)->get();
+	});
+});
+
+
+
+
+
+
+
+
+
+
+Route::middleware('erp.access')->group(function() {
+	// Парсер сайтовы
+	Route::get('/siteparser/list', [SiteParserController::class, 'list']);
+	Route::get('/siteparser/get_subjects', [SiteParserController::class, 'get_subjects']);
+	Route::get('/siteparser/import_form', [SiteParserController::class, 'import_form']);
+	Route::post('/siteparser/import_form', [SiteParserController::class, 'import_data']);
+	Route::post('/siteparser/set_stat', [SiteParserController::class, 'set_stat']);
+});
 
 
 // AutoCAD
-Route::middleware(['isajax:admin', 'lang'])->post('/autocad/convert', [AutoCADController::class, 'convertToJson']);
+Route::middleware(['isajax:admin', 'lang', 'erp.access'])->post('/autocad/convert', [AutoCADController::class, 'convertToJson']);
 
 
 
@@ -333,4 +351,4 @@ Route::middleware(['isajax:admin', 'lang'])->post('/autocad/convert', [AutoCADCo
 
 
 # ИИ-ассистент
-Route::post('/ai', [AiAssistantController::class, 'index']);
+Route::middleware('erp.access')->post('/ai', [AiAssistantController::class, 'index']);
