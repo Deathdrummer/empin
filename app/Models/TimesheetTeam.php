@@ -77,6 +77,11 @@ class TimesheetTeam extends Model {
 	
 	
 
+    /** Исполнитель-бригада задания (ТЗ, П-ЗД-12); NULL — личный исполнитель staff_id */
+    public function brigade():BelongsTo {
+        return $this->belongsTo(\App\Models\Erp\Brigade::class, 'brigade_id');
+    }
+
     public function profile():BelongsTo {
         return $this->belongsTo(Staff::class, 'staff_id', 'id')
 			->select(['id', 'sname', 'fname', 'mname']);

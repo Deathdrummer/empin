@@ -83,6 +83,25 @@ class TimesheetContract extends Model {
 	/**
      * Получить этапы к отделу.
      */
+    /** Создатель задания — его хозяин (П-ЗД-09); NULL у записей прототипа и сайта */
+    public function creator():BelongsTo {
+        return $this->belongsTo(Staff::class, 'creator_staff_id');
+    }
+
+    /** Виды работ задания из плана объекта с количествами (П-ЗД-11) */
+    public function works():HasMany {
+        return $this->hasMany(TimesheetContractWork::class, 'timesheet_contract_id');
+    }
+
+    /** Приглашения в задание, в том числе отозванные — история (П-ЗД-24) */
+    public function invites():HasMany {
+        return $this->hasMany(TimesheetContractInvite::class, 'timesheet_contract_id');
+    }
+
+    public function activeInvites():HasMany {
+        return $this->invites()->whereNull('revoked_at');
+    }
+
     public function chat():HasMany {
         return $this->hasMany(TimesheetChat::class, 'timesheet_contract_id', 'id');
     }
