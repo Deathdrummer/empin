@@ -11,9 +11,11 @@ use App\Http\Controllers\crud\Admins;
 use App\Http\Controllers\crud\Brigades;
 use App\Http\Controllers\crud\Contracts;
 use App\Http\Controllers\crud\Departments;
+use App\Http\Controllers\crud\Drivers;
 use App\Http\Controllers\crud\Permissions;
 use App\Http\Controllers\crud\Roles;
 use App\Http\Controllers\crud\Staff;
+use App\Http\Controllers\crud\Vehicles;
 use App\Http\Controllers\crud\Steps;
 use App\Http\Controllers\crud\StepsPatterns;
 use App\Http\Controllers\crud\UsersNew;
@@ -185,7 +187,7 @@ Route::resource('permissions', Permissions::class);
 
 
 
-// Производство ЭМПИН-pro: бригады («Доработки ERP», п. 3). Только для вошедших администраторов ERP
+// Производство ЭМПИН-pro: бригады («Доработки ERP», п. 3), техника и водители (п. 4). Только для вошедших администраторов ERP
 Route::middleware(['auth:admin'])->group(function () {
 	Route::post('/brigades/store_show', [Brigades::class, 'store_show']);
 	Route::post('/brigades/members', [Brigades::class, 'members']);
@@ -198,6 +200,16 @@ Route::middleware(['auth:admin'])->group(function () {
 	Route::post('/brigades/restore', [Brigades::class, 'restore']);
 	Route::post('/brigades/history', [Brigades::class, 'history']);
 	Route::resource('brigades', Brigades::class)->except(['show', 'edit']);
+
+	// Техника и водители («Доработки ERP», п. 4)
+	Route::post('/vehicles/store_show', [Vehicles::class, 'store_show']);
+	Route::post('/vehicles/drivers', [Vehicles::class, 'drivers']);
+	Route::post('/vehicles/set_driver', [Vehicles::class, 'set_driver']);
+	Route::post('/vehicles/history', [Vehicles::class, 'history']);
+	Route::resource('vehicles', Vehicles::class)->except(['show', 'edit']);
+	Route::post('/drivers/store_show', [Drivers::class, 'store_show']);
+	Route::post('/drivers/history', [Drivers::class, 'history']);
+	Route::resource('drivers', Drivers::class)->except(['show', 'edit']);
 });
 
 // Отделы

@@ -2,16 +2,13 @@
 
 namespace App\Production\Erp;
 
-use App\Models\AuditEntry;
 use App\Models\Erp\Brigade;
 use App\Models\Erp\BrigadeMember;
 use App\Models\Staff;
 use App\Models\TimesheetContract;
-use App\Production\Objects\ObjectDirectory;
 use App\Production\Support\OrgClock;
 use App\Production\Support\ProductionException;
 use Carbon\CarbonImmutable;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 
@@ -194,14 +191,7 @@ class BrigadeRegistry
     /** История изменений бригады для ERP: новые сверху */
     public function history(Brigade $brigade): array
     {
-        return AuditEntry::where('entity_type', self::ENTITY)->where('entity_id', $brigade->id)->orderByDesc('id')->get()
-            ->map(fn (AuditEntry $e) => [
-                'at' => $e->created_at,
-                'action' => $e->action,
-                'before' => $e->before,
-                'after' => $e->after,
-                'admin' => $e->context['admin']['name'] ?? null,
-            ])->all();
+        return ErpAudit::history(self::ENTITY, $brigade->id);
     }
 
     /** Даты членства с проверками модели (выход позже вступления, без пересечений) и расформирования */
@@ -260,26 +250,12 @@ class BrigadeRegistry
 
     private function log(int $brigadeId, string $action, ?array $before, ?array $after): void
     {
-        $admin = Auth::guard('admin')->user();
-        AuditEntry::create([
-            'entity_type' => self::ENTITY,
-            'entity_id' => $brigadeId,
-            'action' => $action,
-            'actor_staff_id' => null,
-            'before' => $before,
-            'after' => $after,
-            'context' => ['admin' => $admin ? ['id' => $admin->id, 'name' => $admin->name ?: $admin->pseudoname] : null],
-        ]);
+        ErpAudit::write(self::ENTITY, $brigadeId, $action, $before, $after);
     }
 
     private function person(?int $staffId): ?array
     {
-        if (!$staffId) {
-            return null;
-        }
-        $staff = Staff::find($staffId, ['id', 'sname', 'fname', 'mname']);
-
-        return ['id' => $staffId, 'name' => $staff ? ObjectDirectory::name($staff->sname, $staff->fname, $staff->mname) : null];
+        return ErpAudit::person($staffId);
     }
 
     private function assertWorking(Brigade $brigade): void
