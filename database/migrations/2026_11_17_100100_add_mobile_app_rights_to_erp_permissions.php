@@ -15,7 +15,9 @@ use Spatie\Permission\PermissionRegistrar;
  * несколько настроек на одно право — интервью, 8.18, FR-359) и историей выдачи и отзыва (кто, кому, что, когда).
  */
 return new class extends Migration {
-    private const GROUP_NAME = "ПРАВА ПРИЛОЖЕНИЯ\nЭМПИН-PRO (ПРОИЗВОДСТВО)";
+    private const GROUP_NAME = "ПРАВА ПРИЛОЖЕНИЯ\n(ПРОИЗВОДСТВО)";
+    /** Название ранней версии — переименовывается */
+    private const OLD_GROUP_NAME = "ПРАВА ПРИЛОЖЕНИЯ\nЭМПИН-PRO (ПРОИЗВОДСТВО)";
 
     public function up(): void
     {
@@ -46,7 +48,8 @@ return new class extends Migration {
             }
         }
 
-        Schema::create('permission_settings', function (Blueprint $table) {
+        // Повторный запуск (выкладка через --path) таблицы не пересоздаёт
+        if (!Schema::hasTable('permission_settings')) Schema::create('permission_settings', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('permission_id')->constrained('permissions')->cascadeOnDelete();
@@ -62,7 +65,7 @@ return new class extends Migration {
         });
 
         // История выдачи, отзыва и изменения прав: кто, кому, что и когда («Доработки ERP», п. 6; П-ПР-25)
-        Schema::create('permission_events', function (Blueprint $table) {
+        if (!Schema::hasTable('permission_events')) Schema::create('permission_events', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete()->comment('Кому (учётная запись сотрудника)');
             $table->unsignedBigInteger('role_id')->nullable()->comment('Роль, если менялась роль или её права');
@@ -84,7 +87,7 @@ return new class extends Migration {
         Schema::dropIfExists('permission_settings');
         DB::table('permissions')->where('guard_name', 'site')->whereIn('name', array_map(fn (Right $r) => $r->permissionName(), Right::cases()))->delete();
         $groups = $this->groups();
-        $groups = array_values(array_filter($groups, fn ($g) => ($g['name'] ?? null) !== self::GROUP_NAME));
+        $groups = array_values(array_filter($groups, fn ($g) => !in_array($g['name'] ?? null, [self::GROUP_NAME, self::OLD_GROUP_NAME], true)));
         DB::table('settings')->where('key', 'permissions_groups')->update(['value' => json_encode($groups, JSON_UNESCAPED_UNICODE)]);
         app(PermissionRegistrar::class)->forgetCachedPermissions();
     }
@@ -93,8 +96,13 @@ return new class extends Migration {
     private function ensureGroup(): int
     {
         $groups = $this->groups();
-        foreach ($groups as $group) {
-            if (($group['name'] ?? null) === self::GROUP_NAME) {
+        foreach ($groups as $i => $group) {
+            if (in_array($group['name'] ?? null, [self::GROUP_NAME, self::OLD_GROUP_NAME], true)) {
+                if ($group['name'] !== self::GROUP_NAME) {
+                    $groups[$i]['name'] = self::GROUP_NAME;
+                    DB::table('settings')->where('key', 'permissions_groups')->update(['value' => json_encode($groups, JSON_UNESCAPED_UNICODE)]);
+                }
+
                 return (int) $group['id'];
             }
         }
