@@ -65,7 +65,8 @@ class Roles extends Controller {
 		$viewPath = $validData['views'];
 		if (!$viewPath) return response()->json(['no_view' => true]);
         
-		$list = Role::where('guard_name', $validData['guard'])->orderBy('sort', 'ASC')->get();
+		// Типовые наборы приложения (роли app-set-…) ведутся в своём разделе
+		$list = Role::where('guard_name', $validData['guard'])->where('name', 'not like', 'app-set-%')->orderBy('sort', 'ASC')->get();
 		
 		$itemView = $viewPath.'.item';
 		

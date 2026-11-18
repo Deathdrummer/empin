@@ -1,0 +1,55 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\DB;
+
+/**
+ * Пункт меню админки ERP «Роли → Типовые наборы приложения» (ТЗ п. 4.2.3; «Доработки ERP», п. 6).
+ * Разделы админки хранятся только в базе (`admin_sections`), поэтому их добавляет миграция; группа «Роли» есть
+ * на проде (сверено 18.11.2026, только чтение); если её нет — создаётся. Доступ: главному администратору сразу, остальным — правом
+ * `section-roles.app_sets:admin` («Права → Разделы»).
+ * Повторный запуск ничего не дублирует; отдельно выкладывается через `migrate --path`.
+ */
+return new class extends Migration {
+    private const ITEMS = [
+        'roles.app_sets' => 'Типовые наборы приложения',
+    ];
+
+    public function up(): void
+    {
+        $parentId = DB::table('admin_sections')->where('section', 'roles')->where('parent_id', 0)->value('id')
+            ?? DB::table('admin_sections')->insertGetId([
+                'section' => 'roles',
+                'title' => json_encode(['ru' => 'Роли'], JSON_UNESCAPED_UNICODE),
+                'page_title' => json_encode(['ru' => 'Роли'], JSON_UNESCAPED_UNICODE),
+                'parent_id' => 0,
+                'nav' => 0, // группа только раскрывается, своей страницы у неё нет
+                'visible' => 1,
+                '_sort' => (int) DB::table('admin_sections')->where('parent_id', 0)->max('_sort') + 1,
+            ]);
+
+        foreach (self::ITEMS as $section => $title) {
+            if (DB::table('admin_sections')->where('section', $section)->exists()) {
+                continue;
+            }
+            DB::table('admin_sections')->insert([
+                'section' => $section,
+                'title' => json_encode(['ru' => $title], JSON_UNESCAPED_UNICODE),
+                'page_title' => json_encode(['ru' => $title], JSON_UNESCAPED_UNICODE),
+                'parent_id' => $parentId,
+                'nav' => 1,
+                'visible' => 1,
+                '_sort' => (int) DB::table('admin_sections')->where('parent_id', $parentId)->max('_sort') + 1,
+            ]);
+        }
+    }
+
+    public function down(): void
+    {
+        DB::table('admin_sections')->whereIn('section', array_keys(self::ITEMS))->delete();
+        $parentId = DB::table('admin_sections')->where('section', 'roles')->where('parent_id', 0)->value('id');
+        if ($parentId && !DB::table('admin_sections')->where('parent_id', $parentId)->exists()) {
+            DB::table('admin_sections')->whereKey($parentId)->delete();
+        }
+    }
+};

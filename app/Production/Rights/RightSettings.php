@@ -63,7 +63,17 @@ class RightSettings
             throw ProductionException::invalid('Нужна хотя бы одна настройка');
         }
         $rows = array_map(fn ($row) => $this->normalize($right, (array) $row), array_values($input));
+        $this->replace($user, $permissionId, $rows);
+    }
 
+    /**
+     * Заменить выдачи права сотрудника готовыми строками настроек (из окна ERP или из типового набора); пустой список —
+     * настроек нет. Изменение — в истории
+     *
+     * @param array<int, array<string, mixed>> $rows
+     */
+    public function replace(User $user, int $permissionId, array $rows): void
+    {
         DB::transaction(function () use ($user, $permissionId, $rows) {
             $before = $this->rows($user, $permissionId)->map(fn (PermissionSetting $s) => $s->snapshot())->all();
             if ($before === $rows) {
@@ -158,6 +168,30 @@ class RightSettings
             ])->values()->all();
 
         return ['group' => $permissions->first()?->group !== null ? (int) $permissions->first()->group : null, 'rights' => $rights];
+    }
+
+    /**
+     * Списки для редактора настроек: сотрудники (для прав 4, 5, 6, 9 — с учётной записью; для права 19 — все работающие)
+     * и действующие бригады; уже выбранные показываются, даже если сотрудник уволен или бригада расформирована
+     *
+     * @return array{0: array, 1: array}
+     */
+    public function editorOptions(Right $right, array $rows): array
+    {
+        $selectedStaff = collect($rows)->pluck('staff_ids')->flatten()->filter()->unique()->all();
+        $staff = Staff::query()
+            ->where(fn ($q) => $right === Right::TimesheetView
+                ? $q->where('working', 1)
+                : $q->where('working', 1)->whereIn('id', User::whereNotNull('staff_id')->select('staff_id')))
+            ->orWhereIn('id', $selectedStaff ?: [0])
+            ->orderBy('sname')->orderBy('fname')->get(['id', 'sname', 'fname', 'mname', 'work_post'])
+            ->map(fn (Staff $s) => ['id' => (int) $s->id, 'name' => ObjectDirectory::name($s->sname, $s->fname, $s->mname).($s->work_post ? ' — '.$s->work_post : '')])
+            ->all();
+        $selectedBrigades = collect($rows)->pluck('brigade_ids')->flatten()->filter()->unique()->all();
+        $brigades = Brigade::where(fn ($q) => $q->whereNull('disbanded_on')->orWhereIn('id', $selectedBrigades ?: [0]))->orderBy('name')->get(['id', 'name'])
+            ->map(fn (Brigade $b) => ['id' => (int) $b->id, 'name' => $b->name])->all();
+
+        return [$staff, $brigades];
     }
 
     /** Право с настройками нельзя выдать, пока настройки не заданы (интервью 7.2, 8.2) */

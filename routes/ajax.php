@@ -8,6 +8,7 @@ use App\Http\Controllers\AssistentFilesController;
 use App\Http\Controllers\AutoCADController;
 use App\Http\Controllers\ContractsFilesController;
 use App\Http\Controllers\crud\Admins;
+use App\Http\Controllers\crud\AppRightSets;
 use App\Http\Controllers\crud\AppRights;
 use App\Http\Controllers\crud\Brigades;
 use App\Http\Controllers\crud\ContractProduction;
@@ -229,6 +230,16 @@ Route::middleware(['auth:admin'])->group(function () {
 	Route::post('/app_rights/editor', [AppRights::class, 'editor']);
 	Route::post('/app_rights/save', [AppRights::class, 'save']);
 	Route::post('/app_rights/history', [AppRights::class, 'history']);
+	Route::post('/app_rights/apply', [AppRights::class, 'apply']);
+	Route::post('/app_rights/tab', [AppRights::class, 'tab']);
+
+	// Типовые наборы прав приложения (ТЗ, п. 4.2.3)
+	Route::post('/app_sets/store_show', [AppRightSets::class, 'store_show']);
+	Route::post('/app_sets/rights', [AppRightSets::class, 'rights']);
+	Route::post('/app_sets/set_right', [AppRightSets::class, 'set_right']);
+	Route::post('/app_sets/editor', [AppRightSets::class, 'editor']);
+	Route::post('/app_sets/save_settings', [AppRightSets::class, 'save_settings']);
+	Route::resource('app_sets', AppRightSets::class)->except(['show', 'edit']);
 });
 
 // Отделы

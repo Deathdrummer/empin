@@ -9,6 +9,7 @@ use App\Models\Staff;
 use App\Models\User;
 use App\Production\Objects\ObjectDirectory;
 use App\Production\Rights\Right;
+use App\Production\Rights\RightSets;
 use App\Production\Rights\RightSettings;
 use App\Production\Support\ProductionException;
 use App\Traits\HasCrudController;
@@ -42,15 +43,7 @@ class AppRights extends Controller {
 		[$user, $right, $permissionId] = $this->target($request);
 		$rows = $this->settings->rows($user, $permissionId)->map(fn (PermissionSetting $s) => $s->snapshot())->all();
 
-		$accounts = $right === Right::TimesheetView
-			? Staff::where('working', 1)
-			: Staff::where('working', 1)->whereIn('id', User::whereNotNull('staff_id')->select('staff_id'));
-		$selectedStaff = collect($rows)->pluck('staff_ids')->flatten()->unique()->all();
-		$staff = $accounts->orWhereIn('id', $selectedStaff ?: [0])->orderBy('sname')->orderBy('fname')->get(['id', 'sname', 'fname', 'mname', 'work_post'])
-			->map(fn (Staff $s) => ['id' => $s->id, 'name' => ObjectDirectory::name($s->sname, $s->fname, $s->mname).($s->work_post ? ' — '.$s->work_post : '')])->all();
-		$selectedBrigades = collect($rows)->pluck('brigade_ids')->flatten()->unique()->all();
-		$brigades = Brigade::where(fn ($q) => $q->whereNull('disbanded_on')->orWhereIn('id', $selectedBrigades ?: [0]))->orderBy('name')->get(['id', 'name'])
-			->map(fn (Brigade $b) => ['id' => $b->id, 'name' => $b->name])->all();
+		[$staff, $brigades] = $this->settings->editorOptions($right, $rows);
 
 		return $this->view(self::VIEWS.'.editor', [
 			'user' => (int) $request->input('user'),
@@ -68,6 +61,24 @@ class AppRights extends Controller {
 		$this->settings->save($user, $right, $permissionId, $rows);
 
 		return response()->json(['summary' => $this->summary($user, $right, $permissionId)]);
+	}
+
+	/** Применить типовой набор (ТЗ, п. 4.2.3): права приложения сотрудника становятся правами набора */
+	public function apply(Request $request) {
+		$valid = $request->validate(['user' => 'required|integer', 'set' => 'required|integer']);
+		$user = User::fromStaff((int) $valid['user'])->first() ?? throw ProductionException::notFound('Учётная запись не найдена');
+		$sets = app(RightSets::class);
+
+		return response()->json(['need_settings' => $sets->apply($user, $sets->find((int) $valid['set']))]);
+	}
+
+	/** Вкладка прав приложения заново — после применения набора */
+	public function tab(Request $request) {
+		$staffId = (int) $request->validate(['user' => 'required|integer'])['user'];
+		$user = User::fromStaff($staffId)->first() ?? throw ProductionException::notFound('Учётная запись не найдена');
+		$tab = $this->settings->tab($user, $user->getAllPermissions()->pluck('id')->all());
+
+		return $this->view(self::VIEWS.'.tab', ['appRights' => $tab['rights'], 'user' => $staffId]);
 	}
 
 	/** История прав сотрудника: выдача, отзыв, роль, настройки — кто, когда */
@@ -90,7 +101,7 @@ class AppRights extends Controller {
 				'at' => $e->created_at,
 				'action' => $e->action,
 				'permission' => $permission?->title ?? $permission?->name,
-				'role' => $e->role_id ? ($roles[$e->role_id] ?? null) : null,
+				'role' => $e->role_id ? ($roles[$e->role_id] ?? ($e->after['set'] ?? null)) : null,
 				'before' => $e->action === 'settings_changed' ? $describe($e->before['settings'] ?? []) : null,
 				'after' => $e->action === 'settings_changed' ? $describe($e->after['settings'] ?? []) : null,
 				'admin' => $e->by_admin_id ? ($admins[$e->by_admin_id] ?? null) : null,

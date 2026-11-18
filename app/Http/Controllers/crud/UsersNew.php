@@ -751,6 +751,7 @@ class UsersNew extends Controller {
 		
 		$allRoles = Role::select(['id', 'title'])
 			->where(['guard_name' => 'site'])
+			->where('name', 'not like', 'app-set-%') // типовые наборы приложения ролью не назначаются
 			->whereNot('title', null)->get()
 			->mapWithKeys(function ($item, $key) {
 				$newItem[$key] = [
