@@ -8,6 +8,7 @@ use App\Http\Controllers\AssistentFilesController;
 use App\Http\Controllers\AutoCADController;
 use App\Http\Controllers\ContractsFilesController;
 use App\Http\Controllers\crud\Admins;
+use App\Http\Controllers\crud\Brigades;
 use App\Http\Controllers\crud\Contracts;
 use App\Http\Controllers\crud\Departments;
 use App\Http\Controllers\crud\Permissions;
@@ -183,6 +184,21 @@ Route::resource('permissions', Permissions::class);
 
 
 
+
+// Производство ЭМПИН-pro: бригады («Доработки ERP», п. 3). Только для вошедших администраторов ERP
+Route::middleware(['auth:admin'])->group(function () {
+	Route::post('/brigades/store_show', [Brigades::class, 'store_show']);
+	Route::post('/brigades/members', [Brigades::class, 'members']);
+	Route::post('/brigades/add_member', [Brigades::class, 'add_member']);
+	Route::post('/brigades/update_member', [Brigades::class, 'update_member']);
+	Route::post('/brigades/remove_member', [Brigades::class, 'remove_member']);
+	Route::post('/brigades/transfer_member', [Brigades::class, 'transfer_member']);
+	Route::post('/brigades/set_foreman', [Brigades::class, 'set_foreman']);
+	Route::post('/brigades/disband', [Brigades::class, 'disband']);
+	Route::post('/brigades/restore', [Brigades::class, 'restore']);
+	Route::post('/brigades/history', [Brigades::class, 'history']);
+	Route::resource('brigades', Brigades::class)->except(['show', 'edit']);
+});
 
 // Отделы
 Route::post('/departments/store_show', [Departments::class, 'store_show']);
