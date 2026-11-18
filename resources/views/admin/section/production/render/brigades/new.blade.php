@@ -14,7 +14,7 @@
 				empty-has-value
 				/>
 		</td>
-		<td class="center" title="С этой даты бригадир в составе бригады">
+		<td class="center">
 			<x-input type="date" name="foreman_since" value="{{$today}}" class="w100" />
 		</td>
 		<td><p class="color-gray">Новая</p></td>

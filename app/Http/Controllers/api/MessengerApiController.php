@@ -1248,7 +1248,7 @@ class MessengerApiController extends Controller {
         if (!$target) {
             return $replyToId
                 ? response()->json(['error' => 'Сообщение для ответа не найдено'], 422)
-                : response()->json(['error' => 'У вас нет заданий на этом объекте: писать в его переписку нельзя'], 403);
+                : response()->json(['error' => 'У вас нет заданий на этом объекте'], 403);
         }
 
         $media = MediaStorage::store($request, 'timesheet/comments');

@@ -3,8 +3,8 @@
 	<td>
 		<x-input name="name" value="{{$name}}" class="w100" placeholder="Наименование вида работ" />
 	</td>
-	<td @if($unit_locked)title="Вид работ уже есть в планах или заданиях — единицу изменить нельзя"@endif>
-		<x-input name="unit" value="{{$unit}}" class="w100" placeholder="м, шт, т" :disabled="$unit_locked" />
+	<td >
+		<x-input name="unit" value="{{$unit}}" class="w100" placeholder="Ед. изм." :disabled="$unit_locked" />
 	</td>
 	<td>
 		@if($plans || $tasks)

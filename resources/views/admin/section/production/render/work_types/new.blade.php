@@ -4,7 +4,7 @@
 			<x-input name="name" class="w100" placeholder="Наименование вида работ" />
 		</td>
 		<td>
-			<x-input name="unit" class="w100" placeholder="м, шт, т" />
+			<x-input name="unit" class="w100" placeholder="Ед. изм." />
 		</td>
 		<td><p class="color-gray">Новый</p></td>
 		<td class="center">

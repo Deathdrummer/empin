@@ -3,7 +3,7 @@
 	<td>
 		<strong @class(['color-black' => !$fired, 'color-gray' => $fired])>{{$name}}</strong>
 		@if($work_post)<span class="color-gray fz12px ml5px">{{$work_post}}</span>@endif
-		@if($fired)<span class="color-red fz12px ml5px" title="В заданиях не предлагается">уволен</span>@endif
+		@if($fired)<span class="color-red fz12px ml5px">уволен</span>@endif
 	</td>
 	<td>
 		@if($vehicles)

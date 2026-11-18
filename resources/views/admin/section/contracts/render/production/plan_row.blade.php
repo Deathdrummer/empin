@@ -17,7 +17,7 @@
 		@endif
 	</td>
 	<td>
-		<x-input name="quantity" value="{{isset($item['quantity']) ? rtrim(rtrim(number_format($item['quantity'], 3, '.', ''), '0'), '.') : ''}}" class="w100" placeholder="0" />
+		<x-input name="quantity" value="{{isset($item['quantity']) ? rtrim(rtrim(number_format($item['quantity'], 3, '.', ''), '0'), '.') : ''}}" class="w100" />
 	</td>
 	<td><span class="color-gray" unit>{{$item['unit'] ?? ''}}</span></td>
 	<td class="center">

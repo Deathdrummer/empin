@@ -1,7 +1,7 @@
 <x-input-group group="normal">
 	<tr class="h6rem" index="{{$index}}">
 		<td>
-			<x-input name="name" class="w100" placeholder="Например: Автовышка" />
+			<x-input name="name" class="w100" placeholder="Наименование" />
 		</td>
 		<td>
 			<x-input name="plate" class="w100" placeholder="Госномер" />

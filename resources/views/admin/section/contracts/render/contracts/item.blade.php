@@ -40,7 +40,7 @@
 		<td class="center">
 			<x-buttons-group group="small" gx="5">
 				<x-button variant="yellow" action="contractStatuses:{{$id}}" title="Статусы договора по отделам"><i class="fa-solid fa-fw fa-list-check"></i></x-button>
-				<x-button variant="neutral" action="contractProduction:{{$id}},№{{$object_number}}" title="Производство: ответственный, бригады, готовность, план объекта"><i class="fa-solid fa-fw fa-helmet-safety"></i></x-button>
+				<x-button variant="neutral" action="contractProduction:{{$id}},№{{$object_number}}" title="Производство"><i class="fa-solid fa-fw fa-helmet-safety"></i></x-button>
 				<x-button variant="purple" action="contractShow:{{$id}},№{{$object_number}}" title="Открыть договор"><i class="fa-solid fa-fw fa-eye"></i></x-button>
 				<x-button variant="red" action="contractRemove:{{$id}}" title="Удалить"><i class="fa-solid fa-fw fa-trash-can"></i></x-button>
 			</x-buttons-group>

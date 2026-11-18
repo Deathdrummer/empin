@@ -6,7 +6,7 @@
 					<tr>
 						<td class="w50rem"><strong>Водитель</strong></td>
 						<td><strong>Закреплён за машинами</strong></td>
-						<td class="w10rem center" title="Уволен, отстранён: в новых заданиях не предлагается"><strong>Не используется</strong></td>
+						<td class="w10rem center"><strong>Не используется</strong></td>
 						<td class="w14rem center"><strong>Действия</strong></td>
 					</tr>
 				</thead>

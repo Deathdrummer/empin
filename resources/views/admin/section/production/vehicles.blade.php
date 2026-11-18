@@ -7,7 +7,7 @@
 						<td class="w36rem"><strong>Наименование (тип)</strong></td>
 						<td class="w18rem"><strong>Госномер</strong></td>
 						<td><strong>Закреплённые водители</strong></td>
-						<td class="w10rem center" title="Ремонт, продажа: в новых заданиях не предлагается"><strong>Не используется</strong></td>
+						<td class="w10rem center"><strong>Не используется</strong></td>
 						<td class="w14rem center"><strong>Действия</strong></td>
 					</tr>
 				</thead>

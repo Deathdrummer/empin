@@ -385,7 +385,7 @@ final class TaskService
             return [];
         }
         $plan = ContractPlanRevision::currentFor($contractId)
-            ?? throw ProductionException::invalid('У объекта нет плана работ: задание ставится текстом', 'no_plan');
+            ?? throw ProductionException::invalid('У объекта нет плана работ', 'no_plan');
         $allowed = $plan->items()->pluck('work_type_id')->map(fn ($id) => (int) $id)->all();
 
         $result = [];

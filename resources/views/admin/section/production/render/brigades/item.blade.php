@@ -11,7 +11,7 @@
 		@endif
 	</td>
 	<td class="center">
-		<x-button variant="neutral" group="small" action="brigadeMembers:{{$id}}" title="Состав бригады, бригадир, перевод, исключение">{{$members_count}} чел.</x-button>
+		<x-button variant="neutral" group="small" action="brigadeMembers:{{$id}}" title="Состав">{{$members_count}} чел.</x-button>
 	</td>
 	<td>
 		@if($disbanded_on)

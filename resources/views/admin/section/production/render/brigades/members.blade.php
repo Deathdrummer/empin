@@ -9,7 +9,7 @@
 				<tr>
 					<td><strong>Сотрудник</strong></td>
 					<td class="w16rem"><strong>В бригаде с</strong></td>
-					<td class="w16rem" title="С этого дня уже не состоит"><strong>Вышел с</strong></td>
+					<td class="w16rem"><strong>Вышел с</strong></td>
 					<td class="w22rem center"><strong>Действия</strong></td>
 				</tr>
 			</thead>
@@ -34,9 +34,9 @@
 									@else
 										<x-button variant="light" action="brigadeForeman:{{$brigade->id}},{{$member['staff_id']}}" title="Сделать бригадиром"><i class="fa-regular fa-star"></i></x-button>
 									@endif
-									<x-button variant="neutral" action="brigadeMemberTransfer:{{$member['id']}}" title="Перевести в другую бригаду"><i class="fa-solid fa-right-left"></i></x-button>
+									<x-button variant="neutral" action="brigadeMemberTransfer:{{$member['id']}}" title="Перевести"><i class="fa-solid fa-right-left"></i></x-button>
 								@endif
-								<x-button variant="red" action="brigadeMemberRemove:{{$member['id']}}" title="Удалить ошибочную запись"><i class="fa-solid fa-trash-can"></i></x-button>
+								<x-button variant="red" action="brigadeMemberRemove:{{$member['id']}}" title="Удалить"><i class="fa-solid fa-trash-can"></i></x-button>
 							</x-buttons-group>
 						</td>
 					</tr>
