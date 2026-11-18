@@ -16,6 +16,7 @@ use App\Http\Controllers\crud\Permissions;
 use App\Http\Controllers\crud\Roles;
 use App\Http\Controllers\crud\Staff;
 use App\Http\Controllers\crud\Vehicles;
+use App\Http\Controllers\crud\WorkTypes;
 use App\Http\Controllers\crud\Steps;
 use App\Http\Controllers\crud\StepsPatterns;
 use App\Http\Controllers\crud\UsersNew;
@@ -187,7 +188,7 @@ Route::resource('permissions', Permissions::class);
 
 
 
-// Производство ЭМПИН-pro: бригады («Доработки ERP», п. 3), техника и водители (п. 4). Только для вошедших администраторов ERP
+// Производство ЭМПИН-pro: бригады («Доработки ERP», п. 3), техника и водители (п. 4), виды работ (п. 5). Только для вошедших администраторов ERP
 Route::middleware(['auth:admin'])->group(function () {
 	Route::post('/brigades/store_show', [Brigades::class, 'store_show']);
 	Route::post('/brigades/members', [Brigades::class, 'members']);
@@ -210,6 +211,11 @@ Route::middleware(['auth:admin'])->group(function () {
 	Route::post('/drivers/store_show', [Drivers::class, 'store_show']);
 	Route::post('/drivers/history', [Drivers::class, 'history']);
 	Route::resource('drivers', Drivers::class)->except(['show', 'edit']);
+
+	// Виды работ («Доработки ERP», п. 5)
+	Route::post('/work_types/store_show', [WorkTypes::class, 'store_show']);
+	Route::post('/work_types/history', [WorkTypes::class, 'history']);
+	Route::resource('work_types', WorkTypes::class)->except(['show', 'edit']);
 });
 
 // Отделы
