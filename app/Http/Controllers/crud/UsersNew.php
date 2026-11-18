@@ -9,6 +9,7 @@ use App\Models\Staff;
 use App\Models\Step;
 use App\Models\User;
 use App\Production\Rights\RightsHistory;
+use App\Production\Rights\RightSettings;
 use App\Services\Business\Department as BusinessDepartment;
 use App\Traits\HasCrudController;
 use Illuminate\Http\Request;
@@ -532,7 +533,11 @@ class UsersNew extends Controller {
 			return strnatcmp($a['sort'], $b['sort']);
 		});
 		
-		return $this->view($valid['view'], ['permissions' => $allPermissions, 'user_permissions' => $userPermissions, 'user' => $valid['user']]);
+		// Права приложения ЭМПИН-pro — своя вкладка с настройками и историей (только для прав сотрудников)
+		$appRights = $valid['guard'] === 'site' ? app(RightSettings::class)->tab($user, $userPermissions) : null;
+
+		return $this->view($valid['view'], ['permissions' => $allPermissions, 'user_permissions' => $userPermissions, 'user' => $valid['user'],
+			'app_rights' => $appRights['rights'] ?? null, 'app_rights_group' => $appRights['group'] ?? null]);
 	}
 	
 	
@@ -550,6 +555,11 @@ class UsersNew extends Controller {
 		]);
 		
 		if (!$user = User::fromStaff($valid['user'])->first()) return response()->json(false);
+
+		// Право приложения с настройками без настроек не выдаётся (интервью 7.2, 8.2): настройки — во вкладке прав приложения
+		if ($valid['stat'] && !app(RightSettings::class)->canGrant($user, (int) $valid['permission'])) {
+			return response()->json(['error' => 'Не заданы настройки права', 'message' => 'Не заданы настройки права'], 422);
+		}
 
 		$history = app(RightsHistory::class);
 		if ($hasRole = !!count($user->roles)) {

@@ -28,7 +28,10 @@
 						ddrtabscontentitem="permissionsTab{{$groupData['id'] ?? null}}"
 						pgroupid="{{$groupId}}"
 						>
-						@isset($permissions[$groupData['id']])
+						@if(isset($app_rights) && (int) ($groupData['id'] ?? 0) === (int) ($app_rights_group ?? -1))
+							{{-- Права приложения ЭМПИН-pro: с настройками и историей --}}
+							@include('admin.section.personal.render.app_rights.tab', ['appRights' => $app_rights, 'user' => $user])
+						@elseif(isset($permissions[$groupData['id']]))
 							<div class="row gx-20">
 								@foreach($permissions[$groupData['id']] as $chunk)
 									<div class="col">
@@ -47,7 +50,7 @@
 							</div>
 						@else
 							<p class="text-center color-gray">Список пуст</p>
-						@endisset
+						@endif
 					</li>
 				@endforeach
 			</ul>

@@ -29,10 +29,14 @@ return new class extends Migration {
         $now = now();
         foreach (Right::cases() as $right) {
             $exists = DB::table('permissions')->where('name', $right->permissionName())->where('guard_name', 'site')->exists();
-            if (!$exists) {
+            if ($exists) {
+                // Ранняя версия писала названия с префиксом «ЭМПИН-pro: »; группа прав и так подписана — префикс не нужен
+                DB::table('permissions')->where('name', $right->permissionName())->where('guard_name', 'site')
+                    ->where('title', 'ЭМПИН-pro: ' . $right->title())->update(['title' => $right->title()]);
+            } else {
                 DB::table('permissions')->insert([
                     'name' => $right->permissionName(),
-                    'title' => 'ЭМПИН-pro: ' . $right->title(),
+                    'title' => $right->title(),
                     'guard_name' => 'site',
                     'group' => $groupId,
                     'sort' => $right->value,
