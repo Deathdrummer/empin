@@ -4,10 +4,7 @@ namespace App\Models\Erp;
 
 use Illuminate\Database\Eloquent\Model;
 
-/**
- * Изменение готовности объекта (ТЗ П-ФК-34): было → стало, источник, кто (администратор ERP или сотрудник), когда.
- * Записи не меняются и не удаляются.
- */
+/** Изменение готовности объекта (ТЗ П-ФК-34): было → стало, источник, кто (администратор ERP или сотрудник), когда */
 class ContractReadinessEvent extends Model
 {
     public const SOURCE_ERP = 'erp';

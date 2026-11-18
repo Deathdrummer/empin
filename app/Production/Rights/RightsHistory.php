@@ -5,10 +5,7 @@ namespace App\Production\Rights;
 use App\Models\Erp\PermissionEvent;
 use Illuminate\Support\Facades\Auth;
 
-/**
- * История прав ERP: выдача, отзыв, назначение роли, перевод прав роли в личные, изменение настроек.
- * Автор — администратор ERP, вошедший в админку (guard `admin`). Запись не должна ломать само действие.
- */
+/** История прав ERP: выдача, отзыв, назначение роли, перевод прав роли в личные, изменение настроек */
 class RightsHistory
 {
     public function record(string $action, ?int $userId, ?int $permissionId = null, ?array $before = null, ?array $after = null, ?int $roleId = null): void

@@ -6,10 +6,7 @@ use App\Models\TimesheetContract;
 use App\Production\Objects\ObjectDirectory;
 use Carbon\CarbonImmutable;
 
-/**
- * Сведения о задании, нужные для проверки доступа. Задание — запись план-графика ERP (timesheet_contracts):
- * объект на дату исполнителя (timesheet_teams).
- */
+/** Сведения о задании, нужные для проверки доступа */
 final class TaskFacts
 {
     /** @param int[] $invitedStaffIds действующие (не отозванные) приглашения */

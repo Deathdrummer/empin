@@ -191,7 +191,8 @@ Route::resource('permissions', Permissions::class);
 
 
 
-// Производство ЭМПИН-pro: бригады («Доработки ERP», п. 3), техника и водители (п. 4), виды работ и план объекта (п. 5), объекты (п. 1), права приложения (п. 6). Только для вошедших администраторов ERP
+// Производство ЭМПИН-pro: бригады («Доработки ERP», п. 3), техника и водители (п. 4), виды работ и план
+// объекта (п. 5), объекты (п. 1), права приложения (п. 6)
 Route::middleware(['auth:admin'])->group(function () {
 	Route::post('/brigades/store_show', [Brigades::class, 'store_show']);
 	Route::post('/brigades/members', [Brigades::class, 'members']);

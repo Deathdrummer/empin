@@ -6,10 +6,7 @@ use App\Models\Erp\PermissionSetting;
 use App\Models\User;
 use Illuminate\Support\Collection;
 
-/**
- * Права сотрудника из ERP: права приложения в механизме прав ERP (личные и через роль) плюс их настройки.
- * Отозванное право не действует сразу (П-ПР-24). Окончательная проверка — на сервере при каждом действии (п. 9.1, правило 4).
- */
+/** Права сотрудника из ERP: права приложения в механизме прав ERP (личные и через роль) плюс их настройки */
 final class StaffRights
 {
     /** @param Collection<int, Grant> $grants */

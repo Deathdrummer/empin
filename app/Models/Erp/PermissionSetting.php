@@ -7,10 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\Permission\Models\Permission;
 
-/**
- * Настройки выданного права ERP: глубина, область, даты (ТЗ, п. 4.2.2). У одного права их может быть несколько:
- * например, у права 19 у каждой области свои даты «с/по» (интервью, 8.18; FR-359).
- */
+/** Настройки выданного права ERP: глубина, область, даты (ТЗ, п. 4.2.2) */
 class PermissionSetting extends Model
 {
     protected $table = 'permission_settings';

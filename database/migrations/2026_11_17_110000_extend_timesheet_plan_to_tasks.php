@@ -6,15 +6,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 /**
- * План-график ERP развивается до заданий ТЗ ЭМПИН-pro (раздел 6), а не дублируется новыми таблицами.
- *
- *  timesheet_teams     — исполнитель на дату: бригада (`brigade_id`) или сотрудник. Для бригады `staff_id` — её бригадир,
- *                        чтобы раздел сайта «План-график работ» и чаты объектов работали как раньше. Запись «бригада на дату»
- *                        — внутренняя «смена» ТЗ (П-СМ-02). Прежние записи без `brigade_id` — задания с личным исполнителем.
- *  timesheet_contracts — задание: объект на эту дату + создатель, текст, техника и водитель (снимок на момент назначения,
- *                        П-ОБ-23б). Переписка задания — timesheet_chat (она же чат объекта в мессенджере, п. 1.2 ТЗ).
- * Добавляются: виды работ задания из плана объекта (П-ЗД-11), приглашения с историей (П-ЗД-24), журнал изменений (п. 9.4)
- * и уведомления до ручного закрытия (п. 9.3). Всё новое — с допуском NULL, прежние данные и код продолжают работать.
+ * План-график ERP развивается до заданий ТЗ ЭМПИН-pro (раздел 6), а не дублируется новыми таблицами. timesheet_teams
+ * — исполнитель на дату: бригада (`brigade_id`) или сотрудник
  */
 return new class extends Migration {
     public function up(): void
@@ -58,7 +51,7 @@ return new class extends Migration {
             $table->index(['staff_id', 'revoked_at']);
         });
 
-        // Журнал изменений: кто, что, когда, было и стало (п. 9.4). Своего журнала в ERP нет
+        // Журнал изменений: кто, что, когда, было и стало (п. 9.4)
         if (!Schema::hasTable('audit_log')) Schema::create('audit_log', function (Blueprint $table) {
             $table->id();
             $table->string('entity_type', 32)->comment('task, …');
@@ -73,8 +66,7 @@ return new class extends Migration {
             $table->index(['actor_staff_id', 'created_at']);
         });
 
-        // Уведомления в приложении, которые висят до ручного закрытия (п. 9.3). Остаются у получателя,
-        // даже если доступа к заданию больше нет (П-ЗД-32), поэтому без внешнего ключа на задание
+        // Уведомления в приложении, которые висят до ручного закрытия (п. 9.3)
         if (!Schema::hasTable('staff_notifications')) Schema::create('staff_notifications', function (Blueprint $table) {
             $table->id();
             $table->foreignId('staff_id')->constrained('staff')->restrictOnDelete();

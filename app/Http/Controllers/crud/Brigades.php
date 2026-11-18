@@ -10,9 +10,7 @@ use App\Production\Support\OrgClock;
 use App\Traits\HasCrudController;
 use Illuminate\Http\Request;
 
-/**
- * Раздел админки ERP «Производство → Бригады» («Доработки ERP», п. 3). Правила — в BrigadeRegistry.
- */
+/** Раздел админки ERP «Производство → Бригады» («Доработки ERP», п. 3) */
 class Brigades extends Controller {
 	use HasCrudController;
 

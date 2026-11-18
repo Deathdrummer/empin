@@ -9,11 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use InvalidArgumentException;
 
-/**
- * Период членства сотрудника в бригаде (ERP). История с датами нужна для ТУРВ (П-ОБ-19).
- * joined_on — первый день в бригаде; left_on — дата выхода: с этого дня сотрудник уже не состоит.
- * Пересекающиеся периоды одного сотрудника в одной бригаде недопустимы («дубли связей», п. 3 «Доработок ERP»).
- */
+/** Период членства сотрудника в бригаде (ERP) */
 class BrigadeMember extends Model
 {
     protected $table = 'brigade_members';

@@ -9,10 +9,7 @@ use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
 
-/**
- * Задание для приложения и его снимок для журнала. Снимок хранит названия на момент события, чтобы история
- * читалась и после переименования или удаления машины, бригады, сотрудника в ERP (п. 10.3, правила 1–2).
- */
+/** Задание для приложения и его снимок для журнала */
 final class TaskPresenter
 {
     public const RELATIONS = ['team.brigade.foreman', 'team.profile', 'creator', 'works.workType', 'activeInvites'];

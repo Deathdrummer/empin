@@ -6,9 +6,7 @@ use App\Production\Rights\Grant;
 use App\Production\Rights\Right;
 use Carbon\CarbonInterface;
 
-/**
- * Доступ к заданию по ТЗ (п. 4.2.1, 4.2.2, П-ПР-05…12, П-ЗД-20…29а). Сервер проверяет его при каждом действии.
- */
+/** Доступ к заданию по ТЗ (п. 4.2.1, 4.2.2, П-ПР-05…12, П-ЗД-20…29а) */
 final class TaskAccess
 {
     public const BASE_CREATOR = 'creator';
@@ -19,10 +17,10 @@ final class TaskAccess
     public const BASE_VIEW_ALL = 'view_all';
 
     /**
-     * Основания видеть задание (П-ЗД-20). Доступ — объединение всех оснований (П-ПР-05).
-     * Закрепление объекта за начальником участка оснований не даёт (П-ЗД-21).
+     * Основания видеть задание (П-ЗД-20)
      *
      * @return string[]
+     *
      */
     public function bases(Viewer $viewer, TaskFacts $task): array
     {
@@ -55,10 +53,7 @@ final class TaskAccess
         return $this->bases($viewer, $task) !== [];
     }
 
-    /**
-     * Изменить задание (права 2 и 4). Глубина проверяется для текущей даты задания, а при переносе — и для новой
-     * (П-ПР-08, раздел 12 п. 28). Права 4 и 5 просмотра не дают (П-ПР-05а).
-     */
+    /** Изменить задание (права 2 и 4) */
     public function canEdit(Viewer $viewer, TaskFacts $task, CarbonInterface $today, ?CarbonInterface $newDate = null): bool
     {
         return $this->canChange($viewer, $task, $today, Right::TaskEditOwn, Right::TaskEditOthers, $newDate);

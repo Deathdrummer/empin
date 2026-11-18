@@ -5,10 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-/**
- * Приглашение в задание (ТЗ, П-ЗД-24): полный просмотр и переписка без права менять задание и отчёт.
- * Отзыв закрывает доступ, сообщения приглашённого остаются; запись не удаляется — история.
- */
+/** Приглашение в задание (ТЗ, П-ЗД-24): полный просмотр и переписка без права менять задание и отчёт */
 class TimesheetContractInvite extends Model
 {
     protected $table = 'timesheet_contract_invites';

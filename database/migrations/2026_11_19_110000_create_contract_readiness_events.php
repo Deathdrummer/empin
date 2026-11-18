@@ -4,11 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-/**
- * История готовности объекта (ТЗ П-ФК-34): каждое изменение — прежнее и новое значение, источник, кто, когда.
- * Источник `erp` — изменение в окне «Производство» договора (решение 19.11.2026); источники приложения (согласование
- * отчёта, прямое изменение и др., П-ФК-32) добавит раздел учёта работ. Актуальное значение — в `contract_production_info`.
- */
+/** История готовности объекта (ТЗ П-ФК-34): каждое изменение — прежнее и новое значение, источник, кто, когда */
 return new class extends Migration {
     public function up(): void
     {

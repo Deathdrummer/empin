@@ -4,10 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-/**
- * Переписка задания без связи (ИС-ЗД-16): телефон повторяет отправку, пока не получит ответ. Метка отправки
- * с телефона (client_uuid) не даёт повтору создать второе сообщение. Самодостаточная: выкладывается по --path.
- */
+/** Переписка задания без связи (ИС-ЗД-16): телефон повторяет отправку, пока не получит ответ */
 return new class extends Migration
 {
     public function up(): void

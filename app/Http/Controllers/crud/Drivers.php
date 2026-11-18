@@ -10,10 +10,7 @@ use App\Production\Objects\ObjectDirectory;
 use App\Traits\HasCrudController;
 use Illuminate\Http\Request;
 
-/**
- * Раздел админки ERP «Производство → Водители» — список водителей из числа сотрудников («Доработки ERP», п. 4).
- * Закрепление за машинами — в разделе «Техника».
- */
+/** Раздел админки ERP «Производство → Водители» — список водителей из числа сотрудников («Доработки ERP», п. 4) */
 class Drivers extends Controller {
 	use HasCrudController;
 

@@ -12,13 +12,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Permission;
 
-/**
- * Настройки прав приложения в ERP (ТЗ, п. 4.2.2; «Доработки ERP», п. 6; интервью 7.2, 8.2, 8.18 — FR-359).
- *
- * У права может быть несколько выдач, у каждой свои настройки (выдачи складываются — Grant). Право с настройками
- * без настроек не выдаётся: глубина «не менее 1 дня или без ограничений», область не пустая. Каждое изменение
- * настроек — в истории прав (кто, кому, что, когда).
- */
+/** Настройки прав приложения в ERP (ТЗ, п. 4.2.2; «Доработки ERP», п. 6; интервью 7.2, 8.2, 8.18 — FR-359) */
 class RightSettings
 {
     public const MAX_DEPTH = 3650;
@@ -49,10 +43,10 @@ class RightSettings
     }
 
     /**
-     * Заменить все выдачи права сотрудника новыми (одной транзакцией). Пустой список — нельзя: право с настройками без
-     * настроек не действует как задумано (интервью 7.2: «обязательная настройка»)
+     * Заменить все выдачи права сотрудника новыми (одной транзакцией)
      *
      * @param array<int, array<string, mixed>> $input
+     *
      */
     public function save(User $user, Right $right, int $permissionId, array $input): void
     {
@@ -67,10 +61,11 @@ class RightSettings
     }
 
     /**
-     * Заменить выдачи права сотрудника готовыми строками настроек (из окна ERP или из типового набора); пустой список —
-     * настроек нет. Изменение — в истории
+     * Заменить выдачи права сотрудника готовыми строками настроек (из окна ERP или из типового набора); пустой список
+     * — настроек нет
      *
      * @param array<int, array<string, mixed>> $rows
+     *
      */
     public function replace(User $user, int $permissionId, array $rows): void
     {
@@ -87,12 +82,7 @@ class RightSettings
         });
     }
 
-    /**
-     * Строка настроек из окна ERP → поля таблицы. Поля, которых у права нет, не сохраняются.
-     *
-     * Вход: depth_unlimited (0/1), depth_days; scope — all | selected (права 4, 5, 9, 6, 17, 18) или
-     * company | all_brigades | brigades | people (право 19); staff_ids, brigade_ids; date_from, date_to (право 19)
-     */
+    /** Строка настроек из окна ERP → поля таблицы */
     public function normalize(Right $right, array $row): array
     {
         $result = ['depth_days' => null, 'scope_all' => false, 'staff_ids' => [], 'brigade_ids' => [], 'all_brigades' => false, 'date_from' => null, 'date_to' => null];

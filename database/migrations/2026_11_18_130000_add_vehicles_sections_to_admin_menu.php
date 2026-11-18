@@ -3,13 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
 
-/**
- * Пункты меню админки ERP «Производство → Техника» и «Производство → Водители» («Доработки ERP», п. 4).
- * Разделы админки хранятся только в базе (`admin_sections`), поэтому их добавляет миграция; группа «Производство» —
- * для справочников ЭМПИН-pro (сюда же войдут «Виды работ»). Доступ: главному администратору сразу, остальным — правами
- * `section-production.vehicles:admin` и `section-production.drivers:admin` («Права → Разделы»).
- * Повторный запуск ничего не дублирует; отдельно выкладывается через `migrate --path`.
- */
+/** Пункты меню админки ERP «Производство → Техника» и «Производство → Водители» («Доработки ERP», п. 4) */
 return new class extends Migration {
     private const ITEMS = [
         'production.vehicles' => 'Техника',

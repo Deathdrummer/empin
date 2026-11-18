@@ -5,10 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-/**
- * Запись журнала изменений приложения (ТЗ, п. 9.4): кто, что и когда сделал, прежнее и новое значение.
- * Всегда конкретный сотрудник, а не должность (П-ПР-06). Записи не меняются и не удаляются.
- */
+/** Запись журнала изменений приложения (ТЗ, п. 9.4): кто, что и когда сделал, прежнее и новое значение */
 class AuditEntry extends Model
 {
     public const ENTITY_TASK = 'task';

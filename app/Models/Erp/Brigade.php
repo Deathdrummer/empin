@@ -9,10 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-/**
- * Бригада (ERP). Постоянный коллектив 2–5 человек; бригадир — только в одной бригаде (П-ОБ-16, П-ОБ-17).
- * Не удаляется, а расформировывается: прежние задания, отчёты и выходы сохраняются (п. 10.3 ТЗ).
- */
+/** Бригада (ERP) */
 class Brigade extends Model
 {
     protected $table = 'brigades';
@@ -51,11 +48,11 @@ class Brigade extends Model
     }
 
     /**
-     * Текущий состав бригады — члены на дату и бригадир. Бригада — «2–5 человек, включая бригадира» (П-ОБ-16):
-     * бригадир входит в состав, даже если в ERP его забыли внести строкой состава
+     * Текущий состав бригады — члены на дату и бригадир
      *
      * @param int[] $brigadeIds
      * @return array<int, int[]> brigade_id => staff_id[]
+     *
      */
     public static function currentStaff(array $brigadeIds, CarbonInterface $date): array
     {

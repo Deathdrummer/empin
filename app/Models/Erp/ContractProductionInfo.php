@@ -7,8 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * Производственные сведения объекта в ERP (п. 1 «Доработок ERP»): ответственный начальник участка и
- * утверждённая готовность. Отдельная таблица, чтобы не менять `contracts`, которой пользуется веб-ERP.
+ * Производственные сведения объекта в ERP (п. 1 «Доработок ERP»): ответственный начальник участка и утверждённая
+ * готовность
  */
 class ContractProductionInfo extends Model
 {

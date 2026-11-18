@@ -7,10 +7,7 @@ use App\Production\Support\DateWindows;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
 
-/**
- * Одна выдача права с настройками (ТЗ, п. 4.2.2). Права независимы (П-ПР-03): каждая выдача проверяется сама по себе,
- * несколько выдач одного права складываются.
- */
+/** Одна выдача права с настройками (ТЗ, п. 4.2.2) */
 final class Grant
 {
     /**
@@ -44,18 +41,13 @@ final class Grant
         );
     }
 
-    /**
-     * Право выдано, а настройки не заданы. По словам заказчика настройка обязательна при выдаче (интервью, ответы
-     * 7.2 и 8.2: «с обязательной настройкой… не менее 1. Или без ограничений»), значит ERP должна требовать её.
-     * Если её всё же нет — страховка: минимальный объём (глубина N = 1, область пустая). Права без настроек
-     * (1, 7, 8, 10–16) действуют полностью.
-     */
+    /** Право выдано, а настройки не заданы */
     public static function withoutSettings(Right $right): self
     {
         return new self(right: $right, depthDays: $right->hasDepth() ? 1 : null);
     }
 
-    /** Глубина права пускает к дате (П-ПР-08). У прав без глубины ограничения по дате нет */
+    /** Глубина права пускает к дате (П-ПР-08) */
     public function allowsDate(CarbonInterface $date, CarbonInterface $today): bool
     {
         return DateWindows::depthAllows($this->right->hasDepth() ? $this->depthDays : null, $date, $today);

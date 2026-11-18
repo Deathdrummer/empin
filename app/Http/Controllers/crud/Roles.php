@@ -241,7 +241,7 @@ class Roles extends Controller {
 
 		$rolePermissions = Role::where('id', $valid['role'])->first()->permissions->keyBy('id');
 
-		// Права приложения с настройками выдаются лично или типовым набором — у роли отдела настроек нет. Уже выданное остаётся видно, чтобы его можно было снять
+		// Права приложения с настройками выдаются лично или типовым набором — у роли отдела настроек нет
 		$permissions = $permissions->reject(fn ($p) => !$rolePermissions->has($p->id) && ($right = Right::fromPermissionName($p->name)) && RightSettings::hasSettings($right))->groupBy('group');
 
 		$this->addSettingToGlobalData('permissions_groups', 'id', 'name');

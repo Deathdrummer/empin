@@ -15,18 +15,14 @@ use App\Production\Support\ProductionException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-/**
- * Производственный модуль: общие сведения для приложения.
- * Приложение хранит их на устройстве и пользуется ими без связи (ТЗ, п. 9.1, правило 1);
- * окончательная проверка прав — на сервере при каждом действии (п. 9.1, правило 4).
- */
+/** Производственный модуль: общие сведения для приложения */
 class ProductionController extends Controller
 {
     public function __construct(private readonly OrgClock $clock)
     {
     }
 
-    /** Серверное время организации: по нему приложение считает окна 05:00–10:00 и пр. (п. 9.2) */
+    /** Серверное время организации: по нему приложение считает окна 05:00–10:00 и пр. */
     public function time(): JsonResponse
     {
         return response()->json($this->timePayload());

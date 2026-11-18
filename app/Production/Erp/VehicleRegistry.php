@@ -8,14 +8,7 @@ use App\Models\Staff;
 use App\Production\Support\ProductionException;
 use Illuminate\Support\Facades\DB;
 
-/**
- * Техника и водители в ERP («Доработки ERP», п. 4; ТЗ П-ОБ-22…23б, ИС-ОБ-07…08а).
- *
- * Машина: наименование (тип), госномер, отметка «не используется» (ремонт, продажа), закреплённые водители — один или
- * несколько. Водитель — сотрудник ERP со своей отметкой «не используется» (уволен, отстранён). С отметкой — не
- * предлагаются в новых заданиях, но остаются в прежних. Удаление мягкое: запись и её номер остаются, прежние задания
- * хранят снимок машины и водителя на момент назначения (П-ОБ-23б). Каждое изменение — в журнале.
- */
+/** Техника и водители в ERP («Доработки ERP», п. 4; ТЗ П-ОБ-22…23б, ИС-ОБ-07…08а) */
 class VehicleRegistry
 {
     public const VEHICLE = 'vehicle';
@@ -57,7 +50,7 @@ class VehicleRegistry
         });
     }
 
-    /** Закрепить водителя за машиной или открепить. За машиной может быть несколько водителей (П-ОБ-23) */
+    /** Закрепить водителя за машиной или открепить */
     public function setVehicleDriver(Vehicle $vehicle, Driver $driver, bool $assigned): void
     {
         $has = $vehicle->drivers()->whereKey($driver->id)->exists();
@@ -72,10 +65,7 @@ class VehicleRegistry
         ErpAudit::write(self::VEHICLE, $vehicle->id, $assigned ? 'driver_assigned' : 'driver_unassigned', null, ['driver' => ErpAudit::person((int) $driver->staff_id)]);
     }
 
-    /**
-     * Внести сотрудника в список водителей. Ранее удалённый водитель возвращается той же записью — у сотрудника
-     * одна запись водителя, номер не меняется
-     */
+    /** Внести сотрудника в список водителей */
     public function addDriver(int $staffId): Driver
     {
         if (!Staff::whereKey($staffId)->where('working', 1)->exists()) {

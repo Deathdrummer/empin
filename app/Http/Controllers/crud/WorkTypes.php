@@ -7,9 +7,7 @@ use App\Production\Erp\WorkTypeRegistry;
 use App\Traits\HasCrudController;
 use Illuminate\Http\Request;
 
-/**
- * Раздел админки ERP «Производство → Виды работ» («Доработки ERP», п. 5). Правила — в WorkTypeRegistry.
- */
+/** Раздел админки ERP «Производство → Виды работ» («Доработки ERP», п. 5) */
 class WorkTypes extends Controller {
 	use HasCrudController;
 

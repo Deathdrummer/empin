@@ -9,9 +9,7 @@ use App\Production\Objects\ObjectDirectory;
 use App\Traits\HasCrudController;
 use Illuminate\Http\Request;
 
-/**
- * Раздел админки ERP «Производство → Техника» («Доработки ERP», п. 4). Правила — в VehicleRegistry.
- */
+/** Раздел админки ERP «Производство → Техника» («Доработки ERP», п. 4) */
 class Vehicles extends Controller {
 	use HasCrudController;
 

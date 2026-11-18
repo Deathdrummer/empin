@@ -5,11 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-/**
- * Одна учётная запись приложения на сотрудника ERP (П-ОБ-21; находка 6): уникальный ключ на `users.staff_id`.
- * На проде 17.11.2026 повторов не было. Если они появились, миграция останавливается и перечисляет сотрудников —
- * лишние учётные записи разбирает администратор, автоматически ничего не удаляется.
- */
+/** Одна учётная запись приложения на сотрудника ERP (П-ОБ-21; находка 6): уникальный ключ на `users.staff_id` */
 return new class extends Migration {
     private const INDEX = 'users_staff_id_unique';
 

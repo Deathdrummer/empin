@@ -8,11 +8,7 @@ use App\Models\TimesheetContract;
 use App\Production\Objects\ObjectDirectory;
 use Illuminate\Support\Collection;
 
-/**
- * Варианты фильтров календаря (п. 6.4): объект, бригада или сотрудник-исполнитель, создатель, техника, водитель.
- * Берутся только из заданий, которые сотрудник видит (TaskVisibility), поэтому фильтр ничего не раскрывает сверх
- * календаря и работает у любого, кто видит задания, в том числе у руководства с правом 6 без прав на справочники.
- */
+/** Варианты фильтров календаря (п. 6.4): объект, бригада или сотрудник-исполнитель, создатель, техника, водитель */
 final class TaskFilterOptions
 {
     public function __construct(private readonly ObjectDirectory $objects)
@@ -39,8 +35,7 @@ final class TaskFilterOptions
         $brigades = Brigade::query()->whereIn('id', $ids('t.brigade_id'))->orderBy('name')->get(['id', 'name'])
             ->map(fn (Brigade $b) => ['id' => $b->id, 'name' => $b->name]);
 
-        // Техника — по снимку в задании: машину могли переименовать или убрать из ERP (П-ОБ-23б). Название берётся
-        // из последнего задания с этой машиной; база отдаёт по одной строке на машину, а не все задания с техникой
+        // Техника — по снимку в задании: машину могли переименовать или убрать из ERP (П-ОБ-23б)
         $latest = (new TaskVisibility())->query($viewer)
             ->whereNotNull('timesheet_contracts.vehicle_id')
             ->select('timesheet_contracts.vehicle_id')

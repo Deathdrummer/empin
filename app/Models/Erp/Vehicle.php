@@ -6,10 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-/**
- * Машина спецтехники (ERP, п. 4 «Доработок ERP»). «Не используется» — не предлагается в новых заданиях,
- * но остаётся в прежних (П-ОБ-23а). Удаление мягкое: прежние задания хранят свой снимок (П-ОБ-23б).
- */
+/** Машина спецтехники (ERP, п. 4 «Доработок ERP») */
 class Vehicle extends Model
 {
     use SoftDeletes;

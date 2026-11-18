@@ -18,11 +18,7 @@ use App\Services\AccountAccess;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-/**
- * Данные ERP для формы задания (ТЗ, раздел 5): объекты, план объекта, исполнители, техника и водители.
- * В приложении они только читаются (п. 5.1). Нужны тому, кто ставит или меняет задания (права 1, 2, 4 — п. 5.2);
- * список пользователей — ещё и для приглашения (право 7).
- */
+/** Данные ERP для формы задания (ТЗ, раздел 5): объекты, план объекта, исполнители, техника и водители */
 class ProductionDirectoryController extends Controller
 {
     private const TASK_FORM_RIGHTS = [Right::TaskCreate, Right::TaskEditOwn, Right::TaskEditOthers];
@@ -74,8 +70,7 @@ class ProductionDirectoryController extends Controller
 
     /**
      * Общий справочник видов работ независимо от плана объекта (ERP9-005; П-ОБ-29, П-ОБ-33): в отчёте по объекту без
-     * плана и для работ вне плана. Удалённые виды работ не предлагаются. Справочник не секретный — нужен всем, кто
-     * работает с отчётами, поэтому отдельного права не требует.
+     * плана и для работ вне плана
      */
     public function workTypes(): JsonResponse
     {
@@ -87,7 +82,7 @@ class ProductionDirectoryController extends Controller
 
     /**
      * Исполнители (п. 5.4 «Выбор исполнителя»): бригады ERP с бригадиром и текущим составом; сотрудники — все, у кого
-     * есть учётная запись в приложении (П-ОБ-21). Тот же список сотрудников — для приглашения в задание (право 7).
+     * есть учётная запись в приложении (П-ОБ-21)
      */
     public function executors(Request $request): JsonResponse
     {

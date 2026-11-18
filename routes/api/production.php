@@ -6,9 +6,7 @@ use App\Http\Controllers\api\ProductionTaskChatController;
 use App\Http\Controllers\api\ProductionTasksController;
 use Illuminate\Support\Facades\Route;
 
-/*
-| Производственный модуль (ТЗ ЭМПИН-pro). Отдельный файл маршрутов, чтобы не смешиваться с прототипом табеля.
-*/
+/* Производственный модуль (ТЗ ЭМПИН-pro) */
 Route::prefix('production')->middleware(['auth:sanctum', 'presence'])->group(function () {
     Route::get('/time', [ProductionController::class, 'time']);
     Route::get('/me', [ProductionController::class, 'me']);

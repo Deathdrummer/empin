@@ -10,10 +10,7 @@ use App\Production\Objects\ObjectDirectory;
 use App\Traits\HasCrudController;
 use Illuminate\Http\Request;
 
-/**
- * Окна «Производство» и «План объекта» из строки договора в админке ERP («Доработки ERP», пп. 1 и 5).
- * Форма договора и её сохранение не меняются. Правила — в ObjectProductionRegistry.
- */
+/** Окна «Производство» и «План объекта» из строки договора в админке ERP («Доработки ERP», пп. 1 и 5) */
 class ContractProduction extends Controller {
 	use HasCrudController;
 
