@@ -67,7 +67,7 @@ class MessengerApiController extends Controller {
         // Состав группы: добавляет любой участник, исключает администратор.
         // Состав объекта: добавляет участник или тот, кто ставит объекты бригадам, убирает — только он.
         return response()->json($this->directory->infoFor($chat, $me) + [
-            'can_write'          => !$chat->isObject() || $this->canComment($request),
+            'can_write'          => !$chat->isObject() || $this->objects->canWrite((int) $chat->contract_id, $me),
             'is_member'          => $member !== null,
             'can_add_members'    => $chat->isGroup() || ($chat->isObject() && ($member !== null || $canAssign)),
             'can_remove_members' => ($chat->isGroup() && $member?->role === MessengerChatMember::ROLE_ADMIN)
@@ -218,7 +218,7 @@ class MessengerApiController extends Controller {
         $opening = empty($validated['before_id']) && empty($validated['after_id']);
 
         if ($chat->isObject()) {
-            $query = $this->objects->commentsQuery((int) $chat->contract_id)
+            $query = $this->objects->commentsQuery((int) $chat->contract_id, $me)
                 ->whereNotIn('id', MessengerHiddenMessage::idsQuery($me, $chat->id))
                 ->with(['profile', 'replyTo.profile', 'timesheetContract.team']);
             [$messages, $hasMore, $hasMoreNewer] = $this->page($query, $validated);
@@ -310,7 +310,7 @@ class MessengerApiController extends Controller {
         $lastRead = (int) ($member->last_read_id ?? 0);
 
         $unread = $chat->isObject()
-            ? $this->objects->commentsQuery((int) $chat->contract_id)->where('id', '>', $lastRead)->where('from_id', '!=', $me)
+            ? $this->objects->commentsQuery((int) $chat->contract_id, $me)->where('id', '>', $lastRead)->where('from_id', '!=', $me)
             : MessengerMessage::where('chat_id', $chat->id)->where('id', '>', $lastRead)->where('from_id', '!=', $me)
                 ->where('type', '!=', MessengerMessage::TYPE_SYSTEM);
         $unread->whereNotIn('id', MessengerHiddenMessage::idsQuery($me, $chat->id));
@@ -395,7 +395,7 @@ class MessengerApiController extends Controller {
             return null;
         }
         if ($chat->isObject()) {
-            $comment = $this->objects->commentsQuery((int) $chat->contract_id)->with(['profile', 'replyTo.profile', 'timesheetContract.team'])->find($id);
+            $comment = $this->objects->commentsQuery((int) $chat->contract_id, $this->me($request))->with(['profile', 'replyTo.profile', 'timesheetContract.team'])->find($id);
 
             return $comment ? response()->json(ObjectCommentResource::forChat($comment, $chat->id)->resolve($request)) : null;
         }
@@ -501,7 +501,7 @@ class MessengerApiController extends Controller {
         $this->afterResponse(fn () => $this->notifier->broadcastToChat($chat, 'message.updated', [
             'chat_id' => $chat->id,
             'message' => $this->forRecipients($chat, $payload, $me),
-        ], $me));
+        ], $me, $this->taskOf($chat, $record)));
 
         return response()->json($payload);
     }
@@ -527,12 +527,13 @@ class MessengerApiController extends Controller {
 
         MediaStorage::delete($record->media);
         $messageId = $record->id;
+        $taskId = $this->taskOf($chat, $record);
         $record->delete();
 
         $this->afterResponse(fn () => $this->notifier->broadcastToChat($chat, 'message.deleted', [
             'chat_id'    => $chat->id,
             'message_id' => $messageId,
-        ], $me));
+        ], $me, $taskId));
 
         return response()->json(['success' => true]);
     }
@@ -557,7 +558,7 @@ class MessengerApiController extends Controller {
         $me = $this->me($request);
         // Только сообщения этого чата: чужие id молча пропускаются
         $ids = ($chat->isObject()
-                ? $this->objects->commentsQuery((int) $chat->contract_id)
+                ? $this->objects->commentsQuery((int) $chat->contract_id, $me)
                 : MessengerMessage::where('chat_id', $chat->id))
             ->whereIn('id', array_unique($validated['message_ids']))
             ->pluck('id')
@@ -618,7 +619,7 @@ class MessengerApiController extends Controller {
         $this->afterResponse(fn () => $this->notifier->broadcastToChat($chat, 'message.updated', [
             'chat_id' => $chat->id,
             'message' => $this->forRecipients($chat, $payload, $me),
-        ], $me));
+        ], $me, $this->taskOf($chat, $record)));
 
         return response()->json([
             'success'   => true,
@@ -645,7 +646,7 @@ class MessengerApiController extends Controller {
 
         // Не дальше последнего существующего сообщения этого чата
         $lastId = ($chat->isObject()
-                ? $this->objects->commentsQuery((int) $chat->contract_id)
+                ? $this->objects->commentsQuery((int) $chat->contract_id, $me)
                 : MessengerMessage::where('chat_id', $chat->id))
             ->where('id', '<=', $validated['message_id'])
             ->max('id');
@@ -754,11 +755,22 @@ class MessengerApiController extends Controller {
         $record->save();
         $record->timestamps = true;
 
-        $pinned = $this->directory->pinnedMessages($chat);
-        $this->afterResponse(fn () => $this->notifier->broadcastToChat($chat, 'chat.pinned', [
-            'chat_id'         => $chat->id,
-            'pinned_messages' => $pinned,
-        ]));
+        if ($chat->isObject()) {
+            $this->afterResponse(function () use ($chat) {
+                foreach ($chat->memberIds() as $staffId) {
+                    $this->notifier->broadcast([$staffId], 'chat.pinned', [
+                        'chat_id'         => $chat->id,
+                        'pinned_messages' => $this->directory->pinnedMessages($chat, $staffId),
+                    ]);
+                }
+            });
+        } else {
+            $pinned = $this->directory->pinnedMessages($chat);
+            $this->afterResponse(fn () => $this->notifier->broadcastToChat($chat, 'chat.pinned', [
+                'chat_id'         => $chat->id,
+                'pinned_messages' => $pinned,
+            ]));
+        }
 
         return response()->json(['pinned_messages' => $this->directory->pinnedMessages($chat, $this->me($request))]);
     }
@@ -840,7 +852,7 @@ class MessengerApiController extends Controller {
         }
 
         $records = ($source->isObject()
-                ? $this->objects->commentsQuery((int) $source->contract_id)
+                ? $this->objects->commentsQuery((int) $source->contract_id, $me)
                 : MessengerMessage::where('chat_id', $source->id)->where('type', '!=', MessengerMessage::TYPE_SYSTEM))
             ->whereIn('id', $validated['message_ids'])
             ->orderBy('id')
@@ -1035,6 +1047,7 @@ class MessengerApiController extends Controller {
                         $join->on('c.contract_id', '=', 'tc.contract_id')->where('c.type', MessengerChat::TYPE_OBJECT);
                     })
                     ->when($chat, fn ($q) => $q->where('c.id', $chat->id), fn ($q) => $q->whereIn('c.id', MessengerChatMember::where('staff_id', $me)->select('chat_id')))
+                    ->whereIn('timesheet_chat.timesheet_contract_id', $this->objects->visibleTasks($me))
                     ->where('timesheet_chat.message', 'like', $like)
                     ->tap(fn ($q) => MessengerHiddenMessage::excludeFor($q, $me, 'c.id', 'timesheet_chat.id'))
                     ->with('profile'),
@@ -1138,7 +1151,7 @@ class MessengerApiController extends Controller {
             }
 
             $record = $chat->isObject()
-                ? $this->objects->commentsQuery((int) $chat->contract_id)->whereKey($messageId)->first()
+                ? $this->objects->commentsQuery((int) $chat->contract_id, $this->me($request))->whereKey($messageId)->first()
                 : MessengerMessage::where('chat_id', $chat->id)->whereKey($messageId)->first();
 
             return [$chat, $record];
@@ -1148,6 +1161,11 @@ class MessengerApiController extends Controller {
         $chat = $record?->chat;
 
         return $chat && $chat->canAccess($this->me($request)) ? [$chat, $record] : [null, null];
+    }
+
+    /** Задание комментария в чате объекта — события о нём получают только видящие задание; в остальных чатах null */
+    private function taskOf(MessengerChat $chat, $record): ?int {
+        return $chat->isObject() ? (int) $record->timesheet_contract_id : null;
     }
 
     private function messagePayload(Request $request, MessengerChat $chat, $record): array {
@@ -1220,27 +1238,22 @@ class MessengerApiController extends Controller {
      * Комментарий табеля из чата объекта: попадает в объект на ближайший к сегодня день
      */
     private function addObjectComment(Request $request, MessengerChat $chat, array $validated) {
-        if (!$this->canComment($request)) {
-            return response()->json(['error' => 'У вас нет прав для комментариев к объектам'], 403);
-        }
-
         $text = $validated['message'] ?? '';
         if (trim($text) === '' && !$request->hasFile('media')) {
             return response()->json(['error' => 'Необходимо указать текст сообщения или прикрепить медиа'], 422);
         }
 
-        $contractId = (int) $chat->contract_id;
-        $target = $this->objects->targetTimesheetContract($contractId);
-        if (!$target) {
-            return response()->json(['error' => 'Объекта нет в табеле'], 422);
-        }
-
-        $replyToId = $validated['reply_to_id'] ?? null;
-        if ($replyToId && !$this->objects->commentsQuery($contractId)->whereKey($replyToId)->exists()) {
-            return response()->json(['error' => 'Сообщение для ответа не найдено'], 422);
-        }
-
+        // Сообщение — в задание, которое автор видит (П-ЗД-23): ответ — в задание исходного сообщения
         $me = $this->me($request);
+        $contractId = (int) $chat->contract_id;
+        $replyToId = $validated['reply_to_id'] ?? null;
+        $target = $this->objects->targetFor($contractId, $me, $replyToId);
+        if (!$target) {
+            return $replyToId
+                ? response()->json(['error' => 'Сообщение для ответа не найдено'], 422)
+                : response()->json(['error' => 'У вас нет заданий на этом объекте: писать в его переписку нельзя'], 403);
+        }
+
         $media = MediaStorage::store($request, 'timesheet/comments');
 
         $comment = $target->chat()->create([
@@ -1259,7 +1272,7 @@ class MessengerApiController extends Controller {
         $sender = Staff::find($me);
         $event = array_merge($payload, ['self' => false]);
 
-        $this->afterResponse(fn () => $this->notifier->newMessage($chat, $sender, $event, $preview));
+        $this->afterResponse(fn () => $this->notifier->newMessage($chat, $sender, $event, $preview, [], (int) $target->id));
 
         return response()->json($payload, 201);
     }

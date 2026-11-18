@@ -35,8 +35,11 @@ class ChatMedia
      */
     public function list(MessengerChat $chat, string $kind, ?int $beforeId, int $limit, ?int $hiddenFor = null): array
     {
+        if ($chat->isObject() && $hiddenFor === null) {
+            return ['items' => [], 'next_before_id' => null];
+        }
         $base = $chat->isObject()
-            ? $this->objects->commentsQuery((int) $chat->contract_id)
+            ? $this->objects->commentsQuery((int) $chat->contract_id, $hiddenFor)
             : MessengerMessage::where('chat_id', $chat->id)->where('type', '!=', MessengerMessage::TYPE_SYSTEM);
         if ($kind === 'links') {
             $base->whereNotNull('message')->where('message', '!=', '');

@@ -40,10 +40,11 @@ class TimesheetApiController extends Controller {
 
             if ($action === 'deleted') {
                 $commentId = $comment->id;
+                $taskId = (int) $comment->timesheet_contract_id;
                 app()->terminating(fn () => $notifier->broadcastToChat($chat, 'message.deleted', [
                     'chat_id'    => $chat->id,
                     'message_id' => $commentId,
-                ], $me));
+                ], $me, $taskId));
 
                 return;
             }
@@ -59,12 +60,12 @@ class TimesheetApiController extends Controller {
             if ($action === 'created') {
                 $preview = app(ChatDirectory::class)->previewOf($comment, true);
                 $sender = Staff::find($me);
-                app()->terminating(fn () => $notifier->newMessage($chat, $sender, $payload, $preview));
+                app()->terminating(fn () => $notifier->newMessage($chat, $sender, $payload, $preview, [], (int) $comment->timesheet_contract_id));
             } else {
                 app()->terminating(fn () => $notifier->broadcastToChat($chat, 'message.updated', [
                     'chat_id' => $chat->id,
                     'message' => $payload,
-                ], $me));
+                ], $me, (int) $comment->timesheet_contract_id));
             }
         } catch (\Throwable $error) {
             // Комментарий уже сохранён: чат объекта увидит его при следующей загрузке

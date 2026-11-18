@@ -13,11 +13,15 @@ use Illuminate\Database\Eloquent\Builder;
  */
 final class TaskVisibility
 {
-    /** @return Builder<TimesheetContract> задания с присоединённым исполнителем на дату (`t`) */
-    public function query(Viewer $viewer): Builder
+    /**
+     * @param bool $withViewAll false — только личные основания (создатель, исполнитель, бригада, водитель,
+     *                          приглашение), без права 6: по ним сотрудник участвует в чате объекта
+     * @return Builder<TimesheetContract> задания с присоединённым исполнителем на дату (`t`)
+     */
+    public function query(Viewer $viewer, bool $withViewAll = true): Builder
     {
         $me = $viewer->staffId;
-        $viewAll = $viewer->rights->grantsOf(Right::TaskViewAll);
+        $viewAll = $withViewAll ? $viewer->rights->grantsOf(Right::TaskViewAll) : collect();
         $seesEverything = $viewAll->contains(fn (Grant $g) => $g->scopeAll);
         $viewCreators = $viewAll->flatMap(fn (Grant $g) => $g->staffIds)->unique()->values()->all();
         $viewBrigades = $viewAll->flatMap(fn (Grant $g) => $g->brigadeIds)->unique()->values()->all();

@@ -247,8 +247,12 @@ class ChatDirectory
      */
     public function pinnedMessages(MessengerChat $chat, ?int $hiddenFor = null): array
     {
+        // В объекте закреплённое — только из видимой сотруднику переписки; без сотрудника — ничего
+        if ($chat->isObject() && $hiddenFor === null) {
+            return [];
+        }
         $query = $chat->isObject()
-            ? $this->objects->commentsQuery((int) $chat->contract_id)
+            ? $this->objects->commentsQuery((int) $chat->contract_id, $hiddenFor)
             : MessengerMessage::where('chat_id', $chat->id);
         if ($hiddenFor !== null) {
             $query->whereNotIn('id', MessengerHiddenMessage::idsQuery($hiddenFor, $chat->id));

@@ -9,48 +9,122 @@ use App\Models\MessengerHiddenMessage;
 use App\Models\MessengerSetting;
 use App\Models\TimesheetChat;
 use App\Models\TimesheetContract;
+use App\Models\Erp\BrigadeMember;
+use App\Production\Support\OrgClock;
+use App\Production\Tasks\TaskAccess;
+use App\Production\Tasks\TaskFacts;
+use App\Production\Tasks\TaskVisibility;
+use App\Production\Tasks\Viewer;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Чаты объектов: комментарии табеля к договору за все дни и все бригады одной лентой.
+ * Чаты объектов: переписка заданий объекта одной лентой (ТЗ п. 1.2 — переписка задания строится на мессенджере).
  *
- * Участники — мастера бригад, которым объект поставлен в табеле (за любой день), и добавленные вручную.
- * Табель сверяется при загрузке списка чатов, перед рассылкой нового сообщения и в сведениях о чате,
- * поэтому подхватываются назначения, сделанные и в приложении, и на сайте.
- * Убранный из чата (или вышедший сам) возвращается, только если объект поставят его бригаде снова.
- * Открыть и написать в чат любого объекта может любой сотрудник — как в табеле.
+ * Каждый видит в ленте только переписку заданий, которые видит сам (П-ЗД-20…24; решение по находке 11, 18.11):
+ * лента, список чатов, непрочитанные, поиск, медиа, закреплённые и события. Писать — в доступное задание объекта.
+ * Участники — те, у кого есть личное основание видеть задание объекта (создатель, исполнитель, член бригады,
+ * водитель, приглашённый), и добавленные вручную; право «Просматривать все задания» в участники не добавляет
+ * (такой сотрудник открывает чат поиском). Убранный из чата возвращается, только если появится новое задание.
  */
 class ObjectChats
 {
-    /** Комментарии объекта (договора) за все дни */
-    public function commentsQuery(int $contractId): Builder
+    /** @var array<int, Viewer> сотрудник => права и бригады на сегодня (в пределах запроса) */
+    private array $viewers = [];
+
+    public function __construct(private readonly OrgClock $clock, private readonly TaskAccess $access)
     {
-        return TimesheetChat::query()->whereIn(
-            'timesheet_contract_id',
-            TimesheetContract::where('contract_id', $contractId)->select('id')
-        );
     }
 
+    /** Комментарии объекта (договора), которые видит сотрудник: только переписка видимых ему заданий */
+    public function commentsQuery(int $contractId, int $staffId): Builder
+    {
+        return TimesheetChat::query()->whereIn('timesheet_contract_id', $this->visibleTasks($staffId, $contractId));
+    }
+
+    /** Граница «прочитано до» — по всем комментариям объекта: это номер, а не содержимое */
     public function lastCommentId(int $contractId): ?int
     {
-        $id = $this->commentsQuery($contractId)->max('id');
+        $id = TimesheetChat::query()
+            ->whereIn('timesheet_contract_id', TimesheetContract::where('contract_id', $contractId)->select('id'))
+            ->max('id');
 
         return $id !== null ? (int) $id : null;
     }
 
+    /** Подзапрос id заданий, которые сотрудник видит (по объекту — если указан) */
+    public function visibleTasks(int $staffId, ?int $contractId = null): Builder
+    {
+        return (new TaskVisibility())->query($this->viewer($staffId))
+            ->when($contractId !== null, fn ($q) => $q->where('timesheet_contracts.contract_id', $contractId))
+            ->select('timesheet_contracts.id');
+    }
+
+    /** Есть ли у сотрудника видимое задание на объекте — тогда он может писать в чат объекта (П-ЗД-23) */
+    public function canWrite(int $contractId, int $staffId): bool
+    {
+        return $this->visibleTasks($staffId, $contractId)->exists();
+    }
+
     /**
-     * Добавить сотрудника в чаты объектов, которые табель поставил его бригадам.
-     * Новый участник не получает старые комментарии непрочитанными.
+     * Куда записать сообщение из чата объекта: ответ — в задание исходного сообщения; иначе — в видимое сотруднику
+     * задание на сегодня или ближайший прошедший день, а если объект только запланирован — ближайший будущий
+     */
+    public function targetFor(int $contractId, int $staffId, ?int $replyToId = null): ?TimesheetContract
+    {
+        if ($replyToId) {
+            $reply = $this->commentsQuery($contractId, $staffId)->whereKey($replyToId)->first();
+
+            return $reply ? TimesheetContract::find($reply->timesheet_contract_id) : null;
+        }
+        $today = $this->clock->today()->toDateString();
+        $base = fn () => TimesheetContract::query()
+            ->select('timesheet_contracts.*')
+            ->join('timesheet_teams as t', 't.id', '=', 'timesheet_contracts.team_id')
+            ->whereIn('timesheet_contracts.id', $this->visibleTasks($staffId, $contractId));
+
+        return $base()->where('t.day', '<=', $today)->orderByDesc('t.day')->orderByDesc('timesheet_contracts.id')->first()
+            ?? $base()->where('t.day', '>', $today)->orderBy('t.day')->orderBy('timesheet_contracts.id')->first();
+    }
+
+    /**
+     * Кому из сотрудников можно показать сообщение задания: события и уведомления уходят только тем, кто видит
+     * задание (П-ЗД-20); после отзыва приглашения или смены исполнителя новых сообщений прежние не получают
+     *
+     * @param int[] $staffIds
+     * @return int[]
+     */
+    public function whoCanSee(int $taskId, array $staffIds): array
+    {
+        $task = TimesheetContract::find($taskId);
+        if (!$task) {
+            return [];
+        }
+        $facts = TaskFacts::fromModel($task);
+
+        return array_values(array_filter(
+            array_map('intval', $staffIds),
+            fn (int $staffId) => $this->access->canView($this->viewer($staffId), $facts)
+        ));
+    }
+
+    private function viewer(int $staffId): Viewer
+    {
+        return $this->viewers[$staffId] ??= Viewer::load($staffId, $this->clock->today());
+    }
+
+    /**
+     * Добавить сотрудника в чаты объектов, где у него есть задание по личному основанию (создатель, исполнитель,
+     * член бригады, водитель, приглашённый). Новый участник не получает старые комментарии непрочитанными.
      */
     public function syncFollowedObjects(int $staffId): void
     {
-        $assigned = $this->assignments()
-            ->where('t.staff_id', $staffId)
+        $assigned = (new TaskVisibility())->query($this->viewer($staffId), withViewAll: false)
             ->groupBy('timesheet_contracts.contract_id')
             ->select('timesheet_contracts.contract_id', DB::raw('MAX(timesheet_contracts.created_at) as assigned_at'))
+            ->toBase()
             ->pluck('assigned_at', 'contract_id');
         if ($assigned->isEmpty()) {
             return;
@@ -78,7 +152,8 @@ class ObjectChats
     }
 
     /**
-     * Добавить в чат объекта всех мастеров бригад, которым объект поставлен в табеле
+     * Добавить в чат объекта всех, у кого есть личное основание видеть его задания: создатели, исполнители-сотрудники,
+     * текущие члены бригад-исполнителей, водители, приглашённые (П-ЗД-20, без права «Просматривать все задания»)
      */
     public function syncMembers(MessengerChat $chat): void
     {
@@ -86,11 +161,7 @@ class ObjectChats
             return;
         }
 
-        $assigned = $this->assignments()
-            ->where('timesheet_contracts.contract_id', $chat->contract_id)
-            ->groupBy('t.staff_id')
-            ->select('t.staff_id', DB::raw('MAX(timesheet_contracts.created_at) as assigned_at'))
-            ->pluck('assigned_at', 'staff_id');
+        $assigned = $this->participants((int) $chat->contract_id);
 
         $joined = MessengerChatMember::where('chat_id', $chat->id)->pluck('staff_id')->flip();
         $removedAt = MessengerChatRemoval::where('chat_id', $chat->id)->pluck('created_at', 'staff_id');
@@ -158,10 +229,61 @@ class ObjectChats
             ->update(['muted' => $mute]);
     }
 
-    /** Назначения объектов бригадам: строки табеля с мастером бригады (t.staff_id) */
-    private function assignments(): Builder
+    /**
+     * Сотрудники с личным основанием на задания объекта и время их последнего задания
+     *
+     * @return Collection<int, string> staff_id => assigned_at
+     */
+    private function participants(int $contractId): Collection
     {
-        return TimesheetContract::query()->join('timesheet_teams as t', 't.id', '=', 'timesheet_contracts.team_id');
+        $tasks = TimesheetContract::query()
+            ->join('timesheet_teams as t', 't.id', '=', 'timesheet_contracts.team_id')
+            ->where('timesheet_contracts.contract_id', $contractId)
+            ->get(['timesheet_contracts.id', 'timesheet_contracts.created_at', 'timesheet_contracts.creator_staff_id',
+                'timesheet_contracts.driver_staff_id', 't.staff_id', 't.brigade_id']);
+        if ($tasks->isEmpty()) {
+            return collect();
+        }
+
+        $result = collect();
+        $note = function ($staffId, $at) use (&$result) {
+            if (!$staffId) {
+                return;
+            }
+            $staffId = (int) $staffId;
+            $at = (string) $at;
+            if (!isset($result[$staffId]) || $result[$staffId] < $at) {
+                $result[$staffId] = $at;
+            }
+        };
+
+        $members = BrigadeMember::activeOn($this->clock->today())
+            ->whereIn('brigade_id', $tasks->pluck('brigade_id')->filter()->unique())
+            ->get(['brigade_id', 'staff_id'])
+            ->groupBy('brigade_id');
+        $invites = DB::table('timesheet_contract_invites')
+            ->whereIn('timesheet_contract_id', $tasks->pluck('id'))
+            ->whereNull('revoked_at')
+            ->get(['timesheet_contract_id', 'staff_id'])
+            ->groupBy('timesheet_contract_id');
+
+        foreach ($tasks as $task) {
+            $at = $task->created_at;
+            $note($task->creator_staff_id, $at);
+            $note($task->driver_staff_id, $at);
+            if ($task->brigade_id) {
+                foreach ($members->get($task->brigade_id, collect()) as $member) {
+                    $note($member->staff_id, $at);
+                }
+            } else {
+                $note($task->staff_id, $at);
+            }
+            foreach ($invites->get($task->id, collect()) as $invite) {
+                $note($invite->staff_id, $at);
+            }
+        }
+
+        return $result;
     }
 
     /**
@@ -210,7 +332,8 @@ class ObjectChats
     }
 
     /**
-     * Последний комментарий каждого объекта; $hiddenFor — без удалённых этим сотрудником «у себя» (список чатов)
+     * Последний комментарий каждого объекта; $hiddenFor — для списка чатов этого сотрудника: только переписка
+     * видимых ему заданий и без удалённого им «у себя». Без него — граница прочитанного для новых участников
      *
      * @param int[] $contractIds
      * @return array<int, int> contract_id => comment id
@@ -224,6 +347,7 @@ class ObjectChats
         return TimesheetChat::query()
             ->join('timesheet_contracts as tc', 'tc.id', '=', 'timesheet_chat.timesheet_contract_id')
             ->whereIn('tc.contract_id', $contractIds)
+            ->when($hiddenFor !== null, fn ($q) => $q->whereIn('timesheet_chat.timesheet_contract_id', $this->visibleTasks($hiddenFor)))
             ->when($hiddenFor !== null, fn ($q) => $q
                 ->join('messenger_chats as c', function ($join) {
                     $join->on('c.contract_id', '=', 'tc.contract_id')->where('c.type', MessengerChat::TYPE_OBJECT);
@@ -252,6 +376,7 @@ class ObjectChats
                 $join->on('m.chat_id', '=', 'c.id')->where('m.staff_id', $staffId);
             })
             ->when($onlyAudible, fn ($q) => $q->where('m.muted', false)->whereNull('m.archived_at'))
+            ->whereIn('timesheet_chat.timesheet_contract_id', $this->visibleTasks($staffId))
             ->where('timesheet_chat.from_id', '!=', $staffId)
             ->whereRaw('timesheet_chat.id > COALESCE(m.last_read_id, 0)')
             ->tap(fn ($q) => MessengerHiddenMessage::excludeFor($q, $staffId, 'c.id', 'timesheet_chat.id'))
@@ -260,22 +385,6 @@ class ObjectChats
             ->pluck('unread', 'id')
             ->map(fn ($count) => (int) $count)
             ->all();
-    }
-
-    /**
-     * Куда записать комментарий из мессенджера: объект в табеле на сегодня или ближайший прошедший день,
-     * а если объект только запланирован — ближайший будущий день
-     */
-    public function targetTimesheetContract(int $contractId): ?TimesheetContract
-    {
-        $today = today()->toDateString();
-        $base = fn () => TimesheetContract::query()
-            ->select('timesheet_contracts.*')
-            ->join('timesheet_teams as t', 't.id', '=', 'timesheet_contracts.team_id')
-            ->where('timesheet_contracts.contract_id', $contractId);
-
-        return $base()->where('t.day', '<=', $today)->orderByDesc('t.day')->orderByDesc('timesheet_contracts.id')->first()
-            ?? $base()->where('t.day', '>', $today)->orderBy('t.day')->orderBy('timesheet_contracts.id')->first();
     }
 
     /**

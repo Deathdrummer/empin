@@ -52,27 +52,32 @@ class MessengerNotifier
     }
 
     /**
-     * Всем участникам чата, кроме $exceptStaffId
+     * Всем участникам чата, кроме $exceptStaffId. $taskId — событие о сообщении задания в чате объекта: его получают
+     * только те, кто видит это задание (П-ЗД-20…24)
      */
-    public function broadcastToChat(MessengerChat $chat, string $event, array $payload, ?int $exceptStaffId = null): void
+    public function broadcastToChat(MessengerChat $chat, string $event, array $payload, ?int $exceptStaffId = null, ?int $taskId = null): void
     {
-        $this->broadcast(
-            array_filter($chat->memberIds(), fn (int $id) => $id !== $exceptStaffId),
-            $event,
-            $payload
-        );
+        $recipients = array_filter($chat->memberIds(), fn (int $id) => $id !== $exceptStaffId);
+        if ($chat->isObject() && $taskId) {
+            $recipients = $this->objects->whoCanSee($taskId, $recipients);
+        }
+        $this->broadcast($recipients, $event, $payload);
     }
 
     /**
      * Новое сообщение: событие всем участникам, кроме автора; push — тем, у кого чат не «без звука».
      * Упомянутым через @ push приходит всегда.
-     * В чате объекта состав сначала сверяется с табелем: сообщение получат и мастера, ещё не открывавшие «Чаты».
+     * В чате объекта состав сначала сверяется с заданиями объекта, а событие и push получают только те, кто видит
+     * задание сообщения ($taskId, П-ЗД-20…24).
      *
      * @param int[] $mentionIds
      */
-    public function newMessage(MessengerChat $chat, Staff $sender, array $message, string $preview, array $mentionIds = []): void
+    public function newMessage(MessengerChat $chat, Staff $sender, array $message, string $preview, array $mentionIds = [], ?int $taskId = null): void
     {
         $this->objects->syncMembers($chat);
+        $allowed = $chat->isObject() && $taskId
+            ? $this->objects->whoCanSee($taskId, $chat->memberIds())
+            : null;
 
         // Архив, как в Telegram: чат со звуком возвращается в основной список при новом сообщении,
         // «без звука» — остаётся в архиве
@@ -84,6 +89,7 @@ class MessengerNotifier
 
         $members = MessengerChatMember::where('chat_id', $chat->id)
             ->where('staff_id', '!=', $sender->id)
+            ->when($allowed !== null, fn ($q) => $q->whereIn('staff_id', $allowed))
             ->get();
 
         $this->broadcast($members->pluck('staff_id')->all(), 'message.created', [
