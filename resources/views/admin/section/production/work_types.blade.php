@@ -1,10 +1,5 @@
 <section>
 	<x-card id="workTypesCard" loading>
-		<p class="mb10px color-gray fz12px">
-			Общий справочник видов работ ЭМПИН-pro: из него составляются планы объектов, задания и отчёты. Новые виды работ добавляются только здесь.
-			Единицу измерения у вида работ, который уже есть в планах или заданиях, изменить нельзя — заведите новый вид работ.
-			Удалённый вид работ остаётся в прежних планах и заданиях.
-		</p>
 		<div class="mb10px w40rem">
 			<x-input id="workTypesSearch" group="normal" class="w100" placeholder="Поиск по наименованию" icon="magnifying-glass" />
 		</div>
@@ -92,7 +87,7 @@
 				saveWait.destroy();
 				if (data) {
 					$(row).replaceWith(data);
-					$.notify('Вид работ добавлен');
+					$.notify('Запись успешно сохранена!');
 					return;
 				}
 				const err = res?.error || container?.response?.data;
@@ -123,7 +118,7 @@
 			let row = $(btn).closest('tr');
 			ddrPopup({
 				width: 420,
-				html: 'Удалить вид работ из справочника? В новые планы и задания он не попадёт, прежние планы и задания его сохранят.',
+				html: 'Удалить вид работ?',
 				buttons: ['ui.cancel', {title: 'Удалить', variant: 'red', action: 'workTypeRemoveAction'}],
 				centerMode: true,
 				winClass: 'ddrpopup_dialog color-red'
@@ -133,7 +128,7 @@
 					destroy(id, (stat, container, res) => {
 						if (stat) {
 							remove(row);
-							$.notify('Вид работ удалён из справочника');
+							$.notify('Запись удалена');
 						} else {
 							$.notify(errorText(res?.error || container), 'error');
 						}

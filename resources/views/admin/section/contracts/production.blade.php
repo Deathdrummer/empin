@@ -35,7 +35,7 @@
 					.map((_, el) => Number($(el).attr('brigadeid'))).get();
 				wait();
 				call('save_info', {contract: id, responsible_staff_id: box.find('[name="responsible_staff_id"]').val() || null, brigade_ids: brigadeIds})
-					.then(() => { $.notify('Сохранено: в приложении действует сразу'); close(); })
+					.then(() => { $.notify('Запись успешно сохранена!'); close(); })
 					.catch((e) => { wait(false); $.notify(errorText(e), 'error'); });
 			}
 		});
@@ -79,7 +79,7 @@
 				wait();
 				call('save_plan', {contract: id, items})
 					.then((res) => {
-						$.notify(res?.changed ? 'План сохранён: новая редакция действует в приложении сразу' : 'Изменений нет — новая редакция не создана');
+						$.notify(res?.changed ? 'План сохранён' : 'Изменений нет');
 						loadData('ajax/contract_production/plan', {contract: id}, () => wait(false));
 					})
 					.catch((e) => { wait(false); $.notify(errorText(e), 'error'); });

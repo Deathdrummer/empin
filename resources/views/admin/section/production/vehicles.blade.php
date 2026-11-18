@@ -1,10 +1,5 @@
 <section>
 	<x-card id="vehiclesCard" loading>
-		<p class="mb10px color-gray fz12px">
-			Спецтехника ЭМПИН-pro — общий ресурс, за бригадами не закреплена. За машиной закрепляется один или несколько водителей:
-			в задании закреплённый водитель подставляется сам. Машина с отметкой «не используется» (ремонт, продажа) не предлагается в новых заданиях,
-			но остаётся в прежних. После удаления прежние задания сохраняют наименование, госномер и водителя на момент назначения.
-		</p>
 		<div class="table">
 			<table class="w100">
 				<thead>
@@ -86,7 +81,7 @@
 				saveWait.destroy();
 				if (data) {
 					$(row).replaceWith(data);
-					$.notify('Машина добавлена. Закрепите за ней водителей');
+					$.notify('Запись успешно сохранена!');
 					return;
 				}
 				const err = res?.error || container?.response?.data;
@@ -117,7 +112,7 @@
 			let row = $(btn).closest('tr');
 			ddrPopup({
 				width: 420,
-				html: 'Удалить машину из справочника? В новых заданиях она не будет предлагаться, прежние задания сохранят её данные. Если машина в ремонте — лучше отметить «не используется».',
+				html: 'Удалить машину?',
 				buttons: ['ui.cancel', {title: 'Удалить', variant: 'red', action: 'vehicleRemoveAction'}],
 				centerMode: true,
 				winClass: 'ddrpopup_dialog color-red'
@@ -127,7 +122,7 @@
 					destroy(id, (stat, container, res) => {
 						if (stat) {
 							remove(row);
-							$.notify('Машина удалена из справочника');
+							$.notify('Запись удалена');
 						} else {
 							$.notify(errorText(res?.error || container), 'error');
 						}

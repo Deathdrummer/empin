@@ -6,7 +6,7 @@
 		<td>
 			<x-input name="plate" class="w100" placeholder="Госномер" />
 		</td>
-		<td><p class="color-gray">водителей можно закрепить после сохранения</p></td>
+		<td><span class="color-gray">-</span></td>
 		<td class="center">
 			<x-checkbox name="not_used" group="large" />
 		</td>

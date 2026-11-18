@@ -228,7 +228,7 @@ class BrigadeRegistry
 
             return;
         }
-        throw ProductionException::invalid("Сотрудник уже бригадир бригады «{$other->name}»: бригадиром можно быть только в одной бригаде");
+        throw ProductionException::invalid("Сотрудник уже бригадир бригады «{$other->name}»");
     }
 
     /**
@@ -261,7 +261,7 @@ class BrigadeRegistry
     private function assertWorking(Brigade $brigade): void
     {
         if ($brigade->disbanded_on) {
-            throw ProductionException::invalid('Бригада расформирована: сначала отмените расформирование');
+            throw ProductionException::invalid('Бригада расформирована');
         }
     }
 

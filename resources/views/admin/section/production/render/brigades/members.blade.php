@@ -1,7 +1,6 @@
 <div brigademembers="{{$brigade->id}}">
 	<p class="mb10px">
 		Бригадир: <strong>{{$foremanName ?? 'не назначен'}}</strong>.
-		<span class="color-gray fz12px">Бригадир назначается из текущего состава звёздочкой. Исключить — указать дату «Вышел с» и сохранить. Даты можно исправлять и задним числом: по ним строится табель.</span>
 	</p>
 
 	<div class="table">
@@ -50,7 +49,7 @@
 	</div>
 
 	<div class="mt15px" brigadetransfer hidden>
-		<p class="mb5px"><strong>Перевод <span brigadetransfername></span></strong> <span class="color-gray fz12px">выход из этой бригады и вступление в выбранную — той же датой</span></p>
+		<p class="mb5px"><strong>Перевод <span brigadetransfername></span></strong></p>
 		<x-input-group group="small">
 			<div class="d-flex align-items-center">
 				<x-select name="to" class="w30rem mr10px" :options="$targets" choose="В какую бригаду" empty="Нет других действующих бригад" choose-empty empty-has-value />
@@ -63,7 +62,7 @@
 
 	@unless($brigade->disbanded_on)
 		<div class="mt15px" brigadeadd>
-			<p class="mb5px"><strong>Добавить в состав</strong> <span class="color-gray fz12px">сотрудник может состоять в нескольких бригадах</span></p>
+			<p class="mb5px"><strong>Добавить в состав</strong></p>
 			<x-input-group group="small">
 				<div class="d-flex align-items-center">
 					<x-select name="staff_id" class="w40rem mr10px" :options="$data['staff'] ?? []" choose="Выберите сотрудника" empty="Нет сотрудников" choose-empty empty-has-value />
@@ -73,6 +72,6 @@
 			</x-input-group>
 		</div>
 	@else
-		<p class="mt15px color-red">Бригада расформирована с {{$brigade->disbanded_on->format('d.m.Y')}}: добавлять в состав и назначать бригадира нельзя, даты истории исправлять можно.</p>
+		<p class="mt15px color-red">Бригада расформирована с {{$brigade->disbanded_on->format('d.m.Y')}}</p>
 	@endunless
 </div>

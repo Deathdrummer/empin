@@ -37,7 +37,7 @@ class WorkTypeRegistry
         }
         $this->assertNameFree($after['name'], $workType->id);
         if ($after['unit'] !== $before['unit'] && $this->isUsed($workType->id)) {
-            throw ProductionException::invalid("Единицу измерения не изменить: вид работ уже есть в планах или заданиях в «{$before['unit']}». Заведите новый вид работ");
+            throw ProductionException::invalid('Единицу измерения не изменить: вид работ уже есть в планах или заданиях');
         }
         $workType->update($after);
         ErpAudit::write(self::ENTITY, $workType->id, 'updated', $before, $after);
@@ -52,7 +52,7 @@ class WorkTypeRegistry
         $objects = $this->usage([$workType->id])[$workType->id]['plans'] ?? 0;
         if ($objects > 0) {
             $where = $this->oneObject($objects) ? "в действующем плане {$objects} объекта" : "в действующих планах {$objects} объектов";
-            throw ProductionException::invalid("Вид работ есть {$where}: сначала уберите его из плана");
+            throw ProductionException::invalid("Вид работ есть {$where}");
         }
         $workType->delete();
         ErpAudit::write(self::ENTITY, $workType->id, 'deleted', ['name' => $workType->name, 'unit' => $workType->unit], null);

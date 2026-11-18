@@ -3,10 +3,6 @@
 	$qty = fn ($q) => rtrim(rtrim(number_format($q, 3, ',', ' '), '0'), ',');
 @endphp
 <div contractplan="{{$contract->id}}" data-units='@json(collect($workTypes)->mapWithKeys(fn ($t) => [$t['value'] => $t['unit']]))'>
-	<p class="mb10px color-gray fz12px">
-		Виды работ из общего справочника и плановые количества. Сохранение создаёт новую редакцию плана — она сразу действует в приложении,
-		прежние редакции остаются ниже. В задании виды работ выбираются только из плана. Чтобы убрать план целиком — уберите все позиции и сохраните.
-	</p>
 
 	<x-input-group group="normal">
 		<div class="table">
@@ -38,7 +34,7 @@
 	@forelse($revisions as $revision)
 		<div class="mb5px">
 			<span>{{$revision['at'] ? $revision['at']->copy()->timezone($tz)->format('d.m.Y H:i') : ''}}</span>
-			<span class="color-gray fz12px ml5px">{{$revision['admin'] ?? 'автор не записан'}}</span>
+			<span class="color-gray fz12px ml5px">{{$revision['admin'] ?? '-'}}</span>
 			<span class="ml5px">· {{count($revision['items']) ?: 'план убран'}}{{count($revision['items']) ? ' поз.' : ''}}</span>
 			@if($loop->first)<span class="color-green fz12px ml5px">действующая</span>@endif
 			@if($revision['items'])
@@ -56,6 +52,6 @@
 			</div>
 		</div>
 	@empty
-		<p class="color-gray">Плана у объекта пока нет — задания ставятся текстом, готовность задаётся вручную</p>
+		<p class="color-gray">Плана нет</p>
 	@endforelse
 </div>

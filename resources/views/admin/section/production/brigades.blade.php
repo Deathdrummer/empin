@@ -1,9 +1,5 @@
 <section>
 	<x-card id="brigadesCard" loading>
-		<p class="mb10px color-gray fz12px">
-			Бригады ЭМПИН-pro: постоянный коллектив 2–5 человек вместе с бригадиром. Бригадиром можно быть только в одной бригаде,
-			рядовым членом — в нескольких. Изменения сразу действуют в приложении. Бригада не удаляется, а расформировывается — история сохраняется.
-		</p>
 		<div class="table">
 			<table class="w100">
 				<thead>
@@ -90,7 +86,7 @@
 				saveWait.destroy();
 				if (data) {
 					$(row).replaceWith(data);
-					$.notify('Бригада создана');
+					$.notify('Запись успешно сохранена!');
 					return;
 				}
 				const err = res?.error || container?.response?.data;
@@ -109,7 +105,7 @@
 				if (data) {
 					$(row).find('[update]').ddrInputs('disable');
 					$(row).find('input, select, textarea').ddrInputs('state', 'clear');
-					$.notify('Название сохранено');
+					$.notify('Запись успешно обновлена!');
 					return;
 				}
 				$.notify(errorText(res?.error || container), 'error');
@@ -121,7 +117,7 @@
 			ddrPopup({
 				width: 420,
 				title: 'Расформировать бригаду',
-				html: '<p class="mb10px">С этой даты бригада перестаёт работать: новые задания ей не ставятся, прежние задания, отчёты и выходы сохраняются.</p>'+dateInput('disband_date', today()),
+				html: '<p class="mb10px">Дата расформирования</p>'+dateInput('disband_date', today()),
 				buttons: ['ui.cancel', {title: 'Расформировать', variant: 'red', action: 'brigadeDisbandDo'}],
 				winClass: 'ddrpopup_dialog',
 			}).then(({close, wait, popper}) => {
@@ -130,7 +126,7 @@
 					call('disband', {brigade: id, date: $(popper).find('[name="disband_date"]').val()})
 						.then((res) => {
 							$.notify('Бригада расформирована');
-							if (res?.tasks_left) $.notify('У бригады остались задания с этой даты: '+res.tasks_left+'. Их нужно передать другому исполнителю в приложении', 'error');
+							if (res?.tasks_left) $.notify('Заданий бригады с этой даты: '+res.tasks_left, 'error');
 							close();
 							reloadList();
 						})
@@ -186,7 +182,7 @@
 					const box = $(popper).find('[brigadeadd]');
 					const staffId = box.find('[name="staff_id"]').val();
 					if (!staffId) return $.notify('Выберите сотрудника', 'error');
-					run('add_member', {brigade: brigadeId, staff_id: staffId, joined_on: box.find('[name="joined_on"]').val()}, 'Сотрудник добавлен в состав');
+					run('add_member', {brigade: brigadeId, staff_id: staffId, joined_on: box.find('[name="joined_on"]').val()}, 'Сотрудник добавлен');
 				}
 
 				$.brigadeMemberSave = (b, memberId) => {
@@ -199,7 +195,7 @@
 				}
 
 				$.brigadeMemberRemove = (b, memberId) => {
-					dialog('Удалить ошибочную запись состава? Если сотрудник действительно уходил из бригады, укажите дату «Вышел с» — тогда табель за прошлые дни сохранится.', {
+					dialog('Удалить запись?', {
 						buttons: {
 							'Отмена|light': ({closeDialog}) => closeDialog(),
 							'Удалить|red': ({closeDialog}) => {

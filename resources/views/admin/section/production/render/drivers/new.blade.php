@@ -11,7 +11,7 @@
 				empty-has-value
 				/>
 		</td>
-		<td><p class="color-gray">за машинами — в разделе «Техника»</p></td>
+		<td><span class="color-gray">-</span></td>
 		<td class="center"><span class="color-gray">-</span></td>
 		<td class="center">
 			<x-buttons-group group="small" w="3rem">

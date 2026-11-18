@@ -102,7 +102,7 @@ class ObjectProductionRegistry
         foreach (array_keys($next) as $typeId) {
             $type = $types[$typeId] ?? null;
             if (!$type || ($type->trashed() && !array_key_exists($typeId, $currentItems))) {
-                throw ProductionException::invalid('Вид работ удалён из справочника — выберите другой');
+                throw ProductionException::invalid('Вид работ удалён из справочника');
             }
         }
         ksort($next);

@@ -1,9 +1,5 @@
 <section>
 	<x-card id="driversCard" loading>
-		<p class="mb10px color-gray fz12px">
-			Водители спецтехники — из числа сотрудников. Закрепление за машинами — в разделе «Техника». Водитель с отметкой «не используется»
-			(уволен, отстранён) не предлагается в новых заданиях, но остаётся в прежних. Изменения сразу действуют в приложении.
-		</p>
 		<div class="table">
 			<table class="w100">
 				<thead>
@@ -78,7 +74,7 @@
 				saveWait.destroy();
 				if (data) {
 					$(row).replaceWith(data);
-					$.notify('Водитель добавлен');
+					$.notify('Запись успешно сохранена!');
 					return;
 				}
 				$.notify(errorText(res?.error || container?.response?.data || container), 'error');
@@ -106,7 +102,7 @@
 			let row = $(btn).closest('tr');
 			ddrPopup({
 				width: 420,
-				html: 'Убрать сотрудника из списка водителей? Он будет откреплён от машин и не будет предлагаться в новых заданиях, прежние задания сохранятся. Если водитель временно отстранён — лучше отметить «не используется».',
+				html: 'Убрать из списка водителей?',
 				buttons: ['ui.cancel', {title: 'Убрать', variant: 'red', action: 'driverRemoveAction'}],
 				centerMode: true,
 				winClass: 'ddrpopup_dialog color-red'
@@ -116,7 +112,7 @@
 					destroy(id, (stat, container, res) => {
 						if (stat) {
 							remove(row);
-							$.notify('Водитель убран из списка');
+							$.notify('Запись удалена');
 						} else {
 							$.notify(errorText(res?.error || container), 'error');
 						}
