@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\api\ProductionController;
 use App\Http\Controllers\api\ProductionDirectoryController;
+use App\Http\Controllers\api\ProductionTaskChatController;
 use App\Http\Controllers\api\ProductionTasksController;
 use Illuminate\Support\Facades\Route;
 
@@ -28,6 +29,13 @@ Route::prefix('production')->middleware(['auth:sanctum', 'presence'])->group(fun
     Route::delete('/tasks/{id}', [ProductionTasksController::class, 'destroy'])->whereNumber('id');
     Route::post('/tasks/{id}/copy', [ProductionTasksController::class, 'copy'])->whereNumber('id');
     Route::post('/tasks/{id}/invites', [ProductionTasksController::class, 'invite'])->whereNumber('id');
+
+    // Переписка задания (П-ЗД-20…24, ИС-ЗД-16)
+    Route::get('/tasks/{id}/comments', [ProductionTaskChatController::class, 'index'])->whereNumber('id');
+    Route::post('/tasks/{id}/comments', [ProductionTaskChatController::class, 'store'])->whereNumber('id');
+    Route::put('/tasks/{id}/comments/{commentId}', [ProductionTaskChatController::class, 'update'])->whereNumber(['id', 'commentId']);
+    Route::delete('/tasks/{id}/comments/{commentId}', [ProductionTaskChatController::class, 'destroy'])->whereNumber(['id', 'commentId']);
+    Route::post('/tasks/{id}/comments/{commentId}/reaction', [ProductionTaskChatController::class, 'reaction'])->whereNumber(['id', 'commentId']);
     Route::delete('/tasks/{id}/invites/{staffId}', [ProductionTasksController::class, 'revokeInvite'])->whereNumber(['id', 'staffId']);
 
     // Уведомления до ручного закрытия (п. 9.3)

@@ -28,7 +28,7 @@ final class TaskPresenter
      */
     public function list(Collection $tasks, Viewer $viewer, CarbonInterface $today): array
     {
-        $tasks = (new EloquentCollection($tasks->all()))->loadMissing(self::RELATIONS);
+        $tasks = (new EloquentCollection($tasks->all()))->loadMissing(self::RELATIONS)->loadCount('chat');
         $objects = $this->objects->findMany($tasks->pluck('contract_id')->map(fn ($id) => (int) $id)->unique()->values()->all());
 
         return $tasks->map(fn (TimesheetContract $task) => $this->item($task, $viewer, $today, $objects))->values()->all();
@@ -123,6 +123,8 @@ final class TaskPresenter
             'vehicle' => $this->vehicle($task),
             'driver' => $this->driver($task),
             'abilities' => $this->access->abilities($viewer, $facts, $today),
+            // Значок переписки на карточке, как в прежнем «Табеле»
+            'comments_count' => (int) ($task->chat_count ?? 0),
             'updated_at' => $task->updated_at?->toIso8601String(),
         ];
     }
