@@ -33,7 +33,7 @@
 
 <script type="module">
 
-	const views = 'admin.section.personal.render.brigades';
+	const views = 'admin.section.production.render.brigades';
 
 	// Текст отказа сервера: причина из правил бригад, первая ошибка проверки полей или общее сообщение
 	const errorText = (e) => {

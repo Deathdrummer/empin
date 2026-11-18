@@ -11,14 +11,14 @@ use App\Traits\HasCrudController;
 use Illuminate\Http\Request;
 
 /**
- * Раздел админки ERP «Персонал → Бригады» («Доработки ERP», п. 3). Правила — в BrigadeRegistry.
+ * Раздел админки ERP «Производство → Бригады» («Доработки ERP», п. 3). Правила — в BrigadeRegistry.
  */
 class Brigades extends Controller {
 	use HasCrudController;
 
 	protected $data = [];
 
-	public const SECTION_ABILITY = 'section-personal.brigades:admin';
+	public const SECTION_ABILITY = 'section-production.brigades:admin';
 
 	public function __construct(private readonly BrigadeRegistry $registry, private readonly OrgClock $clock) {
 		// Как и страница раздела (get_section): главный администратор — всегда, остальные — с правом на раздел

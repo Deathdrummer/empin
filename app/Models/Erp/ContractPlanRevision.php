@@ -20,9 +20,14 @@ class ContractPlanRevision extends Model
         return $this->hasMany(ContractPlanItem::class, 'revision_id');
     }
 
-    /** Актуальная редакция плана объекта или null, если плана нет (П-ОБ-31) */
+    /**
+     * Актуальная редакция плана объекта или null, если плана нет (П-ОБ-31). Пустая последняя редакция — план убран
+     * в ERP целиком: это тоже «плана нет»
+     */
     public static function currentFor(int $contractId): ?self
     {
-        return static::where('contract_id', $contractId)->orderByDesc('id')->first();
+        $revision = static::where('contract_id', $contractId)->orderByDesc('id')->first();
+
+        return $revision && $revision->items()->exists() ? $revision : null;
     }
 }

@@ -854,3 +854,6 @@
 	
 	
 </script>
+
+
+@include('admin.section.contracts.production')

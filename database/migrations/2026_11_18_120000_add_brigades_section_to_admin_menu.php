@@ -4,44 +4,55 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Пункт меню админки ERP «Персонал → Бригады» («Доработки ERP», п. 3). Разделы админки хранятся только в базе
- * (`admin_sections`), поэтому пункт добавляет миграция. Группа «Персонал» берётся та, где уже лежат «Сотрудники»;
- * если её нет — создаётся. Доступ к разделу: главному администратору сразу, остальным — правом
- * `section-personal.brigades:admin`, которое главный администратор создаёт в «Права → Разделы».
+ * Пункт меню админки ERP «Производство → Бригады» («Доработки ERP», п. 3). Разделы админки хранятся только в базе
+ * (`admin_sections`), поэтому пункт добавляет миграция. Группа «Производство» — для справочников ЭМПИН-pro (бригады,
+ * техника, водители, виды работ); на проде её нет (сверено 18.11.2026, только чтение) — создаётся. Доступ: главному
+ * администратору сразу, остальным — правом `section-production.brigades:admin` («Права → Разделы сайта»).
  * Повторный запуск ничего не дублирует; отдельно выкладывается через `migrate --path`.
  */
 return new class extends Migration {
+    private const ITEMS = [
+        'production.brigades' => 'Бригады',
+    ];
+
     public function up(): void
     {
-        if (DB::table('admin_sections')->where('section', 'personal.brigades')->exists()) {
-            return;
-        }
-        $parentId = DB::table('admin_sections')->whereIn('section', ['personal.staff', 'personal.users_new', 'personal.admins'])
-            ->where('parent_id', '>', 0)->value('parent_id')
-            ?? DB::table('admin_sections')->where('section', 'personal')->where('parent_id', 0)->value('id')
+        // Ранняя локальная версия клала пункт в «Персонал»; на проде такой записи не было
+        DB::table('admin_sections')->where('section', 'personal.brigades')->delete();
+
+        $parentId = DB::table('admin_sections')->where('section', 'production')->where('parent_id', 0)->value('id')
             ?? DB::table('admin_sections')->insertGetId([
-                'section' => 'personal',
-                'title' => json_encode(['ru' => 'Персонал'], JSON_UNESCAPED_UNICODE),
-                'page_title' => json_encode(['ru' => 'Персонал'], JSON_UNESCAPED_UNICODE),
+                'section' => 'production',
+                'title' => json_encode(['ru' => 'Производство'], JSON_UNESCAPED_UNICODE),
+                'page_title' => json_encode(['ru' => 'Производство'], JSON_UNESCAPED_UNICODE),
                 'parent_id' => 0,
                 'nav' => 0, // группа только раскрывается, своей страницы у неё нет
                 'visible' => 1,
                 '_sort' => (int) DB::table('admin_sections')->where('parent_id', 0)->max('_sort') + 1,
             ]);
 
-        DB::table('admin_sections')->insert([
-            'section' => 'personal.brigades',
-            'title' => json_encode(['ru' => 'Бригады'], JSON_UNESCAPED_UNICODE),
-            'page_title' => json_encode(['ru' => 'Бригады'], JSON_UNESCAPED_UNICODE),
-            'parent_id' => $parentId,
-            'nav' => 1,
-            'visible' => 1,
-            '_sort' => (int) DB::table('admin_sections')->where('parent_id', $parentId)->max('_sort') + 1,
-        ]);
+        foreach (self::ITEMS as $section => $title) {
+            if (DB::table('admin_sections')->where('section', $section)->exists()) {
+                continue;
+            }
+            DB::table('admin_sections')->insert([
+                'section' => $section,
+                'title' => json_encode(['ru' => $title], JSON_UNESCAPED_UNICODE),
+                'page_title' => json_encode(['ru' => $title], JSON_UNESCAPED_UNICODE),
+                'parent_id' => $parentId,
+                'nav' => 1,
+                'visible' => 1,
+                '_sort' => (int) DB::table('admin_sections')->where('parent_id', $parentId)->max('_sort') + 1,
+            ]);
+        }
     }
 
     public function down(): void
     {
-        DB::table('admin_sections')->where('section', 'personal.brigades')->delete();
+        DB::table('admin_sections')->whereIn('section', array_keys(self::ITEMS))->delete();
+        $parentId = DB::table('admin_sections')->where('section', 'production')->where('parent_id', 0)->value('id');
+        if ($parentId && !DB::table('admin_sections')->where('parent_id', $parentId)->exists()) {
+            DB::table('admin_sections')->whereKey($parentId)->delete();
+        }
     }
 };

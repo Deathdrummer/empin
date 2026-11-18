@@ -9,6 +9,7 @@ use App\Http\Controllers\AutoCADController;
 use App\Http\Controllers\ContractsFilesController;
 use App\Http\Controllers\crud\Admins;
 use App\Http\Controllers\crud\Brigades;
+use App\Http\Controllers\crud\ContractProduction;
 use App\Http\Controllers\crud\Contracts;
 use App\Http\Controllers\crud\Departments;
 use App\Http\Controllers\crud\Drivers;
@@ -188,7 +189,7 @@ Route::resource('permissions', Permissions::class);
 
 
 
-// Производство ЭМПИН-pro: бригады («Доработки ERP», п. 3), техника и водители (п. 4), виды работ (п. 5). Только для вошедших администраторов ERP
+// Производство ЭМПИН-pro: бригады («Доработки ERP», п. 3), техника и водители (п. 4), виды работ и план объекта (п. 5), объекты (п. 1). Только для вошедших администраторов ERP
 Route::middleware(['auth:admin'])->group(function () {
 	Route::post('/brigades/store_show', [Brigades::class, 'store_show']);
 	Route::post('/brigades/members', [Brigades::class, 'members']);
@@ -216,6 +217,12 @@ Route::middleware(['auth:admin'])->group(function () {
 	Route::post('/work_types/store_show', [WorkTypes::class, 'store_show']);
 	Route::post('/work_types/history', [WorkTypes::class, 'history']);
 	Route::resource('work_types', WorkTypes::class)->except(['show', 'edit']);
+
+	// Объект: ответственный, бригады, готовность (п. 1) и план объекта (п. 5) — окна из строки договора
+	Route::post('/contract_production/info', [ContractProduction::class, 'info']);
+	Route::post('/contract_production/save_info', [ContractProduction::class, 'save_info']);
+	Route::post('/contract_production/plan', [ContractProduction::class, 'plan']);
+	Route::post('/contract_production/save_plan', [ContractProduction::class, 'save_plan']);
 });
 
 // Отделы
