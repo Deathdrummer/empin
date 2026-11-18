@@ -5,6 +5,7 @@ use App\Mail\UserCreated;
 use App\Models\Department;
 use App\Models\User;
 use App\Production\Rights\RightsHistory;
+use App\Production\Rights\RightSettings;
 use App\Traits\HasCrudController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
@@ -400,6 +401,11 @@ class Staff extends Controller {
 		]);
 		
 		if (!$user = User::find($valid['user'])) return response()->json(false);
+
+		// Право приложения с настройками без настроек не выдаётся (интервью 7.2, 8.2): настройки — в «Пользователи нов.»
+		if ($valid['stat'] && !app(RightSettings::class)->canGrant($user, (int) $valid['permission'])) {
+			return response()->json(['error' => 'Не заданы настройки права', 'message' => 'Не заданы настройки права'], 422);
+		}
 
 		$history = app(RightsHistory::class);
 		if ($hasRole = !!count($user->roles)) {

@@ -61,11 +61,15 @@ return new class extends Migration {
         ];
 
         $now = now();
+        // На проде у ролей есть порядок `sort` (его использует раздел «Роли»), миграции репозитория его не создают
+        $withSort = Schema::hasColumn('roles', 'sort');
+        $sort = $withSort ? (int) DB::table('roles')->max('sort') : 0;
         foreach ($sets as $name => [$title, $rights]) {
             if (DB::table('roles')->where('name', $name)->where('guard_name', 'site')->exists()) {
                 continue;
             }
-            $roleId = DB::table('roles')->insertGetId(['name' => $name, 'title' => $title, 'guard_name' => 'site', 'created_at' => $now, 'updated_at' => $now]);
+            $roleId = DB::table('roles')->insertGetId(['name' => $name, 'title' => $title, 'guard_name' => 'site', 'created_at' => $now, 'updated_at' => $now]
+                + ($withSort ? ['sort' => ++$sort] : []));
             foreach ($rights as [$right, $grants]) {
                 $permissionId = DB::table('permissions')->where('name', $right->permissionName())->where('guard_name', 'site')->value('id');
                 if (!$permissionId) {
