@@ -10,6 +10,7 @@ use App\Production\Support\OrgClock;
 use App\Production\Support\ProductionException;
 use App\Production\Tasks\TaskService;
 use App\Production\Tasks\Viewer;
+use App\Services\Messenger\MediaStorage;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -80,10 +81,11 @@ class ProductionTaskChatController extends Controller
             try {
                 $comment->forceFill(['client_uuid' => $uuid])->saveQuietly();
             } catch (QueryException $e) {
-                // Два повтора пришли одновременно: оставляем первое сохранённое
+                // Два повтора пришли одновременно: оставляем первое сохранённое, файлы второго удаляем
                 if (($e->errorInfo[1] ?? null) !== 1062) {
                     throw $e;
                 }
+                MediaStorage::delete($comment->media);
                 $comment->delete();
 
                 return (new TimesheetChatResource($this->byClientUuid($me, $uuid)->load('profile.registred')))->response()->setStatusCode(200);

@@ -1112,9 +1112,6 @@ class MessengerApiController extends Controller {
         return (int) $request->user()->staff_id;
     }
 
-    private function canComment(Request $request): bool {
-        return $request->user()->can('mobile-app-can-create-comment:site');
-    }
 
     /** Ставит объекты бригадам в табеле — управляет составом чатов объектов */
     private function canAssignObjects(Request $request): bool {

@@ -2,6 +2,7 @@
 
 namespace App\Production\Tasks;
 
+use App\Models\Erp\Brigade;
 use App\Models\Erp\BrigadeMember;
 use App\Production\Rights\StaffRights;
 use Carbon\CarbonInterface;
@@ -22,8 +23,10 @@ final class Viewer
         $brigadeIds = BrigadeMember::query()
             ->activeOn($today)
             ->where('staff_id', $staffId)
-            ->whereHas('brigade', fn ($q) => $q->where(fn ($b) => $b->whereNull('disbanded_on')->orWhere('disbanded_on', '>', $today->toDateString())))
+            ->whereHas('brigade', fn ($q) => $q->workingOn($today))
             ->pluck('brigade_id')
+            // Бригадир — в составе своей бригады, даже если ERP не внесла его строкой состава (П-ОБ-16)
+            ->merge(Brigade::where('foreman_staff_id', $staffId)->workingOn($today)->pluck('id'))
             ->map(fn ($id) => (int) $id)
             ->unique()
             ->values()

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Erp\Brigade;
 use App\Models\Erp\BrigadeMember;
 use App\Models\Erp\Driver;
 use App\Models\Staff;
@@ -57,6 +58,11 @@ class ProductionController extends Controller
             ])
             ->unique('id')
             ->values();
+        // Бригадир — в составе своей бригады, даже если ERP не внесла его строкой состава (П-ОБ-16)
+        $led = Brigade::where('foreman_staff_id', $staffId)->workingOn($today)->first(['id', 'name']);
+        if ($led && !$brigades->contains('id', $led->id)) {
+            $brigades->push(['id' => $led->id, 'name' => $led->name, 'is_foreman' => true, 'joined_on' => null]);
+        }
 
         $driver = Driver::where('staff_id', $staffId)->first();
         $rights = StaffRights::load($staffId);

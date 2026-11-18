@@ -43,4 +43,35 @@ class Brigade extends Model
     {
         return $query->whereNull('disbanded_on');
     }
+
+    /** Бригада действует на дату: не расформирована или расформирована позже */
+    public function scopeWorkingOn(Builder $query, CarbonInterface $date): Builder
+    {
+        return $query->where(fn ($q) => $q->whereNull('disbanded_on')->orWhere('disbanded_on', '>', $date->toDateString()));
+    }
+
+    /**
+     * Текущий состав бригады — члены на дату и бригадир. Бригада — «2–5 человек, включая бригадира» (П-ОБ-16):
+     * бригадир входит в состав, даже если в ERP его забыли внести строкой состава
+     *
+     * @param int[] $brigadeIds
+     * @return array<int, int[]> brigade_id => staff_id[]
+     */
+    public static function currentStaff(array $brigadeIds, CarbonInterface $date): array
+    {
+        if (!$brigadeIds) {
+            return [];
+        }
+        $result = array_fill_keys(array_map('intval', $brigadeIds), []);
+        BrigadeMember::activeOn($date)->whereIn('brigade_id', $brigadeIds)->get(['brigade_id', 'staff_id'])
+            ->each(function (BrigadeMember $member) use (&$result) {
+                $result[(int) $member->brigade_id][] = (int) $member->staff_id;
+            });
+        static::whereIn('id', $brigadeIds)->workingOn($date)->whereNotNull('foreman_staff_id')->get(['id', 'foreman_staff_id'])
+            ->each(function (self $brigade) use (&$result) {
+                $result[(int) $brigade->id][] = (int) $brigade->foreman_staff_id;
+            });
+
+        return array_map(fn (array $ids) => array_values(array_unique($ids)), $result);
+    }
 }

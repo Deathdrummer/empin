@@ -494,7 +494,7 @@ final class TaskService
     {
         $previous = $before['executor'];
         $recipients = $previous['type'] === 'brigade'
-            ? BrigadeMember::activeOn($today)->where('brigade_id', $previous['brigade_id'])->pluck('staff_id')->map(fn ($id) => (int) $id)
+            ? collect(Brigade::currentStaff([(int) $previous['brigade_id']], $today)[(int) $previous['brigade_id']] ?? [])
             : collect([(int) $previous['staff_id']]);
         $recipients = $recipients->unique()->reject(fn ($id) => $id === $viewer->staffId);
 

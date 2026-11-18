@@ -9,7 +9,7 @@ use App\Models\MessengerHiddenMessage;
 use App\Models\MessengerSetting;
 use App\Models\TimesheetChat;
 use App\Models\TimesheetContract;
-use App\Models\Erp\BrigadeMember;
+use App\Models\Erp\Brigade;
 use App\Production\Support\OrgClock;
 use App\Production\Tasks\TaskAccess;
 use App\Production\Tasks\TaskFacts;
@@ -103,10 +103,17 @@ class ObjectChats
             return [];
         }
         $facts = TaskFacts::fromModel($task);
+        // Личные основания — без загрузки прав: создатель, исполнитель, бригада, водитель, приглашённые
+        $direct = array_filter([$facts->creatorId, $facts->personalStaffId, $facts->driverStaffId, ...$facts->invitedStaffIds]);
+        if ($facts->brigadeId) {
+            $direct = [...$direct, ...(Brigade::currentStaff([$facts->brigadeId], $this->clock->today())[$facts->brigadeId] ?? [])];
+        }
+        $direct = array_flip(array_map('intval', $direct));
 
+        // Остальным — проверка прав (право 6 «Просматривать все задания» с областью)
         return array_values(array_filter(
             array_map('intval', $staffIds),
-            fn (int $staffId) => $this->access->canView($this->viewer($staffId), $facts)
+            fn (int $staffId) => isset($direct[$staffId]) || $this->access->canView($this->viewer($staffId), $facts)
         ));
     }
 
@@ -257,10 +264,7 @@ class ObjectChats
             }
         };
 
-        $members = BrigadeMember::activeOn($this->clock->today())
-            ->whereIn('brigade_id', $tasks->pluck('brigade_id')->filter()->unique())
-            ->get(['brigade_id', 'staff_id'])
-            ->groupBy('brigade_id');
+        $members = Brigade::currentStaff($tasks->pluck('brigade_id')->filter()->map(fn ($id) => (int) $id)->unique()->values()->all(), $this->clock->today());
         $invites = DB::table('timesheet_contract_invites')
             ->whereIn('timesheet_contract_id', $tasks->pluck('id'))
             ->whereNull('revoked_at')
@@ -272,8 +276,8 @@ class ObjectChats
             $note($task->creator_staff_id, $at);
             $note($task->driver_staff_id, $at);
             if ($task->brigade_id) {
-                foreach ($members->get($task->brigade_id, collect()) as $member) {
-                    $note($member->staff_id, $at);
+                foreach ($members[(int) $task->brigade_id] ?? [] as $staffId) {
+                    $note($staffId, $at);
                 }
             } else {
                 $note($task->staff_id, $at);
