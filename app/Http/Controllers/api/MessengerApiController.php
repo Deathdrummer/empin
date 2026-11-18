@@ -878,7 +878,7 @@ class MessengerApiController extends Controller {
         // Тот же запрос ещё выполняется (телефон не дождался ответа и повторил) — второй раз не пересылаем
         $lock = $replayKey ? $this->forwardLock($replayKey) : null;
         if ($lock === false) {
-            return response()->json(['error' => 'Пересылка ещё идёт — проверьте чат через несколько секунд'], 409);
+            return response()->json(['error' => 'Пересылка ещё идёт'], 409);
         }
 
         try {
