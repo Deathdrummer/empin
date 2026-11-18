@@ -32,7 +32,7 @@ class ContractProduction extends Controller {
 		});
 	}
 
-	/** Окно «Производство»: ответственный, закреплённые бригады, утверждённая готовность (только просмотр) */
+	/** Окно «Производство»: ответственный, закреплённые бригады, готовность объекта и её история */
 	public function info(Request $request) {
 		$contract = Contract::findOrFail($request->validate(['contract' => 'required|integer'])['contract']);
 		$info = $this->registry->info($contract);
@@ -55,7 +55,9 @@ class ContractProduction extends Controller {
 				'checked' => in_array($b->id, $info['brigade_ids'], true),
 			]);
 
-		return $this->view(self::VIEWS.'.info', compact('contract', 'info', 'staff', 'brigades'));
+		$readinessHistory = $this->registry->readinessHistory($contract);
+
+		return $this->view(self::VIEWS.'.info', compact('contract', 'info', 'staff', 'brigades', 'readinessHistory'));
 	}
 
 	public function save_info(Request $request) {
@@ -64,11 +66,15 @@ class ContractProduction extends Controller {
 			'responsible_staff_id' => 'nullable|integer',
 			'brigade_ids' => 'nullable|array',
 			'brigade_ids.*' => 'integer',
+			'readiness' => 'nullable',
+			'readiness_shown' => 'nullable',
 		]);
 		$this->registry->saveInfo(
 			Contract::findOrFail($valid['contract']),
 			($valid['responsible_staff_id'] ?? null) ? (int) $valid['responsible_staff_id'] : null,
 			$valid['brigade_ids'] ?? [],
+			$valid['readiness'] ?? null,
+			$valid['readiness_shown'] ?? null,
 		);
 
 		return response()->json(['saved' => true]);

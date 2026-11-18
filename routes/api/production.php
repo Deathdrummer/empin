@@ -18,6 +18,7 @@ Route::prefix('production')->middleware(['auth:sanctum', 'presence'])->group(fun
     Route::get('/objects/{objectId}/plan', [ProductionDirectoryController::class, 'plan'])->whereNumber('objectId');
     Route::get('/executors', [ProductionDirectoryController::class, 'executors']);
     Route::get('/vehicles', [ProductionDirectoryController::class, 'vehicles']);
+    Route::get('/work-types', [ProductionDirectoryController::class, 'workTypes']);
 
     // Задания и календарь (раздел 6)
     Route::get('/tasks', [ProductionTasksController::class, 'index']);

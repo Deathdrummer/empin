@@ -39,16 +39,25 @@
 			</div>
 		@endif
 
-		<p class="mt20px mb5px"><strong>Утверждённая готовность объекта</strong></p>
-		@if($info['readiness_percent'] !== null)
-			<p>
-				<strong class="fz16px">{{rtrim(rtrim(number_format($info['readiness_percent'], 2, ',', ' '), '0'), ',')}} %</strong>
-				@if($info['readiness_changed_at'])
-					<span class="color-gray fz12px ml5px">{{$info['readiness_changed_at']->copy()->timezone(config('production.timezone'))->format('d.m.Y H:i')}}</span>
-				@endif
-			</p>
-		@else
-			<p class="color-gray">-</p>
-		@endif
+		@php
+			$tz = config('production.timezone');
+			$pct = fn ($p) => $p === null ? '-' : rtrim(rtrim(number_format($p, 2, ',', ' '), '0'), ',');
+			$shown = $info['readiness_percent'] !== null ? rtrim(rtrim(number_format($info['readiness_percent'], 2, '.', ''), '0'), '.') : '';
+		@endphp
+		<p class="mt20px mb5px"><strong>Готовность объекта, %</strong></p>
+		<div class="d-flex align-items-center" readinessshown="{{$shown}}">
+			<x-input type="number" name="readiness" value="{{$shown}}" placeholder="" class="w16rem" />
+		</div>
+
+		<p class="mt20px mb5px"><strong>История готовности</strong></p>
+		@forelse($readinessHistory as $event)
+			<div class="mb5px">
+				<span>{{$event['at'] ? $event['at']->copy()->timezone($tz)->format('d.m.Y H:i') : ''}}</span>
+				<span class="color-gray fz12px ml5px">{{$event['who'] ?? '-'}}</span>
+				<span class="ml5px">· {{$pct($event['before'])}} → {{$pct($event['after'])}} %</span>
+			</div>
+		@empty
+			<p class="color-gray">Изменений нет</p>
+		@endforelse
 	</x-input-group>
 </div>

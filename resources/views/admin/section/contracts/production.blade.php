@@ -34,7 +34,13 @@
 					.filter((_, el) => $(el).find('input[type="checkbox"]').is(':checked'))
 					.map((_, el) => Number($(el).attr('brigadeid'))).get();
 				wait();
-				call('save_info', {contract: id, responsible_staff_id: box.find('[name="responsible_staff_id"]').val() || null, brigade_ids: brigadeIds})
+				call('save_info', {
+					contract: id,
+					responsible_staff_id: box.find('[name="responsible_staff_id"]').val() || null,
+					brigade_ids: brigadeIds,
+					readiness: String(box.find('[name="readiness"]').val() ?? ''),
+					readiness_shown: String(box.find('[readinessshown]').attr('readinessshown') ?? ''),
+				})
 					.then(() => { $.notify('Запись успешно сохранена!'); close(); })
 					.catch((e) => { wait(false); $.notify(errorText(e), 'error'); });
 			}

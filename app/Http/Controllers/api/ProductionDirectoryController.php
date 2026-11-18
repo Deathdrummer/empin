@@ -8,6 +8,7 @@ use App\Models\Erp\BrigadeMember;
 use App\Models\Erp\ContractPlanRevision;
 use App\Models\Erp\Driver;
 use App\Models\Erp\Vehicle;
+use App\Models\Erp\WorkType;
 use App\Production\Objects\ObjectDirectory;
 use App\Production\Rights\Right;
 use App\Production\Rights\StaffRights;
@@ -68,6 +69,19 @@ class ProductionDirectoryController extends Controller
                 'unit' => $item->workType?->unit,
                 'quantity' => (float) $item->quantity,
             ])->sortBy('name')->values() : [],
+        ]);
+    }
+
+    /**
+     * Общий справочник видов работ независимо от плана объекта (ERP9-005; П-ОБ-29, П-ОБ-33): в отчёте по объекту без
+     * плана и для работ вне плана. Удалённые виды работ не предлагаются. Справочник не секретный — нужен всем, кто
+     * работает с отчётами, поэтому отдельного права не требует.
+     */
+    public function workTypes(): JsonResponse
+    {
+        return response()->json([
+            'items' => WorkType::orderBy('name')->get(['id', 'name', 'unit'])
+                ->map(fn (WorkType $type) => ['id' => (int) $type->id, 'name' => $type->name, 'unit' => $type->unit])->values(),
         ]);
     }
 

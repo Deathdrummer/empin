@@ -143,6 +143,37 @@ class BrigadeRegistry
         });
     }
 
+    /**
+     * Сотрудник уволен в ERP («Работает» выключено или запись удалена): даты увольнения в ERP нет, поэтому днём
+     * увольнения считается сегодня — последний день в составе, выход с завтра. Вступление с будущей даты отменяется,
+     * бригадирство снимается. Повторное включение «Работает» состав не возвращает — его восстанавливает администратор.
+     * Задания, выходы и история остаются (ТЗ 10.3.2).
+     *
+     * @return int сколько строк состава изменено
+     */
+    public function releaseStaff(int $staffId): int
+    {
+        $leftOn = $this->clock->today()->addDay()->toDateString();
+        $members = BrigadeMember::with('brigade')->where('staff_id', $staffId)
+            ->where(fn ($q) => $q->whereNull('left_on')->orWhere('left_on', '>', $leftOn))
+            ->get();
+
+        foreach ($members as $member) {
+            if ($member->joined_on->toDateString() >= $leftOn) {
+                DB::transaction(function () use ($member) {
+                    $before = ['staff' => $this->person((int) $member->staff_id), 'joined_on' => $member->joined_on->toDateString(), 'left_on' => $member->left_on?->toDateString()];
+                    $member->delete();
+                    $this->log((int) $member->brigade_id, 'member_removed', $before, ['fired' => true]);
+                    $this->dropForemanWithoutMembership($member->brigade, (int) $member->staff_id);
+                });
+                continue;
+            }
+            $this->correctMember($member, $member->joined_on->toDateString(), $leftOn, ['fired' => true]);
+        }
+
+        return $members->count();
+    }
+
     /** Перевести в другую бригаду: выход из этой и вступление в ту же дату (ERP-FR-004) */
     public function transfer(BrigadeMember $member, Brigade $target, string $date): void
     {

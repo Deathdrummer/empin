@@ -35,13 +35,13 @@
 								В состав: {{$who($a['staff'] ?? [])}} с {{$day($a['joined_on'] ?? null)}}@if(!empty($a['transferred_from'])) — переведён из бригады «{{$a['transferred_from']['name']}}»@endif
 								@break
 							@case('member_excluded')
-								@if(!empty($a['transferred_to']))Переведён в бригаду «{{$a['transferred_to']['name']}}»: {{$who($a['staff'] ?? [])}} с {{$day($a['left_on'] ?? null)}}@else Исключён: {{$who($a['staff'] ?? [])}} с {{$day($a['left_on'] ?? null)}}@endif
+								@if(!empty($a['transferred_to']))Переведён в бригаду «{{$a['transferred_to']['name']}}»: {{$who($a['staff'] ?? [])}} с {{$day($a['left_on'] ?? null)}}@elseif(!empty($a['fired']))Исключён при увольнении: {{$who($a['staff'] ?? [])}} с {{$day($a['left_on'] ?? null)}}@else Исключён:{{$who($a['staff'] ?? [])}} с {{$day($a['left_on'] ?? null)}}@endif
 								@break
 							@case('member_corrected')
-								Исправлены даты: {{$who($a['staff'] ?? [])}} — было {{$day($b['joined_on'] ?? null)}} – {{$day($b['left_on'] ?? null)}}, стало {{$day($a['joined_on'] ?? null)}} – {{$day($a['left_on'] ?? null)}}
+								Исправлены даты: {{$who($a['staff'] ?? [])}} — было {{$day($b['joined_on'] ?? null)}} – {{$day($b['left_on'] ?? null)}}, стало {{$day($a['joined_on'] ?? null)}} – {{$day($a['left_on'] ?? null)}}@if(!empty($a['fired'])) (увольнение)@endif
 								@break
 							@case('member_removed')
-								Удалена ошибочная запись: {{$who($b['staff'] ?? [])}}, {{$day($b['joined_on'] ?? null)}} – {{$day($b['left_on'] ?? null)}}
+								@if(!empty($a['fired']))Отменено вступление при увольнении: {{$who($b['staff'] ?? [])}} с {{$day($b['joined_on'] ?? null)}}@else Удалена ошибочная запись: {{$who($b['staff'] ?? [])}}, {{$day($b['joined_on'] ?? null)}} – {{$day($b['left_on'] ?? null)}}@endif
 								@break
 							@case('disbanded')
 								Расформирована с {{$day($a['disbanded_on'] ?? null)}}

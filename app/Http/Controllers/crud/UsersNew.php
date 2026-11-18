@@ -8,10 +8,12 @@ use App\Models\ListUser;
 use App\Models\Staff;
 use App\Models\Step;
 use App\Models\User;
+use App\Production\Erp\BrigadeRegistry;
 use App\Production\Rights\RightsHistory;
 use App\Production\Rights\RightSettings;
 use App\Services\Business\Department as BusinessDepartment;
 use App\Traits\HasCrudController;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
@@ -261,7 +263,8 @@ class UsersNew extends Controller {
      */
     public function destroy(?int $id = null) {
 		$stat = Staff::where('id', $id)->update(['working' => 0]);
-		
+		if ($id) app(BrigadeRegistry::class)->releaseStaff($id); // уволенный выходит из бригад
+
 		$user = User::where('staff_id', $id)->first();
 		if ($user) {
 			$user->update([
@@ -412,7 +415,17 @@ class UsersNew extends Controller {
 			'user_id' 	=> 'numeric|required',
 		]);
 		
-		if (!$user = User::create(['email' => encodeEmail($email), 'staff_id' => $userId])) return response()->json(false);
+		// Одна учётная запись на сотрудника (П-ОБ-21, находка 6): повторная регистрация, в том числе двойным нажатием, не создаёт вторую
+		$exists = response()->json(['error' => 'У сотрудника уже есть учётная запись', 'message' => 'У сотрудника уже есть учётная запись'], 422);
+		if (User::where('staff_id', $userId)->exists()) return $exists;
+		try {
+			$user = User::create(['email' => encodeEmail($email), 'staff_id' => $userId]);
+		} catch (QueryException $e) {
+			// Два одновременных запроса: второй останавливает уникальный ключ users.staff_id
+			if ((int) ($e->errorInfo[1] ?? 0) === 1062 && User::where('staff_id', $userId)->exists()) return $exists;
+			throw $e;
+		}
+		if (!$user) return response()->json(false);
 		$user->forceFill(['temporary_password' => Crypt::encryptString(Str::random(12))])->save();
 		
 		$user->makeVisible('temporary_password');
@@ -681,9 +694,11 @@ class UsersNew extends Controller {
 		
 		$staff = Staff::find($staffId);
 		
+		$wasWorking = (bool) $staff->working;
 		$staff->working = $stat;
-		
+
 		$res = $staff->save();
+		if ($wasWorking && !$stat) app(BrigadeRegistry::class)->releaseStaff($staff->id); // уволенный выходит из бригад
 
 		return response()->json($res);
 	}

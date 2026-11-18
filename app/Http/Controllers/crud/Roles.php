@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Controller;
 
+use App\Production\Rights\Right;
+use App\Production\Rights\RightSettings;
 use App\Production\Rights\RightsHistory;
 use App\Traits\HasCrudController;
 use Illuminate\Http\Request;
@@ -235,11 +237,13 @@ class Roles extends Controller {
 		$permissions = Permission::where('guard_name', $valid['guard'])
 			->where('group', '!=', null)
 			->orderBy('sort', 'ASC')
-			->get()
-			->groupBy('group');
-		
+			->get();
+
 		$rolePermissions = Role::where('id', $valid['role'])->first()->permissions->keyBy('id');
-		
+
+		// Права приложения с настройками выдаются лично или типовым набором — у роли отдела настроек нет. Уже выданное остаётся видно, чтобы его можно было снять
+		$permissions = $permissions->reject(fn ($p) => !$rolePermissions->has($p->id) && ($right = Right::fromPermissionName($p->name)) && RightSettings::hasSettings($right))->groupBy('group');
+
 		$this->addSettingToGlobalData('permissions_groups', 'id', 'name');
 		
 		return $this->view($valid['view'], ['permissions' => $permissions, 'role_permissions' => $rolePermissions]);
@@ -260,7 +264,11 @@ class Roles extends Controller {
 		]);
 		
 		if (!$role = Role::where('id', $valid['role'])->first()) return response()->json(false);
-		
+
+		if ($valid['stat'] && ($right = RightSettings::rightOf((int) $valid['permission'])) && RightSettings::hasSettings($right)) {
+			return response()->json(['error' => 'Право с настройками ролью отдела не выдаётся', 'message' => 'Право с настройками ролью отдела не выдаётся'], 422);
+		}
+
 		if ($valid['stat']) {
 			if (!$role->hasPermissionTo($valid['permission'])) $role->givePermissionTo($valid['permission']);
 		} else {

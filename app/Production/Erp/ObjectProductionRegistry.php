@@ -2,22 +2,27 @@
 
 namespace App\Production\Erp;
 
+use App\Models\AdminUser;
 use App\Models\Contract;
 use App\Models\Erp\Brigade;
+use App\Models\Erp\ContractReadinessEvent;
 use App\Models\Erp\ContractPlanItem;
 use App\Models\Erp\ContractPlanRevision;
 use App\Models\Erp\ContractProductionInfo;
 use App\Models\Erp\WorkType;
 use App\Models\Staff;
 use App\Production\Support\ProductionException;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 /**
  * Производственные сведения объекта в ERP («Доработки ERP», пп. 1 и 5; ТЗ П-ОБ-07, П-ОБ-08, П-ОБ-30…32, п. 10.3.7).
  *
- * Ответственный начальник участка — один или никого; закреплённых бригад — несколько. Утверждённую готовность пишет
- * приложение, ERP её только показывает. План объекта — виды работ из справочника и плановые количества; каждое
- * сохранение создаёт новую редакцию и действует сразу, прежние редакции остаются. Каждое изменение — в журнале.
+ * Ответственный начальник участка — один или никого; закреплённых бригад — несколько. Готовность объекта утверждает
+ * приложение; администратор ERP тоже может её изменить (решение 19.11.2026) — каждое изменение в истории готовности
+ * (П-ФК-34: было → стало, кто, когда), значение сразу действует в приложении. План объекта — виды работ из справочника
+ * и плановые количества; каждое сохранение создаёт новую редакцию и действует сразу, прежние редакции остаются.
+ * Каждое изменение — в журнале.
  */
 class ObjectProductionRegistry
 {
@@ -38,18 +43,28 @@ class ObjectProductionRegistry
     }
 
     /**
-     * Сохранить ответственного и закреплённые бригады. Новым ответственным — только работающий сотрудник, новой
-     * бригадой — только действующая; уже закреплённую расформированную можно оставить или снять
+     * Сохранить ответственного, закреплённые бригады и готовность. Новым ответственным — только работающий сотрудник,
+     * новой бригадой — только действующая; уже закреплённую расформированную можно оставить или снять.
+     *
+     * Готовность меняется, только если администратор изменил поле (`$readiness` ≠ `$readinessShown` — значение при
+     * открытии окна). Если с открытия окна готовность уже изменили (приложение или другой администратор), сохранение
+     * отклоняется, чтобы не затереть новое значение.
      *
      * @param int[] $brigadeIds
      */
-    public function saveInfo(Contract $contract, ?int $responsibleId, array $brigadeIds): void
+    public function saveInfo(Contract $contract, ?int $responsibleId, array $brigadeIds, mixed $readiness = null, mixed $readinessShown = null): void
     {
         $brigadeIds = array_values(array_unique(array_map('intval', $brigadeIds)));
         $before = $this->info($contract);
         $added = array_diff($brigadeIds, $before['brigade_ids']);
         $removed = array_diff($before['brigade_ids'], $brigadeIds);
-        if ($responsibleId === $before['responsible_staff_id'] && !$added && !$removed) {
+        $shown = $this->percent($readinessShown);
+        $newReadiness = $this->percent($readiness, validate: true, current: $shown);
+        if ($newReadiness !== null && $newReadiness === $shown) {
+            $newReadiness = null;
+        }
+        $productionChanged = $responsibleId !== $before['responsible_staff_id'] || $added || $removed;
+        if (!$productionChanged && $newReadiness === null) {
             return;
         }
         if ($responsibleId && $responsibleId !== $before['responsible_staff_id'] && !Staff::whereKey($responsibleId)->where('working', 1)->exists()) {
@@ -59,7 +74,13 @@ class ObjectProductionRegistry
             throw ProductionException::invalid('Закрепить можно только действующую бригаду');
         }
 
-        DB::transaction(function () use ($contract, $responsibleId, $added, $removed, $before, $brigadeIds) {
+        DB::transaction(function () use ($contract, $responsibleId, $added, $removed, $before, $brigadeIds, $productionChanged, $newReadiness, $shown) {
+            if ($newReadiness !== null) {
+                $this->changeReadiness($contract, $newReadiness, $shown);
+            }
+            if (!$productionChanged) {
+                return;
+            }
             if ($responsibleId !== $before['responsible_staff_id']) {
                 ContractProductionInfo::updateOrCreate(['contract_id' => $contract->id], ['responsible_staff_id' => $responsibleId]);
             }
@@ -73,6 +94,74 @@ class ObjectProductionRegistry
                 ['responsible' => ErpAudit::person($before['responsible_staff_id']), 'brigades' => $this->brigadeNames($before['brigade_ids'])],
                 ['responsible' => ErpAudit::person($responsibleId), 'brigades' => $this->brigadeNames($brigadeIds)]);
         });
+    }
+
+    /**
+     * Изменение готовности в ERP: новое актуальное значение (сразу действует в приложении: подсказки объектов и др.)
+     * и запись в истории готовности. Строка сведений блокируется; если с открытия окна значение уже изменили —
+     * отказ, новое значение не затирается
+     */
+    private function changeReadiness(Contract $contract, float $percent, ?float $shown): void
+    {
+        $info = ContractProductionInfo::whereKey($contract->id)->lockForUpdate()->first();
+        $was = $info?->readiness_percent !== null ? (float) $info->readiness_percent : null;
+        if ($was !== $shown) {
+            throw ProductionException::invalid('Готовность уже изменена: '.$this->percentText($was));
+        }
+        ContractProductionInfo::updateOrCreate(['contract_id' => $contract->id], ['readiness_percent' => $percent, 'readiness_changed_at' => now()]);
+        ContractReadinessEvent::create([
+            'contract_id' => $contract->id,
+            'percent_before' => $was,
+            'percent_after' => $percent,
+            'source' => ContractReadinessEvent::SOURCE_ERP,
+            'admin_id' => Auth::guard('admin')->id(),
+            'created_at' => now(),
+        ]);
+    }
+
+    /**
+     * История готовности объекта для окна: новые сверху, кто (администратор ERP или сотрудник) и когда
+     *
+     * @return array<int, array{at: mixed, before: ?float, after: float, who: ?string}>
+     */
+    public function readinessHistory(Contract $contract): array
+    {
+        $events = ContractReadinessEvent::where('contract_id', $contract->id)->orderByDesc('id')->get();
+        $admins = AdminUser::whereIn('id', $events->pluck('admin_id')->filter()->unique())->get()->keyBy('id');
+
+        return $events->map(fn (ContractReadinessEvent $e) => [
+            'at' => $e->created_at,
+            'before' => $e->percent_before !== null ? (float) $e->percent_before : null,
+            'after' => (float) $e->percent_after,
+            'who' => $e->admin_id ? ($admins[$e->admin_id]?->name ?: $admins[$e->admin_id]?->pseudoname) : (ErpAudit::person($e->staff_id)['name'] ?? null),
+        ])->all();
+    }
+
+    /** Процент готовности 0–100, до двух знаков. Пусто: без значения; пустое поле при заданной готовности — ошибка */
+    private function percent(mixed $value, bool $validate = false, ?float $current = null): ?float
+    {
+        $text = str_replace([' ', ',', '%'], ['', '.', ''], trim((string) $value));
+        if ($text === '') {
+            if ($validate && $current !== null) {
+                throw ProductionException::invalid('Готовность — число от 0 до 100');
+            }
+
+            return null;
+        }
+        if (!is_numeric($text) || (float) $text < 0 || (float) $text > 100) {
+            if ($validate) {
+                throw ProductionException::invalid('Готовность — число от 0 до 100');
+            }
+
+            return null;
+        }
+
+        return round((float) $text, 2);
+    }
+
+    public function percentText(?float $percent): string
+    {
+        return $percent === null ? '-' : rtrim(rtrim(number_format($percent, 2, ',', ' '), '0'), ',').' %';
     }
 
     /**
