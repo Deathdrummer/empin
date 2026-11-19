@@ -74,6 +74,12 @@ final class AttendanceData
         return collect($this->daysByBrigade[$brigadeId.'|'.$date] ?? []);
     }
 
+    /** @return Collection<int, AttendanceMark> все отметившиеся в бригаде на дату, кроме пришедших после подтверждения */
+    public function brigadeMarks(int $brigadeId, string $date): Collection
+    {
+        return collect($this->marksByBrigade[$brigadeId.'|'.$date] ?? [])->reject(fn (AttendanceMark $m) => $m->after_confirmation)->values();
+    }
+
     /**
      * Видимый состав бригады на дату до подтверждения (П-СМ-08): без заявки — все самозаявившиеся; с заявкой — те из
      * неё, кто отметился сам. Отметки, пришедшие после подтверждения, состав не меняют (П-СМ-03а)

@@ -347,13 +347,17 @@ final class AttendanceService
             $shift = $data->shift($brigadeId, $day);
             $confirmed = (bool) $shift?->isConfirmed();
             $crewIds = $shift?->crew();
-            $people = $confirmed
-                ? $data->brigadeDays($brigadeId, $day)->map(fn (AttendanceDay $d) => $this->person((int) $d->staff_id))
-                : $data->visibleCrew($brigadeId, $day)->map(fn (AttendanceMark $m) => $this->person((int) $m->staff_id) + ($service ? [
+            // Подтверждающий видит всех самозаявившихся и заявку; отметить можно только видимый состав (П-СМ-11).
+            // Остальные видят видимый состав без пометок; после подтверждения — подтверждённый
+            $people = match (true) {
+                $confirmed => $data->brigadeDays($brigadeId, $day)->map(fn (AttendanceDay $d) => $this->person((int) $d->staff_id)),
+                $service => $data->brigadeMarks($brigadeId, $day)->map(fn (AttendanceMark $m) => $this->person((int) $m->staff_id) + [
+                    'in_crew' => $crewIds === null || in_array((int) $m->staff_id, $crewIds, true),
                     'offline' => $m->offline && !$m->time_unverified,
                     'time_unverified' => $m->time_unverified,
-                    'declared' => $crewIds !== null && in_array((int) $m->staff_id, $crewIds, true),
-                ] : []));
+                ]),
+                default => $data->visibleCrew($brigadeId, $day)->map(fn (AttendanceMark $m) => $this->person((int) $m->staff_id)),
+            };
             $brigade = [
                 'id' => $brigadeId,
                 'name' => $this->brigadeName($brigadeId),
