@@ -6,6 +6,7 @@ use App\Models\AuditEntry;
 use App\Models\TimesheetContract;
 use App\Production\Attendance\AttendanceService;
 use App\Production\Objects\ObjectDirectory;
+use App\Production\Reports\ReportPresenter;
 use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
@@ -19,6 +20,7 @@ final class TaskPresenter
         private readonly TaskAccess $access,
         private readonly ObjectDirectory $objects,
         private readonly AttendanceService $attendance,
+        private readonly ReportPresenter $reports,
     ) {
     }
 
@@ -32,10 +34,13 @@ final class TaskPresenter
         $tasks = (new EloquentCollection($tasks->all()))->loadMissing(self::RELATIONS)->loadCount('chat');
         $objects = $this->objects->findMany($tasks->pluck('contract_id')->map(fn ($id) => (int) $id)->unique()->values()->all());
         $badges = $this->attendance->badges($viewer, $tasks);
+        $reports = $this->reports->marks($tasks, $today->toDateString());
 
         return $tasks->map(fn (TimesheetContract $task) => $this->item($task, $viewer, $today, $objects) + [
             // Значок неподтверждённых выходов (П-ЗД-44, П-СМ-19)
             'attendance_unconfirmed' => $badges[(int) $task->id] ?? false,
+            // Отметка отчёта: нет / черновик / отправлен / согласован / отклонён и «нет отчёта» (FR9-026, П-ЗД-37)
+            'report' => $reports[(int) $task->id],
         ])->values()->all();
     }
 

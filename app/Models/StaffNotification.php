@@ -19,6 +19,12 @@ class StaffNotification extends Model
     public const KIND_DRIVER_ASSIGNED = 'driver_assigned';
     public const KIND_ATTENDANCE_CORRECTED = 'attendance_corrected';
 
+    // Отчёты (п. 8.6, п. 9.3)
+    public const KIND_REPORT_SUBMITTED = 'report_submitted';
+    public const KIND_REPORT_QUANTITIES_CHANGED = 'report_quantities_changed';
+    public const KIND_REPORT_NOT_ACCEPTED = 'report_not_accepted';
+    public const KIND_REPORT_PROVIDED = 'report_provided';
+
     protected $table = 'staff_notifications';
 
     public const UPDATED_AT = null;

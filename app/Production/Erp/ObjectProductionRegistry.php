@@ -11,6 +11,8 @@ use App\Models\Erp\ContractPlanRevision;
 use App\Models\Erp\ContractProductionInfo;
 use App\Models\Erp\WorkType;
 use App\Models\Staff;
+use App\Production\Reports\ObjectReadiness;
+use App\Production\Reports\ReportAllocations;
 use App\Production\Support\ProductionException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -92,26 +94,14 @@ class ObjectProductionRegistry
      */
     private function changeReadiness(Contract $contract, float $percent, ?float $shown): void
     {
-        $info = ContractProductionInfo::whereKey($contract->id)->lockForUpdate()->first();
-        $was = $info?->readiness_percent !== null ? (float) $info->readiness_percent : null;
-        if ($was !== $shown) {
-            throw ProductionException::invalid('Готовность уже изменена: '.$this->percentText($was));
-        }
-        ContractProductionInfo::updateOrCreate(['contract_id' => $contract->id], ['readiness_percent' => $percent, 'readiness_changed_at' => now()]);
-        ContractReadinessEvent::create([
-            'contract_id' => $contract->id,
-            'percent_before' => $was,
-            'percent_after' => $percent,
-            'source' => ContractReadinessEvent::SOURCE_ERP,
-            'admin_id' => Auth::guard('admin')->id(),
-            'created_at' => now(),
-        ]);
+        (new ObjectReadiness())->apply($contract->id, $percent, ContractReadinessEvent::SOURCE_ERP,
+            ['admin_id' => Auth::guard('admin')->id()], checkShown: true, shown: $shown);
     }
 
     /**
      * История готовности объекта для окна: новые сверху, кто (администратор ERP или сотрудник) и когда
      *
-     * @return array<int, array{at: mixed, before: ?float, after: float, who: ?string}>
+     * @return array<int, array{at: mixed, before: ?float, after: ?float, who: ?string, source: string, reason: ?string}>
      */
     public function readinessHistory(Contract $contract): array
     {
@@ -121,8 +111,10 @@ class ObjectProductionRegistry
         return $events->map(fn (ContractReadinessEvent $e) => [
             'at' => $e->created_at,
             'before' => $e->percent_before !== null ? (float) $e->percent_before : null,
-            'after' => (float) $e->percent_after,
+            'after' => $e->percent_after !== null ? (float) $e->percent_after : null,
             'who' => $e->admin_id ? ($admins[$e->admin_id]?->name ?: $admins[$e->admin_id]?->pseudoname) : (ErpAudit::person($e->staff_id)['name'] ?? null),
+            'source' => ContractReadinessEvent::sourceTitle($e->source),
+            'reason' => $e->reason,
         ])->all();
     }
 
@@ -193,6 +185,8 @@ class ObjectProductionRegistry
             foreach ($next as $typeId => $quantity) {
                 ContractPlanItem::create(['revision_id' => $revision->id, 'work_type_id' => $typeId, 'quantity' => $quantity]);
             }
+            // Отнесение к допам — по новой редакции; сами факты не меняются (П-ФК-24, П-ОБ-32)
+            (new ReportAllocations())->recompute($contract->id);
             ErpAudit::write(self::ENTITY, $contract->id, 'plan_revised', $current ? ['revision_id' => $current->id] : null, [
                 'revision_id' => $revision->id,
                 'items' => collect($next)->map(fn ($q, $typeId) => ['work_type_id' => $typeId, 'name' => $types[$typeId]->name, 'unit' => $types[$typeId]->unit, 'quantity' => $q])->values()->all(),

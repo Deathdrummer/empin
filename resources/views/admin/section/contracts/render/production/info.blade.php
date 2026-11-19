@@ -55,6 +55,10 @@
 				<span>{{$event['at'] ? $event['at']->copy()->timezone($tz)->format('d.m.Y H:i') : ''}}</span>
 				<span class="color-gray fz12px ml5px">{{$event['who'] ?? '-'}}</span>
 				<span class="ml5px">· {{$pct($event['before'])}} → {{$pct($event['after'])}} %</span>
+				<span class="color-gray fz12px ml5px">{{$event['source']}}</span>
+				@if($event['reason'])
+					<span class="fz12px ml5px">· {{$event['reason']}}</span>
+				@endif
 			</div>
 		@empty
 			<p class="color-gray">Изменений нет</p>

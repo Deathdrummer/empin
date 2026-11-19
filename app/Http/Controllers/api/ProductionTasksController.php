@@ -4,6 +4,8 @@ namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
 use App\Production\Attendance\AttendanceService;
+use App\Production\Reports\ReportPresenter;
+use App\Production\Reports\ReportService;
 use App\Production\Support\OrgClock;
 use App\Production\Support\ProductionException;
 use App\Production\Tasks\TaskAccess;
@@ -28,6 +30,8 @@ class ProductionTasksController extends Controller
         private readonly TaskPresenter $presenter,
         private readonly TaskAccess $access,
         private readonly AttendanceService $attendance,
+        private readonly ReportPresenter $reports,
+        private readonly ReportService $reportService,
     ) {
     }
 
@@ -97,6 +101,7 @@ class ProductionTasksController extends Controller
         $viewer = $this->viewer($request);
         $task = $this->tasks->visible($viewer, $id);
         $canInvite = $this->access->canInvite($viewer, TaskFacts::fromModel($task));
+        $report = $task->report;
 
         return response()->json([
             'task' => $this->presenter->one($task, $viewer, $this->clock->today()),
@@ -104,6 +109,10 @@ class ProductionTasksController extends Controller
             'history' => $this->presenter->history($task->id),
             // Блок «Выход» (П-ЗД-39…43); нет бригады и водителя — блока нет
             'attendance' => $this->attendance->block($viewer, $task),
+            // Отчёт и шкалы задания и объекта (п. 8.4); выбор по готовности при удалении (П-ФК-40)
+            'report' => $report ? $this->reportSummary($report) : null,
+            'progress' => $this->reports->progress($task, $report, $viewer),
+            'delete_choice' => $report ? $this->reportService->deleteChoice($task, $report) : null,
         ]);
     }
 
@@ -139,7 +148,8 @@ class ProductionTasksController extends Controller
 
     public function destroy(Request $request, int $id): JsonResponse
     {
-        $this->tasks->delete($this->viewer($request), $id, $this->clock->today());
+        $data = $request->validate(['readiness' => 'nullable|in:keep,restore']);
+        $this->tasks->delete($this->viewer($request), $id, $this->clock->today(), $data['readiness'] ?? null);
 
         return response()->json(['deleted' => true]);
     }
@@ -190,7 +200,21 @@ class ProductionTasksController extends Controller
             'works.*.quantity' => 'nullable|numeric|min:0|max:99999999999',
             'vehicle_id' => 'sometimes|nullable|integer',
             'driver_id' => 'sometimes|nullable|integer',
+            // Смена объекта: готовность прежнего и нового объекта из того же окна (П-ЗД-29)
+            'readiness' => 'sometimes|nullable|array',
+            'readiness.old' => 'sometimes|nullable|array',
+            'readiness.new' => 'sometimes|nullable|array',
         ];
+    }
+
+    /** Отчёт в карточке задания: статус и кто что сделал (п. 8.4) */
+    private function reportSummary(\App\Models\TaskReport $report): array
+    {
+        $full = $this->reports->report($report);
+
+        return array_intersect_key($full, array_flip([
+            'id', 'status', 'author', 'submitted_by', 'submitted_at', 'decided_by', 'decided_at', 'reject_comment', 'edited_by', 'edited_at',
+        ]));
     }
 
     private function viewer(Request $request): Viewer

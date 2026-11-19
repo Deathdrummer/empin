@@ -3,6 +3,7 @@
 use App\Http\Controllers\api\ProductionAttendanceController;
 use App\Http\Controllers\api\ProductionController;
 use App\Http\Controllers\api\ProductionDirectoryController;
+use App\Http\Controllers\api\ProductionReportsController;
 use App\Http\Controllers\api\ProductionTaskChatController;
 use App\Http\Controllers\api\ProductionTurvController;
 use App\Http\Controllers\api\ProductionTasksController;
@@ -50,6 +51,19 @@ Route::prefix('production')->middleware(['auth:sanctum', 'presence'])->group(fun
     Route::post('/turv/cell', [ProductionTurvController::class, 'cell']);
     Route::put('/turv/order', [ProductionTurvController::class, 'order']);
     Route::get('/turv/export', [ProductionTurvController::class, 'export']);
+
+    // Отчёты и готовность объекта (раздел 8)
+    Route::get('/tasks/{id}/report', [ProductionReportsController::class, 'show'])->whereNumber('id');
+    Route::put('/tasks/{id}/report', [ProductionReportsController::class, 'save'])->whereNumber('id');
+    Route::post('/tasks/{id}/report/approve', [ProductionReportsController::class, 'approve'])->whereNumber('id');
+    Route::post('/tasks/{id}/report/reject', [ProductionReportsController::class, 'reject'])->whereNumber('id');
+    Route::post('/tasks/{id}/report/correct', [ProductionReportsController::class, 'correct'])->whereNumber('id');
+    Route::post('/tasks/{id}/report/photos', [ProductionReportsController::class, 'addPhoto'])->whereNumber('id');
+    Route::delete('/tasks/{id}/report/photos/{photoId}', [ProductionReportsController::class, 'removePhoto'])->whereNumber(['id', 'photoId']);
+    Route::post('/tasks/{id}/readiness', [ProductionReportsController::class, 'readiness'])->whereNumber('id');
+    Route::get('/tasks/{id}/object-history', [ProductionReportsController::class, 'objectHistory'])->whereNumber('id');
+    Route::get('/reports/pending', [ProductionReportsController::class, 'pending']);
+    Route::get('/reports/due', [ProductionReportsController::class, 'due']);
 
     // Уведомления до ручного закрытия (п. 9.3)
     Route::get('/notifications', [ProductionController::class, 'notifications']);

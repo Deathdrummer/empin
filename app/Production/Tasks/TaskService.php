@@ -15,6 +15,7 @@ use App\Models\TimesheetContractInvite;
 use App\Models\TimesheetTeam;
 use App\Production\Attendance\AttendanceService;
 use App\Production\Objects\ObjectDirectory;
+use App\Production\Reports\ReportService;
 use App\Production\Rights\Right;
 use App\Production\Support\ProductionException;
 use App\Services\AccountAccess;
@@ -32,6 +33,7 @@ final class TaskService
         private readonly ObjectDirectory $objects,
         private readonly AccountAccess $accounts,
         private readonly AttendanceService $attendance,
+        private readonly ReportService $reports,
     ) {
     }
 
@@ -213,6 +215,11 @@ final class TaskService
             if ($fields) {
                 $this->audit($task->id, 'updated', $viewer, $before, $after, ['fields' => $fields]);
             }
+            // Смена объекта: в том же окне — готовность прежнего и нового объекта (П-ЗД-29, П-ФК-41)
+            if ($object && is_array($input['readiness'] ?? null)) {
+                $this->reports->applyObjectChangeReadiness($viewer, $task, (int) $before['object']['id'], $contractId, $input['readiness']);
+            }
+            $this->reports->afterTaskUpdate($viewer, $task, $before, $after, $today, $executorChanged);
             if ($executorChanged) {
                 $this->notifyPreviousExecutor($task, $before, $after, $viewer, $today);
             }
@@ -229,23 +236,28 @@ final class TaskService
         return [$task, $warnings];
     }
 
-    /** Удалить задание (права 3 и 5) — независимо от отчёта (П-ЗД-27) */
-    public function delete(Viewer $viewer, int $taskId, CarbonImmutable $today): void
+    /**
+     * Удалить задание (права 3 и 5) — независимо от отчёта (П-ЗД-27); отчёт удаляется вместе с ним, выбор по
+     * готовности объекта — $readinessChoice keep / restore (П-ЗД-28, П-ФК-40)
+     */
+    public function delete(Viewer $viewer, int $taskId, CarbonImmutable $today, ?string $readinessChoice = null): void
     {
-        $before = DB::transaction(function () use ($viewer, $taskId, $today) {
+        [$before, $photos] = DB::transaction(function () use ($viewer, $taskId, $today, $readinessChoice) {
             $task = $this->lockVisible($viewer, $taskId);
             if (!$this->access->canDelete($viewer, TaskFacts::fromModel($task), $today)) {
                 throw ProductionException::forbidden('Нет права удалять это задание или его дата вне глубины права');
             }
 
             $before = $this->presenter->snapshot($task);
+            $photos = $this->reports->beforeTaskDelete($viewer, $task, $readinessChoice);
             $teamId = (int) $task->team_id;
             $task->delete();
             $this->releaseTeam($teamId);
             $this->audit($taskId, 'deleted', $viewer, $before, null);
 
-            return $before;
+            return [$before, $photos];
         });
+        $this->reports->afterTaskDelete((int) $before['object']['id'], $photos);
         $this->syncDrivers([[$before['driver']['staff_id'] ?? null, $this->date($before['date'])]]);
     }
 

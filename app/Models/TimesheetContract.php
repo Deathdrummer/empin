@@ -102,6 +102,11 @@ class TimesheetContract extends Model {
         return $this->invites()->whereNull('revoked_at');
     }
 
+    /** Отчёт по заданию — не больше одного (П-ФК-02) */
+    public function report():HasOne {
+        return $this->hasOne(TaskReport::class, 'task_id');
+    }
+
     public function chat():HasMany {
         return $this->hasMany(TimesheetChat::class, 'timesheet_contract_id', 'id');
     }

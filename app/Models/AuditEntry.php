@@ -15,6 +15,9 @@ class AuditEntry extends Model
     public const ENTITY_ATTENDANCE_SHIFT = 'attendance_shift';
     public const ENTITY_ATTENDANCE_DAY = 'attendance_day';
 
+    // Отчёт по заданию (п. 8.6)
+    public const ENTITY_REPORT = 'report';
+
     protected $table = 'audit_log';
 
     public const UPDATED_AT = null;

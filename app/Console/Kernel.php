@@ -15,6 +15,11 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
+        // Напоминания об отчётах (ТЗ П-ЗД-37); на сервере нужен cron `schedule:run` каждую минуту
+        $schedule->command('production:report-reminders')
+            ->dailyAt(config('production.report_reminders_at', '09:00'))
+            ->timezone(config('production.timezone'))
+            ->withoutOverlapping();
         // $schedule->command('inspire')->hourly();
 		/* $schedule->call(function () {
             info('fghfgjfgdj');
