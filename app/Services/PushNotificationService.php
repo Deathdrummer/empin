@@ -158,6 +158,18 @@ class PushNotificationService
         });
     }
 
+    /** Уведомление производственного модуля (выходы, задания): заголовок, текст и данные для перехода */
+    public function sendProductionNotice(Staff $recipient, string $title, string $body, array $data): bool
+    {
+        return $this->sendToExpoTokens($recipient, [
+            'title' => $title,
+            'body' => $body,
+            'sound' => 'default',
+            'priority' => 'high',
+            'data' => ['type' => 'production_notice'] + $data,
+        ]);
+    }
+
     /**
      * Отправить уведомление об активном звонке (звонок принят)
      */

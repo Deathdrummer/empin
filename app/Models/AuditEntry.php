@@ -10,6 +10,11 @@ class AuditEntry extends Model
 {
     public const ENTITY_TASK = 'task';
 
+    // Выходы (п. 7.6, п. 9.4)
+    public const ENTITY_ATTENDANCE_MARK = 'attendance_mark';
+    public const ENTITY_ATTENDANCE_SHIFT = 'attendance_shift';
+    public const ENTITY_ATTENDANCE_DAY = 'attendance_day';
+
     protected $table = 'audit_log';
 
     public const UPDATED_AT = null;

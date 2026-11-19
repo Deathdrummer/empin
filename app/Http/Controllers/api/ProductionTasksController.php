@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
+use App\Production\Attendance\AttendanceService;
 use App\Production\Support\OrgClock;
 use App\Production\Support\ProductionException;
 use App\Production\Tasks\TaskAccess;
@@ -26,6 +27,7 @@ class ProductionTasksController extends Controller
         private readonly TaskService $tasks,
         private readonly TaskPresenter $presenter,
         private readonly TaskAccess $access,
+        private readonly AttendanceService $attendance,
     ) {
     }
 
@@ -89,7 +91,7 @@ class ProductionTasksController extends Controller
         return response()->json($options->for($this->viewer($request)));
     }
 
-    /** Карточка задания: содержание, история изменений и исполнителей; приглашённые — обладателю права 7 */
+    /** Карточка задания: содержание, история изменений и исполнителей, блок «Выход»; приглашённые — обладателю права 7 */
     public function show(Request $request, int $id): JsonResponse
     {
         $viewer = $this->viewer($request);
@@ -100,6 +102,8 @@ class ProductionTasksController extends Controller
             'task' => $this->presenter->one($task, $viewer, $this->clock->today()),
             'invites' => $canInvite ? $this->tasks->invites($task) : null,
             'history' => $this->presenter->history($task->id),
+            // Блок «Выход» (П-ЗД-39…43); нет бригады и водителя — блока нет
+            'attendance' => $this->attendance->block($viewer, $task),
         ]);
     }
 

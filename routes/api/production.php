@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\api\ProductionAttendanceController;
 use App\Http\Controllers\api\ProductionController;
 use App\Http\Controllers\api\ProductionDirectoryController;
 use App\Http\Controllers\api\ProductionTaskChatController;
@@ -36,6 +37,12 @@ Route::prefix('production')->middleware(['auth:sanctum', 'presence'])->group(fun
     Route::delete('/tasks/{id}/comments/{commentId}', [ProductionTaskChatController::class, 'destroy'])->whereNumber(['id', 'commentId']);
     Route::post('/tasks/{id}/comments/{commentId}/reaction', [ProductionTaskChatController::class, 'reaction'])->whereNumber(['id', 'commentId']);
     Route::delete('/tasks/{id}/invites/{staffId}', [ProductionTasksController::class, 'revokeInvite'])->whereNumber(['id', 'staffId']);
+
+    // Выход на смену (раздел 7): плашка, самоотметка, заявка состава, подтверждение в задании
+    Route::get('/attendance/today', [ProductionAttendanceController::class, 'today']);
+    Route::post('/attendance/mark', [ProductionAttendanceController::class, 'mark']);
+    Route::post('/attendance/crew', [ProductionAttendanceController::class, 'crew']);
+    Route::post('/tasks/{id}/attendance', [ProductionAttendanceController::class, 'confirm'])->whereNumber('id');
 
     // Уведомления до ручного закрытия (п. 9.3)
     Route::get('/notifications', [ProductionController::class, 'notifications']);

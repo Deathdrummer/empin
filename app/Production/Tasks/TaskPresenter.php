@@ -4,6 +4,7 @@ namespace App\Production\Tasks;
 
 use App\Models\AuditEntry;
 use App\Models\TimesheetContract;
+use App\Production\Attendance\AttendanceService;
 use App\Production\Objects\ObjectDirectory;
 use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
@@ -14,8 +15,11 @@ final class TaskPresenter
 {
     public const RELATIONS = ['team.brigade.foreman', 'team.profile', 'creator', 'works.workType', 'activeInvites'];
 
-    public function __construct(private readonly TaskAccess $access, private readonly ObjectDirectory $objects)
-    {
+    public function __construct(
+        private readonly TaskAccess $access,
+        private readonly ObjectDirectory $objects,
+        private readonly AttendanceService $attendance,
+    ) {
     }
 
     /**
@@ -27,8 +31,12 @@ final class TaskPresenter
     {
         $tasks = (new EloquentCollection($tasks->all()))->loadMissing(self::RELATIONS)->loadCount('chat');
         $objects = $this->objects->findMany($tasks->pluck('contract_id')->map(fn ($id) => (int) $id)->unique()->values()->all());
+        $badges = $this->attendance->badges($viewer, $tasks);
 
-        return $tasks->map(fn (TimesheetContract $task) => $this->item($task, $viewer, $today, $objects))->values()->all();
+        return $tasks->map(fn (TimesheetContract $task) => $this->item($task, $viewer, $today, $objects) + [
+            // Значок неподтверждённых выходов (П-ЗД-44, П-СМ-19)
+            'attendance_unconfirmed' => $badges[(int) $task->id] ?? false,
+        ])->values()->all();
     }
 
     public function one(TimesheetContract $task, Viewer $viewer, CarbonInterface $today): array

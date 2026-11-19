@@ -13,6 +13,7 @@ use App\Models\StaffNotification;
 use App\Models\TimesheetContract;
 use App\Models\TimesheetContractInvite;
 use App\Models\TimesheetTeam;
+use App\Production\Attendance\AttendanceService;
 use App\Production\Objects\ObjectDirectory;
 use App\Production\Rights\Right;
 use App\Production\Support\ProductionException;
@@ -30,6 +31,7 @@ final class TaskService
         private readonly TaskPresenter $presenter,
         private readonly ObjectDirectory $objects,
         private readonly AccountAccess $accounts,
+        private readonly AttendanceService $attendance,
     ) {
     }
 
@@ -97,6 +99,7 @@ final class TaskService
 
             return $task;
         });
+        $this->syncDrivers([[$task->driver_staff_id, $date]]);
 
         return [$task->fresh(), array_merge($this->objectWarnings($object, $viewer), $fleetWarnings)];
     }
@@ -140,7 +143,7 @@ final class TaskService
      */
     public function update(Viewer $viewer, int $taskId, array $input, CarbonImmutable $today): array
     {
-        return DB::transaction(function () use ($viewer, $taskId, $input, $today) {
+        [$task, $warnings, $drivers] = DB::transaction(function () use ($viewer, $taskId, $input, $today) {
             $task = $this->lockVisible($viewer, $taskId);
             $facts = TaskFacts::fromModel($task);
             if (!$this->access->canEdit($viewer, $facts, $today)) {
@@ -213,15 +216,23 @@ final class TaskService
             if ($executorChanged) {
                 $this->notifyPreviousExecutor($task, $before, $after, $viewer, $today);
             }
+            // Водитель или дата сменились — сообщения водителям «нет заданий» / «вы назначены» (П-СМ-22)
+            $drivers = [];
+            if (in_array('driver', $fields, true) || in_array('date', $fields, true)) {
+                $drivers = [[$before['driver']['staff_id'] ?? null, $this->date($before['date'])], [$after['driver']['staff_id'] ?? null, $this->date($after['date'])]];
+            }
 
-            return [$task, array_merge($warnings, $fleetWarnings)];
+            return [$task, array_merge($warnings, $fleetWarnings), $drivers];
         });
+        $this->syncDrivers($drivers);
+
+        return [$task, $warnings];
     }
 
     /** Удалить задание (права 3 и 5) — независимо от отчёта (П-ЗД-27) */
     public function delete(Viewer $viewer, int $taskId, CarbonImmutable $today): void
     {
-        DB::transaction(function () use ($viewer, $taskId, $today) {
+        $before = DB::transaction(function () use ($viewer, $taskId, $today) {
             $task = $this->lockVisible($viewer, $taskId);
             if (!$this->access->canDelete($viewer, TaskFacts::fromModel($task), $today)) {
                 throw ProductionException::forbidden('Нет права удалять это задание или его дата вне глубины права');
@@ -232,7 +243,20 @@ final class TaskService
             $task->delete();
             $this->releaseTeam($teamId);
             $this->audit($taskId, 'deleted', $viewer, $before, null);
+
+            return $before;
         });
+        $this->syncDrivers([[$before['driver']['staff_id'] ?? null, $this->date($before['date'])]]);
+    }
+
+    /** @param array<int, array{0: ?int, 1: CarbonImmutable}> $pairs водитель и дата */
+    private function syncDrivers(array $pairs): void
+    {
+        foreach ($pairs as [$driverStaffId, $date]) {
+            if ($driverStaffId) {
+                $this->attendance->syncDriverNotices((int) $driverStaffId, $date);
+            }
+        }
     }
 
     /** Пригласить в задание пользователя приложения (право 7, П-ЗД-24) */
