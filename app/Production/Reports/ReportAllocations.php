@@ -2,9 +2,9 @@
 
 namespace App\Production\Reports;
 
-use App\Models\Erp\ContractPlanRevision;
 use App\Models\TaskReport;
 use App\Models\TaskReportItem;
+use App\Production\Erp\ErpGateway;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -14,6 +14,10 @@ use Illuminate\Support\Facades\DB;
  */
 final class ReportAllocations
 {
+    public function __construct(private readonly ErpGateway $erp)
+    {
+    }
+
     /**
      * Согласованные количества по видам работ объекта, без отчёта $exceptReportId
      *
@@ -33,10 +37,8 @@ final class ReportAllocations
     /** Пересчитать отнесение всех согласованных позиций объекта по актуальной редакции плана (П-ФК-24) */
     public function recompute(int $contractId): void
     {
-        $plan = ContractPlanRevision::currentFor($contractId);
-        $planned = $plan
-            ? $plan->items()->pluck('quantity', 'work_type_id')->map(fn ($q) => (float) $q)->all()
-            : null;
+        $plan = $this->erp->currentPlan($contractId);
+        $planned = $plan ? $plan['items'] : null;
 
         $rows = $this->approvedItems($contractId)
             ->select(['i.id', 'i.work_type_id', 'i.quantity_approved', 'i.plan_revision_id', 'i.quantity_in_plan', 'i.quantity_extra', 'i.extra_kind'])
@@ -52,13 +54,13 @@ final class ReportAllocations
                 // Плана нет — к допам не относится до появления плана (П-ФК-04)
                 $next = [null, null, null, null];
             } elseif (!array_key_exists((int) $row->work_type_id, $planned)) {
-                $next = [$plan->id, 0.0, $quantity, $quantity > 0 ? TaskReportItem::EXTRA_OFF_PLAN : null];
+                $next = [$plan['revision_id'], 0.0, $quantity, $quantity > 0 ? TaskReportItem::EXTRA_OFF_PLAN : null];
             } else {
                 $rest = max(0.0, $left[(int) $row->work_type_id]);
                 $inPlan = min($quantity, $rest);
                 $left[(int) $row->work_type_id] = round($rest - $inPlan, 3);
                 $extra = round($quantity - $inPlan, 3);
-                $next = [$plan->id, round($inPlan, 3), $extra, $extra > 0 ? TaskReportItem::EXTRA_OVERAGE : null];
+                $next = [$plan['revision_id'], round($inPlan, 3), $extra, $extra > 0 ? TaskReportItem::EXTRA_OVERAGE : null];
             }
             $current = [
                 $row->plan_revision_id !== null ? (int) $row->plan_revision_id : null,

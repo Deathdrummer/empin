@@ -1,6 +1,6 @@
 {{-- Вкладка прав приложения ЭМПИН-pro в окне прав сотрудника: галочки прав, у прав с настройками — настройки и их сводка --}}
 @php
-	[$appSets, $appSetSuggested] = app(\App\Production\Rights\RightSets::class)->choices((int) $user);
+	[$appSets, $appSetSuggested] = app(\App\Production\Erp\RightSets::class)->choices((int) $user);
 @endphp
 <x-input-group group="normal">
 <div apprights="{{$user}}">

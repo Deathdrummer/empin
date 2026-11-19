@@ -3,23 +3,17 @@
 namespace App\Production\Tasks;
 
 use App\Models\AuditEntry;
-use App\Models\Erp\Brigade;
-use App\Models\Erp\BrigadeMember;
-use App\Models\Erp\ContractPlanRevision;
-use App\Models\Erp\Driver;
-use App\Models\Erp\Vehicle;
-use App\Models\Staff;
 use App\Models\StaffNotification;
 use App\Models\TimesheetContract;
 use App\Models\TimesheetContractInvite;
 use App\Models\TimesheetTeam;
 use App\Production\Attendance\AttendanceService;
+use App\Production\Erp\ErpGateway;
 use App\Production\Objects\ObjectDirectory;
 use App\Production\Reports\ReportService;
 use App\Production\Rights\Right;
 use App\Production\Support\NoticeTexts;
 use App\Production\Support\ProductionException;
-use App\Services\AccountAccess;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\QueryException;
@@ -32,7 +26,7 @@ final class TaskService
         private readonly TaskAccess $access,
         private readonly TaskPresenter $presenter,
         private readonly ObjectDirectory $objects,
-        private readonly AccountAccess $accounts,
+        private readonly ErpGateway $erp,
         private readonly AttendanceService $attendance,
         private readonly ReportService $reports,
     ) {
@@ -83,17 +77,17 @@ final class TaskService
     {
         $date = $this->date($input['date']);
         $object = $this->objects->find((int) $input['object_id']) ?? throw ProductionException::invalid('Объект не найден');
-        $this->assertCanCreate($viewer, $date, $today, ObjectDirectory::isActive($object->archive));
+        $this->assertCanCreate($viewer, $date, $today, $object['active']);
 
         $executor = isset($input['brigade_id']) ? Executor::brigade((int) $input['brigade_id']) : Executor::staff((int) $input['executor_staff_id']);
         $this->assertExecutorAllowed($executor, $date);
-        $works = $this->works((int) $object->id, $input['works'] ?? []);
+        $works = $this->works($object['id'], $input['works'] ?? []);
         [$fleet, $fleetWarnings] = $this->fleet(null, $input);
 
         $task = DB::transaction(function () use ($viewer, $input, $date, $object, $executor, $works, $fleet) {
             $task = TimesheetContract::create([
                 'team_id' => $this->team($executor, $date)->id,
-                'contract_id' => $object->id,
+                'contract_id' => $object['id'],
                 'creator_staff_id' => $viewer->staffId,
                 'text' => $this->text($input['text'] ?? null),
             ] + $fleet);
@@ -119,7 +113,7 @@ final class TaskService
         $source = $this->visible($viewer, $sourceId);
         $date = $this->date($date);
         $object = $this->objects->find((int) $source->contract_id) ?? throw ProductionException::invalid('Объект не найден');
-        $this->assertCanCreate($viewer, $date, $today, ObjectDirectory::isActive($object->archive));
+        $this->assertCanCreate($viewer, $date, $today, $object['active']);
 
         $executor = Executor::ofTeam($source->team);
         $this->assertExecutorAllowed($executor, $date);
@@ -127,7 +121,7 @@ final class TaskService
         $task = DB::transaction(function () use ($viewer, $source, $date, $object, $executor) {
             $task = TimesheetContract::create([
                 'team_id' => $this->team($executor, $date)->id,
-                'contract_id' => $object->id,
+                'contract_id' => $object['id'],
                 'creator_staff_id' => $viewer->staffId,
             ]);
             $this->audit($task->id, 'created', $viewer, null, $this->presenter->snapshot($task), ['copied_from' => (int) $source->id]);
@@ -163,12 +157,12 @@ final class TaskService
             $warnings = [];
             if (isset($input['object_id']) && (int) $input['object_id'] !== (int) $task->contract_id) {
                 $object = $this->objects->find((int) $input['object_id']) ?? throw ProductionException::invalid('Объект не найден');
-                if (!ObjectDirectory::isActive($object->archive)) {
+                if (!$object['active']) {
                     throw ProductionException::invalid('Объект в архиве: перенести на него задание нельзя', 'archived_object');
                 }
                 $warnings = $this->objectWarnings($object, $viewer);
             }
-            $contractId = $object ? (int) $object->id : (int) $task->contract_id;
+            $contractId = $object ? $object['id'] : (int) $task->contract_id;
 
             $current = Executor::ofTeam($task->team);
             $executor = $current;
@@ -278,7 +272,7 @@ final class TaskService
         DB::transaction(function () use ($viewer, $taskId, $staffId) {
             $task = $this->lockVisible($viewer, $taskId);
             $this->assertCanInvite($viewer, $task);
-            if (!$this->accounts->isStaffIdActive($staffId)) {
+            if (!$this->erp->hasAccount($staffId)) {
                 throw ProductionException::invalid('Пригласить можно только пользователя приложения');
             }
             if ($task->activeInvites()->where('staff_id', $staffId)->exists()) {
@@ -345,14 +339,14 @@ final class TaskService
     private function assertExecutorAllowed(Executor $executor, CarbonImmutable $date): void
     {
         if ($executor->isBrigade()) {
-            $brigade = Brigade::find($executor->brigadeId) ?? throw ProductionException::invalid('Бригада не найдена');
-            if ($brigade->disbanded_on !== null && $brigade->disbanded_on->toDateString() <= $date->toDateString()) {
+            $brigade = $this->erp->brigades([$executor->brigadeId])[$executor->brigadeId] ?? throw ProductionException::invalid('Бригада не найдена');
+            if ($brigade['disbanded_on'] !== null && $brigade['disbanded_on'] <= $date->toDateString()) {
                 throw ProductionException::invalid('Бригада расформирована', 'brigade_disbanded');
             }
 
             return;
         }
-        if (!$this->accounts->isStaffIdActive($executor->staffId)) {
+        if (!$this->erp->hasAccount($executor->staffId)) {
             throw ProductionException::invalid('Исполнителем-сотрудником может быть только сотрудник с учётной записью в приложении', 'executor_without_account');
         }
     }
@@ -370,20 +364,20 @@ final class TaskService
         if ($existing) {
             return $existing;
         }
-        $brigade = Brigade::findOrFail($executor->brigadeId);
-        $teamStaff = $brigade->foreman_staff_id
-            ?? BrigadeMember::activeOn($date)->where('brigade_id', $brigade->id)->orderBy('joined_on')->orderBy('id')->value('staff_id')
+        $brigade = $this->erp->brigades([$executor->brigadeId])[$executor->brigadeId] ?? throw ProductionException::invalid('Бригада не найдена');
+        $teamStaff = $brigade['foreman_staff_id']
+            ?? ($this->erp->brigadeMembersOn([$brigade['id']], $date)[$brigade['id']][0] ?? null)
             ?? throw ProductionException::invalid('В бригаде нет ни бригадира, ни состава в ERP', 'brigade_empty');
 
         try {
-            return TimesheetTeam::create(['staff_id' => $teamStaff, 'brigade_id' => $brigade->id, 'day' => $day]);
+            return TimesheetTeam::create(['staff_id' => $teamStaff, 'brigade_id' => $brigade['id'], 'day' => $day]);
         } catch (QueryException $error) {
             // Одновременное создание первого задания бригады на дату: запись уже добавил другой запрос
             if ((int) ($error->errorInfo[1] ?? 0) !== 1062) {
                 throw $error;
             }
 
-            return TimesheetTeam::where('brigade_id', $brigade->id)->where('day', $day)->firstOrFail();
+            return TimesheetTeam::where('brigade_id', $brigade['id'])->where('day', $day)->firstOrFail();
         }
     }
 
@@ -406,9 +400,9 @@ final class TaskService
         if (!$works) {
             return [];
         }
-        $plan = ContractPlanRevision::currentFor($contractId)
+        $plan = $this->erp->currentPlan($contractId)
             ?? throw ProductionException::invalid('У объекта нет плана работ', 'no_plan');
-        $allowed = $plan->items()->pluck('work_type_id')->map(fn ($id) => (int) $id)->all();
+        $allowed = array_map('intval', array_keys($plan['items']));
 
         $result = [];
         foreach ($works as $work) {
@@ -465,25 +459,26 @@ final class TaskService
 
         $fields = [];
         if ($vehicleChanged) {
-            $vehicle = Vehicle::find($vehicleId);
-            if (!$vehicle || $vehicle->not_used) {
+            $vehicle = $this->erp->vehicles([$vehicleId])[$vehicleId] ?? null;
+            if (!$vehicle || $vehicle['not_used']) {
                 throw ProductionException::invalid('Машина не используется или удалена из справочника ERP', 'vehicle_unavailable');
             }
-            $fields = ['vehicle_id' => $vehicle->id, 'vehicle_name' => $vehicle->name, 'vehicle_plate' => $vehicle->plate];
+            $fields = ['vehicle_id' => $vehicle['id'], 'vehicle_name' => $vehicle['name'], 'vehicle_plate' => $vehicle['plate']];
         }
         if ($driverId === null) {
             return [$fields + $noDriver, []];
         }
 
-        $driver = Driver::with('staff')->find($driverId);
-        if (!$driver || $driver->not_used || !$driver->staff?->working) {
+        $driver = $this->erp->drivers([$driverId])[$driverId] ?? null;
+        if (!$driver || $driver['not_used'] || !$driver['working']) {
             throw ProductionException::invalid('Водитель не используется или удалён из списка водителей ERP', 'driver_unavailable');
         }
-        $assigned = DB::table('vehicle_drivers')->where('vehicle_id', $vehicleId)->where('driver_id', $driver->id)->exists();
+        $assigned = in_array($driver['id'], $this->erp->vehicles([$vehicleId])[$vehicleId]['driver_ids'] ?? [], true);
         $fields += [
-            'driver_id' => $driver->id,
-            'driver_staff_id' => $driver->staff_id,
-            'driver_name' => ObjectDirectory::name($driver->staff->sname, $driver->staff->fname, $driver->staff->mname),
+            'driver_id' => $driver['id'],
+            'driver_staff_id' => $driver['staff_id'],
+            // Снимок ФИО на момент назначения (П-ОБ-23б)
+            'driver_name' => $this->erp->people([$driver['staff_id']])[$driver['staff_id']]['name'] ?? null,
             'driver_assigned' => $assigned,
         ];
 
@@ -491,9 +486,9 @@ final class TaskService
     }
 
     /** Объект чужой или без ответственного — предупреждение, задание создаётся (П-ЗД-08) */
-    private function objectWarnings(object $object, Viewer $viewer): array
+    private function objectWarnings(array $object, Viewer $viewer): array
     {
-        $responsible = $object->responsible_staff_id ? (int) $object->responsible_staff_id : null;
+        $responsible = $object['responsible_staff_id'];
         if ($responsible === $viewer->staffId) {
             return [];
         }
@@ -501,7 +496,7 @@ final class TaskService
         return [[
             'code' => 'foreign_object',
             'message' => $responsible
-                ? 'Ответственный за объект — '.ObjectDirectory::name($object->r_sname, $object->r_fname, $object->r_mname)
+                ? 'Ответственный за объект — '.$this->person($responsible)['name']
                 : 'У объекта нет ответственного начальника участка',
         ]];
     }
@@ -514,15 +509,15 @@ final class TaskService
     {
         $previous = $before['executor'];
         $recipients = $previous['type'] === 'brigade'
-            ? collect(Brigade::currentStaff([(int) $previous['brigade_id']], $today)[(int) $previous['brigade_id']] ?? [])
+            ? collect($this->erp->brigadeStaffOn([(int) $previous['brigade_id']], $today)[(int) $previous['brigade_id']] ?? [])
             : collect([(int) $previous['staff_id']]);
         $recipients = $recipients->unique()->reject(fn ($id) => $id === $viewer->staffId);
 
         // «Иванов Сергей Петрович передал задание на 18 ноября по объекту 12 «Название»: новый исполнитель — Бригада Сидоров.»
         $object = $after['object'];
-        $by = Staff::query()->select(['id', 'sname', 'fname', 'mname'])->find($viewer->staffId);
+        $by = $this->erp->people([$viewer->staffId])[$viewer->staffId] ?? null;
         $body = sprintf('%s задание на %s по объекту %s: новый исполнитель — %s.',
-            NoticeTexts::upper(trim($this->person($viewer->staffId)['name'].' '.NoticeTexts::verb('передал', $by?->mname))),
+            NoticeTexts::upper(trim($this->person($viewer->staffId)['name'].' '.NoticeTexts::verb('передал', $by['patronymic'] ?? null))),
             NoticeTexts::date($after['date'], $today), NoticeTexts::object($object['number'], $object['title']), $after['executor']['name']);
 
         foreach ($recipients as $staffId) {
@@ -569,9 +564,7 @@ final class TaskService
 
     private function person(int $staffId): array
     {
-        $staff = Staff::query()->select(['id', 'sname', 'fname', 'mname'])->find($staffId);
-
-        return ['id' => $staffId, 'name' => $staff ? ObjectDirectory::name($staff->sname, $staff->fname, $staff->mname) : null];
+        return ['id' => $staffId, 'name' => $this->erp->people([$staffId])[$staffId]['name'] ?? null];
     }
 
     private function text(?string $text): ?string

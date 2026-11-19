@@ -3,11 +3,8 @@
 namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Erp\Brigade;
-use App\Models\Erp\BrigadeMember;
-use App\Models\Erp\Driver;
-use App\Models\Staff;
 use App\Models\StaffNotification;
+use App\Production\Erp\ErpGateway;
 use App\Production\Rights\Grant;
 use App\Production\Rights\StaffRights;
 use App\Production\Support\OrgClock;
@@ -18,7 +15,7 @@ use Illuminate\Http\Request;
 /** Производственный модуль: общие сведения для приложения */
 class ProductionController extends Controller
 {
-    public function __construct(private readonly OrgClock $clock)
+    public function __construct(private readonly OrgClock $clock, private readonly ErpGateway $erp)
     {
     }
 
@@ -32,45 +29,26 @@ class ProductionController extends Controller
     public function me(Request $request): JsonResponse
     {
         $staffId = (int) $request->user()->staff_id;
-        $staff = Staff::find($staffId);
+        $staff = $this->erp->people([$staffId])[$staffId] ?? null;
         if (!$staff) {
             return response()->json(['error' => 'Учётная запись не связана с сотрудником ERP'], 403);
         }
 
         $today = $this->clock->today();
-
-        // Текущее членство даёт доступ к заданиям бригады (П-ОБ-18); расформированная бригада не действует
-        $brigades = BrigadeMember::query()
-            ->activeOn($today)
-            ->where('staff_id', $staffId)
-            ->whereHas('brigade', fn ($q) => $q->where(fn ($b) => $b->whereNull('disbanded_on')->orWhere('disbanded_on', '>', $today->toDateString())))
-            ->with('brigade:id,name,foreman_staff_id')
-            ->get()
-            ->map(fn (BrigadeMember $member) => [
-                'id' => $member->brigade->id,
-                'name' => $member->brigade->name,
-                'is_foreman' => (int) $member->brigade->foreman_staff_id === $staffId,
-                'joined_on' => $member->joined_on->toDateString(),
-            ])
-            ->unique('id')
-            ->values();
-        // Бригадир — в составе своей бригады, даже если ERP не внесла его строкой состава (П-ОБ-16)
-        $led = Brigade::where('foreman_staff_id', $staffId)->workingOn($today)->first(['id', 'name']);
-        if ($led && !$brigades->contains('id', $led->id)) {
-            $brigades->push(['id' => $led->id, 'name' => $led->name, 'is_foreman' => true, 'joined_on' => null]);
-        }
-
-        $driver = Driver::where('staff_id', $staffId)->first();
+        // Текущее членство даёт доступ к заданиям бригады (П-ОБ-18); бригадир — в составе своей бригады (П-ОБ-16);
+        // расформированная бригада не действует
+        $brigades = array_values($this->erp->brigadesOfStaff($staffId, $today));
+        $driver = $this->erp->driverOfStaff($staffId);
         $rights = StaffRights::load($staffId);
 
         return response()->json([
             'staff' => [
-                'id' => $staff->id,
-                'full_name' => $staff->full_name,
-                'position' => $staff->work_post,
+                'id' => $staff['id'],
+                'full_name' => $staff['name'],
+                'position' => $staff['position'],
             ],
             'brigades' => $brigades,
-            'driver' => $driver ? ['id' => $driver->id, 'not_used' => $driver->not_used] : null,
+            'driver' => $driver ? ['id' => $driver['id'], 'not_used' => $driver['not_used']] : null,
             'rights' => $rights->all()->map(fn (Grant $grant) => $grant->toArray())->values(),
             'rights_version' => $rights->version(),
             'time' => $this->timePayload(),

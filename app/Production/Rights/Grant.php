@@ -2,7 +2,6 @@
 
 namespace App\Production\Rights;
 
-use App\Models\Erp\PermissionSetting;
 use App\Production\Support\DateWindows;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
@@ -26,18 +25,22 @@ final class Grant
     ) {
     }
 
-    /** Выдача права с настройками из ERP */
-    public static function fromSetting(Right $right, PermissionSetting $row): self
+    /**
+     * Выдача права с настройками из ERP (шлюз ERP, {@see \App\Production\Erp\ErpGateway::grants()})
+     *
+     * @param array{depth_days: ?int, scope_all: bool, staff_ids: int[], brigade_ids: int[], all_brigades: bool, date_from: ?string, date_to: ?string} $row
+     */
+    public static function fromSetting(Right $right, array $row): self
     {
         return new self(
             right: $right,
-            depthDays: $right->hasDepth() ? $row->depth_days : null,
-            scopeAll: (bool) $row->scope_all,
-            staffIds: array_values(array_map('intval', $row->staff_ids ?? [])),
-            brigadeIds: array_values(array_map('intval', $row->brigade_ids ?? [])),
-            allBrigades: (bool) $row->all_brigades,
-            dateFrom: $row->date_from ? CarbonImmutable::parse($row->date_from->toDateString()) : null,
-            dateTo: $row->date_to ? CarbonImmutable::parse($row->date_to->toDateString()) : null,
+            depthDays: $right->hasDepth() ? $row['depth_days'] : null,
+            scopeAll: $row['scope_all'],
+            staffIds: $row['staff_ids'],
+            brigadeIds: $row['brigade_ids'],
+            allBrigades: $row['all_brigades'],
+            dateFrom: $row['date_from'] ? CarbonImmutable::parse($row['date_from']) : null,
+            dateTo: $row['date_to'] ? CarbonImmutable::parse($row['date_to']) : null,
         );
     }
 

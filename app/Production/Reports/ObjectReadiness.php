@@ -2,8 +2,8 @@
 
 namespace App\Production\Reports;
 
-use App\Models\Erp\ContractProductionInfo;
-use App\Models\Erp\ContractReadinessEvent;
+use App\Models\ContractReadinessEvent;
+use App\Production\Erp\ErpGateway;
 use App\Production\Support\ProductionException;
 
 /**
@@ -12,11 +12,13 @@ use App\Production\Support\ProductionException;
  */
 final class ObjectReadiness
 {
+    public function __construct(private readonly ErpGateway $erp)
+    {
+    }
+
     public function current(int $contractId): ?float
     {
-        $value = ContractProductionInfo::whereKey($contractId)->value('readiness_percent');
-
-        return $value !== null ? (float) $value : null;
+        return $this->erp->storedReadiness($contractId);
     }
 
     /**
@@ -27,8 +29,7 @@ final class ObjectReadiness
      */
     public function apply(int $contractId, ?float $percent, string $source, array $meta, bool $checkShown = false, ?float $shown = null, bool $recordUnchanged = false): ?ContractReadinessEvent
     {
-        $info = ContractProductionInfo::whereKey($contractId)->lockForUpdate()->first();
-        $was = $info?->readiness_percent !== null ? (float) $info->readiness_percent : null;
+        $was = $this->erp->storedReadiness($contractId, lock: true);
         if ($checkShown && $was !== $shown) {
             throw ProductionException::invalid('Готовность уже изменена: '.self::text($was), 'readiness_changed');
         }
@@ -36,7 +37,7 @@ final class ObjectReadiness
             return null;
         }
         if ($was !== $percent) {
-            ContractProductionInfo::updateOrCreate(['contract_id' => $contractId], ['readiness_percent' => $percent, 'readiness_changed_at' => now()]);
+            $this->erp->storeReadiness($contractId, $percent);
         }
 
         return ContractReadinessEvent::create([

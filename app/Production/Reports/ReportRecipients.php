@@ -2,9 +2,9 @@
 
 namespace App\Production\Reports;
 
-use App\Models\Erp\Brigade;
 use App\Models\TaskReport;
 use App\Models\TimesheetContract;
+use App\Production\Erp\ErpGateway;
 use App\Production\Rights\Right;
 use App\Production\Rights\StaffRights;
 use Carbon\CarbonImmutable;
@@ -15,6 +15,10 @@ use Carbon\CarbonImmutable;
  */
 final class ReportRecipients
 {
+    public function __construct(private readonly ErpGateway $erp)
+    {
+    }
+
     /**
      * @param array<int, bool>|null $memo права сотрудников между вызовами (ежедневная рассылка); без него — свежие
      * @return int[]
@@ -41,6 +45,6 @@ final class ReportRecipients
     /** @return int[] */
     public function brigadeStaff(int $brigadeId, CarbonImmutable $today): array
     {
-        return Brigade::currentStaff([$brigadeId], $today)[$brigadeId] ?? [];
+        return $this->erp->brigadeStaffOn([$brigadeId], $today)[$brigadeId] ?? [];
     }
 }

@@ -3,17 +3,14 @@
 namespace App\Production\Reports;
 
 use App\Models\AuditEntry;
-use App\Models\Erp\ContractPlanRevision;
-use App\Models\Erp\ContractReadinessEvent;
-use App\Models\Erp\WorkType;
-use App\Models\Staff;
+use App\Models\ContractReadinessEvent;
 use App\Models\StaffNotification;
 use App\Models\TaskReport;
 use App\Models\TaskReportItem;
 use App\Models\TaskReportPhoto;
 use App\Models\TimesheetContract;
 use App\Production\Attendance\AttendanceNotices;
-use App\Production\Objects\ObjectDirectory;
+use App\Production\Erp\ErpGateway;
 use App\Production\Rights\Right;
 use App\Production\Support\NoticeTexts;
 use App\Production\Support\ProductionException;
@@ -40,6 +37,7 @@ final class ReportService
         private readonly ObjectReadiness $readiness,
         private readonly AttendanceNotices $notices,
         private readonly ReportRecipients $recipients,
+        private readonly ErpGateway $erp,
     ) {
     }
 
@@ -499,13 +497,13 @@ final class ReportService
                 break;
             }
         }
-        $plan = ContractPlanRevision::currentFor($contractId);
+        $plan = $this->erp->currentPlan($contractId);
         if (!$plan) {
             return $problems;
         }
-        $planned = $plan->items()->pluck('quantity', 'work_type_id')->map(fn ($q) => (float) $q)->all();
+        $planned = $plan['items'];
         $approved = $this->allocations->approvedTotals($contractId, $exceptReportId);
-        $names = WorkType::withTrashed()->whereIn('id', array_keys($items))->pluck('name', 'id');
+        $names = array_map(fn (array $type) => $type['name'], $this->erp->workTypes(array_keys($items)));
 
         $overage = $approving ? Right::OverageApprove : Right::OverageDeclare;
         $offPlan = $approving ? Right::OffPlanApprove : Right::OffPlanDeclare;
@@ -599,10 +597,10 @@ final class ReportService
             }
             $result[$typeId] = $quantity;
         }
-        $types = WorkType::withTrashed()->whereIn('id', array_keys($result))->get()->keyBy('id');
+        $types = $this->erp->workTypes(array_keys($result));
         foreach (array_keys($result) as $typeId) {
             $type = $types[$typeId] ?? null;
-            if (!$type || ($type->trashed() && !in_array($typeId, $current, true))) {
+            if (!$type || ($type['deleted'] && !in_array($typeId, $current, true))) {
                 throw ProductionException::invalid('Вид работ не найден в справочнике');
             }
         }
@@ -654,18 +652,18 @@ final class ReportService
     /** Что согласующий поменял в отправленном: позиции с другим количеством, добавленные и снятые */
     private function quantityChanges(TaskReport $report, array $items): array
     {
-        $existing = $report->items()->with('workType')->get()->keyBy(fn (TaskReportItem $i) => (int) $i->work_type_id);
-        $types = WorkType::withTrashed()->whereIn('id', array_keys($items))->get()->keyBy('id');
+        $existing = $report->items()->get()->keyBy(fn (TaskReportItem $i) => (int) $i->work_type_id);
+        $types = $this->erp->workTypes(array_merge(array_keys($items), $existing->keys()->all()));
         $changes = [];
         foreach ($existing as $typeId => $item) {
             $approved = array_key_exists($typeId, $items) ? $items[$typeId] : null;
             if ($approved !== $item->quantity_declared) {
-                $changes[] = ['work_type_id' => $typeId, 'name' => $item->workType?->name, 'unit' => $item->workType?->unit, 'declared' => $item->quantity_declared, 'approved' => $approved];
+                $changes[] = ['work_type_id' => $typeId, 'name' => $types[$typeId]['name'] ?? null, 'unit' => $types[$typeId]['unit'] ?? null, 'declared' => $item->quantity_declared, 'approved' => $approved];
             }
         }
         foreach ($items as $typeId => $quantity) {
             if (!isset($existing[$typeId])) {
-                $changes[] = ['work_type_id' => $typeId, 'name' => $types[$typeId]?->name, 'unit' => $types[$typeId]?->unit, 'declared' => null, 'approved' => $quantity];
+                $changes[] = ['work_type_id' => $typeId, 'name' => $types[$typeId]['name'] ?? null, 'unit' => $types[$typeId]['unit'] ?? null, 'declared' => null, 'approved' => $quantity];
             }
         }
 
@@ -721,18 +719,17 @@ final class ReportService
     private function about(TimesheetContract $task, CarbonImmutable $today): string
     {
         $task->loadMissing('team');
-        $object = DB::table('contracts')->where('id', $task->contract_id)->first(['object_number', 'title']);
+        $object = $this->erp->objects([(int) $task->contract_id])[(int) $task->contract_id] ?? null;
 
-        return NoticeTexts::about($object?->object_number, $object?->title, $task->team->day, $today);
+        return NoticeTexts::about($object['number'] ?? null, $object['title'] ?? null, $task->team->day, $today);
     }
 
     /** «Иванов Сергей Петрович изменил», «Иванова Мария Петровна изменила» */
     private function whoDid(int $staffId, string $verb): string
     {
-        $staff = Staff::query()->select(['id', 'sname', 'fname', 'mname'])->find($staffId);
-        $name = $staff ? ObjectDirectory::name($staff->sname, $staff->fname, $staff->mname) : '';
+        $person = $this->erp->people([$staffId])[$staffId] ?? null;
 
-        return NoticeTexts::upper(trim($name.' '.NoticeTexts::verb($verb, $staff?->mname)));
+        return NoticeTexts::upper(trim(($person['name'] ?? '').' '.NoticeTexts::verb($verb, $person['patronymic'] ?? null)));
     }
 
     private function quantityText(?float $quantity, ?string $unit): string
@@ -744,6 +741,8 @@ final class ReportService
     private function snapshot(TaskReport $report, ?TaskReport $unsaved = null): array
     {
         $source = $unsaved ?? $report;
+        $items = TaskReportItem::where('report_id', $report->id)->orderBy('id')->get();
+        $types = $this->erp->workTypes($items->pluck('work_type_id')->map(fn ($id) => (int) $id)->all());
 
         return [
             'status' => $source->status,
@@ -751,10 +750,10 @@ final class ReportService
             'task_percent' => ['declared' => $source->task_percent_declared, 'approved' => $source->task_percent_approved],
             'object_percent' => ['declared' => $source->object_percent_declared, 'approved' => $source->object_percent_approved],
             'reject_comment' => $source->reject_comment,
-            'items' => TaskReportItem::where('report_id', $report->id)->with('workType')->orderBy('id')->get()->map(fn (TaskReportItem $i) => [
+            'items' => $items->map(fn (TaskReportItem $i) => [
                 'work_type_id' => (int) $i->work_type_id,
-                'name' => $i->workType?->name,
-                'unit' => $i->workType?->unit,
+                'name' => $types[(int) $i->work_type_id]['name'] ?? null,
+                'unit' => $types[(int) $i->work_type_id]['unit'] ?? null,
                 'declared' => $i->quantity_declared,
                 'approved' => $i->quantity_approved,
             ])->all(),
@@ -776,9 +775,7 @@ final class ReportService
 
     private function personName(int $staffId): string
     {
-        $staff = Staff::query()->select(['id', 'sname', 'fname', 'mname'])->find($staffId);
-
-        return $staff ? ObjectDirectory::name($staff->sname, $staff->fname, $staff->mname) : '';
+        return $this->erp->people([$staffId])[$staffId]['name'] ?? '';
     }
 
     private function text(?string $text): ?string

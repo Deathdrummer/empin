@@ -3,18 +3,12 @@
 namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Erp\Brigade;
-use App\Models\Erp\BrigadeMember;
-use App\Models\Erp\ContractPlanRevision;
-use App\Models\Erp\Driver;
-use App\Models\Erp\Vehicle;
-use App\Models\Erp\WorkType;
+use App\Production\Erp\ErpGateway;
 use App\Production\Objects\ObjectDirectory;
 use App\Production\Rights\Right;
 use App\Production\Rights\StaffRights;
 use App\Production\Support\OrgClock;
 use App\Production\Support\ProductionException;
-use App\Services\AccountAccess;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -26,7 +20,7 @@ class ProductionDirectoryController extends Controller
     public function __construct(
         private readonly OrgClock $clock,
         private readonly ObjectDirectory $objects,
-        private readonly AccountAccess $accounts,
+        private readonly ErpGateway $erp,
     ) {
     }
 
@@ -54,16 +48,17 @@ class ProductionDirectoryController extends Controller
     public function plan(Request $request, int $objectId): JsonResponse
     {
         $this->requireAny($request, self::TASK_FORM_RIGHTS);
-        $plan = ContractPlanRevision::currentFor($objectId);
+        $plan = $this->erp->currentPlan($objectId);
+        $types = $plan ? $this->erp->workTypes(array_keys($plan['items'])) : [];
 
         return response()->json([
             'object_id' => $objectId,
-            'revision_id' => $plan?->id,
-            'items' => $plan ? $plan->items()->with(['workType' => fn ($q) => $q->withTrashed()])->get()->map(fn ($item) => [
-                'work_type_id' => (int) $item->work_type_id,
-                'name' => $item->workType?->name,
-                'unit' => $item->workType?->unit,
-                'quantity' => (float) $item->quantity,
+            'revision_id' => $plan['revision_id'] ?? null,
+            'items' => $plan ? collect($plan['items'])->map(fn (float $quantity, int $typeId) => [
+                'work_type_id' => $typeId,
+                'name' => $types[$typeId]['name'] ?? null,
+                'unit' => $types[$typeId]['unit'] ?? null,
+                'quantity' => $quantity,
             ])->sortBy('name')->values() : [],
         ]);
     }
@@ -75,8 +70,8 @@ class ProductionDirectoryController extends Controller
     public function workTypes(): JsonResponse
     {
         return response()->json([
-            'items' => WorkType::orderBy('name')->get(['id', 'name', 'unit'])
-                ->map(fn (WorkType $type) => ['id' => (int) $type->id, 'name' => $type->name, 'unit' => $type->unit])->values(),
+            'items' => collect($this->erp->workTypes())
+                ->map(fn (array $type) => ['id' => $type['id'], 'name' => $type['name'], 'unit' => $type['unit']])->values(),
         ]);
     }
 
@@ -89,23 +84,19 @@ class ProductionDirectoryController extends Controller
         $this->requireAny($request, [...self::TASK_FORM_RIGHTS, Right::TaskInvite]);
         $today = $this->clock->today();
 
-        $members = BrigadeMember::activeOn($today)->with('staff:id,sname,fname,mname')->orderBy('joined_on')->get()->groupBy('brigade_id');
-        $brigades = Brigade::query()
-            ->where(fn ($q) => $q->whereNull('disbanded_on')->orWhere('disbanded_on', '>', $today->toDateString()))
-            ->with('foreman:id,sname,fname,mname')
-            ->orderBy('name')
-            ->get()
-            ->map(fn (Brigade $brigade) => [
-                'id' => $brigade->id,
-                'name' => $brigade->name,
-                'foreman' => $brigade->foreman ? $this->person($brigade->foreman) : null,
-                'members' => ($members->get($brigade->id) ?? collect())->map(fn ($m) => $this->person($m->staff))->values(),
-            ]);
+        $working = $this->erp->brigadesWorkingOn($today);
+        $members = $this->erp->brigadeMembersOn(array_column($working, 'id'), $today);
+        $people = $this->erp->people(array_merge(array_filter(array_column($working, 'foreman_staff_id')), ...array_values($members)));
+        $brigades = collect($working)->map(fn (array $brigade) => [
+            'id' => $brigade['id'],
+            'name' => $brigade['name'],
+            'foreman' => $brigade['foreman_staff_id'] ? $this->person($people[$brigade['foreman_staff_id']] ?? null, $brigade['foreman_staff_id']) : null,
+            'members' => collect($members[$brigade['id']] ?? [])->map(fn (int $id) => $this->person($people[$id] ?? null, $id))->values(),
+        ])->values();
 
-        $staff = $this->accounts->activeStaffQuery()
-            ->orderBy('s.sname')->orderBy('s.fname')
-            ->get(['s.id', 's.sname', 's.fname', 's.mname', 's.work_post'])
-            ->map(fn ($row) => $this->person($row) + ['position' => $row->work_post]);
+        $staff = collect($this->erp->accountPeople())
+            ->map(fn (array $person) => $this->person($person, $person['id']) + ['position' => $person['position']])
+            ->values();
 
         return response()->json(['brigades' => $brigades, 'staff' => $staff]);
     }
@@ -118,27 +109,21 @@ class ProductionDirectoryController extends Controller
     {
         $this->requireAny($request, self::TASK_FORM_RIGHTS);
 
-        $drivers = Driver::query()
-            ->where('not_used', false)
-            ->whereHas('staff', fn ($q) => $q->where('working', 1))
-            ->with('staff:id,sname,fname,mname')
-            ->get()
-            ->map(fn (Driver $driver) => ['id' => $driver->id, 'staff_id' => $driver->staff_id, 'name' => $this->person($driver->staff)['name']])
+        $active = $this->erp->drivers();
+        $people = $this->erp->people(array_column($active, 'staff_id'));
+        $drivers = collect($active)
+            ->map(fn (array $driver) => ['id' => $driver['id'], 'staff_id' => $driver['staff_id'], 'name' => $people[$driver['staff_id']]['name'] ?? null])
             ->sortBy('name')
             ->values();
         $available = $drivers->pluck('id')->flip();
 
-        $vehicles = Vehicle::query()
-            ->where('not_used', false)
-            ->with('drivers:id')
-            ->orderBy('name')
-            ->get()
-            ->map(fn (Vehicle $vehicle) => [
-                'id' => $vehicle->id,
-                'name' => $vehicle->name,
-                'plate' => $vehicle->plate,
-                'driver_ids' => $vehicle->drivers->pluck('id')->filter(fn ($id) => $available->has($id))->values(),
-            ]);
+        $vehicles = collect($this->erp->vehicles())
+            ->map(fn (array $vehicle) => [
+                'id' => $vehicle['id'],
+                'name' => $vehicle['name'],
+                'plate' => $vehicle['plate'],
+                'driver_ids' => collect($vehicle['driver_ids'])->filter(fn ($id) => $available->has($id))->values(),
+            ])->values();
 
         return response()->json(['vehicles' => $vehicles, 'drivers' => $drivers]);
     }
@@ -156,8 +141,8 @@ class ProductionDirectoryController extends Controller
         throw ProductionException::forbidden('Нет права ставить или изменять задания');
     }
 
-    private function person(?object $staff): array
+    private function person(?array $person, int $staffId): array
     {
-        return ['id' => $staff ? (int) $staff->id : null, 'name' => $staff ? ObjectDirectory::name($staff->sname, $staff->fname, $staff->mname) : null];
+        return ['id' => $staffId, 'name' => $person['name'] ?? null];
     }
 }

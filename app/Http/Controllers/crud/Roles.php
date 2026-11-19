@@ -3,8 +3,8 @@
 use App\Http\Controllers\Controller;
 
 use App\Production\Rights\Right;
-use App\Production\Rights\RightSettings;
-use App\Production\Rights\RightsHistory;
+use App\Production\Erp\RightSettings;
+use App\Production\Erp\RightsHistory;
 use App\Traits\HasCrudController;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;

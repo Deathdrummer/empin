@@ -1,8 +1,8 @@
 <?php namespace App\Http\Controllers\crud;
 
 use App\Http\Controllers\Controller;
-use App\Production\Rights\RightSets;
-use App\Production\Rights\RightSettings;
+use App\Production\Erp\RightSets;
+use App\Production\Erp\RightSettings;
 use App\Production\Support\ProductionException;
 use App\Traits\HasCrudController;
 use Illuminate\Http\Request;

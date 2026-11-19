@@ -33,6 +33,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register() {
         //$this->app->bind(\App\Contracts\Rool::class, \App\Services\DdrService::class);
+        // Шлюз ERP для модуля производства: сейчас — таблицы этой же базы; при выносе ERP меняется только реализация
+        $this->app->singleton(\App\Production\Erp\ErpGateway::class, \App\Production\Erp\DatabaseErpGateway::class);
     }
 	
 	

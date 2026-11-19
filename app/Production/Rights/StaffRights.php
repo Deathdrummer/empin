@@ -2,8 +2,7 @@
 
 namespace App\Production\Rights;
 
-use App\Models\Erp\PermissionSetting;
-use App\Models\User;
+use App\Production\Erp\ErpGateway;
 use Illuminate\Support\Collection;
 
 /** Права сотрудника из ERP: права приложения в механизме прав ERP (личные и через роль) плюс их настройки */
@@ -16,32 +15,13 @@ final class StaffRights
 
     public static function load(int $staffId): self
     {
-        $user = User::where('staff_id', $staffId)->first();
-        if (!$user) {
-            return new self($staffId, collect());
-        }
-
-        $permissions = $user->getAllPermissions()
-            ->filter(fn ($permission) => $permission->guard_name === 'site')
-            ->mapWithKeys(fn ($permission) => [$permission->id => Right::fromPermissionName($permission->name)])
-            ->filter();
-
-        $settings = PermissionSetting::query()
-            ->where('user_id', $user->id)
-            ->whereIn('permission_id', $permissions->keys())
-            ->orderBy('id')
-            ->get()
-            ->groupBy('permission_id');
-
-        $grants = $permissions
-            ->sortBy(fn (Right $right) => $right->value)
-            ->flatMap(function (Right $right, int $permissionId) use ($settings) {
-                $rows = $settings->get($permissionId);
-
-                return $rows && $rows->isNotEmpty()
-                    ? $rows->map(fn (PermissionSetting $row) => Grant::fromSetting($right, $row))->all()
-                    : [Grant::withoutSettings($right)];
-            })
+        $grants = collect(app(ErpGateway::class)->grants($staffId))
+            ->map(fn (array $grant) => ['right' => Right::fromPermissionName($grant['permission'])] + $grant)
+            ->filter(fn (array $grant) => $grant['right'] !== null)
+            ->sortBy(fn (array $grant) => $grant['right']->value)
+            ->flatMap(fn (array $grant) => $grant['settings']
+                ? array_map(fn (array $row) => Grant::fromSetting($grant['right'], $row), $grant['settings'])
+                : [Grant::withoutSettings($grant['right'])])
             ->values();
 
         return new self($staffId, $grants);

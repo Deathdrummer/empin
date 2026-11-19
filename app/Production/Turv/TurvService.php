@@ -4,13 +4,9 @@ namespace App\Production\Turv;
 
 use App\Models\AttendanceDay;
 use App\Models\AttendanceMark;
-use App\Models\Erp\Brigade;
-use App\Models\Erp\BrigadeMember;
-use App\Models\Erp\Driver;
-use App\Models\Staff;
 use App\Models\TurvOrder;
 use App\Production\Attendance\AttendanceService;
-use App\Production\Objects\ObjectDirectory;
+use App\Production\Erp\ErpGateway;
 use App\Production\Rights\Grant;
 use App\Production\Rights\Right;
 use App\Production\Support\OrgClock;
@@ -34,7 +30,7 @@ final class TurvService
     /** @var array<int, string> ФИО */
     private array $names = [];
 
-    public function __construct(private readonly OrgClock $clock, private readonly AttendanceService $attendance)
+    public function __construct(private readonly OrgClock $clock, private readonly AttendanceService $attendance, private readonly ErpGateway $erp)
     {
     }
 
@@ -70,14 +66,15 @@ final class TurvService
         $brigadeGrants = $view->filter(fn (Grant $g) => $g->allBrigades || $g->brigadeIds);
         $brigadeIds = collect(array_keys($base))
             ->merge($brigadeGrants->contains(fn (Grant $g) => $g->allBrigades)
-                ? Brigade::where(fn ($q) => $q->whereNull('disbanded_on')->orWhere('disbanded_on', '>', $dates[0]))->pluck('id')
+                ? array_column($this->erp->brigadesWorkingOn(CarbonImmutable::parse($dates[0])), 'id')
                 : $brigadeGrants->flatMap(fn (Grant $g) => $g->brigadeIds))
             ->map(fn ($id) => (int) $id)->unique()->values();
-        $brigades = Brigade::whereIn('id', $brigadeIds)->get()->keyBy('id');
-        $memberships = BrigadeMember::whereIn('brigade_id', $brigadeIds)->get()->groupBy('brigade_id');
-        $this->preloadNames($memberships->flatten()->pluck('staff_id')->all());
+        $brigades = $this->erp->brigades($brigadeIds->all());
+        ksort($brigades);
+        $memberships = collect($this->erp->memberships($brigadeIds->all()))->groupBy('brigade_id');
+        $this->preloadNames($memberships->flatten(1)->pluck('staff_id')->all());
         foreach ($brigades as $brigade) {
-            $id = (int) $brigade->id;
+            $id = $brigade['id'];
             $allowed = array_values(array_filter($dates, fn (string $date) => $this->inRanges($base[$id] ?? [], $date)
                 || $brigadeGrants->contains(fn (Grant $g) => ($g->allBrigades || in_array($id, $g->brigadeIds, true)) && $g->coversViewDate(CarbonImmutable::parse($date)))));
             if (!$allowed) {
@@ -85,7 +82,7 @@ final class TurvService
             }
             // Строки: состоявшие в бригаде в разрешённые даты и привлечённые с днями в этой бригаде (П-СМ-31)
             $staff = collect($memberships->get($id, []))
-                ->filter(fn (BrigadeMember $m) => collect($allowed)->contains(fn ($date) => $m->joined_on->toDateString() <= $date && (!$m->left_on || $m->left_on->toDateString() > $date)))
+                ->filter(fn (array $m) => collect($allowed)->contains(fn ($date) => $m['joined_on'] <= $date && (!$m['left_on'] || $m['left_on'] > $date)))
                 ->pluck('staff_id')
                 ->merge($days->filter(fn (AttendanceDay $d) => !$d->as_driver && (int) $d->brigade_id === $id && in_array($d->work_date->toDateString(), $allowed, true))->pluck('staff_id'))
                 ->map(fn ($s) => (int) $s)->unique()->values()->all();
@@ -100,12 +97,12 @@ final class TurvService
                 return !$day && $mark && !$mark->as_driver && (int) $mark->brigade_id === $id && in_array($date, $correctDates, true) ? self::CELL_MARK : self::CELL_NONE;
             }), $staff);
             // По умолчанию первым — текущий бригадир, остальные по алфавиту (П-СМ-33, инт. 8.49)
-            usort($rows, fn ($a, $b) => [(int) ($a['staff_id'] !== (int) $brigade->foreman_staff_id), $a['name']] <=> [(int) ($b['staff_id'] !== (int) $brigade->foreman_staff_id), $b['name']]);
+            usort($rows, fn ($a, $b) => [(int) ($a['staff_id'] !== $brigade['foreman_staff_id']), $a['name']] <=> [(int) ($b['staff_id'] !== $brigade['foreman_staff_id']), $b['name']]);
             $sections[] = [
                 'key' => 'b'.$id,
                 'type' => 'brigade',
                 'brigade_id' => $id,
-                'title' => $brigade->name,
+                'title' => $brigade['name'],
                 'rows' => $rows,
                 'correct_dates' => $correctDates,
                 // «Без ограничений по бригадам» — выход можно поставить любому сотруднику ERP (п. 7.2, право 18)
@@ -115,7 +112,7 @@ final class TurvService
         $sections = $this->sortSections($sections, $order['brigade_ids'] ?? $this->saved($viewer)?->brigade_ids ?? []);
 
         // ---- Водители: по праву 19 на этих людей или на компанию; свою строку водитель видит без права (П-СМ-30а) ----
-        $driverStaff = Driver::query()->pluck('staff_id')
+        $driverStaff = collect($this->erp->driverStaffIds())
             ->merge($days->filter(fn (AttendanceDay $d) => $d->as_driver)->pluck('staff_id'))
             ->map(fn ($s) => (int) $s)->unique()->values();
         $driverRows = [];
@@ -148,7 +145,7 @@ final class TurvService
         // ---- Персональный раздел: все дни сотрудника в любых бригадах и водителем (П-СМ-30) ----
         $people = $view->flatMap(fn (Grant $g) => $g->staffIds);
         if ($view->contains(fn (Grant $g) => $g->scopeAll)) {
-            $people = $people->merge(Staff::where('working', 1)->pluck('id'))->merge($days->pluck('staff_id'));
+            $people = $people->merge($this->erp->workingStaffIds())->merge($days->pluck('staff_id'));
         }
         $personalRows = [];
         $people = $people->map(fn ($s) => (int) $s)->unique()->values();
@@ -207,7 +204,7 @@ final class TurvService
         if (!$row && !$section['can_add_staff']) {
             throw ProductionException::invalid('Сотрудника нет в разделе');
         }
-        if (!$row && !Staff::whereKey($staffId)->exists()) {
+        if (!$row && !$this->erp->people([$staffId])) {
             throw ProductionException::invalid('Сотрудник не найден');
         }
         $this->attendance->correct($viewer, $staffId, CarbonImmutable::parse($date, $this->clock->timezone()), $kind === 'driver' ? null : $brigadeId, $present, $notify);
@@ -230,10 +227,10 @@ final class TurvService
     private function baseRanges(int $staffId): array
     {
         $ranges = [];
-        foreach (BrigadeMember::where('staff_id', $staffId)->get() as $m) {
-            $ranges[(int) $m->brigade_id][] = [
-                $m->joined_on->copy()->startOfMonth()->toDateString(),
-                $m->left_on ? $m->left_on->copy()->subDay()->endOfMonth()->toDateString() : null,
+        foreach ($this->erp->memberships(null, $staffId) as $m) {
+            $ranges[$m['brigade_id']][] = [
+                CarbonImmutable::parse($m['joined_on'])->startOfMonth()->toDateString(),
+                $m['left_on'] ? CarbonImmutable::parse($m['left_on'])->subDay()->endOfMonth()->toDateString() : null,
             ];
         }
 
@@ -297,18 +294,15 @@ final class TurvService
     private function preloadNames(array $staffIds): void
     {
         $missing = array_diff(array_unique(array_map('intval', $staffIds)), array_keys($this->names));
-        foreach (array_chunk($missing, 500) as $chunk) {
-            foreach (Staff::query()->whereIn('id', $chunk)->get(['id', 'sname', 'fname', 'mname']) as $staff) {
-                $this->names[(int) $staff->id] = ObjectDirectory::name($staff->sname, $staff->fname, $staff->mname);
-            }
+        foreach ($this->erp->people($missing) as $id => $person) {
+            $this->names[$id] = $person['name'];
         }
     }
 
     private function name(int $staffId): ?string
     {
         if (!array_key_exists($staffId, $this->names)) {
-            $staff = Staff::query()->select(['id', 'sname', 'fname', 'mname'])->find($staffId);
-            $this->names[$staffId] = $staff ? ObjectDirectory::name($staff->sname, $staff->fname, $staff->mname) : null;
+            $this->names[$staffId] = $this->erp->people([$staffId])[$staffId]['name'] ?? null;
         }
 
         return $this->names[$staffId];

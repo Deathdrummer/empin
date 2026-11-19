@@ -2,10 +2,11 @@
 
 namespace App\Production\Reports;
 
-use App\Models\Erp\ContractReadinessEvent;
+use App\Models\ContractReadinessEvent;
 use App\Models\TaskReport;
 use App\Models\TaskReportItem;
 use App\Models\TimesheetContract;
+use App\Production\Erp\ErpGateway;
 use App\Production\Rights\Grant;
 use App\Production\Rights\Right;
 use App\Production\Tasks\TaskFacts;
@@ -25,6 +26,7 @@ final class ReportQueries
         private readonly ReportAccess $access,
         private readonly ReportPresenter $presenter,
         private readonly ReportRecipients $recipients,
+        private readonly ErpGateway $erp,
     ) {
     }
 
@@ -85,12 +87,14 @@ final class ReportQueries
             ->where('r.status', TaskReport::APPROVED)
             ->orderByDesc('t.day')
             ->limit(self::LIST_LIMIT)
-            ->with(['team.brigade', 'team.profile'])
+            ->with('team')
             ->get();
-        $reports = TaskReport::whereIn('task_id', $tasks->pluck('id'))->with('items.workType')->get()->keyBy('task_id');
-        $taskPresenter = app(TaskPresenter::class);
+        $reports = TaskReport::whereIn('task_id', $tasks->pluck('id'))->with('items')->get()->keyBy('task_id');
+        $executors = app(TaskPresenter::class)->executors($tasks);
+        $types = $this->erp->workTypes($reports->flatMap(fn (TaskReport $r) => $r->items->pluck('work_type_id'))->map(fn ($id) => (int) $id)->unique()->values()->all());
+        $this->presenter->loadPeople($reports->flatMap(fn (TaskReport $r) => [$r->submitted_by_staff_id, $r->decided_by_staff_id, $r->edited_by_staff_id])->all());
 
-        $approved = $tasks->map(function (TimesheetContract $task) use ($reports, $taskPresenter) {
+        $approved = $tasks->map(function (TimesheetContract $task) use ($reports, $executors, $types) {
             $report = $reports->get($task->id);
 
             return [
@@ -98,10 +102,10 @@ final class ReportQueries
                 'at' => $report->decided_at?->toIso8601String(),
                 'task_id' => (int) $task->id,
                 'date' => substr((string) $task->team->day, 0, 10),
-                'executor' => $taskPresenter->executor($task),
+                'executor' => $executors[(int) $task->id],
                 'items' => $report->items->sortBy('id')->map(fn (TaskReportItem $i) => [
-                    'name' => $i->workType?->name,
-                    'unit' => $i->workType?->unit,
+                    'name' => $types[(int) $i->work_type_id]['name'] ?? null,
+                    'unit' => $types[(int) $i->work_type_id]['unit'] ?? null,
                     'declared' => $i->quantity_declared,
                     'approved' => $i->quantity_approved,
                     'edited' => $i->edited_at !== null,

@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Production\Rights;
+namespace App\Production\Erp;
 
 use App\Models\Erp\PermissionSetting;
 use App\Models\Erp\RolePermissionSetting;
 use App\Models\Staff;
 use App\Models\User;
+use App\Production\Rights\Right;
 use App\Production\Support\ProductionException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;

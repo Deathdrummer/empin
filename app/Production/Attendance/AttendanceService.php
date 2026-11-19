@@ -6,13 +6,9 @@ use App\Models\AttendanceDay;
 use App\Models\AttendanceMark;
 use App\Models\AttendanceShift;
 use App\Models\AuditEntry;
-use App\Models\Erp\Brigade;
-use App\Models\Erp\BrigadeMember;
-use App\Models\Erp\Driver;
-use App\Models\Staff;
 use App\Models\StaffNotification;
 use App\Models\TimesheetContract;
-use App\Production\Objects\ObjectDirectory;
+use App\Production\Erp\ErpGateway;
 use App\Production\Rights\Grant;
 use App\Production\Rights\Right;
 use App\Production\Support\NoticeTexts;
@@ -40,6 +36,7 @@ final class AttendanceService
         private readonly OrgClock $clock,
         private readonly TaskAccess $access,
         private readonly AttendanceNotices $notices,
+        private readonly ErpGateway $erp,
     ) {
     }
 
@@ -52,17 +49,15 @@ final class AttendanceService
      */
     public function brigadesOf(int $staffId, CarbonInterface $date): array
     {
-        $ids = BrigadeMember::activeOn($date)->where('staff_id', $staffId)->pluck('brigade_id')
-            ->merge(Brigade::where('foreman_staff_id', $staffId)->pluck('id'))
-            ->unique()->values()->all();
-
-        return $ids ? Brigade::whereIn('id', $ids)->workingOn($date)->orderBy('name')->pluck('name', 'id')->all() : [];
+        return array_map(fn (array $brigade) => $brigade['name'], $this->erp->brigadesOfStaff($staffId, $date));
     }
 
     /** В списке водителей ERP и не «не используется» */
     public function isDriver(int $staffId): bool
     {
-        return Driver::where('staff_id', $staffId)->where('not_used', false)->exists();
+        $driver = $this->erp->driverOfStaff($staffId);
+
+        return $driver !== null && !$driver['not_used'];
     }
 
     // ---- Плашка «Выход на смену» (п. 7.4) ----
@@ -77,7 +72,7 @@ final class AttendanceService
         $data = AttendanceData::forDates([$day]);
         $mark = $data->markOf($viewer->staffId, $day);
         $canDeclare = $viewer->rights->has(Right::CrewDeclare);
-        $members = Brigade::currentStaff(array_keys($brigades), $today);
+        $members = $this->erp->brigadeStaffOn(array_keys($brigades), $today);
 
         return [
             'date' => $day,
@@ -220,7 +215,7 @@ final class AttendanceService
         if (!isset($this->brigadesOf($viewer->staffId, $date)[$brigadeId])) {
             throw ProductionException::invalid('Вы не член бригады', 'not_member');
         }
-        $members = Brigade::currentStaff([$brigadeId], $date)[$brigadeId] ?? [];
+        $members = $this->erp->brigadeStaffOn([$brigadeId], $date)[$brigadeId] ?? [];
         $staffIds = array_values(array_unique(array_map('intval', $staffIds)));
         if (array_diff($staffIds, $members)) {
             throw ProductionException::invalid('В заявке есть не член бригады');
@@ -519,9 +514,10 @@ final class AttendanceService
             return;
         }
         $this->notices->withdraw($driverStaffId, StaffNotification::KIND_DRIVER_NO_TASKS, ['date' => $day]);
-        $object = DB::table('timesheet_contracts as c')->join('contracts as o', 'o.id', '=', 'c.contract_id')->where('c.id', $taskId)->first(['o.object_number', 'o.title']);
+        $objectId = (int) TimesheetContract::whereKey($taskId)->value('contract_id');
+        $object = $this->erp->objects([$objectId])[$objectId] ?? null;
         $this->notices->send($driverStaffId, StaffNotification::KIND_DRIVER_ASSIGNED, 'Вы назначены в задание',
-            sprintf('Задание на %s по объекту %s.', $this->date($day), NoticeTexts::object($object?->object_number, $object?->title)), ['date' => $day, 'task_id' => (int) $taskId], taskId: (int) $taskId);
+            sprintf('Задание на %s по объекту %s.', $this->date($day), NoticeTexts::object($object['number'] ?? null, $object['title'] ?? null)), ['date' => $day, 'task_id' => (int) $taskId], taskId: (int) $taskId);
     }
 
     // ---- Внутреннее ----
@@ -731,22 +727,33 @@ final class AttendanceService
     /** @param int[] $staffIds */
     private function people(array $staffIds): array
     {
+        $this->loadPeople($staffIds);
+
         return collect($staffIds)->map(fn (int $id) => $this->person($id))->sortBy('name')->values()->all();
     }
 
     private function person(int $staffId): array
     {
-        if (!isset($this->names[$staffId])) {
-            $staff = Staff::query()->select(['id', 'sname', 'fname', 'mname'])->find($staffId);
-            $this->names[$staffId] = ['id' => $staffId, 'name' => $staff ? ObjectDirectory::name($staff->sname, $staff->fname, $staff->mname) : null];
-        }
+        $this->loadPeople([$staffId]);
 
-        return $this->names[$staffId];
+        return ['id' => $staffId, 'name' => $this->names[$staffId]['name'] ?? null];
+    }
+
+    /** Люди из ERP одним запросом на список; уже загруженные не запрашиваются */
+    private function loadPeople(array $staffIds): void
+    {
+        $missing = array_values(array_diff(array_map('intval', $staffIds), array_keys($this->names)));
+        if ($missing) {
+            $found = $this->erp->people($missing);
+            foreach ($missing as $id) {
+                $this->names[$id] = $found[$id] ?? null;
+            }
+        }
     }
 
     private function brigadeName(?int $brigadeId): ?string
     {
-        return $brigadeId ? Brigade::whereKey($brigadeId)->value('name') : null;
+        return $brigadeId ? ($this->erp->brigades([$brigadeId])[$brigadeId]['name'] ?? null) : null;
     }
 
     // ---- Тексты уведомлений — обычными предложениями (решение 19.11.2026) ----
@@ -777,7 +784,9 @@ final class AttendanceService
 
     private function verb(int $staffId, string $verb): string
     {
-        return NoticeTexts::verb($verb, Staff::whereKey($staffId)->value('mname'));
+        $this->loadPeople([$staffId]);
+
+        return NoticeTexts::verb($verb, $this->names[$staffId]['patronymic'] ?? null);
     }
 
     /** «19 ноября»; год — только если не текущий */

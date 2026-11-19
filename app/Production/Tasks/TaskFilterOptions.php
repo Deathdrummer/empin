@@ -2,16 +2,15 @@
 
 namespace App\Production\Tasks;
 
-use App\Models\Erp\Brigade;
-use App\Models\Staff;
 use App\Models\TimesheetContract;
+use App\Production\Erp\ErpGateway;
 use App\Production\Objects\ObjectDirectory;
 use Illuminate\Support\Collection;
 
 /** Варианты фильтров календаря (п. 6.4): объект, бригада или сотрудник-исполнитель, создатель, техника, водитель */
 final class TaskFilterOptions
 {
-    public function __construct(private readonly ObjectDirectory $objects)
+    public function __construct(private readonly ObjectDirectory $objects, private readonly ErpGateway $erp)
     {
     }
 
@@ -28,12 +27,14 @@ final class TaskFilterOptions
             ->all();
 
         $objects = $this->objects->findMany($ids('timesheet_contracts.contract_id'))
-            ->map(fn ($row) => ['id' => (int) $row->id, 'number' => $row->object_number, 'title' => $row->title])
+            ->map(fn (array $o) => ['id' => $o['id'], 'number' => $o['number'], 'title' => $o['title']])
             ->sortBy(fn ($o) => [strlen((string) $o['number']), $o['number']])
             ->values();
 
-        $brigades = Brigade::query()->whereIn('id', $ids('t.brigade_id'))->orderBy('name')->get(['id', 'name'])
-            ->map(fn (Brigade $b) => ['id' => $b->id, 'name' => $b->name]);
+        $brigades = collect($this->erp->brigades($ids('t.brigade_id')))
+            ->map(fn (array $b) => ['id' => $b['id'], 'name' => $b['name']])
+            ->sortBy('name')
+            ->values();
 
         // Техника — по снимку в задании: машину могли переименовать или убрать из ERP (П-ОБ-23б)
         $latest = (new TaskVisibility())->query($viewer)
@@ -62,8 +63,8 @@ final class TaskFilterOptions
 
     private function people(array $ids): Collection
     {
-        return Staff::query()->whereIn('id', $ids)->get(['id', 'sname', 'fname', 'mname'])
-            ->map(fn (Staff $s) => ['id' => (int) $s->id, 'name' => ObjectDirectory::name($s->sname, $s->fname, $s->mname)])
+        return collect($this->erp->people($ids))
+            ->map(fn (array $p) => ['id' => $p['id'], 'name' => $p['name']])
             ->sortBy('name')
             ->values();
     }

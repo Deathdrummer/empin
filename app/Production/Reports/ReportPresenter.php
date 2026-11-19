@@ -4,13 +4,11 @@ namespace App\Production\Reports;
 
 use App\Models\AttendanceMark;
 use App\Models\AuditEntry;
-use App\Models\Erp\ContractPlanRevision;
-use App\Models\Staff;
 use App\Models\TaskReport;
 use App\Models\TaskReportItem;
 use App\Models\TaskReportPhoto;
 use App\Models\TimesheetContract;
-use App\Production\Objects\ObjectDirectory;
+use App\Production\Erp\ErpGateway;
 use App\Production\Tasks\TaskFacts;
 use App\Production\Tasks\Viewer;
 use Illuminate\Support\Collection;
@@ -25,6 +23,7 @@ final class ReportPresenter
         private readonly ReportAccess $access,
         private readonly ReportAllocations $allocations,
         private readonly ObjectReadiness $readiness,
+        private readonly ErpGateway $erp,
     ) {
     }
 
@@ -33,7 +32,8 @@ final class ReportPresenter
     {
         $facts = TaskFacts::fromModel($task);
         $contractId = (int) $task->contract_id;
-        $plan = ContractPlanRevision::currentFor($contractId);
+        $plan = $this->erp->currentPlan($contractId);
+        $planTypes = $plan ? $this->erp->workTypes(array_keys($plan['items'])) : [];
 
         return [
             'report' => $report ? $this->report($report) : null,
@@ -41,11 +41,11 @@ final class ReportPresenter
                 'object_id' => $contractId,
                 'readiness' => $this->readiness->current($contractId),
                 // План объекта и уже согласованное по объекту без этого отчёта (П-ФК-20, П-ФК-25, ИС-ФК-10)
-                'plan' => $plan ? $plan->items()->with('workType')->get()->map(fn ($i) => [
-                    'work_type_id' => (int) $i->work_type_id,
-                    'name' => $i->workType?->name,
-                    'unit' => $i->workType?->unit,
-                    'quantity' => (float) $i->quantity,
+                'plan' => $plan ? collect($plan['items'])->map(fn (float $quantity, int $typeId) => [
+                    'work_type_id' => $typeId,
+                    'name' => $planTypes[$typeId]['name'] ?? null,
+                    'unit' => $planTypes[$typeId]['unit'] ?? null,
+                    'quantity' => $quantity,
                 ])->sortBy('name')->values()->all() : null,
                 'approved' => (object) $this->allocations->approvedTotals($contractId, $report?->id),
                 'warnings' => $this->warnings($task),
@@ -56,8 +56,15 @@ final class ReportPresenter
 
     public function report(TaskReport $report): array
     {
-        $report->loadMissing(['items.workType']);
+        $report->loadMissing(['items']);
         $photos = TaskReportPhoto::where('report_id', $report->id)->orderBy('id')->get();
+        $types = $this->erp->workTypes($report->items->pluck('work_type_id')->map(fn ($id) => (int) $id)->all());
+        // Все люди отчёта — одним запросом
+        $this->loadPeople(array_merge(
+            [$report->author_staff_id, $report->submitted_by_staff_id, $report->decided_by_staff_id, $report->edited_by_staff_id],
+            $report->items->pluck('edited_by_staff_id')->all(),
+            $photos->pluck('added_by_staff_id')->all(),
+        ));
 
         return [
             'id' => (int) $report->id,
@@ -83,9 +90,9 @@ final class ReportPresenter
             ],
             'items' => $report->items->sortBy('id')->map(fn (TaskReportItem $i) => [
                 'work_type_id' => (int) $i->work_type_id,
-                'name' => $i->workType?->name,
-                'unit' => $i->workType?->unit,
-                'deleted' => (bool) $i->workType?->trashed(),
+                'name' => $types[(int) $i->work_type_id]['name'] ?? null,
+                'unit' => $types[(int) $i->work_type_id]['unit'] ?? null,
+                'deleted' => (bool) ($types[(int) $i->work_type_id]['deleted'] ?? false),
                 'declared' => $i->quantity_declared,
                 'approved' => $i->quantity_approved,
                 'edited_by' => $this->person($i->edited_by_staff_id),
@@ -198,11 +205,21 @@ final class ReportPresenter
         if (!$staffId) {
             return null;
         }
-        if (!array_key_exists($staffId, $this->people)) {
-            $staff = Staff::query()->select(['id', 'sname', 'fname', 'mname'])->find($staffId);
-            $this->people[$staffId] = $staff ? ['id' => (int) $staffId, 'name' => ObjectDirectory::name($staff->sname, $staff->fname, $staff->mname)] : null;
-        }
+        $this->loadPeople([$staffId]);
 
         return $this->people[$staffId];
+    }
+
+    /** Люди из ERP одним запросом на список; уже загруженные не запрашиваются */
+    public function loadPeople(array $staffIds): void
+    {
+        $missing = array_values(array_diff(array_unique(array_map('intval', array_filter($staffIds))), array_keys($this->people)));
+        if (!$missing) {
+            return;
+        }
+        $found = $this->erp->people($missing);
+        foreach ($missing as $id) {
+            $this->people[$id] = isset($found[$id]) ? ['id' => $id, 'name' => $found[$id]['name']] : null;
+        }
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Production\Rights;
+namespace App\Production\Erp;
 
 use App\Models\Erp\PermissionEvent;
 use Illuminate\Support\Facades\Auth;

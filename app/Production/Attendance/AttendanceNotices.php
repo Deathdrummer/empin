@@ -2,7 +2,6 @@
 
 namespace App\Production\Attendance;
 
-use App\Models\Staff;
 use App\Models\StaffNotification;
 use App\Services\PushNotificationService;
 use Illuminate\Support\Facades\Log;
@@ -25,9 +24,9 @@ final class AttendanceNotices
             'task_id' => $taskId,
             'payload' => $payload,
         ]);
-        if ($push && $staff = Staff::find($staffId)) {
+        if ($push) {
             try {
-                $this->push->sendProductionNotice($staff, $title, $body, ['notice_id' => $notice->id, 'kind' => $kind] + ($taskId ? ['task_id' => $taskId] : []));
+                $this->push->sendProductionNotice($staffId, $title, $body, ['notice_id' => $notice->id, 'kind' => $kind] + ($taskId ? ['task_id' => $taskId] : []));
             } catch (Throwable $error) {
                 // Плашка уже создана — без push сотрудник увидит её при открытии приложения
                 Log::warning('[Attendance] push not sent: '.$error->getMessage());

@@ -159,8 +159,17 @@ class PushNotificationService
     }
 
     /** Уведомление производственного модуля (выходы, задания): заголовок, текст и данные для перехода */
-    public function sendProductionNotice(Staff $recipient, string $title, string $body, array $data): bool
+    /**
+     * Уведомление модуля производства. Получатель — по id сотрудника: модуль не работает с моделями ERP напрямую
+     * (шлюз ERP), а токены устройств — забота сервиса push
+     */
+    public function sendProductionNotice(int $staffId, string $title, string $body, array $data): bool
     {
+        $recipient = Staff::find($staffId);
+        if (!$recipient) {
+            return false;
+        }
+
         return $this->sendToExpoTokens($recipient, [
             'title' => $title,
             'body' => $body,

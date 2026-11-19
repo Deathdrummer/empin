@@ -5,7 +5,7 @@ namespace App\Production\Erp;
 use App\Models\AdminUser;
 use App\Models\Contract;
 use App\Models\Erp\Brigade;
-use App\Models\Erp\ContractReadinessEvent;
+use App\Models\ContractReadinessEvent;
 use App\Models\Erp\ContractPlanItem;
 use App\Models\Erp\ContractPlanRevision;
 use App\Models\Erp\ContractProductionInfo;
@@ -94,7 +94,7 @@ class ObjectProductionRegistry
      */
     private function changeReadiness(Contract $contract, float $percent, ?float $shown): void
     {
-        (new ObjectReadiness())->apply($contract->id, $percent, ContractReadinessEvent::SOURCE_ERP,
+        app(ObjectReadiness::class)->apply($contract->id, $percent, ContractReadinessEvent::SOURCE_ERP,
             ['admin_id' => Auth::guard('admin')->id()], checkShown: true, shown: $shown);
     }
 
@@ -186,7 +186,7 @@ class ObjectProductionRegistry
                 ContractPlanItem::create(['revision_id' => $revision->id, 'work_type_id' => $typeId, 'quantity' => $quantity]);
             }
             // Отнесение к допам — по новой редакции; сами факты не меняются (П-ФК-24, П-ОБ-32)
-            (new ReportAllocations())->recompute($contract->id);
+            app(ReportAllocations::class)->recompute($contract->id);
             ErpAudit::write(self::ENTITY, $contract->id, 'plan_revised', $current ? ['revision_id' => $current->id] : null, [
                 'revision_id' => $revision->id,
                 'items' => collect($next)->map(fn ($q, $typeId) => ['work_type_id' => $typeId, 'name' => $types[$typeId]->name, 'unit' => $types[$typeId]->unit, 'quantity' => $q])->values()->all(),

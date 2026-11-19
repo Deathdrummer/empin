@@ -3,7 +3,7 @@
 namespace App\Production\Tasks;
 
 use App\Models\TimesheetContract;
-use App\Production\Objects\ObjectDirectory;
+use App\Production\Erp\ErpGateway;
 use Carbon\CarbonImmutable;
 
 /** Сведения о задании, нужные для проверки доступа */
@@ -37,7 +37,7 @@ final class TaskFacts
             personalStaffId: $brigadeId ? null : (int) $team->staff_id,
             driverStaffId: $task->driver_staff_id ? (int) $task->driver_staff_id : null,
             invitedStaffIds: $task->activeInvites->pluck('staff_id')->map(fn ($id) => (int) $id)->all(),
-            objectActive: $objectActive ?? ObjectDirectory::isActive(\DB::table('contracts')->where('id', $task->contract_id)->value('archive')),
+            objectActive: $objectActive ?? (app(ErpGateway::class)->objects([(int) $task->contract_id])[(int) $task->contract_id]['active'] ?? false),
         );
     }
 }
