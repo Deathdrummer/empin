@@ -18,6 +18,7 @@ class AttendanceShift extends Model
         'crew_at' => 'datetime',
         'confirmed_at' => 'datetime',
         'confirmed_offline' => 'boolean',
+        'corrected_at' => 'datetime',
     ];
 
     public function confirmedBy(): BelongsTo

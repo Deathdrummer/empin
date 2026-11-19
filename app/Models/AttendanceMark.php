@@ -20,6 +20,7 @@ class AttendanceMark extends Model
         'offline' => 'boolean',
         'time_unverified' => 'boolean',
         'after_confirmation' => 'boolean',
+        'corrected_at' => 'datetime',
     ];
 
     public function staff(): BelongsTo

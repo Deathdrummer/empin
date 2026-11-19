@@ -4,6 +4,7 @@ use App\Http\Controllers\api\ProductionAttendanceController;
 use App\Http\Controllers\api\ProductionController;
 use App\Http\Controllers\api\ProductionDirectoryController;
 use App\Http\Controllers\api\ProductionTaskChatController;
+use App\Http\Controllers\api\ProductionTurvController;
 use App\Http\Controllers\api\ProductionTasksController;
 use Illuminate\Support\Facades\Route;
 
@@ -43,6 +44,12 @@ Route::prefix('production')->middleware(['auth:sanctum', 'presence'])->group(fun
     Route::post('/attendance/mark', [ProductionAttendanceController::class, 'mark']);
     Route::post('/attendance/crew', [ProductionAttendanceController::class, 'crew']);
     Route::post('/tasks/{id}/attendance', [ProductionAttendanceController::class, 'confirm'])->whereNumber('id');
+
+    // ТУРВ (раздел 7): табель месяца, корректировка ячейки, порядок, выгрузка
+    Route::get('/turv', [ProductionTurvController::class, 'index']);
+    Route::post('/turv/cell', [ProductionTurvController::class, 'cell']);
+    Route::put('/turv/order', [ProductionTurvController::class, 'order']);
+    Route::get('/turv/export', [ProductionTurvController::class, 'export']);
 
     // Уведомления до ручного закрытия (п. 9.3)
     Route::get('/notifications', [ProductionController::class, 'notifications']);

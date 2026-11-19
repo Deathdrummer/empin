@@ -17,6 +17,7 @@ class StaffNotification extends Model
     public const KIND_ATTENDANCE_REJECTED = 'attendance_rejected';
     public const KIND_DRIVER_NO_TASKS = 'driver_no_tasks';
     public const KIND_DRIVER_ASSIGNED = 'driver_assigned';
+    public const KIND_ATTENDANCE_CORRECTED = 'attendance_corrected';
 
     protected $table = 'staff_notifications';
 

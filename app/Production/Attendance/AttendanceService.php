@@ -366,6 +366,8 @@ final class AttendanceService
                 'confirmed_by' => $confirmed ? $this->person((int) $shift->confirmed_by_staff_id) : null,
                 'confirmed_at' => $confirmed ? $shift->confirmed_at->toIso8601String() : null,
                 'declared_by' => $service && $crewIds !== null ? $this->person((int) $shift->crew_by_staff_id) : null,
+                // Корректировка в ТУРВ: «Изменено <кем>» дополнительно; до подтверждения кнопка остаётся (П-СМ-15в)
+                'changed_by' => $shift?->corrected_by_staff_id ? $this->person((int) $shift->corrected_by_staff_id) : null,
                 'can_confirm' => $canBrigade && !$confirmed && $timeAllows,
             ];
         }
@@ -374,15 +376,20 @@ final class AttendanceService
         if ($driverStaffId !== null) {
             $mark = $data->markOf($driverStaffId, $day);
             $dayRow = $data->dayOf($driverStaffId, $day);
+            $driverDay = $dayRow !== null && $dayRow->as_driver ? $dayRow : null;
+            // Выход водителя исправили в табеле — «Изменено <кем>», подтверждать в задании больше нечего (П-СМ-21)
             $status = match (true) {
+                $driverDay !== null && $driverDay->source === AttendanceDay::SOURCE_CORRECTED => 'changed',
+                $driverDay !== null => 'confirmed',
+                $mark?->corrected_by_staff_id !== null => 'changed',
                 $mark === null => 'not_marked',
                 !$mark->as_driver => 'in_brigade',
-                $dayRow !== null && $dayRow->as_driver => 'confirmed',
                 default => 'unconfirmed',
             };
             $driverPart = $this->person($driverStaffId) + [
                 'status' => $status,
-                'confirmed_by' => $status === 'confirmed' ? $this->person((int) $dayRow->by_staff_id) : null,
+                'confirmed_by' => $status === 'confirmed' ? $this->person((int) $driverDay->by_staff_id) : null,
+                'changed_by' => $status === 'changed' ? $this->person((int) ($driverDay?->by_staff_id ?? $mark->corrected_by_staff_id)) : null,
                 'can_confirm' => $canDriver && $status === 'unconfirmed' && $timeAllows,
             ] + ($service && $mark ? ['offline' => $mark->offline && !$mark->time_unverified, 'time_unverified' => $mark->time_unverified] : []);
         }
@@ -413,6 +420,62 @@ final class AttendanceService
         $data = AttendanceData::forDates($facts->map(fn (TaskFacts $f) => $f->date->toDateString())->values()->all());
 
         return $facts->map(fn (TaskFacts $f) => $this->badge($viewer, $f, $data, $now))->all();
+    }
+
+    // ---- Корректировка выхода в ТУРВ (право 18; П-СМ-15…18) ----
+
+    /**
+     * Поставить или снять выход сотрудника за день — в бригаде ($brigadeId) или водителем (null). Право и область
+     * проверяет ТУРВ. Личная отметка от имени сотрудника не создаётся; смена бригады создаётся незаметно
+     *
+     * @return bool изменилось ли что-то
+     */
+    public function correct(Viewer $viewer, int $staffId, CarbonImmutable $date, ?int $brigadeId, bool $present, bool $notify): bool
+    {
+        $day = $date->toDateString();
+        $asDriver = $brigadeId === null;
+        $changed = DB::transaction(function () use ($viewer, $staffId, $date, $day, $brigadeId, $asDriver, $present) {
+            $shift = $brigadeId ? $this->lockShift($brigadeId, $date) : null;
+            $existing = AttendanceDay::where('staff_id', $staffId)->where('work_date', $day)->lockForUpdate()->first();
+            $same = $existing && $existing->as_driver === $asDriver && (int) $existing->brigade_id === (int) $brigadeId;
+            $context = ['staff' => $this->person($staffId), 'date' => $day, 'as_driver' => $asDriver, 'brigade_id' => $brigadeId];
+            if ($present) {
+                if ($same) {
+                    return false;
+                }
+                if ($existing) {
+                    // Один сотрудник — один засчитанный день на дату (П-СМ-17, П-СМ-20а)
+                    throw ProductionException::invalid($existing->as_driver
+                        ? 'Выход уже засчитан водителем'
+                        : 'Выход уже засчитан в бригаде «'.$this->brigadeName((int) $existing->brigade_id).'»', 'day_elsewhere');
+                }
+                $row = AttendanceDay::create([
+                    'staff_id' => $staffId, 'work_date' => $day, 'as_driver' => $asDriver, 'brigade_id' => $brigadeId,
+                    'source' => AttendanceDay::SOURCE_CORRECTED, 'shift_id' => $shift?->id, 'by_staff_id' => $viewer->staffId,
+                ]);
+                $this->audit(AuditEntry::ENTITY_ATTENDANCE_DAY, $row->id, 'corrected_set', $viewer->staffId, null, $context);
+            } else {
+                if (!$same) {
+                    return false;
+                }
+                $this->audit(AuditEntry::ENTITY_ATTENDANCE_DAY, $existing->id, 'corrected_removed', $viewer->staffId, $context + ['source' => $existing->source], null);
+                $existing->delete();
+            }
+            $shift?->update(['corrected_by_staff_id' => $viewer->staffId, 'corrected_at' => now()]);
+            if ($asDriver) {
+                AttendanceMark::where('staff_id', $staffId)->where('work_date', $day)->update(['corrected_by_staff_id' => $viewer->staffId, 'corrected_at' => now()]);
+            }
+
+            return true;
+        });
+        // Уведомить — по выбору автора и только плашкой, без push (П-СМ-16)
+        if ($changed && $notify) {
+            $this->notices->send($staffId, StaffNotification::KIND_ATTENDANCE_CORRECTED, $present ? 'Выход поставлен' : 'Выход снят',
+                sprintf('%s, %s. Исправил: %s', $this->date($day), $asDriver ? 'водитель' : 'бригада «'.$this->brigadeName($brigadeId).'»', $this->person($viewer->staffId)['name']),
+                ['date' => $day, 'brigade_id' => $brigadeId]);
+        }
+
+        return $changed;
     }
 
     // ---- Водитель: «нет заданий» и «вы назначены в задание» (П-СМ-22) ----
@@ -491,7 +554,7 @@ final class AttendanceService
             $mark = $data->markOf($facts->driverStaffId, $day);
             $confirmed = $data->dayOf($facts->driverStaffId, $day)?->as_driver;
 
-            return $mark !== null && $mark->as_driver && !$confirmed && $this->canConfirm($viewer, $facts, null, $today);
+            return $mark !== null && $mark->as_driver && !$confirmed && $mark->corrected_by_staff_id === null && $this->canConfirm($viewer, $facts, null, $today);
         }
 
         return false;
@@ -540,7 +603,11 @@ final class AttendanceService
         if ($late) {
             AttendanceMark::whereIn('staff_id', $late)->where('work_date', $day)->update(['after_confirmation' => true]);
         }
+        // Исключённые при подтверждении; у кого день уже поставлен корректировкой — не исключены (П-СМ-15в)
         $excluded = array_values(array_diff($seen, $staffIds));
+        if ($excluded) {
+            $excluded = array_values(array_diff($excluded, AttendanceDay::whereIn('staff_id', $excluded)->where('work_date', $day)->pluck('staff_id')->map(fn ($id) => (int) $id)->all()));
+        }
         $this->audit(AuditEntry::ENTITY_ATTENDANCE_SHIFT, $shift->id, 'confirmed', $viewer->staffId, ['staff_ids' => $seen], [
             'brigade_id' => $brigadeId, 'date' => $day, 'staff_ids' => $staffIds, 'excluded' => $excluded,
             'offline' => $offline, 'time_unverified' => $unverified,
