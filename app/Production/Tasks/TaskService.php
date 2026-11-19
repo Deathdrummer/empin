@@ -17,6 +17,7 @@ use App\Production\Attendance\AttendanceService;
 use App\Production\Objects\ObjectDirectory;
 use App\Production\Reports\ReportService;
 use App\Production\Rights\Right;
+use App\Production\Support\NoticeTexts;
 use App\Production\Support\ProductionException;
 use App\Services\AccountAccess;
 use Carbon\CarbonImmutable;
@@ -517,10 +518,12 @@ final class TaskService
             : collect([(int) $previous['staff_id']]);
         $recipients = $recipients->unique()->reject(fn ($id) => $id === $viewer->staffId);
 
+        // «Иванов Сергей Петрович передал задание на 18 ноября по объекту 12 «Название»: новый исполнитель — Бригада Сидоров.»
         $object = $after['object'];
-        $body = sprintf('Объект %s «%s», %s. Новый исполнитель: %s. Изменил: %s.',
-            $object['number'], $object['title'], CarbonImmutable::parse($after['date'])->format('d.m.Y'),
-            $after['executor']['name'], $this->person($viewer->staffId)['name']);
+        $by = Staff::query()->select(['id', 'sname', 'fname', 'mname'])->find($viewer->staffId);
+        $body = sprintf('%s задание на %s по объекту %s: новый исполнитель — %s.',
+            NoticeTexts::upper(trim($this->person($viewer->staffId)['name'].' '.NoticeTexts::verb('передал', $by?->mname))),
+            NoticeTexts::date($after['date'], $today), NoticeTexts::object($object['number'], $object['title']), $after['executor']['name']);
 
         foreach ($recipients as $staffId) {
             StaffNotification::create([

@@ -6,9 +6,9 @@ use App\Models\Staff;
 use App\Models\TimesheetContract;
 use App\Production\Reports\ReportQueries;
 use App\Production\Reports\ReportRecipients;
+use App\Production\Support\NoticeTexts;
 use App\Production\Support\OrgClock;
 use App\Services\PushNotificationService;
-use Carbon\CarbonImmutable;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -34,7 +34,8 @@ class ReportReminders extends Command
             foreach ($tasks as $task) {
                 /** @var TimesheetContract $task */
                 $object = $objects->get($task->contract_id);
-                $body = sprintf('Объект %s «%s», %s.', $object?->object_number, $object?->title, CarbonImmutable::parse($task->team->day)->format('d.m.Y'));
+                // «Отчёт за 18 ноября по объекту 12 «Название» не предоставлен.»
+                $body = 'Отчёт '.NoticeTexts::about($object?->object_number, $object?->title, $task->team->day, $today).' не предоставлен.';
                 foreach ($recipients->forTask($task, $today, $task->report, $rights) as $staffId) {
                     $staff = Staff::find($staffId);
                     if (!$staff) {

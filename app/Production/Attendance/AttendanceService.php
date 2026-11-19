@@ -15,6 +15,7 @@ use App\Models\TimesheetContract;
 use App\Production\Objects\ObjectDirectory;
 use App\Production\Rights\Grant;
 use App\Production\Rights\Right;
+use App\Production\Support\NoticeTexts;
 use App\Production\Support\OrgClock;
 use App\Production\Support\ProductionException;
 use App\Production\Tasks\TaskAccess;
@@ -185,11 +186,10 @@ final class AttendanceService
         });
 
         $day = $date->toDateString();
-        $me = $this->person($viewer->staffId)['name'];
         if ($shift && $mark->after_confirmation) {
             // Отметка без связи пришла после подтверждения: состав не меняется, подтвердившему — сигнал (П-СМ-03а)
             $this->notices->send((int) $shift->confirmed_by_staff_id, StaffNotification::KIND_MARK_LATE, 'Отметка после подтверждения',
-                sprintf('%s, %s, %s', $me, $this->brigadeName($brigadeId), $this->date($day)), ['date' => $day, 'brigade_id' => $brigadeId, 'staff_id' => $viewer->staffId]);
+                $this->markedLate($viewer->staffId, $brigadeId, $day), ['date' => $day, 'brigade_id' => $brigadeId, 'staff_id' => $viewer->staffId]);
         } elseif ($shift && $shift->crew() !== null && !in_array($viewer->staffId, $shift->crew(), true)) {
             $this->notifyNotIncluded($viewer->staffId, $shift);
         }
@@ -230,10 +230,10 @@ final class AttendanceService
             $shift = DB::transaction(function () use ($viewer, $brigadeId, $date, $staffIds) {
                 $shift = $this->lockShift($brigadeId, $date);
                 if ($shift->isConfirmed()) {
-                    throw ProductionException::invalid('Выход уже подтверждён: '.$this->person((int) $shift->confirmed_by_staff_id)['name'], 'already_confirmed');
+                    throw ProductionException::invalid($this->already((int) $shift->confirmed_by_staff_id, 'Выход', 'подтвердил'), 'already_confirmed');
                 }
                 if ($shift->crew_by_staff_id && (int) $shift->crew_by_staff_id !== $viewer->staffId) {
-                    throw ProductionException::invalid('Состав уже заявлен: '.$this->person((int) $shift->crew_by_staff_id)['name'], 'crew_declared');
+                    throw ProductionException::invalid($this->already((int) $shift->crew_by_staff_id, 'Состав', 'заявил'), 'crew_declared');
                 }
                 $before = $shift->crew();
                 sort($staffIds);
@@ -447,7 +447,7 @@ final class AttendanceService
                     // Один сотрудник — один засчитанный день на дату (П-СМ-17, П-СМ-20а)
                     throw ProductionException::invalid($existing->as_driver
                         ? 'Выход уже засчитан водителем'
-                        : 'Выход уже засчитан в бригаде «'.$this->brigadeName((int) $existing->brigade_id).'»', 'day_elsewhere');
+                        : 'Выход уже засчитан в бригаде '.NoticeTexts::brigade($this->brigadeName((int) $existing->brigade_id)), 'day_elsewhere');
                 }
                 $row = AttendanceDay::create([
                     'staff_id' => $staffId, 'work_date' => $day, 'as_driver' => $asDriver, 'brigade_id' => $brigadeId,
@@ -470,8 +470,10 @@ final class AttendanceService
         });
         // Уведомить — по выбору автора и только плашкой, без push (П-СМ-16)
         if ($changed && $notify) {
+            // «Иванов Сергей Петрович поставил вам выход 18 ноября в бригаде Петров.»
             $this->notices->send($staffId, StaffNotification::KIND_ATTENDANCE_CORRECTED, $present ? 'Выход поставлен' : 'Выход снят',
-                sprintf('%s, %s. Исправил: %s', $this->date($day), $asDriver ? 'водитель' : $this->brigadeName($brigadeId), $this->person($viewer->staffId)['name']),
+                sprintf('%s вам выход %s %s.', $this->who($viewer->staffId, $present ? 'поставил' : 'снял'), $this->date($day),
+                    $asDriver ? 'водителем' : 'в бригаде '.NoticeTexts::brigade($this->brigadeName($brigadeId))),
                 ['date' => $day, 'brigade_id' => $brigadeId]);
         }
 
@@ -508,7 +510,8 @@ final class AttendanceService
                 return;
             }
             $this->notices->withdraw($driverStaffId, StaffNotification::KIND_DRIVER_ASSIGNED, ['date' => $day]);
-            $this->notices->send($driverStaffId, StaffNotification::KIND_DRIVER_NO_TASKS, 'Нет заданий', $this->date($day), ['date' => $day], push: true);
+            $this->notices->send($driverStaffId, StaffNotification::KIND_DRIVER_NO_TASKS, 'Нет заданий',
+                sprintf('На %s у вас нет заданий.', $this->date($day)), ['date' => $day], push: true);
 
             return;
         }
@@ -518,7 +521,7 @@ final class AttendanceService
         $this->notices->withdraw($driverStaffId, StaffNotification::KIND_DRIVER_NO_TASKS, ['date' => $day]);
         $object = DB::table('timesheet_contracts as c')->join('contracts as o', 'o.id', '=', 'c.contract_id')->where('c.id', $taskId)->first(['o.object_number', 'o.title']);
         $this->notices->send($driverStaffId, StaffNotification::KIND_DRIVER_ASSIGNED, 'Вы назначены в задание',
-            sprintf('Объект %s «%s», %s', $object?->object_number, $object?->title, $this->date($day)), ['date' => $day, 'task_id' => (int) $taskId], taskId: (int) $taskId);
+            sprintf('Задание на %s по объекту %s.', $this->date($day), NoticeTexts::object($object?->object_number, $object?->title)), ['date' => $day, 'task_id' => (int) $taskId], taskId: (int) $taskId);
     }
 
     // ---- Внутреннее ----
@@ -583,7 +586,7 @@ final class AttendanceService
             if ((int) $shift->confirmed_by_staff_id === $viewer->staffId && $offline) {
                 return null; // повторная отправка того же подтверждения из очереди
             }
-            throw ProductionException::invalid('Выход уже подтверждён: '.$this->person((int) $shift->confirmed_by_staff_id)['name'], 'already_confirmed');
+            throw ProductionException::invalid($this->already((int) $shift->confirmed_by_staff_id, 'Выход', 'подтвердил'), 'already_confirmed');
         }
         $visible = AttendanceData::forDates([$day])->visibleCrew($brigadeId, $day)->pluck('staff_id')->map(fn ($id) => (int) $id)->all();
         // Без связи — тот список, что был на экране; отметки, которых в нём не было, пришли «после подтверждения»
@@ -613,18 +616,16 @@ final class AttendanceService
             'offline' => $offline, 'time_unverified' => $unverified,
         ]);
 
-        $by = $this->person($viewer->staffId)['name'];
-
-        return function () use ($excluded, $late, $shift, $brigadeId, $day, $by, $viewer) {
+        return function () use ($excluded, $late, $shift, $brigadeId, $day, $viewer) {
             foreach ($excluded as $staffId) {
                 // Исключённый при подтверждении — push и переносимая плашка с тем, кто подтвердил (П-СМ-14)
                 $this->notices->send($staffId, StaffNotification::KIND_CREW_EXCLUDED, 'Вас исключили из состава',
-                    sprintf('%s, %s. Подтвердил: %s', $this->brigadeName($brigadeId), $this->date($day), $by),
+                    $this->crewWithout($viewer->staffId, 'подтвердил', $brigadeId, $day),
                     ['shift_id' => $shift->id, 'date' => $day, 'brigade_id' => $brigadeId], push: true);
             }
             foreach ($late as $staffId) {
                 $this->notices->send($viewer->staffId, StaffNotification::KIND_MARK_LATE, 'Отметка после подтверждения',
-                    sprintf('%s, %s, %s', $this->person($staffId)['name'], $this->brigadeName($brigadeId), $this->date($day)),
+                    $this->markedLate($staffId, $brigadeId, $day),
                     ['date' => $day, 'brigade_id' => $brigadeId, 'staff_id' => $staffId]);
             }
         };
@@ -639,7 +640,7 @@ final class AttendanceService
         $existing = AttendanceDay::where('staff_id', $driverStaffId)->where('work_date', $day)->first();
         if ($existing) {
             if ($only && (int) $existing->by_staff_id !== $viewer->staffId) {
-                throw ProductionException::invalid('Выход уже подтверждён: '.$this->person((int) $existing->by_staff_id)['name'], 'already_confirmed');
+                throw ProductionException::invalid($this->already((int) $existing->by_staff_id, 'Выход', 'подтвердил'), 'already_confirmed');
             }
 
             return;
@@ -693,7 +694,7 @@ final class AttendanceService
     {
         $day = $shift->work_date->toDateString();
         $this->notices->send($staffId, StaffNotification::KIND_CREW_NOT_INCLUDED, 'Вас нет в заявке состава',
-            sprintf('%s, %s. Заявил: %s', $this->brigadeName((int) $shift->brigade_id), $this->date($day), $this->person((int) $shift->crew_by_staff_id)['name']),
+            $this->crewWithout((int) $shift->crew_by_staff_id, 'заявил', (int) $shift->brigade_id, $day),
             ['shift_id' => $shift->id, 'date' => $day, 'brigade_id' => (int) $shift->brigade_id], push: true);
     }
 
@@ -748,8 +749,40 @@ final class AttendanceService
         return $brigadeId ? Brigade::whereKey($brigadeId)->value('name') : null;
     }
 
+    // ---- Тексты уведомлений — обычными предложениями (решение 19.11.2026) ----
+
+    /** «Петров Алексей Иванович заявил состав бригады Петров на 19 ноября без вас.» */
+    private function crewWithout(int $staffId, string $verb, int $brigadeId, string $day): string
+    {
+        return sprintf('%s состав бригады %s на %s без вас.', $this->who($staffId, $verb), NoticeTexts::brigade($this->brigadeName($brigadeId)), $this->date($day));
+    }
+
+    /** «Алексеев Юрий Михайлович отметился 19 ноября в бригаде Петров уже после подтверждения состава.» */
+    private function markedLate(int $staffId, ?int $brigadeId, string $day): string
+    {
+        return sprintf('%s %s в бригаде %s уже после подтверждения состава.', $this->who($staffId, 'отметился'), $this->date($day), NoticeTexts::brigade($this->brigadeName($brigadeId)));
+    }
+
+    /** Отказ: «Выход уже подтвердил Иванов Сергей Петрович», «Состав уже заявила Петрова Анна Ивановна» */
+    private function already(int $staffId, string $what, string $verb): string
+    {
+        return sprintf('%s уже %s %s', $what, $this->verb($staffId, $verb), $this->person($staffId)['name']);
+    }
+
+    /** «Иванов Сергей Петрович подтвердил», «Иванова Мария Петровна подтвердила» */
+    private function who(int $staffId, string $verb): string
+    {
+        return NoticeTexts::upper(trim($this->person($staffId)['name'].' '.$this->verb($staffId, $verb)));
+    }
+
+    private function verb(int $staffId, string $verb): string
+    {
+        return NoticeTexts::verb($verb, Staff::whereKey($staffId)->value('mname'));
+    }
+
+    /** «19 ноября»; год — только если не текущий */
     private function date(string $day): string
     {
-        return CarbonImmutable::parse($day)->format('d.m.Y');
+        return NoticeTexts::date($day, $this->clock->today());
     }
 }

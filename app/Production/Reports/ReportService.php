@@ -15,6 +15,7 @@ use App\Models\TimesheetContract;
 use App\Production\Attendance\AttendanceNotices;
 use App\Production\Objects\ObjectDirectory;
 use App\Production\Rights\Right;
+use App\Production\Support\NoticeTexts;
 use App\Production\Support\ProductionException;
 use App\Production\Tasks\TaskAccess;
 use App\Production\Tasks\TaskFacts;
@@ -141,13 +142,13 @@ final class ReportService
         [$task, $error, $report] = $result;
         if ($error) {
             if ($offline) {
-                $this->notNotified($viewer->staffId, $task, 'Отчёт не принят', $error->getMessage(), $taskId);
+                $this->notNotified($viewer->staffId, $task, 'Отчёт не принят', 'не принят', $error->getMessage(), $taskId, $today);
             }
             throw $error;
         }
         $warnings = $result[3] ?? [];
         if ($offline && $warnings) {
-            $this->notNotified($viewer->staffId, $task, 'Отчёт не отправлен', $warnings[0]['message'], $taskId);
+            $this->notNotified($viewer->staffId, $task, 'Отчёт не отправлен', 'не отправлен', $warnings[0]['message'], $taskId, $today);
         }
         if ($result[4] ?? false) {
             $this->afterProvided($task, $report, $viewer, $today, submitted: true);
@@ -213,8 +214,11 @@ final class ReportService
         });
 
         if ($changes && (int) $report->author_staff_id !== $viewer->staffId) {
-            $this->notices->send((int) $report->author_staff_id, StaffNotification::KIND_REPORT_QUANTITIES_CHANGED, 'Изменены количества в отчёте',
-                $this->taskLine($task).' '.implode('; ', array_map(fn ($c) => sprintf('%s: %s → %s', $c['name'], $this->quantityText($c['declared'], $c['unit']), $this->quantityText($c['approved'], $c['unit'])), $changes)).'. Согласовал: '.$this->personName($viewer->staffId).'.',
+            // «Иванов Сергей Петрович изменил количество в отчёте за 18 ноября по объекту …: опоры — 5 шт вместо 6 шт.»
+            $items = implode('; ', array_map(fn ($c) => sprintf('%s — %s вместо %s', NoticeTexts::lower((string) $c['name']),
+                $this->quantityText($c['approved'], $c['unit']), $this->quantityText($c['declared'], $c['unit'])), $changes));
+            $this->notices->send((int) $report->author_staff_id, StaffNotification::KIND_REPORT_QUANTITIES_CHANGED, 'Отчёт согласован с изменениями',
+                sprintf('%s количество в отчёте %s: %s.', $this->whoDid($viewer->staffId, 'изменил'), $this->about($task, $today), $items),
                 ['task_id' => (int) $task->id, 'changes' => $changes], push: true, taskId: (int) $task->id);
         }
         if (!$wasProvided) {
@@ -685,10 +689,12 @@ final class ReportService
     private function afterProvided(TimesheetContract $task, TaskReport $report, Viewer $viewer, CarbonImmutable $today, bool $submitted): void
     {
         $name = $this->personName($viewer->staffId);
+        // «Петров Иван Иванович отправил отчёт за 18 ноября по объекту 12 «Название».»
+        $sentence = sprintf('%s отчёт %s.', $this->whoDid($viewer->staffId, $submitted ? 'отправил' : 'согласовал'), $this->about($task, $today));
         $creator = $task->creator_staff_id ? (int) $task->creator_staff_id : null;
         if ($submitted && $creator && $creator !== $viewer->staffId) {
-            $this->notices->send($creator, StaffNotification::KIND_REPORT_SUBMITTED, 'Отчёт отправлен на согласование',
-                $this->taskLine($task).' Заявил: '.$name.'.', ['task_id' => (int) $task->id], push: true, taskId: (int) $task->id);
+            $this->notices->send($creator, StaffNotification::KIND_REPORT_SUBMITTED, 'Отчёт на согласование',
+                $sentence, ['task_id' => (int) $task->id], push: true, taskId: (int) $task->id);
         }
         $recipients = $this->recipients->forTask($task, $today);
         if (in_array($viewer->staffId, $recipients, true)) {
@@ -696,24 +702,37 @@ final class ReportService
         }
         foreach ($recipients as $staffId) {
             $this->notices->send($staffId, StaffNotification::KIND_REPORT_PROVIDED, 'Отчёт предоставлен',
-                $this->taskLine($task).' Предоставил: '.$name.'.', ['task_id' => (int) $task->id, 'by' => ['id' => $viewer->staffId, 'name' => $name]], taskId: (int) $task->id);
+                $sentence, ['task_id' => (int) $task->id, 'by' => ['id' => $viewer->staffId, 'name' => $name]], taskId: (int) $task->id);
         }
     }
 
-    /** Данные, пришедшие без связи, не приняты — уведомление автору до ручного закрытия (П-ФК-43, П-ФК-44) */
-    private function notNotified(int $staffId, ?TimesheetContract $task, string $title, string $reason, int $taskId): void
+    /**
+     * Данные, пришедшие без связи, не приняты — уведомление автору до ручного закрытия (П-ФК-43, П-ФК-44):
+     * «Отчёт за 18 ноября по объекту 12 «Название» не принят. Отчёт уже согласован.»
+     */
+    private function notNotified(int $staffId, ?TimesheetContract $task, string $title, string $verdict, string $reason, int $taskId, CarbonImmutable $today): void
     {
-        $this->notices->send($staffId, StaffNotification::KIND_REPORT_NOT_ACCEPTED, $title,
-            ($task ? $this->taskLine($task).' ' : '').$reason.'.', ['task_id' => $taskId, 'reason' => $reason], push: true, taskId: $taskId);
+        $body = ($task ? 'Отчёт '.$this->about($task, $today).' '.$verdict.'. ' : '').rtrim($reason, '.').'.';
+        $this->notices->send($staffId, StaffNotification::KIND_REPORT_NOT_ACCEPTED, $title, $body,
+            ['task_id' => $taskId, 'reason' => $reason], push: true, taskId: $taskId);
     }
 
-    /** «Объект 12 «Название», 19.11.2026.» */
-    private function taskLine(TimesheetContract $task): string
+    /** «за 18 ноября по объекту 12 «Название»» */
+    private function about(TimesheetContract $task, CarbonImmutable $today): string
     {
         $task->loadMissing('team');
         $object = DB::table('contracts')->where('id', $task->contract_id)->first(['object_number', 'title']);
 
-        return sprintf('Объект %s «%s», %s.', $object?->object_number, $object?->title, CarbonImmutable::parse($task->team->day)->format('d.m.Y'));
+        return NoticeTexts::about($object?->object_number, $object?->title, $task->team->day, $today);
+    }
+
+    /** «Иванов Сергей Петрович изменил», «Иванова Мария Петровна изменила» */
+    private function whoDid(int $staffId, string $verb): string
+    {
+        $staff = Staff::query()->select(['id', 'sname', 'fname', 'mname'])->find($staffId);
+        $name = $staff ? ObjectDirectory::name($staff->sname, $staff->fname, $staff->mname) : '';
+
+        return NoticeTexts::upper(trim($name.' '.NoticeTexts::verb($verb, $staff?->mname)));
     }
 
     private function quantityText(?float $quantity, ?string $unit): string
