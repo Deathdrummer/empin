@@ -189,7 +189,7 @@ final class AttendanceService
         if ($shift && $mark->after_confirmation) {
             // Отметка без связи пришла после подтверждения: состав не меняется, подтвердившему — сигнал (П-СМ-03а)
             $this->notices->send((int) $shift->confirmed_by_staff_id, StaffNotification::KIND_MARK_LATE, 'Отметка после подтверждения',
-                sprintf('%s, бригада «%s», %s', $me, $this->brigadeName($brigadeId), $this->date($day)), ['date' => $day, 'brigade_id' => $brigadeId, 'staff_id' => $viewer->staffId]);
+                sprintf('%s, %s, %s', $me, $this->brigadeName($brigadeId), $this->date($day)), ['date' => $day, 'brigade_id' => $brigadeId, 'staff_id' => $viewer->staffId]);
         } elseif ($shift && $shift->crew() !== null && !in_array($viewer->staffId, $shift->crew(), true)) {
             $this->notifyNotIncluded($viewer->staffId, $shift);
         }
@@ -471,7 +471,7 @@ final class AttendanceService
         // Уведомить — по выбору автора и только плашкой, без push (П-СМ-16)
         if ($changed && $notify) {
             $this->notices->send($staffId, StaffNotification::KIND_ATTENDANCE_CORRECTED, $present ? 'Выход поставлен' : 'Выход снят',
-                sprintf('%s, %s. Исправил: %s', $this->date($day), $asDriver ? 'водитель' : 'бригада «'.$this->brigadeName($brigadeId).'»', $this->person($viewer->staffId)['name']),
+                sprintf('%s, %s. Исправил: %s', $this->date($day), $asDriver ? 'водитель' : $this->brigadeName($brigadeId), $this->person($viewer->staffId)['name']),
                 ['date' => $day, 'brigade_id' => $brigadeId]);
         }
 
@@ -619,12 +619,12 @@ final class AttendanceService
             foreach ($excluded as $staffId) {
                 // Исключённый при подтверждении — push и переносимая плашка с тем, кто подтвердил (П-СМ-14)
                 $this->notices->send($staffId, StaffNotification::KIND_CREW_EXCLUDED, 'Вас исключили из состава',
-                    sprintf('Бригада «%s», %s. Подтвердил: %s', $this->brigadeName($brigadeId), $this->date($day), $by),
+                    sprintf('%s, %s. Подтвердил: %s', $this->brigadeName($brigadeId), $this->date($day), $by),
                     ['shift_id' => $shift->id, 'date' => $day, 'brigade_id' => $brigadeId], push: true);
             }
             foreach ($late as $staffId) {
                 $this->notices->send($viewer->staffId, StaffNotification::KIND_MARK_LATE, 'Отметка после подтверждения',
-                    sprintf('%s, бригада «%s», %s', $this->person($staffId)['name'], $this->brigadeName($brigadeId), $this->date($day)),
+                    sprintf('%s, %s, %s', $this->person($staffId)['name'], $this->brigadeName($brigadeId), $this->date($day)),
                     ['date' => $day, 'brigade_id' => $brigadeId, 'staff_id' => $staffId]);
             }
         };
@@ -693,7 +693,7 @@ final class AttendanceService
     {
         $day = $shift->work_date->toDateString();
         $this->notices->send($staffId, StaffNotification::KIND_CREW_NOT_INCLUDED, 'Вас нет в заявке состава',
-            sprintf('Бригада «%s», %s. Заявил: %s', $this->brigadeName((int) $shift->brigade_id), $this->date($day), $this->person((int) $shift->crew_by_staff_id)['name']),
+            sprintf('%s, %s. Заявил: %s', $this->brigadeName((int) $shift->brigade_id), $this->date($day), $this->person((int) $shift->crew_by_staff_id)['name']),
             ['shift_id' => $shift->id, 'date' => $day, 'brigade_id' => (int) $shift->brigade_id], push: true);
     }
 
