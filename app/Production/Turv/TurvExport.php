@@ -34,12 +34,18 @@ final class TurvExport
         $month = CarbonImmutable::createFromFormat('!Y-m', $table['month']);
         $title = 'Табель — '.self::MONTHS[$month->month].' '.$month->year;
         $book = new Spreadsheet();
+        if ($format === 'pdf') {
+            // Шрифт с кириллицей, который есть в dompdf: шрифт Excel по умолчанию dompdf не знает
+            $book->getDefaultStyle()->getFont()->setName('DejaVu Sans')->setSize(9);
+        }
         $sheet = $book->getActiveSheet();
         $sheet->setTitle('Табель');
         $count = count($table['dates']);
         $last = Coordinate::stringFromColumnIndex($count + 2);
 
+        $book->getProperties()->setTitle($title)->setCreator('ЭМПИН');
         $sheet->setCellValue('A1', $title);
+        $sheet->mergeCells("A1:{$last}1");
         $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
         $sheet->setCellValue('A2', 'Сотрудник');
         foreach ($table['dates'] as $i => $date) {
